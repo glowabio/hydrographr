@@ -12,11 +12,11 @@ Authors@R:
       person("Jaime", "Garcia Marquez",
              email = "jaime.marquez@igb-berlin.de",
              role = c("aut")),
-      person("Sami", "Domisch",
-             email = "sami.domisch@igb-berlin.de",
-             role = c("aut")),
       person("Christoph", "Schürz",
              email = "christoph.schuerz@ufz.de",
+             role = c("aut")),
+      person("Sami", "Domisch",
+             email = "sami.domisch@igb-berlin.de",
              role = c("aut")))
 Maintainer: Maria Üblacker <maria.ueblacker@igb-berlin.d>
 Description: A collection of R function wrappers for GDAL and GRASS-GIS functions to efficiently work with Hydrography90m spatial data.
