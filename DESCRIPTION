@@ -1,0 +1,27 @@
+Package: hydrographr
+Type: Package
+Title: Working with Hydrography90m Data in R
+Version: 0.1.0
+Authors@R: 
+    c(person("Maria", "Üblacker",
+             email = "maria.ueblacker@igb-berlin.de",
+             role = c("aut", "cre")),
+      person("Afroditi", "Grigoropoulou",
+             email = "afroditi.grigoropoulou@igb-berlin.de",
+             role = c("aut")),
+      person("Jaime", "Garcia Marquez",
+             email = "jaime.marquez@igb-berlin.de",
+             role = c("aut")),
+      person("Sami", "Domisch",
+             email = "sami.domisch@igb-berlin.de",
+             role = c("aut")),
+      person("Christoph", "Schürz",
+             email = "christoph.schuerz@ufz.de",
+             role = c("aut")))
+Maintainer: Maria Üblacker <maria.ueblacker@igb-berlin.d>
+Description: A collection of R function wrappers for GDAL and GRASS-GIS functions to efficiently work with Hydrography90m spatial data.
+License: GPL-3
+URL: https://glowabio.github.io/hydrographr/
+BugReports: https://github.com/glowabio/hydrographr/issues
+Encoding: UTF-8
+LazyData: true
