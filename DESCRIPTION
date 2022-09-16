@@ -23,7 +23,10 @@ Authors@R:
              role = c("aut")),
       person("Thomas", "Tomiczek",
              email = "thomas.tomiczek@igb-berlin.de",
-             role = c("aut")),       
+             role = c("aut")),    
+      person("Vanessa", "Bremerich",
+             email = "bremerich@igb-berlin.de",
+             role = c("aut")),    
       person("Sami", "Domisch",
              email = "sami.domisch@igb-berlin.de",
              role = c("aut")))
