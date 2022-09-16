@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="index.html">hydrographr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.9000</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -62,6 +62,22 @@
 </h1></div>
 
 <p><code>hydrographr</code> provides a collection of <code>R</code> function wrappers for GDAL and GRASS-GIS functions to efficiently work with Hydrography90m spatial data. The package is currently under development. More and more useful functions will be made available over time here.</p>
+<div class="section level3">
+<h3 id="next-steps-in-package-development">Next steps in package development<a class="anchor" aria-label="anchor" href="#next-steps-in-package-development"></a>
+</h3>
+<ul>
+<li>Test first test function <code><a href="reference/get_subcID.html">get_subcID()</a></code>
+<ul>
+<li>Check link between the .sh script in ’*/inst/sh’ and the <code><a href="http://processx.r-lib.org/reference/run.html" class="external-link">processx::run()</a></code> call</li>
+<li>Is making scripts executable always necessary? (<code>system(paste0('chmod u=x', x))</code>)</li>
+</ul>
+</li>
+<li>Generate light weight test data set for implementation in ’*/inst/extdata’</li>
+<li>Implementation and documentation (header, etc.) of further functions</li>
+<li>Generalization of functions, now functions cover very specific cases</li>
+<li>Update of gh-page</li>
+</ul>
+</div>
 </div>
   </main><aside class="col-md-3"><div class="links">
 <h2 data-toc-skip>Links</h2>
