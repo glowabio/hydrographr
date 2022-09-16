@@ -6,7 +6,7 @@
 #'
 #' @param subc_path Description of parameter subc_path
 #' @param dataset_path Description of parameter dataset_path
-#' @importFrom datatable fread
+#' @importFrom data.table fread
 #' @importFrom processx run
 #' @export
 #'
