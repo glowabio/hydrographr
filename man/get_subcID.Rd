@@ -4,15 +4,16 @@
 \alias{get_subcID}
 \title{Join sub-catchment IDs with occurrence points}
 \usage{
-get_subcID(taxon, subc_path, dataset_path)
+get_subcID(subc_path, dataset_path)
 }
 \arguments{
-\item{subc_path}{Description of parameter subc_path}
+\item{subc_path}{Path to the sub-catchment ID .tif layer}
 
-\item{dataset_path}{Description of parameter dataset_path}
+\item{dataset_path}{Path to data set text file with the lat long columns}
 }
 \description{
 Add the column 'subcID' to the dataset in 'dataset_path' and export the
-dataframe in a csv.
-The longitude-latitude values should be in the 3rd-4th column respectively!!
+data frame in a csv.
+In the current version the long-lat values must be in the 2nd and 3rd
+column of the data set text file.
 }

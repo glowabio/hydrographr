@@ -1,7 +1,7 @@
 Package: hydrographr
 Type: Package
 Title: Working with Hydrography90m Data in R
-Version: 0.1.9000
+Version: 0.1.9001
 Authors@R: 
     c(person("Maria", "Üblacker",
              email = "maria.ueblacker@igb-berlin.de",

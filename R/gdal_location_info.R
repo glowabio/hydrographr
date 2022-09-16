@@ -1,34 +1,30 @@
 #' Join sub-catchment IDs with occurrence points
 #'
 #' Add the column 'subcID' to the dataset in 'dataset_path' and export the
-#' dataframe in a csv.
-#' The longitude-latitude values should be in the 3rd-4th column respectively!!
+#' data frame in a csv.
+#' In the current version the long-lat values must be in the 2nd and 3rd
+#' column of the data set text file.
 #'
-#' @param subc_path Description of parameter subc_path
-#' @param dataset_path Description of parameter dataset_path
+#' @param subc_path Path to the sub-catchment ID .tif layer
+#' @param dataset_path Path to data set text file with the lat long columns
 #' @importFrom data.table fread
 #' @importFrom processx run
 #' @export
 #'
-get_subcID <- function(taxon, subc_path, dataset_path) {
-
-  dataIDs <- NULL
-  IDs <- NULL
-
+get_subcID <- function(subc_path, dataset_path) {
   # Call external gdal command of gdal_location_info()
-  IDs <- run(system.file("extdata", "gdal_location_info",
+  IDs <- run(system.file("sh", "gdal_location_info.sh",
                          package = "hydrographr"),
                     args = c(dataset_path, subc_path),
-
                     echo = F)$stdout
   # Format the IDs string
-  IDs <- data.frame(subcID = strsplit(IDs, "\n", "", fixed = TRUE)[[1]])
+  IDs <- data.frame(subcID = as.integer(strsplit(IDs, "\n", "", fixed = TRUE)[[1]]))
 
   # Import taxon occurrence points
   dataset <- fread(dataset_path, header = T, sep=" ")
 
   # Join the IDs with the observations
-  dataIDs <- cbind.data.frame(dataset, IDs)
+  dataIDs <- cbind(dataset, IDs)
 
   return(dataIDs)
 }
