@@ -12,4 +12,5 @@
   * Is making scripts executable always necessary? (`system(paste0('chmod u=x', x))`)
 - Generate light weight test data set for implementation in '*/inst/extdata'
 - Implementation and documentation (header, etc.) of further functions
+- Generalization of functions, now functions cover very specific cases
 - Update of gh-page
