@@ -14,3 +14,7 @@
 - Implementation and documentation (header, etc.) of further functions
 - Generalization of functions, now functions cover very specific cases
 - Update of gh-page
+- Establish common guideline for package development
+  * naming of branches, variables, functions
+  * workflow to avoid conflicts
+  * version of package
