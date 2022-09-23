@@ -24,7 +24,8 @@ get_ids <- function(dataset_path, lon, lat, subc_path, basin_path) {
   if (missing(basin_path) || is.na(basin_path)) {
 
   # Call the external .sh script get_ids() containing the gdal function
-  subc_ids <- processx::run("inst/sh/get_ids.sh",
+  subc_ids <- run(system.file("sh", "get_ids.sh",
+                              package = "hydrographr"),
                            args = c(dataset_path, lon, lat, subc_path),
                            echo = FALSE)$stdout
   # Format the ids string
@@ -38,7 +39,8 @@ get_ids <- function(dataset_path, lon, lat, subc_path, basin_path) {
   # To extract only basin ids
 } else if (missing(subc_path) || is.na(subc_path)) {
 
-  basin_ids <- processx::run("inst/sh/get_ids.sh",
+  basin_ids <- run(system.file("sh", "get_ids.sh",
+                               package = "hydrographr"),
                        args = c(dataset_path, lon, lat, basin_path),
                        echo = FALSE)$stdout
   # Format the ids string
@@ -52,7 +54,8 @@ get_ids <- function(dataset_path, lon, lat, subc_path, basin_path) {
    # To extract both subcatchment and basin ids
 } else {
 
-  subc_ids <- processx::run("inst/sh/get_ids.sh",
+  subc_ids <- run(system.file("sh", "get_ids.sh",
+                              package = "hydrographr"),
                             args = c(dataset_path, lon, lat, subc_path),
                             echo = FALSE)$stdout
 
@@ -61,7 +64,8 @@ get_ids <- function(dataset_path, lon, lat, subc_path, basin_path) {
     strsplit(subc_ids, "\n", "", fixed = TRUE)[[1]]
   ))
 
-  basin_ids <- processx::run("inst/sh/get_ids.sh",
+  basin_ids <- run(system.file("sh", "get_ids.sh",
+                               package = "hydrographr"),
                              args = c(dataset_path, lon, lat, basin_path),
                              echo = FALSE)$stdout
   # Format the ids string
@@ -72,10 +76,10 @@ get_ids <- function(dataset_path, lon, lat, subc_path, basin_path) {
   # Join the IDs with the observations
   data_ids <- cbind.data.frame(dataset, subc_ids, basin_ids)
 }
-    # ids <- run(system.file("sh", "get_ids.sh",
-    #                       package = "hydrographr"),
-    #                   args = c(dataset_path, subc_path, lon, lat),
-    #                   echo = FALSE)$stdout
+    ids <- run(system.file("sh", "get_ids.sh",
+                          package = "hydrographr"),
+                      args = c(dataset_path, subc_path, lon, lat),
+                      echo = FALSE)$stdout
 
   return(data_ids)
 
