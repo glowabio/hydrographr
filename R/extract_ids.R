@@ -53,7 +53,7 @@ extract_ids <- function(dataset_path, lon, lat, subc_path, basin_path) {
 
    # To extract both subcatchment and basin ids
 } else {
-
+  # subcatchment
   subc_ids <- run(system.file("sh", "extract_ids.sh",
                               package = "hydrographr"),
                             args = c(dataset_path, lon, lat, subc_path),
@@ -63,7 +63,7 @@ extract_ids <- function(dataset_path, lon, lat, subc_path, basin_path) {
   subc_ids <- data.frame(subc_id = as.integer(
     strsplit(subc_ids, "\n", "", fixed = TRUE)[[1]]
   ))
-
+  # basin
   basin_ids <- run(system.file("sh", "extract_ids.sh",
                                package = "hydrographr"),
                              args = c(dataset_path, lon, lat, basin_path),
@@ -76,10 +76,6 @@ extract_ids <- function(dataset_path, lon, lat, subc_path, basin_path) {
   # Join the IDs with the observations
   data_ids <- cbind.data.frame(dataset, subc_ids, basin_ids)
 }
-    ids <- run(system.file("sh", "extract_ids.sh",
-                          package = "hydrographr"),
-                      args = c(dataset_path, subc_path, lon, lat),
-                      echo = FALSE)$stdout
 
   return(data_ids)
 
