@@ -27,6 +27,7 @@ Authors:
   \item Christoph Schürz \email{christoph.schuerz@ufz.de}
   \item Mathieu Floury \email{mathieu.floury@univ-lyon1.fr}
   \item Thomas Tomiczek \email{thomas.tomiczek@igb-berlin.de}
+  \item Vanessa Bremerich \email{bremerich@igb-berlin.de}
   \item Sami Domisch \email{sami.domisch@igb-berlin.de}
 }
 
