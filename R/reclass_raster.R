@@ -27,7 +27,8 @@ reclass_raster <- function(rast_val, recl_val, rast_path,
                            recl_path, recl_read = TRUE,
                            nodata = -9999, type = "Int32",
                            compress = "DEFLATE") {
-
+  # Check operating system
+  system <- get_os()
   # The r.reclass function of GRASS GIS requires a text file
   # including the old and the new value with an = between
   # (e.g. 1 = 20)
@@ -42,15 +43,15 @@ reclass_raster <- function(rast_val, recl_val, rast_path,
   rules_path <- paste0(tempdir(), "/reclass_rules_", rand_string, ".txt")
   # Write rules as a .txt file to the temporary folder
   fwrite(rules, rules_path, sep = " ", col.names = FALSE)
-
+  if(system == "linux"){
   # Open GRASS GIS session
   # Call external GRASS GIS command r.reclass
-  run(system.file("sh", "reclass_raster.sh",
-                         package = "hydrographr"),
+  run(system.file("lnx","sh", "reclass_raster.sh",
+                           package = "hydrographr"),
                     args = c(rast_path, rules_path, recl_path,
                              nodata, type, compress),
                     echo = FALSE)
-
+  }
   # Remove temporary rules file
   file.remove(rules_path)
 
