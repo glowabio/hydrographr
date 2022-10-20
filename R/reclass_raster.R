@@ -6,15 +6,12 @@
 #' @param recl_val Numeric vector of reclassification values .
 #' @param rast_path Path to raster .tif layer.
 #' @param recl_path Path to reclassified .tif layer = output file.
-#' @param recl_read If TRUE the reclassified raster .tif layer
-#' gets read into R. TRUE is set by default.
-#' @param nodata Nodata value of the new .tif layer.
-#' The default value is -9999.
-#' @param type Data type; Options are Byte, Int16, UInt16,
-#' Int32, UInt32, Float32, Float64, CInt16, CInt32, CFloat32, CFloat64;
-#' Int32 is set by default.
-#' @param compress Compression type: DEFLATE or LZW; DEFLATE
-#' is set by default.
+#' @param recl_read If TRUE the reclassified raster .tif layer gets read into R.
+#' TRUE is set by default.
+#' @param nodata Nodata value of the new .tif layer. The default value is -9999.
+#' @param type Data type; Options are Byte, Int16, UInt16, Int32, UInt32,
+#' CInt16, CInt32; Int32 is set by default.
+#' @param compress Compression type: DEFLATE or LZW; DEFLATE is set by default.
 #' @importFrom dplyr
 #' @importFrom stringi stri_rand_strings
 #' @importFrom data.table fwrite
@@ -26,7 +23,7 @@
 reclass_raster <- function(rast_val, recl_val, rast_path,
                            recl_path, recl_read = TRUE,
                            nodata = -9999, type = "Int32",
-                           compress = "DEFLATE") {
+                           compress = "DEFLATE", quiet = FALSE) {
   # Check operating system
   system <- get_os()
   # The r.reclass function of GRASS GIS requires a text file
@@ -46,11 +43,41 @@ reclass_raster <- function(rast_val, recl_val, rast_path,
   if(system == "linux"){
   # Open GRASS GIS session
   # Call external GRASS GIS command r.reclass
-  run(system.file("lnx","sh", "reclass_raster.sh",
+  run(system.file("sh", "reclass_raster.sh",
                            package = "hydrographr"),
-                    args = c(rast_path, rules_path, recl_path,
+      args = c(rast_path, rules_path, recl_path,
                              nodata, type, compress),
-                    echo = FALSE)
+      echo = quiet)
+  }
+
+  if(system == "windows"){
+    # Check if WSL and Ubuntu are installed
+    check_wsl()
+    # Change paths for WSL
+    wsl_rast_path <- stri_replace_all_fixed(rast_path, "\\", "/") %>%
+      stri_replace_first_fixed(., "C:", "/mnt/c")
+
+    wsl_recl_path <- stri_replace_all_fixed(recl_path, "\\", "/") %>%
+      stri_replace_first_fixed(., "C:", "/mnt/c")
+
+    wsl_rules_path <- stri_replace_all_fixed(rulest_path, "\\", "/") %>%
+      stri_replace_first_fixed(., "C:", "/mnt/c")
+
+    wsl_sh_file <- system.file("sh", "reclass_raster.sh",
+                            package = "hydrographr") %>%
+      stri_replace_first_fixed(., "C:", "/mnt/c")
+
+    # Open GRASS GIS session on WSL
+    # Call external GRASS GIS command r.reclass
+    run(system.file("bat", "reclass_raster.bat",
+                    package = "hydrographr"),
+        args = c(wsl_rast_path, wsl_rules_path, wsl_recl_path,
+                 nodata, type, compress, wsl_sh_file),
+        echo = quiet)
+
+  } else {
+    # Stop the function if the OS is macOS
+    stop("Sorry, the function is not implimented for macOS.")
   }
   # Remove temporary rules file
   file.remove(rules_path)
@@ -68,5 +95,4 @@ reclass_raster <- function(rast_val, recl_val, rast_path,
   }
 
 }
-
 
