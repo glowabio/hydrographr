@@ -39,8 +39,7 @@ check_wsl <- function(){
                        pattern ="Ubuntu")
 
   if (lxss == TRUE & length(ubuntu) == 1) {
-    wsl <- TRUE
-    return(wsl)
+
   }
 
   if (lxss == TRUE & length(ubuntu) == 0) {
