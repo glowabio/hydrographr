@@ -1,0 +1,19 @@
+---
+title: "Windows system setup"
+output: rmarkdown::html_vignette
+#vignette: >
+#  %\VignetteIndexEntry{Getting started with hydrographr}
+#  %\VignetteEngine{knitr::rmarkdown}
+#  %\VignetteEncoding{UTF-8}
+#bibliography: literature.bib
+link-citations: yes
+linkcolor: blue
+#csl: copernicus.csl
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```

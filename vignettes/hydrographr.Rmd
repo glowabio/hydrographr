@@ -1,0 +1,44 @@
+---
+title: "Getting started with hydrographr"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting started with hydrographr}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+#bibliography: literature.bib
+link-citations: yes
+linkcolor: blue
+#csl: copernicus.csl
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## System requirements
+
+Installation guidelines for different operating systems:
+
+Linux
+
+Windows
+
+## Loading `hydrographr`
+
+You can install `hydrographr` from its GitHub repository. If you did not install the `R` package yet, install it with `remotes::install_github()`.
+
+```{r, eval=FALSE}
+# If the package remotes is not installed run first:
+install.packages("remotes")
+
+remotes::install_github("glowabio/hydrographr")
+```
+
+Before we start exploring the package load `hydrographr`.
+
+```{r}
+library(hydrographr)
+```
