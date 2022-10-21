@@ -1,6 +1,6 @@
 @echo on
 
-set WSLENV=%1 $2 %3 %4 %5 %6
+set WSLENV=%1 %2 %3 %4 %5 %6
 set RULES=%2
 set SHDIR=%7
 

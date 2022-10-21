@@ -4,16 +4,17 @@
 #' to the reclassification rules.
 #' @param rast_val Numeric vector of current raster values.
 #' @param recl_val Numeric vector of reclassification values .
-#' @param rast_path Path to raster .tif layer.
-#' @param recl_path Path to reclassified .tif layer = output file.
+#' @param rast_path Full path to raster .tif layer.
+#' @param recl_path Full path to reclassified .tif layer = output file.
 #' @param recl_read If TRUE the reclassified raster .tif layer gets read into R.
 #' TRUE is set by default.
 #' @param nodata Nodata value of the new .tif layer. The default value is -9999.
 #' @param type Data type; Options are Byte, Int16, UInt16, Int32, UInt32,
 #' CInt16, CInt32; Int32 is set by default.
 #' @param compress Compression type: DEFLATE or LZW; DEFLATE is set by default.
-#' @importFrom dplyr
-#' @importFrom stringi stri_rand_strings
+#' @import magrittr
+#' @importFrom stringi stri_rand_strings stri_replace_all_fixed
+#' stri_replace_first_fixed
 #' @importFrom data.table fwrite
 #' @importFrom processx run
 #' @importFrom terra rast
@@ -47,7 +48,7 @@ reclass_raster <- function(rast_val, recl_val, rast_path,
                            package = "hydrographr"),
       args = c(rast_path, rules_path, recl_path,
                              nodata, type, compress),
-      echo = quiet)
+      echo = !quiet)
   }
 
   if(system == "windows"){
@@ -60,7 +61,7 @@ reclass_raster <- function(rast_val, recl_val, rast_path,
     wsl_recl_path <- stri_replace_all_fixed(recl_path, "\\", "/") %>%
       stri_replace_first_fixed(., "C:", "/mnt/c")
 
-    wsl_rules_path <- stri_replace_all_fixed(rulest_path, "\\", "/") %>%
+    wsl_rules_path <- stri_replace_all_fixed(rules_path, "\\", "/") %>%
       stri_replace_first_fixed(., "C:", "/mnt/c")
 
     wsl_sh_file <- system.file("sh", "reclass_raster.sh",
@@ -73,7 +74,7 @@ reclass_raster <- function(rast_val, recl_val, rast_path,
                     package = "hydrographr"),
         args = c(wsl_rast_path, wsl_rules_path, wsl_recl_path,
                  nodata, type, compress, wsl_sh_file),
-        echo = quiet)
+        echo = !quiet)
 
   } else {
     # Stop the function if the OS is macOS

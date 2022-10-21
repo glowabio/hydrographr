@@ -12,32 +12,30 @@ reclass_raster(
   recl_read = TRUE,
   nodata = -9999,
   type = "Int32",
-  compress = "DEFLATE"
+  compress = "DEFLATE",
+  quiet = FALSE
 )
 }
 \arguments{
-\item{rast_val}{Column with current raster values.}
+\item{rast_val}{Numeric vector of current raster values.}
 
-\item{recl_val}{Column with reclassification values .}
+\item{recl_val}{Numeric vector of reclassification values .}
 
-\item{rast_path}{Path to raster .tif layer.}
+\item{rast_path}{Full path to raster .tif layer.}
 
-\item{recl_path}{Path to reclassified .tif layer = output file.}
+\item{recl_path}{Full path to reclassified .tif layer = output file.}
 
-\item{recl_read}{If TRUE the reclassified raster .tif layer
-gets read into R. TRUE is set by default.}
+\item{recl_read}{If TRUE the reclassified raster .tif layer gets read into R.
+TRUE is set by default.}
 
-\item{nodata}{Nodata value of the new .tif layer.
-The default value is -9999.}
+\item{nodata}{Nodata value of the new .tif layer. The default value is -9999.}
 
-\item{type}{Data type; Options are Byte, Int16, UInt16,
-Int32, UInt32, Float32, Float64, CInt16, CInt32, CFloat32, CFloat64;
-Int32 is set by default.}
+\item{type}{Data type; Options are Byte, Int16, UInt16, Int32, UInt32,
+CInt16, CInt32; Int32 is set by default.}
 
-\item{compress}{Compression type: DEFLATE or LZW; DEFLATE
-is set by default.}
+\item{compress}{Compression type: DEFLATE or LZW; DEFLATE is set by default.}
 }
 \description{
-Reclassifies a raster file according to the reclassification
-rules.
+Reclassifies a raster file based on integer values according
+to the reclassification rules.
 }
