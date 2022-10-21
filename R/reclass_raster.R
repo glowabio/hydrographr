@@ -31,7 +31,6 @@ reclass_raster <- function(rast_val, recl_val, rast_path,
   rules <- data.table(old = rast_val,
                       equal = "=",
                       new = recl_val)
-
   # Create random string to attach to the file name of the temporary
   # rules .txt file
   rand_string <- stri_rand_strings(n=1, length=8, pattern="[A-Za-z0-9]")
@@ -39,7 +38,8 @@ reclass_raster <- function(rast_val, recl_val, rast_path,
   rules_path <- paste0(tempdir(), "/reclass_rules_", rand_string, ".txt")
   # Write rules as a .txt file to the temporary folder
   fwrite(rules, rules_path, sep = " ", col.names = FALSE)
-  if(system == "linux"){
+
+  if (system == "linux") {
   # Open GRASS GIS session
   # Call external GRASS GIS command r.reclass
   run(system.file("sh", "reclass_raster.sh",
@@ -47,18 +47,14 @@ reclass_raster <- function(rast_val, recl_val, rast_path,
       args = c(rast_path, rules_path, recl_path,
                              nodata, type, compress),
       echo = !quiet)
-  }
 
-  if(system == "windows"){
+  } else if (system == "windows") {
     # Check if WSL and Ubuntu are installed
     check_wsl()
     # Change paths for WSL
     wsl_rast_path <- fix_path(rast_path)
-
     wsl_recl_path <- fix_path(recl_path)
-
     wsl_rules_path <- fix_path(rules_path)
-
     wsl_sh_file <- fix_path(
       system.file("sh", "reclass_raster.sh",
                             package = "hydrographr"))
@@ -75,19 +71,17 @@ reclass_raster <- function(rast_val, recl_val, rast_path,
     # Stop the function if the OS is macOS
     stop("Sorry, reclass_raster() is not implimented for macOS.")
   }
+
   # Remove temporary rules file
   file.remove(rules_path)
 
-  if(recl_read == TRUE){
-
+  if (recl_read == TRUE) {
     # Read reclassified .tif layer
     recl_rast <- rast(recl_path)
 
-  }else{
-
+  } else {
    # Print message
    print(paste0("Reclassified raster saved under: ", recl_path))
-
   }
 
 }
