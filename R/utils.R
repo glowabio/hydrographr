@@ -7,15 +7,15 @@
 #'
 #' @keywords internal
 #'
-
-# Get the operating system
 get_os <- function(){
   sysinf <- Sys.info()
+
   if (!is.null(sysinf)) {
     os <- sysinf["sysname"]
     if (os == "Darwin") {
       os <- "osx"
     }
+
   # If rare case occurs that Sys.info() is NULL
   } else {
     os <- .Platform$OS.type
@@ -29,18 +29,17 @@ get_os <- function(){
   tolower(os)
 }
 
-# Check if WSL and Ubuntu is installed on Windows
-check_wsl <- function(){
 
+#' Check if WSL and Ubuntu is installed on Windows
+#'
+#' #' @keywords internal
+#'
+check_wsl <- function(){
   # Check if lxss folder exists under C:\Windows\System32
   lxss <- file.exists(paste0(Sys.getenv("windir"),"/System32/lxss"))
   # Check if Ubuntu exists under ~\Appdata\Local\...
   ubuntu <- list.files(paste0(Sys.getenv("localappdata"), "/Packages"),
                        pattern ="Ubuntu")
-
-  if (lxss == TRUE & length(ubuntu) == 1) {
-
-  }
 
   if (lxss == TRUE & length(ubuntu) == 0) {
     stop("Ubuntu is not installed!")
@@ -48,7 +47,6 @@ check_wsl <- function(){
 
   if (lxss == FALSE & length(ubuntu) == 1) {
     stop("WSL is not installed!")
-
   }
 
   if (lxss == FALSE & length(ubuntu) == 0)  {
