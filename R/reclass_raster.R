@@ -13,18 +13,16 @@
 #' CInt16, CInt32; Int32 is set by default.
 #' @param compress Compression type: DEFLATE or LZW; DEFLATE is set by default.
 #' @import magrittr
-#' @importFrom stringi stri_rand_strings stri_replace_all_fixed
-#' stri_replace_first_fixed
+#' @importFrom stringi stri_rand_strings
 #' @importFrom data.table fwrite
 #' @importFrom processx run
 #' @importFrom terra rast
 #' @export
 
-
 reclass_raster <- function(rast_val, recl_val, rast_path,
                            recl_path, recl_read = TRUE,
                            nodata = -9999, type = "Int32",
-                           compress = "DEFLATE", quiet = FALSE) {
+                           compress = "DEFLATE", quiet = TRUE) {
   # Check operating system
   system <- get_os()
   # The r.reclass function of GRASS GIS requires a text file
@@ -55,18 +53,15 @@ reclass_raster <- function(rast_val, recl_val, rast_path,
     # Check if WSL and Ubuntu are installed
     check_wsl()
     # Change paths for WSL
-    wsl_rast_path <- stri_replace_all_fixed(rast_path, "\\", "/") %>%
-      stri_replace_first_fixed(., "C:", "/mnt/c")
+    wsl_rast_path <- fix_path(rast_path)
 
-    wsl_recl_path <- stri_replace_all_fixed(recl_path, "\\", "/") %>%
-      stri_replace_first_fixed(., "C:", "/mnt/c")
+    wsl_recl_path <- fix_path(recl_path)
 
-    wsl_rules_path <- stri_replace_all_fixed(rules_path, "\\", "/") %>%
-      stri_replace_first_fixed(., "C:", "/mnt/c")
+    wsl_rules_path <- fix_path(rules_path)
 
-    wsl_sh_file <- system.file("sh", "reclass_raster.sh",
-                            package = "hydrographr") %>%
-      stri_replace_first_fixed(., "C:", "/mnt/c")
+    wsl_sh_file <- fix_path(
+      system.file("sh", "reclass_raster.sh",
+                            package = "hydrographr"))
 
     # Open GRASS GIS session on WSL
     # Call external GRASS GIS command r.reclass
@@ -78,7 +73,7 @@ reclass_raster <- function(rast_val, recl_val, rast_path,
 
   } else {
     # Stop the function if the OS is macOS
-    stop("Sorry, the function is not implimented for macOS.")
+    stop("Sorry, reclass_raster() is not implimented for macOS.")
   }
   # Remove temporary rules file
   file.remove(rules_path)
