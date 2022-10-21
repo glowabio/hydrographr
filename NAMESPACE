@@ -2,8 +2,11 @@
 
 export(get_subcID)
 export(reclass_raster)
+import(magrittr)
 importFrom(data.table,fread)
 importFrom(data.table,fwrite)
 importFrom(processx,run)
 importFrom(stringi,stri_rand_strings)
+importFrom(stringi,stri_replace_all_fixed)
+importFrom(stringi,stri_replace_first_fixed)
 importFrom(terra,rast)

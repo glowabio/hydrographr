@@ -7,5 +7,6 @@
 check_wsl()
 }
 \description{
-#' @keywords internal
+Check if WSL and Ubuntu is installed on Windows
 }
+\keyword{internal}

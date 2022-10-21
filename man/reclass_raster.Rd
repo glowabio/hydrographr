@@ -13,7 +13,7 @@ reclass_raster(
   nodata = -9999,
   type = "Int32",
   compress = "DEFLATE",
-  quiet = FALSE
+  quiet = TRUE
 )
 }
 \arguments{
