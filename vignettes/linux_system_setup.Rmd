@@ -1,0 +1,57 @@
+---
+title: "Linux system setup"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting started with hydrographr}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+#bibliography: literature.bib
+link-citations: yes
+linkcolor: blue
+#csl: copernicus.csl
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+## Installation of the required GIS tools
+
+If you do not have installed any of the GIS tools, please, install before using `hydrographr`.
+
+**GRASS GIS**
+
+If you use Ubuntu you can copy-paste the commands below. If you use another Linux distribution, please, see the [GRASS GIS](https://grass.osgeo.org/download/linux/) webpage for installation instruction.
+
+```{bash, eval=FALSE}
+# Install and update GRASS GIS
+sudo add-apt-repository ppa:ubuntugis/ubuntugis-unstable
+sudo apt update
+sudo apt-get install ubuntugis-unstable
+```
+
+**GDAL/ORG**
+
+For GDAL, go to the GDAL webpage and [download](https://gdal.org/download.html#current-release) the last release for your Linux distribution (e.g. gdal-3.5.2.tar.gz).
+
+```{bash, eval=FALSE}
+# Go to the Downloads folder
+cd /Downloads
+
+# Install gdal
+# Note: Change program name according to the release and Linux distribution you have downloaded.
+tar -zxvf gdal-3.5.2.tar.gz 
+
+# Install pktools
+sudo bash install_pktools.sh
+```
+
+**pktools**
+
+To install pktools, please visit the [pktools webpage](https://pktools.nongnu.org/html/md_installation_linux.html#install_manual) and follow the guidelines according to your Linux distribution.
+
+
