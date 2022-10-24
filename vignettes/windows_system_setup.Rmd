@@ -1,10 +1,10 @@
 ---
 title: "Windows system setup"
 output: rmarkdown::html_vignette
-#vignette: >
-#  %\VignetteIndexEntry{Getting started with hydrographr}
-#  %\VignetteEngine{knitr::rmarkdown}
-#  %\VignetteEncoding{UTF-8}
+vignette: >
+  %\VignetteIndexEntry{Getting started with hydrographr}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 #bibliography: literature.bib
 link-citations: yes
 linkcolor: blue
@@ -17,3 +17,68 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 ```
+
+
+Below you find a short summary of the most important information and steps to install WSL, so that the `hydrographr` functions can use the subsystem in the background. 
+
+If you like to learn more about the WSL, the [Microsoft webpage](https://learn.microsoft.com/en-us/windows/wsl/) provides a very good Documentation.
+
+## Installation of the Windows subsystem for Linux and Ubuntu
+
+The install of WSL and Ubuntu is very easy and fast, but you need to make sure that you at least have 4 GB of free space. 
+
+You can install everything you need to run Windows Subsystem for Linux (WSL) by entering this command in an administrator PowerShell or Windows Command Prompt (cmd.exe) and then restarting your machine.
+
+```{bash, eval=FALSE}
+# Enable the features necessary to run WSL and 
+# install the Ubuntu distribution of Linux. 
+wsl --install 
+```
+
+After you have completed the installation, you have to open Ubuntu via the Start menu and create a **username** and **password** for the Linux distribution (This will be the default user account and administrator for Ubuntu). Please note that whilst entering the Password, nothing will appear on screen and you won't see what you ar typing, this is completely normal.
+
+Window does not automatically update your Linux distribution. To update and upgrade your packages on Ubuntu, please, copy-paste the command below in your Ubuntu terminal. 
+```{bash, eval=FALSE}
+# Update and upgrade packages on Linux
+sudo apt update && sudo apt upgrade
+```
+
+For more installation details see [here](https://learn.microsoft.com/en-us/windows/wsl/install). 
+
+For more details about the username and password see [here](https://learn.microsoft.com/en-us/windows/wsl/setup/environment#set-up-your-linux-username-and-password).
+
+
+## Installation of the required GIS tools on your WSL
+
+Further, you need to install the required GIS tools on your WSL. To install the GIS tools on Ubuntu use the Ubuntu terminal and follow the instructions below.
+
+**GRASS GIS**
+
+Copy-paste the commands below or see the [GRASS GIS](https://grass.osgeo.org/download/linux/) webpage for installation instruction on Ubuntu.
+
+```{bash, eval=FALSE}
+# Install and update GRASS GIS
+sudo add-apt-repository ppa:ubuntugis/ubuntugis-unstable
+sudo apt update
+sudo apt-get install ubuntugis-unstable
+```
+
+**GDAL/ORG Packages and pktools**
+
+For GDAL, go to the GDAL webpage and [download](https://gdal.org/download.html#current-release) the last release for Ubuntu. For pktools got to the pktools webpage and [download](https://pktools.nongnu.org/html/md_installation_linux.html#install_manual) the install_pktools.sh file.
+
+```{bash, eval=FALSE}
+# Go (with cd) to your mounted Windows Download folder
+# Exchange the Windows partition e.g. C: with /mnt/c
+# and attache the rest of the Windows path
+# like this:
+cd /mnt/c/Users/your_windows_username/Downloads
+
+# Install gdal
+# Note: Change program name according to the release you have downloaded.
+tar -zxvf gdal-3.5.2.tar.gz 
+
+# Install pktools
+sudo bash install_pktools.sh
+```
+
