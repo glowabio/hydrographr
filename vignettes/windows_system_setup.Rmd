@@ -18,16 +18,17 @@ knitr::opts_chunk$set(
 )
 ```
 
+To use `hydrographr` on Windows it is necessary to install the Windows Subsystem for Linux (WSL) with the Ubuntu operating system.
 
-Below you find a short summary of the most important information and steps to install WSL, so that the `hydrographr` functions can use the subsystem in the background. 
+Below you find a short summary of the most important information and steps to install WSL, so that `hydrographr` functions can use the subsystem in the background. 
 
-If you like to learn more about the WSL, the [Microsoft webpage](https://learn.microsoft.com/en-us/windows/wsl/) provides a very good Documentation.
+If you like to learn more about the WSL, the [Microsoft webpage](https://learn.microsoft.com/en-us/windows/wsl/) provides a very good documentation.
 
 ## Installation of the Windows subsystem for Linux and Ubuntu
 
-The install of WSL and Ubuntu is very easy and fast, but you need to make sure that you at least have 4 GB of free space. 
+The installion of WSL and Ubuntu is very easy and fast, but you need to make sure that you at least have 4 GB of free space. 
 
-You can install everything you need to run Windows Subsystem for Linux (WSL) by entering this command in an administrator PowerShell or Windows Command Prompt (cmd.exe) and then restarting your machine.
+You can install everything you need to run WSL by entering this command in an administrator PowerShell or Windows Command Prompt (cmd.exe) and then restarting your machine.
 
 ```{bash, eval=FALSE}
 # Enable the features necessary to run WSL and 
@@ -35,9 +36,10 @@ You can install everything you need to run Windows Subsystem for Linux (WSL) by 
 wsl --install 
 ```
 
-After you have completed the installation, you have to open Ubuntu via the Start menu and create a **username** and **password** for the Linux distribution (This will be the default user account and administrator for Ubuntu). Please note that whilst entering the Password, nothing will appear on screen and you won't see what you ar typing, this is completely normal.
+After you have completed the installation, you have to open Ubuntu via the Start menu and create a **username** and **password** for the Linux distribution (This will be the default user account and administrator for Ubuntu). Please note that whilst entering the password, nothing will appear on screen and you won't see what you are typing, this is completely normal.
 
-Window does not automatically update your Linux distribution. To update and upgrade your packages on Ubuntu, please, copy-paste the command below in your Ubuntu terminal. 
+Window does not automatically update your Linux distribution. To update and upgrade your packages on Ubuntu, please, copy-paste the command below in your Ubuntu terminal. This should be done on a regularly basis. 
+
 ```{bash, eval=FALSE}
 # Update and upgrade packages on Linux
 sudo apt update && sudo apt upgrade
@@ -50,7 +52,7 @@ For more details about the username and password see [here](https://learn.micros
 
 ## Installation of the required GIS tools on your WSL
 
-Further, you need to install the required GIS tools on your WSL. To install the GIS tools on Ubuntu use the Ubuntu terminal and follow the instructions below.
+Further, you need to install the required GIS tools on your WSL. To install the GIS tools on Ubuntu you can use the Ubuntu terminal, PowerShell or Windows Command Prompt. If you use the PowerShell or Windows Command Prompt use first the command `wsl` to enter the WSL and after installation the GIS tools `exit` to go back to your Windows OS. 
 
 **GRASS GIS**
 
@@ -63,12 +65,12 @@ sudo apt update
 sudo apt-get install ubuntugis-unstable
 ```
 
-**GDAL/ORG Packages and pktools**
+**GDAL/ORG and pktools**
 
-For GDAL, go to the GDAL webpage and [download](https://gdal.org/download.html#current-release) the last release for Ubuntu. For pktools got to the pktools webpage and [download](https://pktools.nongnu.org/html/md_installation_linux.html#install_manual) the install_pktools.sh file.
+For GDAL, go to the GDAL webpage and [download](https://gdal.org/download.html#current-release) the last release for Ubuntu. For pktools go to the pktools webpage and [download](https://pktools.nongnu.org/html/md_installation_linux.html#install_manual) the install_pktools.sh file.
 
 ```{bash, eval=FALSE}
-# Go (with cd) to your mounted Windows Download folder
+# Go (with cd) to your mounted Windows Downloads folder
 # Exchange the Windows partition e.g. C: with /mnt/c
 # and attache the rest of the Windows path
 # like this:

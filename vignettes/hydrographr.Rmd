@@ -20,11 +20,17 @@ knitr::opts_chunk$set(
 
 ## System requirements
 
+To work smoothly with the `hydrographr` package, `GRASS GIS`, `GDAL`, and `pktools` need to be installed. 
+
+*Note:* One of the major advantages of the package is that it can aslo handle large data efficiently. When you use the`hydrographr` package you do not have to read e.g. large raster files into R. Instead the files get processed in the background using bash and only the output gets read into R. Processing of large files often make the use of a server inevitable and on servers Linux is the most common operating system. Therefore, `hydrographr` is optimized for Linux operating systems. However, we also implemented a way to use it within Rstudio on Windows. To use `hydrographr` on Windows some additional software needs to be installed (see [Windows system setup](https://glowabio/hydrographr/articels/windows_system_setup.html)). 
+
 Installation guidelines for different operating systems:
 
-Linux
+[Linux](https://glowabio/hydrographr/articels/linux_system_setup.html)
 
-Windows
+[Windows](https://glowabio/hydrographr/articels/windows_system_setup.html)
+
+macOS
 
 ## Loading `hydrographr`
 
@@ -42,3 +48,10 @@ Before we start exploring the package load `hydrographr`.
 ```{r}
 library(hydrographr)
 ```
+
+
+## `hydrographr` tutorial
+
+In the how-to-get-started tutorial we will show ...
+
+The the test dataset of `hydrographr` includes .....
