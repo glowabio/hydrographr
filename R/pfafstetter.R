@@ -9,36 +9,49 @@
 ## TESTING
 path <- "D:/projects/hydrographr/hydrographr_data"
 setwd(path)
+## END TESTING
+
+!!! the graph and table need to match, else the IDs are not found during the graph-subsetting !!!
+
+todo:
+- check if could run on any given outlet, as long as the datatable is created from this graph?
+- implement GRASS functions
+- test with other basins as well
+- does only one round, leave as it is --> users can loop for themselves
+- 
 
 
 
-# not yet implemented: threshold 
+# not yet implemented: threshold for small/large basins to avoid splitting, or prefer splitting sooner
 # input can be a graph or table
 # users can specify n_cores?
 # is moveme-function needed? if yes, check citation
 
 
 
+g <- read_geopackage("order_vect_59.gpkg", graph=T)
+g <- get_largest_catchment(g)
 
-### Attach the area of each stream-reach
-tmp_area <- fread(paste0(DIR, "/basins_area_stats.txt"), h=F)
-setnames(tmp_area, c("stream", "V2", "area_km2", "area_cells")) # still in m2
-tmp_area$area_km2 <- round(tmp_area$area_km2 / 1000000, 4) # convert to km2
-tmp_area$V2 <- NULL
-### Merge to big table
-streams_dt <- tmp_area[streams_dt, on="stream"]
+g <- as.data.table(as_data_frame(g))
+names(g)[1:2] <- c("stream", "next_stream")
 
-streams_dt$flow_accum <- NULL
+# streams_dt <- read_geopackage("order_vect_59.gpkg")
 
 
 ### Create graph based on two columns only
-tmp_names <- c("stream", "next_stream")
-g <- graph.data.frame(streams_dt[,..tmp_names], directed = T); rm(tmp_names) #what="edges"  what="vertices"
+g_cols <- c("stream", "next_stream")
+g <- graph.data.frame(g[,..g_cols], directed = T)
 
-## END TESTING
+# get_largest_catchment()
+# if outlet is specified by the user
+#  then use this, 
+#  else take outlet from graph
+#  --> but headwaters need to be connected to the outlet, how to check this? 
 
-
-
+# g <- read_geopackage("order_vect_59.gpkg", graph=T)
+# g <- get_largest_catchment(g)
+# 
+# do function: get graph for a specific outlet id
 
 
 
@@ -64,8 +77,10 @@ usePackage("R.utils")
 
 
 
-pfafstetter <- function(input_graph, flow_accum=flow_accum)
+pfafstetter <- function(g, flow_accum=flow_accum, outlet=outlet)
 
+  # Avoid exponential numbers in the reclassification, only set this only within the function
+  options(scipen=999)
 
 cat("Setting up parallel backend...\n")
 # Set up parallel backend
@@ -79,57 +94,104 @@ mapply_fun <- function(element,name){
   mutate(element,connected_to = name)
 }
 
+### Fast subsetting by vector elements
+"%ni%" <- Negate("%in%")
 
 
-### Change column order
-moveme <- function (invec, movecommand) {
-  movecommand <- lapply(strsplit(strsplit(movecommand, ";")[[1]], 
-                                 ",|\\s+"), function(x) x[x != ""])
-  movelist <- lapply(movecommand, function(x) {
-    Where <- x[which(x %in% c("before", "after", "first", 
-                              "last")):length(x)]
-    ToMove <- setdiff(x, Where)
-    list(ToMove, Where)
-  })
-  myVec <- invec
-  for (i in seq_along(movelist)) {
-    temp <- setdiff(myVec, movelist[[i]][[1]])
-    A <- movelist[[i]][[2]][1]
-    if (A %in% c("before", "after")) {
-      ba <- movelist[[i]][[2]][2]
-      if (A == "before") {
-        after <- match(ba, temp) - 1
-      }
-      else if (A == "after") {
-        after <- match(ba, temp)
-      }
-    }
-    else if (A == "first") {
-      after <- 0
-    }
-    else if (A == "last") {
-      after <- length(myVec)
-    }
-    myVec <- append(temp, values = movelist[[i]][[1]], after = after)
-  }
-  myVec
-}
+
+# ### Change column order
+# moveme <- function (invec, movecommand) {
+#   movecommand <- lapply(strsplit(strsplit(movecommand, ";")[[1]], 
+#                                  ",|\\s+"), function(x) x[x != ""])
+#   movelist <- lapply(movecommand, function(x) {
+#     Where <- x[which(x %in% c("before", "after", "first", 
+#                               "last")):length(x)]
+#     ToMove <- setdiff(x, Where)
+#     list(ToMove, Where)
+#   })
+#   myVec <- invec
+#   for (i in seq_along(movelist)) {
+#     temp <- setdiff(myVec, movelist[[i]][[1]])
+#     A <- movelist[[i]][[2]][1]
+#     if (A %in% c("before", "after")) {
+#       ba <- movelist[[i]][[2]][2]
+#       if (A == "before") {
+#         after <- match(ba, temp) - 1
+#       }
+#       else if (A == "after") {
+#         after <- match(ba, temp)
+#       }
+#     }
+#     else if (A == "first") {
+#       after <- 0
+#     }
+#     else if (A == "last") {
+#       after <- length(myVec)
+#     }
+#     myVec <- append(temp, values = movelist[[i]][[1]], after = after)
+#   }
+#   myVec
+# }
+
+
+
+
+
+
+# Needs a data-table to assign results
+streams_dt <- as.data.table(as_long_data_frame(g))
+setnames(streams_dt, c("ver[el[, 1], ]"), c("stream"))
+streams_dt <- streams_dt[,"stream"]
+streams_dt$stream <- as.numeric(as.character(streams_dt$stream))
+# Calculate the area of each sub-catchment (which is more accurate than the flow_accum)
+
+
+
+
+
+
+# start GRASS session 
+# server3
+export DIR=/data/domisch/hydrographr_data
+grass78  -text -c -e   subcatchment_1264942.tif  $DIR/grass_location # rectangle
+# grass78  -text -c -e   subc_1264942.tif   $DIR/grass_location
+export GRASSEXEC="grass78 $DIR/grass_location/PERMANENT/ --exec" # create alias
+
+$GRASSEXEC  r.in.gdal  input=$DIR/subcatchment_1264942.tif  output=scatch --o
+$GRASSEXEC  r.stats input=scatch  output=$DIR/sub_catchment_area_stats.txt  separator=tab  -aclnC --o # rectangle
+# $GRASSEXEC  r.stats input=$DIR/subc_1264942.tif output=$DIR/sub_cachment_area_stats.txt  separator=tab  -aclnC --o
+
+ 
+
+
+
+
+### Attach the area of each stream-reach
+scatch_area <- fread("sub_catchment_area_stats.txt", h=F)
+setnames(scatch_area, c("stream", "V2", "area_km2", "area_cells")) # still in m2
+scatch_area$area_km2 <- round(scatch_area$area_km2 / 1000000, 4) # convert to km2
+scatch_area$V2 <- NULL
+### Merge to stream table --> keeps only those in the input graph, tosses the rectangle
+streams_dt <- scatch_area[streams_dt, on="stream"]
+
 
 
 
 ### Get all possible paths from the outlet
 # find root and leaves --> vertices
-outlet = which(degree(input_graph, v = V(input_graph), mode = "out")==0, useNames = T)
-headwater = which(degree(input_graph, v = V(input_graph), mode = "in")==0, useNames = T)
+outlet = which(degree(g, v = V(g), mode = "out")==0, useNames = T)
+headwater = which(degree(g, v = V(g), mode = "in")==0, useNames = T)
 
-
-
+# Stop if too many outlets
+if (length(outlet)!=1) {
+  stop("Only one outlet possible. You may want to run get_largest_catchment() to get a single drainage basin as the input graph, or you use the same input graph but specify the outlet using outlet=your_segment_id. ")
+}
 
 
 ### 3 options depending on the amount of headwaters, all return the identical objects
 ### Several options as else some methods fail for very few headwaters...
 
-cat(">>>>>>>> Finding the most contributing (=main) stream.... <<<<<<<<", "\n")
+cat("Finding the main stream....\n")
 ### Run without foreach if only small basin (otherwise the split might not work for very small basins)
 
 registerDoFuture()
@@ -298,7 +360,8 @@ if (length(headwater) < 10) {
 # main_headwater_id <- read.table(paste0(DIR, "/main_headwater_id.txt"))$V1
 
 
-} # close if: Read the main headwater id if already produced
+
+# } # close if: Read the main headwater id if already produced
 
 
 
@@ -326,7 +389,7 @@ rm(list=ls(pattern="^tmp_")) # cleanup
 
 
 
-cat(">>>>>>>> Finding the next 4 most contributing tributaries.... <<<<<<<<", "\n")
+cat("Finding the next 4 most contributing tributaries....", "\n")
 ### Delete the edges of the main stream (not the vertices, else any single stream reaches, i.e. stand-alone connected to main stream, yield an error as there is nothing to connect to)
 g_del <- delete_edges(g, V(g)[paste(main_stream)])
 # plot_net(g_del)
@@ -459,21 +522,18 @@ main_stream_branch_id <- as.character(t(main_stream_branch_id))
 
 
 ###------Save intermediate output in txt file ------------
-res_ID=data.table(MACROBASIN_ID=MACROBASIN_ID,
-                  MAIN_HEADWATER_ID=main_headwater_id,
-                  LEVEL=LEVEL,
-                  PFAFSTETTER_ID=PFAF,
+res_ID=data.table(MAIN_HEADWATER_ID=main_headwater_id,
                   MAIN_STR_BRANCH_ID1=main_stream_branch_id[1],
                   MAIN_STR_BRANCH_ID2=main_stream_branch_id[2],
                   MAIN_STR_BRANCH_ID3=main_stream_branch_id[3],
                   MAIN_STR_BRANCH_ID4=main_stream_branch_id[4])
 
-if(ITERATOR==0) { # if first round
-  write.table(res_ID, paste0(DIR, "/lbasinID_", MACROBASIN_ID, "_intermediate_IDs.txt"), row.names = F, col.names = T, quote = F)
-} else {
-  # if(Sys.info()[["sysname"]]=="Windows") {
-  write.table(res_ID, paste0(DIR, "/lbasinID_", MACROBASIN_ID, "_intermediate_IDs.txt"), row.names = F, col.names = F, quote = F,append=TRUE)
-}
+# if(ITERATOR==0) { # if first round
+#   write.table(res_ID, paste0(DIR, "/lbasinID_", MACROBASIN_ID, "_intermediate_IDs.txt"), row.names = F, col.names = T, quote = F)
+# } else {
+#   # if(Sys.info()[["sysname"]]=="Windows") {
+#   write.table(res_ID, paste0(DIR, "/lbasinID_", MACROBASIN_ID, "_intermediate_IDs.txt"), row.names = F, col.names = F, quote = F,append=TRUE)
+# }
 
 
 
@@ -552,7 +612,7 @@ trib_order <- na.omit(trib_order)
 
 
 ###---- Assign Pfafstetter code -----
-cat(">>>>>>>> Assigning the Pfafstetter codes.... <<<<<<<<", "\n")
+cat("Assigning the Pfafstetter codes.... ", "\n")
 ### Generate the sequence - can be shorter for small basins
 tmp_odd <- seq(1, 7, 2)
 tmp_even <- seq(2, 8, 2)
@@ -588,11 +648,13 @@ main_dt$code <- ifelse(is.na(main_dt$code_inter), 9, main_dt$code_inter)
 
 
 ###--- Get all stream ID of the interbasins -----
-### Get a network without tributary streams, and without the main stream ID to which the tributaries connect (=nead to break the network)  
-### Delete the tributary streams ID and the branching stream ID from g = limit the subcomponent search
+### Get a network without tributary streams, and without the main stream ID to which the tributaries connect (=need to break the network)  
+### Delete the tributary streams ID and the branching stream ID from g --> limit the subcomponent search
 delete_these <- append(as.character(main_trib_all_id$stream), as.character(trib_order$stream) )
 g_del_for_interbas <- delete_edges(g, V(g)[paste(delete_these)])
 
+# work-around
+# g_del_for_interbas <- g - V(g)[paste(delete_these)]
 
 
 ### Get the most downstream interbasin stream reach for which to search
@@ -607,7 +669,6 @@ names(first_interbas_id)[1] <- "first_interbas_id"
 
 ###---- Find all streams belonging to the interbasins ----
 first_interbas_id_char <- as.character(first_interbas_id$first_interbas_id)
-
 tmp <- future_sapply(first_interbas_id_char, function(x) subcomponent(g_del_for_interbas, x, mode = c("in")))
 ### Get into datatable format
 tmp <- future_lapply(tmp, function(x) names(x))
@@ -677,16 +738,48 @@ setorder(all_stream_code, stream)
 # sort(unique(all_stream_code$code)) # check
 
 
-### Run these lines to export the last Pfafstetter basin reclassification for GRASS:
-# GRASS_format <- rbind(all_stream_code,
-#                       data.table(stream="*", code="NULL")) # all other streams should be deleted (if any)
-# 
-# GRASS_format$GRASS <- paste0(GRASS_format$stream, " = ", GRASS_format$code)
-# 
-# ### Write to disk
-# write.table(GRASS_format[,"GRASS"], paste0(DIR, "/level_", MACROBASIN_ID, "_", LEVEL, "_for_GRASS_reclass.txt"), row.names = F, col.names = F, quote = F)
-# rm(list=ls(pattern="^tmp_")) # cleanup
-# rm(list=ls(pattern="^dt"))
-# rm(g, g_del, g_del_for_interbas)
-cat(">>>>>>>> Pfafstetter basin delineation done <<<<<<<<", "\n", "\n", "\n")
+## Run these lines to export the last Pfafstetter basin reclassification for GRASS:
+GRASS_format <- rbind(all_stream_code,
+                      data.table(stream="*", code="NULL")) # all other streams should be deleted (if any)
 
+GRASS_format$GRASS <- paste0(GRASS_format$stream, " = ", GRASS_format$code)
+
+### Write to disk
+write.table(GRASS_format[,"GRASS"], paste0("pfafstetter_for_GRASS_reclass.txt"), row.names = F, col.names = F, quote = F)
+rm(list=ls(pattern="^tmp_")) # cleanup
+rm(list=ls(pattern="^dt"))
+rm(g, g_del, g_del_for_interbas)
+
+
+
+# Run reclassification in GRASS
+
+# start GRASS session 
+# server3
+export DIR=/data/domisch/hydrographr_data
+# grass78  -text -c -e   subcatchment_1264942.tif  $DIR/grass_location # rectangle
+# grass78  -text -c -e   subc_1264942.tif   $DIR/grass_location
+export GRASSEXEC="grass78 $DIR/grass_location/PERMANENT/ --exec" # create alias
+
+### reclassify sub-catchments directly
+# $GRASSEXEC  r.in.gdal  input=$DIR/subcatchment_1264942.tif  output=scatch --o
+$GRASSEXEC  r.reclass input=scatch   output=pfafstetter_scatch  rules=$DIR/pfafstetter_for_GRASS_reclass.txt --o --q
+$GRASSEXEC  r.out.gdal input=pfafstetter_scatch  output=$DIR/pfafstetter_scatch_rast.tif  type=Int32  nodata=-9999  --o  -c  -m  createopt="COMPRESS=LZW,ZLEVEL=9" --q
+
+### reclassify streams and run r.basins
+$GRASSEXEC  r.in.gdal input=$DIR/stream_1264942.tif   output=stream  --o
+$GRASSEXEC  r.in.gdal input=$DIR/direction_1264942.tif   output=dir  --o
+$GRASSEXEC  r.reclass input=stream   output=pfafstetter_stream   rules=$DIR/pfafstetter_for_GRASS_reclass.txt --o --q
+$GRASSEXEC  r.stream.basins dir=dir  stream=pfafstetter_stream   basins=pfafstetter_basin  --o --q
+$GRASSEXEC  r.out.gdal input=pfafstetter_basin  output=$DIR/pfafstetter_basin_rast.tif  type=Int32  nodata=-9999  --o  -c  -m  createopt="COMPRESS=LZW,ZLEVEL=9" --q
+$GRASSEXEC  r.out.gdal input=pfafstetter_stream  output=$DIR/pfafstetter_stream_rast.tif  type=Int32  nodata=-9999  --o  -c  -m  createopt="COMPRESS=LZW,ZLEVEL=9" --q
+
+
+# delete intermediate files from disk
+
+# Import raster layer into R
+
+
+cat("Pfafstetter basin delineation done \n")
+
+return() raster layer, table, or graph, or all
