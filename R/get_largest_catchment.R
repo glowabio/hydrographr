@@ -4,6 +4,10 @@
 
 ### identify largest drainage basin in a tile
 
+- need to add the argument "outlet="segment_ID" "
+- in the best case:
+- get outlet IDs as table and scan for outlets in the given vector file. Use the outlet to run subcompartment to get the graph. Faster than the largest-drainage-function, and would get all drainages in the tile (which could be however incomplete if river stretches from adjacent tile)
+
 
 
 usePackage <- function(p){
