@@ -1,34 +1,45 @@
 
-# status 7Nov22 (Sami)
+#' Import GeoPackage file as a data.table or as a directed graph
+#'
+#' Import a Geopackage vector file into R, either as a data.table or as a directed igraph object.
+#'
+#' @param filename Name of the GeoPackage file to import, e.g. "order_vect_59.gpkg"
+#' @param graph In case of a network, should the date be imported as a data.table (graph=FALSE, the default) or as a igraph object (graph=TRUE)
 
-# Import a geopackage file as a data.table or as a directed graph
+#' @importFrom DBI dbConnect dbListTables dbGetQuery
+#' @importFrom RSQLite SQLite
+#' @importFrom data.table setDT
+#' @importFrom igraph graph_from_data_frame
+#' @export
+#'
+
+
+
 
 
 # To do:
-# cast into package-format
-# define functions
 # load demo data data
+# load libraries
 
 
-usePackage <- function(p){
-  if (!is.element(p, installed.packages()[,1])) install.packages(p, dep = TRUE) 
-  library(p, character.only = TRUE)
-}
-
-usePackage("DBI")
-usePackage("data.table")
-usePackage("igraph")
+# usePackage <- function(p){
+#   if (!is.element(p, installed.packages()[,1])) install.packages(p, dep = TRUE) 
+#   library(p, character.only = TRUE)
+# }
+# 
+# usePackage("DBI")
+# usePackage("data.table")
+# usePackage("igraph")
 
 
 
 path <- "D:/projects/hydrographr/hydrographr_data"
-
 setwd(path)
 
 
 
 # Import a geopackage from disk as a data.table
-read_geopackage <- function(filename, graph=F, verbose=T) {
+read_geopackage <- function(filename, graph=F) {
   # Avoid exponential numbers in the reclassification, only set this only within the function 
   options(scipen=999)
   # create a connection to the SQLite database
@@ -45,7 +56,7 @@ read_geopackage <- function(filename, graph=F, verbose=T) {
   
   if(graph==T) {
     g <- graph_from_data_frame(network_table, directed = T)
-    if (verbose==T) print(g)
+    if (graph==T) print(g)
     return(g) 
               } else {
   return(network_table)
@@ -54,9 +65,9 @@ read_geopackage <- function(filename, graph=F, verbose=T) {
 
 
 ### Test function
-my_table <- read_geopackage("order_vect_59.gpkg", graph=F, verbose=F) # loads a data.table
-my_graph <- read_geopackage("order_vect_59.gpkg", graph=T, verbose=F) # loads as an directed graph
-my_graph <- read_geopackage("order_vect_59.gpkg", graph=T, verbose=T) # loads as an directed graph, printing the graph summary
+# my_table <- read_geopackage("order_vect_59.gpkg", graph=F) # loads a data.table
+# my_graph <- read_geopackage("order_vect_59.gpkg", graph=T) # loads as an directed graph
+
 
 
 
