@@ -59,18 +59,17 @@ read_geopackage <- function(filename, dt=F, graph=F, sf=F, SpatVect=F) {
   dbDisconnect(conn) # close db connection
 
   if(dt==T) {
-  return(network_table)
-  }
+    return(network_table) }
 
   if (graph==T) {
     g <- graph_from_data_frame(network_table, directed = T)
     return(g) }
 
-   if(sf==T) {
+  if(sf==T) {
     sf <- read_sf("order_vect_59.gpkg")
     return(sf)  }
 
-   if (SpatVect==T) {
+  if (SpatVect==T) {
     sf <- read_sf("order_vect_59.gpkg")
     vect <- vect(sf)
     return(vect)  }
