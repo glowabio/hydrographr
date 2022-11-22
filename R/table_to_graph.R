@@ -1,17 +1,23 @@
 
-# status 7Nov22 (Sami)
+#' Convert a table to a graph
+#'
+#' Convert a table as an directed or undirected graph (igraph object). The attributes will be attached to the edges (i.e. the stream segments), and the input table nees to have the "stream" and "next_stream" as the first two columns.
+#'
+#' @param filename A data.frame or data.table that has the "stream" as the 1st column, and "next_stream" as the 2nd column.
+#'
+#' @param directed If TRUE (the default), then the output will be a directed graph, else an undirected graph.
 
-# Convert data.table to a directed graph
+#' @importFrom data.table setDT
+#' @importFrom igraph graph_from_data_frame
+#' @export
+#'
 
 
-# To do:
-# cast into package-format
-# define packages
-# load demo data
+
 
 
 usePackage <- function(p){
-  if (!is.element(p, installed.packages()[,1])) install.packages(p, dep = TRUE) 
+  if (!is.element(p, installed.packages()[,1])) install.packages(p, dep = TRUE)
   library(p, character.only = TRUE)
 }
 
@@ -22,18 +28,22 @@ usePackage("igraph")
 
 
 # convert table to a directed graph
-table_to_graph <- function(network_table, print=F) {
-  # Avoid exponential numbers in the reclassification, only set this only within the function 
+table_to_graph <- function(filename, directed=T) {
+  # Avoid exponential numbers in the reclassification, only set this only within the function
   options(scipen=999)
-  g <- graph_from_data_frame(network_table, directed = T, vertices=NULL)
-  if (print==T) print(g)  # print graph summary
+
+  if(directed==TRUE) {
+  g <- graph_from_data_frame(filename, directed = T, vertices=NULL)
   return(g)
+  } else if (directed==FALSE) {
+  g <- graph_from_data_frame(filename, directed = F, vertices=NULL)
+      }
+
   }
 
 
 
-# test functions
+# test function
 my_graph <- table_to_graph(my_table)
-my_graph <- table_to_graph(my_table, print=T)
 
 
