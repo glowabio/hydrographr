@@ -54,33 +54,24 @@ For more details about the username and password see [here](https://learn.micros
 
 Further, you need to install the required GIS tools on your WSL. To install the GIS tools on Ubuntu you can use the Ubuntu terminal, PowerShell or Windows Command Prompt. If you use the PowerShell or Windows Command Prompt use first the command `wsl` to enter the WSL and after installation the GIS tools `exit` to go back to your Windows OS. 
 
-**GRASS GIS**
+**Add the Ubuntugis repository**
+```{bash, eval=FALSE}
+sudo add-apt-repository ppa:ubuntugis/ubuntugis-unstable
+sudo apt update
+```
 
+# Install gdal
+```{bash, eval=FALSE}
+sudo apt install gdal-bin python3-gdal 
+
+# Install pktools
+sudo apt install pktools
+```
+
+**GRASS GIS**
 Copy-paste the commands below or see the [GRASS GIS](https://grass.osgeo.org/download/linux/) webpage for installation instruction on Ubuntu.
 
 ```{bash, eval=FALSE}
-# Install and update GRASS GIS
-sudo add-apt-repository ppa:ubuntugis/ubuntugis-unstable
-sudo apt update
-sudo apt-get install ubuntugis-unstable
+# Install GRASS GIS
+sudo apt-get install grass grass-core grass-dev grass-gui grass-doc
 ```
-
-**GDAL/ORG and pktools**
-
-For GDAL, go to the GDAL webpage and [download](https://gdal.org/download.html#current-release) the last release for Ubuntu. For pktools go to the pktools webpage and [download](https://pktools.nongnu.org/html/md_installation_linux.html#install_manual) the install_pktools.sh file.
-
-```{bash, eval=FALSE}
-# Go (with cd) to your mounted Windows Downloads folder
-# Exchange the Windows partition e.g. C: with /mnt/c
-# and attache the rest of the Windows path
-# like this:
-cd /mnt/c/Users/your_windows_username/Downloads
-
-# Install gdal
-# Note: Change program name according to the release you have downloaded.
-tar -zxvf gdal-3.5.2.tar.gz 
-
-# Install pktools
-sudo bash install_pktools.sh
-```
-
