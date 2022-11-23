@@ -37,7 +37,7 @@ read_geopackage <- function(filename, dt=F, g=F, sf=F, SpatVect=F) {
   if(missing(filename)) stop("Please specify the input geopackage file.")
   if(!grepl(".gpkg", filename, fixed = TRUE)) stop("Input must be a GeoPackage file.")
   # If all options are missing
-  if(missing(dt) & missing(g) & missing(sf) & missing(SpatVect)) {
+  if(dt==FALSE & g==FALSE & sf==FALSE & SpatVect==FALSE) {
     stop("Please select one output type.\n")
   }
 
@@ -112,7 +112,7 @@ my_vect <- read_geopackage("order_vect_59.gpkg", SpatVect=T) # loads as an terra
 big file:
 filename="order_vect_segment_h10v08.gpkg"
 my_graph <- read_geopackage("order_vect_segment_h10v08.gpkg", g=T)
-
+my_table <- read_geopackage("order_vect_segment_h10v08.gpkg", g=T)
 
 # small file
 filename="order_vect_segment_h00v00.gpkg"
