@@ -25,11 +25,14 @@
 crop_to_extent <- function(raster_path, vector_path = NULL, bound_box = NULL,
                            output_path,
                            rcrop_read=TRUE) {
+  # Check that an input path and an output path were provided
+  if (missing(raster_path)) stop("Please provide an input path")
+  if (missing(output_path)) stop("Please provide an output path")
   # Check that at least a cutline source or a bounding box coordinates are
   # provided
   if (is.null(vector_path) & is.null(bound_box)){
-    stop("Please provide at least a cutline source or a bounding box
-          coordinates")
+    stop("Please provide at least a cutline source, a bounding box
+          coordinates or an spatial object from which extract an extent")
   } else {
     # Check operating system
     system <- get_os()
@@ -43,7 +46,7 @@ crop_to_extent <- function(raster_path, vector_path = NULL, bound_box = NULL,
             echo = TRUE)
       } else if (!is.null(bound_box)) {
       # Check if bound_box is a vector with corner coordinate values, if FALSE
-      # try to extract the values from ans spatial object
+      # try to extract the values from an spatial object
         if (is.vector(bound_box) & length(bound_box) == 4) {
           xmin <- bound_box[1]
           ymin <- bound_box[2]
@@ -84,11 +87,26 @@ crop_to_extent <- function(raster_path, vector_path = NULL, bound_box = NULL,
             args = c(raster_path, vector_path, output_path),
             echo = TRUE)
       } else if (!is.null(bound_box)) {
-        # Call external pkcrop command from pktools library
+        # Check if bound_box is a vector with corner coordinate values, if FALSE
+        # try to extract the values from an spatial object
+        if (is.vector(bound_box) & length(bound_box) == 4) {
+          xmin <- bound_box[1]
+          ymin <- bound_box[2]
+          xmax <- bound_box[3]
+          ymax <- bound_box[4]
+        } else {
+          bb <- as.vector(ext(bound_box))
+          xmin <- bb[1]
+          ymin <- bb[3]
+          xmax <- bb[2]
+          ymax <- bb[4]
+        }
+        # Call external gdalwarp command from GDAL library. Cut through a polygon
+        # extent
         run(system.file("sh", "crop_to_extent_bb.sh",
                         package = "hydrographr"),
-            args = c(raster_path, bound_box[1], bound_box[2],
-                     bound_box[3], bound_box[4], output_path),
+            args = c(raster_path, xmin, ymin,
+                     xmax, ymax, output_path),
             echo = TRUE)
       }
     }
