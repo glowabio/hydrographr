@@ -80,12 +80,13 @@ read_geopackage <- function(filename, dt=F, g=F, sf=F, SpatVect=F) {
     return(network_table) }
 
   if (g==T) {
+    cat("Building graph...\n")
     g_out <- graph_from_data_frame(network_table, directed = T)
     return(g_out) }
 
 } else if (sf==T) {
     cat("Importing as a sf spatial dataframe...\n")
-    sf <- read_sf(filename, as_tibble=F)
+    sf <- read_sf(filename, as_tibble=F) # tibble=F to avoid exponential numbera
     return(sf)  } else if (SpatVect==T) {
     cat("Importing as a terra SpatVect file...\n")
     sf <- read_sf(filename)
