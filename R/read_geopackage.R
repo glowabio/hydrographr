@@ -35,7 +35,7 @@
 # usePackage("data.table")
 # usePackage("igraph")
 # usePackage("terra")
-#
+# usePackage("sf")
 #
 # path <- "D:/projects/hydrographr/hydrographr_data"
 # setwd(path)
