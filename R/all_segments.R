@@ -41,8 +41,10 @@ usePackage("dplyr")
 usePackage("parallel")
 
 
+g <- my_catchment
+
 # find_upstream <- function(g, aggregate_var=c("length", "flow_accum"), aggregate_type="sum") {
-upstream_segments <- function(g, agg_var, agg_type) {
+upstream_segments <- function(g, agg_var=NULL, agg_type=NULL) {
 
   ### Get the path number as an additional column in the graph list.vs
   mapply_fun <- function(element,name){
@@ -52,7 +54,7 @@ upstream_segments <- function(g, agg_var, agg_type) {
   # Set up parallel backend
   n_cores <- detectCores(logical=F)-2
   registerDoFuture()
-  plan(multisession, workers = n_cores)
+  plan(multisession, workers = n_cores) # windows / linux
 
   cat("Finding all upstream segments...\n")
   # Get all subcomponents
@@ -61,7 +63,7 @@ upstream_segments <- function(g, agg_var, agg_type) {
   l <- future_lapply(l, function(x) names(x))
   # specify names of list elements = connected_to
   l <- future_lapply(l, as.data.frame)
-  ### Get the path number as an additional column
+  ### Get the stream (from) ID as an additional column
   l <- future_mapply(mapply_fun,l,names(l),SIMPLIFY = F)
   ### Merge as datatable
   dt <- rbindlist(l)
@@ -69,7 +71,7 @@ upstream_segments <- function(g, agg_var, agg_type) {
   setkey(dt, stream)
 
   # If aggregation was defined:
-  if(hasArg(aggregate_var)) {
+  if(hasArg(agg_var)) {
 
   cat("Attaching the selected attributes...\n")
   ### Sort and remove the self-connection of the source stream
@@ -85,9 +87,9 @@ upstream_segments <- function(g, agg_var, agg_type) {
   dt <- dt[lookup_dt, on="stream"] # left join, preserves ordering
 
   cat("Aggregating attributes...\n")
-  agg_type
-  dt_agg <- dt[,lapply(.SD, !!agg_type, na.rm=TRUE),
-                         .SDcols=aggregate_var,
+
+  dt_agg <- dt[,lapply(.SD, agg_type, na.rm=TRUE),
+                         .SDcols=agg_var,
                          by="stream"]
 
                       return(dt_agg)
@@ -106,11 +108,11 @@ upstream_segments <- function(g, agg_var, agg_type) {
 # test functions
 
 # provides only the upstream connection to each stream
-my_graph_largest_streams <- all_segments(my_graph_largest)
+all_segments_out <- all_segments(my_catchment)
 
 # # provides besides the upstream connection to each stream, also the aggregation of variables
-my_graph_largest_agg <- all_segments(my_graph_largest,
-                                          agg_var=c("length", "flow_accum"),
-                                            agg_type="sum") # or mean, sd, ...
+all_segments_out <- all_segments(my_catchment,
+                                 agg_var=c("length", "flow_accum"),
+                                 agg_type="sum") # or mean, sd, ...
 
 
