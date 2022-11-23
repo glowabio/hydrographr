@@ -6,7 +6,7 @@
 #' @param segmentID Optional. The stream segment or sub-catchments IDs for which to delineate the upstream drainage area. Can be a single ID or a vector of multiple IDs (c(ID1, ID2, ID3, ...). If empty, then outlets will be used as segment IDs (with outlet=TRUE).
 #' @param outlet Logical. If TRUE, then the outlets of the given network graph will be used as additional input segmentIDs. Outlets will be identified internally as those stream segments that do not have any downstream donnected segment.
 #' @param graph Logical. If TRUE then the output will be a new graph or a list of new graphs with the original attributes, If FALSE (the default), then the output will be a new data.table, or a list of data.tables. List objects are named after the segmentIDs.
-#' @param n_cores Optional. Specify the number of CPUs for internal parallelization in the case of multiple stream segments / outlets. Defaults to the all available CPUs except two.. In case the graph is very large, and many segments are used as an input, setting n_cores to a lower number might be useful to avoid any errors regarding RAM.
+#' @param n_cores Optional. Specify the number of CPUs for internal parallelization in the case of multiple stream segments / outlets. Defaults to the all available CPUs except two.. In case the graph is very large, and many segments are used as an input, setting n_cores to 1 might might be useful to avoid any RAM errors, while still achieving a fast computation.
 #' @param n_cores Optional. Specify the maximum size of the data passed to the parallel backend in MB. Defaults to 1500 (1.5 GB). Consider a higher value for large study areas (more than one 20°x20° tile).
 
 #'
@@ -59,12 +59,13 @@ get_catchment_graph <- function(g, segmentID=NULL, outlet=F, graph=F, n_cores=NU
     if(missing(segmentID) & length(outlet)>=1) {
       segmentID <-  as.numeric(as.character(names(outlet)))
         } else if (length(segmentID)>=1 & length(outlet)>=1) {
-        # If segmentId and outlets are specified, take both and remove duplicates
+        # If segmentId and outlets are specified, take both
         segmentID <- c(segmentID, as.numeric(as.character(names(outlet))))
-        segmentID <- segmentID[!duplicated(segmentID)]
     }
   }
 
+  #  Remove any duplicate segmenrIDs
+  segmentID <- segmentID[!duplicated(segmentID)]
 
   # Set up parallel backend if multiple segments
   if(length(segmentID)>1) {
@@ -171,11 +172,15 @@ my_catchment <- get_catchment_graph(my_graph, segmentID = my_seg$ID, outlet=T, g
 my_catchment <- get_catchment_graph(my_graph, outlet=F) # OK
 my_catchment <- get_catchment_graph(my_graph, outlet=T)
 
-
+1.83652939e8
 
 # big file
 my_seg=c(173368095, 173373237, 173353203, 173363307)
-my_catchment <- get_catchment_graph(my_graph, segmentID = my_seg, outlet=F, graph=T, n_cores=1)
 
-options(future.globals.maxSize)
+my_seg=c(183959344, 183959344, 183959344)
+my_catchment <- get_catchment_graph(my_graph, segmentID = my_seg, outlet=F, graph=F, n_cores=1)
+
+summary(my_table)
+my_table[order(-rank(flow_accum))]
+
 
