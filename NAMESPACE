@@ -2,6 +2,7 @@
 
 export(extract_ids)
 export(get_regional_unit_id)
+export(get_tile_id)
 import(magrittr)
 importFrom(data.table,fread)
 importFrom(processx,run)
