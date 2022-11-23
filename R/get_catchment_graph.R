@@ -7,6 +7,7 @@
 #' @param outlet Logical. If TRUE, then the outlets of the given network graph will be used as additional input segmentIDs. Outlets will be identified internally as those stream segments that do not have any downstream donnected segment.
 #' @param graph Logical. If TRUE then the output will be a new graph or a list of new graphs with the original attributes, If FALSE (the default), then the output will be a new data.table, or a list of data.tables. List objects are named after the segmentIDs.
 #' @param n_cores Optional. Specify the number of CPUs for internal parallelization, in the case of multiple stream segments / outlets.
+#' @param n_cores Optional. Specify the maximum size of the data passed to the parallel backend in MB. Defaults to 1500 (1.5 GB). Consider a higher value for large study areas (more than one 20°x20° tile).
 
 #'
 #' @importFrom future plan
@@ -15,6 +16,7 @@
 #' @importFrom data.table setDT setnames
 #' @importFrom igraph subcomponent subgraph as_data_frame
 #' @importFrom future.apply future_lapply
+#' @importFrom memuse Sys.meminfo
 #' @export
 #'
 
@@ -29,10 +31,10 @@
 # usePackage("doFuture")
 # usePackage("data.table")
 # usePackage("parallel")
-# usePackage("parallel")
+# usePackage("memuse")
 # g <- my_graph
 
-get_catchment_graph <- function(g, segmentID=NULL, outlet=F, graph=F, n_cores=NULL) {
+get_catchment_graph <- function(g, segmentID=NULL, outlet=F, graph=F, n_cores=NULL, maxsize=1500) {
 
   # Check input arguments
   if ( class(g) != "igraph")     stop("Input must be an igraph object. Please run table_to_graph() first.")
@@ -46,6 +48,13 @@ get_catchment_graph <- function(g, segmentID=NULL, outlet=F, graph=F, n_cores=NU
   if(hasArg(n_cores)) {
   if (length(segmentID)>1 & n_cores==0)  stop("You have specified multiple segments but zero workers. Please specify at least n_cores=1, or leave it empty to allow enable the automatic setup.")
   }
+
+  # Set available RAM for future.apply
+  # maxmem <- memuse::Sys.meminfo()$totalram@size-1
+  # Define the size of the onjects passed to future:
+  # 1500*1024^2=1572864000 , i.e. 1.5GB for one tile
+  options(future.globals.maxSize=maxsize*1024^2)
+
 
   # Use the outlets as the segmentIDs?
   if(outlet==TRUE) {
@@ -76,7 +85,7 @@ get_catchment_graph <- function(g, segmentID=NULL, outlet=F, graph=F, n_cores=NU
      if(length(segmentID)>1 & missing(n_cores)) {
         n_cores <- detectCores(logical=F)-2
      }
-   # Checl parallel backend depending on the OS
+   # Check parallel backend depending on the OS
     if(get_os()=="windows") {
       plan(multisession, workers = n_cores)
     }
@@ -89,7 +98,7 @@ get_catchment_graph <- function(g, segmentID=NULL, outlet=F, graph=F, n_cores=NU
 
   # Extract the catchments
     if(length(segmentID)==1) {
-      cat("Calculating the upstream drainage basin...\n")
+      cat("Delineating the upstream drainage basin...\n")
   # Get subcomponent
   l <- subcomponent(g, as.character(segmentID), mode = c("in"))
   # Subset the graph
@@ -159,3 +168,12 @@ my_catchment <- get_catchment_graph(my_graph, segmentID = my_seg$ID, outlet=T, g
 my_catchment <- get_catchment_graph(my_graph, segmentID = my_seg$ID, outlet=T, graph=T)
 my_catchment <- get_catchment_graph(my_graph, outlet=F) # OK
 my_catchment <- get_catchment_graph(my_graph, outlet=T)
+
+
+
+# big file
+my_seg=173361864
+my_catchment <- get_catchment_graph(my_graph, segmentID = my_seg, outlet=T, graph=F)
+
+options(future.globals.maxSize)
+
