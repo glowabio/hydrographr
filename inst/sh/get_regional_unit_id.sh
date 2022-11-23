@@ -8,7 +8,7 @@ export TMPDIR=$5
 
 
 # add header
-echo "reg_unit_id" > $TMPDIR/reg_unit_ids.txt
+echo "reg_unit_id" > $TMPDIR
 
 # Query the global file of the regional units
 awk -v LON=$LON -v LAT=$LAT '
@@ -18,7 +18,7 @@ NR==1 {
     }
 }
 { if(NR>1) {print $(f[LON]), $(f[LAT]) }}
-' $DATA   | gdallocationinfo -valonly -geoloc  $REG_UNIT_LAYER | sort -n -u >> $TMPDIR/reg_unit_ids.txt
+' $DATA   | gdallocationinfo -valonly -geoloc  $REG_UNIT_LAYER | sort -n -u >> $TMPDIR
 
 
 
