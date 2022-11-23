@@ -2,24 +2,30 @@
 % Please edit documentation in R/extract_ids.R
 \name{extract_ids}
 \alias{extract_ids}
-\title{Join sub-catchment IDs with occurrence points}
+\title{Adds sub-catchment and/or basin IDs to a dataframe of points}
 \usage{
-extract_ids(dataset_path, lon, lat, subc_path, basin_path)
+extract_ids(
+  data,
+  lon,
+  lat,
+  subcatchment_path = NULL,
+  basin_path = NULL,
+  quiet = TRUE
+)
 }
 \arguments{
-\item{dataset_path}{Path to data set text file with the lat long columns}
+\item{data}{Data.frame with lat/lon columns}
 
-\item{lon}{Name of the longitude column}
+\item{lon}{Name of the longitude column (WGS 84)}
 
-\item{lat}{Name of the latitude column}
+\item{lat}{Name of the latitude column (WGS 84)}
 
-\item{subc_path}{Path to the sub-catchment ID .tif layer}
+\item{subcatchment_path}{Full path to the sub-catchment ID .tif layer}
 
-\item{basin_path}{Path to the basin ID .tif layer}
+\item{basin_path}{Full path to the basin ID .tif layer}
+
+\item{quiet}{If FLASE, process is printed}
 }
 \description{
-Add the column 'subcID' to the dataset in 'dataset_path' and export the
-data frame in a csv.
-In the current version the long-lat values must be in the 2nd and 3rd
-column of the data set text file.
+Adds sub-catchment and/or basin IDs to a dataframe of points
 }
