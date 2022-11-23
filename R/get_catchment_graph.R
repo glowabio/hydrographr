@@ -172,8 +172,8 @@ my_catchment <- get_catchment_graph(my_graph, outlet=T)
 
 
 # big file
-my_seg=173361864
-my_catchment <- get_catchment_graph(my_graph, segmentID = my_seg, outlet=T, graph=F)
+my_seg=176827949
+my_catchment <- get_catchment_graph(my_graph, segmentID = my_seg, outlet=F, graph=F)
 
 options(future.globals.maxSize)
 
