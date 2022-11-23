@@ -25,20 +25,8 @@
 # To do:
 # load demo data data
 
-#
-# usePackage <- function(p){
-#   if (!is.element(p, installed.packages()[,1])) install.packages(p, dep = TRUE)
-#   library(p, character.only = TRUE)
-# }
-#
-# usePackage("DBI")
-# usePackage("data.table")
-# usePackage("igraph")
-# usePackage("terra")
-# usePackage("sf")
-#
-# path <- "D:/projects/hydrographr/hydrographr_data"
-# setwd(path)
+
+
 
 
 
@@ -98,6 +86,23 @@ read_geopackage <- function(filename, dt=F, g=F, sf=F, SpatVect=F) {
 
 
 ### Test function
+
+# usePackage <- function(p){
+#   if (!is.element(p, installed.packages()[,1])) install.packages(p, dep = TRUE)
+#   library(p, character.only = TRUE)
+# }
+#
+# usePackage("DBI")
+# usePackage("data.table")
+# usePackage("igraph")
+# usePackage("terra")
+# usePackage("sf")
+#
+# path <- "D:/projects/hydrographr/hydrographr_data"
+# setwd(path)
+
+
+
 my_table <- read_geopackage("order_vect_59.gpkg", dt=T) # loads a data.table
 my_graph <- read_geopackage("order_vect_59.gpkg", g=T) # loads as an directed graph
 my_sf <- read_geopackage("order_vect_59.gpkg", sf=T) # loads as an spatial dataframe
