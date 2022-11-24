@@ -1,9 +1,10 @@
 #' @title crop_to_extent
 #'
 #' @description Crop a raster .tif to a polygon border line if a vector layer
-#' is provided, otherwise if the coordinates of a bounding box are provided,
-#' the raster is cropped to the extent of the bounding box. At least a cutline
-#' source (vector layer) or a bounding box coordinates must be provided.
+#' is provided, otherwise if the coordinates of a bounding box or a spatial
+#' object are provided, the raster is cropped to the extent of the bounding box
+#' or spatial object. At least a cutline source (vector layer) or a bounding box
+#' coordinates or spatial object must be provided.
 #'
 #' @param raster_path Path to the raster .tif layer
 #' @param vector_path Path to a vector layer that is used as a cutline data
@@ -16,10 +17,11 @@
 #'
 #' @importFrom processx run
 #' @importFrom terra rast
+#' @importFrom terra ext
 #' @export
 #'
 #' @return A .tif raster file and a SpatRaster object, or a .tif raster file if
-#' rcrop_read = TRUE
+#' rcrop_read = FALSE
 #'
 
 crop_to_extent <- function(raster_path, vector_path = NULL, bound_box = NULL,
@@ -40,20 +42,21 @@ crop_to_extent <- function(raster_path, vector_path = NULL, bound_box = NULL,
       if (!is.null(vector_path)){
         # Call external gdalwarp command from GDAL library. Cut through
         # the border line option
+        cat("Cropping...\n")
         run(system.file("sh", "crop_to_extent_cl.sh",
                         package = "hydrographr"),
             args = c(raster_path, vector_path, output_path),
-            echo = TRUE)
+            echo = FALSE)
       } else if (!is.null(bound_box)) {
       # Check if bound_box is a vector with corner coordinate values, if FALSE
-      # try to extract the values from an spatial object
+      # try to extract the values from a spatial object
         if (is.vector(bound_box) & length(bound_box) == 4) {
           xmin <- bound_box[1]
           ymin <- bound_box[2]
           xmax <- bound_box[3]
           ymax <- bound_box[4]
         } else {
-          bb <- as.vector(ext(bound_box))
+          bb <- as.vector(terra::ext(bound_box))
           xmin <- bb[1]
           ymin <- bb[3]
           xmax <- bb[2]
@@ -61,11 +64,12 @@ crop_to_extent <- function(raster_path, vector_path = NULL, bound_box = NULL,
         }
         # Call external gdalwarp command from GDAL library. Cut through a polygon
         # extent
+        cat("Cropping...\n")
         run(system.file("sh", "crop_to_extent_bb.sh",
                         package = "hydrographr"),
             args = c(raster_path, xmin, ymin,
                      xmax, ymax, output_path),
-            echo = TRUE)
+            echo = FALSE)
       }
     } else if (system == "windows") {
       # Check if WSL and Ubuntu are installed
@@ -82,10 +86,12 @@ crop_to_extent <- function(raster_path, vector_path = NULL, bound_box = NULL,
                     package = "hydrographr"))
       if (!is.null(vector_path)){
         # Call external gdalwarp command from GDAL library
-        run(system.file("sh", "crop_to_extent_cl.sh",
+        cat("Cropping...\n")
+        run(system.file("bat", "crop_to_extent_cl.bat",
                         package = "hydrographr"),
-            args = c(raster_path, vector_path, output_path),
-            echo = TRUE)
+            args = c(wsl_raster_path, wsl_vector_path, wsl_output_path,
+                     wsl_sh_cl_file),
+            echo = FALSE)
       } else if (!is.null(bound_box)) {
         # Check if bound_box is a vector with corner coordinate values, if FALSE
         # try to extract the values from an spatial object
@@ -95,7 +101,7 @@ crop_to_extent <- function(raster_path, vector_path = NULL, bound_box = NULL,
           xmax <- bound_box[3]
           ymax <- bound_box[4]
         } else {
-          bb <- as.vector(ext(bound_box))
+          bb <- as.vector(terra::ext(bound_box))
           xmin <- bb[1]
           ymin <- bb[3]
           xmax <- bb[2]
@@ -103,20 +109,22 @@ crop_to_extent <- function(raster_path, vector_path = NULL, bound_box = NULL,
         }
         # Call external gdalwarp command from GDAL library. Cut through a polygon
         # extent
-        run(system.file("sh", "crop_to_extent_bb.sh",
+        cat("Cropping...\n")
+        run(system.file("bat", "crop_to_extent_bb.bat",
                         package = "hydrographr"),
-            args = c(raster_path, xmin, ymin,
-                     xmax, ymax, output_path),
-            echo = TRUE)
+            args = c(wsl_raster_path, xmin, ymin,
+                     xmax, ymax, wsl_output_path, wsl_sh_bb_file),
+            echo = FALSE)
       }
     }
     if (rcrop_read == TRUE) {
       # Read cropped .tif layer
+      cat("Cropped raster saved under: ", output_path)
       crop_rast <- rast(output_path)
       return(crop_rast)
     } else {
       # Print message
-      print(paste0("Cropped raster saved under: ", output_path))
+      cat("Cropped raster saved under: ", output_path)
     }
   }
 }
