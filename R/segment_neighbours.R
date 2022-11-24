@@ -11,7 +11,7 @@
 #' @param variable Optional. One or more attribute(s) or variable(s) of the input graph that should be reported for each output segmentID ("to_stream").
 #' @param attach_only Logical. If TRUE then the selected variables will be only attached to each for each segment without any further aggregation.
 #' @param stat One of mean, median, min, max, sd (without quotes). Aggregates (or summarizes) the variables for the neighbourhood of each input segment ("stream", e.g., the average land cover in the next five upstream segments or sub-catchments).
-#' @param n_cores Optional. Specify the number of CPUs for internal parallelization in the case of multiple stream segments / outlets. Defaults to the all available CPUs minus two. In case the graph is very large, and many segments are used as an input, setting n_cores to 1 might might be useful to avoid any RAM errors, while still achieving a fast computation. This is because the large data will be copied to each CPU which might slow things down.
+#' @param n_cores Optional. Specify the number of CPUs for internal parallelization in the case of multiple stream segments / outlets. Defaults to 1. In case the graph is very large, and many segments are used as an input, setting n_cores to a higher value can speed up the coputatation. This comes however at the cost of possible RAM limitations and even slower processing since the large data will be copied to each CPU.
 #' @param maxsize Optional. Specify the maximum size of the data passed to the parallel backend in MB. Defaults to 1500 (1.5 GB). Consider a higher value for large study areas (more than one 20°x20° tile).
 
 #'
@@ -29,7 +29,7 @@
 
 
 segment_neighbours <- function(g, segmentID=NULL, variable=NULL, stat=NULL,
-                               attach_only=F, order=5, mode="in", n_cores=NULL,
+                               attach_only=F, order=5, mode="in", n_cores=1,
                                maxsize=1500) {
 
   # Check input arguments
@@ -63,7 +63,8 @@ segment_neighbours <- function(g, segmentID=NULL, variable=NULL, stat=NULL,
     registerDoFuture()
     # If n_cores not specified, use all-2
     if(length(segmentID)>1 & missing(n_cores)) {
-      n_cores <- detectCores(logical=F)-2
+      # n_cores <- detectCores(logical=F)-2
+      n_cores <- 1
     }
     # Check parallel backend depending on the OS
     if(get_os()=="windows") {
