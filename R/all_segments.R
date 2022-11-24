@@ -1,23 +1,27 @@
-#' All stream segments within a given distance
+#' Stream segment neighbours
 #'
-#' For each segment, find all upstream connected segments and return a data.table.
+#' For each segment, report those segments that are connected to one or multiple inout segments within a specified neighbour order, with the option to summarize attributes for these segments.
 #'
 #' In addition, variables can be selected that should be aggregated, e.g. the upstream landcover. This function can also be used to create the connectivity table for Marxan by using agg_var="length" and agg_type="sum". The resulting table reports the upstream connectivity from each segment, along with the distance to all upstream segments.
 #'
 #' @param g A directed graph (igraph object).
-#' @param agg_var Optional. The stream segment or sub-catchments IDs for which to delineate the upstream drainage area. Can be a single ID or a vector of multiple IDs (c(ID1, ID2, ID3, ...). If empty, then outlets will be used as segment IDs (with outlet=TRUE).
-#' @param agg_type Logical. If TRUE, then the outlets of the given network graph will be used as additional input segmentIDs. Outlets will be identified internally as those stream segments that do not have any downstream donnected segment.
-#' @param graph Logical. If TRUE then the output will be a new graph or a list of new graphs with the original attributes, If FALSE (the default), then the output will be a new data.table, or a list of data.tables. List objects are named after the segmentIDs.
+#' @param segmentID The input segment IDs as a numerical vector for which to search the connected segments.
+#' @param order The neighbouring order. Order=1 would be immediate neighbours of the input segementID, order=2 would be the order 1 plus the immediate neighbours of the segementIDs in order 1.
+#' @param mode One of "in", "out", or "all". "in" reports only upstream neighbour segments, "out" resports only the downstream segments, and "all" does both.
+#' @param variable Optional. One or more attribute(s) or variable(s) of the input graph that should be reported for each output segmentID.
+#' @param attach_only Logical. If TRUE then the selected variables will be only attached to each for each segment without any further aggregation.
+#' @param stat One of mean, median, min, max, sd, or any user-specified function. Aggregates (or summarizes) the variables for the neighbourhood of each input stream segment (e.g., the average land cover in the next five upstream segments or sub-catchments).
 #' @param n_cores Optional. Specify the number of CPUs for internal parallelization in the case of multiple stream segments / outlets. Defaults to the all available CPUs minus two. In case the graph is very large, and many segments are used as an input, setting n_cores to 1 might might be useful to avoid any RAM errors, while still achieving a fast computation. This is because the large data will be copied to each CPU which might slow things down.
-#' @param n_cores Optional. Specify the maximum size of the data passed to the parallel backend in MB. Defaults to 1500 (1.5 GB). Consider a higher value for large study areas (more than one 20°x20° tile).
+#' @param maxsize Optional. Specify the maximum size of the data passed to the parallel backend in MB. Defaults to 1500 (1.5 GB). Consider a higher value for large study areas (more than one 20°x20° tile).
 
 #'
 #' @importFrom future plan
 #' @importFrom doFuture registerDoFuture
 #' @importFrom parallel detectCores
-#' @importFrom data.table setDT setnames
-#' @importFrom igraph subcomponent subgraph as_data_frame
-#' @importFrom future.apply future_lapply
+#' @importFrom as.data.table setDT setnames unique order rbindlist setcolorder names setkey
+#' @importFrom igraph ego subgraph as_data_frame as_ids
+#' @importFrom future.apply future_lapply future_sapply future_mapply
+#' @importFrom dplyr mutate
 #' @importFrom memuse Sys.meminfo
 #' @export
 #'
@@ -25,27 +29,10 @@
 
 
 
-# todo:
-- use quotes or no quotes?
 
 
-usePackage <- function(p){
-  if (!is.element(p, installed.packages()[,1])) install.packages(p, dep = TRUE)
-  library(p, character.only = TRUE)
-}
 
-usePackage("future.apply")
-usePackage("doFuture")
-usePackage("future.batchtools")
-usePackage("dplyr")
-usePackage("parallel")
-
-
-g <- my_graph
-segmentID=c(371698007, 371698005, 371698008)
-
-# find_upstream <- function(g, aggregate_var=c("length", "flow_accum"), aggregate_type="sum") {
-segment_neighbours <- function(g, segmentID=NULL, order=5, mode="in", n_cores=NULL, maxsize=1500) {
+segment_neighbours <- function(g, segmentID=NULL, variable=NULL, stat=NULL, attach_only=F, order=5, mode="in", n_cores=NULL, maxsize=1500) {
 
 
   # Check input arguments
@@ -61,6 +48,7 @@ segment_neighbours <- function(g, segmentID=NULL, order=5, mode="in", n_cores=NU
     if (length(segmentID)>1 & n_cores==0)  stop("You have specified multiple segments but zero workers. Please specify at least n_cores=1, or leave it empty to allow an automatic setup.")
   }
 
+  if (attach_only==TRUE & missing(variable)) stop("No variable specified that should be attached to the stream segments. Please provide at least one variables from the input graph.")
 
 
   # Set available RAM for future.apply
@@ -122,87 +110,77 @@ segment_neighbours <- function(g, segmentID=NULL, order=5, mode="in", n_cores=NU
 
 
   # If aggregation was defined:
-  if(hasArg(agg_var)) {
+  if(!missing(variable)) {
 
-  cat("Attaching the attribute(s)", agg_var, "\n")
+
+  cat("Attaching the attribute(s)", variable, "\n")
   # Get the attributes for each edge
-  lookup_dt <- as.data.table(as_long_data_frame(g)[c("ver[el[, 1], ]", agg_var)])
-  names(lookup_dt)[1] <- "stream"
+  lookup_dt <- as.data.table(as_long_data_frame(g)[c("ver[el[, 1], ]", variable)])
+  names(lookup_dt)[1] <- "to_stream"
 
-  # Merge the network attributes.
-  dt <- lookup_dt[dt, on="stream"] # left join, preserves ordering
-  # Set col order
-  setcolorder(dt, c("stream", "to_stream", agg_var))
+  # Merge the network attributes and sort:
+  dt_join <- dt[lookup_dt, on="to_stream"] # lookup_dt[dt, on="stream"]  gives NAs
+  dt_join <- dt_join[order(-rank(stream))]
+  # Export only attached data
+  if(attach_only==TRUE) {
+    return(dt_join)
+# Else aggregate the variables to each "from" stream
+  } else if(attach_only==FALSE & !missing(stat))   {
+  cat("Aggregating variable(s)", variable, "for each segmentID.\n")
 
-
-  cat("Aggregating attribute(s)", agg_var, "for each segment. \n")
-
-  dt_agg <- dt[,lapply(.SD, agg_type, na.rm=TRUE),
-                         .SDcols=agg_var,
+  dt_agg <- dt_join[,lapply(.SD, stat, na.rm=TRUE),
+                         .SDcols=variable,
                          by="stream"]
-
-            return(dt_agg)
-          }  else {
+  dt_agg <- dt_agg[order(-rank(stream))]
+  return(dt_agg)
+          } else stop("Please provide the summary statistic for the aggregation.")
+    }  else {
            return(dt)
-     }
+          }
+  plan(sequential)
 }
 
 
 
-out <- segment_neighbours(my_graph, segmentID=as_ids(V(my_graph)), order=1, mode="in", n_cores=5)
 
 
-
-  ### Sort and remove the self-connection of the source stream
-  dt <- dt[order(stream, connected_to),]
-  # dt <- subset(dt, stream != connected_to)
-
-
-
-
-
-
-
-  cat("Clean up...\n")
-  # Stop parallel backend
-  plan(sequential, .cleanup = T)
-
-
-
-
-  cat("Setting up parallel backend...\n")
-  # Set up parallel backend
-  n_cores <- detectCores(logical=F)-2
-  registerDoFuture()
-  plan(multisession, workers = n_cores) # windows / linux
-
-
-
-
-  ### Get into datatable format
-
-  # specify names of list elements = connected_to
-  l <- future_sapply(l, setDT)
-
-  ### Merge as datatable
-  dt <- rbindlist(l)
-  names(dt)[1] <- "stream"
-
-
-
+# Test function
+usePackage <- function(p){
+  if (!is.element(p, installed.packages()[,1])) install.packages(p, dep = TRUE)
+  library(p, character.only = TRUE)
 }
 
+usePackage("future.apply")
+usePackage("doFuture")
+usePackage("future.batchtools")
+usePackage("dplyr")
+usePackage("parallel")
 
 
-# test functions
+g <- my_catchment
+segmentID=c(371901515)
 
-# provides only the upstream connection to each stream
+segmentID=as_ids(V(my_catchment))
+
+
+out <- segment_neighbours(my_catchment, segmentID=as_ids(V(my_catchment)),
+                          order=2, mode="in", n_cores=5,
+                          attach_only=F)
+
+out <- segment_neighbours(my_catchment, segmentID=as_ids(V(my_catchment)),
+                          order=2, mode="all", n_cores=5,
+                          variable=c("length", "source_elev"),
+                          stat=mean)
+
+
+out <- segment_neighbours(my_catchment, segmentID=as_ids(V(my_catchment)),
+                          order=2, mode="in", n_cores=5,
+                          variable=c("length", "source_elev"),
+                          stat=mean,
+                          attach_only=T)
 
 
 
-# # provides besides the upstream connection to each stream, also the aggregation of variables
-all_segments_out <- all_segments(my_catchment,
-                                 agg_var=c("length", "flow_accum"),
-                                 agg_type="sum") # or mean, sd, ...
 
-agg_var=c("length")
+
+
