@@ -5,9 +5,7 @@ export OUT=$2
 ## $1 is the raster tile or spatial vector path
 ## $2 is the output path
 
-for i in "$BAS"
-do
-	if [[ $(find "$BAS" -name "*tif") ]]
+if [[ $(find "$BAS" -name "*tif") ]];
 	then
 	# merge raster file by first creating a vrt and then do the merge
 	 gdalbuildvrt $BAS/basin.vrt $BAS/*.tif
@@ -20,4 +18,4 @@ do
 	 rm -f $BAS/basin_dissolved.gpkg  
 	 ogr2ogr  -nlt POLYGON -dialect sqlite -sql "SELECT ST_Union(ST_MakeValid(geom)),"ID" FROM merged GROUP BY "ID" " $OUT/basin_dissolved.gpkg $BAS/basin.gpkg
 	 rm -f $BAS/basin.gpkg 
-done
+	fi
