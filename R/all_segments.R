@@ -74,7 +74,7 @@ segment_neighbours <- function(g, segmentID=NULL, variable=NULL, stat=NULL, atta
     }
 
     if(get_os()=="osx" || get_os()=="linux")  {
-      plan(multisession, workers = n_cores) # multicore?
+      plan(multicore, workers = n_cores) # multicore?
     }
   }
 
@@ -144,40 +144,41 @@ segment_neighbours <- function(g, segmentID=NULL, variable=NULL, stat=NULL, atta
 
 
 
-# Test function
-usePackage <- function(p){
-  if (!is.element(p, installed.packages()[,1])) install.packages(p, dep = TRUE)
-  library(p, character.only = TRUE)
-}
-
-usePackage("future.apply")
-usePackage("doFuture")
-usePackage("future.batchtools")
-usePackage("dplyr")
-usePackage("parallel")
-
-
-g <- my_catchment
-segmentID=c(371901515)
-
-segmentID=as_ids(V(my_catchment))
+# # Test function
+# usePackage <- function(p){
+#   if (!is.element(p, installed.packages()[,1])) install.packages(p, dep = TRUE)
+#   library(p, character.only = TRUE)
+# }
+#
+# usePackage("future.apply")
+# usePackage("doFuture")
+# usePackage("future.batchtools")
+# usePackage("dplyr")
+# usePackage("parallel")
 
 
-out <- segment_neighbours(my_catchment, segmentID=as_ids(V(my_catchment)),
-                          order=2, mode="in", n_cores=1,
-                          attach_only=T)
-
-out <- segment_neighbours(my_catchment, segmentID=as_ids(V(my_catchment)),
-                          order=2, mode="all", n_cores=1,
-                          variable=c("length", "source_elev"),
-                          stat=median)
-
-
-out <- segment_neighbours(my_catchment, segmentID=as_ids(V(my_catchment)),
-                          order=2, mode="in", n_cores=1,
-                          variable=c("length", "source_elev"),
-                          stat=mean,
-                          attach_only=T)
+# g <- my_catchment
+# segmentID=c(371901515)
+#
+# segmentID=as_ids(V(my_catchment))
+#
+#
+# out <- segment_neighbours(my_graph, segmentID=as_ids(V(my_graph)),
+#                           order=5, mode="in", n_cores=20,
+#                           variable=c("length", "source_elev"),
+#                           attach_only=T)
+#
+# out <- segment_neighbours(my_catchment, segmentID=as_ids(V(my_graph)),
+#                           order=2, mode="all", n_cores=1,
+#                           variable=c("length", "source_elev"),
+#                           stat=median)
+#
+#
+# out <- segment_neighbours(my_catchment, segmentID=as_ids(V(my_graph)),
+#                           order=2, mode="in", n_cores=1,
+#                           variable=c("length", "source_elev"),
+#                           stat=mean,
+#                           attach_only=T)
 
 
 
