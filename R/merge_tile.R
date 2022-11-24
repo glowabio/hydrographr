@@ -12,17 +12,17 @@
 #' @export
 #'
 
-merge_tiles <- function(tile_path, output_path, rmerge_read == TRUE) {
+merge_tiles <- function(tile_path, output_path, rraster_read = TRUE, rvector_read = FALSE) {
 	if (missing(tile_path) || is.na(tile_path)) {
     tile_path <- "NOT_ASSIGNED" 
     } else {
       # Check operating system
       system <- get_os()
       if (system == "linux") {
- 	  merge_tiles <- run(system.file("sh", "merge_tiles.sh",
+ 	    merge_tiles <- run(system.file("sh", "merge_tiles.sh",
                            package = "hydrographr"),
                    args = c(tile_path),
-                   echo = FALSE)$stdout
+                   echo = TRUE)
 
        } else if (system == "windows") {
        # Check if WSL and Ubuntu are installed
