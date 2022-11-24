@@ -1,9 +1,9 @@
 
-#' Import GeoPackage file as multiple formats
+#' Read a GeoPackage file
 #'
-#' Import a Geopackage vector file , either as a table (data.table), as a directed graph object (igraph), a spatial dataframe (sf) or a SpatVect object (terra).
+#' Read a Geopackage vector file from disk either as a table (data.table), as a directed graph object (igraph), a spatial dataframe (sf) or a SpatVect object (terra).
 #'
-#' @param filename Name of the GeoPackage file to import, e.g. "order_vect_59.gpkg"
+#' @param filename Name of the GeoPackage file to import, e.g. "order_vect_segment_h00v00.gpkg"
 #' @param dt If TRUE, import the GeoPackage as a data.table
 #' @param g If TRUE, import the GeoPackage as a directed graph (igraph object)
 #' @param sf If TRUE, import the GeoPackage as a spatial dataframe (sf object)
@@ -17,15 +17,6 @@
 #' @importFrom terra vect
 #' @export
 #'
-
-
-
-
-
-# To do:
-# load demo data data
-
-
 
 
 
@@ -114,7 +105,7 @@ read_geopackage <- function(filename, dt=F, g=F, sf=F, SpatVect=F) {
 # my_graph <- read_geopackage("order_vect_segment_h10v08.gpkg", g=T)
 # my_table <- read_geopackage("order_vect_segment_h10v08.gpkg", g=T)
 #
-# # small file
+# small file
 # filename="order_vect_segment_h00v00.gpkg"
 # my_table <- read_geopackage("order_vect_segment_h00v00.gpkg", dt=T)
 # my_graph <- read_geopackage("order_vect_segment_h00v00.gpkg", g=T)
