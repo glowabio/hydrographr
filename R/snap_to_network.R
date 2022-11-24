@@ -1,5 +1,5 @@
 #' Snap data point to the next stream reach
-#' Snappes data points to the next stream reach within a defined radius
+#' Snaps data points to the next stream reach within a defined radius
 #' or based on a flow accumulation threshold,
 #'
 #'
@@ -18,7 +18,8 @@
 #' @importFrom processx run
 #' @export
 #'
-#'
+
+
 snap_to_network <- function(data, lon, lat, stream_path = NULL, radius = 500,
                             flow_path = NULL, thre = 0.5, quiet = TRUE) {
   # Check operating system
@@ -75,10 +76,10 @@ snap_to_network <- function(data, lon, lat, stream_path = NULL, radius = 500,
                  wsl_snap_tmp_path, wsl_tmp_path, wsl_sh_file),
         echo = !quiet)
   }
+  snapped_coord <- fread(paste0(tempdir(), "/snapped_points", rand_string, ".txt"),
+                             keepLeadingZeros = TRUE, header = TRUE, sep = " ")
 
-
-  }
-
-
+  # Remove files in the tmp folder
+  file.remove(snap_tmp_path)
 
 }
