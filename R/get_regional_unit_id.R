@@ -55,13 +55,12 @@ get_regional_unit_id <- function(data, lon, lat, quiet = TRUE) {
                                         "get_regional_unit_id.sh",
                                         package = "hydrographr"))
 
-    run("C:/Users/maria/Documents/Glowabio/Code/hydrographr/inst/bat/get_regional_unit_id.bat",
-      #system.file("bat", "get_regional_unit_id.bat",
-         #                           package = "hydrographr"),
-                        args = c(wsl_coord_tmp_path, lon, lat,
-                                 wsl_reg_unit_file, wsl_ids_tmp_path,
-                                 wsl_sh_file),
-                        echo = !quiet)
+    run(system.file("bat", "get_regional_unit_id.bat",
+                    package = "hydrographr"),
+        args = c(wsl_coord_tmp_path, lon, lat,
+                 wsl_reg_unit_file, wsl_ids_tmp_path,
+                 wsl_sh_file),
+        echo = !quiet)
   }
   # Read in the file containing the ids
   data_reg_unit_ids <- fread(paste0(tempdir(), "/reg_unit_ids", rand_string, ".txt"),
@@ -74,9 +73,7 @@ get_regional_unit_id <- function(data, lon, lat, quiet = TRUE) {
   return(data_reg_unit_ids$reg_unit_id)
 
 
-
   #  # To get tile ids based on the given extent of a study area:
-
 
 }
 
