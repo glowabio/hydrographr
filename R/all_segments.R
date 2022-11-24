@@ -10,7 +10,7 @@
 #' @param mode One of "in", "out", or "all". "in" reports only upstream neighbour segments, "out" resports only the downstream segments, and "all" does both.
 #' @param variable Optional. One or more attribute(s) or variable(s) of the input graph that should be reported for each output segmentID.
 #' @param attach_only Logical. If TRUE then the selected variables will be only attached to each for each segment without any further aggregation.
-#' @param stat One of mean, median, min, max, sd, or any user-specified function. Aggregates (or summarizes) the variables for the neighbourhood of each input stream segment (e.g., the average land cover in the next five upstream segments or sub-catchments).
+#' @param stat One of mean, median, min, max, sd (without quotes). Aggregates (or summarizes) the variables for the neighbourhood of each input stream segment (e.g., the average land cover in the next five upstream segments or sub-catchments).
 #' @param n_cores Optional. Specify the number of CPUs for internal parallelization in the case of multiple stream segments / outlets. Defaults to the all available CPUs minus two. In case the graph is very large, and many segments are used as an input, setting n_cores to 1 might might be useful to avoid any RAM errors, while still achieving a fast computation. This is because the large data will be copied to each CPU which might slow things down.
 #' @param maxsize Optional. Specify the maximum size of the data passed to the parallel backend in MB. Defaults to 1500 (1.5 GB). Consider a higher value for large study areas (more than one 20°x20° tile).
 
@@ -144,41 +144,41 @@ segment_neighbours <- function(g, segmentID=NULL, variable=NULL, stat=NULL, atta
 
 
 
-# Test function
-usePackage <- function(p){
-  if (!is.element(p, installed.packages()[,1])) install.packages(p, dep = TRUE)
-  library(p, character.only = TRUE)
-}
-
-usePackage("future.apply")
-usePackage("doFuture")
-usePackage("future.batchtools")
-usePackage("dplyr")
-usePackage("parallel")
-
-
-g <- my_catchment
-segmentID=c(371901515)
-
-segmentID=as_ids(V(my_catchment))
-
-
-out <- segment_neighbours(my_catchment, segmentID=as_ids(V(my_catchment)),
-                          order=2, mode="in", n_cores=5,
-                          attach_only=F)
-
-out <- segment_neighbours(my_catchment, segmentID=as_ids(V(my_catchment)),
-                          order=2, mode="all", n_cores=5,
-                          variable=c("length", "source_elev"),
-                          stat=mean)
-
-
-out <- segment_neighbours(my_catchment, segmentID=as_ids(V(my_catchment)),
-                          order=2, mode="in", n_cores=5,
-                          variable=c("length", "source_elev"),
-                          stat=mean,
-                          attach_only=T)
-
+# # Test function
+# usePackage <- function(p){
+#   if (!is.element(p, installed.packages()[,1])) install.packages(p, dep = TRUE)
+#   library(p, character.only = TRUE)
+# }
+#
+# usePackage("future.apply")
+# usePackage("doFuture")
+# usePackage("future.batchtools")
+# usePackage("dplyr")
+# usePackage("parallel")
+#
+#
+# g <- my_catchment
+# segmentID=c(371901515)
+#
+# segmentID=as_ids(V(my_catchment))
+#
+#
+# out <- segment_neighbours(my_catchment, segmentID=as_ids(V(my_catchment)),
+#                           order=2, mode="in", n_cores=5,
+#                           attach_only=T)
+#
+# out <- segment_neighbours(my_catchment, segmentID=as_ids(V(my_catchment)),
+#                           order=2, mode="all", n_cores=5,
+#                           variable=c("length", "source_elev"),
+#                           stat=median)
+#
+#
+# out <- segment_neighbours(my_catchment, segmentID=as_ids(V(my_catchment)),
+#                           order=2, mode="in", n_cores=5,
+#                           variable=c("length", "source_elev"),
+#                           stat=mean,
+#                           attach_only=T)
+#
 
 
 
