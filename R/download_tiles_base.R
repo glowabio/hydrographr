@@ -1,5 +1,5 @@
 #' Downloads a single file from https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4?path=%2F.
-#' It is called by the function download_tiles.
+#' It is called and inherits arguments by the function 'download_tiles()'.
 #'
 #' @param variable vector of variable names (character)
 #' @param filetype format of the requested file ("tif" or "gpkg")
