@@ -4,6 +4,7 @@
 #' Read a Geopackage vector file from disk either as a table (data.table), as a directed graph object (igraph), a spatial dataframe (sf) or a SpatVect object (terra).
 #'
 #' @param filename Name of the GeoPackage file to import, e.g. "order_vect_segment_h00v00.gpkg"
+#' @param SQL_table Optional. Name of the specific data to import from the GeoPackage. Defaults to "merged" in the case of the Hydrography90m stream network.
 #' @param dt If TRUE, import the GeoPackage as a data.table
 #' @param g If TRUE, import the GeoPackage as a directed graph (igraph object)
 #' @param sf If TRUE, import the GeoPackage as a spatial dataframe (sf object)
@@ -22,7 +23,7 @@
 
 
 # Import a geopackage from disk as a data.table
-read_geopackage <- function(filename, dt=F, g=F, sf=F, SpatVect=F) {
+read_geopackage <- function(filename, dt=F, g=F, sf=F, SpatVect=F, SQL_table="merged") {
 
   # Test input argumnets
   if(missing(filename)) stop("Please specify the input geopackage file.")
@@ -42,10 +43,10 @@ read_geopackage <- function(filename, dt=F, g=F, sf=F, SpatVect=F) {
   # create a connection to the SQLite database
   cat("Opening SQL connection...\n")
   conn <- dbConnect(drv=RSQLite::SQLite(), dbname=filename) # get connection
-  # conn_table <- dbListTables(conn) # list all tables
-  conn_table <- "merged" # "SELECT"
+  # SQL_table <- dbListTables(conn) # list all tables
+  # SQL_table <- "merged" # "SELECT"
   cat("Reading GeoPackage file...\n")
-  network_table <- dbGetQuery(conn=conn, statement=paste0("SELECT * FROM '", conn_table, "'")) # Read the database
+  network_table <- dbGetQuery(conn=conn, statement=paste0("SELECT * FROM '", SQL_table, "'")) # Read the database
   setDT(network_table) # convert to data.table
   #If vertices is NULL, then the first two columns of d are used as a symbolic edge list and additional columns as edge attributes. The names of the attributes are taken from the names of the columns. Remove the columns for the subsequent igraph functions.
   try(network_table[, c("geom","fid", "cat"):=NULL], silent = T)
@@ -67,7 +68,7 @@ read_geopackage <- function(filename, dt=F, g=F, sf=F, SpatVect=F) {
     cat("Importing as a sf spatial dataframe...\n")
     sf <- read_sf(filename, as_tibble=F) # tibble=F to avoid exponential numbera
     return(sf)  } else if (SpatVect==T) {
-    cat("Importing as a terra SpatVect file...\n")
+    cat("Importing as a terra SpatVect object...\n")
     sf <- read_sf(filename)
     vect <- vect(sf)
     return(vect)
