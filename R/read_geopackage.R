@@ -59,11 +59,13 @@ read_geopackage <- function(filename, type=NULL, SQL_table=NULL, dt=F, g=F, sf=F
   cat("Reading GeoPackage file...\n")
   network_table <- dbGetQuery(conn=conn, statement=paste0("SELECT * FROM '", SQL_table, "'")) # Read the database
   setDT(network_table) # convert to data.table
+
   #If vertices is NULL, then the first two columns of d are used as a symbolic edge list and additional columns as edge attributes. The names of the attributes are taken from the names of the columns. Remove the columns for the subsequent igraph functions.
-  try(network_table[, c("geom","fid", "cat"):=NULL], silent = T)
-  # network_table$geom <- NULL
-  # network_table$fid <- NULL
-  # network_table$cat <- NULL
+
+  # which columns to remove:
+  toss_these <- which(network_table[,!names(network_table) %in% c("geom","fid", "cat")]==TRUE)
+  network_table <- network_table[,..toss_these]
+
   cat("Closing SQL connection...\n")
   dbDisconnect(conn) # close db connection
 
