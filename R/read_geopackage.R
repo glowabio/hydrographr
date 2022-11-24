@@ -5,7 +5,7 @@
 #'
 #' @param filename Name of the GeoPackage file to import, e.g. "order_vect_segment_h00v00.gpkg"
 #' @param type Either "net" for importing a network, or "catch" for sub-catchments.
-#' @param SQL_table Optional. Name of the specific data to import from the GeoPackage. Defaults to "merged" in the case of the Hydrography90m stream network.
+#' @param SQL_table Optional. Name of the specific data to import from the GeoPackage. This is set automatically for the Hydrography90m data, and needs to be specified for any other data.
 #' @param dt If TRUE, import the GeoPackage as a data.table.
 #' @param g If TRUE, import the GeoPackage as a directed graph (igraph object). Only possible for a network.
 #' @param sf If TRUE, import the GeoPackage as a spatial dataframe (sf object).
@@ -24,7 +24,7 @@
 
 
 # Import a geopackage from disk as a data.table
-read_geopackage <- function(filename, type=NULL, dt=F, g=F, sf=F, SpatVect=F, SQL_table=NULL) {
+read_geopackage <- function(filename, type=NULL, SQL_table=NULL, dt=F, g=F, sf=F, SpatVect=F) {
 
   # Test input arguments
   if(missing(filename)) stop("Please specify the input geopackage file.")
