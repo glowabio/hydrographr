@@ -79,6 +79,8 @@ sudo apt-get install grass grass-core grass-dev grass-gui grass-doc
 **GRASS GIS addons**
 Copy-paste the commands below to install the required addons for GRASS GIS
 ```{bash, eval=FALSE}
+sudo apt install make
+
 export GRASSEXEC="grass --exec"
 $GRASSEXEC  g.extension  extension=r.stream.distance
 $GRASSEXEC  g.extension  extension=r.stream.order
