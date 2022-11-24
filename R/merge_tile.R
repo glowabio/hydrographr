@@ -15,6 +15,9 @@
 merge_tiles <- function(tile_path, output_path, rraster_read = TRUE, rvector_read = FALSE) {
 	if (missing(tile_path) || is.na(tile_path)) {
     tile_path <- "NOT_ASSIGNED" 
+    }
+  if (missing(output_path) || is.na(output_path)) {
+    output_path <- "NOT_ASSIGNED" 
     } else {
       # Check operating system
       system <- get_os()
@@ -27,25 +30,30 @@ merge_tiles <- function(tile_path, output_path, rraster_read = TRUE, rvector_rea
        } else if (system == "windows") {
        # Check if WSL and Ubuntu are installed
        check_wsl()
-       # Change paths for WSL
+       # Change path for WSL
        wsl_tile_path <- fix_path(tile_path)
        wsl_output_path <- fix_path(output_path)
-       wsl_sh_mer_file <- fix_path(
+       wsl_sh_file <- fix_path(
          system.file("sh", "merge_tiles.sh",
                     package = "hydrographr"))
+
+       run(system.file("bat", "merge_tiles.bat",
+                    package = "hydrographr"),
+        args = c(wsl_tile_path, wsl_output_path, wsl_sh_mer_file),
+        echo = !quiet)
        }
     }
 
  	if (rraster_read == TRUE) {
       # Read merged .tif layer
-      merge_tiles <- rast(output_path)
+      merge_tiles <- rast(output_path/basin.tif)
 
       return(merge_tiles)
     }
     
     if (rvector_read == FALSE) {
       # Read merged vector layer
-      merge_tiles <- vect(output_path/basin.tif) 
+      merge_tiles <- vect(output_path/basin_dissolved.gpkg) 
 
       return(merge_tiles)
     } else {
