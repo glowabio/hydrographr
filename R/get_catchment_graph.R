@@ -152,37 +152,37 @@ get_catchment_graph <- function(g, segmentID=NULL, outlet=F, graph=F, n_cores=NU
 # usePackage("memuse")
 # g <- my_graph
 
-
-segmentID = 513868395
-
-my_seg = 513868395
-my_seg = c(513853532, 513833203, 513853533, 513853535)
-segmentID = c(513853532, 513833203, 513853533, 513853535)
-
-my_seg = data.frame(ID=c(513853532, 513833203, 513853533, 513853535,513853532, 513833203, 513853533, 513853535))
-
-
-my_catchment <- get_catchment_graph(my_graph, segmentID = my_seg, outlet=F, graph=F, n_cores=3)
-my_catchment <- get_catchment_graph(my_graph, segmentID = my_seg, outlet=T, graph=F, n_cores=3)
-
-
-my_catchment <- get_catchment_graph(my_graph, segmentID = my_seg$ID, outlet=F, graph=F, n_cores=2)
-my_catchment <- get_catchment_graph(my_graph, segmentID = my_seg$ID, outlet=T, graph=T, n_cores=2)
-my_catchment <- get_catchment_graph(my_graph, segmentID = my_seg$ID, outlet=T, graph=T)
-my_catchment <- get_catchment_graph(my_graph, outlet=F) # OK
-my_catchment <- get_catchment_graph(my_graph, outlet=T)
-
-1.83652939e8
-
-# big file
-my_seg=c(173368095, 173373237, 173353203, 173363307)
-
-my_seg=c(183959344, 183959344, 183959344)
-
-my_seg=371901515 #h00v00
-my_catchment <- get_catchment_graph(my_graph, segmentID = my_seg, outlet=F, graph=T, n_cores=1)
-
-summary(my_table)
-my_table[order(-rank(flow_accum))]
+#
+# segmentID = 513868395
+#
+# my_seg = 513868395
+# my_seg = c(513853532, 513833203, 513853533, 513853535)
+# segmentID = c(513853532, 513833203, 513853533, 513853535)
+#
+# my_seg = data.frame(ID=c(513853532, 513833203, 513853533, 513853535,513853532, 513833203, 513853533, 513853535))
+#
+#
+# my_catchment <- get_catchment_graph(my_graph, segmentID = my_seg, outlet=F, graph=F, n_cores=3)
+# my_catchment <- get_catchment_graph(my_graph, segmentID = my_seg, outlet=T, graph=F, n_cores=3)
+#
+#
+# my_catchment <- get_catchment_graph(my_graph, segmentID = my_seg$ID, outlet=F, graph=F, n_cores=2)
+# my_catchment <- get_catchment_graph(my_graph, segmentID = my_seg$ID, outlet=T, graph=T, n_cores=2)
+# my_catchment <- get_catchment_graph(my_graph, segmentID = my_seg$ID, outlet=T, graph=T)
+# my_catchment <- get_catchment_graph(my_graph, outlet=F) # OK
+# my_catchment <- get_catchment_graph(my_graph, outlet=T)
+#
+# 1.83652939e8
+#
+# # big file
+# my_seg=c(173368095, 173373237, 173353203, 173363307)
+#
+# my_seg=c(183959344, 183959344, 183959344)
+#
+# my_seg=371901515 #h00v00
+# my_catchment <- get_catchment_graph(my_graph, segmentID = my_seg, outlet=F, graph=T, n_cores=1)
+#
+# summary(my_table)
+# my_table[order(-rank(flow_accum))]
 
 
