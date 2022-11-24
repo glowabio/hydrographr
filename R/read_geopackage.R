@@ -33,7 +33,8 @@ read_geopackage <- function(filename, type=NULL, SQL_table=NULL, dt=F, g=F, sf=F
   if(dt==FALSE & g==FALSE & sf==FALSE & SpatVect==FALSE) {
     stop("Please select one output type.\n")
   }
-  if(type!="net" & type!="catch") stop("Please specify 'net' or 'catch' as the input file type.")
+  if(missing(type)) stop("Please specify 'net' or 'catch' as the input file type.")
+  if(!any(c("net", "catch") %in% type)) stop("Please specify 'net' or 'catch' as the input file type.")
   if(type=="catch" & g==TRUE) stop("A graph can only be created from a network.")
 
 
@@ -123,7 +124,7 @@ read_geopackage <- function(filename, type=NULL, SQL_table=NULL, dt=F, g=F, sf=F
 # filename="order_vect_segment_h00v00.gpkg"
 # filename="sub_catchment_h00v00.gpkg"
 # my_table <- read_geopackage("order_vect_segment_h00v00.gpkg", type="net", dt=T)
-# my_graph <- read_geopackage("order_vect_segment_h00v00.gpkg", g=T)
+# my_graph <- read_geopackage("order_vect_segment_h00v00.gpkg", type="net", g=T)
 # my_sf <- read_geopackage("order_vect_segment_h00v00.gpkg", sf=T)
 # my_vect <- read_geopackage("order_vect_segment_h00v00.gpkg", SpatVect=T)
 
