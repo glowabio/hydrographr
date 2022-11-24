@@ -114,11 +114,12 @@ segment_neighbours <- function(g, segmentID=NULL, variable=NULL, stat=NULL, atta
 
 
   cat("Attaching the attribute(s)", variable, "\n")
-  # Get the attributes for each edge
+  # Get the attributes for all edges of the full graph
   lookup_dt <- as.data.table(as_long_data_frame(g)[c("ver[el[, 1], ]", variable)])
-  names(lookup_dt)[1] <- "to_stream"
+  names(lookup_dt)[1] <- "stream"
 
   # Merge the network attributes and sort:
+  dt_join <- merge(dt, lookup_dt, by="stream", all.x=TRUE)
   dt_join <- dt[lookup_dt, on="to_stream"] # lookup_dt[dt, on="stream"]  gives NAs
   dt_join <- dt_join[order(-rank(stream))]
   # Export only attached data
@@ -160,25 +161,25 @@ segment_neighbours <- function(g, segmentID=NULL, variable=NULL, stat=NULL, atta
 # g <- my_catchment
 # segmentID=c(371901515)
 #
-# segmentID=as_ids(V(my_catchment))
-#
-#
-# out <- segment_neighbours(my_graph, segmentID=as_ids(V(my_graph)),
-#                           order=5, mode="in", n_cores=20,
-#                           variable=c("length", "source_elev"),
-#                           attach_only=T)
-#
-# out <- segment_neighbours(my_catchment, segmentID=as_ids(V(my_graph)),
-#                           order=2, mode="all", n_cores=1,
-#                           variable=c("length", "source_elev"),
-#                           stat=median)
-#
-#
-# out <- segment_neighbours(my_catchment, segmentID=as_ids(V(my_graph)),
-#                           order=2, mode="in", n_cores=1,
-#                           variable=c("length", "source_elev"),
-#                           stat=mean,
-#                           attach_only=T)
+segmentID=tail(as_ids(V(my_graph)))
+
+
+out <- segment_neighbours(my_graph, segmentID=segmentID,
+                          order=5, mode="in", n_cores=1,
+                          variable=c("length", "source_elev"),
+                          attach_only=T)
+
+out <- segment_neighbours(my_graph, segmentID=segmentID,
+                          order=2, mode="in", n_cores=1,
+                          variable=c("length", "source_elev"),
+                          stat=median)
+
+
+out <- segment_neighbours(my_graph, segmentID=segmentID,
+                          order=2, mode="in", n_cores=1,
+                          variable=c("length", "source_elev"),
+                          stat=mean,
+                          attach_only=T)
 
 
 
