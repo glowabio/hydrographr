@@ -30,6 +30,19 @@ get_os <- function() {
 }
 
 
+#' Make bash scripts executable
+#'
+#' @keywords internal
+#
+
+make_sh_exec <- function() {
+  sh_files <- list.files(system.file("sh", package = "hydrographr"),
+                      pattern = "\\.sh", full.names = TRUE)
+  lapply(sh_files, function(x) system(command = paste0("chmod u+x ", x)))
+
+}
+
+
 #' Check if WSL and Ubuntu is installed on Windows
 #'
 #' @keywords internal
