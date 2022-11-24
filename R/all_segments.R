@@ -1,13 +1,13 @@
 #' Stream segment neighbours
 #'
-#' For each segment, report those segments that are connected to one or multiple inout segments within a specified neighbour order, with the option to summarize attributes for these segments.
+#' For each segment, report those segments that are connected to one or multiple input segments within a specified neighbour order, with the option to summarize attributes across these segments.
 #'
-#' In addition, variables can be selected that should be aggregated, e.g. the upstream landcover. This function can also be used to create the connectivity table for Marxan by using agg_var="length" and agg_type="sum". The resulting table reports the upstream connectivity from each segment, along with the distance to all upstream segments.
+#' This function can also be used to create the connectivity table for Marxan by using agg_var="length" and attach_only=TRUE. The resulting table reports the connectivity from each segment, along with the stream length for all connected segments.
 #'
 #' @param g A directed graph (igraph object).
 #' @param segmentID The input segment IDs as a numerical vector for which to search the connected segments.
 #' @param order The neighbouring order. Order=1 would be immediate neighbours of the input segementID, order=2 would be the order 1 plus the immediate neighbours of the segementIDs in order 1.
-#' @param mode One of "in", "out", or "all". "in" reports only upstream neighbour segments, "out" resports only the downstream segments, and "all" does both.
+#' @param mode One of "in", "out", or "all". "in" reports only upstream neighbour segments, "out" reports only the downstream segments, and "all" does both.
 #' @param variable Optional. One or more attribute(s) or variable(s) of the input graph that should be reported for each output segmentID.
 #' @param attach_only Logical. If TRUE then the selected variables will be only attached to each for each segment without any further aggregation.
 #' @param stat One of mean, median, min, max, sd (without quotes). Aggregates (or summarizes) the variables for the neighbourhood of each input stream segment (e.g., the average land cover in the next five upstream segments or sub-catchments).
@@ -144,41 +144,41 @@ segment_neighbours <- function(g, segmentID=NULL, variable=NULL, stat=NULL, atta
 
 
 
-# # Test function
-# usePackage <- function(p){
-#   if (!is.element(p, installed.packages()[,1])) install.packages(p, dep = TRUE)
-#   library(p, character.only = TRUE)
-# }
-#
-# usePackage("future.apply")
-# usePackage("doFuture")
-# usePackage("future.batchtools")
-# usePackage("dplyr")
-# usePackage("parallel")
-#
-#
-# g <- my_catchment
-# segmentID=c(371901515)
-#
-# segmentID=as_ids(V(my_catchment))
-#
-#
-# out <- segment_neighbours(my_catchment, segmentID=as_ids(V(my_catchment)),
-#                           order=2, mode="in", n_cores=5,
-#                           attach_only=T)
-#
-# out <- segment_neighbours(my_catchment, segmentID=as_ids(V(my_catchment)),
-#                           order=2, mode="all", n_cores=5,
-#                           variable=c("length", "source_elev"),
-#                           stat=median)
-#
-#
-# out <- segment_neighbours(my_catchment, segmentID=as_ids(V(my_catchment)),
-#                           order=2, mode="in", n_cores=5,
-#                           variable=c("length", "source_elev"),
-#                           stat=mean,
-#                           attach_only=T)
-#
+# Test function
+usePackage <- function(p){
+  if (!is.element(p, installed.packages()[,1])) install.packages(p, dep = TRUE)
+  library(p, character.only = TRUE)
+}
+
+usePackage("future.apply")
+usePackage("doFuture")
+usePackage("future.batchtools")
+usePackage("dplyr")
+usePackage("parallel")
+
+
+g <- my_catchment
+segmentID=c(371901515)
+
+segmentID=as_ids(V(my_catchment))
+
+
+out <- segment_neighbours(my_catchment, segmentID=as_ids(V(my_catchment)),
+                          order=2, mode="in", n_cores=1,
+                          attach_only=T)
+
+out <- segment_neighbours(my_catchment, segmentID=as_ids(V(my_catchment)),
+                          order=2, mode="all", n_cores=1,
+                          variable=c("length", "source_elev"),
+                          stat=median)
+
+
+out <- segment_neighbours(my_catchment, segmentID=as_ids(V(my_catchment)),
+                          order=2, mode="in", n_cores=1,
+                          variable=c("length", "source_elev"),
+                          stat=mean,
+                          attach_only=T)
+
 
 
 
