@@ -5,7 +5,8 @@ export OUT=$2
 ## $1 is the raster tile or spatial vector path
 ## $2 is the output path
 
-for i in "$BAS"; do
+for i in "$BAS"
+do
 	# merge raster file by first creating a vrt and then do the merge
 	 gdalbuildvrt $BAS/basin.vrt $BAS/*.tif
 	 rm -f $BAS/basin.tif
