@@ -75,3 +75,14 @@ Copy-paste the commands below or see the [GRASS GIS](https://grass.osgeo.org/dow
 # Install GRASS GIS
 sudo apt-get install grass grass-core grass-dev grass-gui grass-doc
 ```
+
+**GRASS GIS addons**
+Copy-paste the commands below to install the required addons for GRASS GIS
+```{bash, eval=FALSE}
+export GRASSEXEC="grass --exec"
+$GRASSEXEC  g.extension  extension=r.stream.distance
+$GRASSEXEC  g.extension  extension=r.stream.order
+$GRASSEXEC  g.extension  extension=r.stream.snap
+$GRASSEXEC  g.extension  extension=r.stream.basins
+```
+
