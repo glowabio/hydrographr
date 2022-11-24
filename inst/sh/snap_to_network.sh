@@ -2,7 +2,7 @@
 
 ##  file (e.g. txt or csv) that has been generated at the beginning
 ##  of the R function, based on the data.frame table the user provided 
-export DAT=$1
+export DATA=$1
 
 ## names of the lon and lat columns
 export LON=$2
@@ -24,13 +24,13 @@ export acct=$7
 export SNAP=$8
 
 ## Temporary folder
-export TMPDIR=$9
+export DIR=$9
 
 ## Set random string
 export RAND_STRING=$(xxd -l 8 -c 32 -p < /dev/random)
 
 ## save name of file without extension
-b=$(echo $DAT | awk -F"." '{print $1}')
+#b=$(echo $DAT | awk -F"." '{print $1}')
 
 # Note: Tmp output from R is already a .csv
 # if the file is not csv, add the comma and make it .csv
@@ -42,14 +42,14 @@ b=$(echo $DAT | awk -F"." '{print $1}')
 
 ##  make the file a gpkg
 ogr2ogr -f "GPKG" -overwrite -nln ref_points -nlt POINT -a_srs EPSG:4326 \
-    $TMPDIR/ref_points_${RAND_STRING}.gpkg $DATC -oo X_POSSIBLE_NAMES=$LON \
+    $DIR/ref_points_${RAND_STRING}.gpkg $DATA -oo X_POSSIBLE_NAMES=$LON \
     -oo Y_POSSIBLE_NAMES=$LAT -oo AUTODETECT_TYPE=YES
 
 
 ##  do the snapping in GRASS
-grass78 -f -text --tmp-location -c $STR  <<'EOF'
+grass -f --text --tmp-location $STR  <<'EOF'
 
-v.in.ogr --o input=$TMPDIR/ref_points_${RAND_STRING}.gpkg layer=ref_points output=ref_points \
+v.in.ogr --o input=$DIR/ref_points_${RAND_STRING}.gpkg layer=ref_points output=ref_points \
     type=point #key=
 
 r.in.gdal input=$STR output=stream
@@ -66,12 +66,13 @@ else
 fi
 
 v.out.ascii -c input=snap_points separator=space | awk '{print $1, $2}' \
-    > $TMPDIR/snap_coords_${RAND_STRING}.txt
+    > $DIR/snap_coords_${RAND_STRING}.txt
 
-sed -i 's/east/lon_snap/g' $TMPDIR/snap_coords_${RAND_STRING}.txt
-sed -i 's/north/lat_snap/g' $TMPDIR/snap_coords_${RAND_STRING}.txt
+sed -i 's/east/lon_snap/g' $DIR/snap_coords_${RAND_STRING}.txt
+sed -i 's/north/lat_snap/g' $DIR/snap_coords_${RAND_STRING}.txt
 
-paste -d" " $DAT $TMPDIR/snap_coords_${RAND_STRING}.txt >  $SNAP
+cat  $DATA | tr -s ',' ' ' > $DIR/coords_${RAND_STRING}.txt
+paste -d" " $DIR/coords_${RAND_STRING}.txt $DIR/snap_coords_${RAND_STRING}.txt >  $SNAP
 
 EOF
 
