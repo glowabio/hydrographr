@@ -39,7 +39,7 @@ merge_tiles <- function(tile_path, output_path, rraster_read = TRUE, rvector_rea
 
        run(system.file("bat", "merge_tiles.bat",
                     package = "hydrographr"),
-        args = c(wsl_tile_path, wsl_output_path, wsl_sh_mer_file),
+        args = c(wsl_tile_path, wsl_output_path, wsl_sh_file),
         echo = !quiet)
        }
     }
