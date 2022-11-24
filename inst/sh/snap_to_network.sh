@@ -27,6 +27,7 @@ export SNAP=$8
 export TMPDIR=$9
 
 ## Set random string
+export RAND_STRING=$(xxd -l 8 -c 32 -p < /dev/random)
 
 ## save name of file without extension
 b=$(echo $DAT | awk -F"." '{print $1}')
@@ -41,14 +42,14 @@ b=$(echo $DAT | awk -F"." '{print $1}')
 
 ##  make the file a gpkg
 ogr2ogr -f "GPKG" -overwrite -nln ref_points -nlt POINT -a_srs EPSG:4326 \
-    $TMPDIR/ref_points.gpkg $DATC -oo X_POSSIBLE_NAMES=$LON \
+    $TMPDIR/ref_points_${RAND_STRING}.gpkg $DATC -oo X_POSSIBLE_NAMES=$LON \
     -oo Y_POSSIBLE_NAMES=$LAT -oo AUTODETECT_TYPE=YES
 
 
 ##  do the snapping in GRASS
 grass78 -f -text --tmp-location -c $STR  <<'EOF'
 
-v.in.ogr --o input=$DIR/ref_points.gpkg layer=ref_points output=ref_points \
+v.in.ogr --o input=$TMPDIR/ref_points_${RAND_STRING}.gpkg layer=ref_points output=ref_points \
     type=point #key=
 
 r.in.gdal input=$STR output=stream
@@ -64,13 +65,13 @@ else
 fi
 
 v.out.ascii -c input=snap_points separator=space | awk '{print $1, $2}' \
-    > $DIR/snap_coords.txt
+    > $TMPDIR/snap_coords_${RAND_STRING}.txt
 
-sed -i 's/east/lon_snap/g' $DIR/snap_coords.txt
-sed -i 's/north/lat_snap/g' $DIR/snap_coords.txt
+sed -i 's/east/lon_snap/g' $TMPDIR/snap_coords_${RAND_STRING}.txt
+sed -i 's/north/lat_snap/g' $TMPDIR/snap_coords_${RAND_STRING}.txt
 
-paste -d" " $DAT $DIR/snap_coords.txt >  $DIR/${b}_snap.txt
+paste -d" " $DAT $TMPDIR/snap_coords_${RAND_STRING}.txt >  $SNAP
 
 EOF
 
-rm $DIR/snap_coords.txt $DIR/$DATC $DIR/ref_points.gpkg
+rm $DIR/snap_coords_${RAND_STRING}.txt  $DIR/ref_points_${RAND_STRING}.gpkg #$DIR/$DATC
