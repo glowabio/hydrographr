@@ -54,7 +54,8 @@ v.in.ogr --o input=$TMPDIR/ref_points_${RAND_STRING}.gpkg layer=ref_points outpu
 
 r.in.gdal input=$STR output=stream
 
-if [ ! -z $ACC  ]
+
+if [ "$STR" = "NA"  ]
 then 
     r.in.gdal input=$ACC output=accum
     r.stream.snap --o input=ref_points output=snap_points stream_rast=stream \
