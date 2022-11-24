@@ -103,20 +103,20 @@ read_geopackage <- function(filename, dt=F, g=F, sf=F, SpatVect=F) {
 
 
 
-my_table <- read_geopackage("order_vect_59.gpkg", dt=T) # loads a data.table
-my_graph <- read_geopackage("order_vect_59.gpkg", g=T) # loads as an directed graph
-my_sf <- read_geopackage("order_vect_59.gpkg", sf=T) # loads as an spatial dataframe
-my_vect <- read_geopackage("order_vect_59.gpkg", SpatVect=T) # loads as an terra object
-
-
-big file:
-filename="order_vect_segment_h10v08.gpkg"
-my_graph <- read_geopackage("order_vect_segment_h10v08.gpkg", g=T)
-my_table <- read_geopackage("order_vect_segment_h10v08.gpkg", g=T)
-
-# small file
-filename="order_vect_segment_h00v00.gpkg"
-my_table <- read_geopackage("order_vect_segment_h00v00.gpkg", dt=T)
-my_graph <- read_geopackage("order_vect_segment_h00v00.gpkg", g=T)
-my_sf <- read_geopackage("order_vect_segment_h00v00.gpkg", sf=T)
-my_vect <- read_geopackage("order_vect_segment_h00v00.gpkg", SpatVect=T)
+# my_table <- read_geopackage("order_vect_59.gpkg", dt=T) # loads a data.table
+# my_graph <- read_geopackage("order_vect_59.gpkg", g=T) # loads as an directed graph
+# my_sf <- read_geopackage("order_vect_59.gpkg", sf=T) # loads as an spatial dataframe
+# my_vect <- read_geopackage("order_vect_59.gpkg", SpatVect=T) # loads as an terra object
+#
+#
+# big file:
+# filename="order_vect_segment_h10v08.gpkg"
+# my_graph <- read_geopackage("order_vect_segment_h10v08.gpkg", g=T)
+# my_table <- read_geopackage("order_vect_segment_h10v08.gpkg", g=T)
+#
+# # small file
+# filename="order_vect_segment_h00v00.gpkg"
+# my_table <- read_geopackage("order_vect_segment_h00v00.gpkg", dt=T)
+# my_graph <- read_geopackage("order_vect_segment_h00v00.gpkg", g=T)
+# my_sf <- read_geopackage("order_vect_segment_h00v00.gpkg", sf=T)
+# my_vect <- read_geopackage("order_vect_segment_h00v00.gpkg", SpatVect=T)
