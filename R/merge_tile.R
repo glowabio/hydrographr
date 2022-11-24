@@ -21,7 +21,7 @@ merge_tiles <- function(tile_path, output_path, rraster_read = TRUE, rvector_rea
       if (system == "linux") {
  	    merge_tiles <- run(system.file("sh", "merge_tiles.sh",
                            package = "hydrographr"),
-                   args = c(tile_path),
+                   args = c(tile_path, output_path),
                    echo = TRUE)
 
        } else if (system == "windows") {
