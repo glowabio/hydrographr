@@ -43,10 +43,6 @@ get_regional_unit_id <- function(data, lon, lat) {
   return(data_reg_unit_ids$reg_unit_id)
 
 
-
-  #  # To get tile ids based on the given extent of a study area:
-
-
 }
 
 
