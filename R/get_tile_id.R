@@ -11,7 +11,6 @@
 #' @importFrom processx run
 # ' @importFrom rlang is_missing
 # ' @importFrom terra vect ext
-
 #' @export
 #'
 #'
@@ -25,7 +24,6 @@ get_tile_id <- function(data, lon, lat) {
                                package = "hydrographr"))
 
   # Find the tile ID in the lookup table based on the regional unit id
-  tile_id <- sort(unique(lookup[lookup$reg_unit %in% reg_un, tile]))
-  tile_id
+  sort(unique(lookup[lookup$reg_unit %in% reg_un, tile]))
 
 }
