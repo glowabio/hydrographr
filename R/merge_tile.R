@@ -36,7 +36,7 @@ merge_tiles <- function(tile_path, output_path, rraster_read = TRUE, rvector_rea
  	    merge_tiles <- run(system.file("sh", "merge_tiles.sh",
                            package = "hydrographr"),
                    args = c(tile_path, output_path),
-                   echo = TRUE)
+                   echo = FALSE)
 
        } else if (system == "windows") {
        # Check if WSL and Ubuntu are installed
@@ -51,7 +51,7 @@ merge_tiles <- function(tile_path, output_path, rraster_read = TRUE, rvector_rea
        run(system.file("bat", "merge_tiles.bat",
                     package = "hydrographr"),
         args = c(wsl_tile_path, wsl_output_path, wsl_sh_file),
-        echo = !quiet)
+        echo = FALSE)
        }
     }
 
