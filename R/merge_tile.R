@@ -1,17 +1,22 @@
 #' @title merge_tiles
 
-#' @description Merge all raster or spatial vector objects in one folder set as the input folder 
-to form a new raster or spatial vector object with a larger spatial extent. 
+#' @description Merge all raster or spatial vector objects in one folder, set as the input folder, 
+#' to form a new raster or spatial vector object with a larger spatial extent. Important the input folder 
+#' should only either contain raster tif or spatial vector geopackage files.
+
 #' @param tile_path Path to raster tile or spatial vector
 #' @param output_path Path to write the output
+#' @param rraster_read If TRUE merged raster .tif layer gets read into R.
+#' TRUE is set by default
+#' @param rvector_read If TRUE merged spatial vector gets read into R.
+#' FALSE is set by default and if TRUE rraster_read needs to be set to FALSE
+
 #' @importFrom processx run
 #' @importFrom terra rast
 #' @importFrom terra vect
-#' @param rraster_read If TRUE merged raster .tif layer gets read into R.
-#' TRUE is set by default.
-#' @param rvector_read If TRUE merged spatial vector gets read into R.
-#' FALSE is set by default.
 #' @export
+#'
+#' @return A .tif raster file or spatial vector object
 #'
 
 merge_tiles <- function(tile_path, output_path, rraster_read = TRUE, rvector_read = FALSE) {
@@ -60,6 +65,6 @@ merge_tiles <- function(tile_path, output_path, rraster_read = TRUE, rvector_rea
       return(merge_tiles)
     } else {
       # Print message
-      print(paste0("Merge saved under: ", output_path))
+      cat("Merge saved under: ", output_path)
     }
  }
