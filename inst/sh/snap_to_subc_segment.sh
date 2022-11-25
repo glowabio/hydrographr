@@ -1,12 +1,12 @@
 #! /bin/bash
 
 ### testing
-#export DAT=spdata_1264942_ids.txt
+#export DATA=spdata_1264942_ids.txt
 #export DIR=/home/marquez/hydrographr
-#export TMP=/home/marquez/hydrographr 
-#[ ! -d $TMP/snappoints ] && mkdir $TMP/snappoints
-#export OUTDIR=$TMP/snappoints
-#export SITE=$( awk 'NR==1 {print $1}' $DAT )
+#export DIR=/home/marquez/hydrographr 
+#[ ! -d $DIR/snappoints ] && mkdir $DIR/snappoints
+#export OUTDIR=$DIR/snappoints
+#export SITE=$( awk 'NR==1 {print $1}' $DATA )
 #export BASIN=basin_h18v04.tif
 #export SUBCATCH=sub_catchment_h18v04.tif
 #export VECT=order_vect_59.gpkg
@@ -15,7 +15,7 @@
 
 
 # input dataset
-export DAT=$1
+export DATA=$1
 
 ## names of the lon and lat columns
 export LON=$2
@@ -24,47 +24,50 @@ export LAT=$3
 # path to data inputs
 export DIR=$4
 
-# path to temporal folder
-export TMP=$5
-
 # prepare target folder for temporal data
-[ ! -d $TMP/snappoints ] && mkdir $TMP/snappoints 
-export OUTDIR=$TMP/snappoints
+[ ! -d $DIR/snappoints ] && mkdir $DIR/snappoints 
+export OUTDIR=$DIR/snappoints
 
 # basin file name
 export BASIN=$5
 
 # subcatchment file name
-export SUBCATCH=$7
+export SUBCATCH=$6
 
 # stream vector gpkg name
-export VECT=$8
+export VECT=$7
 
 # How many cores to run in parallel
-export PAR=$9
+export PAR=$8
+
+## Full path to output snap_points.txt file
+export SNAP=$9
+
 
 ###################################
 ###################################
 
+## Set random string
+export RAND_STRING=$(xxd -l 8 -c 32 -p < /dev/random)
 
 # name of unique id identifier
-export SITE=$( awk 'NR==1 {print $1}' $DAT )
+export SITE=$( awk 'NR==1 {print $1}' $DATA )
 
-## save name of file without extension
-export b=$(echo $DAT | awk -F"." '{print $1}')
-
-## if the file is not csv, add the comma and make it .csv
-if [ "${DAT: -4}" != ".csv" ]
-then
-    cat  $DAT | tr -s '[:blank:]' ',' > ${b}.csv
-    export DATC=$(echo ${b}.csv)
-else
-    DATC=$DAT
-fi
+### save name of file without extension
+#export b=$(echo $DATA | awk -F"." '{print $1}')
+#
+### if the file is not csv, add the comma and make it .csv
+#if [ "${DATA: -4}" != ".csv" ]
+#then
+#    cat  $DATA | tr -s '[:blank:]' ',' > ${b}.csv
+#    export DATAC=$(echo ${b}.csv)
+#else
+#    DATAC=$DATA
+#fi
 
 ##  make the file a gpkg
 ogr2ogr -f "GPKG" -overwrite -nln ref_points -nlt POINT -a_srs EPSG:4326 \
-    $DIR/ref_points.gpkg $DATC -oo X_POSSIBLE_NAMES=$LON \
+    $DIR/ref_points_${RAND_STRING}.gpkg $DATA -oo X_POSSIBLE_NAMES=$LON \
     -oo Y_POSSIBLE_NAMES=$LAT -oo AUTODETECT_TYPE=YES
 
 ################
@@ -77,27 +80,27 @@ SnapPoint(){
 export ID=$1
 
 # identify basin ID for that point
-export MAB=$(awk -v id="$ID" '$1==id {print $6}' $DAT)
+export MAB=$(awk -v id="$ID" '$1==id {print $6}' $DATA)
 # identify sub-catchment ID for that point
-export MIB=$(awk -v id="$ID" '$1==id {print $5}' $DAT)
+export MIB=$(awk -v id="$ID" '$1==id {print $5}' $DATA)
 
 # extract point of interest
-ogr2ogr -where "$SITE = $ID" -f GPKG $TMP/point_$ID.gpkg \
-    $DIR/ref_points.gpkg
+ogr2ogr -where "$SITE = $ID" -f GPKG $DIR/point_$ID_${RAND_STRING}.gpkg \
+    $DIR/ref_points_${RAND_STRING}.gpkg
 
 # extract vector line (stream reach) associated with point
 ogr2ogr -nln orderV_bid${MAB} -nlt LINESTRING -where "stream = ${MIB}" \
-    -f GPKG $TMP/Microb_${MIB}.gpkg $VECT
+    -f GPKG $DIR/Microb_${MIB}_${RAND_STRING}.gpkg $VECT
 
 # open grass session based on microbasin raster
 grass78 -f -text --tmp-location -c $SUBCATCH <<'EOF'
 
     # read in point of interest
-    v.in.ogr input=$TMP/point_$ID.gpkg layer=ref_points output=point_$ID \
+    v.in.ogr input=$DIR/point_$ID_${RAND_STRING}.gpkg layer=ref_points output=point_$ID \
     type=point key=$SITE
 
     # read vector line representing stream reach
-    v.in.ogr input=$TMP/Microb_$MIB.gpkg layer=orderV_bid${MAB} \
+    v.in.ogr input=$DIR/Microb_$MIB_${RAND_STRING}.gpkg layer=orderV_bid${MAB} \
         output=streamReach_$MIB type=line key=stream
 
     # Raster with microbasins
@@ -121,12 +124,12 @@ grass78 -f -text --tmp-location -c $SUBCATCH <<'EOF'
         node_layer=2
 
         v.out.ascii input=snap_${ID} layer=2 separator=comma \
-        > ${OUTDIR}/coords_${ID}
+        > ${OUTDIR}/coords_${ID}_${RAND_STRING}
     
     else 
 
         v.distance -pa from=micr_vp_${ID} to=micr_vp_${ID}  upload=dist \
-          > $TMP/dist_mat_p${ID}_${MAB}_${MIB}.txt
+          > $DIR/dist_mat_p${ID}_${MAB}_${MIB}_${RAND_STRING}.txt
           
         # calculate maximum distance between all points in microbasin
         MAXDIST=0
@@ -134,7 +137,7 @@ grass78 -f -text --tmp-location -c $SUBCATCH <<'EOF'
         $( seq -s' ' 2 $(v.info micr_vp_${ID}  | awk '/points/{print $5}') )
         do
           newmax=$(awk -F'|' -v X="$i" '{print $X}' \
-          $TMP/dist_mat_p${ID}_${MAB}_${MIB}.txt | sort -n | tail -n1)
+          $DIR/dist_mat_p${ID}_${MAB}_${MIB}_${RAND_STRING}.txt | sort -n | tail -n1)
           if (( $(echo "$newmax > $MAXDIST" | bc -l) ));then MAXDIST=$newmax;fi
         done
 
@@ -143,30 +146,30 @@ grass78 -f -text --tmp-location -c $SUBCATCH <<'EOF'
         node_layer=2
 
         v.out.ascii input=snap_${ID} layer=2 separator=comma \
-        > ${OUTDIR}/coords_${ID}
+        > ${OUTDIR}/coords_${ID}_${RAND_STRING}
 
-        rm $TMP/dist_mat_p${ID}_${MAB}_${MIB}.txt $TMP/point_${ID}.gpkg \
-        $TMP/Microb_${MIB}.gpkg
+        rm $DIR/dist_mat_p${ID}_${MAB}_${MIB}_${RAND_STRING}.txt $DIR/point_${ID}_${RAND_STRING}.gpkg \
+        $DIR/Microb_${MIB}_${RAND_STRING}.gpkg
     fi 
 EOF
 }
 
 export -f SnapPoint
 
-IDS=$(awk -F, 'NR > 1 {print $1}' $DATC)
+IDS=$(awk -F, 'NR > 1 {print $1}' $DATA)
 parallel -j $PAR --delay 5 SnapPoint ::: $IDS 
 
 
 #  Join all single tables in one file
-echo lon_snap,lat_snap,Site_ID_snap > ${OUTDIR}/snap_all.csv
-cat ${OUTDIR}/coords_* >> ${OUTDIR}/snap_all.csv
+echo lon_snap,lat_snap,Site_ID_snap > ${OUTDIR}/snap_all_${RAND_STRING}.csv
+cat ${OUTDIR}/coords_* >> ${OUTDIR}/snap_all_${RAND_STRING}.csv
 
 # Join original table with new coordinates 
 paste -d" "   \
-    $DAT \
-    <(sort -t, -k3 -h ${OUTDIR}/snap_all.csv | awk -F, '{print $1, $2}')  \
-    > $DIR/${b}_snap.txt
+    $DATA \
+    <(sort -t, -k3 -h ${OUTDIR}/snap_all_${RAND_STRING}.csv | awk -F, '{print $1, $2}')  \
+    > $SNAP
 
 # remove temporal folder
 rm -rf $OUTDIR
-rm $DATC
+rm $DATA
