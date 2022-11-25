@@ -4,6 +4,7 @@
 \alias{extract_ids}
 \title{Adds sub-catchment and/or basin IDs to a dataframe of points}
 \usage{
+<<<<<<< HEAD
 extract_ids(
   data,
   lon,
@@ -15,16 +16,28 @@ extract_ids(
 }
 \arguments{
 \item{data}{Data.frame with lat/lon columns}
+=======
+extract_ids(data, lon, lat, subcatchment_path = NULL, basin_path = NULL)
+}
+\arguments{
+\item{data}{data.frame with the lat lon columns}
+>>>>>>> dev_get_tile_id_win
 
 \item{lon}{Name of the longitude column (WGS 84)}
 
 \item{lat}{Name of the latitude column (WGS 84)}
 
+<<<<<<< HEAD
 \item{subcatchment_path}{Full path to the sub-catchment ID .tif layer}
 
 \item{basin_path}{Full path to the basin ID .tif layer}
 
 \item{quiet}{If FLASE, process is printed}
+=======
+\item{basin_path}{Path to the basin ID .tif layer}
+
+\item{subc_path}{Path to the sub-catchment ID .tif layer}
+>>>>>>> dev_get_tile_id_win
 }
 \description{
 Adds sub-catchment and/or basin IDs to a dataframe of points
