@@ -19,7 +19,7 @@ export LAT=$4
 ################################
 
 ## save name of file without extension
-b=$(echo $DAT | awk -F"." '{print $1}')
+export b=$(echo $DAT | awk -F"." '{print $1}')
 
 ## if the file is not csv, add the comma and make it .csv
 if [ "${DAT: -4}" != ".csv" ]
@@ -46,17 +46,15 @@ v.in.ogr --o input=$DIR/ref_points.gpkg layer=ref_points \
 output=allpoints type=point key=$SITE
 
 #  Calculate distance, results are given in meters
-v.distance -pa from=allpoints to=allpoints upload=dist separator=space \
-> $DIR/pairwise_euclidian_dist.txt
+v.distance -pa from=allpoints to=allpoints upload=dist separator=comma \
+    | sed -re 's/([0-9]+\.[0-9]{2})[0-9]+/\1/g' | \
+    awk -F, 'NR > 1 {print $0}' >  $DIR/pairwise_euclidian_dist.txt
 
 EOF
 
+
+
 exit
-
-
-# testing how to make all values two decimal float numbers
-awk 'FNR > 2 { for (i=2; i<=NF; i++) a[i]=sprintf("%.2f ", $i) } 
-END {print a[2]}' test.txt
 
 
 
