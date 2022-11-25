@@ -1,10 +1,13 @@
 #' @title crop_to_extent
 #'
 #' @description Crop a raster .tif to a polygon border line if a vector layer
-#' is provided, otherwise if the coordinates of a bounding box or a spatial
-#' object are provided, the raster is cropped to the extent of the bounding box
-#' or spatial object. At least a cutline source (vector layer) or a bounding box
-#' coordinates or spatial object must be provided.
+#' (cutline source) is provided, otherwise if a bounding box is provided
+#' (xmin, ymin, xmax, ymax coordinates or a spatial object from which to extract
+#'  a bounding box), the raster is cropped to the extent of the bounding box. At
+#'  least a cutline source (vector_path) or a bounding box (bound_box)
+#'  must be provided. If rcrop_read = TRUE (default), the outputs are a .tif
+#'  (saved under output_path) and a SpatRaster (terra package) object,
+#'  otherwise if rcrop_read = FALSE, the .tif file is the only output.
 #'
 #' @param raster_path Path to the raster .tif layer
 #' @param vector_path Path to a vector layer that is used as a cutline data
