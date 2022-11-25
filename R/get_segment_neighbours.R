@@ -19,7 +19,7 @@
 #' @importFrom doFuture registerDoFuture
 #' @importFrom parallel detectCores
 #' @importFrom as.data.table setDT setnames unique order rbindlist setcolorder names setkey
-#' @importFrom igraph ego subgraph as_data_frame as_ids
+#' @importFrom igraph
 #' @importFrom future.apply future_lapply future_sapply future_mapply
 #' @importFrom dplyr mutate
 #' @importFrom memuse Sys.meminfo
@@ -158,25 +158,25 @@ segment_neighbours <- function(g, segmentID=NULL, variable=NULL, stat=NULL,
 # g <- my_catchment
 # segmentID=c(371901515)
 #
-segmentID=(as_ids(V(my_graph)))
-
-
-out <- segment_neighbours(my_graph, segmentID=segmentID,
-                          order=5, mode="in", n_cores=1,
-                          variable=c("length", "source_elev"),
-                          attach_only=T)
-
-out <- segment_neighbours(my_graph, segmentID=segmentID,
-                          order=2, mode="out", n_cores=1,
-                          variable=c("length", "source_elev"),
-                          stat=median)
-
-
-out <- segment_neighbours(my_graph, segmentID=segmentID,
-                          order=2, mode="all", n_cores=1,
-                          variable=c("length", "source_elev"),
-                          stat=mean,
-                          attach_only=T)
+# segmentID=(as_ids(V(my_graph)))
+#
+#
+# out <- segment_neighbours(my_graph, segmentID=segmentID,
+#                           order=5, mode="in", n_cores=1,
+#                           variable=c("length", "source_elev"),
+#                           attach_only=T)
+#
+# out <- segment_neighbours(my_graph, segmentID=segmentID,
+#                           order=2, mode="out", n_cores=1,
+#                           variable=c("length", "source_elev"),
+#                           stat=median)
+#
+#
+# out <- segment_neighbours(my_graph, segmentID=segmentID,
+#                           order=2, mode="all", n_cores=1,
+#                           variable=c("length", "source_elev"),
+#                           stat=mean,
+#                           attach_only=T)
 
 
 
