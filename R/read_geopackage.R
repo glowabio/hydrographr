@@ -15,7 +15,7 @@
 #' @importFrom RSQLite SQLite
 #' @importFrom data.table setDT
 #' @importFrom igraph graph_from_data_frame
-#' @importFrom sf vect
+#' @importFrom sf read_sf
 #' @importFrom terra vect
 #' @export
 #'
