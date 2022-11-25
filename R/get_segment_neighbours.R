@@ -19,7 +19,7 @@
 #' @importFrom doFuture registerDoFuture
 #' @importFrom parallel detectCores
 #' @importFrom data.table setDT setnames rbindlist setcolorder setkey
-#' @importFrom igraph
+#' @importFrom igraph ego as_ids
 #' @importFrom future.apply future_lapply future_sapply future_mapply
 #' @importFrom dplyr mutate
 #' @importFrom memuse Sys.meminfo
