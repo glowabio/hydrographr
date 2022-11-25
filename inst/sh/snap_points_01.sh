@@ -1,5 +1,14 @@
 #! /bin/bash
 
+export DAT=spdata_1264942_ids.txt
+export DIR=/home/marquez/hydrographr
+export LON=longitude
+export LAT=latitude
+export STR=stream_1264942.tif
+export rdist=500
+export export ACC=flow_1264942.tif
+export acct=30
+
 #################################################
 
 ##   directory where the data is located
@@ -27,7 +36,7 @@ export acct=$8
 
 
 ## save name of file without extension
-b=$(echo $DAT | awk -F"." '{print $1}')
+export b=$(echo $DAT | awk -F"." '{print $1}')
 
 ## if the file is not csv, add the comma and make it .csv
 if [ "${DAT: -4}" != ".csv" ]
@@ -60,14 +69,20 @@ else
         radius=$rdist 
 fi
 
+r.what map=stream points=snap_points separator=comma \
+    | awk -F, '{print $4}' > $DIR/stream_ID.txt
+
 v.out.ascii -c input=snap_points separator=space | awk '{print $1, $2}' \
     > $DIR/snap_coords.txt
+
+EOF
 
 sed -i 's/east/lon_snap/g' $DIR/snap_coords.txt
 sed -i 's/north/lat_snap/g' $DIR/snap_coords.txt
 
-paste -d" " $DAT $DIR/snap_coords.txt >  $DIR/${b}_snap.txt
+paste -d" " $DAT $DIR/snap_coords.txt \
+    <(printf "%s\n" subcatchment_id_snap $(cat $DIR/stream_ID.txt))  \
+    >  $DIR/${b}_snap.txt
 
-EOF
-
-rm $DIR/snap_coords.txt $DIR/$DATC $DIR/ref_points.gpkg
+rm $DIR/snap_coords.txt $DIR/$DATC $DIR/ref_points.gpkg \
+    $DIR/${b}.csv
