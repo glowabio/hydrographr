@@ -14,7 +14,7 @@
 #' @importFrom DBI dbConnect dbListTables dbGetQuery
 #' @importFrom RSQLite SQLite
 #' @importFrom data.table setDT
-#' @importFrom igraph graph_from_data_frame
+#' @importFrom igraph graph_from_data_frame as_ids
 #' @importFrom sf vect
 #' @importFrom terra vect
 #' @export
