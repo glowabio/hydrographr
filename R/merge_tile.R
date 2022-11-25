@@ -1,8 +1,12 @@
 #' @title merge_tiles
 
-#' @description Merge all raster or spatial vector objects in one folder, set as the input folder, 
-#' to form a new raster or spatial vector object with a larger spatial extent. Important the input folder 
-#' should only either contain raster tif or spatial vector geopackage files.
+#' @description Merge multiple raster or spatial vector objects from disk 
+#' to form a new raster or spatial vector object with a larger spatial extent.
+#' At least a raster .tif or spatial vector geopackage file must be provided. 
+#' If rraster`_`read = TRUE (default), the outputs are a .tif (saved under output`_`path) and a SpatRaster (terra package) object, 
+#' otherwise if rraster`_`read = FALSE, the .tif file is the only output. 
+#' If rvector`_`read = TRUE, the outputs are a .gpkg (saved under output`_`path) and a SpatVector (terra package) object, 
+#' otherwise if rvector`_`read = FALSE (default), the .tif file is the only output
 
 #' @param tile_path Path to raster tile or spatial vector
 #' @param output_path Path to write the output
