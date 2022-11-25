@@ -18,7 +18,7 @@
 #' @importFrom future plan
 #' @importFrom doFuture registerDoFuture
 #' @importFrom parallel detectCores
-#' @importFrom as.data.table setDT setnames unique order rbindlist setcolorder names setkey
+#' @importFrom data.table setDT setnames rbindlist setcolorder setkey
 #' @importFrom igraph
 #' @importFrom future.apply future_lapply future_sapply future_mapply
 #' @importFrom dplyr mutate
