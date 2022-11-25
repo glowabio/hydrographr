@@ -46,14 +46,14 @@ merge_tiles <- function(tile_path, output_path, rraster_read = TRUE, rvector_rea
 
  	if (rraster_read == TRUE) {
       # Read merged .tif layer
-      merge_tiles <- rast(output_path/basin.tif)
+      merge_tiles <- rast(paste0(output_path,"/","basin.tif"))
 
       return(merge_tiles)
     }
     
     if (rvector_read == FALSE) {
       # Read merged vector layer
-      merge_tiles <- vect(output_path/basin_dissolved.gpkg) 
+      merge_tiles <- vect(paste0(output_path,"/","basin_dissolved.gpkg")) 
 
       return(merge_tiles)
     } else {
