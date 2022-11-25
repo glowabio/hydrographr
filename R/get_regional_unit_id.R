@@ -1,4 +1,4 @@
-#' Adds sub-catchment and/or basin IDs to a dataframe of points
+#' Identifies the ids of the regional units in which the given points are located. Input is a point data frame.
 #'
 #' @param data data.frame with the lat lon columns
 #' @param lon Name of the longitude column as character string

@@ -1,4 +1,4 @@
-#' Get tile id when the input is a point dataframe
+#' Identifies the ids of the tiles in which the given points are located. Input is a point data frame.
 
 #' @param data data.frame with the lat lon columns
 #' @param lon Name of the longitude column
@@ -14,7 +14,6 @@
 #' @export
 #'
 #'
-# Get tile id when the input is a point dataframe
 get_tile_id <- function(data, lon, lat) {
 
   reg_un <- get_regional_unit_id(data, lon, lat)
