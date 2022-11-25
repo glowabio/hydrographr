@@ -52,17 +52,22 @@ merge_tiles <- function(tile_path, output_path, rraster_read = TRUE, rvector_rea
     }
 
  	if (rraster_read == TRUE) {
+      # Print message
+      cat("Merge saved under: ", output_path)
       # Read merged .tif layer
-      merge_tiles <- rast(paste0(output_path,"basin.tif"))
+      merged_tiles <- rast(paste0(output_path, "/", "basin.tif"))
 
-      return(merge_tiles)
+      return(merged_tiles)
     }
     
   else if (rvector_read == TRUE) {
+      # Print message
+      cat("Merge saved under: ", output_path)
       # Read merged vector layer
-      merge_tiles <- vect(paste0(output_path,"basin_dissolved.gpkg")) 
+      merged_tiles <- vect(paste0(output_path, "/", "basin_dissolved.gpkg")) 
 
-      return(merge_tiles)
+      return(merged_tiles)
+
     } else {
       # Print message
       cat("Merge saved under: ", output_path)
