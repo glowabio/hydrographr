@@ -55,7 +55,7 @@ v.in.ogr --o input=$DIR/ref_points_${RAND_STRING}.gpkg layer=ref_points output=r
 r.in.gdal input=$STR output=stream
 
 
-if [ "$STR" = "NA"  ]
+if [ "$ACC" != "NA"  ]
 then 
     r.in.gdal input=$ACC output=accum
     r.stream.snap --o input=ref_points output=snap_points stream_rast=stream \
@@ -65,15 +65,20 @@ else
         radius=$rdist 
 fi
 
+r.what map=stream points=snap_points separator=comma \
+    | awk -F, '{print $4}' > $DIR/stream_ID_${RAND_STRING}.txt
 v.out.ascii -c input=snap_points separator=space | awk '{print $1, $2}' \
     > $DIR/snap_coords_${RAND_STRING}.txt
+EOF
 
 sed -i 's/east/lon_snap/g' $DIR/snap_coords_${RAND_STRING}.txt
 sed -i 's/north/lat_snap/g' $DIR/snap_coords_${RAND_STRING}.txt
 
 cat  $DATA | tr -s ',' ' ' > $DIR/coords_${RAND_STRING}.txt
-paste -d" " $DIR/coords_${RAND_STRING}.txt $DIR/snap_coords_${RAND_STRING}.txt >  $SNAP
+paste -d" " $DIR/coords_${RAND_STRING}.txt $DIR/snap_coords_${RAND_STRING}.txt \
+    <(printf "%s\n" subc_id_snap $(cat $DIR/stream_ID_${RAND_STRING}.txt))  \
+    >  $SNAP
 
 EOF
 
-rm $DIR/snap_coords_${RAND_STRING}.txt  $DIR/ref_points_${RAND_STRING}.gpkg #$DIR/$DATC
+rm $DIR/snap_coords_${RAND_STRING}.txt $DIR/stream_ID_${RAND_STRING}.txt $DIR/ref_points_${RAND_STRING}.gpkg #$DIR/$DATC
