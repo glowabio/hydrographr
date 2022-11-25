@@ -1,5 +1,7 @@
-#' Merge raster or spatial vector tiles
-#'
+#' @title merge_tiles
+
+#' @description Merge all raster or spatial vector objects in one folder set as the input folder 
+to form a new raster or spatial vector object with a larger spatial extent. 
 #' @param tile_path Path to raster tile or spatial vector
 #' @param output_path Path to write the output
 #' @importFrom processx run
@@ -46,14 +48,14 @@ merge_tiles <- function(tile_path, output_path, rraster_read = TRUE, rvector_rea
 
  	if (rraster_read == TRUE) {
       # Read merged .tif layer
-      merge_tiles <- rast(paste0(output_path,"/","basin.tif"))
+      merge_tiles <- rast(paste0(output_path,"basin.tif"))
 
       return(merge_tiles)
     }
     
-    if (rvector_read == FALSE) {
+  else if (rvector_read == TRUE) {
       # Read merged vector layer
-      merge_tiles <- vect(paste0(output_path,"/","basin_dissolved.gpkg")) 
+      merge_tiles <- vect(paste0(output_path,"basin_dissolved.gpkg")) 
 
       return(merge_tiles)
     } else {
