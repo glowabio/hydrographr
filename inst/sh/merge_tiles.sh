@@ -5,14 +5,14 @@ export OUT=$2
 ## $1 is the raster tile or spatial vector path
 ## $2 is the output path
 
-if (find "$BAS" -name "*tif") | grep -q .;then 
+ if (find "$BAS" -name "*tif") | grep -q $BAS; then 
 	# merge raster file by first creating a vrt and then do the merge
 	 gdalbuildvrt -overwrite $BAS/basin.vrt $BAS/*.tif 
 	 rm -f $BAS/basin.tif 
 	 gdal_translate -co COMPRESS=DEFLATE -co ZLEVEL=9 $BAS/basin.vrt $OUT/basin.tif
 	 rm -f $BAS/basin.vrt
- fi 
- if (find "$BAS" -name "*gpgk") | grep -q .; then
+
+ elif (find "$BAS" -name "*gpkg") | grep -q $BAS; then
 	 # merge vector file
 	 rm -f $BAS/basin.gpkg
 	 ogrmerge.py -single -progress -skipfailures -overwrite_ds -f GPKG -o $BAS/basin.gpkg  $BAS/*.gpkg 
