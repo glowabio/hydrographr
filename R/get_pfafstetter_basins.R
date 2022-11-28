@@ -1,9 +1,18 @@
+#' Delineate Pfafstetter basins
+#'
+#' Using a graph object, subset the input catchment into smaller, so-called Pfafstetter basins.
+#'
+#' The function calculates internally the area of each sub-catchment
+#'
+#' @param g A directed graph with one outlet
+#' @param outlet A different, user-specified (upstream) outlet
+#' @importFrom data.table ..
+#' @importFrom processx run
+#' @export
+#'
 
 
 
-# 9Nov22, sami
-
-# Delineate Pfafstetter basins for a given drainage basin
 
 
 ## TESTING
@@ -16,9 +25,8 @@ setwd(path)
 todo:
 - check if could run on any given outlet, as long as the datatable is created from this graph?
 - implement GRASS functions
-- test with other basins as well
-- does only one round, leave as it is --> users can loop for themselves
-- 
+
+-
 
 
 
@@ -44,19 +52,19 @@ g <- graph.data.frame(g[,..g_cols], directed = T)
 
 # get_largest_catchment()
 # if outlet is specified by the user
-#  then use this, 
+#  then use this,
 #  else take outlet from graph
-#  --> but headwaters need to be connected to the outlet, how to check this? 
+#  --> but headwaters need to be connected to the outlet, how to check this?
 
 # g <- read_geopackage("order_vect_59.gpkg", graph=T)
 # g <- get_largest_catchment(g)
-# 
+#
 # do function: get graph for a specific outlet id
 
 
 
 usePackage <- function(p){
-  if (!is.element(p, installed.packages()[,1])) install.packages(p, dep = TRUE) 
+  if (!is.element(p, installed.packages()[,1])) install.packages(p, dep = TRUE)
   library(p, character.only = TRUE)
 }
 
@@ -77,10 +85,10 @@ usePackage("R.utils")
 
 
 
-pfafstetter <- function(g, flow_accum=flow_accum, outlet=outlet)
+pfafstetter <- function(g, sub_catch=sub_catch, flow_accum=flow_accum, outlet=outlet)
 
-  # Avoid exponential numbers in the reclassification, only set this only within the function
-  options(scipen=999)
+# Avoid exponential numbers in the reclassification, only set this only within the function
+options(scipen=999)
 
 cat("Setting up parallel backend...\n")
 # Set up parallel backend
@@ -101,10 +109,10 @@ mapply_fun <- function(element,name){
 
 # ### Change column order
 # moveme <- function (invec, movecommand) {
-#   movecommand <- lapply(strsplit(strsplit(movecommand, ";")[[1]], 
+#   movecommand <- lapply(strsplit(strsplit(movecommand, ";")[[1]],
 #                                  ",|\\s+"), function(x) x[x != ""])
 #   movelist <- lapply(movecommand, function(x) {
-#     Where <- x[which(x %in% c("before", "after", "first", 
+#     Where <- x[which(x %in% c("before", "after", "first",
 #                               "last")):length(x)]
 #     ToMove <- setdiff(x, Where)
 #     list(ToMove, Where)
@@ -150,7 +158,7 @@ streams_dt$stream <- as.numeric(as.character(streams_dt$stream))
 
 
 
-# start GRASS session 
+# start GRASS session
 # server3
 export DIR=/data/domisch/hydrographr_data
 grass78  -text -c -e   subcatchment_1264942.tif  $DIR/grass_location # rectangle
@@ -161,7 +169,7 @@ $GRASSEXEC  r.in.gdal  input=$DIR/subcatchment_1264942.tif  output=scatch --o
 $GRASSEXEC  r.stats input=scatch  output=$DIR/sub_catchment_area_stats.txt  separator=tab  -aclnC --o # rectangle
 # $GRASSEXEC  r.stats input=$DIR/subc_1264942.tif output=$DIR/sub_cachment_area_stats.txt  separator=tab  -aclnC --o
 
- 
+
 
 
 
@@ -199,7 +207,7 @@ plan(multisession, workers = n_cores) # Parallelize
 
 ### For very small catchments run subcomponent sequentially
 if (length(headwater) < 10) {
-  
+
   l <- foreach (i=names(headwater), .inorder=T)  %dopar% {
     # print(i)
     out <-subcomponent(g, i, mode = c("out"))
@@ -207,7 +215,7 @@ if (length(headwater) < 10) {
     # names(out) <- i
     return(out)
   } # close foreach
-  
+
   ### Get into datatable format
   names(l) <- names(headwater)
   # l <- future_lapply(l, function(x) names(x))
@@ -219,32 +227,32 @@ if (length(headwater) < 10) {
   ### Merge as datatable
   dt <- rbindlist(l); rm(l)
   names(dt)[1] <- "stream"
-  
+
   ### Remove the outlet
   setkey(dt, stream)
   dt <- dt[!(dt$stream==as.numeric(names(outlet))),]
-  dt$seq_id <- seq.int(1:nrow(dt)) 
-  
+  dt$seq_id <- seq.int(1:nrow(dt))
+
   dt$stream <- as.numeric(as.character(dt$stream))
   dt$connected_to <- as.numeric(as.character(dt$connected_to))
-  
-  ### Join 
+
+  ### Join
   dt <- streams_dt[dt, on="stream"] # left join, preserves ordering
-  
+
   ### Get maximum flow acc per connected_to
   sum_flow_acc_connected_to <- dt[,.(sum_flow_acc=sum(area_km2)), by="connected_to"]
-  
+
   ### Identify the main stream = max contributing drainage
   setorder(sum_flow_acc_connected_to, -sum_flow_acc)
   main_headwater_id <- sum_flow_acc_connected_to[1]$connected_to # headwater tip ID
   rm(dt); gc()
-  
-  
+
+
   ### For medium sized run with future_sapply
 } else if (length(headwater) >=10 & length(headwater) < 1000) {
-  
+
   l <- future_sapply(names(headwater), function(x) subcomponent(g, x, mode = c("out")))
-  
+
   ### Get into datatable format
   l <- future_lapply(l, function(x) names(x))
   # names(l) <- seq.int(1:length(l)) # specify names of list elements = connected_to
@@ -254,27 +262,27 @@ if (length(headwater) < 10) {
   ### Merge as datatable
   dt <- rbindlist(l); rm(l)
   names(dt)[1] <- "stream"
-  
+
   ### Remove the outlet
   setkey(dt, stream)
   dt <- dt[!(dt$stream==as.numeric(names(outlet))),]
-  dt$seq_id <- seq.int(1:nrow(dt)) 
-  
+  dt$seq_id <- seq.int(1:nrow(dt))
+
   dt$stream <- as.numeric(as.character(dt$stream))
   dt$connected_to <- as.numeric(as.character(dt$connected_to))
-  
-  ### Join 
+
+  ### Join
   dt <- streams_dt[dt, on="stream"] # left join, preserves ordering
-  
+
   ### Get maximum flow acc per connected_to
   sum_flow_acc_connected_to <- dt[,.(sum_flow_acc=sum(area_km2)), by="connected_to"]
-  
+
   ### Identify the main stream = max contributing drainage
   setorder(sum_flow_acc_connected_to, -sum_flow_acc)
   main_headwater_id <- sum_flow_acc_connected_to[1]$connected_to # headwater tip ID
   rm(dt); gc()
-  
-  
+
+
   ### For very large basins create chunks, run future_sapply with foreach
 } else {
   ### Split the headwater file and run in parallel
@@ -283,74 +291,74 @@ if (length(headwater) < 10) {
   tmp <- seq_along(tmp_headwater)
   tmp_chunks <- split(tmp_headwater, ceiling(tmp/2000)); length(tmp_chunks)
   rm(tmp, tmp_headwater); gc()
-  
+
   registerDoFuture()
   plan(multisession, workers = NUMBER_CPU_FOREACH)
-  # batchtools_multicore(workers = NUMBER_CPU_FOREACH) # for batch (background) process ? 
-  
+  # batchtools_multicore(workers = NUMBER_CPU_FOREACH) # for batch (background) process ?
+
   ### Check size of objects
   # data.frame(sort(sapply(ls(),function(x){object.size(get(x))})))
-  
-  
+
+
   # for (k in 1:length(tmp_chunks)) {
-  
+
   ### Show progress bar:
   with_progress({
     p <- progressor(along = 1:length(tmp_chunks) )
-    
+
     ### Start foreach
-    flow_acc_per_connected_to <- 
+    flow_acc_per_connected_to <-
       foreach(mychunk=tmp_chunks, .combine=rbind, .inorder=T,.errorhandling="stop", .verbose=T) %dopar% {
         # mychunk is a list and each list object serves as the task for each worker
         # not needed in doFuture: .packages=c("igraph", "data.table", "future.apply", "dplyr")
-        
-        
+
+
         p(sprintf("x=%g", 1:length(tmp_chunks))) # print progress
         # cat("Running chunk", i, "of", length(tmp_chunks), "\n")
         plan(multisession, workers = NUMBER_CPU_FUTUREAPPLY)  # need to tell within foreach again...
-        # batchtools_multicore(workers = NUMBER_CPU_FUTUREAPPLY) 
-        
-        
+        # batchtools_multicore(workers = NUMBER_CPU_FUTUREAPPLY)
+
+
         ### Find each path from headwater to outlet
         tmp <- future_sapply(mychunk, function(x) subcomponent(g, x, mode = c("out")))
-        
+
         ### Get into datatable format
         tmp <- future_lapply(tmp, function(x) names(x))
         tmp <- future_lapply(tmp, as.data.frame)
         tmp <- future_mapply(mapply_fun,tmp,names(tmp),SIMPLIFY = F)
-        
-        
+
+
         ### Merge as datatable
         tmp <- rbindlist(tmp)
         names(tmp)[1] <- "stream"
-        
+
         ### Remove the outlet
         setkey(tmp, stream)
         tmp <- tmp[!(tmp$stream==as.numeric(names(outlet))),]
-        
+
         tmp$stream <- as.numeric(as.character(tmp$stream))
         tmp$connected_to <- as.numeric(as.character(tmp$connected_to))
-        
+
         ### Join
         tmp <- streams_dt[tmp, on="stream"] # left join, preserves ordering
-        
+
         ### Get maximum flow acc per connected_to
         sum_flow_acc_connected_to <- tmp[,.(sum_flow_acc=sum(area_km2)), by="connected_to"]
-        
+
         return(sum_flow_acc_connected_to)
         rm(tmp, sum_flow_acc_connected_to); gc()
-        
+
       } # close foreach
   }) # close progressr
-  
+
   # stopCluster(cl) # stop parallel backend
   plan(sequential, .cleanup = T)
-  
-  
+
+
   ### Identify the main stream = max contributing drainage
   setorder(flow_acc_per_connected_to, -sum_flow_acc)
   main_headwater_id <- flow_acc_per_connected_to[1]$connected_to
-  
+
 } # close if
 
 ### Write to disk
@@ -365,7 +373,7 @@ if (length(headwater) < 10) {
 
 
 
-### Get the single stream reaches of the main stream 
+### Get the single stream reaches of the main stream
 main_stream <- all_simple_paths(g, from = outlet, to = as.character(main_headwater_id), "in") # edges, ordered from down-to upstream
 # main_stream <- future_lapply(main_stream, function(x) x[-1]) # remove the "-1", not a stream reach
 main_stream <- as_ids(unlist(main_stream[[1]]))
@@ -382,7 +390,7 @@ rm(list=ls(pattern="^tmp_")) # cleanup
 ###---------------------------------------------------------------------#
 
 
-### Skip if the four main branches are defined in a previous run saved on disk: 
+### Skip if the four main branches are defined in a previous run saved on disk:
 # if(!file.exists(paste0(DIR, "/main_stream_branch_id.txt")) && LEVEL==1) {
 
 
@@ -396,111 +404,111 @@ g_del <- delete_edges(g, V(g)[paste(main_stream)])
 
 
 ### From each main stream vertex, walk to the headwaters to get the entire tributary
-## (note: previous version was finding only main tributary. Entire tributary is faster and allows to re-code 
+## (note: previous version was finding only main tributary. Entire tributary is faster and allows to re-code
 ## the streams_dt for the next-smaller division, without GRASS)
 
 if(length(main_stream) < 1000) {
-  
+
   l2 <- future_sapply(as.character(main_stream), function(x) subcomponent(g_del, x, mode = c("in")))
-  
+
   ### Get into datatable format
   l2 <- future_lapply(l2, function(x) names(x))
-  # l2 <- future_sapply(l2, as_ids) 
+  # l2 <- future_sapply(l2, as_ids)
   l2 <- future_lapply(l2, as.data.frame)
   l2 <- future_mapply(mapply_fun,l2,names(l2),SIMPLIFY = F)
-  
+
   ### Merge as datatable
-  dt2 <- rbindlist(l2) 
+  dt2 <- rbindlist(l2)
   names(dt2)[1] <- "stream"
   setkey(dt2, stream)
-  
+
   dt2$stream <- as.numeric(as.character(dt2$stream))
   dt2$connected_to <- as.numeric(as.character(dt2$connected_to))
-  
-  
+
+
   ### Remove the main stream ID from each subcomponent
   dt2 <- dt2[dt2$stream %ni% as.numeric(as.character(main_stream)) ,]
-  
-  ### Join 
+
+  ### Join
   dt2 <- streams_dt[dt2, on="stream"] # left join, preserves ordering
-  
+
   ### Get maximum flow acc per connected_to
   flow_acc_per_connected_to_trib <- dt2[,.(sum_flow_acc=sum(area_km2)), by="connected_to"]
-  
+
   ### Identify the major tributaries flowing in to main stream = max contributing drainage
   setorder(flow_acc_per_connected_to_trib, -sum_flow_acc)
-  
+
   ### this idemntifies the top 4 tributaries
-  
-  
-  
+
+
+
 } else {
-  
+
   tmp_main_stream <- as.character(main_stream)
   tmp <- seq_along(tmp_main_stream)
   tmp_chunks <- split(tmp_main_stream, ceiling(tmp/500)); length(tmp_chunks)
   rm(tmp, tmp_main_stream); gc()
-  
-  
+
+
   registerDoFuture()
   plan(multisession, workers = NUMBER_CPU_FOREACH)
-  
+
   ### Show progress bar:
   with_progress({
     p <- progressor(along = 1:length(tmp_chunks) )
-    
+
     ### Start foreach
-    flow_acc_per_connected_to_trib <- 
+    flow_acc_per_connected_to_trib <-
       foreach(mychunk=tmp_chunks, .combine=rbind, .inorder=T,.errorhandling="stop", .verbose=T) %dopar% {
         # mychunk is a list and each list object serves as the task for each worker
         # not needed in doFuture: .packages=c("igraph", "data.table", "future.apply", "dplyr")
-        
-        
+
+
         p(sprintf("x=%g", 1:length(tmp_chunks))) # print progress
         # cat("Running chunk", i, "of", length(tmp_chunks), "\n")
         plan(multisession, workers = NUMBER_CPU_FUTUREAPPLY)  # need to tell within foreach again...
-        
-        mychunk <- unlist(mychunk, use.names = F) 
+
+        mychunk <- unlist(mychunk, use.names = F)
         tmp <- future_sapply(mychunk, function(x) subcomponent(g_del, x, mode = c("in")))
-        
+
         ### Get into datatable format
         tmp <- future_lapply(tmp, function(x) names(x))
         tmp <- future_lapply(tmp, as.data.frame)
         tmp <- future_mapply(mapply_fun,tmp,names(tmp),SIMPLIFY = F)
-        
+
         ### Merge as datatable
-        dt2 <- rbindlist(tmp) 
+        dt2 <- rbindlist(tmp)
         names(dt2)[1] <- "stream"
         setkey(dt2, stream)
-        
+
         dt2$stream <- as.numeric(as.character(dt2$stream))
         dt2$connected_to <- as.numeric(as.character(dt2$connected_to))
-        
-        
+
+
         ### Remove the main stream ID from each subcomponent
         dt2 <- dt2[dt2$stream %ni% main_stream,]
-        
-        ### Join 
+
+        ### Join
         dt2 <- streams_dt[dt2, on="stream"] # left join, preserves ordering
-        
+
         ### Get maximum flow acc per connected_to
         res <- dt2[,.(sum_flow_acc=sum(area_km2)), by="connected_to"]
-        
+
         return(res)
         rm(res, tmp, dt2); gc()
-        
+
       } # close foreach
   }) # close progressr
-  
+
   # stopCluster(cl) # stop parallel backend
   plan(sequential, .cleanup = T)
-  
-  
+
+
   ### Identify the major tributaries flowing in to main stream = max contributing drainage
   setorder(flow_acc_per_connected_to_trib, -sum_flow_acc)
-  
-  
-  
+
+
+
 } # close if
 
 
@@ -543,47 +551,47 @@ if (length(headwater)>50) {
   ### Get all id of single streams belonging to the entire tributary (note: main stream is deleted in g_del)
   main_trib_all_id <- future_sapply(main_stream_branch_id, function(x) subcomponent(g_del, x, mode = c("in")))
   # main_trib_all_id <- subcomponent(g_del, main_stream_branch_id, mode = c("in")) # takes only first argument!
-  
-  
+
+
   ### Get into datatable format
   main_trib_all_id <- future_lapply(main_trib_all_id, function(x) names(x))
   main_trib_all_id <- future_lapply(main_trib_all_id, as.data.frame)
   main_trib_all_id <- future_mapply(mapply_fun,main_trib_all_id,names(main_trib_all_id),SIMPLIFY = F)
-  
+
   ### Merge as datatable
-  main_trib_all_id <- rbindlist(main_trib_all_id) 
+  main_trib_all_id <- rbindlist(main_trib_all_id)
   names(main_trib_all_id)[1] <- "stream"
   setkey(main_trib_all_id, stream)
-  
+
   main_trib_all_id$stream <- as.numeric(as.character(main_trib_all_id$stream))
   main_trib_all_id$connected_to <- as.numeric(as.character(main_trib_all_id$connected_to))
-  
-  
+
+
 } else {
-  
+
   registerDoFuture()
-  
+
   main_trib_all_id <- foreach (i=main_stream_branch_id, .inorder=T)  %dopar% {
     out <-subcomponent(g_del, i, mode = c("in"))
     # names(out) <- i
     return(out)
   } # close foreach
-  
+
   ### Get into datatable format
   names(main_trib_all_id) <- main_stream_branch_id # needs this line after the foreach subcomponent()
   main_trib_all_id <- future_lapply(main_trib_all_id, function(x) names(x))
   main_trib_all_id <- future_lapply(main_trib_all_id, as.data.frame)
   main_trib_all_id <- future_mapply(mapply_fun,main_trib_all_id,names(main_trib_all_id),SIMPLIFY = F)
-  
+
   ### Merge as datatable
-  main_trib_all_id <- rbindlist(main_trib_all_id) 
+  main_trib_all_id <- rbindlist(main_trib_all_id)
   names(main_trib_all_id)[1] <- "stream"
   setkey(main_trib_all_id, stream)
-  
+
   main_trib_all_id$stream <- as.numeric(as.character(main_trib_all_id$stream))
   main_trib_all_id$connected_to <- as.numeric(as.character(main_trib_all_id$connected_to))
-  
-  
+
+
 } # close if
 
 
@@ -592,8 +600,8 @@ if (length(headwater)>50) {
 ### Remove the main stream ID
 # main_trib_all_id <- main_trib_all_id[main_trib_all_id$stream %ni% main_stream_branch_id ,]
 
-### At which position are the tributaries? Use the ordered main stream 
-main_dt <- data.table(stream=as.numeric(as.character(main_stream)), 
+### At which position are the tributaries? Use the ordered main stream
+main_dt <- data.table(stream=as.numeric(as.character(main_stream)),
                       seq_id=seq.int(1:length(main_stream)))
 main_dt$connected_to <- main_dt$stream # copy for join only
 
@@ -601,9 +609,9 @@ main_dt$connected_to <- main_dt$stream # copy for join only
 
 
 
-### Get tributary position along main stream 
+### Get tributary position along main stream
 # trib_order <- flow_acc_per_connected_to_trib[1:4,1] # done above
-trib_order <- main_dt[trib_order, on="connected_to"] 
+trib_order <- main_dt[trib_order, on="connected_to"]
 setorder(trib_order, seq_id)
 ### In case of less than four tributaries
 trib_order <- na.omit(trib_order)
@@ -622,11 +630,11 @@ N_TRIBUTARIES <- length(unique(trib_order$connected_to))
 trib_order$code_trib <- tmp_even[1:N_TRIBUTARIES]
 
 N_INTERBASIN <- nrow(trib_order)
-trib_order$code_inter <-  tmp_odd[1:N_INTERBASIN] 
+trib_order$code_inter <-  tmp_odd[1:N_INTERBASIN]
 
 ### Attach to the main stream table
 tmp_names <- c("connected_to", "code_trib", "code_inter")
-main_trib_all_id <-  trib_order[,..tmp_names] [main_trib_all_id, on="connected_to"] 
+main_trib_all_id <-  trib_order[,..tmp_names] [main_trib_all_id, on="connected_to"]
 setnames(main_trib_all_id, "code_trib", "code") # change name to match other table
 
 
@@ -639,7 +647,7 @@ if (max(main_dt$code_trib, na.rm=T)<=6) {
   main_dt$code_inter <- ifelse(!is.na(main_dt$connected_to) & is.na(main_dt$code_inter), max(main_dt$code_inter, na.rm=T)+2, main_dt$code_inter)
 }
 
-### Fill in the interbasin Pfafstetter code along the main stream (ordered from down- to upstream) 
+### Fill in the interbasin Pfafstetter code along the main stream (ordered from down- to upstream)
 main_dt <- as.data.table(main_dt %>% fill(code_inter, .direction = c("up")))
 
 ###--- Assign the "9" code = the upstream part of the main stream ----
@@ -648,7 +656,7 @@ main_dt$code <- ifelse(is.na(main_dt$code_inter), 9, main_dt$code_inter)
 
 
 ###--- Get all stream ID of the interbasins -----
-### Get a network without tributary streams, and without the main stream ID to which the tributaries connect (=need to break the network)  
+### Get a network without tributary streams, and without the main stream ID to which the tributaries connect (=need to break the network)
 ### Delete the tributary streams ID and the branching stream ID from g --> limit the subcomponent search
 delete_these <- append(as.character(main_trib_all_id$stream), as.character(trib_order$stream) )
 g_del_for_interbas <- delete_edges(g, V(g)[paste(delete_these)])
@@ -665,7 +673,7 @@ g_del_for_interbas <- delete_edges(g, V(g)[paste(delete_these)])
 # first_interbas_id <- get_interbas_stream[match(unique(get_interbas_stream$code), get_interbas_stream$code),]
 
 first_interbas_id <- main_dt[match(unique(main_dt$code), main_dt$code),]
-names(first_interbas_id)[1] <- "first_interbas_id" 
+names(first_interbas_id)[1] <- "first_interbas_id"
 
 ###---- Find all streams belonging to the interbasins ----
 first_interbas_id_char <- as.character(first_interbas_id$first_interbas_id)
@@ -676,9 +684,9 @@ tmp <- future_lapply(tmp, as.data.frame)
 tmp <- future_mapply(mapply_fun,tmp,names(tmp),SIMPLIFY = F)
 
 ### Merge as datatable
-dt3 <- rbindlist(tmp) 
+dt3 <- rbindlist(tmp)
 names(dt3)[1] <- "stream"
-setnames(dt3, "connected_to", "first_interbas_id") 
+setnames(dt3, "connected_to", "first_interbas_id")
 
 dt3$stream <- as.numeric(as.character(dt3$stream))
 dt3$first_interbas_id <- as.numeric(as.character(dt3$first_interbas_id))
@@ -690,9 +698,9 @@ tmp_adj <- adjacent_vertices(g_del_for_interbas, first_interbas_id_char, mode = 
 tmp_adj <- lapply(tmp_adj, function(x) names(x))
 tmp_adj <- lapply(tmp_adj, as.data.frame)
 tmp_adj <- mapply(mapply_fun,tmp_adj,names(tmp_adj),SIMPLIFY = F)
-tmp_adj <- rbindlist(tmp_adj) 
+tmp_adj <- rbindlist(tmp_adj)
 tmp_adj_names <- c("stream_in_catchment", "connected_to")
-setnames(tmp_adj, names(tmp_adj), tmp_adj_names) 
+setnames(tmp_adj, names(tmp_adj), tmp_adj_names)
 tmp_adj$stream_in_catchment <- as.numeric(as.character(tmp_adj$stream_in_catchment))
 tmp_adj$connected_to <- as.numeric(as.character(tmp_adj$connected_to))
 
@@ -717,7 +725,7 @@ dt3$fix_these=NULL
 
 ### Get the Pfafstetter code for these interbasin subcomponent streams
 tmp_names <- c("first_interbas_id", "code")
-dt3 <- first_interbas_id[,..tmp_names] [dt3, on="first_interbas_id"] 
+dt3 <- first_interbas_id[,..tmp_names] [dt3, on="first_interbas_id"]
 ### Add the branching stream ID as well - not needed, done in next step...
 
 ### Delete duplicate main stream ID in the interbasin stream IDs
@@ -733,7 +741,7 @@ all_stream_code <- rbind(main_trib_all_id[main_trib_all_id$stream %ni% trib_orde
 
 ## Check if still duplicated
 all_stream_code <- all_stream_code[!duplicated(all_stream_code),]
-setorder(all_stream_code, stream) 
+setorder(all_stream_code, stream)
 # all_stream_code[duplicated(all_stream_code$stream),] # check
 # sort(unique(all_stream_code$code)) # check
 
@@ -754,7 +762,16 @@ rm(g, g_del, g_del_for_interbas)
 
 # Run reclassification in GRASS
 
-# start GRASS session 
+
+
+reclass_raster <- function(rast_val, recl_val, rast_path,
+                           recl_path, recl_read = TRUE,
+                           nodata = -9999, type = "Int32",
+                           compress = "DEFLATE", quiet = TRUE)
+
+
+
+# start GRASS session
 # server3
 export DIR=/data/domisch/hydrographr_data
 # grass78  -text -c -e   subcatchment_1264942.tif  $DIR/grass_location # rectangle
