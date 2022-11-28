@@ -21,37 +21,70 @@ knitr::opts_chunk$set(
 
 ## Installation of the required GIS tools
 
-If you do not have installed any of the GIS tools, please, install before using `hydrographr`.
+If you do not have installed any of the GIS tools, please, install before using `hydrographr`. If you use Ubuntu you can copy-paste the commands below. If you use another Linux distribution, please, see the linked software webpage below for installation instruction.
 
-**GRASS GIS**
 
-If you use Ubuntu you can copy-paste the commands below. If you use another Linux distribution, please, see the [GRASS GIS](https://grass.osgeo.org/download/linux/) webpage for installation instruction.
+**Add the Ubuntugis repository**
+
+First, you have to add the "Ubuntugis" Personal Package Archive (PPA) to your system's software sources to be able to install the GIS tools available from there.
 
 ```{bash, eval=FALSE}
-# Install and update GRASS GIS
+# Add the Ubuntugis PPA
 sudo add-apt-repository ppa:ubuntugis/ubuntugis-unstable
-sudo apt update
-sudo apt-get install ubuntugis-unstable
 ```
 
-**GDAL/ORG**
-
-For GDAL, go to the GDAL webpage and [download](https://gdal.org/download.html#current-release) the last release for your Linux distribution (e.g. gdal-3.5.2.tar.gz).
+Next, you need to tell your system to pull down the latest list of software from each archive it knows about, including the PPA you just added:
 
 ```{bash, eval=FALSE}
-# Go to the Downloads folder
-cd /Downloads
+# Update the packages list
+sudo apt update
+```
 
-# Install gdal
-# Note: Change program name according to the release and Linux distribution you have downloaded.
-tar -zxvf gdal-3.5.2.tar.gz 
+Now you are ready to install  `GDAL`, `pktools` and `GRASS GIS`. Copy and paste the commands below into your console and follow the instructions to install the tools.
 
-# Install pktools
-sudo bash install_pktools.sh
+**GDAL**
+
+GDAL is a translator library for raster and vector geospatial data formats and comes with a variety of useful command line utilities for data translation and processing. For more information check the [GDAL](https://gdal.org/) website.
+
+```{bash, eval=FALSE}
+# Install GDAL
+sudo apt install gdal-bin python3-gdal
 ```
 
 **pktools**
 
-To install pktools, please visit the [pktools webpage](https://pktools.nongnu.org/html/md_installation_linux.html#install_manual) and follow the guidelines according to your Linux distribution.
+Pktools is a suite of command line utilities for image processing and remote sensing applications written in C++. For more information check the [pktools](https://pktools.nongnu.org/html/index.html) website.
+
+```{bash, eval=FALSE}
+# Install pktools
+sudo apt install pktools
+```
+
+**GRASS GIS**
+
+GRASS GIS is a powerful raster, vector, and geospatial processing engine including tools for terrain and ecosystem modeling, hydrology and the processing of satellite and aerial imagery. For more detailed installation instructions check the [GRASS GIS users wiki](https://grasswiki.osgeo.org/wiki/Installation_Guide#Ubuntu) or the [GRASS GIS](https://grass.osgeo.org/) website.
+
+```{bash, eval=FALSE}
+# Install GRASS GIS
+sudo apt-get install grass grass-core grass-dev grass-gui grass-doc
+```
+
+**GRASS GIS addons**
+
+Copy-paste the commands below to install the required addons for GRASS GIS.
+
+```{bash, eval=FALSE}
+sudo apt install make
+
+# Install GRASS GIS addons
+export GRASSEXEC="grass --exec"
+$GRASSEXEC  g.extension  extension=r.stream.distance
+$GRASSEXEC  g.extension  extension=r.stream.order
+$GRASSEXEC  g.extension  extension=r.stream.snap
+$GRASSEXEC  g.extension  extension=r.stream.basins
+```
+
+
+
 
 
