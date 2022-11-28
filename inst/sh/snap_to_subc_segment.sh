@@ -51,7 +51,7 @@ export SNAP=$9
 export RAND_STRING=$(xxd -l 8 -c 32 -p < /dev/random)
 
 # name of unique id identifier
-export SITE=$( awk 'NR==1 {print $1}' $DATA )
+export SITE=$( awk -F, 'NR==1 {print $1}' $DATA )
 
 ### save name of file without extension
 #export b=$(echo $DATA | awk -F"." '{print $1}')
