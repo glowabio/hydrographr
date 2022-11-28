@@ -8,8 +8,8 @@
 # path - location of input data
 export DIR=$1
 
-# name of input table
-export DAT=$2
+# name of input table. Must be a .csv file
+export DATA=$2
 
 # name of lon and lat coordinates
 export LON=$3
@@ -19,24 +19,24 @@ export LAT=$4
 ################################
 
 ## save name of file without extension
-export b=$(echo $DAT | awk -F"." '{print $1}')
+export b=$(echo $DATA | awk -F"." '{print $1}')
 
 ## if the file is not csv, add the comma and make it .csv
-if [ "${DAT: -4}" != ".csv" ]
+if [ "${DATA: -4}" != ".csv" ]
 then
-    cat  $DAT | tr -s '[:blank:]' ',' > ${b}.csv
-    export DATC=$(echo ${b}.csv)
+    cat  $DATA | tr -s '[:blank:]' ',' > ${b}.csv
+    export DATAC=$(echo ${b}.csv)
 else
-    DATC=$DAT
+    DATAC=$DATA
 fi
 
 ##  make the file a gpkg
 ogr2ogr -f "GPKG" -overwrite -nln ref_points -nlt POINT -a_srs EPSG:4326 \
-    $DIR/ref_points.gpkg $DATC -oo X_POSSIBLE_NAMES=$LON \
+    $DIR/ref_points.gpkg $DATAC -oo X_POSSIBLE_NAMES=$LON \
     -oo Y_POSSIBLE_NAMES=$LAT -oo AUTODETECT_TYPE=YES
 
 # Name of column for unique ID
-export SITE=$( awk 'NR==1 {print $1}' $DAT )
+export SITE=$( awk 'NR==1 {print $1}' $DATA )
 
 ###  Calculate Euclidean distance between all points
 grass78  -f -text --tmp-location  -c EPSG:4326 <<'EOF'
