@@ -22,7 +22,7 @@ One of the major advantages of the package is that it can handle large geodata e
 
 <!--Processing of large files often makes server inevitable and on servers Linux is the most common operating system. Therefore, `hydrographr` is optimized for Linux operating systems. However, we also implemented a way to use it within Rstudio on Windows. --> 
 
-Since the `hydrographr` package is optimized to run in a Linux operating system, in a Windows environment some additional software needs to be installed (see [Windows system setup](https://glowabio.github.io/hydrographr/articels/windows_system_setup.html)).
+Since the `hydrographr` package is optimized to run in a Linux operating system, in a Windows environment some additional software needs to be installed (see [Windows system setup](https://glowabio.github.io/hydrographr/articles/windows_system_setup.html)).
 
 ## System requirements
 
@@ -30,9 +30,9 @@ To work smoothly with the `hydrographr` package, `GRASS GIS`, `GDAL`, and `pktoo
 
 Here you can find the installation guideline for your operating systems:
 
-[Linux](https://glowabio.github.io/hydrographr/articels/linux_system_setup.html)
+[Linux](https://glowabio.github.io/hydrographr/articles/linux_system_setup.html)
 
-[Windows](https://glowabio.github.io/hydrographr/articels/windows_system_setup.html)
+[Windows](https://glowabio.github.io/hydrographr/articles/windows_system_setup.html)
 
 macOS
 
