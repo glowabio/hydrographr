@@ -81,28 +81,28 @@
 
     
     
+<p>One of the major advantages of the package is that it can handle
+large geodata efficiently using a suite of Open Source geoprocessing
+tools like <code>GRASS GIS</code>, <code>GDAL</code>, and
+<code>pktools</code>. With the<code>hydrographr</code> package large
+geodata is not loaded into R. Instead the files get processed in the
+background using <code>GRASS GIS</code>, <code>GDAL</code>, and
+<code>pktools</code> and only the output gets read into R.</p>
+<!--Processing of large files often makes server inevitable and on servers Linux is the most common operating system. Therefore, `hydrographr` is optimized for Linux operating systems. However, we also implemented a way to use it within Rstudio on Windows. -->
+<p>Since the <code>hydrographr</code> package is optimized to run in a
+Linux operating system, in a Windows environment some additional
+software needs to be installed (see <a href="https://glowabio.github.io/hydrographr/articels/windows_system_setup.html" class="external-link">Windows
+system setup</a>).</p>
 <div class="section level2">
 <h2 id="system-requirements">System requirements<a class="anchor" aria-label="anchor" href="#system-requirements"></a>
 </h2>
 <p>To work smoothly with the <code>hydrographr</code> package,
 <code>GRASS GIS</code>, <code>GDAL</code>, and <code>pktools</code> need
 to be installed.</p>
-<p><em>Note:</em> One of the major advantages of the package is that it
-can aslo handle large data efficiently. When you use
-the<code>hydrographr</code> package you do not have to read e.g. large
-raster files into R. Instead the files get processed in the background
-using <code>GRASS GIS</code>, <code>GDAL</code>, and
-<code>pktools</code> within the Linux environment and only the output
-gets read into R. Processing of large files often makes server
-inevitable and on servers Linux is the most common operating system.
-Therefore, <code>hydrographr</code> is optimized for Linux operating
-systems. However, we also implemented a way to use it within Rstudio on
-Windows. To use <code>hydrographr</code> on Windows some additional
-software needs to be installed (see <a href="https://glowabio/hydrographr/articels/windows_system_setup.html" class="external-link">Windows
-system setup</a>).</p>
-<p>Installation guidelines for different operating systems:</p>
-<p><a href="https://glowabio/hydrographr/articels/linux_system_setup.html" class="external-link">Linux</a></p>
-<p><a href="https://glowabio/hydrographr/articels/windows_system_setup.html" class="external-link">Windows</a></p>
+<p>Here you can find the installation guideline for your operating
+systems:</p>
+<p><a href="https://glowabio.github.io/hydrographr/articels/linux_system_setup.html" class="external-link">Linux</a></p>
+<p><a href="https://glowabio.github.io/hydrographr/articels/windows_system_setup.html" class="external-link">Windows</a></p>
 <p>macOS</p>
 </div>
 <div class="section level2">
@@ -136,7 +136,7 @@ If you did not install the <code>R</code> package yet, install it with
 
     <footer><div class="pkgdown-footer-left">
   <p></p>
-<p>Developed by Maria Üblacker, Afroditi Grigoropoulou, Jaime Garcia Marquez, Yusdiel Torres Cambas, Christoph Schürz, Mathieu Floury, Thomas Tomiczek, Vanessa Bremerich, Sami Domisch.</p>
+<p>Developed by Maria Üblacker, Afroditi Grigoropoulou, Jaime Garcia Marquez, Yusdiel Torres Cambas, Christoph Schürz, Mathieu Floury, Thomas Tomiczek, Vanessa Bremerich, Giuseppe Amatulli, Sami Domisch.</p>
 </div>
 
 <div class="pkgdown-footer-right">
