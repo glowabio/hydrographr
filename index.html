@@ -36,7 +36,17 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="nav-item">
+  <a class="nav-link" href="articles/hydrographr.html">Get started</a>
+</li>
+<li class="nav-item">
   <a class="nav-link" href="reference/index.html">Reference</a>
+</li>
+<li class="nav-item dropdown">
+  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
+  <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+    <a class="dropdown-item" href="articles/linux_system_setup.html">Setting up the package requirements on Linux</a>
+    <a class="dropdown-item" href="articles/windows_system_setup.html">Setting up the package requirements on Windows</a>
+  </div>
 </li>
       </ul>
 <form class="form-inline my-2 my-lg-0" role="search">
@@ -62,28 +72,13 @@
 </h1></div>
 
 <p><code>hydrographr</code> provides a collection of <code>R</code> function wrappers for GDAL and GRASS-GIS functions to efficiently work with Hydrography90m spatial data. The package is currently under development. More and more useful functions will be made available over time here.</p>
-<div class="section level3">
-<h3 id="next-steps-in-package-development">Next steps in package development<a class="anchor" aria-label="anchor" href="#next-steps-in-package-development"></a>
-</h3>
-<ul>
-<li>Test first test function <code><a href="reference/get_subcID.html">get_subcID()</a></code>
-<ul>
-<li>Check link between the .sh script in ’*/inst/sh’ and the <code><a href="http://processx.r-lib.org/reference/run.html" class="external-link">processx::run()</a></code> call</li>
-<li>Is making scripts executable always necessary? (<code>system(paste0('chmod u=x', x))</code>)</li>
-</ul>
-</li>
-<li>Generate light weight test data set for implementation in ’*/inst/extdata’</li>
-<li>Implementation and documentation (header, etc.) of further functions</li>
-<li>Generalization of functions, now functions cover very specific cases</li>
-<li>Update of gh-page</li>
-<li>Establish common guideline for package development
-<ul>
-<li>naming of branches, variables, functions</li>
-<li>workflow to avoid conflicts</li>
-<li>version of package</li>
-</ul>
-</li>
-</ul>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
+<pre class="{r}"><code><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span></span>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"glowabio/hydrographr"</span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://glowabio.github.io/hydrographr/" class="external-link">hydrographr</a></span><span class="op">)</span></span></code></pre>
+<p>The package is currently being developed and we invite users to test the functions and report issues as well as feature requests.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">
@@ -127,7 +122,7 @@
 <div class="dev-status">
 <h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
-<li><a href="https://www.repostatus.org/#concept" class="external-link"><img src="https://www.repostatus.org/badges/latest/concept.svg" alt="Project Status: Concept – Minimal or no implementation has been done yet, or the repository is only intended to be a limited example, demo, or proof-of-concept."></a></li>
+<li><a href="https://www.repostatus.org/#wip" class="external-link"><img src="https://www.repostatus.org/badges/latest/wip.svg" alt="Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public."></a></li>
 </ul>
 </div>
 

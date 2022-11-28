@@ -7,18 +7,72 @@
     <loc>/LICENSE-text.html</loc>
   </url>
   <url>
+    <loc>/articles/hydrographr.html</loc>
+  </url>
+  <url>
+    <loc>/articles/index.html</loc>
+  </url>
+  <url>
+    <loc>/articles/linux_system_setup.html</loc>
+  </url>
+  <url>
+    <loc>/articles/windows_system_setup.html</loc>
+  </url>
+  <url>
     <loc>/authors.html</loc>
   </url>
   <url>
     <loc>/index.html</loc>
   </url>
   <url>
-    <loc>/reference/get_subcID.html</loc>
+    <loc>/reference/check_tiles_filesize.html</loc>
   </url>
   <url>
-    <loc>/reference/hydrographr-package.html</loc>
+    <loc>/reference/check_wsl.html</loc>
+  </url>
+  <url>
+    <loc>/reference/crop_to_extent.html</loc>
+  </url>
+  <url>
+    <loc>/reference/download_tiles.html</loc>
+  </url>
+  <url>
+    <loc>/reference/download_tiles_base.html</loc>
+  </url>
+  <url>
+    <loc>/reference/extract_ids.html</loc>
+  </url>
+  <url>
+    <loc>/reference/fix_path.html</loc>
+  </url>
+  <url>
+    <loc>/reference/get_catchment_graph.html</loc>
+  </url>
+  <url>
+    <loc>/reference/get_os.html</loc>
+  </url>
+  <url>
+    <loc>/reference/get_regional_unit_id.html</loc>
+  </url>
+  <url>
+    <loc>/reference/get_tile_id.html</loc>
   </url>
   <url>
     <loc>/reference/index.html</loc>
+  </url>
+  <url>
+    <loc>/reference/make_sh_exec.html</loc>
+  </url>
+  <url>
+    <loc>/reference/merge_tiles.html</loc>
+  </url>
+  <url>
+    <loc>/reference/read_geopackage.html</loc>
+  </url>
+  <url>
+    <loc>/reference/reclass_raster.html</loc>
+  </url>
+  <url>
+    <loc>/reference/segment_neighbours.html</loc>
   </url>
 </urlset>
