@@ -54,8 +54,8 @@ library(hydrographr)
 ```
 
 
-## `hydrographr` tutorial
+<!--## `hydrographr` tutorial
 
 In the how-to-get-started tutorial we will show ...
 
-The the test dataset of `hydrographr` includes .....
+The the test dataset of `hydrographr` includes ..... -->
