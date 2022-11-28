@@ -1,8 +1,8 @@
 ---
-title: "Linux system setup"
+title: "Setting up the package requirements on Linux"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Getting started with hydrographr}
+  %\VignetteIndexEntry{Setting up the package requirements on Linux}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 #bibliography: literature.bib

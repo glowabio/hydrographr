@@ -2,7 +2,7 @@
 title: "Setting up the package requirements on Windows"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Getting started with hydrographr}
+  %\VignetteIndexEntry{Setting up the package requirements on Windows}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 #bibliography: literature.bib
