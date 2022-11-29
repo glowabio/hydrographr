@@ -5,7 +5,7 @@
 #export LON=lon_snap
 #export LAT=lat_snap
 
-# path - location of input data
+# path - location of input/output data
 export DIR=$1
 
 # name of input table. Must be a .csv file
