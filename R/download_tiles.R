@@ -19,17 +19,23 @@ download_tiles <- function(variable, filetype = "tif",
   # Introductory steps
 
   # Import lookup table with the size of each file
-  file_size_table <- fread(system.file("data", "hydrography90m_file_sizes.txt", package = "hydrographr"))
+  file_size_table <- fread(system.file("data",
+                                       "hydrography90m_paths_file_sizes.txt",
+                                       package = "hydrographr"), sep = ";")
+  # file_size_table <- fread("inst/data/hydrography90m_paths_file_sizes.txt",
+  #                         sep = ";")
 
   # Separate the table to get the names of the hydrography variables
   file_size_table_sep <- separate(
     data = file_size_table,
-    col = path,
+    col = file_path,
     into = c("grass_module", "foldername", "varname_tile"),
     sep = "/",
     fill = "left",
   )
 
+  file_size_table_sep$grass_module[
+    is.na(file_size_table_sep$grass_module)] <- ""
   # Get the valid names of the hydrography variables
   # to check that the requested variable exists
   valid_varnames <- sort(unique(sub("_[^_]+$", "",
@@ -38,31 +44,43 @@ download_tiles <- function(variable, filetype = "tif",
   # to check that the requested variable exists
   valid_filetypes <- sort(unique(file_size_table_sep$varname_tile))
 
-  # Sizes of the global files
-  file_size_table_global <- file_size_table[grep("global", path)]
-  # Sizes of the rest of the files
-  file_size_table <- file_size_table[!grep("global", path)]
-
   # Get the valid tile ids of the hydrography
   # to check that the requested tile exists
   valid_tile_ids <- unique(str_extract(
-    file_size_table$path, "h[0-9]+v[0-9]+"))
+    file_size_table$file_path, "h[0-9]+v[0-9]+"))
 
   valid_tile_ids <- valid_tile_ids[!is.na(valid_tile_ids)]
 
-  # General path to the download folder in Nimbus
-  nimbus_path <- "https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4/download?path=%2F"
-
   variable_size_sum <- 0
+
   for (ivar in variable) {
+
+
+    if (global == TRUE) {
+      tile_id <-  "_ovr"
+
+    } else if (global == FALSE) {
+
+      if (ivar == "regional_unit") {
+
+        tile_id <- as.character(reg_unit_id)
+
+      } else {
+        tile_id <- tile_id
+      }
+
+    }
+
+
     tile_size_sum <- 0
 
     for (itile in tile_id) {
 
       tile_size <- check_tiles_filesize(variable = ivar,
                                         filetype = filetype,
-                                        tile_id = itile, reg_unit_id = reg_unit_id,
-                                        global = global, valid_varnames = valid_varnames,
+                                        tile_id = itile,
+                                        global = global,
+                                        valid_varnames = valid_varnames,
                                         valid_tile_ids = valid_tile_ids,
                                         valid_filetypes = valid_filetypes,
                                         file_size_table_sep = file_size_table_sep)
@@ -72,29 +90,59 @@ download_tiles <- function(variable, filetype = "tif",
     }
 
     variable_size_sum <- tile_size_sum + variable_size_sum
-
   }
 
+  variable_size_sum
 
   # Print warning on file size and ask for input from the user
-  arg <- readline(prompt=paste0("Download size is ",
-                                round(variable_size_sum / 1000000, 2),
-                                " MB. Please type \"y\" if you are ready to smash it or \"n\" if you'd rather not to, and then press Enter \n"))
+  arg <- readline(prompt = paste0("Download size is ",
+                                  round(variable_size_sum / 1000000, 2),
+                                  " MB. Please type \"y\" if you are ready to smash it
+or \"n\" if you'd rather not to, and then press Enter \n"))
 
-  #include trycatch to limit it to y/n and try again if other input is given!
   if (arg == "y") {
+
+
+    # The argument 'server_path' of the download_tiles_base() function controls
+    # the server from which the files will be downloaded
+
+    # General path to the download folder in Nimbus
+    nimbus_path <- "https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4/download?path=%2F"
+    # General path to the download folder in GDrive
+    gdrive_path <- "https://drive.google.com/uc?export=download&id="
+
+    # Use README file as a test to check if Nimbus is up.
+    server_path <- tryCatch(
+      {
+        download.file(paste0(nimbus_path, "README/README.txt"),
+                      destfile = paste0(download_path, "/README.txt"))
+        server_path <- nimbus_path
+        server_path
+      },
+      warning = function(c) {
+        # Get gdrive file id of the README.txt file
+        readme_id <- file_size_table_sep[varname_tile == "README.txt", ]$file_id
+        # Download README.txt file
+        download.file(paste0(gdrive_path, readme_id),
+                      destfile = paste0(download_path, "/README.txt"))
+        server_path <- gdrive_path
+        server_path
+      },
+      error = function(c) {
+        server_path <- gdrive_path
+        server_path
+      }
+    )
 
     for (ivar in variable) {
       for (itile in tile_id) {
 
         download_tiles_base(variable = ivar, filetype = filetype,
-                            tile_id = itile, reg_unit_id = reg_unit_id,
-                            global = global, download_path = download_path,
-                            valid_varnames = valid_varnames,
-                            valid_tile_ids = valid_tile_ids,
-                            valid_filetypes = valid_filetypes,
+                            tile_id = itile, global = global,
+                            download_path = download_path,
                             file_size_table_sep = file_size_table_sep,
-                            nimbus_path = nimbus_path)
+                            server_path = server_path
+        )
       }
     }
   }
