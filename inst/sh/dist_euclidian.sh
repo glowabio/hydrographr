@@ -15,6 +15,9 @@ export DATA=$2
 export LON=$3
 export LAT=$4
 
+# full path and name of output file $DIR/pairwise_euclidian_dist.txt
+export OUT=$5
+
 ################################
 ################################
 
@@ -32,11 +35,11 @@ fi
 
 ##  make the file a gpkg
 ogr2ogr -f "GPKG" -overwrite -nln ref_points -nlt POINT -a_srs EPSG:4326 \
-    $DIR/ref_points.gpkg $DATAC -oo X_POSSIBLE_NAMES=$LON \
+    $DIR/ref_points.gpkg $DATA -oo X_POSSIBLE_NAMES=$LON \
     -oo Y_POSSIBLE_NAMES=$LAT -oo AUTODETECT_TYPE=YES
 
 # Name of column for unique ID
-export SITE=$( awk 'NR==1 {print $1}' $DATA )
+export SITE=$( awk -F, 'NR==1 {print $1}' $DATA )
 
 ###  Calculate Euclidean distance between all points
 grass78  -f -text --tmp-location  -c EPSG:4326 <<'EOF'
@@ -48,11 +51,11 @@ output=allpoints type=point key=$SITE
 #  Calculate distance, results are given in meters
 v.distance -pa from=allpoints to=allpoints upload=dist separator=comma \
     | sed -re 's/([0-9]+\.[0-9]{2})[0-9]+/\1/g' | \
-    awk -F, 'NR > 1 {print $0}' >  $DIR/pairwise_euclidian_dist.txt
+    awk -F, 'NR > 1 {print $0}' > $OUT 
 
 EOF
 
-
+rm $DIR/ref_points.gpkg
 
 exit
 
