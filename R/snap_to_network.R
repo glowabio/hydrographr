@@ -1,17 +1,24 @@
-#' Snap data point to the next stream reach
-#' Snaps data points to the next stream reach within a defined radius
-#' or based on a flow accumulation threshold,
+#' Snap data points to the next stream segment
+#' Snaps data/sampling points to the next stream segment within a defined radius
+#' or a minimum flow accumulation.
 #'
 #'
-#' @param data data.frame with the lat lon columns
+#' @param data Data.frame with lat lon columns in WGS84
 #' @param lon Name of the longitude column as character string
 #' @param lat Name of the latitude column as character string
-#' @param stream_path Full path to the stream network .tif file
-#' @param radius Maximum distance in meters; Point will be snapped to the next
-#' stream within a certain distance.
-#' @param flow_path Full path to the flow accumulation .tif file.
-#' @param thre Minimum flow accumulation; Point will be snapped to the next
-#' stream with a flow accumulation equal or higher than the given value.
+#' @param stream_path Full path of the stream network .tif file
+#' @param flow_path Full path of the flow accumulation .tif file. Needed if
+#' the the point should be snapped to next stream segment with a minimum flow
+#' accumulation.
+#' @param calc Options "dist", "accu", or "both". Default is "dist".
+#' Defines if the points are snapped using the distance or flow accumulation.
+#' If calc is set to "both" the output will contain the new coordinates for both
+#' calculations.
+#' @param dist Maximum distance in meters; Point will be snapped to the next
+#' stream within a defined radius. By default the distance is 500 meter.
+#' @param accu Minimum flow accumulation; Point will be snapped to the next
+#' stream with a flow accumulation equal or higher than the given value. By
+#' default the flow accumulation value is set to 0.5.
 #' @importFrom stringi stri_rand_strings
 #' @importFrom dplyr select
 #' @importFrom data.table fread
@@ -19,11 +26,54 @@
 #' @export
 #'
 
-# Note change to one path and one threshold argument or make it possible to
-# calculate both snapping at once
+snap_to_network <- function(data, lon, lat, stream_path, flow_path = NULL,
+                            calc = "dist", dist = 500, accu = 0.5,
+                            quiet = TRUE) {
+  # Check if data.frame is defined
+  if (missing(data))
+    stop("Input data is missing.")
 
-snap_to_network <- function(data, lon, lat, stream_path = NULL, radius = 500,
-                            flow_path = NULL, thre = 0.5, quiet = TRUE) {
+  # Add here: if condition to check if input data is of type data.frame,
+  # data.table or tibble
+
+  # Check if column name is defined
+  if (missing(lon))
+    stop("Column name of longitudinal coordinate is not defined.")
+
+  # Check if column name is defined
+  if (missing(lat))
+    stop("Column name of latitudinal coordinate is not defined.")
+
+  # Check if values of the lon/lat columns are numeric
+  if(!is.numeric(data %>% select(matches(lon) %>% .[1])))
+    stop("Longitudinal coordinates have to be numeric.")
+  if(!is.numeric(data %>% select(matches(lat) %>% .[1])))
+    stop("Longitudinal coordinates have to be numeric.")
+  # Add here: if condition to check if lat/long columns are in WGS84
+
+
+  # Check if stream_path is defined
+  if (missing(stream_path))
+    stop("stream_path is missing.")
+
+  # Check if stream_path exists
+  if (!dir.exists(stream_path))
+    stop(paste0("stream_path: ", stream_path, " doesn't exist."))
+
+  # If calc is set to "accu" or "calc"
+  # Check if flow_path is defined
+  if (calc == "accu" || calc == "both")
+    if(is.null(flow_path))
+      stop(paste0("flow_path is missing."))
+
+  # Check if flow_path exists
+  if (!is.null(flow_path))
+    if(!dir.exists(flow_path))
+    stop(paste0("flow_path: ", flow_path, " doesn't exist."))
+
+
+
+
   # Check operating system
   system <- get_os()
   # Make bash scripts executable
@@ -47,7 +97,6 @@ snap_to_network <- function(data, lon, lat, stream_path = NULL, radius = 500,
 
     # Convert NULL argument to "NA" so that the bash script can evaluate
     # the argument
-    stream_path <- ifelse(is.null(stream_path), "NA", stream_path)
     flow_path <- ifelse(is.null(flow_path), "NA", flow_path)
 
     run(system.file("sh", "snap_to_network.sh",
@@ -64,7 +113,7 @@ snap_to_network <- function(data, lon, lat, stream_path = NULL, radius = 500,
     check_wsl()
     # Change path for WSL
     wsl_coord_tmp_path <- fix_path(coord_tmp_path)
-    wsl_stream_path <- ifelse(is.null(stream_path), "NA", fix_path(stream_path))
+    wsl_stream_path <- fix_path(stream_path)
     wsl_flow_path <- ifelse(is.null(flow_path), "NA", fix_path(flow_path))
     wsl_snap_tmp_path <- fix_path(snap_tmp_path)
     wsl_tmp_path <- fix_path(tempdir())
