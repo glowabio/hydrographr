@@ -40,6 +40,7 @@ importFrom(igraph,subgraph)
 importFrom(memuse,Sys.meminfo)
 importFrom(parallel,detectCores)
 importFrom(processx,run)
+<<<<<<< HEAD
 importFrom(sf,read_sf)
 importFrom(stringi,stri_rand_strings)
 importFrom(stringi,stri_replace_all_fixed)
@@ -50,3 +51,9 @@ importFrom(terra,ext)
 importFrom(terra,rast)
 importFrom(terra,vect)
 importFrom(tidyr,separate)
+||||||| bb5553b
+=======
+importFrom(stringi,stri_rand_strings)
+importFrom(stringi,stri_replace_all_fixed)
+importFrom(stringi,stri_replace_first_fixed)
+>>>>>>> 1b4652b0a4181a0bc17eb51b51f300ce26af5bb9
