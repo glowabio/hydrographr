@@ -1,14 +1,15 @@
 #! /bin/bash
-export DIR=/home/marquez/hydrographr
-export DATA=$DIR/spdata_1264942_ids_snap.csv
-export LON=lon_snap
-export LAT=lat_snap
-export BAS=basin_id
-export STREAM=$DIR/order_vect_59.gpkg
-export BASIN=basin_h18v04.tif
-export PAR=1
-export OUT=$DIR
-export DIST=all
+
+#export DIR=/home/marquez/hydrographr
+#export DATA=$DIR/spdata_1264942_ids_snap.csv
+#export LON=lon_snap
+#export LAT=lat_snap
+#export BAS=basin_id
+#export STREAM=$DIR/order_vect_59.gpkg
+#export BASIN=basin_h18v04.tif
+#export PAR=1
+#export OUT=$DIR
+#export DIST=all
 
 # path - location of input/output data
 export DIR=$1
@@ -73,25 +74,25 @@ fi
 if [ "$DIST" = long ] || [ "$DIST" = all  ]
 then
 
-# all ids from basins in the input data
-export basinID=($(awk -F, -v basin_id="$BAS" '
+# array of all ids from basins in the input data
+export basinID=($(awk -F, -v basin_col="$BAS" '
 NR == 1 { for (i=1; i<=NF; i++) {f[$i] = i} }
-NR > 1 {print $(f["basin_id"])}' $DATA | sort | uniq))
+NR > 1 {print $(f[basin_col])}' $DATA | sort | uniq))
+
 
 [ ! -d $DIR/distance ] && mkdir $DIR/distance
 export OUTDIR=$DIR/distance
 
 [ ! -d $OUTDIR/dist_fly ] && mkdir $OUTDIR/dist_fly
 [ ! -d $OUTDIR/dist_fish ] && mkdir $OUTDIR/dist_fish
+
 # function to do the longitudinal distance calculations per basin
 # where each basin can be send to a core in parallel
 
 DistCalc(){
 
 # Macro-basin
-#export ID=$(echo $basinID | awk -v id=$SLURM_ARRAY_TASK_ID '{print $id}')
 export ID=$1
-
 
 ### create table to store output of distance algorithms
 echo "from_$SITE,to_$SITE,dist" > $OUTDIR/dist_fly/dist_fly_allp_${ID}.csv
@@ -135,16 +136,9 @@ parallel -j $PAR --delay 5 DistCalc ::: ${basinID[@]}
     if [ "${#basinID[@]}" -eq 1 ]
     then
 
-        #mv $OUTDIR/dist_fly/dist_fly_allp_${ID}.csv $OUT/dist_euclidian_basin.csv
         mv $OUTDIR/dist_fish/dist_fish_allp_${ID}.csv $OUT/dist_longitudinal.csv
 
     else
-
-        #echo "from_$SITE,to_$SITE,dist" > $OUT/dist_euclidian_basin.csv
-        #for FILE in $(find $OUTDIR/dist_fly/ -name 'dist_fly_*')
-        #do
-        #    awk 'FNR > 1' $FILE >> $OUT/dist_euclidian_basin.csv
-        #done
 
         echo "from_$SITE,to_$SITE,dist" > $OUT/dist_longitudinal.csv
         for FILE in $(find $OUTDIR/dist_fish/ -name 'dist_fish_*')
