@@ -20,7 +20,7 @@
 #' @export
 #'
 
-extract_var_stat <- function(subc_ids, subc_layer, variables, n_cores) {
+extract_zonal_stat <- function(subc_ids, subc_layer, variables, n_cores) {
 
   # check if the input is vector?
   if (!is.vector(subc_ids)) {
