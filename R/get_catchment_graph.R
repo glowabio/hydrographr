@@ -1,6 +1,8 @@
 #' Get catchment from graph
 #'
-#' Subset the network graph by extracting the upstream sub-catchments, i.e. the drainage basin, for one or multiple stream segments. The function will return either one or more data.tables or graph objects for each inout stream segment.
+#' Subset the network graph by extracting the upstream sub-catchments, i.e. the drainage basin, for one or multiple stream segments. The function will return either one or more data.tables or graph objects for each input stream segment.
+#'
+#' By switching the mode to either "in", "out" or "all", only the upstream, downstream or all connected segments will be returned.
 #'
 #' @param g A directed graph (igraph object).
 #' @param segmentID Optional. The stream segment or sub-catchments IDs for which to delineate the upstream drainage area. Can be a single ID or a vector of multiple IDs (c(ID1, ID2, ID3, ...). If empty, then outlets will be used as segment IDs (with outlet=TRUE). Note that you can browse the entire network online at https://geo.igb-berlin.de/maps/351/view and to left hand side, select the "Stream segment ID"  layer and click on the map to get the ID.
@@ -9,17 +11,32 @@
 #' @param mode Can be either "in", "out" or "all". "in" will delineate the upstream catchment, "out" delineates the downstream catchment (all segments that are reachable from the given input segment), and "all" does both.
 #' @param n_cores Optional. Specify the number of CPUs for internal parallelization in the case of multiple stream segments / outlets. Defaults to 1. Setting a higher number is might be slower in the end, as the data has to be provided to each CPU (worker) which can take time.
 #' @param maxsize Optional. Specify the maximum size of the data passed to the parallel backend in MB. Defaults to 1500 (1.5 GB). Consider a higher value for large study areas (more than one 20°x20° tile).
-
 #'
-#' @importFrom future plan
+#' @return A graphs or datatable that reports all segmentIDs. In case of multiple input segements, the results are stored in a list.
+#'
+#' @importFrom future plan multisession multicore
 #' @importFrom doFuture registerDoFuture
 #' @importFrom parallel detectCores
 #' @importFrom data.table setDT setnames
-#' @importFrom igraph subcomponent subgraph as_data_frame as_ids
+#' @importFrom igraph subcomponent subgraph as_data_frame is_directed
 #' @importFrom future.apply future_lapply
 #' @importFrom memuse Sys.meminfo
 #' @export
 #'
+#' @examples
+#' # Get the upstream catchment as a graph
+#' get_catchment_graph(g, segmentID = segmentID, mode="in", outlet=F, graph=T, n_cores=1)
+#'
+#' #' # Get the downstream segments as a data.table,
+#' get_catchment_graph(g, segmentID = segmentID, mode="out", outlet=F, graph=F n_cores=1)
+#'
+#' # Get the catchments of all outlets in the study area as a graph
+#' get_catchment_graph(g, mode="in", outlet=T, graph=T, n_cores=1)
+#'
+#' @author Sami Domisch
+
+
+
 
 
 
@@ -140,56 +157,3 @@ get_catchment_graph <- function(g, segmentID=NULL, outlet=F, mode=NULL, graph=F,
   # Close parallel backend
   plan(sequential)
 }
-
-
-
-
-# Test function
-# usePackage <- function(p){
-#   if (!is.element(p, installed.packages()[,1])) install.packages(p, dep = TRUE)
-#   library(p, character.only = TRUE)
-# }
-#
-# usePackage("future.apply")
-# usePackage("doFuture")
-# usePackage("data.table")
-# usePackage("parallel")
-# usePackage("memuse")
-# g <- my_graph
-
-#
-# segmentID = 513868395
-#
-# my_seg = 513868395
-# my_seg = c(513853532, 513833203, 513853533, 513853535)
-# segmentID = c(513853532, 513833203, 513853533, 513853535)
-#
-# my_seg = data.frame(ID=c(513853532, 513833203, 513853533, 513853535,513853532, 513833203, 513853533, 513853535))
-#
-#
-# my_catchment <- get_catchment_graph(my_graph, segmentID = my_seg, outlet=F, graph=F, n_cores=3)
-# my_catchment <- get_catchment_graph(my_graph, segmentID = my_seg, outlet=T, graph=F, n_cores=3)
-#
-#
-# my_catchment <- get_catchment_graph(my_graph, segmentID = my_seg$ID, outlet=F, graph=F, n_cores=2)
-# my_catchment <- get_catchment_graph(my_graph, segmentID = my_seg$ID, outlet=T, graph=T, n_cores=2)
-# my_catchment <- get_catchment_graph(my_graph, segmentID = my_seg$ID, outlet=T, graph=T)
-# my_catchment <- get_catchment_graph(my_graph, outlet=F) # OK
-# my_catchment <- get_catchment_graph(my_graph, outlet=T)
-#
-# 1.83652939e8
-#
-# # big file
-# my_seg=c(173368095, 173373237, 173353203, 173363307)
-#
-# my_seg=c(183959344, 183959344, 183959344)
-#
-# my_seg=371901515 #h00v00
-# my_seg=c(371901515, 371698050, 371698051, 371698052, 371698053, 371698054, 371698055, 371698056)
-#
-# my_catchment <- get_catchment_graph(my_graph, segmentID = my_seg, mode="in", outlet=F, graph=F, n_cores=1)
-#
-# summary(my_table)
-# my_table[order(-rank(flow_accum))]
-
-
