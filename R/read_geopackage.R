@@ -15,7 +15,7 @@
 #' @importFrom RSQLite SQLite
 #' @importFrom data.table setDT
 #' @importFrom igraph graph_from_data_frame
-#' @importFrom sf vect
+#' @importFrom sf read_sf
 #' @importFrom terra vect
 #' @export
 #'
@@ -89,4 +89,3 @@ read_geopackage <- function(filename, type=NULL, SQL_table=NULL, dt=F, g=F, sf=F
     }
 
 }
-
