@@ -35,6 +35,8 @@ snap_to_network <- function(data, lon, lat, stream_path, accu_path = NULL,
 
   # Add here: if condition to check if input data is of type data.frame,
   # data.table or tibble
+  if(!is(data, "data.frame"))
+    stop("data: Has to be of class 'data.frame'.")
 
   # Check if column name is defined
   if (missing(lon))
