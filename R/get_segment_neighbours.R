@@ -11,7 +11,7 @@
 #' @param variable Optional. One or more attribute(s) or variable(s) of the input graph that should be reported for each output segmentID ("to_stream").
 #' @param attach_only Logical. If TRUE then the selected variables will be only attached to each for each segment without any further aggregation.
 #' @param stat One of mean, median, min, max, sd (without quotes). Aggregates (or summarizes) the variables for the neighbourhood of each input segment ("stream", e.g., the average land cover in the next five upstream segments or sub-catchments).
-#' @param n_cores Optional. Specify the number of CPUs for internal parallelization in the case of multiple stream segments / outlets. Defaults to 1. In case the graph is very large, and many segments are used as an input, setting n_cores to a higher value can speed up the computation. This comes however at the cost of possible RAM limitations and even slower processing since the large data will be copied to each CPU. Hence consider testing with n_cores=1 first. 
+#' @param n_cores Optional. Specify the number of CPUs for internal parallelization in the case of multiple stream segments / outlets. Defaults to 1. In case the graph is very large, and many segments are used as an input, setting n_cores to a higher value can speed up the computation. This comes however at the cost of possible RAM limitations and even slower processing since the large data will be copied to each CPU. Hence consider testing with n_cores=1 first.
 #' @param maxsize Optional. Specify the maximum size of the data passed to the parallel backend in MB. Defaults to 1500 (1.5 GB). Consider a higher value for large study areas (more than one 20°x20° tile).
 
 #'
@@ -25,26 +25,26 @@
 #' @importFrom memuse Sys.meminfo
 #' @export
 #'
-#' 
+#'
 #' @examples 
-#' # Get the upstream segment neighbours in the 5th order and report the length and source elevation for the neighbours of each input segment 
+#' # Get the upstream segment neighbours in the 5th order and report the length and source elevation for the neighbours of each input segment
 #' segment_neighbours(g, segmentID=segmentID,
 #'                    order=5, mode="in", n_cores=1,
 #'                    variable=c("length", "source_elev"),
 #'                    attach_only=T)
 #'
-#' # Get the downstream segment neighbours in the 5th order and calculate the median length and source elevation across the neighbours of each input segment 
+#' # Get the downstream segment neighbours in the 5th order and calculate the median length and source elevation across the neighbours of each input segment
 #' segment_neighbours(my_graph, segmentID=segmentID,
 #'                    order=2, mode="out", n_cores=1,
 #'                    variable=c("length", "source_elev"),
 #'                    stat=median)
 #'
-#' Get the up-and downstream segment neighbours in the 5th order and report the median length and source elevation for the neighbours of each input segment 
+#' Get the up-and downstream segment neighbours in the 5th order and report the median length and source elevation for the neighbours of each input segment
 #' segment_neighbours(my_graph, segmentID=segmentID,
 #'                    order=2, mode="all", n_cores=1,
 #'                    variable=c("length", "source_elev"),
 #'                    stat=mean, attach_only=T)
-#' 
+#'
 #' @author Sami Domisch
 
 
@@ -52,32 +52,32 @@
 segment_neighbours <- function(g, segmentID=NULL, variable=NULL, stat=NULL,
                                attach_only=F, order=5, mode="in", n_cores=1,
                                maxsize=1500) {
-  
+
   # Check input arguments
   if ( class(g) != "igraph")     stop("Input must be an igraph object. Please create the graph first.")
-  
+
   if ( !is_directed(g)) stop("The input graph must be a directed graph.")
-  
+
   if ( missing(segmentID)) stop("Please provide at least one segment ID of the input graph. The segmentID must be a numeric vector.")
-  
+
   if (is.data.frame(segmentID)==TRUE) stop("The segmentID must be a numeric vector.")
-  
+
   if(hasArg(n_cores)) {
     if (length(segmentID)>1 & n_cores==0)  stop("You have specified multiple segments but zero workers. Please specify at least n_cores=1, or leave it empty to allow an automatic setup.")
   }
-  
+
   if (attach_only==TRUE & missing(variable)) stop("No variable specified that should be attached to the stream segments. Please provide at least one variable from the input graph.")
-  
-  
+
+
   # Set available RAM for future.apply
   # maxmem <- memuse::Sys.meminfo()$totalram@size-1
   # Define the size of the onjects passed to future:
   # 1500*1024^2=1572864000 , i.e. 1.5GB for one tile
   options(future.globals.maxSize=maxsize*1024^2)
-  
+
   #  Remove any duplicate segmenrIDs
   segmentID <- segmentID[!duplicated(segmentID)]
-  
+
   # Set up parallel backend if multiple segments
   if(length(segmentID)>1) {
     cat("Setting up parallel backend...\n")
@@ -95,20 +95,20 @@ segment_neighbours <- function(g, segmentID=NULL, variable=NULL, stat=NULL,
       plan(multicore, workers = n_cores) # multicore?
     }
   }
-  
-  
-  
+
+
+
   cat("Finding stream segments within neighbourhood order", order, "\n")
-  
+
   l <- future_sapply(as.character(segmentID), function(x) ego(g, nodes=x, order, mode = mode))
   # ego_out <- ego(g, nodes=as.character(segmentID), order, mode = mode)
-  
+
   # Reduce list items
   l <- future_lapply(l, as_ids)
-  
+
   # As data.frame
   l <- future_lapply(l, as.data.table)
-  
+
   ### Get the path number as an additional column in the graph list.vs
   mapply_fun <- function(element,name){
     mutate(element,stream = name) }
@@ -120,16 +120,16 @@ segment_neighbours <- function(g, segmentID=NULL, variable=NULL, stat=NULL,
   names(dt)[1] <- "to_stream"
   setkey(dt, stream)
   dt <- unique(dt) # remove any duplicates, if any
-  
+
   # If aggregation was defined:
   if(!missing(variable)) {
-    
-    
+
+
     cat("Attaching the attribute(s)", variable, "\n")
     # Get the attributes for all edges of the full graph
     lookup_dt <- as.data.table(as_long_data_frame(g)[c("ver[el[, 1], ]", variable)])
     names(lookup_dt)[1] <- "to_stream"
-    
+
     # Merge the network attributes and sort:
     # dt_join <- merge(dt, lookup_dt, by="to_stream", all.x=TRUE)
     # dt_join <- dt[lookup_dt, on="to_stream"] # lookup_dt[dt, on="stream"]  gives NAs
@@ -139,14 +139,14 @@ segment_neighbours <- function(g, segmentID=NULL, variable=NULL, stat=NULL,
     dt_join <- dt_join[dt_join$stream != dt_join$to_stream,]
     # Set col order
     setcolorder(dt_join, c("stream", "to_stream", variable))
-    
+
     # Export only attached data
     if(attach_only==TRUE) {
       return(dt_join)
       # Else aggregate the variables to each "from" stream
     } else if(attach_only==FALSE & !missing(stat))   {
       cat("Aggregating variable(s)", variable, "for each segmentID.\n")
-      
+
       dt_agg <- dt_join[,lapply(.SD, stat, na.rm=TRUE),
                         .SDcols=variable,
                         by="stream"]
@@ -158,4 +158,3 @@ segment_neighbours <- function(g, segmentID=NULL, variable=NULL, stat=NULL,
   }
   plan(sequential)
 }
-
