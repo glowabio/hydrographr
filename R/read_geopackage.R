@@ -11,7 +11,7 @@
 #' @param sf If TRUE, import the GeoPackage as a spatial dataframe (sf object).
 #' @param SpatVect If TRUE, import the GeoPackage as a SpatVecteor (terra object).
 
-#' @importFrom DBI dbConnect dbListTables dbGetQuery
+#' @importFrom DBI dbConnect dbListTables dbGetQuery dbDisconnect
 #' @importFrom RSQLite SQLite
 #' @importFrom data.table setDT
 #' @importFrom igraph graph_from_data_frame
