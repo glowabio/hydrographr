@@ -1,7 +1,7 @@
 #' Get catchment from graph
 #'
 #' Subset the network graph by extracting the upstream sub-catchments, i.e. the drainage basin, for one or multiple stream segments. The function will return either one or more data.tables or graph objects for each input stream segment.
-#' 
+#'
 #' By switching the mode to either "in", "out" or "all", only the upstream, downstream or all connected segments will be returned.
 #'
 #' @param g A directed graph (igraph object).
@@ -12,7 +12,7 @@
 #' @param n_cores Optional. Specify the number of CPUs for internal parallelization in the case of multiple stream segments / outlets. Defaults to 1. Setting a higher number is might be slower in the end, as the data has to be provided to each CPU (worker) which can take time.
 #' @param maxsize Optional. Specify the maximum size of the data passed to the parallel backend in MB. Defaults to 1500 (1.5 GB). Consider a higher value for large study areas (more than one 20°x20° tile).
 #'
-#' @return A graphs or datatable that reports all segmentIDs. In case of multiple input segements, the results are stored in a list. 
+#' @return A graphs or datatable that reports all segmentIDs. In case of multiple input segements, the results are stored in a list.
 #'
 #' @importFrom future plan multisession multicore
 #' @importFrom doFuture registerDoFuture
@@ -22,17 +22,17 @@
 #' @importFrom future.apply future_lapply
 #' @importFrom memuse Sys.meminfo
 #' @export
-#' 
-#' @examples 
+#'
+#' @examples
 #' # Get the upstream catchment as a graph
 #' get_catchment_graph(g, segmentID = segmentID, mode="in", outlet=F, graph=T, n_cores=1)
-#' 
-#' #' # Get the downstream segments as a data.table, 
+#'
+#' #' # Get the downstream segments as a data.table,
 #' get_catchment_graph(g, segmentID = segmentID, mode="out", outlet=F, graph=F n_cores=1)
-#' 
+#'
 #' # Get the catchments of all outlets in the study area as a graph
 #' get_catchment_graph(g, mode="in", outlet=T, graph=T, n_cores=1)
-#' 
+#'
 #' @author Sami Domisch
 
 
@@ -157,6 +157,3 @@ get_catchment_graph <- function(g, segmentID=NULL, outlet=F, mode=NULL, graph=F,
   # Close parallel backend
   plan(sequential)
 }
-
-
-
