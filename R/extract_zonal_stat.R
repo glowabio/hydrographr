@@ -1,10 +1,10 @@
 #' Calculate zonal statistics based on environmental variable raster and vector layers.
 #'
-#' @param data_dir Path to the directory containing all input data
-#' @param out_path Full path of the output file. If not NULL, the output data.frame is exported as a csv in the given path
-#' @param subc_ids Vector of sub-catchment ids, can be acquired from the extract_ids() function, by sub setting the resulting data.frame
-#' @param subc_layer Full path to the sub-catchment ID .tif layer
-#' @param variables Variable file names, e.g. slope_grad_dw_cel_h00v00.tif. Variable names should remain intact in file names, even after prior file processing, i.e., slope_grad_dw_cel should appear in the file name
+#' @param data_dir Character. Path to the directory containing all input data
+#' @param out_path Character. Full path of the output file. If not NULL, the output data.frame is exported as a csv in the given path
+#' @param subc_ids Vector of sub-catchment ids or "all". If "all", zonal statistics are calculated for all the sub-catchments of the given sub-catchment layer. A vector of the sub-catchment ids can be acquired from the extract_ids() function, by sub setting the resulting data.frame
+#' @param subc_layer Character Full path to the sub-catchment ID .tif layer
+#' @param variables Character vector. Variable file names, e.g. slope_grad_dw_cel_h00v00.tif. Variable names should remain intact in file names, even after prior file processing, i.e., slope_grad_dw_cel should appear in the file name. The files should be cropped to the extent of the sub-catchment layer
 #' @importFrom data.table fread fwrite
 #' @importFrom processx run
 #' @importFrom rlang is_missing
@@ -24,29 +24,37 @@ extract_zonal_stat <- function(data_dir, out_path = NULL, subc_ids,
 
   # check if the input is vector
   if (!is.vector(subc_ids)) {
-    print("The subcatchment ids should be in a vector format")
+    print("subc_ids should be either a vector of ids, or \"all\" ")
   }
   if (!is.vector(variables)) {
-    print("The variables should be given in a vector format")
+    print("The variables should be provided in a vector format")
   }
 
   # Create temporary output directories
   dir.create(paste0(data_dir, "/tmp"), showWarnings = FALSE)
   dir.create(paste0(data_dir, "/tmp/r_univar"), showWarnings = FALSE)
 
-  # Create file with reclassification rules for the r.reclass function
-  reclass <- rbind.data.frame(data.frame(str_c(subc_ids, " = ", 1)),
-                              "* = NULL")
-  fwrite(reclass, paste0(data_dir,"/tmp/reclass_rules.txt"), sep = "\t",
-         row.names = FALSE, quote = FALSE, col.names = FALSE)
+  calc_all <- 1
 
-  # Format subc_ids vector so that it can be read
-  # as an array in the bash script
-  subc_ids <- paste(unique(subc_ids), collapse = " ")
+  # Create file with reclassification rules for the r.reclass function
+  if (!identical(subc_ids, "all")) {
+    calc_all <- 0
+    reclass <- rbind.data.frame(data.frame(str_c(subc_ids, " = ", 1)),
+                                "* = NULL")
+    fwrite(reclass, paste0(data_dir,"/tmp/reclass_rules.txt"), sep = "\t",
+           row.names = FALSE, quote = FALSE, col.names = FALSE)
+
+    # Format subc_ids vector so that it can be read
+    # as an array in the bash script
+    subc_ids <- paste(unique(subc_ids), collapse = " ")
+
+  }
+
 
   # Setting up parallelization
   #  Detect number of available cores
-  n_cores <- detectCores() - 1
+  # n_cores <- detectCores() - 1
+  n_cores <- 6
 
   # Create the cluster
   my_cluster <- makeCluster(n_cores, type = "PSOCK")
@@ -77,7 +85,7 @@ extract_zonal_stat <- function(data_dir, out_path = NULL, subc_ids,
     # containing the grass functions
     run(system.file("sh", "extract_zonal_stat.sh",
                     package = "hydrographr"),
-        args = c(data_dir, subc_ids, subc_layer, ivar),
+        args = c(data_dir, subc_ids, subc_layer, ivar, calc_all),
         echo = FALSE)$stdout
 
     print(varname)
@@ -104,6 +112,6 @@ extract_zonal_stat <- function(data_dir, out_path = NULL, subc_ids,
   stopCluster(cl = my_cluster)
 
   # Delete temporary output directory
-  unlink(paste0(data_dir, "/tmp"))
+  unlink(paste0(data_dir, "/tmp/"), recursive = TRUE)
 
 }

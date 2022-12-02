@@ -7,15 +7,15 @@
 extract_zonal_stat(data_dir, out_path = NULL, subc_ids, subc_layer, variables)
 }
 \arguments{
-\item{data_dir}{Path to the directory containing all input data}
+\item{data_dir}{Character. Path to the directory containing all input data}
 
-\item{out_path}{Full path of the output file. If not NULL, the output data.frame is exported as a csv in the given path}
+\item{out_path}{Character. Full path of the output file. If not NULL, the output data.frame is exported as a csv in the given path}
 
-\item{subc_ids}{Vector of sub-catchment ids, can be acquired from the extract_ids() function, by sub setting the resulting data.frame}
+\item{subc_ids}{Vector of sub-catchment ids or "all". If "all", zonal statistics are calculated for all the sub-catchments of the given sub-catchment layer. A vector of the sub-catchment ids can be acquired from the extract_ids() function, by sub setting the resulting data.frame}
 
-\item{subc_layer}{Full path to the sub-catchment ID .tif layer}
+\item{subc_layer}{Character Full path to the sub-catchment ID .tif layer}
 
-\item{variables}{Variable file names, e.g. slope_grad_dw_cel_h00v00.tif. Variable names should remain intact in file names, even after prior file processing, i.e., slope_grad_dw_cel should appear in the file name}
+\item{variables}{Character vector. Variable file names, e.g. slope_grad_dw_cel_h00v00.tif. Variable names should remain intact in file names, even after prior file processing, i.e., slope_grad_dw_cel should appear in the file name. The files should be cropped to the extent of the sub-catchment layer}
 }
 \description{
 Calculate zonal statistics based on environmental variable raster and vector layers.
