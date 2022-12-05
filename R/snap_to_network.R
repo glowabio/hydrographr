@@ -14,7 +14,7 @@
 #' Defines if the points are snapped using the distance or flow accumulation.
 #' If calc is set to "both" the output will contain the new coordinates for both
 #' calculations.
-#' @param dist Maximum distance in meters; Point will be snapped to the next
+#' @param dist Maximum radius in meters; Point will be snapped to the next
 #' stream within a defined radius. By default the distance is 500 meter.
 #' @param accu Minimum flow accumulation; Point will be snapped to the next
 #' stream with a flow accumulation equal or higher than the given value. By
@@ -33,7 +33,7 @@ snap_to_network <- function(data, lon, lat, stream_path, accu_path = NULL,
   if (missing(data))
     stop("Input data is missing.")
 
-  # Add here: if condition to check if input data is of type data.frame,
+  # Check if input data is of type data.frame,
   # data.table or tibble
   if(!is(data, "data.frame"))
     stop("data: Has to be of class 'data.frame'.")
@@ -46,30 +46,42 @@ snap_to_network <- function(data, lon, lat, stream_path, accu_path = NULL,
   if (missing(lat))
     stop("Column name of latitudinal coordinate is not defined.")
 
+  # Check if lon/lat column names are character strings
+  if(!is.character(lon))
+    stop("lon: Column name is not a character string.")
+  if(!is.character(lat))
+    stop("lat: Column name is not a character string.")
+
+  # Check if lon/lat column names exist
+  if(is.null(data[[lon]]))
+    stop(paste0("Column name '",lon ,"' does not exist."))
+  if(is.null(data[[lat]]))
+    stop(paste0("Column name '",lat ,"' does not exist."))
+
   # Check if values of the lon/lat columns are numeric
-  if(!is.numeric(data %>% select(matches(lon) %>% .[1])))
-    stop(paste0("Column", lon, "has to be numeric."))
-  if(!is.numeric(data %>% select(matches(lat) %>% .[1])))
-    stop(paste0("Column", lat, "has to be numeric."))
+  if(!is.numeric(data[[lon]]))
+    stop(paste0("Column ", lon, " has to be numeric."))
+  if(!is.numeric(data[[lat]]))
+    stop(paste0("Column ", lat, " has to be numeric."))
 
   # Add here: if condition to check if lat/long columns are in WGS84
 
   # Check if stream_path is defined
   if (missing(stream_path))
     stop("stream_path is missing.")
-  # If calc is set to "accu" or "calc"
   # Check if accu_path is defined
+  # If calc is set to "accu" or "both"
   if (calc == "accu" || calc == "both")
     if(is.null(accu_path))
       stop(paste0("accu_path is missing."))
 
   # Check if stream_path exists
-  if (!dir.exists(stream_path))
-    stop(paste0("stream_path: ", stream_path, " doesn't exist."))
+  if (!file.exists(stream_path))
+    stop(paste0("stream_path: ", stream_path, " does not exist."))
   # Check if accu_path exists
   if (!is.null(accu_path))
-    if(!dir.exists(accu_path))
-      stop(paste0("accu_path: ", accu_path, " doesn't exist."))
+    if(!file.exists(accu_path))
+      stop(paste0("accu_path: ", accu_path, " does not exist."))
 
   # Check if stream_path ends with .tif
   if (!endsWith(stream_path, ".tif"))
@@ -80,7 +92,7 @@ snap_to_network <- function(data, lon, lat, stream_path, accu_path = NULL,
     stop("accu_path: Flow accumulation raster is not a .tif file.")
 
   # Check if calc is set probably
-  if (calc != "dist" || calc != "accu" || calc != "both")
+  if (!(calc == "dist" || calc == "accu" || calc == "both"))
     stop("calc: Has to be 'dist', 'accu', or 'both'.")
 
   # Check if values of dist and accu are numeric
@@ -121,7 +133,7 @@ snap_to_network <- function(data, lon, lat, stream_path, accu_path = NULL,
     run(system.file("sh", "snap_to_network.sh",
                     package = "hydrographr"),
         args = c(coord_tmp_path, lon, lat,
-                 stream_path, radius, accu_path, thre,
+                 stream_path, accu_path, calc, dist, accu,
                  snap_tmp_path, tempdir()),
         echo = !quiet)
 
@@ -139,10 +151,10 @@ snap_to_network <- function(data, lon, lat, stream_path, accu_path = NULL,
     wsl_sh_file <- fix_path(system.file("sh", "snap_to_network.sh",
                                         package = "hydrographr"))
 
-    run(system.file("bat", "snap_to_network.bat",
+    processx::run(system.file("bat", "snap_to_network.bat",
                     package = "hydrographr"),
         args = c(wsl_coord_tmp_path, lon, lat,
-                 wsl_stream_path, radius, wsl_accu_path, thre,
+                 wsl_stream_path, wsl_accu_path, calc, dist, accu,
                  wsl_snap_tmp_path, wsl_tmp_path, wsl_sh_file),
         echo = !quiet)
   }
