@@ -1,7 +1,10 @@
 @echo on
 
-set WSLENV=%1 %2 %3 %4 %5 %6 %7 %8 %9
 set DATA=%1
+set a=%1 %2 %3 %4 %5 %6 %7 %8 %9
+shift 
+set b=%9
+set WSLENV=%a% %b%
 shift
 set SHDIR=%9
 
