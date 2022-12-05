@@ -1,7 +1,7 @@
 #! /bin/bash
 
 ##  file (e.g. txt or csv) that has been generated at the beginning
-##  of the R function, based on the data.frame table the user provided 
+##  of the R function, based on the data.frame table the user provided
 export DATA=$1
 
 ## names of the lon and lat columns
@@ -11,23 +11,25 @@ export LAT=$3
 ## stream raster file (e.g. .tif file)
 export STR=$4
 
-## radius distance
-export rdist=$5
-
 ## accumulation raster files
-export ACC=$6
-
-## accumulation threshold
-export acct=$7
-
-## Full path to output snap_points.txt file
-export SNAP=$8
-
-## Temporary folder
-export DIR=$9
+export ACC=$5
 
 ## What to calculate
-export CALC=${10}
+export CALC=$6
+
+## radius distance
+export rdist=$7
+
+## accumulation threshold
+export acct=$8
+
+## Full path to output snap_points.txt file
+export SNAP=$9
+
+## Temporary folder
+export DIR=${10}
+
+
 
 ## Set random string
 export RAND_STRING=$(xxd -l 8 -c 32 -p < /dev/random)
@@ -76,9 +78,9 @@ then
     paste -d" " $DIR/coords_${RAND_STRING}.txt $DIR/snap_coords_${RAND_STRING}.txt \
         <(printf "%s\n" subc_id_snap $(cat $DIR/stream_ID_${RAND_STRING}.txt))  \
         >  $SNAP
-    
-    rm $DIR/snap_coords_${RAND_STRING}_*.txt $DIR/stream_ID_${RAND_STRING}_*.txt \
-        $DIR/ref_points_${RAND_STRING}.gpkg 
+
+    rm $DIR/snap_coords_${RAND_STRING}.txt $DIR/stream_ID_${RAND_STRING}.txt \
+        $DIR/ref_points_${RAND_STRING}.gpkg
 fi
 
 
@@ -101,9 +103,9 @@ then
     paste -d" " $DIR/coords_${RAND_STRING}.txt $DIR/snap_coords_${RAND_STRING}.txt \
         <(printf "%s\n" subc_id_snap $(cat $DIR/stream_ID_${RAND_STRING}.txt))  \
         >  $SNAP
-    
-    rm $DIR/snap_coords_${RAND_STRING}_*.txt $DIR/stream_ID_${RAND_STRING}_*.txt \
-        $DIR/ref_points_${RAND_STRING}.gpkg 
+
+    rm $DIR/snap_coords_${RAND_STRING}.txt $DIR/stream_ID_${RAND_STRING}.txt \
+        $DIR/ref_points_${RAND_STRING}.gpkg
 fi
 
 
@@ -119,36 +121,34 @@ then
 
     r.what map=stream points=snap_points_d separator=comma \
         | awk -F, '{print $4}' > $DIR/stream_ID_${RAND_STRING}_d.txt
-    
+
     r.what map=stream points=snap_points_a separator=comma \
         | awk -F, '{print $4}' > $DIR/stream_ID_${RAND_STRING}_a.txt
 
     v.out.ascii -c input=snap_points_d separator=space | awk '{print $1, $2}' \
         > $DIR/snap_coords_${RAND_STRING}_d.txt
-    
+
     v.out.ascii -c input=snap_points_a separator=space | awk '{print $1, $2}' \
         > $DIR/snap_coords_${RAND_STRING}_a.txt
 
-    sed -i 's/east/lon_snap/g' $DIR/snap_coords_${RAND_STRING}_d.txt
-    sed -i 's/north/lat_snap/g' $DIR/snap_coords_${RAND_STRING}_d.txt
-    
-    sed -i 's/east/lon_snap/g' $DIR/snap_coords_${RAND_STRING}_a.txt
-    sed -i 's/north/lat_snap/g' $DIR/snap_coords_${RAND_STRING}_a.txt
+    sed -i 's/east/lon_snap_dist/g' $DIR/snap_coords_${RAND_STRING}_d.txt
+    sed -i 's/north/lat_snap_dist/g' $DIR/snap_coords_${RAND_STRING}_d.txt
+
+    sed -i 's/east/lon_snap_accu/g' $DIR/snap_coords_${RAND_STRING}_a.txt
+    sed -i 's/north/lat_snap_accu/g' $DIR/snap_coords_${RAND_STRING}_a.txt
 
     cat  $DATA | tr -s ',' ' ' > $DIR/coords_${RAND_STRING}.txt
 
     paste -d" " $DIR/coords_${RAND_STRING}.txt \
         $DIR/snap_coords_${RAND_STRING}_d.txt \
-        <(printf "%s\n" subc_id_snap_d $(cat $DIR/stream_ID_${RAND_STRING}_d.txt))  \
+        <(printf "%s\n" subc_id_snap_dist $(cat $DIR/stream_ID_${RAND_STRING}_d.txt))  \
         $DIR/snap_coords_${RAND_STRING}_a.txt \
-        <(printf "%s\n" subc_id_snap_a $(cat $DIR/stream_ID_${RAND_STRING}_a.txt))  \
+        <(printf "%s\n" subc_id_snap_accu $(cat $DIR/stream_ID_${RAND_STRING}_a.txt))  \
         >  $SNAP
 
     rm $DIR/snap_coords_${RAND_STRING}_*.txt $DIR/stream_ID_${RAND_STRING}_*.txt \
-        $DIR/ref_points_${RAND_STRING}.gpkg 
+        $DIR/ref_points_${RAND_STRING}.gpkg
 fi
 
 
 EOF
-
-
