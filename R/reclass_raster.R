@@ -25,6 +25,38 @@ reclass_raster <- function(rast_val, recl_val, rast_path,
                            compress = "DEFLATE", quiet = TRUE) {
   # Check operating system
   system <- get_os()
+
+  # Check if rast_val is defined
+  if (missing(rast_val))
+    stop("rast_val is missing.")
+  # Check if rast_val is defined
+  if (missing(recl_val))
+    stop("recl_val is missing.")
+  # Check if rast_path is defined
+  if (missing(rast_path))
+    stop("rast_path is missing.")
+  # Check if rast_path is defined
+  if (missing(recl_path))
+    stop("rast_path is missing.")
+
+  if (!is.logical(recl_read))
+   stop("recl_read: Has to be TRUE or FALSE.")
+
+  # Check if type is one of the listed types
+  if (!(type == "INT16" || type == "UINT16" || type == "CINT16" ||
+        type == "INT32" || type == "UINT32" || type == "CINT32" ||
+        type == "Byte"))
+    stop("type: Has to be 'Byte', 'Int16', 'UInt16', 'Int32', 'UInt32',
+    'CInt16', or 'CInt32' ")
+
+  # Check if compress is "DEFLATE" or "LZW"
+  if (!(compress == "DEFLATE" || compress == "LZW"))
+    stop("compress: Has to be 'DEFLATE or 'LZW'.")
+
+  # Check if quiet is logical
+  if(!is.logical(quiet))
+    stop("quiet: Has to be TRUE or FALSE.")
+
   # The r.reclass function of GRASS GIS requires a text file
   # including the old and the new value with an = between
   # (e.g. 1 = 20)
@@ -39,7 +71,7 @@ reclass_raster <- function(rast_val, recl_val, rast_path,
   # Write rules as a .txt file to the temporary folder
   fwrite(rules, rules_path, sep = " ", col.names = FALSE)
 
-  if (system == "linux") {
+  if (system == "linux" || system == "osx") {
   # Open GRASS GIS session
   # Call external GRASS GIS command r.reclass
   run(system.file("sh", "reclass_raster.sh",
@@ -48,7 +80,7 @@ reclass_raster <- function(rast_val, recl_val, rast_path,
                              nodata, type, compress),
       echo = !quiet)
 
-  } else if (system == "windows") {
+  } else (system == "windows") {
     # Check if WSL and Ubuntu are installed
     check_wsl()
     # Change paths for WSL
@@ -67,11 +99,7 @@ reclass_raster <- function(rast_val, recl_val, rast_path,
                  nodata, type, compress, wsl_sh_file),
         echo = !quiet)
 
-  } else {
-    # Stop the function if the OS is macOS
-    stop("Sorry, reclass_raster() is not implimented for macOS.")
   }
-
   # Remove temporary rules file
   file.remove(rules_path)
 
