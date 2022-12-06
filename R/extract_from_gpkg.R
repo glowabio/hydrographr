@@ -1,4 +1,4 @@
-#' Calculate zonal statistics based on environmental variable raster and vector layers.
+#' Extract values from the stream order .gpkg files.
 #'
 #' @param data_dir Character. Path to the directory containing all input data
 #' @param out_path Character. Full path of the output file.
@@ -21,10 +21,11 @@
 #' @importFrom foreach %dopar%
 #' @importFrom stringr str_c
 #' @import dplyr
+#' @author Afroditi Grigoropoulou Jaime Garcia Marquez
 #' @export
 #'
 
-extract_zonal_stat <- function(data_dir, out_path = NULL, subc_ids,
+extract_from_gpkg <- function(data_dir, out_path = NULL, subc_ids,
                                subc_layer, variables) {
 
   # Introductory steps
@@ -111,8 +112,6 @@ extract_zonal_stat <- function(data_dir, out_path = NULL, subc_ids,
 
   # Return table
   return(var_table)
-
-
 
   # Stop cluster
   stopCluster(cl = my_cluster)

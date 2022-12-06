@@ -15,7 +15,7 @@ export OUTDIR=$DATADIR/tmp
 ######     START GRASS
 grass78 -f --gtext --tmp-location $SUBC_LAYER  <<'EOF'
 
-
+export LAYER_NAME=$(ogrinfo -al -so order_vect_point_h00v04.gpkg | grep "Layer name:" | awk '{print $3}')
 VARNAME=$(basename $VAR .gpkg)
 
 if [ $CALC_ALL == 0 ]; then
@@ -35,7 +35,7 @@ r.in.gdal --o input=$SUBC_LAYER output=subc
 export SUBC_IDS=$(r.describe -1 -n subc | sed -z 's/\n/,/g;s/,$/\n/')
 
 # #This is in case we manage to filter the gpkg in another way:
-# v.in.ogr -r --o input=$DATADIR/$VAR layer=SELECT \
+# v.in.ogr -r --o input=$DATADIR/$VAR layer=$LAYER_NAME \
 # output=stre_cl type=line
 
 fi
