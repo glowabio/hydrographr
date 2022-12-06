@@ -29,6 +29,26 @@ get_catchment_graph(
 
 \item{maxsize}{Optional. Specify the maximum size of the data passed to the parallel backend in MB. Defaults to 1500 (1.5 GB). Consider a higher value for large study areas (more than one 20°x20° tile).}
 }
+\value{
+A graphs or datatable that reports all segmentIDs. In case of multiple input segements, the results are stored in a list.
+}
 \description{
-Subset the network graph by extracting the upstream sub-catchments, i.e. the drainage basin, for one or multiple stream segments. The function will return either one or more data.tables or graph objects for each inout stream segment.
+Subset the network graph by extracting the upstream sub-catchments, i.e. the drainage basin, for one or multiple stream segments. The function will return either one or more data.tables or graph objects for each input stream segment.
+}
+\details{
+By switching the mode to either "in", "out" or "all", only the upstream, downstream or all connected segments will be returned.
+}
+\examples{
+# Get the upstream catchment as a graph
+get_catchment_graph(g, segmentID = segmentID, mode="in", outlet=F, graph=T, n_cores=1)
+
+#' # Get the downstream segments as a data.table,
+get_catchment_graph(g, segmentID = segmentID, mode="out", outlet=F, graph=F n_cores=1)
+
+# Get the catchments of all outlets in the study area as a graph
+get_catchment_graph(g, mode="in", outlet=T, graph=T, n_cores=1)
+
+}
+\author{
+Sami Domisch
 }

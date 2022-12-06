@@ -21,9 +21,7 @@ check_tiles_filesize(
 
 \item{filetype}{format of the requested file ("tif" or "gpkg")}
 
-\item{tile_id}{id of the requested tile (character)}
-
-\item{reg_unit_id}{id of the requested regional unit (character)}
+\item{tile_id}{id of the requested tile or regional unit (character)}
 
 \item{global}{Should the global file be downloaded or not. TRUE/FALSE, FALSE by default}
 
