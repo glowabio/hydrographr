@@ -13,13 +13,20 @@ get_os <- function() {
   if (!is.null(sysinf)) {
     os <- sysinf["sysname"]
     if (os == "Darwin") {
+      warning("macOS: The functions of the 'hydrographr' R package have not been tested on macOS yet.
+       If you encounter an error, please, contact us (https://glowabio.org) or write an issue
+       (https://github.com/glowabio/hydrographr/issues) and help us to improve the package.
+       Thanks for testing!")
       os <- "osx"
     }
-
   # If rare case occurs that Sys.info() is NULL
   } else {
     os <- .Platform$OS.type
     if (grepl("^darwin", R.version$os)) {
+      warning("macOS: The functions of the 'hydrographr' R package have not been tested on macOS yet.
+       If you encounter an error, please, contact us (https://glowabio.org) or write an issue
+       (https://github.com/glowabio/hydrographr/issues) and help us to improve the package.
+       Thanks for testing!")
       os <- "osx"
     }
     if (grepl("linux-gnu", R.version$os)) {
