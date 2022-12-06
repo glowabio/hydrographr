@@ -7,12 +7,12 @@
 #' @param g A directed graph (igraph object).
 #' @param segmentID Optional. The stream segment or sub-catchments IDs for which to delineate the upstream drainage area. Can be a single ID or a vector of multiple IDs (c(ID1, ID2, ID3, ...). If empty, then outlets will be used as segment IDs (with outlet=TRUE). Note that you can browse the entire network online at https://geo.igb-berlin.de/maps/351/view and to left hand side, select the "Stream segment ID"  layer and click on the map to get the ID.
 #' @param outlet Logical. If TRUE, then the outlets of the given network graph will be used as additional input segmentIDs. Outlets will be identified internally as those stream segments that do not have any downstream donnected segment.
-#' @param graph Logical. If TRUE then the output will be a new graph or a list of new graphs with the original attributes, If FALSE (the default), then the output will be a new data.table, or a list of data.tables. List objects are named after the segmentIDs.
+#' @param as_graph Logical. If TRUE then the output will be a new graph or a list of new graphs with the original attributes, If FALSE (the default), then the output will be a new data.table, or a list of data.tables. List objects are named after the segmentIDs.
 #' @param mode Can be either "in", "out" or "all". "in" will delineate the upstream catchment, "out" delineates the downstream catchment (all segments that are reachable from the given input segment), and "all" does both.
 #' @param n_cores Optional. Specify the number of CPUs for internal parallelization in the case of multiple stream segments / outlets. Defaults to 1. Setting a higher number is might be slower in the end, as the data has to be provided to each CPU (worker) which can take time.
 #' @param maxsize Optional. Specify the maximum size of the data passed to the parallel backend in MB. Defaults to 1500 (1.5 GB). Consider a higher value for large study areas (more than one 20°x20° tile).
 #'
-#' @return A graphs or datatable that reports all segmentIDs. In case of multiple input segements, the results are stored in a list.
+#' @return A graph or datatable that reports all segmentIDs. In case of multiple input segements, the results are stored in a list.
 #'
 #' @importFrom future plan multisession multicore
 #' @importFrom doFuture registerDoFuture
@@ -25,13 +25,13 @@
 #'
 #' @examples
 #' # Get the upstream catchment as a graph
-#' get_catchment_graph(g, segmentID = segmentID, mode="in", outlet=F, graph=T, n_cores=1)
+#' get_catchment_graph(g, segmentID = segmentID, mode="in", outlet=F, as_graph=T, n_cores=1)
 #'
-#' #' # Get the downstream segments as a data.table,
-#' get_catchment_graph(g, segmentID = segmentID, mode="out", outlet=F, graph=F n_cores=1)
+#'# Get the downstream segments as a data.table,
+#' get_catchment_graph(g, segmentID = segmentID, mode="out", outlet=F, as_graph=F, n_cores=1)
 #'
 #' # Get the catchments of all outlets in the study area as a graph
-#' get_catchment_graph(g, mode="in", outlet=T, graph=T, n_cores=1)
+#' get_catchment_graph(g, mode="in", outlet=T, as_graph=T, n_cores=1)
 #'
 #' @author Sami Domisch
 
@@ -41,10 +41,10 @@
 
 
 
-get_catchment_graph <- function(g, segmentID=NULL, outlet=F, mode=NULL, graph=F, n_cores=1, maxsize=1500) {
+get_catchment_graph <- function(g, segmentID=NULL, outlet=F, mode=NULL, as_graph=F, n_cores=1, maxsize=1500) {
 
   # Check input arguments
-  if ( class(g) != "igraph")     stop("Input must be an igraph object. Please run table_to_graph() first.")
+  if ( class(g) != "igraph")     stop("Input must be an igraph object.")
 
   if ( !is_directed(g)) stop("The input graph must be a directed graph.")
 
@@ -117,9 +117,9 @@ get_catchment_graph <- function(g, segmentID=NULL, outlet=F, mode=NULL, graph=F,
   cat("Subsetting the original graph to get all attributes...\n")
   g_sub <- subgraph(g,l)
   # Return graph or datatable
-  if (graph==TRUE) {
+  if (as_graph==TRUE) {
     return(g_sub)
-  } else if (graph==FALSE) {
+  } else if (as_graph==FALSE) {
     # Get into datatable format
     dt <- setDT(igraph::as_data_frame(g_sub))
     setnames(dt, c("from", "to"), c("stream", "next_stream")) # use same col names
@@ -142,9 +142,9 @@ get_catchment_graph <- function(g, segmentID=NULL, outlet=F, mode=NULL, graph=F,
        gsub_size <- future_lapply(g_sub, function(x) gsize(x))
        g_sub <- g_sub[gsub_size!=0] # delete the graph objects with zero upstream segments
     # Return graph
-    if (graph==TRUE) {
+    if (as_graph==TRUE) {
            return(g_sub)
-    } else if (graph==FALSE) {
+    } else if (as_graph==FALSE) {
       # Convert to data.frame and data.table
       dt <- future_lapply(g_sub, function(x) igraph::as_data_frame(x))
       # Convert to data.table
