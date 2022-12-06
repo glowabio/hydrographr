@@ -5,7 +5,7 @@
 #' @export
 #'
 
-download_test_data <- function(download_path = "./hydrography90m_test_data") {
+download_test_data <- function(download_path = "./hydrography90m_test_data.zip") {
 
   # General path to the test data folder in GDrive
   gdrive_path <- "https://docs.google.com/uc?export=download&id="
