@@ -1,10 +1,15 @@
 #' Calculate zonal statistics based on environmental variable raster and vector layers.
 #'
 #' @param data_dir Character. Path to the directory containing all input data
-#' @param out_path Character. Full path of the output file. If not NULL, the output data.frame is exported as a csv in the given path
-#' @param subc_ids Vector of sub-catchment ids or "all". If "all", zonal statistics are calculated for all the sub-catchments of the given sub-catchment layer. A vector of the sub-catchment ids can be acquired from the extract_ids() function, by sub setting the resulting data.frame
-#' @param subc_layer Character Full path to the sub-catchment ID .tif layer
-#' @param variables Character vector. Variable file names, e.g. slope_grad_dw_cel_h00v00.tif. Variable names should remain intact in file names, even after prior file processing, i.e., slope_grad_dw_cel should appear in the file name. The files should be cropped to the extent of the sub-catchment layer
+#' @param out_path Character. Full path of the output file.
+#' If not NULL, the output data.frame is exported as a csv in the given path
+#' @param subc_ids Vector of sub-catchment ids or "all".
+#' If "all", zonal statistics are calculated for all the sub-catchments of the given sub-catchment layer. A vector of the sub-catchment ids can be acquired from the extract_ids() function, by sub setting the resulting data.frame
+#' @param subc_layer Character. Full path to the sub-catchment ID .tif layer
+#' @param variables Character vector. Variable file names, e.g. slope_grad_dw_cel_h00v00.tif.
+#' Variable names should remain intact in file names, even after prior file processing,
+#' i.e., slope_grad_dw_cel should appear in the file name.
+#' The files should be cropped to the extent of the sub-catchment layer
 #' @importFrom data.table fread fwrite
 #' @importFrom processx run
 #' @importFrom rlang is_missing
@@ -29,6 +34,7 @@ extract_zonal_stat <- function(data_dir, out_path = NULL, subc_ids,
   if (!is.vector(variables)) {
     print("The variables should be provided in a vector format")
   }
+
 
   # Create temporary output directories
   dir.create(paste0(data_dir, "/tmp"), showWarnings = FALSE)
@@ -71,7 +77,7 @@ extract_zonal_stat <- function(data_dir, out_path = NULL, subc_ids,
   ) %dopar% {
 
     # Get the variable name
-    varname <- gsub(".tif|.gpkg", "", ivar)
+    varname <- gsub(".tif", "", ivar)
 
     # Delete file if it exists
     if (file.exists(paste0(data_dir, "/tmp/r_univar/stats_",
