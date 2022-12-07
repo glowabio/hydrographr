@@ -1,6 +1,10 @@
+
+
 #' Downloads the test data for the Hydrography90m dataset
 #'
-#' The test data is available at from https://drive.google.com/drive/u/1/folders/18RpqmywL7yThitsOklWXAuYIfMvfyPfg and can b downloaded with this function.
+#' The test data contains all Hydrography90m and species point observation data for a small geographic extent to test the functions.
+#'
+#' The test data is available at https://drive.google.com/file/d/1kYNWXmtVm6X7MZLISOePGpvxB1pk1scD/view?usp=share_link and can be automatically downloaded and unzipped with this function to a desired path.
 #'
 #' @param download_path The path where the files will be downloaded
 #' @author Afroditi Grigoropoulou
@@ -10,8 +14,10 @@
 #' # Download the test data to the current working directory
 #' download_test_data()
 #'
+#' # Download the data to a specific directory
+#' download_test_data("path/to/your/directory")
 
-download_test_data <- function(download_path = "./hydrography90m_test_data") {
+download_test_data <- function(download_path = ".") {
 
   # General path to the test data folder in GDrive
   gdrive_path <- "https://docs.google.com/uc?export=download&id="
@@ -19,18 +25,24 @@ download_test_data <- function(download_path = "./hydrography90m_test_data") {
   # File id of the zipped folder retrieved from gdrive
   file_id <- "1kYNWXmtVm6X7MZLISOePGpvxB1pk1scD"
 
+  # Create the folder where the files will be downloaded if it doesn't exist
+  ifelse(!dir.exists(paste0(download_path, "/hydrography90m_test_data")),
+          dir.create(paste0(download_path, "/hydrography90m_test_data")), FALSE)
+
+
   download.file(paste0(gdrive_path, file_id, "&confirm=t"),
-                destfile = paste0(download_path, ".zip"), mode = "wb")
+                destfile = paste0(download_path, "/hydrography90m_test_data.zip"), mode = "wb")
+
 
   # Unzip the data
-  unzip(paste0(download_path, ".zip"),  overwrite = T,
-        exdir = download_path,
+  unzip(paste0(download_path, "/hydrography90m_test_data.zip"),  overwrite = T,
+        exdir = paste0(download_path, "/hydrography90m_test_data"),
         unzip=getOption("unzip"))
 
   # remove the zip file
-  unlink(paste0(download_path, ".zip"))
+  unlink(paste0(download_path, "/hydrography90m_test_data.zip"))
 
   # Report
-  cat("Data downloaded and unzipped to", download_path, "\n")
+  cat("Data downloaded and unzipped to ", download_path,"/hydrography90m_test_data\n", sep = "")
 
 }
