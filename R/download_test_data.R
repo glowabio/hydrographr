@@ -25,7 +25,10 @@ download_test_data <- function(download_path = "./hydrography90m_test_data") {
 
   download.file(paste0(gdrive_path, file_id, "&confirm=t"),
                 destfile = paste0(download_path, "/hydrography90m_test_data.zip"), mode = "wb")
-
+  
+  # Create the folder
+  dir.create(paste0(download_path, "/hydrography90m_test_data"), recursive = T)
+  
   # Unzip the data
   unzip(paste0(download_path, "/hydrography90m_test_data.zip"),  overwrite = T,
         exdir = paste0(download_path, "/hydrography90m_test_data"),
