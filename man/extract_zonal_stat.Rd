@@ -4,7 +4,14 @@
 \alias{extract_zonal_stat}
 \title{Calculate zonal statistics based on environmental variable raster and vector layers.}
 \usage{
-extract_zonal_stat(data_dir, out_path = NULL, subc_ids, subc_layer, variables)
+extract_zonal_stat(
+  data_dir,
+  out_path = NULL,
+  subc_ids,
+  subc_layer,
+  variables,
+  NAflag = NULL
+)
 }
 \arguments{
 \item{data_dir}{Character. Path to the directory containing all input data}

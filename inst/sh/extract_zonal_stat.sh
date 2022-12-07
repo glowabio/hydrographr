@@ -5,10 +5,24 @@ declare -a SUBC_IDS=($2)
 export SUBC_LAYER=$3
 export VAR=$4
 export CALC_ALL=$5
+export NO_DATA=$5
 
 export TMPTAX=$DATADIR/tmp
 export OUTDIR=$DATADIR/tmp/r_univar
 
+
+# Check no data value
+
+if [[ $NO_DATA != 'as is' ]] ; then
+
+  gdal_edit.py $DATADIR/$VAR -a_nodata $NO_DATA
+
+fi
+
+echo "$NO_DATA will be used as the no data value in the calculations"
+
+# To silence non-error output, we redirect stdout to /dev/null:
+# command > /dev/null
 
 ##################################
 ######     START GRASS

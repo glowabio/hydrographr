@@ -15,7 +15,7 @@
 #' @importFrom rlang is_missing
 #' @importFrom parallel detectCores makeCluster stopCluster
 #' @importFrom doParallel registerDoParallel
-#' @importFrom foreach %dopar%
+#' @importFrom foreach %dopar% foreach
 #' @importFrom stringr str_c
 #' @importFrom tidyr separate
 #' @import dplyr
@@ -23,7 +23,7 @@
 #'
 
 extract_zonal_stat <- function(data_dir, out_path = NULL, subc_ids,
-                               subc_layer, variables) {
+                               subc_layer, variables, NAflag = NULL) {
 
   # Introductory steps
 
@@ -34,7 +34,6 @@ extract_zonal_stat <- function(data_dir, out_path = NULL, subc_ids,
   if (!is.vector(variables)) {
     print("The variables should be provided in a vector format")
   }
-
 
   # Create temporary output directories
   dir.create(paste0(data_dir, "/tmp"), showWarnings = FALSE)
@@ -54,6 +53,12 @@ extract_zonal_stat <- function(data_dir, out_path = NULL, subc_ids,
     # as an array in the bash script
     subc_ids <- paste(unique(subc_ids), collapse = " ")
 
+  }
+
+  # No data value
+  no_data <- "as is"
+  if(!is.null(NAflag)) {
+    no_data <- NAflag
   }
 
 
@@ -91,8 +96,9 @@ extract_zonal_stat <- function(data_dir, out_path = NULL, subc_ids,
     # containing the grass functions
     run(system.file("sh", "extract_zonal_stat.sh",
                     package = "hydrographr"),
-        args = c(data_dir, subc_ids, subc_layer, ivar, calc_all),
-        echo = FALSE)$stdout
+        args = c(data_dir, subc_ids, subc_layer,
+                 ivar, calc_all, no_data),
+        echo = TRUE)$stdout
 
     print(varname)
 
