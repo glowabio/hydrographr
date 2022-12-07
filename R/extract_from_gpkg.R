@@ -15,7 +15,6 @@
 #' The files should be cropped to the extent of the sub-catchment layer
 #' @importFrom data.table fread fwrite
 #' @importFrom processx run
-#' @importFrom rlang is_missing
 #' @importFrom parallel detectCores makeCluster stopCluster
 #' @importFrom doParallel registerDoParallel
 #' @importFrom foreach %dopar%
