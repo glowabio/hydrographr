@@ -9,7 +9,7 @@ get_catchment_graph(
   segmentID = NULL,
   outlet = F,
   mode = NULL,
-  graph = F,
+  as_graph = F,
   n_cores = 1,
   maxsize = 1500
 )
@@ -23,14 +23,14 @@ get_catchment_graph(
 
 \item{mode}{Can be either "in", "out" or "all". "in" will delineate the upstream catchment, "out" delineates the downstream catchment (all segments that are reachable from the given input segment), and "all" does both.}
 
-\item{graph}{Logical. If TRUE then the output will be a new graph or a list of new graphs with the original attributes, If FALSE (the default), then the output will be a new data.table, or a list of data.tables. List objects are named after the segmentIDs.}
+\item{as_graph}{Logical. If TRUE then the output will be a new graph or a list of new graphs with the original attributes, If FALSE (the default), then the output will be a new data.table, or a list of data.tables. List objects are named after the segmentIDs.}
 
 \item{n_cores}{Optional. Specify the number of CPUs for internal parallelization in the case of multiple stream segments / outlets. Defaults to 1. Setting a higher number is might be slower in the end, as the data has to be provided to each CPU (worker) which can take time.}
 
 \item{maxsize}{Optional. Specify the maximum size of the data passed to the parallel backend in MB. Defaults to 1500 (1.5 GB). Consider a higher value for large study areas (more than one 20°x20° tile).}
 }
 \value{
-A graphs or datatable that reports all segmentIDs. In case of multiple input segements, the results are stored in a list.
+A graph or datatable that reports all segmentIDs. In case of multiple input segements, the results are stored in a list.
 }
 \description{
 Subset the network graph by extracting the upstream sub-catchments, i.e. the drainage basin, for one or multiple stream segments. The function will return either one or more data.tables or graph objects for each input stream segment.
@@ -40,13 +40,13 @@ By switching the mode to either "in", "out" or "all", only the upstream, downstr
 }
 \examples{
 # Get the upstream catchment as a graph
-get_catchment_graph(g, segmentID = segmentID, mode="in", outlet=F, graph=T, n_cores=1)
+get_catchment_graph(g, segmentID = segmentID, mode="in", outlet=F, as_graph=T, n_cores=1)
 
-#' # Get the downstream segments as a data.table,
-get_catchment_graph(g, segmentID = segmentID, mode="out", outlet=F, graph=F n_cores=1)
+# Get the downstream segments as a data.table,
+get_catchment_graph(g, segmentID = segmentID, mode="out", outlet=F, as_graph=F, n_cores=1)
 
 # Get the catchments of all outlets in the study area as a graph
-get_catchment_graph(g, mode="in", outlet=T, graph=T, n_cores=1)
+get_catchment_graph(g, mode="in", outlet=T, as_graph=T, n_cores=1)
 
 }
 \author{
