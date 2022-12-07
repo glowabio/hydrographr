@@ -13,7 +13,11 @@
 #' @examples
 #' # Download the test data to the current working directory
 #' download_test_data()
+<<<<<<< HEAD
 #'
+=======
+#' 
+>>>>>>> 8f49b5619e6d87a758af3b114fa8bc911345508d
 #' # Download the data to a specific directory
 #' download_test_data("path/to/your/directory")
 
@@ -32,8 +36,15 @@ download_test_data <- function(download_path = ".") {
 
   download.file(paste0(gdrive_path, file_id, "&confirm=t"),
                 destfile = paste0(download_path, "/hydrography90m_test_data.zip"), mode = "wb")
+<<<<<<< HEAD
 
 
+=======
+  
+  # Create the folder
+  dir.create(paste0(download_path, "/hydrography90m_test_data"), recursive = T)
+  
+>>>>>>> 8f49b5619e6d87a758af3b114fa8bc911345508d
   # Unzip the data
   unzip(paste0(download_path, "/hydrography90m_test_data.zip"),  overwrite = T,
         exdir = paste0(download_path, "/hydrography90m_test_data"),
