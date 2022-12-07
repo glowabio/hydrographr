@@ -2,15 +2,25 @@
 % Please edit documentation in R/download_test_data.R
 \name{download_test_data}
 \alias{download_test_data}
-\title{Downloads all the test data from https://drive.google.com/drive/u/1/folders/18RpqmywL7yThitsOklWXAuYIfMvfyPfg.}
+\title{Downloads the test data for the Hydrography90m dataset}
 \usage{
-download_test_data(download_path = "./hydrography90m_test_data")
+download_test_data(download_path = ".")
 }
 \arguments{
 \item{download_path}{The path where the files will be downloaded}
 }
 \description{
-Downloads all the test data from https://drive.google.com/drive/u/1/folders/18RpqmywL7yThitsOklWXAuYIfMvfyPfg.
+The test data contains all Hydrography90m and species point observation data for a small geographic extent to test the functions.
+}
+\details{
+The test data is available at https://drive.google.com/file/d/1kYNWXmtVm6X7MZLISOePGpvxB1pk1scD/view?usp=share_link and can be automatically downloaded and unzipped with this function to a desired path.
+}
+\examples{
+# Download the test data to the current working directory
+download_test_data()
+
+# Download the data to a specific directory
+download_test_data("path/to/your/directory")
 }
 \author{
 Afroditi Grigoropoulou
