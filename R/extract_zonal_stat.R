@@ -17,12 +17,11 @@
 #' @param n_cores Numeric. Number of cores used for parallelization
 #' @importFrom data.table fread fwrite
 #' @importFrom processx run
-#' @importFrom rlang is_missing
 #' @importFrom parallel detectCores
-#' @importFrom doParallel registerDoParallel
-#' @importFrom foreach %dopar% foreach
 #' @importFrom stringr str_c str_split
 #' @import dplyr
+#' @author Afroditi Grigoropoulou Jaime Garcia Marquez
+#' @seealso set_no_data
 #' @export
 #'
 
