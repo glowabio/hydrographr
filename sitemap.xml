@@ -34,13 +34,22 @@
     <loc>/reference/crop_to_extent.html</loc>
   </url>
   <url>
+    <loc>/reference/download_test_data.html</loc>
+  </url>
+  <url>
     <loc>/reference/download_tiles.html</loc>
   </url>
   <url>
     <loc>/reference/download_tiles_base.html</loc>
   </url>
   <url>
+    <loc>/reference/extract_from_gpkg.html</loc>
+  </url>
+  <url>
     <loc>/reference/extract_ids.html</loc>
+  </url>
+  <url>
+    <loc>/reference/extract_zonal_stat.html</loc>
   </url>
   <url>
     <loc>/reference/fix_path.html</loc>

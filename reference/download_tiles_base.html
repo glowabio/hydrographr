@@ -14,7 +14,7 @@ It is called and inherits arguments by the function 'download_tiles()'."><!-- ma
     
     <a class="navbar-brand me-2" href="../index.html">hydrographr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.9001</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.9004</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -68,14 +68,10 @@ It is called and inherits arguments by the function 'download_tiles()'.</p>
 <span>  <span class="va">variable</span>,</span>
 <span>  filetype <span class="op">=</span> <span class="st">"tif"</span>,</span>
 <span>  tile_id <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  reg_unit_id <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  global <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  download_path <span class="op">=</span> <span class="st">"."</span>,</span>
-<span>  <span class="va">valid_varnames</span>,</span>
-<span>  <span class="va">valid_tile_ids</span>,</span>
-<span>  <span class="va">valid_filetypes</span>,</span>
-<span>  <span class="va">file_size_table_sep</span>,</span>
-<span>  <span class="va">nimbus_path</span></span>
+<span>  file_size_table_sep <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  server_path <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -93,10 +89,6 @@ It is called and inherits arguments by the function 'download_tiles()'.</p>
 <dd><p>id of the requested tile (character)</p></dd>
 
 
-<dt>reg_unit_id</dt>
-<dd><p>id of the requested regional unit (character)</p></dd>
-
-
 <dt>global</dt>
 <dd><p>Should the global file be downloaded or not. TRUE/FALSE, FALSE by default</p></dd>
 
@@ -105,24 +97,12 @@ It is called and inherits arguments by the function 'download_tiles()'.</p>
 <dd><p>The path where the files will be downloaded</p></dd>
 
 
-<dt>valid_varnames</dt>
-<dd><p>valid names of the files available for download (inherited by 'download_tiles()')</p></dd>
-
-
-<dt>valid_tile_ids</dt>
-<dd><p>valid ids of the tiles available for download (inherited by 'download_tiles()')</p></dd>
-
-
-<dt>valid_filetypes</dt>
-<dd><p>valid file types of the files available for download (inherited by 'download_tiles()')</p></dd>
-
-
 <dt>file_size_table_sep</dt>
 <dd><p>lookup table of file sizes (inherited by 'download_tiles()')</p></dd>
 
 
-<dt>nimbus_path</dt>
-<dd><p>path to the the home download folder in Nimbus (inherited by 'download_tiles()')</p></dd>
+<dt>server_path</dt>
+<dd><p>path to the the home download folder in either Nimbus or GDrive (inherited by 'download_tiles()')</p></dd>
 
 </dl></div>
 

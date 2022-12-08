@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">hydrographr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.9001</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.9004</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -76,7 +76,7 @@
 
 
 <dt>type</dt>
-<dd><p>Either "net" for importing a network, or "catch" for sub-catchments.</p></dd>
+<dd><p>Either "net" for importing a network, "catch" for sub-catchments, "basin" for drainage basins, or "outlet" for outlet points.</p></dd>
 
 
 <dt>SQL_table</dt>
@@ -99,7 +99,32 @@
 <dd><p>If TRUE, import the GeoPackage as a SpatVecteor (terra object).</p></dd>
 
 </dl></div>
+    <div class="section level2">
+    <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
+    <p>Sami Domisch</p>
+    </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># Read the stream network as a graph</span></span>
+<span><span class="va">my_graph</span> <span class="op">&lt;-</span> <span class="fu">read_geopackage</span><span class="op">(</span><span class="st">"order_vect_59.gpkg"</span>, type<span class="op">=</span><span class="st">"net"</span>, g<span class="op">=</span><span class="cn">T</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Read the stream network as a data.table</span></span>
+<span><span class="va">my_dt</span> <span class="op">&lt;-</span> <span class="fu">read_geopackage</span><span class="op">(</span><span class="st">"order_vect_59.gpkg"</span>, type<span class="op">=</span><span class="st">"net"</span>, dt<span class="op">=</span><span class="cn">T</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Read the sub-catchments as a data.table</span></span>
+<span><span class="va">my_dt</span> <span class="op">&lt;-</span> <span class="fu">read_geopackage</span><span class="op">(</span><span class="st">"sub_catchment_59.gpkg"</span>, type<span class="op">=</span><span class="st">"catch"</span>, dt<span class="op">=</span><span class="cn">T</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Read the basin as a SF-object</span></span>
+<span><span class="va">my_sf</span> <span class="op">&lt;-</span> <span class="fu">read_geopackage</span><span class="op">(</span><span class="st">"basin_59.gpkg"</span>, type<span class="op">=</span><span class="st">"basin"</span>, sf<span class="op">=</span><span class="cn">T</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">#' # Read the basin as SpatVect object</span></span>
+<span><span class="va">my_sf</span> <span class="op">&lt;-</span> <span class="fu">read_geopackage</span><span class="op">(</span><span class="st">"basin_59.gpkg"</span>, type<span class="op">=</span><span class="st">"basin"</span>, SpatVect<span class="op">=</span><span class="cn">T</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Read the outlets as data.table</span></span>
+<span><span class="va">my_sf</span> <span class="op">&lt;-</span> <span class="fu">read_geopackage</span><span class="op">(</span><span class="st">"outlet_59.gpkg"</span>, type<span class="op">=</span><span class="st">"outlet"</span>, sf<span class="op">=</span><span class="cn">T</span><span class="op">)</span></span>
+<span></span></code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
 
