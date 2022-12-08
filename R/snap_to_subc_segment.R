@@ -82,6 +82,58 @@ snap_to_subc_segment <- function(data, lon, lat, site_id, basin_id, subc_id,
   # Make bash scripts executable
   make_sh_exec()
 
+  # Create random string to attach to the file name of the temporary
+  # output coordinates and input ids file
+  rand_string <- stri_rand_strings(n=1, length=8, pattern="[A-Za-z0-9]")
+  # Select columns with lon/lat coordinates
+  ids <- data %>%
+    select(matches(c(side_id, lon, lat, basin_id, subc_id)))
+  # Export taxon point ids
+  ids_tmp_path <- paste0(tempdir(), "/ids_", rand_string, ".txt")
+  fwrite(ids, ids_tmp_path, col.names = TRUE,
+         row.names = FALSE, quote = FALSE, sep = " ")
+  # Path for tmp regional unit ids text file
+  snap_tmp_path <- paste0(tempdir(), "/snapped_points", rand_string, ".txt")
+
+
+  if (system == "linux" || system == "osx"){
+
+    run(system.file("sh", "snap_to_subc_segment.sh",
+                    package = "hydrographr"),
+        args = c(ids_tmp_path, lon, lat, basin_path, subc_path, stream_path,
+                 cores, snap_tmp_path,  tempdir()),
+        echo = !quiet)
+
+
+  } else {
+
+    # Check if WSL and Ubuntu is installed
+    check_wsl()
+    # Change path for WSL
+    wsl_ids_tmp_path <- fix_path(ids_tmp_path)
+    wsl_basin_tmp_path <- fix_path(basin_tmp_path)
+    wsl_subc_tmp_path <- fix_path(subc_tmp_path)
+    wsl_stream_path <- fix_path(stream_path)
+    wsl_snap_tmp_path <- fix_path(snap_tmp_path)
+    wsl_tmp_path <- fix_path(tempdir())
+    wsl_sh_file <- fix_path(system.file("sh", "snap_to_subc_segment.sh",
+                                        package = "hydrographr"))
+
+    run(system.file("bat", "snap_to_subc_segment.bat",
+                    package = "hydrographr"),
+        args = c(wsl_ids_tmp_path, lon, lat, wsl_basin_path,
+                 wsl_subc_path, wsl_stream_path, cores,
+                 wsl_snap_tmp_path, wsl_tmp_path, wsl_sh_file),
+        echo = !quiet)
+  }
+  snapped_coord <- fread(paste0(tempdir(), "/snapped_points", rand_string, ".txt"),
+                         keepLeadingZeros = TRUE, header = TRUE, sep = " ")
+
+  # Remove files in the tmp folder
+  file.remove(ids_tmp_path, snap_tmp_path)
+
+  # Return snapped coordinates
+  return(snapped_coord)
 
 
 }
