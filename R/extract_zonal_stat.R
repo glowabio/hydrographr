@@ -76,7 +76,8 @@ extract_zonal_stat <- function(data_dir, out_path = NULL, subc_ids,
 
 
   # Call the external .sh script report_no_data()
-  reports <- run("/data/grigoropoulou/hydrographr_test/sh/report_no_data.sh",
+  reports <- run(system.file("sh","report_no_data.sh",
+                             package = "hydrographr"),
                  args = c(data_dir, variables_array, n_cores),
                  echo = FALSE)$stdout
 
@@ -99,10 +100,11 @@ extract_zonal_stat <- function(data_dir, out_path = NULL, subc_ids,
 
   # Call the external .sh script extract_zonal_stat()
   # containing the grass functions
-  run("/data/grigoropoulou/hydrographr_test/sh/extract_zonal_stat.sh",
+  run(system.file("sh","extract_zonal_stat.sh",
+                  package = "hydrographr"),
       args = c(data_dir, subc_ids, subc_layer,
                variables_array, calc_all, n_cores),
-      echo = FALSE)$stdout
+      echo = FALSE)$stderr
 
 
   # Read in the resulting variable statistics tables and join them
