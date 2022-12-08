@@ -1,6 +1,6 @@
 #' Snap data points to the next stream segment
 #'
-#' Snaps data points to the stream segment within the
+#' Snaps data points to the stream segment of the
 #' sub-catchment the data point is located.
 #'
 #'
@@ -8,8 +8,10 @@
 #' @param lon Column name with longitude coordinates as character string.
 #' @param lat Column name with latitude coordinates as character string.
 #' @param site_id Column name with unique site ids as character string
-#' @param basin_id Column name with basin ids as character string.
-#' @param subc_id Column name with sub-catchment ids as character string.
+#' @param basin_id Column name with basin ids as character string. If NULL
+#' basin id will be extract.
+#' @param subc_id Column name with sub-catchment ids as character string. If
+#' NULL sub-catchment id will be extracted.
 #' @param basin_path Full path of the basin .tif file.
 #' @param subc_path Full path of hte sub-catchment .tif file.
 #' @param stream_path Full path of stream network .gpkg file.
@@ -17,15 +19,15 @@
 #' is used.
 #' @param quiet TRUE or FALSE;
 #' @importFrom stringi stri_rand_strings
-#' @importFrom dplyr select
+#' @importFrom dplyr select left_join
 #' @importFrom data.table fread
 #' @importFrom processx run
 #' @export
 #'
 
-snap_to_subc_segment <- function(data, lon, lat, site_id, basin_id, subc_id,
-                                 basin_path, subc_path, stream_path, cores = 1,
-                                 quiet = TRUE) {
+snap_to_subc_segment <- function(data, lon, lat, site_id, basin_id = NULL,
+                                 subc_id = NULL, basin_path, subc_path,
+                                 stream_path, cores = 1, quiet = TRUE) {
   # Check operating system
   system <- get_os()
 
@@ -44,25 +46,42 @@ snap_to_subc_segment <- function(data, lon, lat, site_id, basin_id, subc_id,
 
   # Check if lon, lat, side_id, basin_id, and subc_id column names
   # are character strings
-  for(name in  c(lon, lat, site_id, basin_id, subc_id)){
+  for(name in  c(lon, lat, site_id)) {
   if (!is.character(name))
     stop(paste0("Column name ", name, " is not a character string."))
   }
 
+  if (!is.null(basin_id))
+    if (!is.character(basin_id))
+      stop(paste0("Column name ", basin_id, " is not a character string."))
+
+  if (!is.null(subc_id))
+    if (!is.character(subc_id))
+      stop(paste0("Column name ", subc_id, " is not a character string."))
+
   # Check if lon, lat, side_id, basin_id, and subc_id column names exist
-  for(name in c(lon, lat, site_id, basin_id, subc_id)){
+  for(name in c(lon, lat, site_id)) {
     if (is.null(data[[name]]))
       stop(paste0("Column name '", name,"' does not exist."))
   }
 
+  if (!is.null(basin_id))
+    if (is.null(data[[basin_id]]))
+      stop(paste0("Column name '", basin_id,"' does not exist."))
+
+  if (!is.null(subc_id))
+    if (is.null(data[[subc_id]]))
+      stop(paste0("Column name '", subc_id,"' does not exist."))
+
+
    # Check if paths exists
-  for(path in c(basin_path, subc_path, stream_path)){
+  for(path in c(basin_path, subc_path, stream_path)) {
    if (!file.exists(path))
      stop(paste0("File path: ", path, " does not exist."))
   }
 
   # Check if basin_path and subc_path ends with .tif
-  for(path in c(basin_path, subc_path)){
+  for(path in c(basin_path, subc_path)) {
     if (!endsWith(path, ".tif"))
       stop(paste0("File path: ", path, " does not end with .tif"))
   }
@@ -82,12 +101,45 @@ snap_to_subc_segment <- function(data, lon, lat, site_id, basin_id, subc_id,
   # Make bash scripts executable
   make_sh_exec()
 
+  # If basin_id and/or subc_id is NULL
+  # Extract ids first
+  if (is.null(basin_id) && is.null(subc_id)) {
+    # Extract subc and basin ids
+    subc_basin_ids <- extract_ids(data, lon, lat, subcatchment_bath = subc_path,
+                                  basin_path = basin_path, quiet = quiet)
+    # Join with data and select columns needed for the bash script
+    ids <- data %>%
+      left_join(., subc_basin_ids, by = c(lon, lat)) %>%
+      select(matches(c(side_id, lon, lat)), basin_id, subcatchment_id)
+
+  } else if (is.null(basin_id) && !is.null(subc_id)) {
+    # Extract basin ids
+    basin_ids <- extract_ids(data, lon, lat, subcatchment_path = NULL,
+                             basin_path = basin_path, quiet = quiet)
+    # Join with data and select columns needed for the bash script
+    ids <- data %>%
+      left_join(., subc_basin_ids, by = c(lon, lat)) %>%
+      select(matches(c(side_id, lon, lat)), basin_id, matches(subc_id) )
+
+
+  } else if (!is.null(basin_id) && is.null(subc_id)) {
+    # Extract sub-catchment ids
+    subc_ids <- extract_ids(data, lon, lat, subcatchment_path = subc_path,
+                             basin_path = NULL, quiet = quiet)
+    # Join with data and select columns needed for the bash script
+    ids <- data %>%
+      left_join(., subc_basin_ids, by = c(lon, lat)) %>%
+      select(matches(c(side_id, lon, lat, basin_id)),  subcatchment_id)
+
+  } else {
+    # Select columns needed for the bash script
+    ids <- data %>%
+      select(matches(c(side_id, lon, lat, basin_id, subc_id)))
+  }
+
   # Create random string to attach to the file name of the temporary
   # output coordinates and input ids file
   rand_string <- stri_rand_strings(n=1, length=8, pattern="[A-Za-z0-9]")
-  # Select columns with lon/lat coordinates
-  ids <- data %>%
-    select(matches(c(side_id, lon, lat, basin_id, subc_id)))
   # Export taxon point ids
   ids_tmp_path <- paste0(tempdir(), "/ids_", rand_string, ".txt")
   fwrite(ids, ids_tmp_path, col.names = TRUE,
@@ -134,6 +186,5 @@ snap_to_subc_segment <- function(data, lon, lat, site_id, basin_id, subc_id,
 
   # Return snapped coordinates
   return(snapped_coord)
-
 
 }
