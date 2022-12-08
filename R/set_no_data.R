@@ -10,16 +10,18 @@
 #' @param no_data The desired no data value
 #' @importFrom processx run
 #' @importFrom stringr str_split
+#' @author Afroditi Grigoropoulou
 #' @export
 #'
 
 set_no_data <- function(data_dir, variable, no_data) {
 
-  # Call the external .sh script extract_zonal_stat()
-  # containing the grass functions
-  output <- run("/data/grigoropoulou/hydrographr_test/sh/set_no_data.sh",
-                args = c(data_dir, variable, no_data),
-                echo = FALSE)$stdout
+  # Call the external .sh script set_no_data.sh
+  # containing the gdal function
+  output <- run(system.file("sh","set_no_data.sh",
+                             package = "hydrographr"),
+                 args = c(data_dir, variable, no_data),
+                 echo = FALSE)$stdout
 
   # Format output message
   output <- str_split(output, "\n")[[1]][1]
