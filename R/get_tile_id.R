@@ -13,6 +13,17 @@
 # Get tile id when the input is a point data frame
 get_tile_id <- function(data, lon, lat) {
 
+
+  # If the required global regional unit file does not already exist,
+  # download it in the package folder
+  if (!file.exists(system.file("data", "regional_unit_ovr.tif",
+                               package = "hydrographr"))) {
+    download_tiles(variable = "regional_unit", global=TRUE,
+                   download_path = system.file("data", "regional_unit_ovr.tif",
+                                   package = "hydrographr"))
+
+    }
+
   reg_un <- get_regional_unit_id(data, lon, lat)
 
   lookup <- fread(system.file("data", "lookup_tile_regunit.txt",
