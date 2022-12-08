@@ -17,7 +17,7 @@
 #' @param stream_path Full path of stream network .gpkg file.
 #' @param cores Number of cores used for palatalization. By default only 1 core
 #' is used.
-#' @param quiet TRUE or FALSE;
+#' @param quiet Whether the standard output and error will be printed or not.
 #' @importFrom stringi stri_rand_strings
 #' @importFrom dplyr select left_join
 #' @importFrom data.table fread
@@ -32,11 +32,10 @@ snap_to_subc_segment <- function(data, lon, lat, site_id, basin_id = NULL,
   system <- get_os()
 
   # Check if any of the arguments is missing
-  defined <- ls()
-  passed <- names(as.list(match.call())[-1])
-
-  if (any(!defined %in% passed)) {
-    stop(paste0(paste(setdiff(defined, passed), collapse=", "), " is missing."))
+  for(arg in  c(data, lon, lat, site_id, basin_path, subc_path,
+                stream_path)) {
+    if (missing(arg))
+      stop(paste0(quote(arg), " is missing."))
   }
 
   # Check if input data is of type data.frame,
@@ -44,7 +43,7 @@ snap_to_subc_segment <- function(data, lon, lat, site_id, basin_id = NULL,
   if (!is(data, "data.frame"))
     stop("data: Has to be of class 'data.frame'.")
 
-  # Check if lon, lat, side_id, basin_id, and subc_id column names
+  # Check if lon, lat, site_id, basin_id, and subc_id column names
   # are character strings
   for(name in  c(lon, lat, site_id)) {
   if (!is.character(name))
@@ -59,7 +58,7 @@ snap_to_subc_segment <- function(data, lon, lat, site_id, basin_id = NULL,
     if (!is.character(subc_id))
       stop(paste0("Column name ", subc_id, " is not a character string."))
 
-  # Check if lon, lat, side_id, basin_id, and subc_id column names exist
+  # Check if lon, lat, site_id, basin_id, and subc_id column names exist
   for(name in c(lon, lat, site_id)) {
     if (is.null(data[[name]]))
       stop(paste0("Column name '", name,"' does not exist."))
@@ -87,54 +86,55 @@ snap_to_subc_segment <- function(data, lon, lat, site_id, basin_id = NULL,
   }
 
   # Check if basin_path and subc_path ends with .gpkg
-     if (!endsWith(stream_path, ".gpkg"))
-      stop(paste0("File path: ", stream_path, " does not end with .gpkg"))
-  # Check if value of cores numeric
-   if(!is.integer(cores))
-    stop("cores: Value has to be integer.")
+  if (!endsWith(stream_path, ".gpkg"))
+    stop(paste0("File path: ", stream_path, " does not end with .gpkg"))
 
+  # Check if value of cores numeric
+  #if (!is.integer(cores))
+  #  stop("cores: Value has to be integer.")
+  # Add here: Check if cpus are available.
 
   # Check if quiet is logical
-  if(!is.logical(quiet))
+  if (!is.logical(quiet))
     stop("quiet: Has to be TRUE or FALSE.")
-
-  # Make bash scripts executable
-  make_sh_exec()
 
   # If basin_id and/or subc_id is NULL
   # Extract ids first
   if (is.null(basin_id) && is.null(subc_id)) {
     # Extract subc and basin ids
-    subc_basin_ids <- extract_ids(data, lon, lat, subcatchment_bath = subc_path,
+    subc_basin_ids <- extract_ids(data = data, lon = lon, lat = lat,
+                                  subcatchment_path = subc_path,
                                   basin_path = basin_path, quiet = quiet)
     # Join with data and select columns needed for the bash script
     ids <- data %>%
       left_join(., subc_basin_ids, by = c(lon, lat)) %>%
-      select(matches(c(side_id, lon, lat)), basin_id, subcatchment_id)
+      select(matches(c(site_id, lon, lat)), basin_id, subcatchment_id)
 
   } else if (is.null(basin_id) && !is.null(subc_id)) {
     # Extract basin ids
-    basin_ids <- extract_ids(data, lon, lat, subcatchment_path = NULL,
+    basin_ids <- extract_ids(data = data, lon = lon, lat = lat,
+                             subcatchment_path = NULL,
                              basin_path = basin_path, quiet = quiet)
     # Join with data and select columns needed for the bash script
     ids <- data %>%
       left_join(., subc_basin_ids, by = c(lon, lat)) %>%
-      select(matches(c(side_id, lon, lat)), basin_id, matches(subc_id) )
+      select(matches(c(site_id, lon, lat)), basin_id, matches(subc_id) )
 
 
   } else if (!is.null(basin_id) && is.null(subc_id)) {
     # Extract sub-catchment ids
-    subc_ids <- extract_ids(data, lon, lat, subcatchment_path = subc_path,
-                             basin_path = NULL, quiet = quiet)
+    subc_ids <- extract_ids(data = data, lon = lon, lat = lat,
+                            subcatchment_path = subc_path,
+                            basin_path = NULL, quiet = quiet)
     # Join with data and select columns needed for the bash script
     ids <- data %>%
       left_join(., subc_basin_ids, by = c(lon, lat)) %>%
-      select(matches(c(side_id, lon, lat, basin_id)),  subcatchment_id)
+      select(matches(c(site_id, lon, lat, basin_id)),  subcatchment_id)
 
   } else {
     # Select columns needed for the bash script
     ids <- data %>%
-      select(matches(c(side_id, lon, lat, basin_id, subc_id)))
+      select(matches(c(site_id, lon, lat, basin_id, subc_id)))
   }
 
   # Create random string to attach to the file name of the temporary
@@ -147,6 +147,8 @@ snap_to_subc_segment <- function(data, lon, lat, site_id, basin_id = NULL,
   # Path for tmp regional unit ids text file
   snap_tmp_path <- paste0(tempdir(), "/snapped_points", rand_string, ".txt")
 
+  # Make bash scripts executable
+  make_sh_exec()
 
   if (system == "linux" || system == "osx"){
 
@@ -163,8 +165,8 @@ snap_to_subc_segment <- function(data, lon, lat, site_id, basin_id = NULL,
     check_wsl()
     # Change path for WSL
     wsl_ids_tmp_path <- fix_path(ids_tmp_path)
-    wsl_basin_tmp_path <- fix_path(basin_tmp_path)
-    wsl_subc_tmp_path <- fix_path(subc_tmp_path)
+    wsl_basin_path <- fix_path(basin_path)
+    wsl_subc_path <- fix_path(subc_path)
     wsl_stream_path <- fix_path(stream_path)
     wsl_snap_tmp_path <- fix_path(snap_tmp_path)
     wsl_tmp_path <- fix_path(tempdir())
