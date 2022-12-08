@@ -92,7 +92,7 @@ ogr2ogr -nln orderV_bid${MAB} -nlt LINESTRING -where "stream = ${MIB}" \
     -f GPKG $DIR/Microb_${MIB}_${RAND_STRING}.gpkg $VECT
 
 # open grass session based on microbasin raster
-grass -f -gtext --tmp-location $SUBCATCH <<'EOF'
+grass -f --text --tmp-location $SUBCATCH <<'EOF'
 
     # read in point of interest
     v.in.ogr input=$DIR/point_$ID_${RAND_STRING}.gpkg layer=ref_points output=point_$ID \
