@@ -99,7 +99,7 @@ grass -f --text --tmp-location $SUBCATCH <<'EOF'
     type=point key=$SITE
 
     # read vector line representing stream reach
-    v.in.ogr input=$DIR/Microb_$MIB_${RAND_STRING}.gpkg layer=orderV_bid${MAB} \
+    v.in.ogr input=$DIR/Microb_${MIB}_${RAND_STRING}.gpkg layer=orderV_bid${MAB} \
         output=streamReach_$MIB type=line key=stream
 
     # Raster with microbasins
