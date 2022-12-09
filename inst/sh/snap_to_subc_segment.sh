@@ -1,17 +1,18 @@
 #! /bin/bash
 
-### testing
+##export DATA=spdata_1264942_ids.txt
+# testing
 #export DATA=spdata_1264942_ids.txt
-#export DIR=/home/marquez/hydrographr
-#export DIR=/home/marquez/hydrographr
-#[ ! -d $DIR/snappoints ] && mkdir $DIR/snappoints
-#export OUTDIR=$DIR/snappoints
-#export SITE=$( awk 'NR==1 {print $1}' $DATA )
-#export BASIN=basin_h18v04.tif
-#export SUBCATCH=sub_catchment_h18v04.tif
-#export VECT=order_vect_59.gpkg
-#export LON=longitude
-#export LAT=latitude
+export DIR=/home/marquez/hydrographr
+export DIR=/home/marquez/hydrographr
+[ ! -d $DIR/snappoints ] && mkdir $DIR/snappoints
+export OUTDIR=$DIR/snappoints
+export SITE=$( awk 'NR==1 {print $1}' $DATA )
+export BASIN=basin_1264942.tif
+export SUBCATCH=subcatchment_1264942.tif
+export VECT=order_vect_59.gpkg
+export LON=longitude
+export LAT=latitude
 
 
 # input dataset
@@ -84,7 +85,7 @@ export MAB=$(awk -F, -v id="$ID" '$1==id {print $4}' $DATA)
 export MIB=$(awk -F, -v id="$ID" '$1==id {print $5}' $DATA)
 
 # extract point of interest
-ogr2ogr -where "$SITE = $ID" -f GPKG $DIR/point_$ID_${RAND_STRING}.gpkg \
+ogr2ogr -where "$SITE = $ID" -f GPKG $DIR/point_${ID}_${RAND_STRING}.gpkg \
     $DIR/ref_points_${RAND_STRING}.gpkg
 
 # extract vector line (stream reach) associated with point
@@ -95,7 +96,7 @@ ogr2ogr -nln orderV_bid${MAB} -nlt LINESTRING -where "stream = ${MIB}" \
 grass -f --text --tmp-location $SUBCATCH <<'EOF'
 
     # read in point of interest
-    v.in.ogr input=$DIR/point_$ID_${RAND_STRING}.gpkg layer=ref_points output=point_$ID \
+    v.in.ogr input=$DIR/point_${ID}_${RAND_STRING}.gpkg layer=ref_points output=point_$ID \
     type=point key=$SITE
 
     # read vector line representing stream reach
@@ -156,7 +157,7 @@ EOF
 export -f SnapPoint
 
 IDS=$(awk -F, 'NR > 1 {print $1}' $DATA)
-parallel -j $PAR --delay 5 SnapPoint ::: $IDS
+time parallel -j $PAR --delay 5 SnapPoint ::: $IDS
 
 
 #  Join all single tables in one file
