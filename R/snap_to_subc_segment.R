@@ -107,7 +107,7 @@ snap_to_subc_segment <- function(data, lon, lat, site_id, basin_id = NULL,
                                   basin_path = basin_path, quiet = quiet)
     # Join with data and select columns needed for the bash script
     ids <- data %>%
-      left_join(., subc_basin_ids, by = c(lon, lat)) %>%
+     left_join(., subc_basin_ids, by = c(lon, lat)) %>%
       select(matches(c(site_id, lon, lat)), basin_id, subcatchment_id)
 
   } else if (is.null(basin_id) && !is.null(subc_id)) {
@@ -145,14 +145,14 @@ snap_to_subc_segment <- function(data, lon, lat, site_id, basin_id = NULL,
   fwrite(ids, ids_tmp_path, col.names = TRUE,
          row.names = FALSE, quote = FALSE, sep = ",")
   # Path for tmp regional unit ids text file
-  snap_tmp_path <- paste0(tempdir(), "/snapped_points", rand_string, ".txt")
+  snap_tmp_path <- paste0(tempdir(), "/snapped_points", rand_string, ".csv")
 
   # Make bash scripts executable
   make_sh_exec()
 
   if (system == "linux" || system == "osx"){
 
-    run(system.file("sh", "snap_to_subc_segment.sh",
+    processx::run(system.file("sh", "snap_to_subc_segment.sh",
                     package = "hydrographr"),
         args = c(ids_tmp_path, lon, lat, basin_path, subc_path, stream_path,
                  cores, snap_tmp_path,  tempdir()),
@@ -173,15 +173,15 @@ snap_to_subc_segment <- function(data, lon, lat, site_id, basin_id = NULL,
     wsl_sh_file <- fix_path(system.file("sh", "snap_to_subc_segment.sh",
                                         package = "hydrographr"))
 
-    run(system.file("bat", "snap_to_subc_segment.bat",
+    processx::run(system.file("bat", "snap_to_subc_segment.bat",
                     package = "hydrographr"),
         args = c(wsl_ids_tmp_path, lon, lat, wsl_basin_path,
                  wsl_subc_path, wsl_stream_path, cores,
                  wsl_snap_tmp_path, wsl_tmp_path, wsl_sh_file),
         echo = !quiet)
   }
-  snapped_coord <- fread(paste0(tempdir(), "/snapped_points", rand_string, ".txt"),
-                         keepLeadingZeros = TRUE, header = TRUE, sep = " ")
+  snapped_coord <- fread(paste0(tempdir(), "/snapped_points", rand_string, ".csv"),
+                         keepLeadingZeros = TRUE, header = TRUE, sep = ",")
 
   # Remove files in the tmp folder
   file.remove(ids_tmp_path, snap_tmp_path)
