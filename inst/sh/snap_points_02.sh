@@ -3,7 +3,7 @@
 ### testing
 #export DATA=spdata_1264942_ids.txt
 #export DIR=/home/marquez/hydrographr
-#export DIR=/home/marquez/hydrographr
+#export DIR=/home/marquez/hydrographr 
 #[ ! -d $DIR/snappoints ] && mkdir $DIR/snappoints
 #export OUTDIR=$DIR/snappoints
 #export SITE=$( awk 'NR==1 {print $1}' $DATA )
@@ -21,27 +21,28 @@ export DATA=$1
 export LON=$2
 export LAT=$3
 
-# basin file name
-export BASIN=$4
-
-# subcatchment file name
-export SUBCATCH=$5
-
-# stream vector gpkg name
-export VECT=$6
-
-# How many cores to run in parallel
-export PAR=$7
-
-## Full path to output snap_points.txt file
-export SNAP=$8
-
-# path to temporary folder
-export DIR=$9
+# path to data inputs
+export DIR=$4
 
 # prepare target folder for temporal data
-[ ! -d $DIR/snappoints ] && mkdir $DIR/snappoints
+[ ! -d $DIR/snappoints ] && mkdir $DIR/snappoints 
 export OUTDIR=$DIR/snappoints
+
+# basin file name
+export BASIN=$5
+
+# subcatchment file name
+export SUBCATCH=$6
+
+# stream vector gpkg name
+export VECT=$7
+
+# How many cores to run in parallel
+export PAR=$8
+
+## Full path to output snap_points.txt file
+export SNAP=$9
+
 
 ###################################
 ###################################
@@ -50,7 +51,7 @@ export OUTDIR=$DIR/snappoints
 export RAND_STRING=$(xxd -l 8 -c 32 -p < /dev/random)
 
 # name of unique id identifier
-export SITE=$( awk -F, 'NR==1 {print $1}' $DATA )
+export SITE=$( awk 'NR==1 {print $1}' $DATA )
 
 ### save name of file without extension
 #export b=$(echo $DATA | awk -F"." '{print $1}')
@@ -75,13 +76,13 @@ ogr2ogr -f "GPKG" -overwrite -nln ref_points -nlt POINT -a_srs EPSG:4326 \
 # function to do the snapping per point
 SnapPoint(){
 
-# id of the point
+# id of the point 
 export ID=$1
 
 # identify basin ID for that point
-export MAB=$(awk -F, -v id="$ID" '$1==id {print $4}' $DATA)
+export MAB=$(awk -v id="$ID" '$1==id {print $6}' $DATA)
 # identify sub-catchment ID for that point
-export MIB=$(awk -F, -v id="$ID" '$1==id {print $5}' $DATA)
+export MIB=$(awk -v id="$ID" '$1==id {print $5}' $DATA)
 
 # extract point of interest
 ogr2ogr -where "$SITE = $ID" -f GPKG $DIR/point_$ID_${RAND_STRING}.gpkg \
@@ -92,30 +93,30 @@ ogr2ogr -nln orderV_bid${MAB} -nlt LINESTRING -where "stream = ${MIB}" \
     -f GPKG $DIR/Microb_${MIB}_${RAND_STRING}.gpkg $VECT
 
 # open grass session based on microbasin raster
-grass -f --text --tmp-location $SUBCATCH <<'EOF'
+grass78 -f -text --tmp-location -c $SUBCATCH <<'EOF'
 
     # read in point of interest
     v.in.ogr input=$DIR/point_$ID_${RAND_STRING}.gpkg layer=ref_points output=point_$ID \
     type=point key=$SITE
 
     # read vector line representing stream reach
-    v.in.ogr input=$DIR/Microb_${MIB}_${RAND_STRING}.gpkg layer=orderV_bid${MAB} \
+    v.in.ogr input=$DIR/Microb_$MIB_${RAND_STRING}.gpkg layer=orderV_bid${MAB} \
         output=streamReach_$MIB type=line key=stream
 
     # Raster with microbasins
     r.in.gdal input=$SUBCATCH output=micb
 
     # extract microbasin of stream reach $MIB as raster
-    r.mapcalc --o "micr_${ID} = if(micb != ${MIB}, null(), 1)"
-
+    r.mapcalc --o "micr_${ID} = if(micb != ${MIB}, null(), 1)"        
+          
     # make the raster a vector points
-    r.to.vect --o input=micr_${ID} output=micr_vp_${ID} type=point
-
-    # of how many pixels the raster consist?
+    r.to.vect --o input=micr_${ID} output=micr_vp_${ID} type=point     
+    
+    # of how many pixels the raster consist? 
     # 1 if stream reach with only one pixel
     # meaning the points already overlap
     NUMP=$(v.info micr_vp_${ID}  | awk '/points/{print $5}')
-
+            
     if [ $NUMP -eq 1 ]
     then
         v.net --o -s input=streamReach_$MIB  points=point_${ID} \
@@ -124,12 +125,12 @@ grass -f --text --tmp-location $SUBCATCH <<'EOF'
 
         v.out.ascii input=snap_${ID} layer=2 separator=comma \
         > ${OUTDIR}/coords_${ID}_${RAND_STRING}
-
-    else
+    
+    else 
 
         v.distance -pa from=micr_vp_${ID} to=micr_vp_${ID}  upload=dist \
           > $DIR/dist_mat_p${ID}_${MAB}_${MIB}_${RAND_STRING}.txt
-
+          
         # calculate maximum distance between all points in microbasin
         MAXDIST=0
         for i in \
@@ -149,21 +150,21 @@ grass -f --text --tmp-location $SUBCATCH <<'EOF'
 
         rm $DIR/dist_mat_p${ID}_${MAB}_${MIB}_${RAND_STRING}.txt $DIR/point_${ID}_${RAND_STRING}.gpkg \
         $DIR/Microb_${MIB}_${RAND_STRING}.gpkg
-    fi
+    fi 
 EOF
 }
 
 export -f SnapPoint
 
 IDS=$(awk -F, 'NR > 1 {print $1}' $DATA)
-parallel -j $PAR --delay 5 SnapPoint ::: $IDS
+parallel -j $PAR --delay 5 SnapPoint ::: $IDS 
 
 
 #  Join all single tables in one file
 echo lon_snap,lat_snap,Site_ID_snap > ${OUTDIR}/snap_all_${RAND_STRING}.csv
 cat ${OUTDIR}/coords_* >> ${OUTDIR}/snap_all_${RAND_STRING}.csv
 
-# Join original table with new coordinates
+# Join original table with new coordinates 
 paste -d" "   \
     $DATA \
     <(sort -t, -k3 -h ${OUTDIR}/snap_all_${RAND_STRING}.csv | awk -F, '{print $1, $2}')  \

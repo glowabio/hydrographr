@@ -1,7 +1,7 @@
 Package: hydrographr
 Type: Package
 Title: Working with Hydrography90m Data in R
-Version: 0.1.9001
+Version: 0.1.9004
 Authors@R: 
     c(person("Maria", "Üblacker",
              email = "maria.ueblacker@igb-berlin.de",
@@ -26,7 +26,10 @@ Authors@R:
              role = c("aut")),    
       person("Vanessa", "Bremerich",
              email = "bremerich@igb-berlin.de",
-             role = c("aut")),    
+             role = c("aut")), 
+      person("Giuseppe", "Amatulli",
+             email = "giuseppe.amatulli@gmail.com",
+             role = c("aut")),     
       person("Sami", "Domisch",
              email = "sami.domisch@igb-berlin.de",
              role = c("aut")))
@@ -37,7 +40,22 @@ URL: https://glowabio.github.io/hydrographr/
 BugReports: https://github.com/glowabio/hydrographr/issues
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.2.1
-Imports: 
+RoxygenNote: 7.2.2
+Imports:
+    processx (>= 3.7.0),		 
     data.table (>= 1.14.2),
-    processx (>= 3.7.0)
+    tidyr (>= 1.2.1),
+    dplyr (>= 1.0.10),
+    stringi (>= 1.7.8),
+    terra (>= 1.6-41),
+    sf (>= 1.0-9),
+    parallel (>= 4.2.2),
+    doParallel (>= 1.0.17),
+    foreach (>= 1.5.2),
+    future (>= 1.29.0),
+    doFuture (>= 0.12.2),
+    future.apply (>= 1.10.0),
+    DBI (>= 1.1.3),
+    RSQLite (>= 2.2.19),
+    memuse (>= 4.2-2),
+    igraph (>= 1.3.5)
