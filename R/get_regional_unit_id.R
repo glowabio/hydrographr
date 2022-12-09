@@ -17,7 +17,17 @@
 get_regional_unit_id <- function(data, lon, lat) {
 
   # global file of regional units ids
-  reg_unit_file <- "tmp/regional_unit_ovr.tif"
+  reg_unit_file <- paste0(tempdir(), "/regional_unit_ovr.tif")
+
+  # If the required file does not already exist,
+  # download it in the tempdir()
+  if (!file.exists(reg_unit_file)) {
+    print("Downloading required file")
+    download.file("https://drive.google.com/uc?export=download&id=1ykV0jRCglz-_fdc4CJDMZC87VMsxzXE4&confirm=t",
+                  destfile = reg_unit_file)
+
+  }
+
 
   # Export taxon occurrence points
   dataset_tmp_path <- paste0(tempdir(), "/points_dataset.txt")
@@ -35,8 +45,8 @@ get_regional_unit_id <- function(data, lon, lat) {
   data_reg_unit_ids <- fread(paste0(tempdir(), "/reg_unit_ids.txt"),
                              keepLeadingZeros = TRUE, header = TRUE, sep = " ")
 
-  # Remove all files in the tmp folder
-  unlink(paste0(tempdir(), "/*"))
+  # # Remove all files in the tmp folder
+  # unlink(paste0(tempdir(), "/*"))
 
   # Return vector of regional unit ids
   return(data_reg_unit_ids$reg_unit_id)

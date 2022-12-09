@@ -16,3 +16,6 @@ get_tile_id(data, lon, lat)
 \description{
 Get tile id when the input is a point dataframe
 }
+\author{
+Afroditi Grigoropoulou
+}
