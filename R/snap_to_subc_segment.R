@@ -5,17 +5,17 @@
 #'
 #'
 #' @param data Data.frame with lat/lon columns in WGS84.
-#' @param lon Column name with longitude coordinates as character string.
-#' @param lat Column name with latitude coordinates as character string.
-#' @param site_id Column name with unique site ids as character string
-#' @param basin_id Column name with basin ids as character string. If NULL
-#' basin id will be extract.
-#' @param subc_id Column name with sub-catchment ids as character string. If
-#' NULL sub-catchment id will be extracted.
-#' @param basin_path Full path of the basin .tif file.
-#' @param subc_path Full path of hte sub-catchment .tif file.
+#' @param lon Column name of longitude coordinates as character string.
+#' @param lat Column name of latitude coordinates as character string.
+#' @param site_id Column name of unique site IDs as character string
+#' @param basin_id Column name of basin IDs as character string. If NULL
+#' basin ID will be extract.
+#' @param subc_id Column name of sub-catchment IDs as character string. If
+#' NULL sub-catchment ID will be extracted.
+#' @param basin_path Full path of the basin .tif layer.
+#' @param subc_path Full path of the sub-catchment .tif layer.
 #' @param stream_path Full path of stream network .gpkg file.
-#' @param cores Number of cores used for palatalization. By default only 1 core
+#' @param cores Number of cores used for parallelization. By default only 1 core
 #' is used.
 #' @param quiet Whether the standard output and error will be printed or not.
 #' @importFrom stringi stri_rand_strings
@@ -141,9 +141,9 @@ snap_to_subc_segment <- function(data, lon, lat, site_id, basin_id = NULL,
   # output coordinates and input ids file
   rand_string <- stri_rand_strings(n=1, length=8, pattern="[A-Za-z0-9]")
   # Export taxon point ids
-  ids_tmp_path <- paste0(tempdir(), "/ids_", rand_string, ".txt")
+  ids_tmp_path <- paste0(tempdir(), "/ids_", rand_string, ".csv")
   fwrite(ids, ids_tmp_path, col.names = TRUE,
-         row.names = FALSE, quote = FALSE, sep = " ")
+         row.names = FALSE, quote = FALSE, sep = ",")
   # Path for tmp regional unit ids text file
   snap_tmp_path <- paste0(tempdir(), "/snapped_points", rand_string, ".txt")
 

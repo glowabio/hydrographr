@@ -79,9 +79,9 @@ SnapPoint(){
 export ID=$1
 
 # identify basin ID for that point
-export MAB=$(awk -v id="$ID" '$1==id {print $4}' $DATA)
+export MAB=$(awk -F, -v id="$ID" '$1==id {print $4}' $DATA)
 # identify sub-catchment ID for that point
-export MIB=$(awk -v id="$ID" '$1==id {print $5}' $DATA)
+export MIB=$(awk -F, -v id="$ID" '$1==id {print $5}' $DATA)
 
 # extract point of interest
 ogr2ogr -where "$SITE = $ID" -f GPKG $DIR/point_$ID_${RAND_STRING}.gpkg \
