@@ -18,14 +18,19 @@ download_tiles <- function(variable, filetype = "tif",
 
   # Introductory steps
 
-  # Import lookup table with the size of each file
-  file_size_table <- fread(system.file("data",
-                                       "hydrography90m_paths_file_sizes.txt",
-                                       package = "hydrographr"), sep = ";")
-  # file_size_table <- fread("inst/data/hydrography90m_paths_file_sizes.txt",
-  #                         sep = ";")
+  # Download lookup table with the size of each file
+  # if it doesn't exist in the tempdir()
+  file_size_file <- paste0(tempdir(), "/hydrography90m_paths_file_sizes.txt")
+  if (!file.exists(file_size_file)) {
+    download.file("https://drive.google.com/uc?export=download&id=1SEkcgGPutP6ZQPvYtzICh_gcGnVgH_uR&confirm=t",
+                  destfile = file_size_file)
 
-  # Separate the table to get the names of the hydrography variables
+  }
+
+  # Import lookup table with the size of each file
+  file_size_table <- fread(file_size_file, sep = ";")
+
+  # Separate the table to get the names of the hydrography90m variables
   file_size_table_sep <- separate(
     data = file_size_table,
     col = file_path,
@@ -97,8 +102,7 @@ download_tiles <- function(variable, filetype = "tif",
   # Print warning on file size and ask for input from the user
   arg <- readline(prompt = paste0("Download size is ",
                                   round(variable_size_sum / 1000000, 2),
-                                  " MB. Please type \"y\" if you are ready to smash it
-or \"n\" if you'd rather not to, and then press Enter \n"))
+                                  " MB. Please type \"y\" if you are ready to smash it\nor \"n\" if you'd rather not to, and then press Enter \n"))
 
   if (arg == "y") {
 

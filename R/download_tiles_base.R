@@ -59,7 +59,7 @@ download_tiles_base <- function(variable, filetype = "tif",
   }
 
   # Download from GDrive
-  if (server_path == gdrive_path | varname!="cti_ovr.tif") {
+  if (server_path == gdrive_path | varname=="cti_ovr.tif") {
 
     # Get GDrive file id from the lookup table
     file_id <- file_size_table_sep[varname_tile == varname, ]$file_id
