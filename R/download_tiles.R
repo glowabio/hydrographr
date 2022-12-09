@@ -102,7 +102,8 @@ download_tiles <- function(variable, filetype = "tif",
   # Print warning on file size and ask for input from the user
   arg <- readline(prompt = paste0("Download size is ",
                                   round(variable_size_sum / 1000000, 2),
-                                  " MB. Please type \"y\" if you are ready to smash it\nor \"n\" if you'd rather not to, and then press Enter \n"))
+                                  " MB. Please type \"y\" if you are ready to smash it\n
+or \"n\" if you'd rather not to, and then press Enter \n"))
 
   if (arg == "y") {
 
