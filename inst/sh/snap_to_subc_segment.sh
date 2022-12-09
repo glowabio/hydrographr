@@ -1,18 +1,16 @@
 #! /bin/bash
 
-##export DATA=spdata_1264942_ids.txt
-# testing
-#export DATA=spdata_1264942_ids.txt
-export DIR=/home/marquez/hydrographr
-export DIR=/home/marquez/hydrographr
-[ ! -d $DIR/snappoints ] && mkdir $DIR/snappoints
-export OUTDIR=$DIR/snappoints
-export SITE=$( awk 'NR==1 {print $1}' $DATA )
-export BASIN=basin_1264942.tif
-export SUBCATCH=subcatchment_1264942.tif
-export VECT=order_vect_59.gpkg
-export LON=longitude
-export LAT=latitude
+#export DATA=spdata_1264942_ids.csv
+#export DIR=/mnt/c/Users/maria/Documents/Glowabio/data/test_data
+#export DIR=/home/marquez/hydrographr
+#[ ! -d $DIR/snappoints ] && mkdir $DIR/snappoints
+#export OUTDIR=$DIR/snappoints
+#export SITE=$( awk 'NR==1 {print $1}' $DATA )
+#export BASIN=basin_1264942.tif
+#export SUBCATCH=subcatchment_1264942.tif
+#export VECT=order_vect_59.gpkg
+#export LON=longitude
+#export LAT=latitude
 
 
 # input dataset
@@ -47,9 +45,6 @@ export OUTDIR=$DIR/snappoints
 ###################################
 ###################################
 
-## Set random string
-export RAND_STRING=$(xxd -l 8 -c 32 -p < /dev/random)
-
 # name of unique id identifier
 export SITE=$( awk -F, 'NR==1 {print $1}' $DATA )
 
@@ -67,7 +62,7 @@ export SITE=$( awk -F, 'NR==1 {print $1}' $DATA )
 
 ##  make the file a gpkg
 ogr2ogr -f "GPKG" -overwrite -nln ref_points -nlt POINT -a_srs EPSG:4326 \
-    $DIR/ref_points_${RAND_STRING}.gpkg $DATA -oo X_POSSIBLE_NAMES=$LON \
+    $DIR/ref_points.gpkg $DATA -oo X_POSSIBLE_NAMES=$LON \
     -oo Y_POSSIBLE_NAMES=$LAT -oo AUTODETECT_TYPE=YES
 
 ################
@@ -84,9 +79,12 @@ export MAB=$(awk -F, -v id="$ID" '$1==id {print $4}' $DATA)
 # identify sub-catchment ID for that point
 export MIB=$(awk -F, -v id="$ID" '$1==id {print $5}' $DATA)
 
+## Set random string
+export RAND_STRING=$(xxd -l 8 -c 32 -p < /dev/random)
+
 # extract point of interest
 ogr2ogr -where "$SITE = $ID" -f GPKG $DIR/point_${ID}_${RAND_STRING}.gpkg \
-    $DIR/ref_points_${RAND_STRING}.gpkg
+    $DIR/ref_points.gpkg
 
 # extract vector line (stream reach) associated with point
 ogr2ogr -nln orderV_bid${MAB} -nlt LINESTRING -where "stream = ${MIB}" \
@@ -101,7 +99,7 @@ grass -f --text --tmp-location $SUBCATCH <<'EOF'
 
     # read vector line representing stream reach
     v.in.ogr input=$DIR/Microb_${MIB}_${RAND_STRING}.gpkg layer=orderV_bid${MAB} \
-        output=streamReach_$MIB type=line key=stream
+        output=streamReach_${MIB} type=line key=stream
 
     # Raster with microbasins
     r.in.gdal input=$SUBCATCH output=micb
@@ -128,7 +126,7 @@ grass -f --text --tmp-location $SUBCATCH <<'EOF'
 
     else
 
-        v.distance -pa from=micr_vp_${ID} to=micr_vp_${ID}  upload=dist \
+        v.distance -pas from=micr_vp_${ID} to=micr_vp_${ID}  upload=dist \
           > $DIR/dist_mat_p${ID}_${MAB}_${MIB}_${RAND_STRING}.txt
 
         # calculate maximum distance between all points in microbasin
@@ -148,7 +146,7 @@ grass -f --text --tmp-location $SUBCATCH <<'EOF'
         v.out.ascii input=snap_${ID} layer=2 separator=comma \
         > ${OUTDIR}/coords_${ID}_${RAND_STRING}
 
-        rm $DIR/dist_mat_p${ID}_${MAB}_${MIB}_${RAND_STRING}.txt $DIR/point_${ID}_${RAND_STRING}.gpkg \
+        rm $DIR/dist_mat_p${ID}_${MAB}_${MIB}_${RAND_STRING}.txt $DIR/point_${ID}_${RAND_STRING}.gpkg  \
         $DIR/Microb_${MIB}_${RAND_STRING}.gpkg
     fi
 EOF
@@ -161,13 +159,13 @@ time parallel -j $PAR --delay 5 SnapPoint ::: $IDS
 
 
 #  Join all single tables in one file
-echo lon_snap,lat_snap,Site_ID_snap > ${OUTDIR}/snap_all_${RAND_STRING}.csv
-cat ${OUTDIR}/coords_* >> ${OUTDIR}/snap_all_${RAND_STRING}.csv
+echo lon_snap,lat_snap,Site_ID_snap > ${OUTDIR}/snap_all.csv
+cat ${OUTDIR}/coords_* >> ${OUTDIR}/snap_all.csv
 
 # Join original table with new coordinates
-paste -d" "   \
+paste -d","   \
     $DATA \
-    <(sort -t, -k3 -h ${OUTDIR}/snap_all_${RAND_STRING}.csv | awk -F, '{print $1, $2}')  \
+    <(sort -t, -k3 -h ${OUTDIR}/snap_all.csv | awk -F, -v OFS=, '{print $1, $2}')  \
     > $SNAP
 
 # remove temporal folder
