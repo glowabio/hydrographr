@@ -17,8 +17,7 @@
 get_regional_unit_id <- function(data, lon, lat) {
 
   # global file of regional units ids
-  reg_unit_file <- system.file("data", "regional_unit_ovr.tif",
-                               package = "hydrographr")
+  reg_unit_file <- "tmp/regional_unit_ovr.tif"
 
   # Export taxon occurrence points
   dataset_tmp_path <- paste0(tempdir(), "/points_dataset.txt")

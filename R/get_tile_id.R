@@ -14,15 +14,23 @@
 get_tile_id <- function(data, lon, lat) {
 
 
-  # If the required global regional unit file does not already exist,
-  # download it in the package folder
-  if (!file.exists(system.file("data", "regional_unit_ovr.tif",
-                               package = "hydrographr"))) {
-    download_tiles(variable = "regional_unit", global=TRUE,
-                   download_path = system.file("data", "regional_unit_ovr.tif",
-                                   package = "hydrographr"))
+  # If the required files do not already exist,
+  # download them in the inst/data/ package folder
+  dir.create("tmp", showWarnings = FALSE)
+  if (!file.exists("tmp/regional_unit_ovr.tif")) {
+    print("Downloading required file")
+    download.file("https://drive.google.com/uc?export=download&id=1ykV0jRCglz-_fdc4CJDMZC87VMsxzXE4&confirm=t",
+                  destfile = "tmp/regional_unit_ovr.tif")
 
-    }
+}
+
+
+  if (!file.exists("tmp/lookup_tile_regunit.txt")) {
+    download.file("https://drive.google.com/uc?export=download&id=1deKhOEjGgvUXPwivYyH99hgHlJV7OgUv&confirm=t",
+                  destfile = "tmp/lookup_tile_regunit.txt",
+                  quiet = TRUE)
+
+  }
 
   reg_un <- get_regional_unit_id(data, lon, lat)
 

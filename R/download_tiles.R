@@ -18,12 +18,19 @@ download_tiles <- function(variable, filetype = "tif",
 
   # Introductory steps
 
+
+  # If the required files do not already exist,
+  # download them in a tmp folder
+  dir.create("tmp", showWarnings = FALSE)
+  if (!file.exists("tmp/hydrography90m_paths_file_sizes.txt")) {
+    download.file("https://drive.google.com/uc?export=download&id=1SEkcgGPutP6ZQPvYtzICh_gcGnVgH_uR&confirm=t",
+                  destfile = "tmp/hydrography90m_paths_file_sizes.txt",
+                  quiet = TRUE)
+  }
+
+
   # Import lookup table with the size of each file
-  file_size_table <- fread(system.file("data",
-                                       "hydrography90m_paths_file_sizes.txt",
-                                       package = "hydrographr"), sep = ";")
-  # file_size_table <- fread("inst/data/hydrography90m_paths_file_sizes.txt",
-  #                         sep = ";")
+  file_size_table <- fread("tmp/hydrography90m_paths_file_sizes.txt", sep = ";")
 
   # Separate the table to get the names of the hydrography variables
   file_size_table_sep <- separate(
