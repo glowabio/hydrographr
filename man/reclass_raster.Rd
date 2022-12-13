@@ -25,13 +25,14 @@ string.}
 
 \item{new_val}{Column name of new raster integer values as character string.}
 
-\item{rast_path}{Full path to the integer input raster .tif layer. If the input
-raster layer has floating point values, you must multiply the input data
+\item{rast_path}{Full path to the integer input raster .tif layer.
+If the input raster layer has floating point values,
+you should multiply the input data
 by some factor to achieve integer values, otherwise the GRASS GIS r.reclass
 will round the raster values down to the next integer.}
 
-\item{recl_path}{Full path of the output .tif layer of the reclassified raster
-file.}
+\item{recl_path}{Full path of the output .tif layer
+of the reclassified raster file.}
 
 \item{read}{If TRUE the reclassified raster .tif layer gets read into R.
 TRUE is set by default.}

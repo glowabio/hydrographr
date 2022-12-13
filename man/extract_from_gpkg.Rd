@@ -20,15 +20,19 @@ extract_from_gpkg(
 If not NULL, the output data.frame is exported as a csv in the given path}
 
 \item{subc_ids}{Vector of sub-catchment ids or "all".
-If "all", the gpkg values are extracted for all the segments of the given gpkg layer.
+If "all", the gpkg values are extracted for all the segments
+of the given gpkg layer.
 The stream segment ids are the same as the sub-catchment ids.
-A vector of the sub-catchment ids can be acquired from the extract_ids() function,
+A vector of the sub-catchment ids can be acquired
+from the extract_ids() function,
 by sub setting the resulting data.frame}
 
 \item{subc_layer}{Character. Full path to the sub-catchment ID .tif layer}
 
-\item{variables}{Character vector. Variable file names, e.g. order_vect_point_h18v04.gpkg.
-Variable names should remain intact in file names, even after prior file processing,
+\item{variables}{Character vector. Variable file names,
+e.g. order_vect_point_h18v04.gpkg.
+Variable names should remain intact in file names,
+even after prior file processing,
 i.e., order_vect_point should appear in the file name.
 The files should be cropped to the extent of the sub-catchment layer}
 

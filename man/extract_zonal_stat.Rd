@@ -2,7 +2,8 @@
 % Please edit documentation in R/extract_zonal_stat.R
 \name{extract_zonal_stat}
 \alias{extract_zonal_stat}
-\title{Calculate zonal statistics based on environmental variable raster .tif layers.
+\title{Calculate zonal statistics based on
+environmental variable raster .tif layers.
 #'}
 \usage{
 extract_zonal_stat(
@@ -37,7 +38,8 @@ The files should be cropped to the extent of the sub-catchment layer}
 \item{n_cores}{Numeric. Number of cores used for parallelization}
 }
 \description{
-Calculate zonal statistics based on environmental variable raster .tif layers.
+Calculate zonal statistics based on
+environmental variable raster .tif layers.
 #'
 }
 \seealso{

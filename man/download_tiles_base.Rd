@@ -2,7 +2,8 @@
 % Please edit documentation in R/download_tiles_base.R
 \name{download_tiles_base}
 \alias{download_tiles_base}
-\title{Downloads a single file from https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4?path=%2F.
+\title{Downloads a single file from
+https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4?path=%2F.
 It is called and inherits arguments by the function 'download_tiles()'.}
 \usage{
 download_tiles_base(
@@ -22,15 +23,19 @@ download_tiles_base(
 
 \item{tile_id}{id of the requested tile (character)}
 
-\item{global}{Should the global file be downloaded or not. TRUE/FALSE, FALSE by default}
+\item{global}{Should the global file be downloaded or not.
+TRUE/FALSE, FALSE by default}
 
 \item{download_path}{The path where the files will be downloaded}
 
-\item{file_size_table_sep}{lookup table of file sizes (inherited by 'download_tiles()')}
+\item{file_size_table_sep}{lookup table of file sizes
+(inherited by 'download_tiles()')}
 
-\item{server_path}{path to the the home download folder in either Nimbus or GDrive (inherited by 'download_tiles()')}
+\item{server_path}{path to the the home download folder
+in either Nimbus or GDrive (inherited by 'download_tiles()')}
 }
 \description{
-Downloads a single file from https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4?path=%2F.
+Downloads a single file from
+https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4?path=%2F.
 It is called and inherits arguments by the function 'download_tiles()'.
 }

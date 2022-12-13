@@ -2,7 +2,8 @@
 % Please edit documentation in R/download_tiles.R
 \name{download_tiles}
 \alias{download_tiles}
-\title{Downloads multiple files from Nimbus by calling the function download_tiles_base in a loop.}
+\title{Downloads multiple files from Nimbus
+by calling the function download_tiles_base in a loop.}
 \usage{
 download_tiles(
   variable,
@@ -22,10 +23,12 @@ download_tiles(
 
 \item{reg_unit_id}{id of the requested regional unit (character)}
 
-\item{global}{Should the global file be downloaded or not. TRUE/FALSE, FALSE by default}
+\item{global}{Should the global file be downloaded or not.
+TRUE/FALSE, FALSE by default}
 
 \item{download_path}{The path where the files will be downloaded}
 }
 \description{
-Downloads multiple files from Nimbus by calling the function download_tiles_base in a loop.
+Downloads multiple files from Nimbus
+by calling the function download_tiles_base in a loop.
 }

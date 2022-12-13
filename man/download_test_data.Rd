@@ -10,10 +10,14 @@ download_test_data(download_path = ".")
 \item{download_path}{The path where the files will be downloaded}
 }
 \description{
-The test data contains all Hydrography90m and species point observation data for a small geographic extent to test the functions.
+The test data contains all Hydrography90m and species point observation data
+for a small geographic extent to test the functions.
 }
 \details{
-The test data is available at https://drive.google.com/file/d/1kYNWXmtVm6X7MZLISOePGpvxB1pk1scD/view?usp=share_link and can be automatically downloaded and unzipped with this function to a desired path.
+The test data is available at
+https://drive.google.com/file/d/1kYNWXmtVm6X7MZLISOePGpvxB1pk1scD/view?usp=share_link
+and can be automatically downloaded and unzipped
+with this function to a desired path.
 }
 \examples{
 # Download the test data to the current working directory
