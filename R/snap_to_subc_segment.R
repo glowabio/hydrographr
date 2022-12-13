@@ -1,29 +1,94 @@
-#' Snap data points to the next stream segment
+#' Snaps data points to the stream segment within a sub-catchment
 #'
+#' @description
 #' Snaps data points to the stream segment of the
 #' sub-catchment the data point is located.
-#'
-#'
+
 #' @param data Data.frame with lat/lon columns in WGS84.
 #' @param lon Column name of longitude coordinates as character string.
 #' @param lat Column name of latitude coordinates as character string.
-#' @param site_id Column name of unique site IDs as character string
+#' @param site_id Column name of unique site IDs as character string. Each row
+#' of the column needs to have an unique ID.
 #' @param basin_id Column name of basin IDs as character string. If NULL
-#' basin ID will be extract.
+#' basin ID will be extracted automatically beforehand.
 #' @param subc_id Column name of sub-catchment IDs as character string. If
-#' NULL sub-catchment ID will be extracted.
+#' NULL sub-catchment ID will be extracted automatically beforehand.
 #' @param basin_path Full path of the basin .tif layer.
 #' @param subc_path Full path of the sub-catchment .tif layer.
 #' @param stream_path Full path of stream network .gpkg file.
 #' @param cores Number of cores used for parallelization. By default only 1 core
 #' is used.
-#' @param quiet Whether the standard output and error will be printed or not.
+#' @param quiet Whether the standard output will be printed or not.
+#'
+#' @importFrom parallel detectCores
 #' @importFrom stringi stri_rand_strings
 #' @importFrom dplyr select left_join
 #' @importFrom data.table fread
 #' @importFrom processx run
-#' @export
 #'
+#' @export
+#' '
+#' @details
+#' Add detailed description of how the function works. Mention GASS GIS.
+#'
+#' @author Jaime Garcia Marquez, Maria Üblacker
+#'
+#' @references
+#' \url{https://grass.osgeo.org/grass82/manuals/v.distance.html}
+#'
+#' @seealso
+#' \code{\link{snap_to_network}} to snap the data points to the next stream
+#' segment within a given radius and/or a given flow accumulation threshold
+#' value.
+#' \code{\link{extract_ids}} to extract basin and sub-catchment IDs.
+#'
+#'@example
+#' # Download test data into temporary R folder
+#' download_test_data(tempdir())
+#'
+#' # Load occurrence data
+#' species_occurence <- read.table(paste0(test_data_path,
+#'                                        "/spdata_1264942.txt"), header = TRUE)
+#' # Define full path to the basin and sub-catchments raster layer
+#' basin_rast <- paste0(tempdir(), "/hydrography90m_test_data/basin_1264942.tif")
+#' subc_rast <- paste0(tempdir(), "/hydrography90m_test_data/basin_1264942.tif")
+#'
+#' # Define full path to the vector file of the stream network
+#' stream_vect <- paste0(tempdir(), "/hydrography90m_test_data/order_vect_59.gpkg")
+#'
+#' # ETHER
+#' # Extract basin and sub-catchment IDs from the Hydrography90m layers beforehand
+#' hydrography90m_ids <- extract_ids(data = species_occurence,
+#'                                   lon = "longitude",
+#'                                   lat = "latitude",
+#'                                   site_id = "occurrence_id",
+#'                                   subc_path = subcatchments,
+#'                                   basin_path = basin_rast)
+#'
+#' # Snap data points to the stream segment of the provided sub-catchment ID
+#' snapped_coordinates <- snap_to_subc_segement(data = hydrography90m_ids,
+#'                                              lon = "longitude",
+#'                                              lat = "latitude",
+#'                                              site_id = "occurrence_id",
+#'                                              basin_id = "basin_id",
+#'                                              subc_id = "subcatchment_id",
+#'                                              basin_path = basin_rast,
+#'                                              subc_path = subc_rast,
+#'                                              stream_path = stream_vect,
+#'                                              cores = 2)
+#'
+#' # OR
+#' # Automatically extract the basin and sub-catchment IDs and
+#' # snap the data points to the stream segment
+#' snapped_coordinates <- snap_to_subc_segement(data = species_occurence,
+#'                                              lon = "longitude",
+#'                                              lat = "latitude",
+#'                                              site_id = "occurrence_id",
+#'                                              basin_path = basin_rast,
+#'                                              subc_path = subc_rast,
+#'                                              stream_path = stream_vect,
+#'                                              cores = 2)
+
 
 snap_to_subc_segment <- function(data, lon, lat, site_id, basin_id = NULL,
                                  subc_id = NULL, basin_path, subc_path,
@@ -32,11 +97,11 @@ snap_to_subc_segment <- function(data, lon, lat, site_id, basin_id = NULL,
   system <- get_os()
 
   # Check if any of the arguments is missing
-  for(arg in  c(data, lon, lat, site_id, basin_path, subc_path,
+  for (arg in  c(data, lon, lat, site_id, basin_path, subc_path,
                 stream_path)) {
     if (missing(arg))
       stop(paste0(quote(arg), " is missing."))
-  }
+    }
 
   # Check if input data is of type data.frame,
   # data.table or tibble
@@ -45,7 +110,7 @@ snap_to_subc_segment <- function(data, lon, lat, site_id, basin_id = NULL,
 
   # Check if lon, lat, site_id, basin_id, and subc_id column names
   # are character strings
-  for(name in  c(lon, lat, site_id)) {
+  for (name in  c(lon, lat, site_id)) {
   if (!is.character(name))
     stop(paste0("Column name ", name, " is not a character string."))
   }
@@ -59,28 +124,32 @@ snap_to_subc_segment <- function(data, lon, lat, site_id, basin_id = NULL,
       stop(paste0("Column name ", subc_id, " is not a character string."))
 
   # Check if lon, lat, site_id, basin_id, and subc_id column names exist
-  for(name in c(lon, lat, site_id)) {
+  for (name in c(lon, lat, site_id)) {
     if (is.null(data[[name]]))
-      stop(paste0("Column name '", name,"' does not exist."))
+      stop(paste0("Column name '", name, "' does not exist."))
   }
 
   if (!is.null(basin_id))
     if (is.null(data[[basin_id]]))
-      stop(paste0("Column name '", basin_id,"' does not exist."))
+      stop(paste0("Column name '", basin_id, "' does not exist."))
 
   if (!is.null(subc_id))
     if (is.null(data[[subc_id]]))
-      stop(paste0("Column name '", subc_id,"' does not exist."))
+      stop(paste0("Column name '", subc_id, "' does not exist."))
+
+  # Check site_id for duplicated IDs
+  if (length(unique(data[[site_id]])) != length(data[[site_id]]))
+    stop(paste0("Column '", site_id, "' has rows with duplicated IDs."))
 
 
    # Check if paths exists
-  for(path in c(basin_path, subc_path, stream_path)) {
+  for (path in c(basin_path, subc_path, stream_path)) {
    if (!file.exists(path))
      stop(paste0("File path: ", path, " does not exist."))
   }
 
   # Check if basin_path and subc_path ends with .tif
-  for(path in c(basin_path, subc_path)) {
+  for (path in c(basin_path, subc_path)) {
     if (!endsWith(path, ".tif"))
       stop(paste0("File path: ", path, " does not end with .tif"))
   }
@@ -90,9 +159,13 @@ snap_to_subc_segment <- function(data, lon, lat, site_id, basin_id = NULL,
     stop(paste0("File path: ", stream_path, " does not end with .gpkg"))
 
   # Check if value of cores numeric
-  #if (!is.integer(cores))
-  #  stop("cores: Value has to be integer.")
-  # Add here: Check if cpus are available.
+  if (!is.numeric(cores))
+    stop("cores: Value has to be numeric.")
+
+  # Check if cpus are available.
+  if (cores >= detectCores()) {
+    stop("Number of cores set is higher than number of available cores.")
+  }
 
   # Check if quiet is logical
   if (!is.logical(quiet))
@@ -106,8 +179,7 @@ snap_to_subc_segment <- function(data, lon, lat, site_id, basin_id = NULL,
                                   subcatchment_path = subc_path,
                                   basin_path = basin_path, quiet = quiet)
     # Join with data and select columns needed for the bash script
-    ids <- data %>%
-     left_join(., subc_basin_ids, by = c(lon, lat)) %>%
+    ids <- left_join(data, subc_basin_ids, by = c(lon, lat)) %>%
       select(matches(c(site_id, lon, lat)), basin_id, subcatchment_id)
 
   } else if (is.null(basin_id) && !is.null(subc_id)) {
@@ -116,9 +188,8 @@ snap_to_subc_segment <- function(data, lon, lat, site_id, basin_id = NULL,
                              subcatchment_path = NULL,
                              basin_path = basin_path, quiet = quiet)
     # Join with data and select columns needed for the bash script
-    ids <- data %>%
-      left_join(., subc_basin_ids, by = c(lon, lat)) %>%
-      select(matches(c(site_id, lon, lat)), basin_id, matches(subc_id) )
+    ids <- left_join(data, subc_basin_ids, by = c(lon, lat)) %>%
+      select(matches(c(site_id, lon, lat)), basin_id, matches(subc_id))
 
 
   } else if (!is.null(basin_id) && is.null(subc_id)) {
@@ -139,7 +210,7 @@ snap_to_subc_segment <- function(data, lon, lat, site_id, basin_id = NULL,
 
   # Create random string to attach to the file name of the temporary
   # output coordinates and input ids file
-  rand_string <- stri_rand_strings(n=1, length=8, pattern="[A-Za-z0-9]")
+  rand_string <- stri_rand_strings(n = 1, length = 8, pattern = "[A-Za-z0-9]")
   # Export taxon point ids
   ids_tmp_path <- paste0(tempdir(), "/ids_", rand_string, ".csv")
   fwrite(ids, ids_tmp_path, col.names = TRUE,
@@ -150,7 +221,7 @@ snap_to_subc_segment <- function(data, lon, lat, site_id, basin_id = NULL,
   # Make bash scripts executable
   make_sh_exec()
 
-  if (system == "linux" || system == "osx"){
+  if (system == "linux" || system == "osx") {
 
     processx::run(system.file("sh", "snap_to_subc_segment.sh",
                     package = "hydrographr"),
@@ -180,7 +251,8 @@ snap_to_subc_segment <- function(data, lon, lat, site_id, basin_id = NULL,
                  wsl_snap_tmp_path, wsl_tmp_path, wsl_sh_file),
         echo = !quiet)
   }
-  snapped_coord <- fread(paste0(tempdir(), "/snapped_points", rand_string, ".csv"),
+  snapped_coord <- fread(paste0(tempdir(), "/snapped_points",
+                                rand_string, ".csv"),
                          keepLeadingZeros = TRUE, header = TRUE, sep = ",")
 
   # Remove files in the tmp folder
