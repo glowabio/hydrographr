@@ -4,7 +4,11 @@
 \alias{download_test_data}
 \title{Downloads the test data for the Hydrography90m dataset}
 \usage{
+<<<<<<< HEAD
 download_test_data(download_path = ".")
+=======
+download_test_data(download_path = "./hydrography90m_test_data")
+>>>>>>> dev_download_tiles
 }
 \arguments{
 \item{download_path}{The path where the files will be downloaded}
@@ -19,7 +23,11 @@ The test data is available at https://drive.google.com/file/d/1kYNWXmtVm6X7MZLIS
 # Download the test data to the current working directory
 download_test_data()
 
+<<<<<<< HEAD
 # Download the data to a specific directory
+=======
+# Download the data to a specific (existing) directory
+>>>>>>> dev_download_tiles
 download_test_data("path/to/your/directory")
 }
 \author{

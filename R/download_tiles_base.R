@@ -50,7 +50,7 @@ download_tiles_base <- function(variable, filetype = "tif",
   gdrive_path <- "https://drive.google.com/uc?export=download&id="
 
   # Download from Nimbus
-  if (server_path == nimbus_path) {
+  if (server_path == nimbus_path & varname!="cti_ovr.tif") {
 
     print(varname)
     download.file(paste0(nimbus_path, gsub("/", "%2F", file_path)),
@@ -59,7 +59,7 @@ download_tiles_base <- function(variable, filetype = "tif",
   }
 
   # Download from GDrive
-  if (server_path == gdrive_path) {
+  if (server_path == gdrive_path | varname=="cti_ovr.tif") {
 
     # Get GDrive file id from the lookup table
     file_id <- file_size_table_sep[varname_tile == varname, ]$file_id
