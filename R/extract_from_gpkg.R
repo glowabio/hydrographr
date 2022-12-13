@@ -13,11 +13,11 @@
 #' Variable names should remain intact in file names, even after prior file processing,
 #' i.e., order_vect_point should appear in the file name.
 #' The files should be cropped to the extent of the sub-catchment layer
+#' @param n_cores Numeric. Number of cores for parallelization
 #' @importFrom data.table fread fwrite
 #' @importFrom processx run
-#' @importFrom parallel detectCores makeCluster stopCluster
-#' @importFrom doParallel registerDoParallel
-#' @importFrom foreach %dopar%
+#' @importFrom rlang is_missing
+#' @importFrom parallel detectCores
 #' @importFrom stringr str_c
 #' @import dplyr
 #' @author Afroditi Grigoropoulou Jaime Garcia Marquez
@@ -25,7 +25,7 @@
 #'
 
 extract_from_gpkg <- function(data_dir, out_path = NULL, subc_ids,
-                               subc_layer, variables) {
+                               subc_layer, variables, n_cores = NULL) {
 
   # Introductory steps
 
@@ -57,51 +57,51 @@ extract_from_gpkg <- function(data_dir, out_path = NULL, subc_ids,
 
   }
 
+  # Setting up parallelization if n_cores is not provided
+  if (is.null(n_cores)) {
 
-  # Setting up parallelization
-  #  Detect number of available cores
-  n_cores <- detectCores() - 1
+    #  Detect number of available cores
+    n_cores <- detectCores() - 1
 
-  # Create the cluster
-  my_cluster <- makeCluster(n_cores, type = "PSOCK")
+  }
 
-  # Register it to be used by %dopar%
-  registerDoParallel(cl = my_cluster)
 
-  # Run the zonal statistics function in a foreach loop
-  var_table <- NULL
-  var_table <- foreach(
-    ivar = variables,
-    .combine = "cbind",
-    .packages = c("data.table", "dplyr", "processx")
-  ) %dopar% {
+    # Get the variable names
+    varnames <- gsub("gpkg", variables)
 
-    # Get the variable name
-    varname <- gsub("gpkg", ivar)
+    # Format subc_ids vector so that it can be read
+    # as an array in the bash script
+    variables_array <- paste(unique(variables), collapse = " ")
 
-    # Delete file if it exists
-    if (file.exists(paste0(data_dir, "/tmp/stats_",
-                           varname, ".csv"))) {
-      file.remove(paste0(data_dir, "/tmp/stats_",
-                         varname, ".csv"))
+
+    # Delete output files if they exist
+    for (varname in varnames) {
+
+      if (file.exists(paste0(data_dir, "/tmp/r_univar/stats_",
+                             varname, ".csv"))) {
+        file.remove(paste0(data_dir, "/tmp/r_univar/stats_",
+                           varname, ".csv"))
+      }
     }
 
 
-    # Call the external .sh script extract_zonal_stat()
+    # Call the external .sh script extract_from_gpkg.sh
     # containing the grass functions
     run(system.file("sh", "extract_from_gpkg.sh",
                     package = "hydrographr"),
-        args = c(data_dir, subc_ids, subc_layer, ivar, calc_all),
+        args = c(data_dir, subc_ids, subc_layer, variables_array, calc_all, n_cores),
         echo = FALSE)$stdout
 
-    print(varname)
+    out_filenames <- list.files(paste0(data_dir, "/tmp/r_univar/"),
+                                pattern = "stats_.*.csv", full.names = TRUE)
 
-    # Read in the resulting tables and sort them by subc_id,
-    # to later join them using cbind
-    var_table <- fread(paste0(data_dir,"/tmp/stats_",
-                              varname, ".csv")) %>% arrange(subc_id)
+    out_files <- lapply(out_filenames, fread)
 
-  }
+    var_table <- setDT(
+      unlist(out_files, recursive = FALSE),
+      check.names = TRUE
+    )[]
+
 
   # Write out table if requested
   if(!is.null(out_path)) {
@@ -109,13 +109,11 @@ extract_from_gpkg <- function(data_dir, out_path = NULL, subc_ids,
            row.names = FALSE, quote = FALSE, col.names = TRUE)
   }
 
-  # Return table
-  return(var_table)
-
-  # Stop cluster
-  stopCluster(cl = my_cluster)
 
   # Delete temporary output directory
   unlink(paste0(data_dir, "/tmp/"), recursive = TRUE)
+
+  # Return table
+  return(var_table)
 
 }
