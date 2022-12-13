@@ -10,6 +10,11 @@
 #' @param download_path The path where the files will be downloaded
 #' @importFrom tidyr separate
 #' @importFrom stringr str_split_fixed str_extract
+#' @references Amatulli G., Garcia Marquez J., Sethi T., Kiesel J.,
+#' Grigoropoulou A., Üblacker M., Shen L. & Domisch S. (2022-08-09 )
+#' Hydrography90m: A new high-resolution global hydrographic dataset.
+#' IGB Leibniz-Institute of Freshwater Ecology and Inland Fisheries.
+#' dataset. https://doi.org/10.18728/igb-fred-762.1
 #' @export
 #'
 
