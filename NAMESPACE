@@ -47,6 +47,7 @@ importFrom(doParallel,registerDoParallel)
 importFrom(dplyr,mutate)
 importFrom(dplyr,select)
 importFrom(foreach,"%dopar%")
+<<<<<<< HEAD
 importFrom(future,multicore)
 importFrom(future,multisession)
 importFrom(future,plan)
@@ -62,6 +63,9 @@ importFrom(igraph,is_directed)
 importFrom(igraph,subcomponent)
 importFrom(igraph,subgraph)
 importFrom(memuse,Sys.meminfo)
+=======
+importFrom(foreach,foreach)
+>>>>>>> dev_extract_zonal_stat
 importFrom(parallel,detectCores)
 importFrom(parallel,makeCluster)
 importFrom(parallel,stopCluster)
@@ -73,6 +77,7 @@ importFrom(stringi,stri_replace_all_fixed)
 importFrom(stringi,stri_replace_first_fixed)
 <<<<<<< HEAD
 importFrom(stringr,str_c)
+<<<<<<< HEAD
 importFrom(stringr,str_extract)
 importFrom(stringr,str_split_fixed)
 importFrom(terra,ext)
@@ -83,3 +88,6 @@ importFrom(tidyr,separate)
 >>>>>>> dev_download_test_data
 =======
 >>>>>>> dev_get_tile_id
+=======
+importFrom(stringr,str_split)
+>>>>>>> dev_extract_zonal_stat
