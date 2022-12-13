@@ -152,5 +152,7 @@ or \"n\" if you'd rather not to, and then press Enter \n"))
         )
       }
     }
+    cat("Please cite the Hydrography90m publication:\n
+        Amatulli, G., Garcia Marquez, J., Sethi, T., Kiesel, J., Grigoropoulou, A., Üblacker, M. M., Shen, L. Q., and Domisch, S.: Hydrography90m: a new high-resolution global hydrographic dataset, Earth Syst. Sci. Data, 14, 4525–4550, https://doi.org/10.5194/essd-14-4525-2022, 2022.")
   }
 }
