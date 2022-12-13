@@ -40,3 +40,9 @@ The files should be cropped to the extent of the sub-catchment layer}
 Calculate zonal statistics based on environmental variable raster .tif layers.
 #'
 }
+\seealso{
+set_no_data
+}
+\author{
+Afroditi Grigoropoulou Jaime Garcia Marquez
+}

@@ -4,7 +4,14 @@
 \alias{extract_from_gpkg}
 \title{Extract values from the stream order .gpkg files.}
 \usage{
-extract_from_gpkg(data_dir, out_path = NULL, subc_ids, subc_layer, variables)
+extract_from_gpkg(
+  data_dir,
+  out_path = NULL,
+  subc_ids,
+  subc_layer,
+  variables,
+  n_cores = NULL
+)
 }
 \arguments{
 \item{data_dir}{Character. Path to the directory containing all input data}
@@ -24,6 +31,8 @@ by sub setting the resulting data.frame}
 Variable names should remain intact in file names, even after prior file processing,
 i.e., order_vect_point should appear in the file name.
 The files should be cropped to the extent of the sub-catchment layer}
+
+\item{n_cores}{Numeric. Number of cores for parallelization}
 }
 \description{
 Extract values from the stream order .gpkg files.
