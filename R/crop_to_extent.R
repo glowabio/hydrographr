@@ -46,7 +46,7 @@ crop_to_extent <- function(raster_path, vector_path = NULL, bound_box = NULL,
         # Call external gdalwarp command from GDAL library. Cut through
         # the border line option
         cat("Cropping...\n")
-        run(system.file("sh", "crop_to_extent_cl.sh",
+        processx::run(system.file("sh", "crop_to_extent_cl.sh",
                         package = "hydrographr"),
             args = c(raster_path, vector_path, output_path),
             echo = FALSE)
@@ -65,10 +65,10 @@ crop_to_extent <- function(raster_path, vector_path = NULL, bound_box = NULL,
           xmax <- bb[2]
           ymax <- bb[4]
         }
-        # Call external gdalwarp command from GDAL library. Cut through a polygon
-        # extent
+        # Call external gdalwarp command from GDAL library.
+        # Cut through a polygon extent
         cat("Cropping...\n")
-        run(system.file("sh", "crop_to_extent_bb.sh",
+        processx::run(system.file("sh", "crop_to_extent_bb.sh",
                         package = "hydrographr"),
             args = c(raster_path, xmin, ymin,
                      xmax, ymax, output_path),
@@ -90,7 +90,7 @@ crop_to_extent <- function(raster_path, vector_path = NULL, bound_box = NULL,
       if (!is.null(vector_path)){
         # Call external gdalwarp command from GDAL library
         cat("Cropping...\n")
-        run(system.file("bat", "crop_to_extent_cl.bat",
+        processx::run(system.file("bat", "crop_to_extent_cl.bat",
                         package = "hydrographr"),
             args = c(wsl_raster_path, wsl_vector_path, wsl_output_path,
                      wsl_sh_cl_file),
@@ -110,10 +110,11 @@ crop_to_extent <- function(raster_path, vector_path = NULL, bound_box = NULL,
           xmax <- bb[2]
           ymax <- bb[4]
         }
-        # Call external gdalwarp command from GDAL library. Cut through a polygon
-        # extent
+        # Call external gdalwarp command from GDAL library.
+        # Cut through a polygon extent
+
         cat("Cropping...\n")
-        run(system.file("bat", "crop_to_extent_bb.bat",
+        processx::run(system.file("bat", "crop_to_extent_bb.bat",
                         package = "hydrographr"),
             args = c(wsl_raster_path, xmin, ymin,
                      xmax, ymax, wsl_output_path, wsl_sh_bb_file),
@@ -131,9 +132,3 @@ crop_to_extent <- function(raster_path, vector_path = NULL, bound_box = NULL,
     }
   }
 }
-
-
-
-
-
-

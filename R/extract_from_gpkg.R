@@ -4,13 +4,17 @@
 #' @param out_path Character. Full path of the output file.
 #' If not NULL, the output data.frame is exported as a csv in the given path
 #' @param subc_ids Vector of sub-catchment ids or "all".
-#' If "all", the gpkg values are extracted for all the segments of the given gpkg layer.
+#' If "all", the gpkg values are extracted for all the segments
+#' of the given gpkg layer.
 #' The stream segment ids are the same as the sub-catchment ids.
-#' A vector of the sub-catchment ids can be acquired from the extract_ids() function,
+#' A vector of the sub-catchment ids can be acquired
+#' from the extract_ids() function,
 #' by sub setting the resulting data.frame
 #' @param subc_layer Character. Full path to the sub-catchment ID .tif layer
-#' @param variables Character vector. Variable file names, e.g. order_vect_point_h18v04.gpkg.
-#' Variable names should remain intact in file names, even after prior file processing,
+#' @param variables Character vector. Variable file names,
+#' e.g. order_vect_point_h18v04.gpkg.
+#' Variable names should remain intact in file names,
+#' even after prior file processing,
 #' i.e., order_vect_point should appear in the file name.
 #' The files should be cropped to the extent of the sub-catchment layer
 #' @param n_cores Numeric. Number of cores for parallelization
@@ -48,7 +52,7 @@ extract_from_gpkg <- function(data_dir, out_path = NULL, subc_ids,
     calc_all <- 0
     reclass <- rbind.data.frame(data.frame(str_c(subc_ids, " = ", 1)),
                                 "* = NULL")
-    fwrite(reclass, paste0(data_dir,"/tmp/reclass_rules.txt"), sep = "\t",
+    fwrite(reclass, paste0(data_dir, "/tmp/reclass_rules.txt"), sep = "\t",
            row.names = FALSE, quote = FALSE, col.names = FALSE)
 
     # Format subc_ids vector so that it can be read
@@ -89,7 +93,8 @@ extract_from_gpkg <- function(data_dir, out_path = NULL, subc_ids,
     # containing the grass functions
     run(system.file("sh", "extract_from_gpkg.sh",
                     package = "hydrographr"),
-        args = c(data_dir, subc_ids, subc_layer, variables_array, calc_all, n_cores),
+        args = c(data_dir, subc_ids, subc_layer,
+        variables_array, calc_all, n_cores),
         echo = FALSE)$stdout
 
     out_filenames <- list.files(paste0(data_dir, "/tmp/r_univar/"),

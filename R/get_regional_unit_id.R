@@ -1,5 +1,6 @@
-
-#' Identifies the ids of the regional units in which the given points are located. Input is a point data frame.
+#' Identifies the ids of the regional units
+#' in which the given points are located.
+#' Input is a point data frame.
 #'
 #' @param data data.frame with the lat lon columns
 #' @param lon Name of the longitude column as character string
@@ -47,15 +48,8 @@ get_regional_unit_id <- function(data, lon, lat) {
   data_reg_unit_ids <- fread(paste0(tempdir(), "/reg_unit_ids.txt"),
                              keepLeadingZeros = TRUE, header = TRUE, sep = " ")
 
-  # # Remove all files in the tmp folder
-  # unlink(paste0(tempdir(), "/*"))
 
   # Return vector of regional unit ids
-  return(data_reg_unit_ids$reg_unit_id)
-
+  data_reg_unit_ids$reg_unit_id
 
 }
-
-
-
-

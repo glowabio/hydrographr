@@ -1,12 +1,15 @@
 #' @title merge_tiles
 
-#' @description Merge multiple raster or spatial vector objects from disk 
+#' @description Merge multiple raster or spatial vector objects from disk
 #' to form a new raster or spatial vector object with a larger spatial extent.
-#' At least a raster .tif or spatial vector geopackage file must be provided. 
-#' If rraster`_`read = TRUE (default), the outputs are a .tif (saved under output`_`path) and a SpatRaster (terra package) object, 
-#' otherwise if rraster`_`read = FALSE, the .tif file is the only output. 
-#' If rvector`_`read = TRUE, the outputs are a .gpkg (saved under output`_`path) and a SpatVector (terra package) object, 
-#' otherwise if rvector`_`read = FALSE (default), the .tif file is the only output
+#' At least a raster .tif or spatial vector geopackage file must be provided.
+#' If rraster`_`read = TRUE (default), the outputs are a .tif
+#' (saved under output`_`path) and a SpatRaster (terra package) object,
+#' otherwise if rraster`_`read = FALSE, the .tif file is the only output.
+#' If rvector`_`read = TRUE, the outputs are a .gpkg (saved under output`_`path)
+#' and a SpatVector (terra package) object,
+#' otherwise if rvector`_`read = FALSE (default),
+#' the .tif file is the only output
 
 #' @param tile_path Path to raster tile or spatial vector
 #' @param output_path Path to write the output
@@ -23,20 +26,22 @@
 #' @return A .tif raster file or spatial vector object
 #'
 
-merge_tiles <- function(tile_path, output_path, rraster_read = TRUE, rvector_read = FALSE) {
-	if (missing(tile_path) || is.na(tile_path)) {
-    tile_path <- "NOT_ASSIGNED" 
+merge_tiles <- function(tile_path, output_path,
+rraster_read = TRUE, rvector_read = FALSE) {
+
+  if (missing(tile_path) || is.na(tile_path)) {
+    tile_path <- "NOT_ASSIGNED"
     }
   if (missing(output_path) || is.na(output_path)) {
-    output_path <- "NOT_ASSIGNED" 
+    output_path <- "NOT_ASSIGNED"
     } else {
       # Check operating system
       system <- get_os()
       if (system == "linux") {
- 	    merge_tiles <- run(system.file("sh", "merge_tiles.sh",
-                           package = "hydrographr"),
-                   args = c(tile_path, output_path),
-                   echo = FALSE)
+        merge_tiles <- run(system.file("sh", "merge_tiles.sh",
+                            package = "hydrographr"),
+                    args = c(tile_path, output_path),
+                    echo = FALSE)
 
        } else if (system == "windows") {
        # Check if WSL and Ubuntu are installed
@@ -55,20 +60,19 @@ merge_tiles <- function(tile_path, output_path, rraster_read = TRUE, rvector_rea
        }
     }
 
- 	if (rraster_read == TRUE) {
+  if (rraster_read == TRUE) {
       # Print message
       cat("Merge saved under: ", output_path)
       # Read merged .tif layer
       merged_tiles <- rast(paste0(output_path, "/", "basin.tif"))
 
       return(merged_tiles)
-    }
-    
-  else if (rvector_read == TRUE) {
+    } else if (rvector_read == TRUE) {
+
       # Print message
       cat("Merge saved under: ", output_path)
       # Read merged vector layer
-      merged_tiles <- vect(paste0(output_path, "/", "basin_dissolved.gpkg")) 
+      merged_tiles <- vect(paste0(output_path, "/", "basin_dissolved.gpkg"))
 
       return(merged_tiles)
 

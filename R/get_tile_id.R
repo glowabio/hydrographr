@@ -1,5 +1,6 @@
 
-#' Identifies the ids of the tiles in which the given points are located. Input is a point data frame.
+#' Identifies the ids of the tiles in which the given points are located.
+#' Input is a point data frame.
 #' @param data data.frame with the lat lon columns
 #' @param lon Name of the longitude column
 #' @param lat Name of the latitude column
@@ -33,5 +34,3 @@ get_tile_id <- function(data, lon, lat) {
 
 
 }
-
-

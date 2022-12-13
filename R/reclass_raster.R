@@ -8,12 +8,13 @@
 #' @param rast_val Column name of present integer raster values as character
 #' string.
 #' @param new_val Column name of new raster integer values as character string.
-#' @param rast_path Full path to the integer input raster .tif layer. If the input
-#' raster layer has floating point values, you must multiply the input data
+#' @param rast_path Full path to the integer input raster .tif layer.
+#' If the input raster layer has floating point values,
+#' you should multiply the input data
 #' by some factor to achieve integer values, otherwise the GRASS GIS r.reclass
 #' will round the raster values down to the next integer.
-#' @param recl_path Full path of the output .tif layer of the reclassified raster
-#' file.
+#' @param recl_path Full path of the output .tif layer
+#' of the reclassified raster file.
 #' @param read If TRUE the reclassified raster .tif layer gets read into R.
 #' TRUE is set by default.
 #' @param nodata Nodata value of the new .tif layer. The default value is -9999.
@@ -59,15 +60,20 @@ reclass_raster <- function(data, rast_val, new_val, rast_path,
 
   # Check if rast_val/new_val column names exist
   if (is.null(data[[rast_val]]))
-    stop(paste0("rast_val: Column name '",rast_val ,"' does not exist."))
+    stop(paste0("rast_val: Column name '", rast_val,
+    "' does not exist."))
   if (is.null(data[[new_val]]))
-    stop(paste0("new_val: Column name '",new_val ,"' does not exist."))
+    stop(paste0("new_val: Column name '", new_val,
+    "' does not exist."))
 
   # Check if values of the rast_val/new_val columns are numeric
   if (!is.integer(data[[rast_val]]))
-    stop(paste0("rast_val: Values of column ",rast_val , " have to be integers."))
+    stop(
+      paste0("rast_val: Values of column ", rast_val,
+      " have to be integers."))
   if (!is.integer(data[[new_val]]))
-    stop(paste0("new_val: Values of column ",new_val , " have to be integers."))
+    stop(paste0("new_val: Values of column ", new_val,
+    " have to be integers."))
 
   # Check if rast_path is defined
   if (missing(rast_path))
@@ -75,7 +81,7 @@ reclass_raster <- function(data, rast_val, new_val, rast_path,
 
   # Check if rast_path and exists
   if (!file.exists(rast_path))
-    stop(paste0("rast_path: ",rast_path , " does not exist."))
+    stop(paste0("rast_path: ", rast_path, " does not exist."))
 
   # Check if rast_path ends and recl_path with .tif
   if (!endsWith(rast_path, ".tif"))

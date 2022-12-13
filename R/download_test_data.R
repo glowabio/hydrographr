@@ -1,8 +1,12 @@
 #' Downloads the test data for the Hydrography90m dataset
 #'
-#' The test data contains all Hydrography90m and species point observation data for a small geographic extent to test the functions.
+#' The test data contains all Hydrography90m and species point observation data
+#' for a small geographic extent to test the functions.
 #'
-#' The test data is available at https://drive.google.com/file/d/1kYNWXmtVm6X7MZLISOePGpvxB1pk1scD/view?usp=share_link and can be automatically downloaded and unzipped with this function to a desired path.
+#' The test data is available at
+#' https://drive.google.com/file/d/1kYNWXmtVm6X7MZLISOePGpvxB1pk1scD/view?usp=share_link
+#' and can be automatically downloaded and unzipped
+#' with this function to a desired path.
 #'
 #' @param download_path The path where the files will be downloaded
 #' @author Afroditi Grigoropoulou
@@ -30,18 +34,21 @@ download_test_data <- function(download_path = ".") {
          dir.create(paste0(download_path, "/hydrography90m_test_data")), FALSE)
 
   download.file(paste0(gdrive_path, file_id, "&confirm=t"),
-                destfile = paste0(download_path, "/hydrography90m_test_data.zip"), mode = "wb")
+                destfile = paste0(
+                  download_path, "/hydrography90m_test_data.zip"),
+                  mode = "wb")
 
   # Unzip the data
-  unzip(paste0(download_path, "/hydrography90m_test_data.zip"),  overwrite = T,
+  unzip(paste0(download_path, "/hydrography90m_test_data.zip"),
+  overwrite = TRUE,
         exdir = paste0(download_path, "/hydrography90m_test_data"),
-        unzip=getOption("unzip"))
+        unzip = getOption("unzip"))
 
   # remove the zip file
   unlink(paste0(download_path, "/hydrography90m_test_data.zip"))
 
   # Report
-  cat("Data downloaded and unzipped to ", download_path,"/hydrography90m_test_data\n", sep = "")
+  cat("Data downloaded and unzipped to ",
+  download_path, "/hydrography90m_test_data\n", sep = "")
 
 }
-

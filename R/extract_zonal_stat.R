@@ -1,4 +1,5 @@
-#' Calculate zonal statistics based on environmental variable raster .tif layers.
+#' Calculate zonal statistics based on
+#' environmental variable raster .tif layers.
 #' #'
 #' @param data_dir Character. Path to the directory containing all input data
 #' @param out_path Character. Full path of the output file.
@@ -49,7 +50,7 @@ extract_zonal_stat <- function(data_dir, out_path = NULL, subc_ids,
     calc_all <- 0
     reclass <- rbind.data.frame(data.frame(str_c(subc_ids, " = ", 1)),
                                 "* = NULL")
-    fwrite(reclass, paste0(data_dir,"/tmp/reclass_rules.txt"), sep = "\t",
+    fwrite(reclass, paste0(data_dir, "/tmp/reclass_rules.txt"), sep = "\t",
            row.names = FALSE, quote = FALSE, col.names = FALSE)
 
     # Format subc_ids vector so that it can be read
@@ -75,7 +76,7 @@ extract_zonal_stat <- function(data_dir, out_path = NULL, subc_ids,
 
 
   # Call the external .sh script report_no_data()
-  reports <- run(system.file("sh","report_no_data.sh",
+  reports <- run(system.file("sh", "report_no_data.sh",
                              package = "hydrographr"),
                  args = c(data_dir, variables_array, n_cores),
                  echo = FALSE)$stdout
@@ -99,7 +100,7 @@ extract_zonal_stat <- function(data_dir, out_path = NULL, subc_ids,
 
   # Call the external .sh script extract_zonal_stat()
   # containing the grass functions
-  run(system.file("sh","extract_zonal_stat.sh",
+  run(system.file("sh", "extract_zonal_stat.sh",
                   package = "hydrographr"),
       args = c(data_dir, subc_ids, subc_layer,
                variables_array, calc_all, n_cores),
