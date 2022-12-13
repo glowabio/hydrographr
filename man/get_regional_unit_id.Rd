@@ -2,17 +2,32 @@
 % Please edit documentation in R/get_regional_unit_id.R
 \name{get_regional_unit_id}
 \alias{get_regional_unit_id}
+<<<<<<< HEAD
 \title{Identifies the ids of the regional units in which the given points are located. Input is a point data frame.}
 \usage{
 get_regional_unit_id(data, lon, lat, quiet = TRUE)
+=======
+\title{Adds sub-catchment and/or basin IDs to a dataframe of points}
+\usage{
+get_regional_unit_id(data, lon, lat)
+>>>>>>> dev_get_tile_id
 }
 \arguments{
 \item{data}{data.frame with the lat lon columns}
 
+<<<<<<< HEAD
 \item{lon}{Name of the longitude column as character string}
 
 \item{lat}{Name of the latitude column as character string}
 }
 \description{
 Identifies the ids of the regional units in which the given points are located. Input is a point data frame.
+=======
+\item{lon}{Name of the longitude column}
+
+\item{lat}{Name of the latitude column}
+}
+\description{
+Adds sub-catchment and/or basin IDs to a dataframe of points
+>>>>>>> dev_get_tile_id
 }
