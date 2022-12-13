@@ -12,7 +12,6 @@
 #' @export
 #'
 
-
 check_tiles_filesize <- function(variable, filetype = "tif",
                                  tile_id = NULL, reg_unit_id = NULL,
                                  global = FALSE, valid_varnames, valid_tile_ids,
