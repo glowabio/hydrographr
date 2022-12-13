@@ -9,7 +9,8 @@
 #' downstream or all connected segments will be returned.
 #'
 #' @param g A directed graph (igraph object).
-#' @param segment_id Optional. The stream segment or sub-catchments IDs for which
+#' @param segment_id Optional.
+#' The stream segment or sub-catchments IDs for which
 #' to delineate the upstream drainage area. Can be a single ID or a vector of
 #' multiple IDs (c(ID1, ID2, ID3, ...).
 #' If empty, then outlets will be used as segment IDs
@@ -90,7 +91,7 @@ mode = NULL, as_graph = FALSE, n_cores = 1, maxsize = 1500) {
     "The segment_id must be a numeric vector.")
 
   if (hasArg(n_cores)) {
-  if (length(segment_id) >1 && n_cores == 0)  stop(
+  if (length(segment_id) > 1 && n_cores == 0)  stop(
     "You have specified multiple segments but zero workers.
     Please specify at least n_cores=1,
      or leave it empty to allow enable the automatic setup.")
@@ -106,17 +107,17 @@ mode = NULL, as_graph = FALSE, n_cores = 1, maxsize = 1500) {
   options(scipen = 999)
 
   # Use the outlets as the segment_ids?
-  if(outlet == TRUE) {
+  if (outlet == TRUE) {
   cat("Using outlets as (additional) segment_ids...\n")
     # Identify outlets
     # Which vertices are connected to only one inflowing stream reach?
     # The Hydrograhy90m outlets are coded as "-1"
     outlet <- which(degree(g, v = V(g), mode = "out") == 0, useNames = TRUE)
     # Stop if no outlets found.
-    if(length(outlet) == 0) stop("No outlets found.")
+    if (length(outlet) == 0) stop("No outlets found.")
 
     # If no segment_ids provided, then use the outlets as the segment_ids
-    if(missing(segment_id) & length(outlet) >= 1) {
+    if (missing(segment_id) && length(outlet) >= 1) {
       segment_id <-  as.numeric(as.character(names(outlet)))
         } else if (length(segment_id) >= 1 && length(outlet) >= 1) {
         # If segment_id and outlets are specified, take both
@@ -128,11 +129,11 @@ mode = NULL, as_graph = FALSE, n_cores = 1, maxsize = 1500) {
   segment_id <- segment_id[!duplicated(segment_id)]
 
   # Set up parallel backend if multiple segments
-  if(length(segment_id) > 1) {
+  if (length(segment_id) > 1) {
   cat("Setting up parallel backend...\n")
     registerDoFuture()
     # If n_cores not specified, use 1
-     if (length(segment_id) >1 && missing(n_cores)) {
+     if (length(segment_id) > 1 && missing(n_cores)) {
         # n_cores <- detectCores(logical=F)-2
         n_cores <- 1
      }
@@ -141,7 +142,7 @@ mode = NULL, as_graph = FALSE, n_cores = 1, maxsize = 1500) {
       plan(multisession, workers = n_cores)
     }
 
-    if(get_os() == "osx" || get_os() == "linux")  {
+    if (get_os() == "osx" || get_os() == "linux")  {
       plan(multicore, workers = n_cores)
     }
   }
@@ -168,7 +169,7 @@ mode = NULL, as_graph = FALSE, n_cores = 1, maxsize = 1500) {
   }
 
   # if multiple segment_ids, run in parallel
-    } else if(length(segment_id) > 1) {
+    } else if (length(segment_id) > 1) {
       cat("Delineating the catchment for",
       length(segment_id), "segments using mode=", mode, "...\n")
       segment_id <- segment_id[!duplicated(segment_id)] # remove any duplicates

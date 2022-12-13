@@ -17,7 +17,8 @@ get_catchment_graph(
 \arguments{
 \item{g}{A directed graph (igraph object).}
 
-\item{segment_id}{Optional. The stream segment or sub-catchments IDs for which
+\item{segment_id}{Optional.
+The stream segment or sub-catchments IDs for which
 to delineate the upstream drainage area. Can be a single ID or a vector of
 multiple IDs (c(ID1, ID2, ID3, ...).
 If empty, then outlets will be used as segment IDs

@@ -8,29 +8,38 @@ read_geopackage(
   filename,
   type = NULL,
   SQL_table = NULL,
-  dt = F,
-  g = F,
-  sf = F,
-  SpatVect = F
+  dt = FALSE,
+  g = FALSE,
+  sf = FALSE,
+  SpatVect = FALSE
 )
 }
 \arguments{
-\item{filename}{Name of the GeoPackage file to import, e.g. "order_vect_segment_h00v00.gpkg"}
+\item{filename}{Name of the GeoPackage file to import,
+e.g. "order_vect_segment_h00v00.gpkg"}
 
-\item{type}{Either "net" for importing a network, "catch" for sub-catchments, "basin" for drainage basins, or "outlet" for outlet points.}
+\item{type}{Either "net" for importing a network, "catch" for sub-catchments,
+"basin" for drainage basins, or "outlet" for outlet points.}
 
-\item{SQL_table}{Optional. Name of the specific data to import from the GeoPackage. This is set automatically for the Hydrography90m data, and needs to be specified for any other data.}
+\item{SQL_table}{Optional. Name of the specific data
+to import from the GeoPackage.
+This is set automatically for the Hydrography90m data,
+and needs to be specified for any other data.}
 
 \item{dt}{If TRUE, import the GeoPackage as a data.table.}
 
-\item{g}{If TRUE, import the GeoPackage as a directed graph (igraph object). Only possible for a network.}
+\item{g}{If TRUE, import the GeoPackage as a directed graph (igraph object).
+Only possible for a network.}
 
 \item{sf}{If TRUE, import the GeoPackage as a spatial dataframe (sf object).}
 
-\item{SpatVect}{If TRUE, import the GeoPackage as a SpatVecteor (terra object).}
+\item{SpatVect}{If TRUE, import the GeoPackage as a
+SpatVecteor (terra object).}
 }
 \description{
-Read a Geopackage vector file from disk either as a table (data.table), as a directed graph object (igraph), a spatial dataframe (sf) or a SpatVect object (terra).
+Read a Geopackage vector file from disk either as a table (data.table),
+as a directed graph object (igraph), a spatial dataframe (sf)
+or a SpatVect object (terra).
 }
 \examples{
 # Read the stream network as a graph
@@ -47,7 +56,6 @@ my_sf <- read_geopackage("basin_59.gpkg", type="basin", sf=T)
 
 #' # Read the basin as SpatVect object
 my_sf <- read_geopackage("basin_59.gpkg", type="basin", SpatVect=T)
-
 # Read the outlets as data.table
 my_sf <- read_geopackage("outlet_59.gpkg", type="outlet", sf=T)
 

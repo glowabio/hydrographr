@@ -109,7 +109,7 @@ extract_from_gpkg <- function(data_dir, out_path = NULL, subc_ids,
 
 
   # Write out table if requested
-  if(!is.null(out_path)) {
+  if (!is.null(out_path)) {
     fwrite(var_table, out_path, sep = ",",
            row.names = FALSE, quote = FALSE, col.names = TRUE)
   }

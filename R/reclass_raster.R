@@ -119,7 +119,7 @@ reclass_raster <- function(data, rast_val, new_val, rast_path,
                       new = data[[new_val]])
   # Create random string to attach to the file name of the temporary
   # rules .txt file
-  rand_string <- stri_rand_strings(n=1, length=8, pattern="[A-Za-z0-9]")
+  rand_string <- stri_rand_strings(n = 1, length = 8, pattern = "[A-Za-z0-9]")
   # Path to the text file with the reclassification rules
   rules_path <- paste0(tempdir(), "/reclass_rules_", rand_string, ".txt")
   # Write rules as a .txt file to the temporary folder

@@ -54,15 +54,15 @@ check_wsl <- function() {
   ubuntu <- list.files(paste0(Sys.getenv("localappdata"), "/Packages"),
                        pattern = "Ubuntu")
 
-  if (lxss == TRUE & length(ubuntu) == 0) {
+  if (lxss == TRUE && length(ubuntu) == 0) {
     stop("Ubuntu is not installed!")
   }
 
-  if (lxss == FALSE & length(ubuntu) == 1) {
+  if (lxss == FALSE && length(ubuntu) == 1) {
     stop("WSL is not installed!")
   }
 
-  if (lxss == FALSE & length(ubuntu) == 0)  {
+  if (lxss == FALSE && length(ubuntu) == 0)  {
     stop("WSL and Ubuntu are not installed!")
   }
 

@@ -53,7 +53,7 @@
 #' @export
 #'
 #'
-#' @examples 
+#' @examples
 #' # Get the upstream segment neighbours in the 5th order
 #' and report the length and source elevation
 #' for the neighbours of each input segment
@@ -132,7 +132,7 @@ segment_neighbours <- function(g, segment_id = NULL,
     cat("Setting up parallel backend...\n")
     registerDoFuture()
     # If n_cores not specified, use all-2
-    if (length(segment_id) > 1 & missing(n_cores)) {
+    if (length(segment_id) > 1 && missing(n_cores)) {
       # n_cores <- detectCores(logical=F)-2
       n_cores <- 1
     }
@@ -175,7 +175,7 @@ segment_neighbours <- function(g, segment_id = NULL,
   dt <- unique(dt) # remove any duplicates, if any
 
   # If aggregation was defined:
-  if(!missing(variable)) {
+  if (!missing(variable)) {
 
 
     cat("Attaching the attribute(s)", variable, "\n")
@@ -207,7 +207,9 @@ segment_neighbours <- function(g, segment_id = NULL,
                         by = "stream"]
       dt_agg <- dt_agg[order(-rank(stream))]
       return(dt_agg)
-    } else stop("Please provide the summary statistic for the aggregation.")
+    } else {
+      stop("Please provide the summary statistic for the aggregation.")
+    }
   }  else {
     return(dt)
   }

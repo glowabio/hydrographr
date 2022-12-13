@@ -29,20 +29,20 @@
 
 crop_to_extent <- function(raster_path, vector_path = NULL, bound_box = NULL,
                            output_path,
-                           rcrop_read=TRUE) {
+                           rcrop_read = TRUE) {
   # Check that an input path and an output path were provided
   if (missing(raster_path)) stop("Please provide an input path")
   if (missing(output_path)) stop("Please provide an output path")
   # Check that at least a cutline source or a bounding box coordinates are
   # provided
-  if (is.null(vector_path) & is.null(bound_box)){
+  if (is.null(vector_path) && is.null(bound_box)) {
     stop("Please provide at least a cutline source, a bounding box
           coordinates or an spatial object from which extract an extent")
   } else {
     # Check operating system
     system <- get_os()
     if (system == "linux") {
-      if (!is.null(vector_path)){
+      if (!is.null(vector_path)) {
         # Call external gdalwarp command from GDAL library. Cut through
         # the border line option
         cat("Cropping...\n")
@@ -53,7 +53,7 @@ crop_to_extent <- function(raster_path, vector_path = NULL, bound_box = NULL,
       } else if (!is.null(bound_box)) {
       # Check if bound_box is a vector with corner coordinate values, if FALSE
       # try to extract the values from a spatial object
-        if (is.vector(bound_box) & length(bound_box) == 4) {
+        if (is.vector(bound_box) && length(bound_box) == 4) {
           xmin <- bound_box[1]
           ymin <- bound_box[2]
           xmax <- bound_box[3]
@@ -87,7 +87,7 @@ crop_to_extent <- function(raster_path, vector_path = NULL, bound_box = NULL,
       wsl_sh_bb_file <- fix_path(
         system.file("sh", "crop_to_extent_bb.sh",
                     package = "hydrographr"))
-      if (!is.null(vector_path)){
+      if (!is.null(vector_path)) {
         # Call external gdalwarp command from GDAL library
         cat("Cropping...\n")
         processx::run(system.file("bat", "crop_to_extent_cl.bat",
@@ -98,7 +98,7 @@ crop_to_extent <- function(raster_path, vector_path = NULL, bound_box = NULL,
       } else if (!is.null(bound_box)) {
         # Check if bound_box is a vector with corner coordinate values, if FALSE
         # try to extract the values from an spatial object
-        if (is.vector(bound_box) & length(bound_box) == 4) {
+        if (is.vector(bound_box) && length(bound_box) == 4) {
           xmin <- bound_box[1]
           ymin <- bound_box[2]
           xmax <- bound_box[3]

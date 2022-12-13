@@ -34,7 +34,7 @@ extract_ids <- function(data, lon = character(0), lat = character(0),
   ids_tmp_path <- paste0(tempdir(), "/ids_", rand_string, ".txt")
 
 
-  if (system == "linux" | system == "osx") {
+  if (system == "linux" || system == "osx") {
 
     # Convert null arguments to 0 so that bash can evaluate the variables
     subc_path <- ifelse(is.null(subcatchment_path), 0, subcatchment_path)
