@@ -1,4 +1,4 @@
-#' Snaps data points to the stream segment within a sub-catchment
+#' Snaps data points to the stream segment within the sub-catchment
 #'
 #' @description
 #' Snaps data points to the stream segment of the
@@ -29,12 +29,20 @@
 #' @export
 #' '
 #' @details
-#' Add detailed description of how the function works. Mention GASS GIS.
+#' The function uses the network preparation and maintenance module of 
+#' GRASS GIS (v.net), to connect a vector lines map (stream network) with a points
+#' map (ocurrence/sampling points). After masking the stream segment and the 
+#' subcatchment where the target point is located, the connect operation snaps the
+#' point to the stream segment using a distance threshold. This threshold is 
+#' automatically calculated as the longest distance between two points 
+#' within the subcatchemnt. In this way the snapping will always take place. 
+#' This operation creates a new node on the vector line 
+#' (i.e. stream segment) from which the new snapped coordinates can be extracted.
 #'
 #' @author Jaime Garcia Marquez, Maria Üblacker
 #'
 #' @references
-#' \url{https://grass.osgeo.org/grass82/manuals/v.distance.html}
+#' \url{https://grass.osgeo.org/grass82/manuals/v.net.html}
 #'
 #' @seealso
 #' \code{\link{snap_to_network}} to snap the data points to the next stream
@@ -56,7 +64,7 @@
 #' # Define full path to the vector file of the stream network
 #' stream_vect <- paste0(tempdir(), "/hydrography90m_test_data/order_vect_59.gpkg")
 #'
-#' # ETHER
+#' # EITHER
 #' # Extract basin and sub-catchment IDs from the Hydrography90m layers beforehand
 #' hydrography90m_ids <- extract_ids(data = species_occurence,
 #'                                   lon = "longitude",
