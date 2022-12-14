@@ -1,4 +1,3 @@
-#' Snap data points to the next stream segment
 #' Snaps data/sampling points to the next stream segment within a defined radius
 #' or a minimum flow accumulation.
 #'
@@ -8,8 +7,9 @@
 #' @param lat Name of the latitude column as character string
 #' @param stream_path Full path of the stream network .tif file
 #' @param accu_path Full path of the flow accumulation .tif file. Needed if
-#' the the point should be snapped to next stream segment with a minimum flow
-#' accumulation.
+#' the point should be snapped to next stream segment with a value higher than
+#' the flow accumulation threshold. This avoids points to snap to small stream
+#' tributaries.
 #' @param calc Options "dist", "accu", or "both". Default is "dist".
 #' Defines if the points are snapped using the distance or flow accumulation.
 #' If calc is set to "both" the output will contain the new coordinates for both
@@ -23,6 +23,7 @@
 #' @importFrom dplyr select
 #' @importFrom data.table fread
 #' @importFrom processx run
+#' @author Maria Magdalena Üblacker Jaime Garcia Marquez
 #' @export
 #'
 
