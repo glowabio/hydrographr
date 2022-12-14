@@ -49,20 +49,20 @@ make_sh_exec <- function() {
 #'
 check_wsl <- function() {
   # Check if lxss folder exists under C:\Windows\System32
-  lxss <- file.exists(paste0(Sys.getenv("windir"),"/System32/lxss"))
+  lxss <- file.exists(paste0(Sys.getenv("windir"), "/System32/lxss"))
   # Check if Ubuntu exists under ~\Appdata\Local\...
   ubuntu <- list.files(paste0(Sys.getenv("localappdata"), "/Packages"),
-                       pattern ="Ubuntu")
+                       pattern = "Ubuntu")
 
-  if (lxss == TRUE & length(ubuntu) == 0) {
+  if (lxss == TRUE && length(ubuntu) == 0) {
     stop("Ubuntu is not installed!")
   }
 
-  if (lxss == FALSE & length(ubuntu) == 1) {
+  if (lxss == FALSE && length(ubuntu) == 1) {
     stop("WSL is not installed!")
   }
 
-  if (lxss == FALSE & length(ubuntu) == 0)  {
+  if (lxss == FALSE && length(ubuntu) == 0)  {
     stop("WSL and Ubuntu are not installed!")
   }
 

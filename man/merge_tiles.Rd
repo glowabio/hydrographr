@@ -21,11 +21,14 @@ FALSE is set by default and if TRUE rraster_read needs to be set to FALSE}
 A .tif raster file or spatial vector object
 }
 \description{
-Merge multiple raster or spatial vector objects from disk 
+Merge multiple raster or spatial vector objects from disk
 to form a new raster or spatial vector object with a larger spatial extent.
-At least a raster .tif or spatial vector geopackage file must be provided. 
-If rraster`_`read = TRUE (default), the outputs are a .tif (saved under output`_`path) and a SpatRaster (terra package) object, 
-otherwise if rraster`_`read = FALSE, the .tif file is the only output. 
-If rvector`_`read = TRUE, the outputs are a .gpkg (saved under output`_`path) and a SpatVector (terra package) object, 
-otherwise if rvector`_`read = FALSE (default), the .tif file is the only output
+At least a raster .tif or spatial vector geopackage file must be provided.
+If rraster`_`read = TRUE (default), the outputs are a .tif
+(saved under output`_`path) and a SpatRaster (terra package) object,
+otherwise if rraster`_`read = FALSE, the .tif file is the only output.
+If rvector`_`read = TRUE, the outputs are a .gpkg (saved under output`_`path)
+and a SpatVector (terra package) object,
+otherwise if rvector`_`read = FALSE (default),
+the .tif file is the only output
 }
