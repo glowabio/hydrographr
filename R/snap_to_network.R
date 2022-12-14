@@ -23,7 +23,7 @@
 #' default the flow accumulation value is set to 0.5.
 #' @param quiet Logical; Whether the standard output will be printed or not.
 #' @importFrom stringi stri_rand_strings
-#' @importFrom dplyr select
+#' @importFrom dplyr select left_join
 #' @importFrom data.table fread
 #' @importFrom processx run
 #' @export
@@ -56,7 +56,7 @@
 #' snapped_coordinates <- snap_to_network(data = species_occurrence,
 #'                                        lon = "longitude",
 #'                                        lat = "latitude",
-#'                                        site_id = "occurence_id",
+#'                                        site_id = "occurrence_id",
 #'                                        stream_path = stream_vect,
 #'                                        accu_path = flow_rast,
 #'                                        calc = "both",
@@ -99,6 +99,8 @@ snap_to_network <- function(data, lon, lat, site_id, stream_path,
     stop(paste0("Column name '", lon, "' does not exist."))
   if (is.null(data[[lat]]))
     stop(paste0("Column name '", lat, "' does not exist."))
+  if (is.null(data[[site_id]]))
+    stop(paste0("Column name '", site_id, "' does not exist."))
 
   # Check if values of the lon/lat columns are numeric
   if (!is.numeric(data[[lon]]))
@@ -211,7 +213,9 @@ snap_to_network <- function(data, lon, lat, site_id, stream_path,
 
   # Join with site_id
   if (!is.null(site_id)) {
-    snapped_coord <- left_join(data, snapped_coord, by = c(lon, lat))
+    coord <- data %>%
+      select(matches(c(site_id, lon, lat)))
+    snapped_coord <- left_join(coord, snapped_coord, by = c(lon, lat))
   }
 
   # Remove files in the tmp folder
