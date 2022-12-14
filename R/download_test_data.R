@@ -15,6 +15,19 @@
 #'
 #' # Download the data to a specific (existing) directory
 #' download_test_data("path/to/your/directory")
+#'
+#' @references
+#'
+#' Amatulli, G., Garcia Marquez, J., Sethi, T., Kiesel, J., Grigoropoulou, A.,
+#' Üblacker, M. M., Shen, L. Q., and Domisch, S.: Hydrography90m: a new
+#' high-resolution global hydrographic dataset, Earth Syst. Sci. Data, 14,
+#' 4525–4550, https://doi.org/10.5194/essd-14-4525-2022, 2022.")
+#'
+#' Amatulli G., Garcia Marquez J., Sethi T., Kiesel J., Grigoropoulou A.,
+#' Üblacker M., Shen L. & Domisch S. (2022-08-09 ). Hydrography90m: A new
+#' high-resolution global hydrographic dataset. IGB Leibniz-Institute of
+#' Freshwater Ecology and Inland Fisheries. dataset.
+#' https://doi.org/10.18728/igb-fred-762.1
 
 download_test_data <- function(download_path = "./hydrography90m_test_data") {
 
