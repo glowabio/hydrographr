@@ -58,28 +58,24 @@
 #' download_test_data(DATADIR)
 #'
 #' # Load stream network as a graph
-#' g <- read_geopackage(paste0(DATADIR, "/order_vect_59.gpkg"), type="net", g=T)
+#' g <- read_geopackage(paste0(DATADIR, "/order_vect_59.gpkg"), type = "net",
+#'                      g = TRUE)
 #'
 #' # Pick a random segment_id
-#' segment_id="513855877
-#'
+#' segment_id = "513855877"
 #' # Get the upstream catchment as a graph
-#' g_up <- get_catchment_graph(g, segment_id = segment_id, mode="in", outlet=F,
-#' as_graph=T, n_cores=1)
+#' g_up <- get_catchment_graph(g, segment_id = segment_id, mode = "in",
+#'                             outlet = FALSE, as_graph = TRUE, n_cores =1)
 #'
-#'# Get the downstream segments as a data.table,
-#' g_down <- get_catchment_graph(g, segment_id = segment_id, mode="out",
-#' outlet=F, as_graph=F, n_cores=1)
+#' # Get the downstream segments as a data.table,
+#' g_down <- get_catchment_graph(g, segment_id = segment_id, mode = "out",
+#'                               outlet = FALSE, as_graph = FALSE, n_cores = 1)
 #'
 #' # Get the catchments of all outlets in the study area as a graph
-#' g_all <- get_catchment_graph(g, mode="in", outlet=T, as_graph=T, n_cores=1)
+#' g_all <- get_catchment_graph(g, mode = "in", outlet = TRUE, as_graph = TRUE,
+#'                              n_cores=1)
 #'
 #' @author Sami Domisch
-
-
-
-
-
 
 
 get_catchment_graph <- function(g, segment_id = NULL, outlet = FALSE,
