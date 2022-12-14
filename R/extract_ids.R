@@ -6,7 +6,7 @@
 #' @param data Data.frame with lat/lon coordinates in WGS84.
 #' @param lon Column name of longitude coordinates as character vector.
 #' @param lat Column name of latitude coordinates as character vector.
-#' @param site_id  Column name of a unique ID  character vector; Optional
+#' @param site_id  Column name of a unique ID as character vector; Optional
 #' an ID for the point location can be defined.
 #' @param basin_path Full path to the basin ID .tif layer.
 #' @param subc_path Full path to the sub-catchment ID .tif layer.
