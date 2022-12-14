@@ -21,7 +21,7 @@ extract_ids <- function(data, lon = character(0), lat = character(0),
 
   # Create random string to attach to the file name of the temporary
   # points_dataset.txt and ids.txt file
-  rand_string <- stri_rand_strings(n=1, length=8, pattern="[A-Za-z0-9]")
+  rand_string <- stri_rand_strings(n = 1, length = 8, pattern = "[A-Za-z0-9]")
   # Select columns with lon/lat coordinates
   coord <- data %>%
     select(matches(c(lon, lat)))
@@ -34,7 +34,7 @@ extract_ids <- function(data, lon = character(0), lat = character(0),
   ids_tmp_path <- paste0(tempdir(), "/ids_", rand_string, ".txt")
 
 
-  if (system == "linux" | system == "osx"){
+  if (system == "linux" || system == "osx") {
 
     # Convert null arguments to 0 so that bash can evaluate the variables
     subc_path <- ifelse(is.null(subcatchment_path), 0, subcatchment_path)
@@ -79,4 +79,3 @@ extract_ids <- function(data, lon = character(0), lat = character(0),
   return(data_ids)
 
 }
-

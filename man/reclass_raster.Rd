@@ -2,14 +2,15 @@
 % Please edit documentation in R/reclass_raster.R
 \name{reclass_raster}
 \alias{reclass_raster}
-\title{Reclassify raster values of a raster file}
+\title{Reclassification of an integer raster layer}
 \usage{
 reclass_raster(
+  data,
   rast_val,
-  recl_val,
+  new_val,
   rast_path,
   recl_path,
-  recl_read = TRUE,
+  read = TRUE,
   nodata = -9999,
   type = "Int32",
   compress = "DEFLATE",
@@ -17,15 +18,23 @@ reclass_raster(
 )
 }
 \arguments{
-\item{rast_val}{Numeric vector of current raster values.}
+\item{data}{data.frame with the present and new raster values}
 
-\item{recl_val}{Numeric vector of reclassification values .}
+\item{rast_val}{Column name of present integer raster values as character
+string.}
 
-\item{rast_path}{Full path to raster .tif layer.}
+\item{new_val}{Column name of new raster integer values as character string.}
 
-\item{recl_path}{Full path to reclassified .tif layer = output file.}
+\item{rast_path}{Full path to the integer input raster .tif layer.
+If the input raster layer has floating point values,
+you should multiply the input data
+by some factor to achieve integer values, otherwise the GRASS GIS r.reclass
+will round the raster values down to the next integer.}
 
-\item{recl_read}{If TRUE the reclassified raster .tif layer gets read into R.
+\item{recl_path}{Full path of the output .tif layer
+of the reclassified raster file.}
+
+\item{read}{If TRUE the reclassified raster .tif layer gets read into R.
 TRUE is set by default.}
 
 \item{nodata}{Nodata value of the new .tif layer. The default value is -9999.}
@@ -36,6 +45,19 @@ CInt16, CInt32; Int32 is set by default.}
 \item{compress}{Compression type: DEFLATE or LZW; DEFLATE is set by default.}
 }
 \description{
-Reclassifies a raster file based on integer values according
-to the reclassification rules.
+Reclassifies an integer raster .tif layer using the r.reclass function of
+GRASS GIS. To reclassify the raster layer the present raster values
+and the new raster values have to be defined.
+}
+\examples{
+reclassified_raster <- reclass_raster(df, rast_val = "present_value",
+new_val = "new_value", rast_path =  "/home/user/project_folder/input.tif",
+recl_path = "home/user/project_folder/output.tif")
+
+}
+\references{
+https://grass.osgeo.org/grass82/manuals/r.reclass.html
+}
+\author{
+Maria Üblacker
 }

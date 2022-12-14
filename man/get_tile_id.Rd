@@ -2,7 +2,8 @@
 % Please edit documentation in R/get_tile_id.R
 \name{get_tile_id}
 \alias{get_tile_id}
-\title{Identifies the ids of the tiles in which the given points are located. Input is a point data frame.}
+\title{Identifies the ids of the tiles in which the given points are located.
+Input is a point data frame.}
 \usage{
 get_tile_id(data, lon, lat)
 }
@@ -14,5 +15,9 @@ get_tile_id(data, lon, lat)
 \item{lat}{Name of the latitude column}
 }
 \description{
-Identifies the ids of the tiles in which the given points are located. Input is a point data frame.
+Identifies the ids of the tiles in which the given points are located.
+Input is a point data frame.
+}
+\author{
+Afroditi Grigoropoulou
 }

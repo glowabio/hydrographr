@@ -2,9 +2,11 @@
 % Please edit documentation in R/get_regional_unit_id.R
 \name{get_regional_unit_id}
 \alias{get_regional_unit_id}
-\title{Identifies the ids of the regional units in which the given points are located. Input is a point data frame.}
+\title{Identifies the ids of the regional units
+in which the given points are located.
+Input is a point data frame.}
 \usage{
-get_regional_unit_id(data, lon, lat, quiet = TRUE)
+get_regional_unit_id(data, lon, lat)
 }
 \arguments{
 \item{data}{data.frame with the lat lon columns}
@@ -14,5 +16,7 @@ get_regional_unit_id(data, lon, lat, quiet = TRUE)
 \item{lat}{Name of the latitude column as character string}
 }
 \description{
-Identifies the ids of the regional units in which the given points are located. Input is a point data frame.
+Identifies the ids of the regional units
+in which the given points are located.
+Input is a point data frame.
 }
