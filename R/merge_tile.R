@@ -35,7 +35,7 @@
 #'
 #'
 #'
-#' @author
+#' @author Thomas Tomiczek
 #'
 
 merge_tiles <- function(tile_path, output_path,
