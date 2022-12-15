@@ -30,6 +30,14 @@
 #'
 #' @note
 #' Duplicated rows will be removed.
+#' 
+#' @details
+#'The function makes use of the r.stream.snap command available in GRASS GIS to 
+#'snap simultaneously a number of points to a stream network. A distance threshold
+#'can be specified and points will be snap to any stream segemnt within this
+#'distance radius. However, to avoid snapping to small tributaries, an 
+#'acumulation threshold can be used and the snapping occurs on stream segment 
+#'with equal or higher accumulation threshold and within the given distance radius. 
 #'
 #' @author Maria M. Üblacker, Jaime Garcia Marquez
 #'
