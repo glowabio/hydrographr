@@ -2,7 +2,14 @@
 #'
 #' For each segment, report those upstream, downstream, or up-and downstream segments that are connected to one or multiple input segments within a specified neighbour order, with the option to summarize attributes across these segments.
 #'
+<<<<<<< Updated upstream
 #' This function can also be used to create the connectivity table for Marxan by using variable="length" and attach_only=TRUE. The resulting table reports the connectivity from each segment, along with the stream length for all connected segments.
+=======
+#' This function can also be used to create the connectivity table
+#' for Marxan by using variable="length" and attach_only=TRUE.
+#' The resulting table reports the connectivity from each segment,
+#' along with the stream length for all connected segments.
+>>>>>>> Stashed changes
 #'
 #' @param g A directed graph (igraph object).
 #' @param segmentID The input segment IDs as a numerical vector for which to search the connected segments.
@@ -26,9 +33,28 @@
 #' @export
 #'
 #'
+<<<<<<< Updated upstream
 #' @examples 
 #' # Get the upstream segment neighbours in the 5th order and report the length and source elevation for the neighbours of each input segment
 #' segment_neighbours(g, segmentID=segmentID,
+=======
+#' @examples
+#' library(hydrographr)
+#'
+#' # Specify the working directory of the test data
+#' DATADIR <- "path/to/test_data"
+#'
+#' # Download the test data
+#' download_test_data(DATADIR)
+#'
+#' # Load the stream network as graph
+#' g <- read_geopackage(paste0(DATADIR, "/order_vect_59.gpkg"), type="net", g=T)
+#'
+#' # Get the upstream segment neighbours in the 5th order
+#' and report the length and source elevation
+#' for the neighbours of each input segment
+#' segment_neighbours(g, segment_id=segment_id,
+>>>>>>> Stashed changes
 #'                    order=5, mode="in", n_cores=1,
 #'                    variable=c("length", "source_elev"),
 #'                    attach_only=T)
@@ -54,6 +80,7 @@ segment_neighbours <- function(g, segmentID=NULL, variable=NULL, stat=NULL,
                                maxsize=1500) {
 
   # Check input arguments
+<<<<<<< Updated upstream
   if ( class(g) != "igraph")     stop("Input must be an igraph object. Please create the graph first.")
 
   if ( !is_directed(g)) stop("The input graph must be a directed graph.")
@@ -64,6 +91,30 @@ segment_neighbours <- function(g, segmentID=NULL, variable=NULL, stat=NULL,
 
   if(hasArg(n_cores)) {
     if (length(segmentID)>1 & n_cores==0)  stop("You have specified multiple segments but zero workers. Please specify at least n_cores=1, or leave it empty to allow an automatic setup.")
+=======
+  if (class(g) != "igraph") stop(
+    "Input must be an igraph object. Please create the graph first."
+    )
+
+  if (!is_directed(g)) stop(
+    "The input graph must be a directed graph."
+    )
+
+  if (missing(segment_id)) stop(
+    "Please provide at least one segment ID of the input graph.
+    The segment_id must be a numeric vector."
+    )
+
+  if (is.data.frame(segment_id) == TRUE) stop(
+    "The segment_id must be a numeric vector."
+    )
+
+  if (hasArg(n_cores)) {
+    if (length(segment_id) > 1 && n_cores == 0)  stop(
+      "You have specified multiple segments but zero workers.
+      Please specify at least n_cores=1,
+      or leave it empty to allow an automatic setup.")
+>>>>>>> Stashed changes
   }
 
   if (attach_only==TRUE & missing(variable)) stop("No variable specified that should be attached to the stream segments. Please provide at least one variable from the input graph.")
