@@ -2,13 +2,33 @@
 % Please edit documentation in R/merge_tile.R
 \name{merge_tiles}
 \alias{merge_tiles}
-\title{Merge raster or spatial vector tiles}
+\title{merge_tiles}
 \usage{
-merge_tiles()
+merge_tiles(tile_path, output_path, rraster_read = TRUE, rvector_read = FALSE)
 }
 \arguments{
-\item{tile_path}{Path to the raster tile or spatial vector}
+\item{tile_path}{Path to raster tile or spatial vector}
+
+\item{output_path}{Path to write the output}
+
+\item{rraster_read}{If TRUE merged raster .tif layer gets read into R.
+TRUE is set by default}
+
+\item{rvector_read}{If TRUE merged spatial vector gets read into R.
+FALSE is set by default and if TRUE rraster_read needs to be set to FALSE}
+}
+\value{
+A .tif raster file or spatial vector object
 }
 \description{
-Merge raster or spatial vector tiles
+Merge multiple raster or spatial vector objects from disk
+to form a new raster or spatial vector object with a larger spatial extent.
+At least a raster .tif or spatial vector geopackage file must be provided.
+If rraster`_`read = TRUE (default), the outputs are a .tif
+(saved under output`_`path) and a SpatRaster (terra package) object,
+otherwise if rraster`_`read = FALSE, the .tif file is the only output.
+If rvector`_`read = TRUE, the outputs are a .gpkg (saved under output`_`path)
+and a SpatVector (terra package) object,
+otherwise if rvector`_`read = FALSE (default),
+the .tif file is the only output
 }
