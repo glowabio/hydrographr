@@ -1,8 +1,9 @@
-#' Extract sub-catchment and/or basin IDs of a point location
+#' Extract sub-catchment and/or basin IDs for a point location
 #'
 #' Extracts the ID value of the basin and/or sub-catchment raster layer at a
 #' given point location.
 #'
+<<<<<<< Updated upstream
 #' @param data Data.frame with lat/lon coordinates in WGS84.
 #' @param lon Column name of longitude coordinates as character vector.
 #' @param lat Column name of latitude coordinates as character vector.
@@ -11,6 +12,17 @@
 #' @param basin_path Full path to the basin ID .tif layer.
 #' @param subc_path Full path to the sub-catchment ID .tif layer.
 #' @param quiet Whether the standard output will be printed or not.
+=======
+#' @param data A data.frame or data.table with lat/lon coordinates in WGS84.
+#' @param lon Column name of longitude coordinates as a character vector.
+#' @param lat Column name of latitude coordinates as a character vector.
+#' @param site_id  Column name of the unique ID as a character vector.
+#' Alternatively, an ID for the point location can be defined.
+#' @param basin_path Full path to the basin ID .tif layer on disk.
+#' @param subc_path Full path to the sub-catchment ID .tif layer on disk.
+#' @param quiet Whether the standard output will be printed or not (deafult
+#' is TRUE).
+>>>>>>> Stashed changes
 #'
 #' @importFrom stringi stri_rand_strings
 #' @importFrom dplyr select
@@ -20,10 +32,11 @@
 #'
 #' @details
 #' For the extraction of a value at a given point location from the basin
-#' and/or sub-catchment raster layer of the Hydrography90m the GDAL function
-#' 'gdallocationinfo' is used. The point locations have to be defined by
-#' coordinates of the WGS84 reference system, it can be used to extract any
-#' value from a given raster layer with a WGS84 projection.
+#' and/or sub-catchment raster layer of the Hydrography90m dataset, the GDAL
+#' function 'gdallocationinfo' is used. The point locations have to be defined
+#' by coordinates of the WGS84 reference system. The function can also be used
+#' to extract any value from a given raster layer with a WGS84 projection, such
+#' as e.g. environmental information that is stored in the input raster file.
 #'
 #' @note
 #' Duplicated rows will be removed.
@@ -56,8 +69,8 @@
 #'                                   subc_path = subc_rast,
 #'                                   basin_path = basin_rast)
 #'
-#' # Show head of the output table
-#' head(hydrography90m_ids)
+#' # Show the output table
+#' hydrography90m_ids
 
 
 extract_ids <- function(data, lon, lat, site_id = NULL, basin_path = NULL,
