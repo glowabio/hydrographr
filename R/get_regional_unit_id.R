@@ -1,6 +1,14 @@
+<<<<<<< Updated upstream
 #' Adds sub-catchment and/or basin IDs to a dataframe of points
+=======
+#' Identifies the IDs of the regional units within the Hydrography90m data
+#' in which the input points are located. The IDs are required to then download
+#' the data using download_tiles_base() or download_tiles().
+#' Input is a point data frame.
+>>>>>>> Stashed changes
 #'
-#' @param data data.frame with the lat lon columns
+#' @param data A data.frame or data.table with the latitude (lat) and
+#' longitude (lon) columns
 #' @param lon Name of the longitude column as character string
 #' @param lat Name of the latitude column as character string
 #' @importFrom stringi stri_rand_strings
@@ -9,6 +17,24 @@
 #' @importFrom processx run
 #' @export
 #'
+#' @examples
+#' library(hydrographr)
+#' library(data.table)
+#'
+#' # Specify the working directory of the test data
+#' DATADIR <- "path/to/test_data"
+#'
+#' # Download the test data
+#' download_test_data(DATADIR)
+#'
+#' # Read the species data
+#' species <- fread(paste0(DATADIR, "/spdata_1264942.txt"))
+#'
+#' # Get the regional unit ID
+#' my_IDs <- get_regional_unit_id(species, lon="longitude", lat="latitude")
+#'
+#'
+#' @author
 #'
 
 
