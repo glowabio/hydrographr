@@ -40,7 +40,7 @@ Next, you need to tell your system to pull down the latest list of software from
 sudo apt update
 ```
 
-Now you are ready to install  `GDAL`, `pktools` and `GRASS GIS`. Copy and paste the commands below into your console and follow the instructions to install the tools.
+Now you are ready to install`GDAL`, `GRASS GIS` and GNU `parallel`. Copy and paste the commands below into your console and follow the instructions to install the tools.
 
 **GDAL**
 
@@ -51,14 +51,14 @@ GDAL is a translator library for raster and vector geospatial data formats and c
 sudo apt install gdal-bin python3-gdal
 ```
 
-**pktools**
+<!-- **pktools** -->
 
-Pktools is a suite of command line utilities for image processing and remote sensing applications written in C++. For more information check the [pktools](https://pktools.nongnu.org/html/index.html) website.
+<!-- Pktools is a suite of command line utilities for image processing and remote sensing applications written in C++. For more information check the [pktools](https://pktools.nongnu.org/html/index.html) website. -->
 
-```{bash, eval=FALSE}
-# Install pktools
-sudo apt install pktools
-```
+<!-- ```{bash, eval=FALSE} -->
+<!-- # Install pktools -->
+<!-- sudo apt install pktools -->
+<!-- ``` -->
 
 **GRASS GIS**
 

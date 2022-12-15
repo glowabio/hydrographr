@@ -104,7 +104,7 @@ Next, you need to tell your system to pull down the latest list of software from
 sudo apt update
 ```
 
-Now you are ready to install  `GDAL`, `pktools` and `GRASS GIS`. Copy and paste the commands below into your console and follow the instructions to install the tools.
+Now you are ready to install`GDAL`, `GRASS GIS` and GNU `parallel`. Copy and paste the commands below into your console and follow the instructions to install the tools.
 
 **GDAL**
 
@@ -115,14 +115,14 @@ GDAL is a translator library for raster and vector geospatial data formats and c
 sudo apt install gdal-bin python3-gdal
 ```
 
-**pktools**
+<!-- **pktools** -->
 
-Pktools is a suite of command line utilities for image processing and remote sensing applications written in C++. For more information check the [pktools](https://pktools.nongnu.org/html/index.html) website.
+<!-- Pktools is a suite of command line utilities for image processing and remote sensing applications written in C++. For more information check the [pktools](https://pktools.nongnu.org/html/index.html) website. -->
 
-```{bash, eval=FALSE}
-# Install pktools
-sudo apt install pktools
-```
+<!-- ```{bash, eval=FALSE} -->
+<!-- # Install pktools -->
+<!-- sudo apt install pktools -->
+<!-- ``` -->
 
 **GRASS GIS**
 
@@ -146,5 +146,68 @@ $GRASSEXEC  g.extension  extension=r.stream.distance
 $GRASSEXEC  g.extension  extension=r.stream.order
 $GRASSEXEC  g.extension  extension=r.stream.snap
 $GRASSEXEC  g.extension  extension=r.stream.basins
+```
+
+**GNU parallel**
+
+```{bash, eval=FALSE}
+# Download the latest version of GNU parallel 
+wget http://ftp.gnu.org/gnu/parallel/parallel-latest.tar.bz2
+
+# Unzip the the .tar file and create a new folder parallel-yyyymmdd
+tar xjf parallel-latest.tar.bz2
+# Check folders and files in the directory and see the date of 
+# latest version e.g. parallel-20221122
+ls
+# Move to the new created folder
+cd parallel-20221122
+
+sudo ./configure && make
+sudo make install
+parallel --citation
+
+#> Academic tradition requires you to cite works you base your article on.
+#> If you use programs that use GNU Parallel to process data for an article in a
+#> scientific publication, please cite:
+#> 
+#> @software{tange_2022_7347980,
+#>       author       = {Tange, Ole},
+#>       title        = {GNU Parallel 20221122 ('Херсо́н')},
+#>       month        = Nov,
+#>       year         = 2022,
+#>       note         = {{GNU Parallel is a general parallelizer to run
+#>                        multiple serial command line programs in parallel
+#>                        without changing them.}},
+#>       publisher    = {Zenodo},
+#>       doi          = {10.5281/zenodo.7347980},
+#>       url          = {https://doi.org/10.5281/zenodo.7347980}
+#> }
+
+#> (Feel free to use \nocite{tange_2022_7347980})
+
+#> This helps funding further development; AND IT WON'T COST YOU A CENT.
+#> If you pay 10000 EUR you should feel free to use GNU Parallel without citing.
+
+#> More about funding GNU Parallel and the citation notice:
+#> https://lists.gnu.org/archive/html/parallel/2013-11/msg00006.html
+#> https://www.gnu.org/software/parallel/parallel_design.html#citation-notice
+#> https://git.savannah.gnu.org/cgit/parallel.git/tree/doc/citation-notice-faq.txt
+
+#> If you send a copy of your published article to tange@gnu.org, it will be
+#> mentioned in the release notes of next version of GNU Parallel.
+#> 
+#> Type: 'will cite' and press enter.
+
+will cite
+
+#> Thank you for your support: You are the reason why there is funding to
+#> continue maintaining GNU Parallel. On behalf of future versions of
+#> GNU Parallel, which would not exist without your support:
+
+#>  THANK YOU SO MUCH
+
+#> It is really appreciated. The citation notice is now silenced.
+
+
 ```
 
