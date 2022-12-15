@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 #' Checks the size of single files. It is called and inherits arguments by the function 'download_tiles()'
 #'
 #' @param variable vector of variable names (character)
@@ -8,9 +9,31 @@
 #' @param valid_tile_ids valid ids of the tiles available for download (inherited by 'download_tiles()')
 #' @param valid_filetypes valid file types of the files available for download (inherited by 'download_tiles()')
 #' @param file_size_table_sep lookup table of file sizes (inherited by 'download_tiles()')
+=======
+#' Check the size of single files before downloading.
+#' It is called and inherits arguments by the function 'download_tiles()'
+#'
+#' @param variable Vector of variable names (as character)
+#' @param filetype Format of the requested file, either "tif" or "gpkg"
+#' @param tile_id The ID of the requested tile or regional unit (as character)
+#' @param global Logical. Should the global file be downloaded or not.
+#' TRUE/FALSE, FALSE by default
+#' @param valid_varnames The valid names of the files available for download
+#' (inherited by 'download_tiles()')
+#' @param valid_tile_ids The valid IDs of the tiles available for download
+#' (inherited by 'download_tiles()')
+#' @param valid_filetypes The valid file types of the files available for download
+#' (inherited by 'download_tiles()')
+#' @param file_size_table_sep The lookup table of file sizes
+#' (inherited by 'download_tiles()')
+#'
+>>>>>>> Stashed changes
 #' @importFrom stringr str_split_fixed
 #' @export
 #'
+#' @author
+#'
+
 
 check_tiles_filesize <- function(variable, filetype = "tif",
                                  tile_id = NULL, reg_unit_id = NULL,
