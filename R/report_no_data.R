@@ -21,19 +21,57 @@ report_no_data <- function(data_dir, variables, n_cores = NULL) {
 
   }
 
+
+  # Check parallel backend depending on the OS
+  if (get_os() == "windows") {
+    plan(multisession, workers = n_cores)
+  }
+  if (get_os() == "osx" || get_os() == "linux")  {
+    plan(multicore, workers = n_cores) # multicore?
+  }
+}
+
   # Format variables vector so that it can be read
   # as an array in the bash script
   variables_array <- paste(unique(variables), collapse = " ")
 
-  # Call the external .sh script report_no_data()
-  reports <- processx::run(system.file("sh", "report_no_data.sh",
-                             package = "hydrographr"),
-                 args = c(data_dir, variables_array, n_cores),
-                 echo = FALSE)$stdout
+
+  ###################
+  if (get_os() == "linux" || get_os() == "osx"){
+
+    reports <- processx::run(system.file("sh", "report_no_data.sh",
+                                         package = "hydrographr"),
+                             args = c(data_dir, variables_array, n_cores),
+                             echo = FALSE)$stdout
+    # Format output message
+    reports <- str_split(reports, "\n")
+
+  } else {
+    # Check if WSL and Ubuntu is installed
+    check_wsl()
+    # Change path for WSL
+    wsl_data_dir <- fix_path(data_dir)
+    wsl_sh_file <- fix_path(system.file("sh",
+                                        "report_no_data.sh",
+                                        package = "hydrographr"))
+
+    reports <- run(system.file("bat", "report_no_data.bat",
+                    package = "hydrographr"),
+        args = c(wsl_data_dir, variables_array,
+                 n_cores, wsl_sh_file),
+        echo = !quiet)
+
+    # Format output message
+    reports <- str_split(reports, "\n")
+  }
 
 
-  # Format output message
-  reports <- str_split(reports, "\n")
-  return(reports)
+
+  #################
+
+
+
+
+  reports
 
 }
