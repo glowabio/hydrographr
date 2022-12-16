@@ -5,7 +5,6 @@
 #' @param lon Name of the longitude column
 #' @param lat Name of the latitude column
 #' @importFrom data.table fread
-#' @importFrom processx run
 #' @author Afroditi Grigoropoulou
 #' @export
 #'

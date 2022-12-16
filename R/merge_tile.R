@@ -44,7 +44,7 @@ rraster_read = TRUE, rvector_read = FALSE) {
       # Check operating system
       system <- get_os()
       if (system == "linux") {
-        merge_tiles <- run(system.file("sh", "merge_tiles.sh",
+        merge_tiles <- processx::run(system.file("sh", "merge_tiles.sh",
                             package = "hydrographr"),
                     args = c(tile_path, output_path),
                     echo = FALSE)
@@ -59,7 +59,7 @@ rraster_read = TRUE, rvector_read = FALSE) {
          system.file("sh", "merge_tiles.sh",
                     package = "hydrographr"))
 
-       run(system.file("bat", "merge_tiles.bat",
+       processx::run(system.file("bat", "merge_tiles.bat",
                     package = "hydrographr"),
         args = c(wsl_tile_path, wsl_output_path, wsl_sh_file),
         echo = FALSE)

@@ -145,7 +145,7 @@ reclass_raster <- function(data, rast_val, new_val, rast_path,
   if (system == "linux" || system == "osx") {
   # Open GRASS GIS session
   # Call external GRASS GIS command r.reclass
-  run(system.file("sh", "reclass_raster.sh",
+  processx::run(system.file("sh", "reclass_raster.sh",
                            package = "hydrographr"),
       args = c(rast_path, rules_path, recl_path,
                              nodata, type, compress),
@@ -164,7 +164,7 @@ reclass_raster <- function(data, rast_val, new_val, rast_path,
 
     # Open GRASS GIS session on WSL
     # Call external GRASS GIS command r.reclass
-    run(system.file("bat", "reclass_raster.bat",
+    processx::run(system.file("bat", "reclass_raster.bat",
                     package = "hydrographr"),
         args = c(wsl_rast_path, wsl_rules_path, wsl_recl_path,
                  nodata, type, compress, wsl_sh_file),

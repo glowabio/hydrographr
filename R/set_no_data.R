@@ -18,7 +18,7 @@ set_no_data <- function(data_dir, variable, no_data) {
 
   # Call the external .sh script set_no_data.sh
   # containing the gdal function
-  output <- run(system.file("sh", "set_no_data.sh",
+  output <- processx::run(system.file("sh", "set_no_data.sh",
                              package = "hydrographr"),
                  args = c(data_dir, variable, no_data),
                  echo = FALSE)$stdout

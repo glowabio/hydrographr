@@ -37,7 +37,7 @@ get_regional_unit_id <- function(data, lon, lat) {
   fwrite(data, dataset_tmp_path, col.names = TRUE,
          row.names = FALSE, quote = FALSE, sep = " ")
 
-  reg_unit_ids <- run(system.file("sh", "get_regional_unit_id.sh",
+  reg_unit_ids <- processx::run(system.file("sh", "get_regional_unit_id.sh",
                   package = "hydrographr"),
       args = c(dataset_tmp_path, lon, lat,
                reg_unit_file,  tempdir()),

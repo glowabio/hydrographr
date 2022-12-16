@@ -91,7 +91,7 @@ extract_from_gpkg <- function(data_dir, out_path = NULL, subc_ids,
 
     # Call the external .sh script extract_from_gpkg.sh
     # containing the grass functions
-    run(system.file("sh", "extract_from_gpkg.sh",
+    processx::run(system.file("sh", "extract_from_gpkg.sh",
                     package = "hydrographr"),
         args = c(data_dir, subc_ids, subc_layer,
         variables_array, calc_all, n_cores),
