@@ -47,7 +47,7 @@ get_regional_unit_id <- function(data, lon, lat, quiet = TRUE) {
   # If the required file does not already exist,
   # download it in the tempdir()
   if (!file.exists(reg_unit_file)) {
-    print("Downloading required file")
+    print("Downloading the global regional unit file")
     download.file("https://drive.google.com/uc?export=download&id=1ykV0jRCglz-_fdc4CJDMZC87VMsxzXE4&confirm=t",
                   destfile = reg_unit_file, mode = "wb")
 
@@ -101,11 +101,10 @@ get_regional_unit_id <- function(data, lon, lat, quiet = TRUE) {
   data_reg_unit_ids <- fread(ids_tmp_path, keepLeadingZeros = TRUE,
                              header = TRUE, sep = " ")
 
+  # Remove all files in the tmp folder
+  file.remove(ids_tmp_path)
 
   # Return vector of regional unit ids
   data_reg_unit_ids$reg_unit_id
-
-    # Remove all files in the tmp folder
-  file.remove(ids_tmp_path)
 
 }
