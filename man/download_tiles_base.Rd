@@ -39,3 +39,4 @@ Downloads a single file from
 https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4?path=%2F.
 It is called and inherits arguments by the function 'download_tiles()'.
 }
+\keyword{internal}

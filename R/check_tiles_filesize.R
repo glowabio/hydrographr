@@ -16,7 +16,6 @@
 #' (inherited by 'download_tiles()')
 #' @importFrom stringr str_split_fixed
 #' @keywords internal
-#' @export
 #'
 
 check_tiles_filesize <- function(variable, filetype = "tif",

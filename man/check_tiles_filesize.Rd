@@ -43,3 +43,4 @@ TRUE/FALSE, FALSE by default}
 Checks the size of single files.
 It is called and inherits arguments by the function 'download_tiles()'
 }
+\keyword{internal}
