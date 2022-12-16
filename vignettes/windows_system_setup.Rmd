@@ -75,6 +75,8 @@ The first time you open Ubuntu via the "Start" menu you will be prompted to crea
 
 Window does not automatically update your Linux distribution. To update and upgrade your packages on Ubuntu, please copy and paste the command below in your Ubuntu terminal and enter your password. This should be done on a regularly basis. 
 
+> If you run the command `sudo` the system will ask you for the password for the UNIX user account. 
+
 ```{bash, eval=FALSE}
 # Update and upgrade packages on Ubuntu
 sudo apt update && sudo apt upgrade
@@ -155,11 +157,11 @@ $GRASSEXEC  g.extension  extension=r.stream.basins
 wget http://ftp.gnu.org/gnu/parallel/parallel-latest.tar.bz2
 
 # Unzip the the .tar file and create a new folder parallel-yyyymmdd
-tar xjf parallel-latest.tar.bz2
+sudo tar xjf parallel-latest.tar.bz2
 # Check folders and files in the directory and see the date of 
 # latest version e.g. parallel-20221122
 ls
-# Move to the new created folder
+# Move to the new created folder parallel-yyyymmdd
 cd parallel-20221122
 
 sudo ./configure && make
@@ -207,7 +209,5 @@ will cite
 #>  THANK YOU SO MUCH
 
 #> It is really appreciated. The citation notice is now silenced.
-
-
 ```
 
