@@ -16,8 +16,8 @@
 #' @param basin_path Full path of the basin .tif layer.
 #' @param subc_path Full path of the sub-catchment .tif layer.
 #' @param stream_path Full path of stream network .gpkg file.
-#' @param cores Number of cores used for parallelization. By default only 1 core
-#' is used.
+#' @param cores Number of cores used for parallelization. By default the process
+#' does not run in parallel.
 #' @param quiet Whether the standard output will be printed or not.
 #'
 #' @importFrom parallel detectCores
@@ -25,21 +25,20 @@
 #' @importFrom dplyr select left_join
 #' @importFrom data.table fread
 #' @importFrom processx run
-#'
 #' @export
-#' '
-#' @details
-#' The function uses the network preparation and maintenance module of 
-#' GRASS GIS (v.net), to connect a vector lines map (stream network) with a points
-#' map (ocurrence/sampling points). After masking the stream segment and the 
-#' subcatchment where the target point is located, the connect operation snaps the
-#' point to the stream segment using a distance threshold. This threshold is 
-#' automatically calculated as the longest distance between two points 
-#' within the subcatchemnt. In this way the snapping will always take place. 
-#' This operation creates a new node on the vector line 
-#' (i.e. stream segment) from which the new snapped coordinates can be extracted.
 #'
-#' @author Jaime Garcia Marquez, Maria Üblacker
+#' @details
+#' The function uses the network preparation and maintenance module of
+#' GRASS GIS (v.net), to connect a vector lines map (stream network) with a
+#' points map (occurrence/sampling points). After masking the stream segment and
+#' the sub-catchment where the target point is located, the connect operation
+#' snaps the point to the stream segment using a distance threshold. This
+#' threshold is automatically calculated as the longest distance between two
+#' points within the sub-catchment. In this way the snapping will always take
+#' place.This operation creates a new node on the vector line (i.e. stream
+#' segment) from which the new snapped coordinates can be extracted.
+#'
+#' @author Jaime Garcia Marquez, Maria M. Üblacker
 #'
 #' @references
 #' \url{https://grass.osgeo.org/grass82/manuals/v.net.html}
@@ -50,52 +49,62 @@
 #' value.
 #' \code{\link{extract_ids}} to extract basin and sub-catchment IDs.
 #'
-#'@example
+#'@examples
 #' # Download test data into temporary R folder
-#' download_test_data(tempdir())
+#' my_directory <- tempdir()
+#' download_test_data(my_directory)
 #'
 #' # Load occurrence data
-#' species_occurence <- read.table(paste0(test_data_path,
-#'                                        "/spdata_1264942.txt"), header = TRUE)
-#' # Define full path to the basin and sub-catchments raster layer
-#' basin_rast <- paste0(tempdir(), "/hydrography90m_test_data/basin_1264942.tif")
-#' subc_rast <- paste0(tempdir(), "/hydrography90m_test_data/basin_1264942.tif")
+#' species_occurence <- read.table(paste0(my_directory,
+#'                                 "/hydrography90m_test_data/spdata_1264942.txt"),
+#'                                 header = TRUE)
+# Define full path to the basin and sub-catchments raster layer
+#' basin_rast <- paste0(my_directory,
+#'                      "/hydrography90m_test_data/basin_1264942.tif")
+#' subc_rast <- paste0(my_directory,
+#'                     "/hydrography90m_test_data/basin_1264942.tif")
 #'
 #' # Define full path to the vector file of the stream network
-#' stream_vect <- paste0(tempdir(), "/hydrography90m_test_data/order_vect_59.gpkg")
+#' stream_vect <- paste0(my_directory,
+#'                       "/hydrography90m_test_data/order_vect_59.gpkg")
 #'
-#' # EITHER
-#' # Extract basin and sub-catchment IDs from the Hydrography90m layers beforehand
+# EITHER
+# Extract basin and sub-catchment IDs from the Hydrography90m layers beforehand
 #' hydrography90m_ids <- extract_ids(data = species_occurence,
 #'                                   lon = "longitude",
 #'                                   lat = "latitude",
 #'                                   site_id = "occurrence_id",
-#'                                   subc_path = subcatchments,
+#'                                   subc_path = subc_rast,
 #'                                   basin_path = basin_rast)
 #'
 #' # Snap data points to the stream segment of the provided sub-catchment ID
-#' snapped_coordinates <- snap_to_subc_segement(data = hydrography90m_ids,
-#'                                              lon = "longitude",
-#'                                              lat = "latitude",
-#'                                              site_id = "occurrence_id",
-#'                                              basin_id = "basin_id",
-#'                                              subc_id = "subcatchment_id",
-#'                                              basin_path = basin_rast,
-#'                                              subc_path = subc_rast,
-#'                                              stream_path = stream_vect,
-#'                                              cores = 2)
+#' snapped_coordinates <- snap_to_subc_segment(data = hydrography90m_ids,
+#'                                             lon = "longitude",
+#'                                             lat = "latitude",
+#'                                             site_id = "occurrence_id",
+#'                                             basin_id = "basin_id",
+#'                                             subc_id = "subcatchment_id",
+#'                                             basin_path = basin_rast,
+#'                                             subc_path = subc_rast,
+#'                                             stream_path = stream_vect,
+#'                                             cores = 2)
+#' # Show head of output table
+#' head(snapped_coordinates)
 #'
 #' # OR
 #' # Automatically extract the basin and sub-catchment IDs and
 #' # snap the data points to the stream segment
-#' snapped_coordinates <- snap_to_subc_segement(data = species_occurence,
-#'                                              lon = "longitude",
-#'                                              lat = "latitude",
-#'                                              site_id = "occurrence_id",
-#'                                              basin_path = basin_rast,
-#'                                              subc_path = subc_rast,
-#'                                              stream_path = stream_vect,
-#'                                              cores = 2)
+#' snapped_coordinates <- snap_to_subc_segment(data = species_occurence,
+#'                                             lon = "longitude",
+#'                                             lat = "latitude",
+#'                                             site_id = "occurrence_id",
+#'                                             basin_path = basin_rast,
+#'                                             subc_path = subc_rast,
+#'                                             stream_path = stream_vect,
+#'                                             cores = 2)
+#' # Show head of output table
+#' head(snapped_coordinates)
+#'
 
 
 snap_to_subc_segment <- function(data, lon, lat, site_id, basin_id = NULL,
@@ -209,7 +218,7 @@ snap_to_subc_segment <- function(data, lon, lat, site_id, basin_id = NULL,
     ids <- data %>%
       left_join(., subc_basin_ids, by = c(lon, lat)) %>%
       select(matches(c(site_id, lon, lat, basin_id)),  subcatchment_id)
-
+#
   } else {
     # Select columns needed for the bash script
     ids <- data %>%
@@ -264,7 +273,7 @@ snap_to_subc_segment <- function(data, lon, lat, site_id, basin_id = NULL,
                          keepLeadingZeros = TRUE, header = TRUE, sep = ",")
 
   # Remove files in the tmp folder
-  file.remove(ids_tmp_path, snap_tmp_path)
+  file.remove(snap_tmp_path)
 
   # Return snapped coordinates
   return(snapped_coord)
