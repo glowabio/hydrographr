@@ -15,6 +15,7 @@
 #' @param file_size_table_sep lookup table of file sizes
 #' (inherited by 'download_tiles()')
 #' @importFrom stringr str_split_fixed
+#' @keywords internal
 #' @export
 #'
 
