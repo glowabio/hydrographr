@@ -211,3 +211,11 @@ will cite
 #> It is really appreciated. The citation notice is now silenced.
 ```
 
+**dos2unix**
+The Windows systems uses different text file line endings than the Linux systems. Dos2Unix is a package that contains commands for converting line endings in a text file from Windows to Linux and vice versa.
+
+```{bash, eval=FALSE}
+# Install dos2unix
+sudo apt install -y dos2unix
+```
+
