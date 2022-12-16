@@ -18,3 +18,5 @@ library(hydrographr)
 
 
 We thank [NFDI4Biodiversity](https://www.nfdi4biodiversity.org/en/) and [NFDI4Earth](https://www.nfdi4earth.de/) for providing the funding that helped us getting the hydrographr package together!
+
+<img src="man/figures/nfdi_logos.png" align="left" />
