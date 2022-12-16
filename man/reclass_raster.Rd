@@ -18,41 +18,58 @@ reclass_raster(
 )
 }
 \arguments{
-\item{data}{data.frame with the present and new raster values}
+\item{data}{data.frame or data.table with the present and new raster values}
 
-\item{rast_val}{Column name of present integer raster values as character
-string.}
+\item{rast_val}{Column name of present raster values as character string.}
 
-\item{new_val}{Column name of new raster integer values as character string.}
+\item{new_val}{Column name of new raster values as character string.}
 
-\item{rast_path}{Full path to the integer input raster .tif layer.
-If the input raster layer has floating point values,
-you should multiply the input data
-by some factor to achieve integer values, otherwise the GRASS GIS r.reclass
-will round the raster values down to the next integer.}
+\item{rast_path}{Full path to the input raster .tif layer.}
 
 \item{recl_path}{Full path of the output .tif layer
 of the reclassified raster file.}
 
-\item{read}{If TRUE the reclassified raster .tif layer gets read into R.
-TRUE is set by default.}
+\item{read}{If TRUE (default), then the reclassified raster .tif layer
+gets read into R as a SpatRaster (terra object)}
 
-\item{nodata}{Nodata value of the new .tif layer. The default value is -9999.}
+\item{nodata}{The Nodata value of the new .tif layer. The default value
+is -9999.}
 
 \item{type}{Data type; Options are Byte, Int16, UInt16, Int32, UInt32,
-CInt16, CInt32; Int32 is set by default.}
+CInt16, CInt32. Int32 is set by default.}
 
-\item{compress}{Compression type: DEFLATE or LZW; DEFLATE is set by default.}
+\item{compress}{Compression type: DEFLATE or LZW. DEFLATE is set by default.}
 }
 \description{
 Reclassifies an integer raster .tif layer using the r.reclass function of
 GRASS GIS. To reclassify the raster layer the present raster values
 and the new raster values have to be defined.
 }
+\details{
+If the input raster layer has floating point values, you should multiply
+the input data by some factor (e.g. 1000) to achieve integer values,
+otherwise the GRASS GIS r.reclass will round the raster values down to
+the next integer which is not always desired.
+#'
+}
 \examples{
-reclassified_raster <- reclass_raster(df, rast_val = "present_value",
-new_val = "new_value", rast_path =  "/home/user/project_folder/input.tif",
-recl_path = "home/user/project_folder/output.tif")
+# Set directory for test data
+DATADIR <- "/path/to/test_data"
+
+# Download test data
+download_test_data(DATADIR)
+
+# Read the stream order for each sub-catchment as a data.table.
+my_dt <- read_geopackage("order_vect_59.gpkg", type="net", dt=T)
+
+# Select the stream segment ID and and the Strahler stream order
+str_ord <- my_dt[,c("stream", "strahler")]
+
+# Reclassify the stream network to obtain the Strahler stream order raster
+str_ord_rast <- reclass_raster(str_ord, rast_val = "stream",
+new_val = "strahler", rast_path =  "/DATADIR/stream_1264942.tif",
+recl_path = "/path/to/output.tif")
+
 
 }
 \references{

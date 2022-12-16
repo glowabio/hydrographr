@@ -4,22 +4,6 @@
 #' GRASS GIS. To reclassify the raster layer the present raster values
 #' and the new raster values have to be defined.
 #'
-<<<<<<< Updated upstream
-#' @param data data.frame with the present and new raster values
-#' @param rast_val Column name of present integer raster values as character
-#' string.
-#' @param new_val Column name of new raster integer values as character string.
-#' @param rast_path Full path to the integer input raster .tif layer.
-#' If the input raster layer has floating point values,
-#' you should multiply the input data
-#' by some factor to achieve integer values, otherwise the GRASS GIS r.reclass
-#' will round the raster values down to the next integer.
-#' @param recl_path Full path of the output .tif layer
-#' of the reclassified raster file.
-#' @param read If TRUE the reclassified raster .tif layer gets read into R.
-#' TRUE is set by default.
-#' @param nodata Nodata value of the new .tif layer. The default value is -9999.
-=======
 #' If the input raster layer has floating point values, you should multiply
 #' the input data by some factor (e.g. 1000) to achieve integer values,
 #' otherwise the GRASS GIS r.reclass will round the raster values down to
@@ -36,7 +20,6 @@
 #' gets read into R as a SpatRaster (terra object)
 #' @param nodata The Nodata value of the new .tif layer. The default value
 #' is -9999.
->>>>>>> Stashed changes
 #' @param type Data type; Options are Byte, Int16, UInt16, Int32, UInt32,
 #' CInt16, CInt32. Int32 is set by default.
 #' @param compress Compression type: DEFLATE or LZW. DEFLATE is set by default.

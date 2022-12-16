@@ -17,25 +17,6 @@
 #' TRUE is set by default
 #' @param rvector_read If TRUE merged spatial vector gets read into R.
 #' FALSE is set by default and if TRUE rraster_read needs to be set to FALSE
-=======
-#' @description Merge multiple raster or spatial vector objects on disk
-#' to form a new, larger raster or spatial vector object given the input raster
-#' or vector objects. At least one raster .tif or spatial vector geopackage
-#' (.gpkg) file must be provided. The function accepts only one format at a time.
-#'
-#' @param tile_path Path to raster or spatial vector files
-#' @param output_path Path to write the merged output file
-#' @param rraster_read If TRUE (default), the outputs are a .tif file
-#' (saved under output`_`path) and a SpatRaster (terra package) object.
-#' If rraster`_`read = FALSE, only the .tif file will be generated. If TRUE,
-#' then the merged raster layer gets also read into R as a SpatRaster
-#' object.
-#' @param rvector_read If TRUE (default is FALSE), the outputs are a .gpkg
-#' (saved under output`_`path) and a SpatVector (terra object), and the
-#' merged vector object gets read into R as a SpatVect object.
-#' If TRUE, then rraster_read needs to be set to FALSE.
->>>>>>> Stashed changes
-
 #' @importFrom processx run
 #' @importFrom terra rast
 #' @importFrom terra vect
