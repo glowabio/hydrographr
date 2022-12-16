@@ -2,7 +2,7 @@
 % Please edit documentation in R/extract_ids.R
 \name{extract_ids}
 \alias{extract_ids}
-\title{Extract sub-catchment and/or basin IDs of a point location}
+\title{Extract sub-catchment and/or basin IDs for a point location}
 \usage{
 extract_ids(
   data,
@@ -15,20 +15,21 @@ extract_ids(
 )
 }
 \arguments{
-\item{data}{Data.frame with lat/lon coordinates in WGS84.}
+\item{data}{A data.frame or data.table with lat/lon coordinates in WGS84.}
 
-\item{lon}{Column name of longitude coordinates as character vector.}
+\item{lon}{Column name of longitude coordinates as a character vector.}
 
-\item{lat}{Column name of latitude coordinates as character vector.}
+\item{lat}{Column name of latitude coordinates as a character vector.}
 
-\item{site_id}{Column name of a unique ID as character vector; Optional
-an ID for the point location can be defined.}
+\item{site_id}{Column name of the unique ID as a character vector.
+Alternatively, an ID for the point location can be defined.}
 
-\item{basin_path}{Full path to the basin ID .tif layer.}
+\item{basin_path}{Full path to the basin ID .tif layer on disk.}
 
-\item{subc_path}{Full path to the sub-catchment ID .tif layer.}
+\item{subc_path}{Full path to the sub-catchment ID .tif layer on disk.}
 
-\item{quiet}{Whether the standard output will be printed or not.}
+\item{quiet}{Whether the standard output will be printed or not (deafult
+is TRUE).}
 }
 \description{
 Extracts the ID value of the basin and/or sub-catchment raster layer at a
@@ -36,10 +37,11 @@ given point location.
 }
 \details{
 For the extraction of a value at a given point location from the basin
-and/or sub-catchment raster layer of the Hydrography90m the GDAL function
-'gdallocationinfo' is used. The point locations have to be defined by
-coordinates of the WGS84 reference system, it can be used to extract any
-value from a given raster layer with a WGS84 projection.
+and/or sub-catchment raster layer of the Hydrography90m dataset, the GDAL
+function 'gdallocationinfo' is used. The point locations have to be defined
+by coordinates of the WGS84 reference system. The function can also be used
+to extract any value from a given raster layer with a WGS84 projection, such
+as e.g. environmental information that is stored in the input raster file.
 }
 \note{
 Duplicated rows will be removed.
@@ -67,8 +69,8 @@ hydrography90m_ids <- extract_ids(data = species_occurrence,
                                   subc_path = subc_rast,
                                   basin_path = basin_rast)
 
-# Show head of the output table
-head(hydrography90m_ids)
+# Show the output table
+hydrography90m_ids
 }
 \references{
 \url{https://gdal.org/programs/gdallocationinfo.html}
