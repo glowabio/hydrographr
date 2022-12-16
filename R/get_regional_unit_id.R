@@ -1,4 +1,5 @@
-
+#' Adds sub-catchment and/or basin IDs to a dataframe of points
+#'
 #' Identifies the IDs of the regional units within the Hydrography90m data
 #' in which the input points are located. The IDs are required to then download
 #' the data using download_tiles_base() or download_tiles().
@@ -31,7 +32,7 @@
 #' my_IDs <- get_regional_unit_id(species, lon="longitude", lat="latitude")
 #'
 #'
-#' @author
+#' @author Afroditi Grigoropoulou
 #'
 
 
