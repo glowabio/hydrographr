@@ -3,7 +3,6 @@
 export(crop_to_extent)
 export(download_test_data)
 export(download_tiles)
-export(download_tiles_base)
 export(extract_from_gpkg)
 export(extract_ids)
 export(extract_zonal_stat)
