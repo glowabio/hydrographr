@@ -1,11 +1,8 @@
-<<<<<<< Updated upstream
-#' Adds sub-catchment and/or basin IDs to a dataframe of points
-=======
+
 #' Identifies the IDs of the regional units within the Hydrography90m data
 #' in which the input points are located. The IDs are required to then download
 #' the data using download_tiles_base() or download_tiles().
 #' Input is a point data frame.
->>>>>>> Stashed changes
 #'
 #' @param data A data.frame or data.table with the latitude (lat) and
 #' longitude (lon) columns
@@ -44,21 +41,34 @@
 get_regional_unit_id <- function(data, lon, lat, quiet = TRUE) {
 
   system <- get_os()
+
   # global file of regional units ids
-  reg_unit_file <- system.file("data", "regional_unit_ovr.tif",
-                               package = "hydrographr")
+  reg_unit_file <- paste0(tempdir(), "/regional_unit_ovr.tif")
+
+  # If the required file does not already exist,
+  # download it in the tempdir()
+  if (!file.exists(reg_unit_file)) {
+    print("Downloading required file")
+    download.file("https://drive.google.com/uc?export=download&id=1ykV0jRCglz-_fdc4CJDMZC87VMsxzXE4&confirm=t",
+                  destfile = reg_unit_file, mode = "wb")
+
+  }
 
   # Create random string to attach to the file name of the temporary
   # output coordinates and input ids file
   rand_string <- stri_rand_strings(n=1, length=8, pattern="[A-Za-z0-9]")
+
   # Select columns with lon/lat coordinates
   coord <- data %>%
     select(matches(c(lon, lat)))
+
   # Export taxon occurrence points
   coord_tmp_path <- paste0(tempdir(), "/coordinates_", rand_string, ".txt")
+
   ## Note:Only export lon/lat column
   fwrite(coord, coord_tmp_path, col.names = TRUE,
          row.names = FALSE, quote = FALSE, sep = " ")
+
   # Path for tmp regional unit ids text file
   ids_tmp_path <- paste0(tempdir(), "/reg_unit_ids", rand_string, ".txt")
 
@@ -89,17 +99,14 @@ get_regional_unit_id <- function(data, lon, lat, quiet = TRUE) {
         echo = !quiet)
   }
   # Read in the file containing the ids
-  data_reg_unit_ids <- fread(paste0(tempdir(), "/reg_unit_ids", rand_string, ".txt"),
-                             keepLeadingZeros = TRUE, header = TRUE, sep = " ")
+  data_reg_unit_ids <- fread(ids_tmp_path, keepLeadingZeros = TRUE,
+                             header = TRUE, sep = " ")
 
   # Remove all files in the tmp folder
   file.remove(ids_tmp_path)
 
   # Return vector of regional unit ids
   return(data_reg_unit_ids$reg_unit_id)
-
-
-  #  # To get tile ids based on the given extent of a study area:
 
 }
 
