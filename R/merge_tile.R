@@ -1,4 +1,4 @@
-#' @title merge_tiles
+#' @title  Merge multiple raster or spatial vector objects
 
 #' @description Merge multiple raster or spatial vector objects from disk
 #' to form a new raster or spatial vector object with a larger spatial extent.
@@ -17,13 +17,19 @@
 #' TRUE is set by default
 #' @param rvector_read If TRUE merged spatial vector gets read into R.
 #' FALSE is set by default and if TRUE rraster_read needs to be set to FALSE
-
 #' @importFrom processx run
 #' @importFrom terra rast
 #' @importFrom terra vect
 #' @export
 #'
-#' @return A .tif raster file or spatial vector object
+#' @return A .tif raster file or spatial vector object that is always written
+#' to disk, and optionally loaded into R.
+#'
+#' @examples
+#'
+#'
+#'
+#' @author
 #'
 
 merge_tiles <- function(tile_path, output_path,
@@ -38,7 +44,7 @@ rraster_read = TRUE, rvector_read = FALSE) {
       # Check operating system
       system <- get_os()
       if (system == "linux") {
-        merge_tiles <- run(system.file("sh", "merge_tiles.sh",
+        merge_tiles <- processx::run(system.file("sh", "merge_tiles.sh",
                             package = "hydrographr"),
                     args = c(tile_path, output_path),
                     echo = FALSE)
@@ -53,7 +59,7 @@ rraster_read = TRUE, rvector_read = FALSE) {
          system.file("sh", "merge_tiles.sh",
                     package = "hydrographr"))
 
-       run(system.file("bat", "merge_tiles.bat",
+       processx::run(system.file("bat", "merge_tiles.bat",
                     package = "hydrographr"),
         args = c(wsl_tile_path, wsl_output_path, wsl_sh_file),
         echo = FALSE)
@@ -62,7 +68,7 @@ rraster_read = TRUE, rvector_read = FALSE) {
 
   if (rraster_read == TRUE) {
       # Print message
-      cat("Merge saved under: ", output_path)
+      cat("Merged file saved under: ", output_path)
       # Read merged .tif layer
       merged_tiles <- rast(paste0(output_path, "/", "basin.tif"))
 
@@ -70,7 +76,7 @@ rraster_read = TRUE, rvector_read = FALSE) {
     } else if (rvector_read == TRUE) {
 
       # Print message
-      cat("Merge saved under: ", output_path)
+      cat("Merged file saved under: ", output_path)
       # Read merged vector layer
       merged_tiles <- vect(paste0(output_path, "/", "basin_dissolved.gpkg"))
 
@@ -78,6 +84,6 @@ rraster_read = TRUE, rvector_read = FALSE) {
 
     } else {
       # Print message
-      cat("Merge saved under: ", output_path)
+      cat("Merged file saved under: ", output_path)
     }
  }

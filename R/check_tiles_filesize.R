@@ -15,7 +15,7 @@
 #' @param file_size_table_sep lookup table of file sizes
 #' (inherited by 'download_tiles()')
 #' @importFrom stringr str_split_fixed
-#' @export
+#' @keywords internal
 #'
 
 check_tiles_filesize <- function(variable, filetype = "tif",

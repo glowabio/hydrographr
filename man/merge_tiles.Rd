@@ -2,7 +2,7 @@
 % Please edit documentation in R/merge_tile.R
 \name{merge_tiles}
 \alias{merge_tiles}
-\title{merge_tiles}
+\title{Merge multiple raster or spatial vector objects}
 \usage{
 merge_tiles(tile_path, output_path, rraster_read = TRUE, rvector_read = FALSE)
 }
@@ -18,7 +18,8 @@ TRUE is set by default}
 FALSE is set by default and if TRUE rraster_read needs to be set to FALSE}
 }
 \value{
-A .tif raster file or spatial vector object
+A .tif raster file or spatial vector object that is always written
+to disk, and optionally loaded into R.
 }
 \description{
 Merge multiple raster or spatial vector objects from disk

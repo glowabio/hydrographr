@@ -12,7 +12,7 @@
 #' (inherited by 'download_tiles()')
 #' @param server_path path to the the home download folder
 #' in either Nimbus or GDrive (inherited by 'download_tiles()')
-#' @export
+#' @keywords internal
 #'
 
 download_tiles_base <- function(variable, filetype = "tif",

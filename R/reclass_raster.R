@@ -4,23 +4,26 @@
 #' GRASS GIS. To reclassify the raster layer the present raster values
 #' and the new raster values have to be defined.
 #'
-#' @param data data.frame with the present and new raster values
-#' @param rast_val Column name of present integer raster values as character
-#' string.
-#' @param new_val Column name of new raster integer values as character string.
-#' @param rast_path Full path to the integer input raster .tif layer.
-#' If the input raster layer has floating point values,
-#' you should multiply the input data
-#' by some factor to achieve integer values, otherwise the GRASS GIS r.reclass
-#' will round the raster values down to the next integer.
+#' If the input raster layer has floating point values, you should multiply
+#' the input data by some factor (e.g. 1000) to achieve integer values,
+#' otherwise the GRASS GIS r.reclass will round the raster values down to
+#' the next integer which is not always desired.
+#'#'
+#' @param data data.frame or data.table with the present and new raster values
+#' @param rast_val Column name of present raster values as character string.
+#' @param new_val Column name of new raster values as character string.
+#' @param rast_path Full path to the input raster .tif layer.
+
 #' @param recl_path Full path of the output .tif layer
 #' of the reclassified raster file.
-#' @param read If TRUE the reclassified raster .tif layer gets read into R.
-#' TRUE is set by default.
-#' @param nodata Nodata value of the new .tif layer. The default value is -9999.
+#' @param read If TRUE (default), then the reclassified raster .tif layer
+#' gets read into R as a SpatRaster (terra object)
+#' @param nodata The Nodata value of the new .tif layer. The default value
+#' is -9999.
 #' @param type Data type; Options are Byte, Int16, UInt16, Int32, UInt32,
-#' CInt16, CInt32; Int32 is set by default.
-#' @param compress Compression type: DEFLATE or LZW; DEFLATE is set by default.
+#' CInt16, CInt32. Int32 is set by default.
+#' @param compress Compression type: DEFLATE or LZW. DEFLATE is set by default.
+#'
 #' @importFrom stringi stri_rand_strings
 #' @importFrom data.table fwrite
 #' @importFrom processx run
@@ -28,9 +31,23 @@
 #' @export
 #'
 #' @examples
-#' reclassified_raster <- reclass_raster(df, rast_val = "present_value",
-#' new_val = "new_value", rast_path =  "/home/user/project_folder/input.tif",
-#' recl_path = "home/user/project_folder/output.tif")
+#' # Set directory for test data
+#' DATADIR <- "/path/to/test_data"
+#'
+#' # Download test data
+#' download_test_data(DATADIR)
+#'
+#' # Read the stream order for each sub-catchment as a data.table.
+#' my_dt <- read_geopackage("order_vect_59.gpkg", type="net", dt=T)
+#'
+#' # Select the stream segment ID and and the Strahler stream order
+#' str_ord <- my_dt[,c("stream", "strahler")]
+#'
+#' # Reclassify the stream network to obtain the Strahler stream order raster
+#' str_ord_rast <- reclass_raster(str_ord, rast_val = "stream",
+#' new_val = "strahler", rast_path =  "/DATADIR/stream_1264942.tif",
+#' recl_path = "/path/to/output.tif")
+#'
 #'
 #' @references
 #' https://grass.osgeo.org/grass82/manuals/r.reclass.html
@@ -128,7 +145,7 @@ reclass_raster <- function(data, rast_val, new_val, rast_path,
   if (system == "linux" || system == "osx") {
   # Open GRASS GIS session
   # Call external GRASS GIS command r.reclass
-  run(system.file("sh", "reclass_raster.sh",
+  processx::run(system.file("sh", "reclass_raster.sh",
                            package = "hydrographr"),
       args = c(rast_path, rules_path, recl_path,
                              nodata, type, compress),
@@ -147,7 +164,7 @@ reclass_raster <- function(data, rast_val, new_val, rast_path,
 
     # Open GRASS GIS session on WSL
     # Call external GRASS GIS command r.reclass
-    run(system.file("bat", "reclass_raster.bat",
+    processx::run(system.file("bat", "reclass_raster.bat",
                     package = "hydrographr"),
         args = c(wsl_rast_path, wsl_rules_path, wsl_recl_path,
                  nodata, type, compress, wsl_sh_file),
