@@ -30,6 +30,9 @@
 crop_to_extent <- function(raster_path, vector_path = NULL, bound_box = NULL,
                            output_path,
                            rcrop_read = TRUE) {
+  # Make bash scripts executable
+  make_sh_exec()
+
   # Check that an input path and an output path were provided
   if (missing(raster_path)) stop("Please provide an input path")
   if (missing(output_path)) stop("Please provide an output path")

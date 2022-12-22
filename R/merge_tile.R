@@ -35,6 +35,9 @@
 merge_tiles <- function(tile_path, output_path,
 rraster_read = TRUE, rvector_read = FALSE) {
 
+  # Make bash scripts executable
+  make_sh_exec()
+
   if (missing(tile_path) || is.na(tile_path)) {
     tile_path <- "NOT_ASSIGNED"
     }

@@ -128,6 +128,9 @@ reclass_raster <- function(data, rast_val, new_val, rast_path,
   if (!is.logical(quiet))
     stop("quiet: Has to be TRUE or FALSE.")
 
+  # Make bash scripts executable
+  make_sh_exec()
+
   # The r.reclass function of GRASS GIS requires a text file
   # including the old and the new value with an = between
   # (e.g. 1 = 20)

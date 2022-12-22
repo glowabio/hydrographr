@@ -59,6 +59,9 @@ extract_from_gpkg <- function(data_dir, out_path = NULL, subc_ids,
   # Create temporary output directories
   dir.create(paste0(data_dir, "/tmp"), showWarnings = FALSE)
 
+  # Make bash scripts executable
+  make_sh_exec()
+
   calc_all <- 1
 
   # Create file with reclassification rules for the r.reclass function

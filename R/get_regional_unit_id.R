@@ -41,6 +41,9 @@ get_regional_unit_id <- function(data, lon, lat, quiet = TRUE) {
 
   system <- get_os()
 
+  # Make bash scripts executable
+  make_sh_exec()
+
   # global file of regional units ids
   reg_unit_file <- paste0(tempdir(), "/regional_unit_ovr.tif")
 

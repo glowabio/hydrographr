@@ -16,6 +16,9 @@
 
 set_no_data <- function(data_dir, variable, no_data) {
 
+  # Make bash scripts executable
+  make_sh_exec()
+
   # Call the external .sh script set_no_data.sh
   # containing the gdal function
   output <- processx::run(system.file("sh", "set_no_data.sh",

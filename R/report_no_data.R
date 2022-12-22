@@ -25,6 +25,9 @@ report_no_data <- function(data_dir, variables, n_cores = NULL) {
   # as an array in the bash script
   variables_array <- paste(unique(variables), collapse = " ")
 
+  # Make bash scripts executable
+  make_sh_exec()
+
   # Call the external .sh script report_no_data()
   reports <- processx::run(system.file("sh", "report_no_data.sh",
                              package = "hydrographr"),

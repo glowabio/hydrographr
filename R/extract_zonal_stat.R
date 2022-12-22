@@ -43,6 +43,9 @@ extract_zonal_stat <- function(data_dir, out_path = NULL, subc_ids,
   dir.create(paste0(data_dir, "/tmp"), showWarnings = FALSE)
   dir.create(paste0(data_dir, "/tmp/r_univar"), showWarnings = FALSE)
 
+  # Make bash scripts executable
+  make_sh_exec()
+
   calc_all <- 1
 
   # Create file with reclassification rules for the r.reclass function
