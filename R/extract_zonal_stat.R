@@ -39,6 +39,22 @@ extract_zonal_stat <- function(data_dir, out_path = NULL, subc_ids,
     print("The variables should be provided in a character vector format")
   }
 
+
+  # Check if paths exist
+  for (path in c(subc_layer, data_dir)) {
+    if (!file.exists(path))
+      stop(paste0("File path: ", path, " does not exist."))
+  }
+
+  # Check if subc_layer ends with .tif
+  for (path in c(subc_layer, variables)) {
+    if (!endsWith(path, ".tif"))
+      stop(paste0("File path: ", path, " does not end with .tif"))
+  }
+
+
+
+
   # Create temporary output directories
   dir.create(paste0(data_dir, "/tmp"), showWarnings = FALSE)
   dir.create(paste0(data_dir, "/tmp/r_univar"), showWarnings = FALSE)
