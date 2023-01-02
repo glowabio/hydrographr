@@ -30,14 +30,14 @@
 #'
 #' @note
 #' Duplicated rows will be removed.
-#' 
+#'
 #' @details
-#'The function makes use of the r.stream.snap command available in GRASS GIS to 
-#'snap simultaneously a number of points to a stream network. A distance threshold
-#'can be specified and points will be snap to any stream segemnt within this
-#'distance radius. However, to avoid snapping to small tributaries, an 
-#'acumulation threshold can be used and the snapping occurs on stream segment 
-#'with equal or higher accumulation threshold and within the given distance radius. 
+#' The function makes use of the r.stream.snap command available in GRASS GIS to
+#' simultaneously a number of points to a stream network. A distance threshold
+#' can be specified and points will be snap to any stream segemnt within this
+#' distance radius. However, to avoid snapping to small tributaries, an
+#' acumulation threshold can be used and the snapping occurs on stream segment
+#' with equal or higher accumulation threshold and within the given distance radius.
 #'
 #' @author Maria M. Üblacker, Jaime Garcia Marquez
 #'
@@ -46,17 +46,18 @@
 #'
 #' @examples
 #' # Download test data into temporary R folder
-#' download_test_data(tempdir())
+#' my_directory <- tempdir()
+#' download_test_data(my_directory)
 #'
 #' # Load occurrence data
-#' species_occurrence <- read.table(
-#' paste0(tempdir(), "/hydrography90m_test_data/spdata_1264942.txt"),
-#' header = TRUE)
+#' species_occurence <- read.table(paste0(my_directory,
+#'                                 "/hydrography90m_test_data/spdata_1264942.txt"),
+#'                                 header = TRUE
 #'
 #' # Define full path to flow accumulation
-#' stream_rast <- paste0(tempdir(),
+#' stream_rast <- paste0(my_directory,
 #'                      "/hydrography90m_test_data/stream_1264942.tif")
-#' flow_rast <- paste0(tempdir(),
+#' flow_rast <- paste0(my_directory,
 #'                      "/hydrography90m_test_data/flow_1264942.tif")
 #'
 #' # To calculate the new (snapped) coordinates for a radius and a flow
