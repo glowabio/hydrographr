@@ -66,17 +66,18 @@ Duplicated rows will be removed.
 }
 \examples{
 # Download test data into temporary R folder
-download_test_data(tempdir())
+my_directory <- tempdir()
+download_test_data(my_directory)
 
 # Load occurrence data
-species_occurrence <- read.table(
-paste0(tempdir(), "/hydrography90m_test_data/spdata_1264942.txt"),
-header = TRUE)
+species_occurence <- read.table(paste0(my_directory,
+                                "/hydrography90m_test_data/spdata_1264942.txt"),
+                                header = TRUE
 
 # Define full path to flow accumulation
-stream_rast <- paste0(tempdir(),
+stream_rast <- paste0(my_directory,
                      "/hydrography90m_test_data/stream_1264942.tif")
-flow_rast <- paste0(tempdir(),
+flow_rast <- paste0(my_directory,
                      "/hydrography90m_test_data/flow_1264942.tif")
 
 # To calculate the new (snapped) coordinates for a radius and a flow
