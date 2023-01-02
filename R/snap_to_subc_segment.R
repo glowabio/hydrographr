@@ -62,7 +62,7 @@
 #' basin_rast <- paste0(my_directory,
 #'                      "/hydrography90m_test_data/basin_1264942.tif")
 #' subc_rast <- paste0(my_directory,
-#'                     "/hydrography90m_test_data/basin_1264942.tif")
+#'                     "/hydrography90m_test_data/subcatchment_1264942.tif")
 #'
 #' # Define full path to the vector file of the stream network
 #' stream_vect <- paste0(my_directory,
@@ -193,7 +193,7 @@ snap_to_subc_segment <- function(data, lon, lat, site_id, basin_id = NULL,
   if (is.null(basin_id) && is.null(subc_id)) {
     # Extract subc and basin ids
     subc_basin_ids <- extract_ids(data = data, lon = lon, lat = lat,
-                                  subcatchment_path = subc_path,
+                                  subc_path = subc_path,
                                   basin_path = basin_path, quiet = quiet)
     # Join with data and select columns needed for the bash script
     ids <- left_join(data, subc_basin_ids, by = c(lon, lat)) %>%
@@ -202,7 +202,7 @@ snap_to_subc_segment <- function(data, lon, lat, site_id, basin_id = NULL,
   } else if (is.null(basin_id) && !is.null(subc_id)) {
     # Extract basin ids
     basin_ids <- extract_ids(data = data, lon = lon, lat = lat,
-                             subcatchment_path = NULL,
+                             subc_path = NULL,
                              basin_path = basin_path, quiet = quiet)
     # Join with data and select columns needed for the bash script
     ids <- left_join(data, subc_basin_ids, by = c(lon, lat)) %>%
@@ -212,7 +212,7 @@ snap_to_subc_segment <- function(data, lon, lat, site_id, basin_id = NULL,
   } else if (!is.null(basin_id) && is.null(subc_id)) {
     # Extract sub-catchment ids
     subc_ids <- extract_ids(data = data, lon = lon, lat = lat,
-                            subcatchment_path = subc_path,
+                            subc_path = subc_path,
                             basin_path = NULL, quiet = quiet)
     # Join with data and select columns needed for the bash script
     ids <- data %>%
