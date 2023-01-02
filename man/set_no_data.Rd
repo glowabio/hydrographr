@@ -22,6 +22,20 @@ The files should be cropped to the extent of the sub-catchment layer}
 Change or set no data value to raster layers.
 The change happens in-place, meaning that the original file is overwritten
 }
+\examples{
+# Download test data into temporary R folder
+my_directory <- tempdir()
+download_test_data(my_directory)
+
+# Define no data value
+set_no_data(data_dir = paste0(my_directory, "/hydrography90m_test_data"),
+            variable = "subcatchment_1264942.tif",
+            no_data = -9999)
+
+}
 \author{
-Afroditi Grigoropoulou
+Afroditi Grigoropoulou, Maria M. Üblacker
+
+#' @references
+\url{https://gdal.org/programs/gdal_edit.html}
 }
