@@ -3,16 +3,6 @@
 #' Extracts the ID value of the basin and/or sub-catchment raster layer at a
 #' given point location.
 #'
-<<<<<<< Updated upstream
-#' @param data Data.frame with lat/lon coordinates in WGS84.
-#' @param lon Column name of longitude coordinates as character vector.
-#' @param lat Column name of latitude coordinates as character vector.
-#' @param site_id  Column name of a unique ID  character vector; Optional
-#' an ID for the point location can be defined.
-#' @param basin_path Full path to the basin ID .tif layer.
-#' @param subc_path Full path to the sub-catchment ID .tif layer.
-#' @param quiet Whether the standard output will be printed or not.
-=======
 #' @param data A data.frame or data.table with lat/lon coordinates in WGS84.
 #' @param lon Column name of longitude coordinates as a character vector.
 #' @param lat Column name of latitude coordinates as a character vector.
@@ -20,9 +10,9 @@
 #' Alternatively, an ID for the point location can be defined.
 #' @param basin_path Full path to the basin ID .tif layer on disk.
 #' @param subc_path Full path to the sub-catchment ID .tif layer on disk.
-#' @param quiet Whether the standard output will be printed or not (deafult
+#' @param quiet Whether the standard output will be printed or not (default
 #' is TRUE).
->>>>>>> Stashed changes
+
 #'
 #' @importFrom stringi stri_rand_strings
 #' @importFrom dplyr select
