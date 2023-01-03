@@ -1,13 +1,11 @@
-#' Change or set no data value to raster layers.
+#' Change or set the NoData value for a raster layer.
 #' The change happens in-place, meaning that the original file is overwritten
+#' on disk.
 #'
 #' @param data_dir Character. Path to the directory containing all input data.
 #' @param variable Character vector. Variable file name,
-#' e.g. slope_grad_dw_cel_h00v00.tif. Variable names should remain
-#' intact in file names, even after prior file processing,
-#' i.e., slope_grad_dw_cel should appear in the file name
-#' The files should be cropped to the extent of the sub-catchment layer
-#' @param no_data The desired no data value
+#' e.g. slope_grad_dw_cel_h00v00.tif. The original file will be overwritten.
+#' @param no_data The desired NoData value
 #'
 #' @importFrom processx run
 #' @importFrom stringr str_split
@@ -26,7 +24,7 @@
 #'
 #' # Define no data value
 #' set_no_data(data_dir = paste0(my_directory, "/hydrography90m_test_data"),
-#'             variable = "subcatchment_1264942.tif",
+#'             variable = "cti_1264942.tif",
 #'             no_data = -9999)
 #'
 
