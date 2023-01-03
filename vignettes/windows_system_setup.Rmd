@@ -1,0 +1,221 @@
+---
+title: "Setting up the package requirements on Windows"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Setting up the package requirements on Windows}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+#bibliography: literature.bib
+link-citations: yes
+linkcolor: blue
+#csl: copernicus.csl
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+To handle large geodata efficiently the `hydrographr` package relies on a suite of Open Source geoprocessing tools like  `GRASS GIS`, `GDAL`, and `pktools`. Since the `hydrographr` package is optimized to run in a Linux operating system, in a Windows environment the inbuilt Windows Subsystem for Linux (WSL) is used to install a Ubuntu operating system with the additional geoprocessing packages.
+
+Below you will find a short summary of the necessary steps to install WSL, Ubuntu and the required GIS tools.
+
+To learn more about the WSL check out the [Microsoft documentation](https://learn.microsoft.com/en-us/windows/wsl/), which provides background information and step to step tutorials.
+
+## Prerequisites
+
+* Make sure you have at least 4 GB of free disk space.
+* You need to have administrator privileges for Windows.
+* You must be running Windows 10 version 2004 and higher or Windows 11, otherwise WSL is not available.
+
+## Installation of the Windows Subsystem for Linux with Ubuntu
+
+Open the Windows Command Prompt (cmd.exe) in administrator mode by clicking the Start button and typing "cmd" into the search bar.Then right-click "Command Prompt" and select "Run as Administrator" or highlight the result with the arrow keys and press `Ctrl+Shift+Enter` to open the command prompt with administrative privileges.
+
+Enter `wsl --install` to enable the features necessary to run WSL and also directly install the Ubuntu distribution of Linux, which is the default option in WSL.
+
+```{bash, eval=FALSE}
+# Enable the features necessary to run WSL and 
+# install the Ubuntu distribution of Linux. 
+wsl --install
+
+#> Installing: Virtual Machine Platform
+#> Virtual Machine Platform has been installed.
+#> Installing: Windows Subsystem for Linux
+#> Windows Subsystem for Linux has been installed.
+#> Downloading: WSL Kernel
+#> Installing: WSL Kernel
+#> WSL Kernel has been installed.
+#> Downloading: Ubuntu
+#> The requested operation is successful. Changes will not be effective until the system is rebooted.
+```
+
+After the installation is complete, restart your machine. Then open the "Start" menu and click on "Ubuntu" to open the Ubuntu console.
+
+> Please note that if Ubuntu did not get installed automatically, you can alternatively visit the Windows store (https://aka.ms/wslstore), search for Ubuntu, install it from there and then restart.
+
+The first time you open Ubuntu via the "Start" menu you will be prompted to create a **username** and **password** for the Linux distribution. This will be the default user account and administrator for Ubuntu. For the purpose of this guideline we will use  `hydrographr`, but you can pick any name you want.
+
+> Please note that whilst entering the password, nothing will appear on the screen and you won't see what you are typing, this is completely normal.
+
+```{bash, eval=FALSE}
+#> Installing, this may take a few minutes...
+#> Please create a default UNIX user account. The username does not need to match your Windows username.
+#> For more information visit: https://aka.ms/wslusers
+#> Enter new UNIX username: hydrographr
+#> New password:
+#> Retype new password:
+#> passwd: password updated successfully
+#> Installation successful!
+#> To run a command as administrator (user "root"), use "sudo <command>".
+#> See "man sudo_root" for details.
+```
+
+Window does not automatically update your Linux distribution. To update and upgrade your packages on Ubuntu, please copy and paste the command below in your Ubuntu terminal and enter your password. This should be done on a regularly basis. 
+
+> If you run the command `sudo` the system will ask you for the password for the UNIX user account. 
+
+```{bash, eval=FALSE}
+# Update and upgrade packages on Ubuntu
+sudo apt update && sudo apt upgrade
+```
+
+For more details on the installation of WSL see [here](https://learn.microsoft.com/en-us/windows/wsl/install). 
+
+For more details about setting a username and password see [here](https://learn.microsoft.com/en-us/windows/wsl/setup/environment#set-up-your-linux-username-and-password).
+
+## Installation of the required GIS tools on the WSL
+
+Next, you need to install the required GIS tools on your WSL Ubuntu system. You can use the Ubuntu terminal, PowerShell or Windows Command Prompt to start the installation. If you use the PowerShell or Windows Command Prompt use the command `wsl` to enter the WSL first, and `exit` to go back to your Windows OS after the installation of the GIS tools. 
+
+**Add the Ubuntugis repository**
+
+First, you have to add the "Ubuntugis" Personal Package Archive (PPA) to your system's software sources to be able to install the GIS tools available from there.
+
+```{bash, eval=FALSE}
+# Add the Ubuntugis PPA
+sudo add-apt-repository ppa:ubuntugis/ubuntugis-unstable
+```
+
+Next, you need to tell your system to pull down the latest list of software from each archive it knows about, including the PPA you just added:
+
+```{bash, eval=FALSE}
+# Update the packages list
+sudo apt update
+```
+
+Now you are ready to install`GDAL`, `GRASS GIS` and GNU `parallel`. Copy and paste the commands below into your console and follow the instructions to install the tools.
+
+**GDAL**
+
+GDAL is a translator library for raster and vector geospatial data formats and comes with a variety of useful command line utilities for data translation and processing. For more information check the [GDAL](https://gdal.org/) website.
+
+```{bash, eval=FALSE}
+# Install GDAL
+sudo apt install gdal-bin python3-gdal
+```
+
+<!-- **pktools** -->
+
+<!-- Pktools is a suite of command line utilities for image processing and remote sensing applications written in C++. For more information check the [pktools](https://pktools.nongnu.org/html/index.html) website. -->
+
+<!-- ```{bash, eval=FALSE} -->
+<!-- # Install pktools -->
+<!-- sudo apt install pktools -->
+<!-- ``` -->
+
+**GRASS GIS**
+
+GRASS GIS is a powerful raster, vector, and geospatial processing engine including tools for terrain and ecosystem modeling, hydrology and the processing of satellite and aerial imagery. For more detailed installation instructions check the [GRASS GIS users wiki](https://grasswiki.osgeo.org/wiki/Installation_Guide#Ubuntu) or the [GRASS GIS](https://grass.osgeo.org/) website.
+
+```{bash, eval=FALSE}
+# Install GRASS GIS
+sudo apt-get install grass grass-core grass-dev grass-gui grass-doc
+```
+
+**GRASS GIS addons**
+
+Copy-paste the commands below to install the required addons for GRASS GIS.
+
+```{bash, eval=FALSE}
+sudo apt install make
+
+# Install GRASS GIS addons
+export GRASSEXEC="grass --exec"
+$GRASSEXEC  g.extension  extension=r.stream.distance
+$GRASSEXEC  g.extension  extension=r.stream.order
+$GRASSEXEC  g.extension  extension=r.stream.snap
+$GRASSEXEC  g.extension  extension=r.stream.basins
+```
+
+**GNU parallel**
+
+```{bash, eval=FALSE}
+# Download the latest version of GNU parallel 
+wget http://ftp.gnu.org/gnu/parallel/parallel-latest.tar.bz2
+
+# Unzip the the .tar file and create a new folder parallel-yyyymmdd
+sudo tar xjf parallel-latest.tar.bz2
+# Check folders and files in the directory and see the date of 
+# latest version e.g. parallel-20221122
+ls
+# Move to the new created folder parallel-yyyymmdd
+cd parallel-20221122
+
+sudo ./configure && make
+sudo make install
+parallel --citation
+
+#> Academic tradition requires you to cite works you base your article on.
+#> If you use programs that use GNU Parallel to process data for an article in a
+#> scientific publication, please cite:
+#> 
+#> @software{tange_2022_7347980,
+#>       author       = {Tange, Ole},
+#>       title        = {GNU Parallel 20221122 ('Херсо́н')},
+#>       month        = Nov,
+#>       year         = 2022,
+#>       note         = {{GNU Parallel is a general parallelizer to run
+#>                        multiple serial command line programs in parallel
+#>                        without changing them.}},
+#>       publisher    = {Zenodo},
+#>       doi          = {10.5281/zenodo.7347980},
+#>       url          = {https://doi.org/10.5281/zenodo.7347980}
+#> }
+
+#> (Feel free to use \nocite{tange_2022_7347980})
+
+#> This helps funding further development; AND IT WON'T COST YOU A CENT.
+#> If you pay 10000 EUR you should feel free to use GNU Parallel without citing.
+
+#> More about funding GNU Parallel and the citation notice:
+#> https://lists.gnu.org/archive/html/parallel/2013-11/msg00006.html
+#> https://www.gnu.org/software/parallel/parallel_design.html#citation-notice
+#> https://git.savannah.gnu.org/cgit/parallel.git/tree/doc/citation-notice-faq.txt
+
+#> If you send a copy of your published article to tange@gnu.org, it will be
+#> mentioned in the release notes of next version of GNU Parallel.
+#> 
+#> Type: 'will cite' and press enter.
+
+will cite
+
+#> Thank you for your support: You are the reason why there is funding to
+#> continue maintaining GNU Parallel. On behalf of future versions of
+#> GNU Parallel, which would not exist without your support:
+
+#>  THANK YOU SO MUCH
+
+#> It is really appreciated. The citation notice is now silenced.
+```
+
+**dos2unix**
+The Windows systems uses different text file line endings than the Linux systems. Dos2Unix is a package that contains commands for converting line endings in a text file from Windows to Linux and vice versa.
+
+```{bash, eval=FALSE}
+# Install dos2unix
+sudo apt install -y dos2unix
+```
+

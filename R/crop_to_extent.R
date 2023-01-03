@@ -151,9 +151,3 @@ crop_to_extent <- function(raster_path, vector_path = NULL, bound_box = NULL,
     }
   }
 }
-
-
-
-
-
-

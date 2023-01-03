@@ -7,9 +7,9 @@
    inkscape:version="1.2.1 (2ed6d7ae0b, 2022-08-22, custom)"
    id="svg8"
    version="1.1"
-   viewBox="0 0 35.000003 40.431354"
-   height="40.431355mm"
-   width="35mm"
+   viewBox="0 0 31.163936 36"
+   height="36mm"
+   width="31.163933mm"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -155,8 +155,8 @@
      inkscape:document-rotation="0"
      inkscape:current-layer="layer1"
      inkscape:document-units="mm"
-     inkscape:cy="92.555227"
-     inkscape:cx="98.742411"
+     inkscape:cy="92.807764"
+     inkscape:cx="64.902301"
      inkscape:zoom="3.959798"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
@@ -168,34 +168,34 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1">
     <sodipodi:guide
-       position="-113.05853,-257.08542"
+       position="-113.05853,-261.51678"
        orientation="1,0"
        id="guide1014"
        inkscape:locked="false" />
     <sodipodi:guide
-       position="-119.53125,-258.71556"
+       position="-119.53126,-263.14692"
        orientation="1,0"
        id="guide1016"
        inkscape:locked="false" />
     <sodipodi:guide
-       position="-331.15049,-180.37906"
+       position="-331.15049,-184.81042"
        orientation="0,-1"
        id="guide1067"
        inkscape:locked="false" />
     <sodipodi:guide
-       position="-437.38564,-236.84018"
+       position="-437.38565,-241.27154"
        orientation="0,-1"
        id="guide1071"
        inkscape:locked="false" />
     <sodipodi:guide
-       position="15.429886,-274.82679"
+       position="15.429886,-279.25815"
        orientation="0,-1"
        id="guide1138"
        inkscape:locked="false" />
     <sodipodi:guide
        id="guide1115"
        orientation="1,0"
-       position="65.277066,-3.1125358"
+       position="65.277067,-7.5438902"
        inkscape:locked="false" />
   </sodipodi:namedview>
   <metadata
@@ -214,7 +214,7 @@
      id="layer1"
      inkscape:groupmode="layer"
      inkscape:label="Layer 1"
-     transform="translate(-49.582019,-63.641921)">
+     transform="translate(-49.58202,-63.641921)">
     <image
        width="45.055752"
        height="44.353127"
@@ -225,33 +225,33 @@
        y="70.039291"
        style="stroke-width:3.01251"
        clip-path="url(#clipPath398)"
-       transform="matrix(0.8984745,0,0,0.8984745,138.63224,1.0299878)" />
+       transform="matrix(0.80000005,0,0,0.80000005,128.87218,7.8923699)" />
     <path
-       style="fill:none;stroke:#372921;stroke-width:0.66172;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="m 67.091357,64.024044 -17.178472,9.918004 v 19.83187 l 17.177236,9.917292 17.161031,-9.907896 V 73.944387 Z"
+       style="fill:none;stroke:#372921;stroke-width:0.589194;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 65.172302,63.982163 -15.295681,8.830972 v 17.65826 l 15.29458,8.830336 15.28015,-8.821968 V 72.815218 Z"
        id="path1261" />
     <path
-       style="fill:none;stroke:#372921;stroke-width:0.66172;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="m 67.091361,64.024029 -17.178482,9.918035 v 19.831877 l 17.177248,9.917289 17.161031,-9.907893 V 73.944403 Z"
+       style="fill:none;stroke:#372921;stroke-width:0.589194;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 65.172306,63.982149 49.876617,72.81315 V 90.471417 L 65.171205,99.30175 80.451356,90.479783 V 72.815232 Z"
        id="path1036" />
     <path
        id="path1184"
-       d="M 67.091172,64.420717 50.256277,74.140381 V 93.5756 l 16.833686,9.71894 16.817797,-9.709731 V 74.142676 Z"
-       style="fill:none;stroke:#ffffff;stroke-width:0.190298;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+       d="m 65.172137,64.335359 -14.98976,8.654372 v 17.305084 l 14.988684,8.653725 14.974536,-8.645525 v -17.31124 z"
+       style="fill:none;stroke:#ffffff;stroke-width:0.169441;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     <path
-       style="fill:none;stroke:#ffffff;stroke-width:0.190298;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="M 67.091172,64.420717 50.256277,74.140381 V 93.5756 l 16.833686,9.71894 16.817797,-9.709731 V 74.142676 Z"
+       style="fill:none;stroke:#ffffff;stroke-width:0.169441;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 65.172137,64.335359 -14.98976,8.654372 v 17.305084 l 14.988684,8.653725 14.974536,-8.645525 v -17.31124 z"
        id="path1685" />
     <text
        xml:space="preserve"
-       style="font-size:5.8638px;line-height:1.25;font-family:Roboto;-inkscape-font-specification:Roboto;stroke-width:0.116802;stroke-miterlimit:4;stroke-dasharray:none"
-       x="50.852074"
-       y="85.465279"
+       style="font-size:5.22112px;line-height:1.25;font-family:Roboto;-inkscape-font-specification:Roboto;stroke-width:0.104;stroke-miterlimit:4;stroke-dasharray:none"
+       x="50.712875"
+       y="83.073395"
        id="text1426"><tspan
          sodipodi:role="line"
          id="tspan1424"
-         x="50.852074"
-         y="85.465279"
-         style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:5.8638px;font-family:Roboto;-inkscape-font-specification:'Roboto Medium';fill:#ffffff;stroke:#214478;stroke-width:0.116802;stroke-miterlimit:4;stroke-dasharray:none">hydrographr</tspan></text>
+         x="50.712875"
+         y="83.073395"
+         style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:5.22112px;font-family:Roboto;-inkscape-font-specification:'Roboto Medium';fill:#ffffff;stroke:#214478;stroke-width:0.104;stroke-miterlimit:4;stroke-dasharray:none">hydrographr</tspan></text>
   </g>
 </svg>

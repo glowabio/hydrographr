@@ -18,9 +18,8 @@ crop_to_extent(
 \item{vector_path}{Path to a vector layer that is used as a cutline data
 source}
 
-\item{bound_box}{The coordinates of the corner of a bounding box (ULX: upper left x value
-bounding box, ULY: upper left y value bounding box, LRX: lower right x value
-bounding box, LRY: lower right y value bounding box).}
+\item{bound_box}{The coordinates of the corner of a bounding box (xmin, ymin,
+xmax, ymax) or a SpatRaster, SpatVector, or other spatial object.}
 
 \item{output_path}{Path for the raster .tif output}
 
@@ -29,11 +28,15 @@ TRUE is set by default.}
 }
 \value{
 A .tif raster file and a SpatRaster object, or a .tif raster file if
-rcrop_read = TRUE
+rcrop_read = FALSE
 }
 \description{
 Crop a raster .tif to a polygon border line if a vector layer
-is provided, otherwise if the coordinates of a bounding box are provided,
-the raster is cropped to the extent of the bounding box. At least a cutline
-source (vector layer) or a bounding box coordinates must be provided.
+(cutline source) is provided, otherwise if a bounding box is provided
+(xmin, ymin, xmax, ymax coordinates or a spatial object from which to extract
+ a bounding box), the raster is cropped to the extent of the bounding box. At
+ least a cutline source (vector_path) or a bounding box (bound_box)
+ must be provided. If rcrop_read = TRUE (default), the outputs are a .tif
+ (saved under output_path) and a SpatRaster (terra package) object,
+ otherwise if rcrop_read = FALSE, the .tif file is the only output.
 }
