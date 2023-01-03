@@ -4,16 +4,20 @@
 \alias{download_test_data}
 \title{Downloads the test data for the Hydrography90m dataset}
 \usage{
-download_test_data(download_path = "./hydrography90m_test_data")
+download_test_data(download_path = ".")
 }
 \arguments{
 \item{download_path}{The path where the files will be downloaded}
 }
 \description{
-The test data contains all Hydrography90m and species point observation data for a small geographic extent to test the functions.
+The test data contains all Hydrography90m and species point observation data
+for a small geographic extent to test the functions.
 }
 \details{
-The test data is available at https://drive.google.com/file/d/1kYNWXmtVm6X7MZLISOePGpvxB1pk1scD/view?usp=share_link and can be automatically downloaded and unzipped with this function to a desired path.
+The test data is available at
+https://drive.google.com/file/d/1kYNWXmtVm6X7MZLISOePGpvxB1pk1scD/view?usp=share_link
+and can be automatically downloaded and unzipped
+with this function to a desired path.
 }
 \examples{
 # Download the test data to the current working directory
@@ -21,6 +25,19 @@ download_test_data()
 
 # Download the data to a specific (existing) directory
 download_test_data("path/to/your/directory")
+
+}
+\references{
+Amatulli, G., Garcia Marquez, J., Sethi, T., Kiesel, J., Grigoropoulou, A.,
+Üblacker, M. M., Shen, L. Q., and Domisch, S.: Hydrography90m: a new
+high-resolution global hydrographic dataset, Earth Syst. Sci. Data, 14,
+4525–4550, https://doi.org/10.5194/essd-14-4525-2022, 2022.")
+
+Amatulli G., Garcia Marquez J., Sethi T., Kiesel J., Grigoropoulou A.,
+Üblacker M., Shen L. & Domisch S. (2022-08-09 ). Hydrography90m: A new
+high-resolution global hydrographic dataset. IGB Leibniz-Institute of
+Freshwater Ecology and Inland Fisheries. dataset.
+https://doi.org/10.18728/igb-fred-762.1
 }
 \author{
 Afroditi Grigoropoulou

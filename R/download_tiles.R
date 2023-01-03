@@ -1,13 +1,20 @@
-#' Downloads multiple files from Nimbus by calling the function download_tiles_base in a loop.
+#' Downloads multiple files from Nimbus
+#' by calling the function download_tiles_base in a loop.
 #'
 #' @param variable vector of variable names (character)
 #' @param filetype format of the requested file ("tif" or "gpkg")
 #' @param tile_id id of the requested tile (character)
 #' @param reg_unit_id id of the requested regional unit (character)
-#' @param global Should the global file be downloaded or not. TRUE/FALSE, FALSE by default
+#' @param global Should the global file be downloaded or not.
+#' TRUE/FALSE, FALSE by default
 #' @param download_path The path where the files will be downloaded
 #' @importFrom tidyr separate
 #' @importFrom stringr str_split_fixed str_extract
+#' @references Amatulli G., Garcia Marquez J., Sethi T., Kiesel J.,
+#' Grigoropoulou A., Üblacker M., Shen L. & Domisch S. (2022-08-09 )
+#' Hydrography90m: A new high-resolution global hydrographic dataset.
+#' IGB Leibniz-Institute of Freshwater Ecology and Inland Fisheries.
+#' dataset. https://doi.org/10.18728/igb-fred-762.1
 #' @export
 #'
 
@@ -150,5 +157,7 @@ or \"n\" if you'd rather not to, and then press Enter \n"))
         )
       }
     }
+    cat("Please cite the Hydrography90m publication:\n
+        Amatulli, G., Garcia Marquez, J., Sethi, T., Kiesel, J., Grigoropoulou, A., Üblacker, M. M., Shen, L. Q., and Domisch, S.: Hydrography90m: a new high-resolution global hydrographic dataset, Earth Syst. Sci. Data, 14, 4525–4550, https://doi.org/10.5194/essd-14-4525-2022, 2022.")
   }
 }

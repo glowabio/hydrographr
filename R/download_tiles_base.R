@@ -1,14 +1,18 @@
-#' Downloads a single file from https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4?path=%2F.
+#' Downloads a single file from
+#' https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4?path=%2F.
 #' It is called and inherits arguments by the function 'download_tiles()'.
 #'
 #' @param variable vector of variable names (character)
 #' @param filetype format of the requested file ("tif" or "gpkg")
 #' @param tile_id id of the requested tile (character)
-#' @param global Should the global file be downloaded or not. TRUE/FALSE, FALSE by default
+#' @param global Should the global file be downloaded or not.
+#' TRUE/FALSE, FALSE by default
 #' @param download_path The path where the files will be downloaded
-#' @param file_size_table_sep lookup table of file sizes (inherited by 'download_tiles()')
-#' @param server_path path to the the home download folder in either Nimbus or GDrive (inherited by 'download_tiles()')
-#' @export
+#' @param file_size_table_sep lookup table of file sizes
+#' (inherited by 'download_tiles()')
+#' @param server_path path to the the home download folder
+#' in either Nimbus or GDrive (inherited by 'download_tiles()')
+#' @keywords internal
 #'
 
 download_tiles_base <- function(variable, filetype = "tif",
@@ -50,7 +54,7 @@ download_tiles_base <- function(variable, filetype = "tif",
   gdrive_path <- "https://drive.google.com/uc?export=download&id="
 
   # Download from Nimbus
-  if (server_path == nimbus_path & varname!="cti_ovr.tif") {
+  if (server_path == nimbus_path && varname != "cti_ovr.tif") {
 
     print(varname)
     download.file(paste0(nimbus_path, gsub("/", "%2F", file_path)),
@@ -59,7 +63,7 @@ download_tiles_base <- function(variable, filetype = "tif",
   }
 
   # Download from GDrive
-  if (server_path == gdrive_path | varname=="cti_ovr.tif") {
+  if (server_path == gdrive_path || varname == "cti_ovr.tif") {
 
     # Get GDrive file id from the lookup table
     file_id <- file_size_table_sep[varname_tile == varname, ]$file_id
