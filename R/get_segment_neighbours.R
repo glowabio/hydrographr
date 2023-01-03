@@ -8,7 +8,7 @@
 #' This function can also be used to create the connectivity table
 #' for Marxan by using variable="length" and attach_only=TRUE.
 #' The resulting table reports the connectivity from each segment,
-#'  along with the stream length for all connected segments.
+#' along with the stream length for all connected segments.
 #'
 #' @param g A directed graph (igraph object).
 #' @param segment_id The input segment IDs as a numerical vector
@@ -39,7 +39,6 @@
 #' parallel backend in MB. Defaults to 1500 (1.5 GB).
 #' Consider a higher value for
 #' large study areas (more than one 20°x20° tile).
-
 #'
 #' @importFrom future plan multisession multicore
 #' @importFrom doFuture registerDoFuture
@@ -54,6 +53,17 @@
 #'
 #'
 #' @examples
+#' library(hydrographr)
+#'
+#' # Specify the working directory of the test data
+#' DATADIR <- "path/to/test_data"
+#'
+#' # Download the test data
+#' download_test_data(DATADIR)
+#'
+#' # Load the stream network as graph
+#' g <- read_geopackage(paste0(DATADIR, "/order_vect_59.gpkg"), type="net", g=T)
+#'
 #' # Get the upstream segment neighbours in the 5th order
 #' and report the length and source elevation
 #' for the neighbours of each input segment
@@ -98,7 +108,7 @@ segment_neighbours <- function(g, segment_id = NULL,
     )
 
   if (missing(segment_id)) stop(
-    "Please provide at least one segment ID of the input graph. 
+    "Please provide at least one segment ID of the input graph.
     The segment_id must be a numeric vector."
     )
 
@@ -108,7 +118,7 @@ segment_neighbours <- function(g, segment_id = NULL,
 
   if (hasArg(n_cores)) {
     if (length(segment_id) > 1 && n_cores == 0)  stop(
-      "You have specified multiple segments but zero workers. 
+      "You have specified multiple segments but zero workers.
       Please specify at least n_cores=1,
       or leave it empty to allow an automatic setup.")
   }
