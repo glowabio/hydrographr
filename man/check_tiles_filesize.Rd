@@ -2,7 +2,8 @@
 % Please edit documentation in R/check_tiles_filesize.R
 \name{check_tiles_filesize}
 \alias{check_tiles_filesize}
-\title{Checks the size of single files. It is called and inherits arguments by the function 'download_tiles()'}
+\title{Checks the size of single files.
+It is called and inherits arguments by the function 'download_tiles()'}
 \usage{
 check_tiles_filesize(
   variable,
@@ -21,20 +22,25 @@ check_tiles_filesize(
 
 \item{filetype}{format of the requested file ("tif" or "gpkg")}
 
-\item{tile_id}{id of the requested tile (character)}
+\item{tile_id}{id of the requested tile or regional unit (character)}
 
-\item{reg_unit_id}{id of the requested regional unit (character)}
+\item{global}{Should the global file be downloaded or not.
+TRUE/FALSE, FALSE by default}
 
-\item{global}{Should the global file be downloaded or not. TRUE/FALSE, FALSE by default}
+\item{valid_varnames}{valid names of the files available for download
+(inherited by 'download_tiles()')}
 
-\item{valid_varnames}{valid names of the files available for download (inherited by 'download_tiles()')}
+\item{valid_tile_ids}{valid ids of the tiles available for download
+(inherited by 'download_tiles()')}
 
-\item{valid_tile_ids}{valid ids of the tiles available for download (inherited by 'download_tiles()')}
+\item{valid_filetypes}{valid file types of the files available for download
+(inherited by 'download_tiles()')}
 
-\item{valid_filetypes}{valid file types of the files available for download (inherited by 'download_tiles()')}
-
-\item{file_size_table_sep}{lookup table of file sizes (inherited by 'download_tiles()')}
+\item{file_size_table_sep}{lookup table of file sizes
+(inherited by 'download_tiles()')}
 }
 \description{
-Checks the size of single files. It is called and inherits arguments by the function 'download_tiles()'
+Checks the size of single files.
+It is called and inherits arguments by the function 'download_tiles()'
 }
+\keyword{internal}

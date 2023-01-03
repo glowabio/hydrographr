@@ -2,17 +2,45 @@
 % Please edit documentation in R/get_regional_unit_id.R
 \name{get_regional_unit_id}
 \alias{get_regional_unit_id}
-\title{Identifies the ids of the regional units in which the given points are located. Input is a point data frame.}
+\title{Identifies the IDs of the regional units within the Hydrography90m data
+in which the input points are located. The IDs are required to then download
+the data using download_tiles_base() or download_tiles().
+Input is a point data frame.}
 \usage{
 get_regional_unit_id(data, lon, lat, quiet = TRUE)
 }
 \arguments{
-\item{data}{data.frame with the lat lon columns}
+\item{data}{A data.frame or data.table with the latitude (lat) and
+longitude (lon) columns}
 
 \item{lon}{Name of the longitude column as character string}
 
 \item{lat}{Name of the latitude column as character string}
 }
 \description{
-Identifies the ids of the regional units in which the given points are located. Input is a point data frame.
+Identifies the IDs of the regional units within the Hydrography90m data
+in which the input points are located. The IDs are required to then download
+the data using download_tiles_base() or download_tiles().
+Input is a point data frame.
+}
+\examples{
+library(hydrographr)
+library(data.table)
+
+# Specify the working directory of the test data
+DATADIR <- "path/to/test_data"
+
+# Download the test data
+download_test_data(DATADIR)
+
+# Read the species data
+species <- fread(paste0(DATADIR, "/spdata_1264942.txt"))
+
+# Get the regional unit ID
+my_IDs <- get_regional_unit_id(species, lon="longitude", lat="latitude")
+
+
+}
+\author{
+Afroditi Grigoropoulou
 }
