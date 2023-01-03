@@ -2,7 +2,7 @@
 
 # full path to file with snapped points
 export DATA=$1
-# names of columns for ocurrence id, longitude and latitude
+# names of columns for occurrence id, longitude and latitude
 export ID=$2
 export LON=$3
 export LAT=$4
@@ -24,12 +24,12 @@ UpstreamBasin(){
     # ocurrences ids
 export S=$1
     # coordinates for id
-export coord=$(awk -F, -v micid=${S} -v occname=${ID} -v lon=$LON -v lat=$LAT \
+export coord=$(awk -v micid=${S} -v occname=${ID} -v lon=$LON -v lat=$LAT \
     'NR == 1 { for (i=1; i<=NF; i++) {f[$i] = i} } \
     BEGIN{OFS=",";} $(f[occname])==micid {print $(f[lon]),$(f[lat])}' $DATA)
 
 
-grass78 -f -text --tmp-location -c $DIRE <<'EOF'
+grass78 -f -gtext --tmp-location  $DIRE <<'EOF'
 
 #  read direction map
 r.external --o input=$DIRE output=dir
@@ -49,12 +49,12 @@ r.out.gdal --o -f -c -m  createopt="COMPRESS=DEFLATE,ZLEVEL=9" \
 EOF
 
 }
-export -f UpstreamBasin 
+export -f UpstreamBasin
 
-occids=$(awk -F, -v occname=${ID}  'NR == 1 { for (i=1; i<=NF; i++) {f[$i] = i} } \
+# occids=$(awk -v occname=${ID}  'NR == 1 { for (i=1; i<=NF; i++) {f[$i] = i} } \
     NR > 1 {print $(f[occname])}' $DATA)
 parallel -j $PAR --delay 3 UpstreamBasin ::: $occids
 
-    
+
 exit
 
