@@ -4,30 +4,54 @@
 \alias{extract_from_gpkg}
 \title{Extract values from the stream order .gpkg files.}
 \usage{
-extract_from_gpkg(data_dir, out_path = NULL, subc_ids, subc_layer, variables)
+extract_from_gpkg(
+  data_dir,
+  out_path = NULL,
+  subc_ids,
+  subc_layer,
+  variables,
+  n_cores = NULL
+)
 }
 \arguments{
 \item{data_dir}{Character. Path to the directory containing all input data}
 
-\item{out_path}{Character. Full path of the output file.
-If not NULL, the output data.frame is exported as a csv in the given path}
+\item{out_path}{Character. The optional full path of the output file. The
+output is loaded always into R, and if the out_path is specified, the output
+will be stored as a .csv in this location (e.g. "/path/to/output.csv")}
 
-\item{subc_ids}{Vector of sub-catchment ids or "all".
-If "all", the gpkg values are extracted for all the segments of the given gpkg layer.
-The stream segment ids are the same as the sub-catchment ids.
-A vector of the sub-catchment ids can be acquired from the extract_ids() function,
-by sub setting the resulting data.frame}
+\item{subc_ids}{A vector of sub-catchment IDs or "all".
+If "all", the .gpkg values are extracted for all the segments
+of the given .gpkg layer. The stream segment ids are the same as the
+sub-catchment IDs. A vector of the sub-catchment IDs can be acquired
+from the extract_ids() function, by sub-setting the resulting data.frame.}
 
 \item{subc_layer}{Character. Full path to the sub-catchment ID .tif layer}
 
-\item{variables}{Character vector. Variable file names, e.g. order_vect_point_h18v04.gpkg.
-Variable names should remain intact in file names, even after prior file processing,
-i.e., order_vect_point should appear in the file name.
-The files should be cropped to the extent of the sub-catchment layer}
+\item{variables}{Character vector of one or multiple .gpkg file names,
+e.g. "order_vect_point_h18v04.gpkg".}
+
+\item{n_cores}{Numeric. Number of cores for parallelization. Defaults to
+detectCores() - 1.}
 }
 \description{
-Extract values from the stream order .gpkg files.
+The function reads the attribute table of the stream network GeoPackage file
+(.gpkg) stored on disk and extracts the data for one or more (or all) input
+sub-catchment (i.e. stream segment) IDs. The output is a data.table, and only
+the output is loaded into R.
+}
+\examples{
+library(hydrographr)
+
+# Specify the working directory of the test data
+DATADIR <- "path/to/test_data"
+
+# Download the test data
+download_test_data(DATADIR)
+
+my_dt <- extract_from_gpkg(data_dir=DATADIR, subc_ids="all")
+
 }
 \author{
-Afroditi Grigoropoulou Jaime Garcia Marquez
+Afroditi Grigoropoulou, Jaime Garcia Marquez
 }

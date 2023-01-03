@@ -1,7 +1,4 @@
-<<<<<<< Updated upstream
-#' Calculate zonal statistics based on environmental variable raster .tif layers.
-#' #'
-=======
+
 #' Calculate zonal statistics based on one or more environmental variable
 #' raster .tif layers.
 #'
@@ -9,7 +6,6 @@
 #' sub-catchments. The sub-catchment raster (.tif) input file is stored on disk.
 #' The output is a data.table which is loaded into R.
 #'
->>>>>>> Stashed changes
 #' @param data_dir Character. Path to the directory containing all input data
 #' @param out_path Character. Full path of the output file.
 #' If not NULL, the output data.frame is exported as a .csv in the given path
@@ -67,9 +63,28 @@ extract_zonal_stat <- function(data_dir, out_path = NULL, subc_ids,
     print("The variables should be provided in a character vector format")
   }
 
+
+  # Check if paths exist
+  for (path in c(subc_layer, data_dir)) {
+    if (!file.exists(path))
+      stop(paste0("File path: ", path, " does not exist."))
+  }
+
+  # Check if subc_layer ends with .tif
+  for (path in c(subc_layer, variables)) {
+    if (!endsWith(path, ".tif"))
+      stop(paste0("File path: ", path, " does not end with .tif"))
+  }
+
+
+
+
   # Create temporary output directories
   dir.create(paste0(data_dir, "/tmp"), showWarnings = FALSE)
   dir.create(paste0(data_dir, "/tmp/r_univar"), showWarnings = FALSE)
+
+  # Make bash scripts executable
+  make_sh_exec()
 
   calc_all <- 1
 
@@ -78,7 +93,7 @@ extract_zonal_stat <- function(data_dir, out_path = NULL, subc_ids,
     calc_all <- 0
     reclass <- rbind.data.frame(data.frame(str_c(subc_ids, " = ", 1)),
                                 "* = NULL")
-    fwrite(reclass, paste0(data_dir,"/tmp/reclass_rules.txt"), sep = "\t",
+    fwrite(reclass, paste0(data_dir, "/tmp/reclass_rules.txt"), sep = "\t",
            row.names = FALSE, quote = FALSE, col.names = FALSE)
 
     # Format subc_ids vector so that it can be read
@@ -104,7 +119,7 @@ extract_zonal_stat <- function(data_dir, out_path = NULL, subc_ids,
 
 
   # Call the external .sh script report_no_data()
-  reports <- run(system.file("sh","report_no_data.sh",
+  reports <- processx::run(system.file("sh", "report_no_data.sh",
                              package = "hydrographr"),
                  args = c(data_dir, variables_array, n_cores),
                  echo = FALSE)$stdout
@@ -128,7 +143,7 @@ extract_zonal_stat <- function(data_dir, out_path = NULL, subc_ids,
 
   # Call the external .sh script extract_zonal_stat()
   # containing the grass functions
-  run(system.file("sh","extract_zonal_stat.sh",
+  processx::run(system.file("sh", "extract_zonal_stat.sh",
                   package = "hydrographr"),
       args = c(data_dir, subc_ids, subc_layer,
                variables_array, calc_all, n_cores),
