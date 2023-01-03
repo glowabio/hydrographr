@@ -52,7 +52,7 @@ ogr2ogr -f "GPKG" -overwrite -nln ref_points -nlt POINT -a_srs EPSG:4326 \
 
 
 ##  do the snapping in GRASS
-grass -f --text --tmp-location $STR  <<'EOF'
+grass -f --gtext --tmp-location $STR  <<'EOF'
 
 v.in.ogr --o input=$DIR/ref_points_${RAND_STRING}.gpkg layer=ref_points output=ref_points \
     type=point #key=

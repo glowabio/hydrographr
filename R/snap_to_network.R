@@ -178,8 +178,8 @@ snap_to_network <- function(data, lon, lat, site_id, stream_path,
   ## Note: Only export lon/lat column
   fwrite(coord, coord_tmp_path, col.names = TRUE,
          row.names = FALSE, quote = FALSE, sep = ",")
-  # Path for tmp regional unit ids text file
-  snap_tmp_path <- paste0(tempdir(), "/snapped_points", rand_string, ".txt")
+  # Path for snapped coordinates text file
+  snap_tmp_path <- paste0(tempdir(), "/snapped_points_", rand_string, ".txt")
 
   if (system == "linux" || system == "osx") {
 
@@ -187,7 +187,7 @@ snap_to_network <- function(data, lon, lat, site_id, stream_path,
     # the argument
     accu_path <- ifelse(is.null(accu_path), "NA", accu_path)
 
-    run(system.file("sh", "snap_to_network.sh",
+    processx::run(system.file("sh", "snap_to_network.sh",
                     package = "hydrographr"),
         args = c(coord_tmp_path, lon, lat,
                  stream_path, accu_path, calc, dist, accu,
@@ -215,8 +215,7 @@ snap_to_network <- function(data, lon, lat, site_id, stream_path,
                  wsl_snap_tmp_path, wsl_tmp_path, wsl_sh_file),
         echo = !quiet)
   }
-  snapped_coord <- fread(paste0(tempdir(), "/snapped_points",
-                                rand_string, ".txt"),
+  snapped_coord <- fread(snap_tmp_path,
                          keepLeadingZeros = TRUE,
                          header = TRUE, sep = " ")
 
