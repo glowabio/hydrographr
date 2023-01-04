@@ -34,9 +34,9 @@
 #' @details
 #' The function makes use of the r.stream.snap command available in GRASS GIS to
 #' simultaneously a number of points to a stream network. A distance threshold
-#' can be specified and points will be snap to any stream segemnt within this
+#' can be specified and points will be snap to any stream segment within this
 #' distance radius. However, to avoid snapping to small tributaries, an
-#' acumulation threshold can be used and the snapping occurs on stream segment
+#' accumulation threshold can be used and the snapping occurs on stream segment
 #' with equal or higher accumulation threshold and within the given distance radius.
 #'
 #' @author Maria M. Üblacker, Jaime Garcia Marquez
@@ -178,8 +178,8 @@ snap_to_network <- function(data, lon, lat, site_id, stream_path,
   ## Note: Only export lon/lat column
   fwrite(coord, coord_tmp_path, col.names = TRUE,
          row.names = FALSE, quote = FALSE, sep = ",")
-  # Path for snapped coordinates text file
-  snap_tmp_path <- paste0(tempdir(), "/snapped_points_", rand_string, ".txt")
+  # Path for tmp regional unit ids text file
+  snap_tmp_path <- paste0(tempdir(), "/snapped_points", rand_string, ".txt")
 
   if (system == "linux" || system == "osx") {
 
@@ -215,7 +215,8 @@ snap_to_network <- function(data, lon, lat, site_id, stream_path,
                  wsl_snap_tmp_path, wsl_tmp_path, wsl_sh_file),
         echo = !quiet)
   }
-  snapped_coord <- fread(snap_tmp_path,
+  snapped_coord <- fread(paste0(tempdir(), "/snapped_points",
+                                rand_string, ".txt"),
                          keepLeadingZeros = TRUE,
                          header = TRUE, sep = " ")
 

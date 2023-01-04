@@ -62,6 +62,7 @@ r.in.gdal input=$STR output=stream
 
 if [ "$CALC" = "dist" ]
 then
+
     r.stream.snap --o input=ref_points output=snap_points stream_rast=stream \
         radius=$rdist
 
