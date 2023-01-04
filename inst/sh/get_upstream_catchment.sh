@@ -51,7 +51,7 @@ EOF
 }
 export -f UpstreamBasin
 
-# occids=$(awk -v occname=${ID}  'NR == 1 { for (i=1; i<=NF; i++) {f[$i] = i} } \
+occids=$(awk -v occname=${ID}  'NR == 1 { for (i=1; i<=NF; i++) {f[$i] = i} } \
     NR > 1 {print $(f[occname])}' $DATA)
 parallel -j $PAR --delay 3 UpstreamBasin ::: $occids
 
