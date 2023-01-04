@@ -2,21 +2,18 @@
 % Please edit documentation in R/download_tiles_base.R
 \name{download_tiles_base}
 \alias{download_tiles_base}
-\title{Downloads a single file from https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4?path=%2F.
+\title{Downloads a single file from
+https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4?path=%2F.
 It is called and inherits arguments by the function 'download_tiles()'.}
 \usage{
 download_tiles_base(
   variable,
   filetype = "tif",
   tile_id = NULL,
-  reg_unit_id = NULL,
   global = FALSE,
   download_path = ".",
-  valid_varnames,
-  valid_tile_ids,
-  valid_filetypes,
-  file_size_table_sep,
-  nimbus_path
+  file_size_table_sep = NULL,
+  server_path = NULL
 )
 }
 \arguments{
@@ -26,23 +23,20 @@ download_tiles_base(
 
 \item{tile_id}{id of the requested tile (character)}
 
-\item{reg_unit_id}{id of the requested regional unit (character)}
-
-\item{global}{Should the global file be downloaded or not. TRUE/FALSE, FALSE by default}
+\item{global}{Should the global file be downloaded or not.
+TRUE/FALSE, FALSE by default}
 
 \item{download_path}{The path where the files will be downloaded}
 
-\item{valid_varnames}{valid names of the files available for download (inherited by 'download_tiles()')}
+\item{file_size_table_sep}{lookup table of file sizes
+(inherited by 'download_tiles()')}
 
-\item{valid_tile_ids}{valid ids of the tiles available for download (inherited by 'download_tiles()')}
-
-\item{valid_filetypes}{valid file types of the files available for download (inherited by 'download_tiles()')}
-
-\item{file_size_table_sep}{lookup table of file sizes (inherited by 'download_tiles()')}
-
-\item{nimbus_path}{path to the the home download folder in Nimbus (inherited by 'download_tiles()')}
+\item{server_path}{path to the the home download folder
+in either Nimbus or GDrive (inherited by 'download_tiles()')}
 }
 \description{
-Downloads a single file from https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4?path=%2F.
+Downloads a single file from
+https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4?path=%2F.
 It is called and inherits arguments by the function 'download_tiles()'.
 }
+\keyword{internal}

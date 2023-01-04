@@ -2,14 +2,15 @@
 % Please edit documentation in R/reclass_raster.R
 \name{reclass_raster}
 \alias{reclass_raster}
-\title{Reclassify raster values of a raster file}
+\title{Reclassification of an integer raster layer}
 \usage{
 reclass_raster(
+  data,
   rast_val,
-  recl_val,
+  new_val,
   rast_path,
   recl_path,
-  recl_read = TRUE,
+  read = TRUE,
   nodata = -9999,
   type = "Int32",
   compress = "DEFLATE",
@@ -17,25 +18,63 @@ reclass_raster(
 )
 }
 \arguments{
-\item{rast_val}{Numeric vector of current raster values.}
+\item{data}{data.frame or data.table with the present and new raster values}
 
-\item{recl_val}{Numeric vector of reclassification values .}
+\item{rast_val}{Column name of present raster values as character string.}
 
-\item{rast_path}{Full path to raster .tif layer.}
+\item{new_val}{Column name of new raster values as character string.}
 
-\item{recl_path}{Full path to reclassified .tif layer = output file.}
+\item{rast_path}{Full path to the input raster .tif layer.}
 
-\item{recl_read}{If TRUE the reclassified raster .tif layer gets read into R.
-TRUE is set by default.}
+\item{recl_path}{Full path of the output .tif layer
+of the reclassified raster file.}
 
-\item{nodata}{Nodata value of the new .tif layer. The default value is -9999.}
+\item{read}{If TRUE (default), then the reclassified raster .tif layer
+gets read into R as a SpatRaster (terra object)}
+
+\item{nodata}{The Nodata value of the new .tif layer. The default value
+is -9999.}
 
 \item{type}{Data type; Options are Byte, Int16, UInt16, Int32, UInt32,
-CInt16, CInt32; Int32 is set by default.}
+CInt16, CInt32. Int32 is set by default.}
 
-\item{compress}{Compression type: DEFLATE or LZW; DEFLATE is set by default.}
+\item{compress}{Compression type: DEFLATE or LZW. DEFLATE is set by default.}
 }
 \description{
-Reclassifies a raster file based on integer values according
-to the reclassification rules.
+Reclassifies an integer raster .tif layer using the r.reclass function of
+GRASS GIS. To reclassify the raster layer the present raster values
+and the new raster values have to be defined.
+}
+\details{
+If the input raster layer has floating point values, you should multiply
+the input data by some factor (e.g. 1000) to achieve integer values,
+otherwise the GRASS GIS r.reclass will round the raster values down to
+the next integer which is not always desired.
+#'
+}
+\examples{
+# Set directory for test data
+DATADIR <- "/path/to/test_data"
+
+# Download test data
+download_test_data(DATADIR)
+
+# Read the stream order for each sub-catchment as a data.table.
+my_dt <- read_geopackage("order_vect_59.gpkg", type="net", dt=T)
+
+# Select the stream segment ID and and the Strahler stream order
+str_ord <- my_dt[,c("stream", "strahler")]
+
+# Reclassify the stream network to obtain the Strahler stream order raster
+str_ord_rast <- reclass_raster(str_ord, rast_val = "stream",
+new_val = "strahler", rast_path =  "/DATADIR/stream_1264942.tif",
+recl_path = "/path/to/output.tif")
+
+
+}
+\references{
+https://grass.osgeo.org/grass82/manuals/r.reclass.html
+}
+\author{
+Maria Üblacker
 }
