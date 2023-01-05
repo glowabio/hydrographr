@@ -11,7 +11,8 @@ extract_zonal_stat(
   subc_ids,
   subc_layer,
   variables,
-  n_cores = NULL
+  n_cores = NULL,
+  quiet = TRUE
 )
 }
 \arguments{
@@ -22,7 +23,7 @@ If not NULL, the output data.frame is exported as a .csv in the given path}
 
 \item{subc_ids}{Vector of sub-catchment IDs or "all".
 If "all", zonal statistics are calculated for all sub-catchments
-of the given sub-catchment rastter layer. A vector of the sub-catchment IDs
+of the given sub-catchment raster layer. A vector of the sub-catchment IDs
 can be acquired from the extract_ids() function, and by sub-setting
 the resulting data.frame.}
 
@@ -35,7 +36,10 @@ i.e., slope_grad_dw_cel should appear in the file name.
 The files should be cropped to the extent of the sub-catchment layer to
 speed up the computation.}
 
-\item{n_cores}{Numeric. Number of cores used for parallelization}
+\item{n_cores}{Numeric. Number of cores used for parallelization. If NULL,
+the physical available CPUs - 1 are used.}
+
+\item{quiet}{Logical. Whether the standard output will be printed or not.}
 }
 \description{
 This function can be used to aggregate data across a set (or all)
@@ -43,24 +47,34 @@ sub-catchments. The sub-catchment raster (.tif) input file is stored on disk.
 The output is a data.table which is loaded into R.
 }
 \examples{
-library(hydrographr)
-library(data.table)
-
 # Specify the working directory of the test data
-DATADIR <- "path/to/test_data"
+my_directory <- tempdir()
 
 # Download the test data
-download_test_data(DATADIR)
+download_test_data(my_directory)
 
 # Calculate the zonal statistics for all sub-catchments for two variables
-subc_layer=paste0(DATADIR, "/subcatchment_1264942.tif"),
-variables=c(paste0(DATADIR, "/spi_1264942.tif"),
-paste0(DATADIR, "/sti_1264942.tif"), n_cores=2))
+stat <- extract_zonal_stat(data_dir = paste0(my_directory,
+                                             "/hydrography90m_test_data"),
+                           subc_ids = subc_ids <- c(513837216, 513841103,
+                                                    513850467, 513868394,
+                                                    513870312),
+                           subc_layer = paste0(my_directory,
+                                               "/hydrography90m_test_data",
+                                               "/subcatchment_1264942.tif"),
+                           variables = c("spi_1264942.tif", "sti_1264942.tif"),
+                           n_cores = 2)
+# Show output table
+stat
 
 }
+\references{
+\url{https://grass.osgeo.org/grass82/manuals/r.univar.html}
+}
 \seealso{
-set_no_data
+\code{\link{report_no_data}} to check the defined NoData value.
+\code{\link{set_no_data}} to define a NoData value.
 }
 \author{
-Afroditi Grigoropoulou, Jaime Garcia Marquez
+Afroditi Grigoropoulou, Jaime Garcia Marquez, Maria M. Üblacker
 }

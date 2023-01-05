@@ -1,4 +1,3 @@
-
 #' Calculate zonal statistics based on one or more environmental variable
 #' raster .tif layers.
 #'
@@ -11,7 +10,7 @@
 #' If not NULL, the output data.frame is exported as a .csv in the given path
 #' @param subc_ids Vector of sub-catchment IDs or "all".
 #' If "all", zonal statistics are calculated for all sub-catchments
-#' of the given sub-catchment rastter layer. A vector of the sub-catchment IDs
+#' of the given sub-catchment raster layer. A vector of the sub-catchment IDs
 #' can be acquired from the extract_ids() function, and by sub-setting
 #' the resulting data.frame.
 #' @param subc_layer Character. Full path to the sub-catchment ID .tif layer
@@ -21,37 +20,51 @@
 #' i.e., slope_grad_dw_cel should appear in the file name.
 #' The files should be cropped to the extent of the sub-catchment layer to
 #' speed up the computation.
-#' @param n_cores Numeric. Number of cores used for parallelization
+#' @param n_cores Numeric. Number of cores used for parallelization. If NULL,
+#' the physical available CPUs - 1 are used.
+#' @param quiet Logical. Whether the standard output will be printed or not.
 #'
 #' @importFrom data.table fread fwrite
 #' @importFrom processx run
 #' @importFrom parallel detectCores
 #' @importFrom stringr str_c str_split
 #' @import dplyr
-#'
-#' @author Afroditi Grigoropoulou, Jaime Garcia Marquez
-#' @seealso set_no_data
 #' @export
 #'
-#' @examples
-#' library(hydrographr)
-#' library(data.table)
+#' @author Afroditi Grigoropoulou, Jaime Garcia Marquez, Maria M. Üblacker
 #'
+#' @seealso
+#' \code{\link{report_no_data}} to check the defined NoData value.
+#' \code{\link{set_no_data}} to define a NoData value.
+#'
+#' @references
+#' \url{https://grass.osgeo.org/grass82/manuals/r.univar.html}
+#'
+#' @examples
 #' # Specify the working directory of the test data
-#' DATADIR <- "path/to/test_data"
+#' my_directory <- tempdir()
 #'
 #' # Download the test data
-#' download_test_data(DATADIR)
+#' download_test_data(my_directory)
 #'
 #' # Calculate the zonal statistics for all sub-catchments for two variables
-#  zonal_stat_dt <- extract_zonal_stat(data_dir="DATADIR", subc_ids="all",
-#' subc_layer=paste0(DATADIR, "/subcatchment_1264942.tif"),
-#' variables=c(paste0(DATADIR, "/spi_1264942.tif"),
-#' paste0(DATADIR, "/sti_1264942.tif"), n_cores=2))
+#' stat <- extract_zonal_stat(data_dir = paste0(my_directory,
+#'                                              "/hydrography90m_test_data"),
+#'                            subc_ids = subc_ids <- c(513837216, 513841103,
+#'                                                     513850467, 513868394,
+#'                                                     513870312),
+#'                            subc_layer = paste0(my_directory,
+#'                                                "/hydrography90m_test_data",
+#'                                                "/subcatchment_1264942.tif"),
+#'                            variables = c("spi_1264942.tif", "sti_1264942.tif"),
+#'                            n_cores = 2)
+#' # Show output table
+#' stat
 #'
 
 extract_zonal_stat <- function(data_dir, out_path = NULL, subc_ids,
-                               subc_layer, variables, n_cores = NULL) {
+                               subc_layer, variables, n_cores = NULL,
+                               quiet = TRUE) {
 
   # Introductory steps
 
@@ -76,15 +89,13 @@ extract_zonal_stat <- function(data_dir, out_path = NULL, subc_ids,
       stop(paste0("File path: ", path, " does not end with .tif"))
   }
 
-
-
-
+  # Create random string to attach to the tmp folder
+  rand_string <- stri_rand_strings(n = 1, length = 8, pattern = "[A-Za-z0-9]")
+  tmp <- paste0("/tmp_", rand_string)
   # Create temporary output directories
-  dir.create(paste0(data_dir, "/tmp"), showWarnings = FALSE)
-  dir.create(paste0(data_dir, "/tmp/r_univar"), showWarnings = FALSE)
-
-  # Make bash scripts executable
-  make_sh_exec()
+  dir.create(paste0(data_dir, tmp), showWarnings = FALSE)
+  dir.create(paste0(data_dir, tmp, "/r_univar"),
+             showWarnings = FALSE)
 
   calc_all <- 1
 
@@ -93,12 +104,12 @@ extract_zonal_stat <- function(data_dir, out_path = NULL, subc_ids,
     calc_all <- 0
     reclass <- rbind.data.frame(data.frame(str_c(subc_ids, " = ", 1)),
                                 "* = NULL")
-    fwrite(reclass, paste0(data_dir, "/tmp/reclass_rules.txt"), sep = "\t",
+    fwrite(reclass, paste0(data_dir, tmp, "/reclass_rules.txt"), sep = "\t",
            row.names = FALSE, quote = FALSE, col.names = FALSE)
 
     # Format subc_ids vector so that it can be read
     # as an array in the bash script
-    subc_ids <- paste(unique(subc_ids), collapse = " ")
+    subc_ids <- paste(unique(subc_ids), collapse = "/")
 
   }
 
@@ -106,61 +117,80 @@ extract_zonal_stat <- function(data_dir, out_path = NULL, subc_ids,
   if (is.null(n_cores)) {
 
     #  Detect number of available cores
-    n_cores <- detectCores() - 1
+    n_cores <- detectCores(logical = FALSE) - 1
 
   }
 
   # Get the variable names
   varnames <- gsub(".tif", "", variables)
 
-  # Format subc_ids vector so that it can be read
-  # as an array in the bash script
-  variables_array <- paste(unique(variables), collapse = " ")
-
-
-  # Call the external .sh script report_no_data()
-  reports <- processx::run(system.file("sh", "report_no_data.sh",
-                             package = "hydrographr"),
-                 args = c(data_dir, variables_array, n_cores),
-                 echo = FALSE)$stdout
-
-  # Format the message before reporting
-  reports <- str_split(reports, "\n")
-  print(reports)
-
-
   # Delete files if they exist
   for (varname in varnames) {
 
-    if (file.exists(paste0(data_dir, "/tmp/r_univar/stats_",
+    if (file.exists(paste0(data_dir, tmp, "/r_univar/stats_",
                            varname, ".csv"))) {
-      file.remove(paste0(data_dir, "/tmp/r_univar/stats_",
+      file.remove(paste0(data_dir, tmp, "/r_univar/stats_",
                          varname, ".csv"))
     }
   }
 
+  # Format subc_ids vector so that it can be read
+  # as an array in the bash script
+  variables_array <- paste(unique(variables), collapse = "/")
+
+  # Call function report_no_data()
+  no_data <- report_no_data(data_dir = data_dir, variables = variables,
+                             n_cores = n_cores)
+  print(noquote("The following NoData values are used for the calculation:"))
+  print(no_data)
+
+
+  # Check operating system
+  system <- get_os()
+
+  # Make bash scripts executable
+  make_sh_exec()
+
   # Run the zonal statistics function
 
-  # Call the external .sh script extract_zonal_stat()
-  # containing the grass functions
-  processx::run(system.file("sh", "extract_zonal_stat.sh",
+  if (system == "linux" || system == "osx") {
+    # Call the external .sh script extract_zonal_stat()
+    # containing the grass functions
+    processx::run(system.file("sh", "extract_zonal_stat.sh",
                   package = "hydrographr"),
-      args = c(data_dir, subc_ids, subc_layer,
-               variables_array, calc_all, n_cores),
-      echo = FALSE)$stderr
+                  args = c(data_dir, subc_ids, subc_layer,
+                           variables_array, calc_all, n_cores,  rand_string,),
+                  echo = !quiet)
 
+    } else {
+      # Check if WSL and Ubuntu are installed
+      check_wsl()
+      # Change paths for WSL
+      wsl_data_dir <- fix_path(data_dir)
+      wsl_subc_layer <- fix_path(subc_layer)
+      wsl_sh_file <- fix_path(system.file("sh", "extract_zonal_stat.sh",
+                                          package = "hydrographr"))
+
+      # Open GRASS GIS session on WSL
+      # Call external GRASS GIS command r.reclass
+      processx::run(system.file("bat", "extract_zonal_stat.bat",
+                                package = "hydrographr"),
+                    args = c(wsl_data_dir, subc_ids, wsl_subc_layer,
+                             variables_array, calc_all, n_cores, rand_string,
+                             wsl_sh_file),
+                    echo = !quiet)
+
+    }
 
   # Read in the resulting variable statistics tables and join them
-
-  out_filenames <- list.files(paste0(data_dir, "/tmp/r_univar/"),
+  out_filenames <- list.files(paste0(data_dir, tmp, "/r_univar/"),
                               pattern = "stats_.*.csv", full.names = TRUE)
 
   out_files <- lapply(out_filenames, fread)
 
-  var_table <- setDT(
-    unlist(out_files, recursive = FALSE),
-    check.names = TRUE
-  )[]
+  var_table <- setDT(unlist(out_files, recursive = FALSE),
+                     check.names = TRUE) %>%
+               select(!starts_with("subc_id."))
 
   # Write out master table if requested
   if (!is.null(out_path)) {
@@ -169,10 +199,9 @@ extract_zonal_stat <- function(data_dir, out_path = NULL, subc_ids,
   }
 
   # Delete temporary output directory
-  unlink(paste0(data_dir, "/tmp/"), recursive = TRUE)
+  unlink(paste0(data_dir, tmp, "/"), recursive = TRUE)
 
   # Return table
   return(var_table)
-
 
 }
