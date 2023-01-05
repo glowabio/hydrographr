@@ -2,9 +2,8 @@
 % Please edit documentation in R/extract_zonal_stat.R
 \name{extract_zonal_stat}
 \alias{extract_zonal_stat}
-\title{Calculate zonal statistics based on
-environmental variable raster .tif layers.
-#'}
+\title{Calculate zonal statistics based on one or more environmental variable
+raster .tif layers.}
 \usage{
 extract_zonal_stat(
   data_dir,
@@ -19,32 +18,49 @@ extract_zonal_stat(
 \item{data_dir}{Character. Path to the directory containing all input data}
 
 \item{out_path}{Character. Full path of the output file.
-If not NULL, the output data.frame is exported as a csv in the given path}
+If not NULL, the output data.frame is exported as a .csv in the given path}
 
-\item{subc_ids}{Vector of sub-catchment ids or "all".
-If "all", zonal statistics are calculated for all the sub-catchments
-of the given sub-catchment layer. A vector of the sub-catchment ids
-can be acquired from the extract_ids() function, by sub setting
-the resulting data.frame}
+\item{subc_ids}{Vector of sub-catchment IDs or "all".
+If "all", zonal statistics are calculated for all sub-catchments
+of the given sub-catchment rastter layer. A vector of the sub-catchment IDs
+can be acquired from the extract_ids() function, and by sub-setting
+the resulting data.frame.}
 
 \item{subc_layer}{Character. Full path to the sub-catchment ID .tif layer}
 
 \item{variables}{Character vector. Variable file names,
-e.g. slope_grad_dw_cel_h00v00.tif. Variable names should remain
-intact in file names, even after prior file processing,
+e.g. "slope_grad_dw_cel_h00v00.tif". Variable names should remain
+intact in file names, even after file processing,
 i.e., slope_grad_dw_cel should appear in the file name.
-The files should be cropped to the extent of the sub-catchment layer}
+The files should be cropped to the extent of the sub-catchment layer to
+speed up the computation.}
 
 \item{n_cores}{Numeric. Number of cores used for parallelization}
 }
 \description{
-Calculate zonal statistics based on
-environmental variable raster .tif layers.
-#'
+This function can be used to aggregate data across a set (or all)
+sub-catchments. The sub-catchment raster (.tif) input file is stored on disk.
+The output is a data.table which is loaded into R.
+}
+\examples{
+library(hydrographr)
+library(data.table)
+
+# Specify the working directory of the test data
+DATADIR <- "path/to/test_data"
+
+# Download the test data
+download_test_data(DATADIR)
+
+# Calculate the zonal statistics for all sub-catchments for two variables
+subc_layer=paste0(DATADIR, "/subcatchment_1264942.tif"),
+variables=c(paste0(DATADIR, "/spi_1264942.tif"),
+paste0(DATADIR, "/sti_1264942.tif"), n_cores=2))
+
 }
 \seealso{
 set_no_data
 }
 \author{
-Afroditi Grigoropoulou Jaime Garcia Marquez
+Afroditi Grigoropoulou, Jaime Garcia Marquez
 }

@@ -18,25 +18,25 @@ check_tiles_filesize(
 )
 }
 \arguments{
-\item{variable}{vector of variable names (character)}
+\item{variable}{Vector of variable names (as character)}
 
-\item{filetype}{format of the requested file ("tif" or "gpkg")}
+\item{filetype}{Format of the requested file, either "tif" or "gpkg"}
 
-\item{tile_id}{id of the requested tile or regional unit (character)}
+\item{tile_id}{The ID of the requested tile or regional unit (as character)}
 
-\item{global}{Should the global file be downloaded or not.
+\item{global}{Logical. Should the global file be downloaded or not.
 TRUE/FALSE, FALSE by default}
 
-\item{valid_varnames}{valid names of the files available for download
+\item{valid_varnames}{The valid names of the files available for download
 (inherited by 'download_tiles()')}
 
-\item{valid_tile_ids}{valid ids of the tiles available for download
+\item{valid_tile_ids}{The valid IDs of the tiles available for download
 (inherited by 'download_tiles()')}
 
-\item{valid_filetypes}{valid file types of the files available for download
+\item{valid_filetypes}{The valid file types of the files available for download
 (inherited by 'download_tiles()')}
 
-\item{file_size_table_sep}{lookup table of file sizes
+\item{file_size_table_sep}{The lookup table of file sizes
 (inherited by 'download_tiles()')}
 }
 \description{

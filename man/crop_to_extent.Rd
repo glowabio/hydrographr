@@ -2,7 +2,7 @@
 % Please edit documentation in R/crop_to_extent.R
 \name{crop_to_extent}
 \alias{crop_to_extent}
-\title{crop_to_extent}
+\title{Crop a raster layer to a specific extent on disk}
 \usage{
 crop_to_extent(
   raster_path,
@@ -16,27 +16,46 @@ crop_to_extent(
 \item{raster_path}{Path to the raster .tif layer}
 
 \item{vector_path}{Path to a vector layer that is used as a cutline data
-source}
+source (similar to a mask operation)}
 
 \item{bound_box}{The coordinates of the corner of a bounding box (xmin, ymin,
 xmax, ymax) or a SpatRaster, SpatVector, or other spatial object.}
 
-\item{output_path}{Path for the raster .tif output}
+\item{output_path}{Path for copped output raster .tif file.}
 
-\item{rcrop_read}{If TRUE the cropped raster .tif layer gets read into R.
-TRUE is set by default.}
+\item{rcrop_read}{If TRUE (default), then the cropped raster .tif layer
+gets read into R. Else the cropped .tif file will be only written to disk.}
 }
 \value{
-A .tif raster file and a SpatRaster object, or a .tif raster file if
-rcrop_read = FALSE
+The function returns always a .tif raster file written to disk.
+Optionally, a SpatRaster (terra object) can be loaded into R with
+rcrop_read = TRUE.
 }
 \description{
-Crop a raster .tif to a polygon border line if a vector layer
+This function crops an input raster layer directly on disk,
+i.e. the input layer does not be needed to be loaded into R. The function
+crops a raster .tif to a polygon border line if a vector layer
 (cutline source) is provided, otherwise if a bounding box is provided
 (xmin, ymin, xmax, ymax coordinates or a spatial object from which to extract
  a bounding box), the raster is cropped to the extent of the bounding box. At
  least a cutline source (vector_path) or a bounding box (bound_box)
- must be provided. If rcrop_read = TRUE (default), the outputs are a .tif
- (saved under output_path) and a SpatRaster (terra package) object,
- otherwise if rcrop_read = FALSE, the .tif file is the only output.
+ must be provided. The output is always written to disk, and can be
+ optionally loaded directly into R as a SpatRaster (terra package) object
+ (using  rcrop_read = TRUE).
+}
+\examples{
+library(hydrographr)
+library(data.table)
+
+# Specify the working directory of the test data
+DATADIR <- "path/to/test_data"
+
+# Download the test data
+download_test_data(DATADIR)
+
+# Crop the Stream Power Index to the basin
+spi_basin <- crop_to_extent(raster_path=paste0(DATADIR, "/spi_1264942.tif"),
+vector_path = paste0(DATADIR, "/basin_59.gpkg"),
+output_path="/my/output/path/spi_basin_cropped.tif"),
+rcrop_read = TRUE)
 }
