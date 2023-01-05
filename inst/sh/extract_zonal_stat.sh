@@ -1,14 +1,15 @@
 #!/bin/bash
 
 export DATADIR=$1
-declare -a SUBC_IDS=($2)
+declare -a SUBC_IDS=($(echo $2 | tr "/" "\n"))
 export SUBC_LAYER=$3
-declare VARS=($4)
+declare VARS=($(echo $4 | tr "/" "\n"))
 export CALC_ALL=$5
 export NCORES=$6
+export RSTRING=$7
 
-export TMPTAX=$DATADIR/tmp
-export OUTDIR=$DATADIR/tmp/r_univar
+export TMPTAX=$DATADIR/tmp_${RSTRING}
+export OUTDIR=$DATADIR/tmp_${RSTRING}/r_univar
 
 
 extract_zonal_stat(){
@@ -17,7 +18,7 @@ extract_zonal_stat(){
 
     export VARNAME=$(basename $VAR .tif)
 
-grass78 -f --gtext --tmp-location $SUBC_LAYER   <<'EOF'
+grass -f --text --tmp-location $SUBC_LAYER   <<'EOF'
 
 
     # Read in subcatchment raster
@@ -57,4 +58,3 @@ export -f extract_zonal_stat
 
 # VARS should be provided as an array from R
 parallel -j $NCORES extract_zonal_stat ::: ${VARS[*]}
-
