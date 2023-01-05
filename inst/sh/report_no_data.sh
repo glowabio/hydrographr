@@ -14,7 +14,7 @@ report_no_data(){
     export NO_DATA=$(gdalinfo $DATADIR/$VAR | grep "NoData Value="  | awk -F"=" '{print $2}')
 
     # report no data value
-    echo  $VAR ": NoData = " $NO_DATA
+    echo "$VAR=$NO_DATA"
 
 }
 
