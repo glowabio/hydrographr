@@ -2,8 +2,9 @@
 % Please edit documentation in R/set_no_data.R
 \name{set_no_data}
 \alias{set_no_data}
-\title{Change or set no data value to raster layers.
-The change happens in-place, meaning that the original file is overwritten}
+\title{Change or set the NoData value for a raster layer.
+The change happens in-place, meaning that the original file is overwritten
+on disk.}
 \usage{
 set_no_data(data_dir, variable, no_data)
 }
@@ -11,16 +12,14 @@ set_no_data(data_dir, variable, no_data)
 \item{data_dir}{Character. Path to the directory containing all input data.}
 
 \item{variable}{Character vector. Variable file name,
-e.g. slope_grad_dw_cel_h00v00.tif. Variable names should remain
-intact in file names, even after prior file processing,
-i.e., slope_grad_dw_cel should appear in the file name
-The files should be cropped to the extent of the sub-catchment layer}
+e.g. slope_grad_dw_cel_h00v00.tif. The original file will be overwritten.}
 
-\item{no_data}{The desired no data value}
+\item{no_data}{The desired NoData value}
 }
 \description{
-Change or set no data value to raster layers.
+Change or set the NoData value for a raster layer.
 The change happens in-place, meaning that the original file is overwritten
+on disk.
 }
 \examples{
 # Download test data into temporary R folder
@@ -29,12 +28,9 @@ download_test_data(my_directory)
 
 # Define no data value
 set_no_data(data_dir = paste0(my_directory, "/hydrography90m_test_data"),
-            variable = "subcatchment_1264942.tif",
+            variable = "cti_1264942.tif",
             no_data = -9999)
 
-}
-\references{
-\url{https://gdal.org/programs/gdal_edit.html}
 }
 \author{
 Afroditi Grigoropoulou, Maria M. Üblacker

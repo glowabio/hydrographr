@@ -65,9 +65,20 @@ summarize attributes across these segments.
 This function can also be used to create the connectivity table
 for Marxan by using variable="length" and attach_only=TRUE.
 The resulting table reports the connectivity from each segment,
- along with the stream length for all connected segments.
+along with the stream length for all connected segments.
 }
 \examples{
+library(hydrographr)
+
+# Specify the working directory of the test data
+DATADIR <- "path/to/test_data"
+
+# Download the test data
+download_test_data(DATADIR)
+
+# Load the stream network as graph
+g <- read_geopackage(paste0(DATADIR, "/order_vect_59.gpkg"), type="net", g=T)
+
 # Get the upstream segment neighbours in the 5th order
 and report the length and source elevation
 for the neighbours of each input segment

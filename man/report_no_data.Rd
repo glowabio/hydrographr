@@ -2,7 +2,7 @@
 % Please edit documentation in R/report_no_data.R
 \name{report_no_data}
 \alias{report_no_data}
-\title{Report no data value of raster layers.}
+\title{Report NoData value of raster layers.}
 \usage{
 report_no_data(data_dir, variables, n_cores = NULL)
 }
@@ -10,12 +10,33 @@ report_no_data(data_dir, variables, n_cores = NULL)
 \item{data_dir}{Character. Path to the directory containing all input data.}
 
 \item{variables}{Character vector. The names of the raster files.
-e.g. slope_grad_dw_cel_h00v00.tif.
-#' @param n_cores Numeric. Number of cores used for parallelization}
+e.g. slope_grad_dw_cel_h00v00.tif.}
+
+\item{n_cores}{Numeric. Number of cores used for parallelization. If NULL,
+available cores - 1 will be used.}
 }
 \description{
-Report no data value of raster layers.
+This function reports the defined NoData value of a raster layer. The NoData
+value of a raster layer represents the absence of data. In computations the
+NoData value can be treated in different ways. Either the NoData value will
+be reported or the Nodata value will be ignored and a value is computed from
+the available values of a specified location.
+}
+\examples{
+# Download test data into temporary R folder
+my_directory <- tempdir()
+download_test_data(my_directory)
+
+# Report the NoData value
+report_no_data(data_dir = paste0(my_directory, "/hydrography90m_test_data"),
+               variable = c("subcatchment_1264942.tif", "flow_1264942.tif",
+                             "spi_1264942.tif"),
+               n_core = 2)
+
+}
+\references{
+\url{https://gdal.org/programs/gdalinfo.html}
 }
 \author{
-Afroditi Grigoropoulou
+Afroditi Grigoropoulou, Maria M. Üblacker
 }

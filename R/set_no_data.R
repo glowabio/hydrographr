@@ -13,10 +13,6 @@
 #'
 #' @author Afroditi Grigoropoulou, Maria M. Üblacker
 #'
-#' @references
-#' \url{https://gdal.org/programs/gdal_edit.html}
-
-#'
 #'@examples
 #' # Download test data into temporary R folder
 #' my_directory <- tempdir()
