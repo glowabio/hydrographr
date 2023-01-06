@@ -6,9 +6,9 @@
 \usage{
 get_upstream_catchment(
   data,
-  id = character(0),
-  lon = character(0),
-  lat = character(0),
+  id,
+  lon,
+  lat,
   direction_layer = NULL,
   out_path = NULL,
   n_cores = NULL,
@@ -26,12 +26,79 @@ get_upstream_catchment(
 
 \item{direction_layer}{Full path to raster file with the direction variable}
 
-\item{out_path}{Full path to the directory where the output(s) will be stored}
+\item{out_path}{Full path to the directory where the output(s) will be stored.
+To identify the upstream catchment the output file name includes the site id.}
 
-\item{n_cores}{Numeric. Number of cores used for parallelization}
+\item{n_cores}{Numeric. Number of cores used for parallelization.}
 
 \item{quiet}{If FALSE, process is printed}
 }
 \description{
 Calculates the upstream basin taking each point as the outlet
+}
+\examples{
+# Download test data into temporary R folder
+my_directory <- tempdir()
+download_test_data(my_directory)
+
+# Before running the function get_upstream_catchment(), snap the points to
+# to the stream segment. There are multiple ways to snap the points. Here is
+# one example:
+
+# Load occurrence data
+species_occurence <- read.table(paste0(my_directory,
+                                "/hydrography90m_test_data/spdata_1264942.txt"),
+                                header = TRUE)
+
+# Define full path to the basin and sub-catchments raster layer
+basin_rast <- paste0(my_directory,
+                     "/hydrography90m_test_data/basin_1264942.tif")
+subc_rast <- paste0(my_directory,
+                    "/hydrography90m_test_data/subcatchment_1264942.tif")
+
+# Define full path to the vector file of the stream network
+stream_vect <- paste0(my_directory,
+                      "/hydrography90m_test_data/order_vect_59.gpkg")
+
+# Automatically extract the basin and sub-catchment IDs and
+# snap the data points to the stream segment
+snapped_coordinates <- snap_to_subc_segment(data = species_occurence,
+                                            lon = "longitude",
+                                            lat = "latitude",
+                                            site_id = "occurrence_id",
+                                            basin_path = basin_rast,
+                                            subc_path = subc_rast,
+                                            stream_path = stream_vect,
+                                            cores = 2)
+
+# Define full path to the direction .tif
+direction_rast <- paste0(my_directory,
+                        "/hydrography90m_test_data/direction_1264942.tif")
+# Define the path for the output file(s)
+output <-  paste0(my_directory, "/upstream_catchments")
+if(!dir.exists(output)) dir.create(output)
+# Get the upstream catchment for each point location
+get_upstream_catchment(hydrography90m_ids,
+                       lon = "longitude",
+                       lat = "latitude",
+                       id = "occurrence_id",
+                       direction_layer = dir_rast,
+                       out_path = output,
+                       n_cores = 2)
+
+}
+\references{
+\url{https://grass.osgeo.org/grass82/manuals/r.water.outlet.html}
+\url{https://grass.osgeo.org/grass82/manuals/r.region.html}
+}
+\seealso{
+\code{\link{snap_to_network}} to snap the data points to the next stream
+segment within a given radius and/or a given flow accumulation threshold
+value.
+\code{\link{snap_to_subc_segment}} to snap the data points to the next stream
+segment within the sub-catchment the point is located.
+\code{\link{extract_ids}} to extract basin and sub-catchment IDs.
+}
+\author{
+Jaime Garcia Marquez, Afroditi Grigoropoulou, Maria M. Üblacker
 }
