@@ -29,7 +29,7 @@ export coord=$(awk -v micid=${S} -v occname=${ID} -v lon=$LON -v lat=$LAT \
     BEGIN{OFS=",";} $(f[occname])==micid {print $(f[lon]),$(f[lat])}' $DATA)
 
 
-grass78 -f -gtext --tmp-location  $DIRE <<'EOF'
+grass -f --text --tmp-location  $DIRE <<'EOF'
 
 #  read direction map
 r.external --o input=$DIRE output=dir
@@ -57,4 +57,3 @@ parallel -j $PAR --delay 3 UpstreamBasin ::: $occids
 
 
 exit
-
