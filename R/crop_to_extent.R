@@ -61,7 +61,7 @@ crop_to_extent <- function(raster_path, vector_path = NULL, bound_box = NULL,
   } else {
     # Check operating system
     system <- get_os()
-    if (system == "linux") {
+    if (system == "linux" | system == "osx") {
       if (!is.null(vector_path)){
         # Call external gdalwarp command from GDAL library. Cut through
         # the border line option
