@@ -1,9 +1,3 @@
-#' Checks the size of single files.
-#' It is called and inherits arguments by the function 'download_tiles()'
-#'
-#' @param variable vector of variable names (character)
-#' @param filetype format of the requested file ("tif" or "gpkg")
-#' @param tile_id id of the requested tile or regional unit (character)
 #' Check the size of single files before downloading.
 #' It is called and inherits arguments by the function 'download_tiles()'
 #'
