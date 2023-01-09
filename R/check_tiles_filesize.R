@@ -10,7 +10,8 @@
 #' (inherited by 'download_tiles()')
 #' @param valid_tile_ids The valid IDs of the tiles available for download
 #' (inherited by 'download_tiles()')
-#' @param valid_filetypes The valid file types of the files available for download
+#' @param valid_filetypes The valid file types of the files available
+#' for download
 #' (inherited by 'download_tiles()')
 #' @param file_size_table_sep The lookup table of file sizes
 #' (inherited by 'download_tiles()')

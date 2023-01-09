@@ -159,7 +159,7 @@ extract_zonal_stat <- function(data_dir, out_path = NULL, subc_ids,
     processx::run(system.file("sh", "extract_zonal_stat.sh",
                   package = "hydrographr"),
                   args = c(data_dir, subc_ids, subc_layer,
-                           variables_array, calc_all, n_cores,  rand_string,),
+                           variables_array, calc_all, n_cores, rand_string),
                   echo = !quiet)
 
     } else {

@@ -2,7 +2,7 @@
 % Please edit documentation in R/check_tiles_filesize.R
 \name{check_tiles_filesize}
 \alias{check_tiles_filesize}
-\title{Checks the size of single files.
+\title{Check the size of single files before downloading.
 It is called and inherits arguments by the function 'download_tiles()'}
 \usage{
 check_tiles_filesize(
@@ -33,14 +33,15 @@ TRUE/FALSE, FALSE by default}
 \item{valid_tile_ids}{The valid IDs of the tiles available for download
 (inherited by 'download_tiles()')}
 
-\item{valid_filetypes}{The valid file types of the files available for download
+\item{valid_filetypes}{The valid file types of the files available
+for download
 (inherited by 'download_tiles()')}
 
 \item{file_size_table_sep}{The lookup table of file sizes
 (inherited by 'download_tiles()')}
 }
 \description{
-Checks the size of single files.
+Check the size of single files before downloading.
 It is called and inherits arguments by the function 'download_tiles()'
 }
 \keyword{internal}

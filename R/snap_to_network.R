@@ -37,7 +37,8 @@
 #' can be specified and points will be snap to any stream segment within this
 #' distance radius. However, to avoid snapping to small tributaries, an
 #' accumulation threshold can be used and the snapping occurs on stream segment
-#' with equal or higher accumulation threshold and within the given distance radius.
+#' with equal or higher accumulation threshold and within the given distance
+#' radius.
 #'
 #' @author Maria M. Üblacker, Jaime Garcia Marquez
 #'
@@ -51,8 +52,8 @@
 #'
 #' # Load occurrence data
 #' species_occurence <- read.table(paste0(my_directory,
-#'                                 "/hydrography90m_test_data/spdata_1264942.txt"),
-#'                                 header = TRUE
+#'                             "/hydrography90m_test_data/spdata_1264942.txt"),
+#'                               header = TRUE
 #'
 #' # Define full path to flow accumulation
 #' stream_rast <- paste0(my_directory,

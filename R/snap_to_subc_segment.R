@@ -56,8 +56,8 @@
 #'
 #' # Load occurrence data
 #' species_occurence <- read.table(paste0(my_directory,
-#'                                 "/hydrography90m_test_data/spdata_1264942.txt"),
-#'                                 header = TRUE)
+#'                             "/hydrography90m_test_data/spdata_1264942.txt"),
+#'                               header = TRUE)
 # Define full path to the basin and sub-catchments raster layer
 #' basin_rast <- paste0(my_directory,
 #'                      "/hydrography90m_test_data/basin_1264942.tif")

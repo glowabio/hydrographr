@@ -67,8 +67,8 @@ download_test_data(my_directory)
 
 # Load occurrence data
 species_occurence <- read.table(paste0(my_directory,
-                                "/hydrography90m_test_data/spdata_1264942.txt"),
-                                header = TRUE)
+                            "/hydrography90m_test_data/spdata_1264942.txt"),
+                              header = TRUE)
 basin_rast <- paste0(my_directory,
                      "/hydrography90m_test_data/basin_1264942.tif")
 subc_rast <- paste0(my_directory,

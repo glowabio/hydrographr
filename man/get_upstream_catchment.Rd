@@ -26,7 +26,8 @@ get_upstream_catchment(
 
 \item{direction_layer}{Full path to raster file with the direction variable}
 
-\item{out_path}{Full path to the directory where the output(s) will be stored.
+\item{out_path}{Full path to the directory where the output(s)
+will be stored.
 To identify the upstream catchment the output file name includes the site id.}
 
 \item{n_cores}{Numeric. Number of cores used for parallelization.}
@@ -47,8 +48,8 @@ download_test_data(my_directory)
 
 # Load occurrence data
 species_occurence <- read.table(paste0(my_directory,
-                                "/hydrography90m_test_data/spdata_1264942.txt"),
-                                header = TRUE)
+                            "/hydrography90m_test_data/spdata_1264942.txt"),
+                             header = TRUE)
 
 # Define full path to the basin and sub-catchments raster layer
 basin_rast <- paste0(my_directory,

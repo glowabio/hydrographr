@@ -5,7 +5,8 @@
 #' @param lon Name of the longitude column (WGS 84)
 #' @param lat Name of the latitude column (WGS 84)
 #' @param direction_layer Full path to raster file with the direction variable
-#' @param out_path Full path to the directory where the output(s) will be stored.
+#' @param out_path Full path to the directory where the output(s)
+#' will be stored.
 #' To identify the upstream catchment the output file name includes the site id.
 #' @param n_cores Numeric. Number of cores used for parallelization.
 #' @param quiet If FALSE, process is printed
@@ -42,8 +43,8 @@
 #'
 #' # Load occurrence data
 #' species_occurence <- read.table(paste0(my_directory,
-#'                                 "/hydrography90m_test_data/spdata_1264942.txt"),
-#'                                 header = TRUE)
+#'                             "/hydrography90m_test_data/spdata_1264942.txt"),
+#'                              header = TRUE)
 #'
 #' # Define full path to the basin and sub-catchments raster layer
 #' basin_rast <- paste0(my_directory,
@@ -146,7 +147,7 @@ get_upstream_catchment <- function(data, id, lon, lat, direction_layer = NULL,
 
   # Create random string to attach to the file name of the temporary
   # points_dataset.txt and ids.txt file
-  rand_string <- stri_rand_strings(n=1, length=8, pattern="[A-Za-z0-9]")
+  rand_string <- stri_rand_strings(n = 1, length = 8, pattern = "[A-Za-z0-9]")
   # Select columns with lon/lat coordinates and occurrence/site id
   coord_id <- data %>%
     select(matches(c(id, lon, lat)))
@@ -167,7 +168,7 @@ get_upstream_catchment <- function(data, id, lon, lat, direction_layer = NULL,
   make_sh_exec()
 
 
-  if (system == "linux" | system == "osx"){
+  if (system == "linux" || system == "osx") {
 
     # Call the external .sh script get_upstream_catchment() containing the
     # GRASS functions
@@ -204,4 +205,3 @@ get_upstream_catchment <- function(data, id, lon, lat, direction_layer = NULL,
   print(paste0("The output is in ", out_path))
 
 }
-

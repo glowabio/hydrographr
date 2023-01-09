@@ -2,7 +2,8 @@
 
 #' @description Merge multiple raster or spatial vector objects from disk
 #' to form a new raster or spatial vector object with a larger spatial extent.
-#' A directory with at least a raster .tif or spatial vector geopackage file must be provided.
+#' A directory with at least a raster .tif or spatial vector geopackage file
+#' must be provided.
 #' If rraster`_`read = TRUE (default), the outputs are a .tif
 #' (saved under output`_`path) and a SpatRaster (terra package) object,
 #' otherwise if rraster`_`read = FALSE, the .tif file is the only output.
@@ -11,7 +12,8 @@
 #' otherwise if rvector`_`read = FALSE (default),
 #' the .tif file is the only output
 
-#' @param tile_path Path to directory containing the raster tiles or spatial vectors to be merged
+#' @param tile_path Path to directory containing the raster tiles or
+#' spatial vectors to be merged
 #' @param output_path Path to write the output
 #' @param rraster_read If TRUE merged raster .tif layer gets read into R.
 #' TRUE is set by default

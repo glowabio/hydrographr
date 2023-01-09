@@ -58,7 +58,7 @@ get_regional_unit_id <- function(data, lon, lat, quiet = TRUE) {
 
   # Create random string to attach to the file name of the temporary
   # output coordinates and input ids file
-  rand_string <- stri_rand_strings(n=1, length=8, pattern="[A-Za-z0-9]")
+  rand_string <- stri_rand_strings(n = 1, length = 8, pattern = "[A-Za-z0-9]")
 
   # Select columns with lon/lat coordinates
   coord <- data %>%
@@ -74,7 +74,7 @@ get_regional_unit_id <- function(data, lon, lat, quiet = TRUE) {
   # Path for tmp regional unit ids text file
   ids_tmp_path <- paste0(tempdir(), "/reg_unit_ids", rand_string, ".txt")
 
-  if (system == "linux" || system == "osx"){
+  if (system == "linux" || system == "osx") {
 
     run(system.file("sh", "get_regional_unit_id.sh",
                   package = "hydrographr"),
