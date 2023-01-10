@@ -14,15 +14,15 @@
 #' @param new_val Column name of new raster values as character string.
 #' @param rast_path Full path to the input raster .tif layer.
 
-#' @param recl_layer Full path of the output .tif layer
-#' of the reclassified raster file.
+#' @param recl_layer character. Full path of the output .tif layer
+#' of the reclassified raster file
 #' @param read If TRUE (default), then the reclassified raster .tif layer
 #' gets read into R as a SpatRaster (terra object)
 #' @param nodata The Nodata value of the new .tif layer. The default value
-#' is -9999.
+#' is -9999
 #' @param type Data type; Options are Byte, Int16, UInt16, Int32, UInt32,
-#' CInt16, CInt32. Int32 is set by default.
-#' @param compress Compression type: DEFLATE or LZW. DEFLATE is set by default.
+#' CInt16, CInt32. Int32 is set by default
+#' @param compress Compression type: DEFLATE or LZW. DEFLATE is set by default
 #'
 #' @importFrom stringi stri_rand_strings
 #' @importFrom data.table fwrite

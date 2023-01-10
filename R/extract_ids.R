@@ -3,15 +3,15 @@
 #' Extracts the ID value of the basin and/or sub-catchment raster layer at a
 #' given point location.
 #'
-#' @param data A data.frame or data.table with lat/lon coordinates in WGS84.
-#' @param lon Column name of longitude coordinates as a character vector.
-#' @param lat Column name of latitude coordinates as a character vector.
-#' @param site_id  Column name of the unique ID as a character vector.
-#' Alternatively, an ID for the point location can be defined.
-#' @param basin_path Full path to the basin ID .tif layer on disk.
-#' @param subc_path Full path to the sub-catchment ID .tif layer on disk.
+#' @param data A data.frame or data.table with lat/lon coordinates in WGS84
+#' @param lon Column name of longitude coordinates as a character vector
+#' @param lat Column name of latitude coordinates as a character vector
+#' @param site_id  Column name of the unique ID as a character vector
+#' Alternatively, an ID for the point location can be defined
+#' @param basin_layer character. Full path to the basin ID .tif layer
+#' @param subc_layer character. Full path to the sub-catchment ID .tif layer
 #' @param quiet Whether the standard output will be printed or not (deafult
-#' is TRUE).
+#' is TRUE)
 #'
 #' @importFrom stringi stri_rand_strings
 #' @importFrom dplyr select
@@ -55,15 +55,15 @@
 #'                                   lon = "longitude",
 #'                                   lat = "latitude",
 #'                                   site_id = "occurrence_id",
-#'                                   subc_path = subc_rast,
-#'                                   basin_path = basin_rast)
+#'                                   subc_layer = subc_rast,
+#'                                   basin_layer = basin_rast)
 #'
 #' # Show the output table
 #' hydrography90m_ids
 
 
-extract_ids <- function(data, lon, lat, site_id = NULL, basin_path = NULL,
-                        subc_path = NULL, quiet = TRUE) {
+extract_ids <- function(data, lon, lat, site_id = NULL, basin_layer = NULL,
+                        subc_layer = NULL, quiet = TRUE) {
 
   # Check if input data is of type data.frame,
   # data.table or tibble
@@ -86,13 +86,13 @@ extract_ids <- function(data, lon, lat, site_id = NULL, basin_path = NULL,
   }
 
   # Check if paths exists
-  for (path in c(basin_path, subc_path)) {
+  for (path in c(basin_layer, subc_layer)) {
     if (!file.exists(path))
       stop(paste0("File path: ", path, " does not exist."))
   }
 
-  # Check if basin_path and subc_path ends with .tif
-  for (path in c(basin_path, subc_path)) {
+  # Check if basin_layer and subc_layer ends with .tif
+  for (path in c(basin_layer, subc_layer)) {
     if (!endsWith(path, ".tif"))
       stop(paste0("File path: ", path, " does not end with .tif"))
   }
@@ -136,12 +136,12 @@ extract_ids <- function(data, lon, lat, site_id = NULL, basin_path = NULL,
   if (system == "linux" || system == "osx") {
 
     # Convert null arguments to 0 so that bash can evaluate the variables
-    subc_path <- ifelse(is.null(subc_path), 0, subc_path)
-    bas_path <- ifelse(is.null(basin_path), 0, basin_path)
+    subc_layer <- ifelse(is.null(subc_layer), 0, subc_layer)
+    bas_path <- ifelse(is.null(basin_layer), 0, basin_layer)
 
     # Call the external .sh script extract_ids() containing the gdal function
     processx::run(system.file("sh", "extract_ids.sh", package = "hydrographr"),
-                  args = c(coord_tmp_path, lon, lat, subc_path, bas_path,
+                  args = c(coord_tmp_path, lon, lat, subc_layer, bas_path,
                            tempdir(), ids_tmp_path),
                   echo = !quiet)
 
@@ -150,9 +150,9 @@ extract_ids <- function(data, lon, lat, site_id = NULL, basin_path = NULL,
     check_wsl()
     # Change path for WSL
     wsl_coord_tmp_path <- fix_path(coord_tmp_path)
-    wsl_subc_path <- ifelse(is.null(subc_path), 0,
-                            fix_path(subc_path))
-    wsl_bas_path <- ifelse(is.null(basin_path), 0, fix_path(basin_path))
+    wsl_subc_layer <- ifelse(is.null(subc_layer), 0,
+                            fix_path(subc_layer))
+    wsl_bas_path <- ifelse(is.null(basin_layer), 0, fix_path(basin_layer))
     wsl_tmp_path <- fix_path(tempdir())
     wsl_ids_tmp_path <- fix_path(ids_tmp_path)
     wsl_sh_file <- fix_path(
@@ -161,7 +161,7 @@ extract_ids <- function(data, lon, lat, site_id = NULL, basin_path = NULL,
 
     processx::run(system.file("bat", "extract_ids.bat",
                               package = "hydrographr"),
-                  args = c(wsl_coord_tmp_path, lon, lat, wsl_subc_path,
+                  args = c(wsl_coord_tmp_path, lon, lat, wsl_subc_layer,
                            wsl_bas_path, wsl_tmp_path, wsl_ids_tmp_path,
                            wsl_sh_file, echo = !quiet))
 

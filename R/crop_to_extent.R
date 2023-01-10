@@ -6,21 +6,22 @@
 #' (cutline source) is provided, otherwise if a bounding box is provided
 #' (xmin, ymin, xmax, ymax coordinates or a spatial object from which to extract
 #' a bounding box), the raster is cropped to the extent of the bounding box. At
-#' least a cutline source (vector_path) or a bounding box (bounding_box)
+#' least a cutline source (vector_layer) or a bounding box (bounding_box)
 #' must be provided. The output is always written to disk, and can be
 #' optionally loaded directly into R as a SpatRaster (terra package) object
 #' (using  rcrop_read = TRUE).
 #'
-#' @param raster_path character. Path to the raster .tif layer
-#' @param vector_path character. Path to a vector layer that is used as a
+#' @param raster_layer character. Full path to the input raster .tif layer
+#' @param vector_layer character. Full path to a vector layer that is used as a
 #' cutline data source (similar to a mask operation)
 #' @param bounding_box numeric vector of the coordinates of the corners of a
 #' bounding box (xmin, ymin, xmax, ymax), SpatRaster, SpatVector,
 #' or other spatial object.
 #' @param out_dir character. The directory where the output will be stored
 #' @param file_name character. Name of the cropped output raster .tif file
-#' @param rcrop_read logical. If TRUE (default), then the cropped raster .tif layer
-#' gets read into R. Else the cropped .tif file will be only written to disk
+#' @param rcrop_read logical. If TRUE (default), then the cropped raster .tif
+#' layer gets read into R. Else the cropped .tif file will be only written to
+#' disk
 #'
 #' @importFrom processx run
 #' @importFrom terra rast
@@ -44,17 +45,20 @@
 #' download_test_data(DATADIR)
 #'
 #' # Crop the Stream Power Index to the basin
-#' spi_basin <- crop_to_extent(raster_path=paste0(DATADIR, "/spi_1264942.tif"),
-#' vector_path = paste0(DATADIR, "/basin_59.gpkg"),
-#' output_path="/my/output/path/spi_basin_cropped.tif"),
+#' spi_basin <- crop_to_extent(raster_layer = paste0(DATADIR,
+#' "/spi_1264942.tif"),
+#' vector_layer = paste0(DATADIR, "/basin_59.gpkg"),
+#' output_path = "/my/output/path/spi_basin_cropped.tif"),
 #' rcrop_read = TRUE)
 
-crop_to_extent <- function(raster_path, vector_path = NULL, bounding_box = NULL,
+crop_to_extent <- function(raster_layer,
+                           vector_layer = NULL,
+                           bounding_box = NULL,
                            out_dir, file_name,
                            rcrop_read = TRUE) {
 
   # Check that an input path and an output path were provided
-  if (missing(raster_path))
+  if (missing(raster_layer))
     stop("Please provide an input path")
   if (missing(out_dir))
     stop("Please provide an output directory")
@@ -62,7 +66,7 @@ crop_to_extent <- function(raster_path, vector_path = NULL, bounding_box = NULL,
     stop("Please provide a name for the output file")
   # Check that at least a cutline source or a bounding box coordinates are
   # provided
-  if (is.null(vector_path) && is.null(bounding_box)) {
+  if (is.null(vector_layer) && is.null(bounding_box)) {
     stop("Please provide at least a cutline source, a bounding box
           coordinates or an spatial object from which extract an extent")
   } else {
@@ -71,13 +75,13 @@ crop_to_extent <- function(raster_path, vector_path = NULL, bounding_box = NULL,
     # Check operating system
     system <- get_os()
     if (system == "linux" || system == "osx") {
-      if (!is.null(vector_path)) {
+      if (!is.null(vector_layer)) {
         # Call external gdalwarp command from GDAL library. Cut through
         # the border line option
         cat("Cropping...\n")
         run(system.file("sh", "crop_to_extent_cl.sh",
                         package = "hydrographr"),
-            args = c(raster_path, vector_path, output_path),
+            args = c(raster_layer, vector_layer, output_path),
             echo = FALSE)
       } else if (!is.null(bounding_box)) {
       # Check if bounding_box is a vector with corner coordinate values,
@@ -99,7 +103,7 @@ crop_to_extent <- function(raster_path, vector_path = NULL, bounding_box = NULL,
         cat("Cropping...\n")
         processx::run(system.file("sh", "crop_to_extent_bb.sh",
                         package = "hydrographr"),
-            args = c(raster_path, xmin, ymin,
+            args = c(raster_layer, xmin, ymin,
                      xmax, ymax, output_path),
             echo = FALSE)
       }
@@ -107,8 +111,8 @@ crop_to_extent <- function(raster_path, vector_path = NULL, bounding_box = NULL,
       # Check if WSL and Ubuntu are installed
       check_wsl()
       # Change paths for WSL
-      wsl_raster_path <- fix_path(raster_path)
-      wsl_vector_path <- fix_path(vector_path)
+      wsl_raster_layer <- fix_path(raster_layer)
+      wsl_vector_layer <- fix_path(vector_layer)
       wsl_output_path <- fix_path(output_path)
       wsl_sh_cl_file <- fix_path(
         system.file("sh", "crop_to_extent_cl.sh",
@@ -116,12 +120,12 @@ crop_to_extent <- function(raster_path, vector_path = NULL, bounding_box = NULL,
       wsl_sh_bb_file <- fix_path(
         system.file("sh", "crop_to_extent_bb.sh",
                     package = "hydrographr"))
-      if (!is.null(vector_path)) {
+      if (!is.null(vector_layer)) {
         # Call external gdalwarp command from GDAL library
         cat("Cropping...\n")
         processx::run(system.file("bat", "crop_to_extent_cl.bat",
                         package = "hydrographr"),
-            args = c(wsl_raster_path, wsl_vector_path, wsl_output_path,
+            args = c(wsl_raster_layer, wsl_vector_layer, wsl_output_path,
                      wsl_sh_cl_file),
             echo = FALSE)
       } else if (!is.null(bounding_box)) {
@@ -144,7 +148,7 @@ crop_to_extent <- function(raster_path, vector_path = NULL, bounding_box = NULL,
         cat("Cropping...\n")
         processx::run(system.file("bat", "crop_to_extent_bb.bat",
                         package = "hydrographr"),
-            args = c(wsl_raster_path, xmin, ymin,
+            args = c(wsl_raster_layer, xmin, ymin,
                      xmax, ymax, wsl_output_path, wsl_sh_bb_file),
             echo = FALSE)
       }

@@ -6,11 +6,11 @@
 #' be reported or the Nodata value will be ignored and a value is computed from
 #' the available values of a specified location.
 #'
-#' @param data_dir Character. Path to the directory containing all input data.
-#' @param variables Character vector. The names of the raster files.
+#' @param data_dir character. Path to the directory containing all input data
+#' @param variables Character vector. The names of the raster files,
 #' e.g. slope_grad_dw_cel_h00v00.tif.
 #' @param n_cores Numeric. Number of cores used for parallelization. If NULL,
-#' available cores - 1 will be used.
+#' available cores - 1 will be used
 #' @importFrom processx run
 #' @importFrom tidyr separate
 #' @importFrom parallel detectCores

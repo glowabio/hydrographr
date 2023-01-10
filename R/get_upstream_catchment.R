@@ -4,7 +4,8 @@
 #' @param id Name of the column containing the occurrence/site id
 #' @param lon Name of the longitude column (WGS 84)
 #' @param lat Name of the latitude column (WGS 84)
-#' @param direction_layer Full path to raster file with the direction variable
+#' @param direction_layer character. Full path to raster file with the
+#' direction variable
 #' @param out_path Full path to the directory where the output(s)
 #' will be stored.
 #' To identify the upstream catchment the output file name includes the site id.
