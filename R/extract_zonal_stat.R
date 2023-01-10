@@ -5,9 +5,7 @@
 #' sub-catchments. The sub-catchment raster (.tif) input file is stored on disk.
 #' The output is a data.table which is loaded into R.
 #'
-#' @param data_dir Character. Path to the directory containing all input data
-#' @param out_path Character. Full path of the output file.
-#' If not NULL, the output data.frame is exported as a .csv in the given path
+#' @param data_dir character. Path to the directory containing all input data
 #' @param subc_ids Vector of sub-catchment IDs or "all".
 #' If "all", zonal statistics are calculated for all sub-catchments
 #' of the given sub-catchment raster layer. A vector of the sub-catchment IDs
@@ -20,6 +18,12 @@
 #' i.e., slope_grad_dw_cel should appear in the file name.
 #' The files should be cropped to the extent of the sub-catchment layer to
 #' speed up the computation.
+#' @param out_dir character. The directory where the output will be stored.
+#' If the out_dir and file_name are specified, the output table will be stored
+#' as a .csv file in this location. If they are NULL, the output is only
+#' loaded in R and not stored on disk.
+#' @param file_name character. Name of the .csv file where the output table
+#' will be stored. out_dir should also be specified for this purpose.
 #' @param n_cores Numeric. Number of cores used for parallelization. If NULL,
 #' the physical available CPUs - 1 are used.
 #' @param quiet Logical. Whether the standard output will be printed or not.
@@ -42,7 +46,7 @@
 #'
 #' @examples
 #' # Specify the working directory of the test data
-#' my_directory <- tempdir()
+#' my_directory <- getwd()
 #'
 #' # Download the test data
 #' download_test_data(my_directory)
@@ -56,14 +60,18 @@
 #'                            subc_layer = paste0(my_directory,
 #'                                                "/hydrography90m_test_data",
 #'                                                "/subcatchment_1264942.tif"),
-#'                            variables = c("spi_1264942.tif", "sti_1264942.tif"),
+#'                            variables = c("spi_1264942.tif",
+#'                                          "sti_1264942.tif"),
+#'                            out_dir = paste0(my_directory,
+#'                                      "/hydrography90m_test_data/output/"),
+#'                            file_name = "zonal_statistics.csv",
 #'                            n_cores = 2)
 #' # Show output table
 #' stat
 #'
 
-extract_zonal_stat <- function(data_dir, out_path = NULL, subc_ids,
-                               subc_layer, variables, n_cores = NULL,
+extract_zonal_stat <- function(data_dir,  subc_ids, subc_layer, variables,
+                               out_dir = NULL, file_name = NULL, n_cores = NULL,
                                quiet = TRUE) {
 
   # Introductory steps
@@ -193,6 +201,8 @@ extract_zonal_stat <- function(data_dir, out_path = NULL, subc_ids,
                select(!starts_with("subc_id."))
 
   # Write out master table if requested
+  # Compose full out_path by combining out_dir and file_name
+  out_path <- paste0(out_dir, "/", file_name)
   if (!is.null(out_path)) {
     fwrite(var_table, out_path, sep = ",",
            row.names = FALSE, quote = FALSE, col.names = TRUE)

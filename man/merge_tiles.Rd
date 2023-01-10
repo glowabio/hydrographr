@@ -4,13 +4,13 @@
 \alias{merge_tiles}
 \title{Merge multiple raster or spatial vector objects}
 \usage{
-merge_tiles(tile_path, output_path, rraster_read = TRUE, rvector_read = FALSE)
+merge_tiles(tile_dir, out_dir, rraster_read = TRUE, rvector_read = FALSE)
 }
 \arguments{
-\item{tile_path}{Path to directory containing the raster tiles or
+\item{tile_dir}{character. The directory containing the raster tiles or
 spatial vectors to be merged}
 
-\item{output_path}{Path to write the output}
+\item{out_dir}{character. The directory where the output will be stored}
 
 \item{rraster_read}{If TRUE merged raster .tif layer gets read into R.
 TRUE is set by default}
@@ -28,10 +28,10 @@ to form a new raster or spatial vector object with a larger spatial extent.
 A directory with at least a raster .tif or spatial vector geopackage file
 must be provided.
 If rraster`_`read = TRUE (default), the outputs are a .tif
-(saved under output`_`path) and a SpatRaster (terra package) object,
+(saved under out`_`dir) and a SpatRaster (terra package) object,
 otherwise if rraster`_`read = FALSE, the .tif file is the only output.
-If rvector`_`read = TRUE, the outputs are a .gpkg (saved under output`_`path)
+If rvector`_`read = TRUE, the outputs are a .gpkg (saved under out`_`dir)
 and a SpatVector (terra package) object,
 otherwise if rvector`_`read = FALSE (default),
-the .tif file is the only output
+the .gpkg file is the only output
 }

@@ -7,19 +7,17 @@ raster .tif layers.}
 \usage{
 extract_zonal_stat(
   data_dir,
-  out_path = NULL,
   subc_ids,
   subc_layer,
   variables,
+  out_dir = NULL,
+  file_name = NULL,
   n_cores = NULL,
   quiet = TRUE
 )
 }
 \arguments{
-\item{data_dir}{Character. Path to the directory containing all input data}
-
-\item{out_path}{Character. Full path of the output file.
-If not NULL, the output data.frame is exported as a .csv in the given path}
+\item{data_dir}{character. Path to the directory containing all input data}
 
 \item{subc_ids}{Vector of sub-catchment IDs or "all".
 If "all", zonal statistics are calculated for all sub-catchments
@@ -36,6 +34,14 @@ i.e., slope_grad_dw_cel should appear in the file name.
 The files should be cropped to the extent of the sub-catchment layer to
 speed up the computation.}
 
+\item{out_dir}{character. The directory where the output will be stored.
+If the out_dir and file_name are specified, the output table will be stored
+as a .csv file in this location. If they are NULL, the output is only
+loaded in R and not stored on disk.}
+
+\item{file_name}{character. Name of the .csv file where the output table
+will be stored. out_dir should also be specified for this purpose.}
+
 \item{n_cores}{Numeric. Number of cores used for parallelization. If NULL,
 the physical available CPUs - 1 are used.}
 
@@ -48,7 +54,7 @@ The output is a data.table which is loaded into R.
 }
 \examples{
 # Specify the working directory of the test data
-my_directory <- tempdir()
+my_directory <- getwd()
 
 # Download the test data
 download_test_data(my_directory)
@@ -62,7 +68,11 @@ stat <- extract_zonal_stat(data_dir = paste0(my_directory,
                            subc_layer = paste0(my_directory,
                                                "/hydrography90m_test_data",
                                                "/subcatchment_1264942.tif"),
-                           variables = c("spi_1264942.tif", "sti_1264942.tif"),
+                           variables = c("spi_1264942.tif",
+                                         "sti_1264942.tif"),
+                           out_dir = paste0(my_directory,
+                                     "/hydrography90m_test_data/output/"),
+                           file_name = "zonal_statistics.csv",
                            n_cores = 2)
 # Show output table
 stat

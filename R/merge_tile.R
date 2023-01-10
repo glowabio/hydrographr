@@ -5,16 +5,16 @@
 #' A directory with at least a raster .tif or spatial vector geopackage file
 #' must be provided.
 #' If rraster`_`read = TRUE (default), the outputs are a .tif
-#' (saved under output`_`path) and a SpatRaster (terra package) object,
+#' (saved under out`_`dir) and a SpatRaster (terra package) object,
 #' otherwise if rraster`_`read = FALSE, the .tif file is the only output.
-#' If rvector`_`read = TRUE, the outputs are a .gpkg (saved under output`_`path)
+#' If rvector`_`read = TRUE, the outputs are a .gpkg (saved under out`_`dir)
 #' and a SpatVector (terra package) object,
 #' otherwise if rvector`_`read = FALSE (default),
-#' the .tif file is the only output
+#' the .gpkg file is the only output
 
-#' @param tile_path Path to directory containing the raster tiles or
+#' @param tile_dir character. The directory containing the raster tiles or
 #' spatial vectors to be merged
-#' @param output_path Path to write the output
+#' @param out_dir character. The directory where the output will be stored
 #' @param rraster_read If TRUE merged raster .tif layer gets read into R.
 #' TRUE is set by default
 #' @param rvector_read If TRUE merged spatial vector gets read into R.
@@ -34,61 +34,61 @@
 #' @author
 #'
 
-merge_tiles <- function(tile_path, output_path,
+merge_tiles <- function(tile_dir, out_dir,
 rraster_read = TRUE, rvector_read = FALSE) {
 
   # Make bash scripts executable
   make_sh_exec()
 
-  if (missing(tile_path) || is.na(tile_path)) {
-    tile_path <- "NOT_ASSIGNED"
+  if (missing(tile_dir) || is.na(tile_dir)) {
+    tile_dir <- "NOT_ASSIGNED"
     }
-  if (missing(output_path) || is.na(output_path)) {
-    output_path <- "NOT_ASSIGNED"
+  if (missing(out_dir) || is.na(out_dir)) {
+    out_dir <- "NOT_ASSIGNED"
     } else {
       # Check operating system
       system <- get_os()
       if (system == "linux") {
         merge_tiles <- processx::run(system.file("sh", "merge_tiles.sh",
                             package = "hydrographr"),
-                    args = c(tile_path, output_path),
+                    args = c(tile_dir, out_dir),
                     echo = FALSE)
 
        } else if (system == "windows") {
        # Check if WSL and Ubuntu are installed
        check_wsl()
        # Change path for WSL
-       wsl_tile_path <- fix_path(tile_path)
-       wsl_output_path <- fix_path(output_path)
+       wsl_tile_dir <- fix_path(tile_dir)
+       wsl_out_dir <- fix_path(out_dir)
        wsl_sh_file <- fix_path(
          system.file("sh", "merge_tiles.sh",
                     package = "hydrographr"))
 
        processx::run(system.file("bat", "merge_tiles.bat",
                     package = "hydrographr"),
-        args = c(wsl_tile_path, wsl_output_path, wsl_sh_file),
+        args = c(wsl_tile_dir, wsl_out_dir, wsl_sh_file),
         echo = FALSE)
        }
     }
 
   if (rraster_read == TRUE) {
       # Print message
-      cat("Merged file saved under: ", output_path)
+      cat("Merged file saved under: ", out_dir)
       # Read merged .tif layer
-      merged_tiles <- rast(paste0(output_path, "/", "basin.tif"))
+      merged_tiles <- rast(paste0(out_dir, "/", "basin.tif"))
 
       return(merged_tiles)
     } else if (rvector_read == TRUE) {
 
       # Print message
-      cat("Merged file saved under: ", output_path)
+      cat("Merged file saved under: ", out_dir)
       # Read merged vector layer
-      merged_tiles <- vect(paste0(output_path, "/", "basin_dissolved.gpkg"))
+      merged_tiles <- vect(paste0(out_dir, "/", "basin_dissolved.gpkg"))
 
       return(merged_tiles)
 
     } else {
       # Print message
-      cat("Merged file saved under: ", output_path)
+      cat("Merged file saved under: ", out_dir)
     }
  }

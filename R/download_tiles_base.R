@@ -2,28 +2,28 @@
 #' https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4?path=%2F.
 #' It is called and inherits arguments by the function 'download_tiles()'.
 #'
-#' @param variable vector of variable names (character)
-#' @param filetype format of the requested file ("tif" or "gpkg")
+#' @param variable character vector of variable names
+#' @param file_format character. Format of the requested file ("tif" or "gpkg")
 #' @param tile_id id of the requested tile (character)
 #' @param global Should the global file be downloaded or not.
 #' TRUE/FALSE, FALSE by default
-#' @param download_path The path where the files will be downloaded
+#' @param download_dir character. The directory where the files will be downloaded
 #' @param file_size_table_sep lookup table of file sizes
 #' (inherited by 'download_tiles()')
-#' @param server_path path to the the home download folder
+#' @param server_url character. url to the the home download folder
 #' in either Nimbus or GDrive (inherited by 'download_tiles()')
 #' @keywords internal
 #'
 
-download_tiles_base <- function(variable, filetype = "tif",
+download_tiles_base <- function(variable, file_format = "tif",
                                 tile_id = NULL,
-                                global = FALSE, download_path = ".",
+                                global = FALSE, download_dir = ".",
                                 file_size_table_sep = NULL,
-                                server_path = NULL) {
+                                server_url = NULL) {
 
   # Get the name of the file
-  varname <- ifelse(global == TRUE, paste0(variable, "_ovr.", filetype),
-                    paste0(variable, "_", tile_id, ".", filetype))
+  varname <- ifelse(global == TRUE, paste0(variable, "_ovr.", file_format),
+                    paste0(variable, "_", tile_id, ".", file_format))
 
   # Find grass module to build the download link
   # and to create the download destination folder
@@ -45,7 +45,7 @@ download_tiles_base <- function(variable, filetype = "tif",
                             collapse = "/")
 
   # Create download directories
-  dir.create(paste0(download_path, "/", folder_structure),
+  dir.create(paste0(download_dir, "/", folder_structure),
              showWarnings = FALSE, recursive = TRUE)
 
   # General path to the download folder in Nimbus
@@ -54,16 +54,16 @@ download_tiles_base <- function(variable, filetype = "tif",
   gdrive_path <- "https://drive.google.com/uc?export=download&id="
 
   # Download from Nimbus
-  if (server_path == nimbus_path && varname != "cti_ovr.tif") {
+  if (server_url == nimbus_path && varname != "cti_ovr.tif") {
 
     print(varname)
     download.file(paste0(nimbus_path, gsub("/", "%2F", file_path)),
-                  destfile = paste0(download_path, "/", file_path))
+                  destfile = paste0(download_dir, "/", file_path))
 
   }
 
   # Download from GDrive
-  if (server_path == gdrive_path || varname == "cti_ovr.tif") {
+  if (server_url == gdrive_path || varname == "cti_ovr.tif") {
 
     # Get GDrive file id from the lookup table
     file_id <- file_size_table_sep[varname_tile == varname, ]$file_id
@@ -72,7 +72,7 @@ download_tiles_base <- function(variable, filetype = "tif",
     # The addition of &confirm=t in the download link
     # skips the virus scan of the gdrive
     download.file(paste0(gdrive_path, file_id, "&confirm=t"),
-                  destfile = paste0(download_path, "/", file_path))
+                  destfile = paste0(download_dir, "/", file_path))
 
   }
 

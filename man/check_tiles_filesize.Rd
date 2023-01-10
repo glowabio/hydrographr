@@ -7,20 +7,20 @@ It is called and inherits arguments by the function 'download_tiles()'}
 \usage{
 check_tiles_filesize(
   variable,
-  filetype = "tif",
+  file_format = "tif",
   tile_id = NULL,
   reg_unit_id = NULL,
   global = FALSE,
   valid_varnames,
   valid_tile_ids,
-  valid_filetypes,
+  valid_file_formats,
   file_size_table_sep
 )
 }
 \arguments{
 \item{variable}{Vector of variable names (as character)}
 
-\item{filetype}{Format of the requested file, either "tif" or "gpkg"}
+\item{file_format}{character. Format of the requested file ("tif" or "gpkg")}
 
 \item{tile_id}{The ID of the requested tile or regional unit (as character)}
 
@@ -33,7 +33,7 @@ TRUE/FALSE, FALSE by default}
 \item{valid_tile_ids}{The valid IDs of the tiles available for download
 (inherited by 'download_tiles()')}
 
-\item{valid_filetypes}{The valid file types of the files available
+\item{valid_file_formats}{The valid file types of the files available
 for download
 (inherited by 'download_tiles()')}
 

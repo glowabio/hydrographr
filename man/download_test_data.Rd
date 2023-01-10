@@ -4,10 +4,11 @@
 \alias{download_test_data}
 \title{Downloads the test data for the Hydrography90m dataset}
 \usage{
-download_test_data(download_path = ".")
+download_test_data(download_dir = ".")
 }
 \arguments{
-\item{download_path}{The path where the files will be downloaded}
+\item{download_dir}{character. The directory where the files will be
+downloaded}
 }
 \description{
 The test data contains all Hydrography90m and species point observation data

@@ -7,30 +7,45 @@ by calling the function download_tiles_base in a loop.}
 \usage{
 download_tiles(
   variable,
-  filetype = "tif",
+  file_format = "tif",
   tile_id = NULL,
   reg_unit_id = NULL,
   global = FALSE,
-  download_path = "."
+  download_dir = "."
 )
 }
 \arguments{
-\item{variable}{vector of variable names (character)}
+\item{variable}{character vector of variable names}
 
-\item{filetype}{format of the requested file ("tif" or "gpkg")}
+\item{file_format}{character. Format of the requested file ("tif" or "gpkg")}
 
 \item{tile_id}{id of the requested tile (character)}
 
 \item{reg_unit_id}{id of the requested regional unit (character)}
 
 \item{global}{Should the global file be downloaded or not.
-TRUE/FALSE, FALSE by default}
+TRUE/FALSE, FALSE by default (logical)}
 
-\item{download_path}{The path where the files will be downloaded}
+\item{download_dir}{character. The directory where the files will be downloaded}
 }
 \description{
 Downloads multiple files from Nimbus
 by calling the function download_tiles_base in a loop.
+}
+\examples{
+# Download data for two variables in three regular tiles
+# to the current working directory
+download_tiles(variable = c("sti", "stream_dist_up_farth"),
+file_format = "tif",
+tile_id = c("h00v02","h16v02", "h16v04"))
+
+# Download the global .tif layer for the variable "direction"
+# to a specific (existing) directory
+download_tiles(variable = "direction",
+file_format = "tif",
+global = TRUE,
+download_dir = "/path/to/directory/")
+
 }
 \references{
 Amatulli G., Garcia Marquez J., Sethi T., Kiesel J.,

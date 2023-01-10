@@ -73,7 +73,7 @@ download_test_data(my_directory)
 # Load occurrence data
 species_occurence <- read.table(paste0(my_directory,
                             "/hydrography90m_test_data/spdata_1264942.txt"),
-                              header = TRUE
+                              header = TRUE)
 
 # Define full path to flow accumulation
 stream_rast <- paste0(my_directory,

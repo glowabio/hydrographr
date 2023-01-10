@@ -8,7 +8,8 @@
 #' and can be automatically downloaded and unzipped
 #' with this function to a desired path.
 #'
-#' @param download_path The path where the files will be downloaded
+#' @param download_dir character. The directory where the files will be
+#' downloaded
 #' @author Afroditi Grigoropoulou
 #' @export
 #'
@@ -32,7 +33,7 @@
 #' Freshwater Ecology and Inland Fisheries. dataset.
 #' https://doi.org/10.18728/igb-fred-762.1
 
-download_test_data <- function(download_path = ".") {
+download_test_data <- function(download_dir = ".") {
 
 
   # General path to the test data folder in GDrive
@@ -42,26 +43,26 @@ download_test_data <- function(download_path = ".") {
   file_id <- "1kYNWXmtVm6X7MZLISOePGpvxB1pk1scD"
 
   # Create the folder where the files will be downloaded if it doesn't exist
-  ifelse(!dir.exists(paste0(download_path, "/hydrography90m_test_data")),
+  ifelse(!dir.exists(paste0(download_dir, "/hydrography90m_test_data")),
 
-         dir.create(paste0(download_path, "/hydrography90m_test_data")), FALSE)
+         dir.create(paste0(download_dir, "/hydrography90m_test_data")), FALSE)
 
   download.file(paste0(gdrive_path, file_id, "&confirm=t"),
                 destfile = paste0(
-                  download_path, "/hydrography90m_test_data.zip"),
+                  download_dir, "/hydrography90m_test_data.zip"),
                   mode = "wb")
 
   # Unzip the data
-  unzip(paste0(download_path, "/hydrography90m_test_data.zip"),
+  unzip(paste0(download_dir, "/hydrography90m_test_data.zip"),
   overwrite = TRUE,
-        exdir = paste0(download_path, "/hydrography90m_test_data"),
+        exdir = paste0(download_dir, "/hydrography90m_test_data"),
         unzip = getOption("unzip"))
 
   # remove the zip file
-  unlink(paste0(download_path, "/hydrography90m_test_data.zip"))
+  unlink(paste0(download_dir, "/hydrography90m_test_data.zip"))
 
   # Report
   cat("Data downloaded and unzipped to ",
-  download_path, "/hydrography90m_test_data\n", sep = "")
+  download_dir, "/hydrography90m_test_data\n", sep = "")
 
 }

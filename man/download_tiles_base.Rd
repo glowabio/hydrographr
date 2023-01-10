@@ -8,30 +8,30 @@ It is called and inherits arguments by the function 'download_tiles()'.}
 \usage{
 download_tiles_base(
   variable,
-  filetype = "tif",
+  file_format = "tif",
   tile_id = NULL,
   global = FALSE,
-  download_path = ".",
+  download_dir = ".",
   file_size_table_sep = NULL,
-  server_path = NULL
+  server_url = NULL
 )
 }
 \arguments{
-\item{variable}{vector of variable names (character)}
+\item{variable}{character vector of variable names}
 
-\item{filetype}{format of the requested file ("tif" or "gpkg")}
+\item{file_format}{character. Format of the requested file ("tif" or "gpkg")}
 
 \item{tile_id}{id of the requested tile (character)}
 
 \item{global}{Should the global file be downloaded or not.
 TRUE/FALSE, FALSE by default}
 
-\item{download_path}{The path where the files will be downloaded}
+\item{download_dir}{character. The directory where the files will be downloaded}
 
 \item{file_size_table_sep}{lookup table of file sizes
 (inherited by 'download_tiles()')}
 
-\item{server_path}{path to the the home download folder
+\item{server_url}{character. url to the the home download folder
 in either Nimbus or GDrive (inherited by 'download_tiles()')}
 }
 \description{

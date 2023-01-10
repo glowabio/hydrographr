@@ -5,20 +5,22 @@
 #' crops a raster .tif to a polygon border line if a vector layer
 #' (cutline source) is provided, otherwise if a bounding box is provided
 #' (xmin, ymin, xmax, ymax coordinates or a spatial object from which to extract
-#'  a bounding box), the raster is cropped to the extent of the bounding box. At
-#'  least a cutline source (vector_path) or a bounding box (bound_box)
-#'  must be provided. The output is always written to disk, and can be
-#'  optionally loaded directly into R as a SpatRaster (terra package) object
-#'  (using  rcrop_read = TRUE).
+#' a bounding box), the raster is cropped to the extent of the bounding box. At
+#' least a cutline source (vector_path) or a bounding box (bounding_box)
+#' must be provided. The output is always written to disk, and can be
+#' optionally loaded directly into R as a SpatRaster (terra package) object
+#' (using  rcrop_read = TRUE).
 #'
-#' @param raster_path Path to the raster .tif layer
-#' @param vector_path Path to a vector layer that is used as a cutline data
-#' source (similar to a mask operation)
-#' @param bound_box The coordinates of the corner of a bounding box (xmin, ymin,
-#' xmax, ymax) or a SpatRaster, SpatVector, or other spatial object.
-#' @param output_path Path for copped output raster .tif file.
-#' @param rcrop_read If TRUE (default), then the cropped raster .tif layer
-#' gets read into R. Else the cropped .tif file will be only written to disk.
+#' @param raster_path character. Path to the raster .tif layer
+#' @param vector_path character. Path to a vector layer that is used as a
+#' cutline data source (similar to a mask operation)
+#' @param bounding_box numeric vector of the coordinates of the corners of a
+#' bounding box (xmin, ymin, xmax, ymax), SpatRaster, SpatVector,
+#' or other spatial object.
+#' @param out_dir character. The directory where the output will be stored
+#' @param file_name character. Name of the cropped output raster .tif file
+#' @param rcrop_read logical. If TRUE (default), then the cropped raster .tif layer
+#' gets read into R. Else the cropped .tif file will be only written to disk
 #'
 #' @importFrom processx run
 #' @importFrom terra rast
@@ -47,18 +49,25 @@
 #' output_path="/my/output/path/spi_basin_cropped.tif"),
 #' rcrop_read = TRUE)
 
-crop_to_extent <- function(raster_path, vector_path = NULL, bound_box = NULL,
-                           output_path,
+crop_to_extent <- function(raster_path, vector_path = NULL, bounding_box = NULL,
+                           out_dir, file_name,
                            rcrop_read = TRUE) {
+
   # Check that an input path and an output path were provided
-  if (missing(raster_path)) stop("Please provide an input path")
-  if (missing(output_path)) stop("Please provide an output path")
+  if (missing(raster_path))
+    stop("Please provide an input path")
+  if (missing(out_dir))
+    stop("Please provide an output directory")
+  if (missing(file_name))
+    stop("Please provide a name for the output file")
   # Check that at least a cutline source or a bounding box coordinates are
   # provided
-  if (is.null(vector_path) && is.null(bound_box)) {
+  if (is.null(vector_path) && is.null(bounding_box)) {
     stop("Please provide at least a cutline source, a bounding box
           coordinates or an spatial object from which extract an extent")
   } else {
+    # Compose output_path by combining out_dir and file_name
+    output_path <- paste0(out_dir, "/", file_name)
     # Check operating system
     system <- get_os()
     if (system == "linux" || system == "osx") {
@@ -70,16 +79,16 @@ crop_to_extent <- function(raster_path, vector_path = NULL, bound_box = NULL,
                         package = "hydrographr"),
             args = c(raster_path, vector_path, output_path),
             echo = FALSE)
-      } else if (!is.null(bound_box)) {
-      # Check if bound_box is a vector with corner coordinate values, if FALSE
-      # try to extract the values from a spatial object
-        if (is.vector(bound_box) && length(bound_box) == 4) {
-          xmin <- bound_box[1]
-          ymin <- bound_box[2]
-          xmax <- bound_box[3]
-          ymax <- bound_box[4]
+      } else if (!is.null(bounding_box)) {
+      # Check if bounding_box is a vector with corner coordinate values,
+      # if FALSE try to extract the values from a spatial object
+        if (is.vector(bounding_box) && length(bounding_box) == 4) {
+          xmin <- bounding_box[1]
+          ymin <- bounding_box[2]
+          xmax <- bounding_box[3]
+          ymax <- bounding_box[4]
         } else {
-          bb <- as.vector(terra::ext(bound_box))
+          bb <- as.vector(terra::ext(bounding_box))
           xmin <- bb[1]
           ymin <- bb[3]
           xmax <- bb[2]
@@ -88,7 +97,7 @@ crop_to_extent <- function(raster_path, vector_path = NULL, bound_box = NULL,
         # Call external gdalwarp command from GDAL library.
         # Cut through a polygon extent
         cat("Cropping...\n")
-        run(system.file("sh", "crop_to_extent_bb.sh",
+        processx::run(system.file("sh", "crop_to_extent_bb.sh",
                         package = "hydrographr"),
             args = c(raster_path, xmin, ymin,
                      xmax, ymax, output_path),
@@ -110,21 +119,21 @@ crop_to_extent <- function(raster_path, vector_path = NULL, bound_box = NULL,
       if (!is.null(vector_path)) {
         # Call external gdalwarp command from GDAL library
         cat("Cropping...\n")
-        run(system.file("bat", "crop_to_extent_cl.bat",
+        processx::run(system.file("bat", "crop_to_extent_cl.bat",
                         package = "hydrographr"),
             args = c(wsl_raster_path, wsl_vector_path, wsl_output_path,
                      wsl_sh_cl_file),
             echo = FALSE)
-      } else if (!is.null(bound_box)) {
-        # Check if bound_box is a vector with corner coordinate values, if FALSE
+      } else if (!is.null(bounding_box)) {
+        # Check if bounding_box is a vector with corner coordinate values, if FALSE
         # try to extract the values from an spatial object
-        if (is.vector(bound_box) && length(bound_box) == 4) {
-          xmin <- bound_box[1]
-          ymin <- bound_box[2]
-          xmax <- bound_box[3]
-          ymax <- bound_box[4]
+        if (is.vector(bounding_box) && length(bounding_box) == 4) {
+          xmin <- bounding_box[1]
+          ymin <- bounding_box[2]
+          xmax <- bounding_box[3]
+          ymax <- bounding_box[4]
         } else {
-          bb <- as.vector(terra::ext(bound_box))
+          bb <- as.vector(terra::ext(bounding_box))
           xmin <- bb[1]
           ymin <- bb[3]
           xmax <- bb[2]
@@ -133,7 +142,7 @@ crop_to_extent <- function(raster_path, vector_path = NULL, bound_box = NULL,
         # Call external gdalwarp command from GDAL library.
         # Cut through a polygon extent
         cat("Cropping...\n")
-        run(system.file("bat", "crop_to_extent_bb.bat",
+        processx::run(system.file("bat", "crop_to_extent_bb.bat",
                         package = "hydrographr"),
             args = c(wsl_raster_path, xmin, ymin,
                      xmax, ymax, wsl_output_path, wsl_sh_bb_file),

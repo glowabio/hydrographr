@@ -9,7 +9,7 @@ reclass_raster(
   rast_val,
   new_val,
   rast_path,
-  recl_path,
+  recl_layer,
   read = TRUE,
   nodata = -9999,
   type = "Int32",
@@ -26,7 +26,7 @@ reclass_raster(
 
 \item{rast_path}{Full path to the input raster .tif layer.}
 
-\item{recl_path}{Full path of the output .tif layer
+\item{recl_layer}{Full path of the output .tif layer
 of the reclassified raster file.}
 
 \item{read}{If TRUE (default), then the reclassified raster .tif layer
@@ -68,7 +68,7 @@ str_ord <- my_dt[,c("stream", "strahler")]
 # Reclassify the stream network to obtain the Strahler stream order raster
 str_ord_rast <- reclass_raster(str_ord, rast_val = "stream",
 new_val = "strahler", rast_path =  "/DATADIR/stream_1264942.tif",
-recl_path = "/path/to/output.tif")
+recl_layer = "/path/to/output.tif")
 
 
 }

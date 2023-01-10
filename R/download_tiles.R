@@ -1,27 +1,43 @@
 #' Downloads multiple files from Nimbus
 #' by calling the function download_tiles_base in a loop.
 #'
-#' @param variable vector of variable names (character)
-#' @param filetype format of the requested file ("tif" or "gpkg")
+#' @param variable character vector of variable names
+#' @param file_format character. Format of the requested file ("tif" or "gpkg")
 #' @param tile_id id of the requested tile (character)
 #' @param reg_unit_id id of the requested regional unit (character)
 #' @param global Should the global file be downloaded or not.
-#' TRUE/FALSE, FALSE by default
-#' @param download_path The path where the files will be downloaded
+#' TRUE/FALSE, FALSE by default (logical)
+#' @param download_dir character. The directory where the files will be downloaded
 #' @importFrom tidyr separate
 #' @importFrom stringr str_split_fixed str_extract
+#'
+#' @examples
+#' # Download data for two variables in three regular tiles
+#' # to the current working directory
+#' download_tiles(variable = c("sti", "stream_dist_up_farth"),
+#' file_format = "tif",
+#' tile_id = c("h00v02","h16v02", "h16v04"))
+#'
+#' # Download the global .tif layer for the variable "direction"
+#' # to a specific (existing) directory
+#' download_tiles(variable = "direction",
+#' file_format = "tif",
+#' global = TRUE,
+#' download_dir = "/path/to/directory/")
+#'
 #' @references Amatulli G., Garcia Marquez J., Sethi T., Kiesel J.,
 #' Grigoropoulou A., Üblacker M., Shen L. & Domisch S. (2022-08-09 )
 #' Hydrography90m: A new high-resolution global hydrographic dataset.
 #' IGB Leibniz-Institute of Freshwater Ecology and Inland Fisheries.
 #' dataset. https://doi.org/10.18728/igb-fred-762.1
+#'
 #' @export
 #'
 
 
-download_tiles <- function(variable, filetype = "tif",
+download_tiles <- function(variable, file_format = "tif",
                            tile_id = NULL, reg_unit_id = NULL,
-                           global = FALSE, download_path = ".") {
+                           global = FALSE, download_dir = ".") {
 
   # Introductory steps
 
@@ -52,9 +68,9 @@ download_tiles <- function(variable, filetype = "tif",
   # to check that the requested variable exists
   valid_varnames <- sort(unique(sub("_[^_]+$", "",
                                     file_size_table_sep$varname_tile)))
-  # Get the valid filetypes of the hydrography variables
+  # Get the valid file_formats of the hydrography variables
   # to check that the requested variable exists
-  valid_filetypes <- sort(unique(file_size_table_sep$varname_tile))
+  valid_file_formats <- sort(unique(file_size_table_sep$varname_tile))
 
   # Get the valid tile ids of the hydrography
   # to check that the requested tile exists
@@ -89,12 +105,12 @@ download_tiles <- function(variable, filetype = "tif",
     for (itile in tile_id) {
 
       tile_size <- check_tiles_filesize(variable = ivar,
-                                        filetype = filetype,
+                                        file_format = file_format,
                                         tile_id = itile,
                                         global = global,
                                         valid_varnames = valid_varnames,
                                         valid_tile_ids = valid_tile_ids,
-                                        valid_filetypes = valid_filetypes,
+                                        valid_file_formats = valid_file_formats,
                                         file_size_table_sep = file_size_table_sep)
 
       tile_size_sum <- tile_size_sum + tile_size
@@ -115,7 +131,7 @@ or \"n\" if you'd rather not to, and then press Enter \n"))
   if (arg == "y") {
 
 
-    # The argument 'server_path' of the download_tiles_base() function controls
+    # The argument 'server_url' of the download_tiles_base() function controls
     # the server from which the files will be downloaded
 
     # General path to the download folder in Nimbus
@@ -124,36 +140,36 @@ or \"n\" if you'd rather not to, and then press Enter \n"))
     gdrive_path <- "https://drive.google.com/uc?export=download&id="
 
     # Use README file as a test to check if Nimbus is up.
-    server_path <- tryCatch(
+    server_url <- tryCatch(
       {
         download.file(paste0(nimbus_path, "README/README.txt"),
-                      destfile = paste0(download_path, "/README.txt"))
-        server_path <- nimbus_path
-        server_path
+                      destfile = paste0(download_dir, "/README.txt"))
+        server_url <- nimbus_path
+        server_url
       },
       warning = function(c) {
         # Get gdrive file id of the README.txt file
         readme_id <- file_size_table_sep[varname_tile == "README.txt", ]$file_id
         # Download README.txt file
         download.file(paste0(gdrive_path, readme_id),
-                      destfile = paste0(download_path, "/README.txt"))
-        server_path <- gdrive_path
-        server_path
+                      destfile = paste0(download_dir, "/README.txt"))
+        server_url <- gdrive_path
+        server_url
       },
       error = function(c) {
-        server_path <- gdrive_path
-        server_path
+        server_url <- gdrive_path
+        server_url
       }
     )
 
     for (ivar in variable) {
       for (itile in tile_id) {
 
-        download_tiles_base(variable = ivar, filetype = filetype,
+        download_tiles_base(variable = ivar, file_format = file_format,
                             tile_id = itile, global = global,
-                            download_path = download_path,
+                            download_dir = download_dir,
                             file_size_table_sep = file_size_table_sep,
-                            server_path = server_path
+                            server_url = server_url
         )
       }
     }

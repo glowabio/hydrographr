@@ -7,24 +7,28 @@
 crop_to_extent(
   raster_path,
   vector_path = NULL,
-  bound_box = NULL,
-  output_path,
+  bounding_box = NULL,
+  out_dir,
+  file_name,
   rcrop_read = TRUE
 )
 }
 \arguments{
-\item{raster_path}{Path to the raster .tif layer}
+\item{raster_path}{character. Path to the raster .tif layer}
 
-\item{vector_path}{Path to a vector layer that is used as a cutline data
-source (similar to a mask operation)}
+\item{vector_path}{character. Path to a vector layer that is used as a
+cutline data source (similar to a mask operation)}
 
-\item{bound_box}{The coordinates of the corner of a bounding box (xmin, ymin,
-xmax, ymax) or a SpatRaster, SpatVector, or other spatial object.}
+\item{bounding_box}{numeric vector of the coordinates of the corners of a
+bounding box (xmin, ymin, xmax, ymax), SpatRaster, SpatVector,
+or other spatial object.}
 
-\item{output_path}{Path for copped output raster .tif file.}
+\item{out_dir}{character. The directory where the output will be stored}
 
-\item{rcrop_read}{If TRUE (default), then the cropped raster .tif layer
-gets read into R. Else the cropped .tif file will be only written to disk.}
+\item{file_name}{character. Name of the cropped output raster .tif file}
+
+\item{rcrop_read}{logical. If TRUE (default), then the cropped raster .tif layer
+gets read into R. Else the cropped .tif file will be only written to disk}
 }
 \value{
 The function returns always a .tif raster file written to disk.
@@ -37,11 +41,11 @@ i.e. the input layer does not be needed to be loaded into R. The function
 crops a raster .tif to a polygon border line if a vector layer
 (cutline source) is provided, otherwise if a bounding box is provided
 (xmin, ymin, xmax, ymax coordinates or a spatial object from which to extract
- a bounding box), the raster is cropped to the extent of the bounding box. At
- least a cutline source (vector_path) or a bounding box (bound_box)
- must be provided. The output is always written to disk, and can be
- optionally loaded directly into R as a SpatRaster (terra package) object
- (using  rcrop_read = TRUE).
+a bounding box), the raster is cropped to the extent of the bounding box. At
+least a cutline source (vector_path) or a bounding box (bounding_box)
+must be provided. The output is always written to disk, and can be
+optionally loaded directly into R as a SpatRaster (terra package) object
+(using  rcrop_read = TRUE).
 }
 \examples{
 library(hydrographr)

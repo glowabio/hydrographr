@@ -5,18 +5,20 @@
 #' sub-catchment (i.e. stream segment) IDs. The output is a data.table, and only
 #' the output is loaded into R.
 #'
-#' @param data_dir Character. Path to the directory containing all input data
-#' @param out_path Character. The optional full path of the output file. The
-#' output is loaded always into R, and if the out_path is specified, the output
-#' will be stored as a .csv in this location (e.g. "/path/to/output.csv")
+#' @param data_dir character. Path to the directory containing all input data
 #' @param subc_ids A vector of sub-catchment IDs or "all".
 #' If "all", the .gpkg values are extracted for all the segments
 #' of the given .gpkg layer. The stream segment ids are the same as the
 #' sub-catchment IDs. A vector of the sub-catchment IDs can be acquired
 #' from the extract_ids() function, by sub-setting the resulting data.frame.
-#' @param subc_layer Character. Full path to the sub-catchment ID .tif layer
+#' @param subc_layer character. Full path to the sub-catchment ID .tif layer
 #' @param variables Character vector of one or multiple .gpkg file names,
 #' e.g. "order_vect_point_h18v04.gpkg".
+#' @param out_dir character. The directory where the output will be stored.
+#' If the out_dir is specified, the attribute tables will be stored as .csv
+#' files in this location, named after their input variable vector files
+#' (e.g. "/path/to/stats_order_vect_point_h18v04.csv").
+#' If NULL, the output is only loaded in R and not stored on disk.
 #' @param n_cores Numeric. Number of cores for parallelization. Defaults to
 #' detectCores() - 1.
 #'
@@ -42,8 +44,8 @@
 #' my_dt <- extract_from_gpkg(data_dir=DATADIR, subc_ids="all")
 #'
 
-extract_from_gpkg <- function(data_dir, out_path = NULL, subc_ids,
-                               subc_layer, variables, n_cores = NULL) {
+extract_from_gpkg <- function(data_dir, subc_ids, subc_layer, variables,
+                              out_dir = NULL, n_cores = NULL) {
 
   # Introductory steps
 
@@ -126,8 +128,8 @@ extract_from_gpkg <- function(data_dir, out_path = NULL, subc_ids,
 
 
   # Write out table if requested
-  if (!is.null(out_path)) {
-    fwrite(var_table, out_path, sep = ",",
+  if (!is.null(out_dir)) {
+    fwrite(var_table, out_dir, sep = ",",
            row.names = FALSE, quote = FALSE, col.names = TRUE)
   }
 

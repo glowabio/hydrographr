@@ -14,7 +14,7 @@
 #' @param new_val Column name of new raster values as character string.
 #' @param rast_path Full path to the input raster .tif layer.
 
-#' @param recl_path Full path of the output .tif layer
+#' @param recl_layer Full path of the output .tif layer
 #' of the reclassified raster file.
 #' @param read If TRUE (default), then the reclassified raster .tif layer
 #' gets read into R as a SpatRaster (terra object)
@@ -46,7 +46,7 @@
 #' # Reclassify the stream network to obtain the Strahler stream order raster
 #' str_ord_rast <- reclass_raster(str_ord, rast_val = "stream",
 #' new_val = "strahler", rast_path =  "/DATADIR/stream_1264942.tif",
-#' recl_path = "/path/to/output.tif")
+#' recl_layer = "/path/to/output.tif")
 #'
 #'
 #' @references
@@ -55,7 +55,7 @@
 #' @author Maria Üblacker
 
 reclass_raster <- function(data, rast_val, new_val, rast_path,
-                           recl_path, read = TRUE,
+                           recl_layer, read = TRUE,
                            nodata = -9999, type = "Int32",
                            compress = "DEFLATE", quiet = TRUE) {
   # Check operating system
@@ -100,15 +100,15 @@ reclass_raster <- function(data, rast_val, new_val, rast_path,
   if (!file.exists(rast_path))
     stop(paste0("rast_path: ", rast_path, " does not exist."))
 
-  # Check if rast_path ends and recl_path with .tif
+  # Check if rast_path ends and recl_layer with .tif
   if (!endsWith(rast_path, ".tif"))
     stop("rast_path: Input raster is not a .tif file.")
-    if (!endsWith(recl_path, ".tif"))
-      stop("recl_path: Output raster file path needs to end with .tif.")
+    if (!endsWith(recl_layer, ".tif"))
+      stop("recl_layer: Output raster file path needs to end with .tif.")
 
   # Check if rast_path is defined
-  if (missing(recl_path))
-    stop("recl_path: Path for the output raster layer is missing.")
+  if (missing(recl_layer))
+    stop("recl_layer: Path for the output raster layer is missing.")
 
   if (!is.logical(read))
    stop("read: Has to be TRUE or FALSE.")
@@ -150,7 +150,7 @@ reclass_raster <- function(data, rast_val, new_val, rast_path,
   # Call external GRASS GIS command r.reclass
   processx::run(system.file("sh", "reclass_raster.sh",
                            package = "hydrographr"),
-      args = c(rast_path, rules_path, recl_path,
+      args = c(rast_path, rules_path, recl_layer,
                              nodata, type, compress),
       echo = !quiet)
 
@@ -159,7 +159,7 @@ reclass_raster <- function(data, rast_val, new_val, rast_path,
     check_wsl()
     # Change paths for WSL
     wsl_rast_path <- fix_path(rast_path)
-    wsl_recl_path <- fix_path(recl_path)
+    wsl_recl_layer <- fix_path(recl_layer)
     wsl_rules_path <- fix_path(rules_path)
     wsl_sh_file <- fix_path(
       system.file("sh", "reclass_raster.sh",
@@ -169,7 +169,7 @@ reclass_raster <- function(data, rast_val, new_val, rast_path,
     # Call external GRASS GIS command r.reclass
     processx::run(system.file("bat", "reclass_raster.bat",
                     package = "hydrographr"),
-        args = c(wsl_rast_path, wsl_rules_path, wsl_recl_path,
+        args = c(wsl_rast_path, wsl_rules_path, wsl_recl_layer,
                  nodata, type, compress, wsl_sh_file),
         echo = !quiet)
 
@@ -179,11 +179,11 @@ reclass_raster <- function(data, rast_val, new_val, rast_path,
 
   if (read == TRUE) {
     # Read reclassified .tif layer
-    recl_rast <- rast(recl_path)
+    recl_rast <- rast(recl_layer)
 
   } else {
    # Print message
-   print(paste0("Reclassified raster saved under: ", recl_path))
+   print(paste0("Reclassified raster saved under: ", recl_layer))
   }
 
 }
