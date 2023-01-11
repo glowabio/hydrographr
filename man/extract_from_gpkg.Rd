@@ -8,7 +8,7 @@ extract_from_gpkg(
   data_dir,
   subc_id,
   subc_layer,
-  variables,
+  var_layer,
   out_dir = NULL,
   n_cores = NULL
 )
@@ -24,8 +24,8 @@ from the extract_ids() function, by sub-setting the resulting data.frame}
 
 \item{subc_layer}{character. Full path to the sub-catchment ID .tif layer}
 
-\item{variables}{Character vector of one or multiple .gpkg file names,
-e.g. "order_vect_point_h18v04.gpkg".}
+\item{var_layer}{character vector of .gpkg files on disk,
+e.g. "order_vect_point_h18v04.gpkg"}
 
 \item{out_dir}{character. The directory where the output will be stored.
 If the out_dir is specified, the attribute tables will be stored as .csv

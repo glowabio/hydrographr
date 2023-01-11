@@ -12,7 +12,7 @@
 #' can be acquired from the extract_ids() function, and by sub-setting
 #' the resulting data.frame.
 #' @param subc_layer character. Full path to the sub-catchment ID .tif layer
-#' @param variables Character vector. Variable file names,
+#' @param var_layer character vector of variable raster layers on disk,
 #' e.g. "slope_grad_dw_cel_h00v00.tif". Variable names should remain
 #' intact in file names, even after file processing,
 #' i.e., slope_grad_dw_cel should appear in the file name.
@@ -60,7 +60,7 @@
 #'                            subc_layer = paste0(my_directory,
 #'                                                "/hydrography90m_test_data",
 #'                                                "/subcatchment_1264942.tif"),
-#'                            variables = c("spi_1264942.tif",
+#'                            var_layer = c("spi_1264942.tif",
 #'                                          "sti_1264942.tif"),
 #'                            out_dir = paste0(my_directory,
 #'                                      "/hydrography90m_test_data/output/"),
@@ -70,7 +70,7 @@
 #' stat
 #'
 
-extract_zonal_stat <- function(data_dir,  subc_ids, subc_layer, variables,
+extract_zonal_stat <- function(data_dir,  subc_ids, subc_layer, var_layer,
                                out_dir = NULL, file_name = NULL, n_cores = NULL,
                                quiet = TRUE) {
 
@@ -80,8 +80,8 @@ extract_zonal_stat <- function(data_dir,  subc_ids, subc_layer, variables,
   if (!is.vector(subc_ids)) {
     print("subc_ids should be either a vector of ids, or \"all\" ")
   }
-  if (!is.vector(variables)) {
-    print("The variables should be provided in a character vector format")
+  if (!is.vector(var_layer)) {
+    print("The var_layer should be provided in a character vector format")
   }
 
 
@@ -92,7 +92,7 @@ extract_zonal_stat <- function(data_dir,  subc_ids, subc_layer, variables,
   }
 
   # Check if subc_layer ends with .tif
-  for (path in c(subc_layer, variables)) {
+  for (path in c(subc_layer, var_layer)) {
     if (!endsWith(path, ".tif"))
       stop(paste0("File path: ", path, " does not end with .tif"))
   }
@@ -130,7 +130,7 @@ extract_zonal_stat <- function(data_dir,  subc_ids, subc_layer, variables,
   }
 
   # Get the variable names
-  varnames <- gsub(".tif", "", variables)
+  varnames <- gsub(".tif", "", var_layer)
 
   # Delete files if they exist
   for (varname in varnames) {
@@ -144,10 +144,10 @@ extract_zonal_stat <- function(data_dir,  subc_ids, subc_layer, variables,
 
   # Format subc_ids vector so that it can be read
   # as an array in the bash script
-  variables_array <- paste(unique(variables), collapse = "/")
+  var_layer_array <- paste(unique(var_layer), collapse = "/")
 
   # Call function report_no_data()
-  no_data <- report_no_data(data_dir = data_dir, variables = variables,
+  no_data <- report_no_data(data_dir = data_dir, var_layer = var_layer,
                              n_cores = n_cores)
   print(noquote("The following NoData values are used for the calculation:"))
   print(no_data)
@@ -167,7 +167,7 @@ extract_zonal_stat <- function(data_dir,  subc_ids, subc_layer, variables,
     processx::run(system.file("sh", "extract_zonal_stat.sh",
                   package = "hydrographr"),
                   args = c(data_dir, subc_ids, subc_layer,
-                           variables_array, calc_all, n_cores, rand_string),
+                           var_layer_array, calc_all, n_cores, rand_string),
                   echo = !quiet)
 
     } else {
@@ -184,7 +184,7 @@ extract_zonal_stat <- function(data_dir,  subc_ids, subc_layer, variables,
       processx::run(system.file("bat", "extract_zonal_stat.bat",
                                 package = "hydrographr"),
                     args = c(wsl_data_dir, subc_ids, wsl_subc_layer,
-                             variables_array, calc_all, n_cores, rand_string,
+                             var_layer_array, calc_all, n_cores, rand_string,
                              wsl_sh_file),
                     echo = !quiet)
 

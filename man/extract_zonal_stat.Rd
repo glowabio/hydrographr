@@ -9,7 +9,7 @@ extract_zonal_stat(
   data_dir,
   subc_ids,
   subc_layer,
-  variables,
+  var_layer,
   out_dir = NULL,
   file_name = NULL,
   n_cores = NULL,
@@ -27,7 +27,7 @@ the resulting data.frame.}
 
 \item{subc_layer}{character. Full path to the sub-catchment ID .tif layer}
 
-\item{variables}{Character vector. Variable file names,
+\item{var_layer}{character vector of variable raster layers on disk,
 e.g. "slope_grad_dw_cel_h00v00.tif". Variable names should remain
 intact in file names, even after file processing,
 i.e., slope_grad_dw_cel should appear in the file name.
@@ -68,7 +68,7 @@ stat <- extract_zonal_stat(data_dir = paste0(my_directory,
                            subc_layer = paste0(my_directory,
                                                "/hydrography90m_test_data",
                                                "/subcatchment_1264942.tif"),
-                           variables = c("spi_1264942.tif",
+                           var_layer = c("spi_1264942.tif",
                                          "sti_1264942.tif"),
                            out_dir = paste0(my_directory,
                                      "/hydrography90m_test_data/output/"),

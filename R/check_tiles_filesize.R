@@ -1,7 +1,7 @@
 #' Check the size of single files before downloading.
 #' It is called and inherits arguments by the function 'download_tiles()'
 #'
-#' @param variable Vector of variable names (as character)
+#' @param variable character vector of variable names
 #' @param file_format character. Format of the requested file ("tif" or "gpkg")
 #' @param tile_id character. The ID of the requested tile or regional unit
 #' @param global Logical. Should the global file be downloaded or not.

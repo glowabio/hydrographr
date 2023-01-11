@@ -4,13 +4,13 @@
 \alias{report_no_data}
 \title{Report NoData value of raster layers.}
 \usage{
-report_no_data(data_dir, variables, n_cores = NULL)
+report_no_data(data_dir, var_layer, n_cores = NULL)
 }
 \arguments{
 \item{data_dir}{character. Path to the directory containing all input data}
 
-\item{variables}{Character vector. The names of the raster files,
-e.g. slope_grad_dw_cel_h00v00.tif.}
+\item{var_layer}{character vector of variable raster layers on disk,
+e.g. "slope_grad_dw_cel_h00v00.tif".}
 
 \item{n_cores}{Numeric. Number of cores used for parallelization. If NULL,
 available cores - 1 will be used}

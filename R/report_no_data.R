@@ -7,8 +7,8 @@
 #' the available values of a specified location.
 #'
 #' @param data_dir character. Path to the directory containing all input data
-#' @param variables Character vector. The names of the raster files,
-#' e.g. slope_grad_dw_cel_h00v00.tif.
+#' @param var_layer character vector of variable raster layers on disk,
+#' e.g. "slope_grad_dw_cel_h00v00.tif".
 #' @param n_cores Numeric. Number of cores used for parallelization. If NULL,
 #' available cores - 1 will be used
 #' @importFrom processx run
@@ -34,7 +34,7 @@
 #'
 
 
-report_no_data <- function(data_dir, variables, n_cores = NULL) {
+report_no_data <- function(data_dir, var_layer, n_cores = NULL) {
 
   # Check if path exists
   if (!dir.exists(data_dir))
@@ -48,9 +48,9 @@ report_no_data <- function(data_dir, variables, n_cores = NULL) {
 
   }
 
-  # Format variables vector so that it can be read
+  # Format var_layer vector so that it can be read
   # as an array in the bash script
-  variables_array <- paste(unique(variables), collapse = "/")
+  var_layer_array <- paste(unique(var_layer), collapse = "/")
 
   # Check operating system
   system <- get_os()
@@ -62,7 +62,7 @@ report_no_data <- function(data_dir, variables, n_cores = NULL) {
   # Call the external .sh script report_no_data()
   reports <- processx::run(system.file("sh", "report_no_data.sh",
                              package = "hydrographr"),
-                 args = c(data_dir, variables_array, n_cores),
+                 args = c(data_dir, var_layer_array, n_cores),
                  echo = FALSE)$stdout
 
   } else {
@@ -77,7 +77,7 @@ report_no_data <- function(data_dir, variables, n_cores = NULL) {
     # Call external GRASS GIS command r.reclass
     reports <-  processx::run(system.file("bat", "report_no_data.bat",
                                            package = "hydrographr"),
-                            args = c(wsl_data_dir, variables_array, n_cores,
+                            args = c(wsl_data_dir, var_layer_array, n_cores,
                                      wsl_sh_file),
                             echo = FALSE)$stdout
   }

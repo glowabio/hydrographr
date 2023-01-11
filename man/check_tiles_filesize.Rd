@@ -18,7 +18,7 @@ check_tiles_filesize(
 )
 }
 \arguments{
-\item{variable}{Vector of variable names (as character)}
+\item{variable}{character vector of variable names}
 
 \item{file_format}{character. Format of the requested file ("tif" or "gpkg")}
 

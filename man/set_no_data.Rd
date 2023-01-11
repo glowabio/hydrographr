@@ -6,15 +6,16 @@
 The change happens in-place, meaning that the original file is overwritten
 on disk.}
 \usage{
-set_no_data(data_dir, variable, no_data)
+set_no_data(data_dir, var_layer, no_data)
 }
 \arguments{
-\item{data_dir}{Character. Path to the directory containing all input data.}
+\item{data_dir}{character. Path to the directory containing all input layers}
 
-\item{variable}{Character vector. Variable file name,
-e.g. slope_grad_dw_cel_h00v00.tif. The original file will be overwritten.}
+\item{var_layer}{character vector of var_layer layers on disk,
+e.g. c("sti_h16v02.tif", "slope_grad_dw_cel_h00v00.tif").
+The original files will be overwritten.}
 
-\item{no_data}{The desired NoData value}
+\item{no_data}{numeric. The desired NoData value}
 }
 \description{
 Change or set the NoData value for a raster layer.
@@ -28,7 +29,7 @@ download_test_data(my_directory)
 
 # Define no data value
 set_no_data(data_dir = paste0(my_directory, "/hydrography90m_test_data"),
-            variable = "cti_1264942.tif",
+            var_layer = "cti_1264942.tif",
             no_data = -9999)
 
 }

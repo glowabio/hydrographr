@@ -12,8 +12,8 @@
 #' sub-catchment IDs. A vector of the sub-catchment IDs can be acquired
 #' from the extract_ids() function, by sub-setting the resulting data.frame
 #' @param subc_layer character. Full path to the sub-catchment ID .tif layer
-#' @param variables Character vector of one or multiple .gpkg file names,
-#' e.g. "order_vect_point_h18v04.gpkg".
+#' @param var_layer character vector of .gpkg files on disk,
+#' e.g. "order_vect_point_h18v04.gpkg"
 #' @param out_dir character. The directory where the output will be stored.
 #' If the out_dir is specified, the attribute tables will be stored as .csv
 #' files in this location, named after their input variable vector files
@@ -44,7 +44,7 @@
 #' my_dt <- extract_from_gpkg(data_dir=DATADIR, subc_id="all")
 #'
 
-extract_from_gpkg <- function(data_dir, subc_id, subc_layer, variables,
+extract_from_gpkg <- function(data_dir, subc_id, subc_layer, var_layer,
                               out_dir = NULL, n_cores = NULL) {
 
   # Introductory steps
@@ -53,8 +53,8 @@ extract_from_gpkg <- function(data_dir, subc_id, subc_layer, variables,
   if (!is.vector(subc_id)) {
     print("subc_id should be either a vector of ids, or \"all\" ")
   }
-  if (!is.vector(variables)) {
-    print("The variables should be provided in a vector format")
+  if (!is.vector(var_layer)) {
+    print("The var_layer should be provided in a vector format")
   }
 
 
@@ -90,11 +90,11 @@ extract_from_gpkg <- function(data_dir, subc_id, subc_layer, variables,
 
 
     # Get the variable names
-    varnames <- gsub("gpkg", variables)
+    varnames <- gsub("gpkg", var_layer)
 
     # Format subc_id vector so that it can be read
     # as an array in the bash script
-    variables_array <- paste(unique(variables), collapse = " ")
+    var_layer_array <- paste(unique(var_layer), collapse = " ")
 
 
     # Delete output files if they exist
@@ -113,7 +113,7 @@ extract_from_gpkg <- function(data_dir, subc_id, subc_layer, variables,
     processx::run(system.file("sh", "extract_from_gpkg.sh",
                     package = "hydrographr"),
         args = c(data_dir, subc_id, subc_layer,
-        variables_array, calc_all, n_cores),
+        var_layer_array, calc_all, n_cores),
         echo = FALSE)$stdout
 
     out_filenames <- list.files(paste0(data_dir, "/tmp/r_univar/"),

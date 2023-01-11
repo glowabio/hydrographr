@@ -20,7 +20,7 @@
 #' @param mode One of "in", "out", or "all". "in" reports only
 #' upstream neighbouring segments, "out" reports only the downstream segments,
 #' and "all" does both.
-#' @param variable Optional. One or more attribute(s) or variable(s) of the
+#' @param variable optional. One or more attribute(s) or variable(s) of the
 #' input graph that should be reported for each output subc_id ("to_stream").
 #' @param attach_only Logical. If TRUE then the selected variables will be
 #' only attached to each for each segment without any further aggregation.

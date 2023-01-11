@@ -22,7 +22,7 @@ segment_neighbours(
 \item{subc_id}{The input sub-catchment IDs as a numerical vector
 for which to search the connected segments.}
 
-\item{variable}{Optional. One or more attribute(s) or variable(s) of the
+\item{variable}{optional. One or more attribute(s) or variable(s) of the
 input graph that should be reported for each output subc_id ("to_stream").}
 
 \item{stat}{One of mean, median, min, max, sd (without quotes).
