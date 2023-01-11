@@ -11,8 +11,8 @@ check_tiles_filesize(
   tile_id = NULL,
   reg_unit_id = NULL,
   global = FALSE,
-  valid_varnames,
-  valid_tile_ids,
+  h90m_varnames,
+  h90m_tile_id,
   valid_file_formats,
   file_size_table_sep
 )
@@ -22,16 +22,16 @@ check_tiles_filesize(
 
 \item{file_format}{character. Format of the requested file ("tif" or "gpkg")}
 
-\item{tile_id}{The ID of the requested tile or regional unit (as character)}
+\item{tile_id}{character. The ID of the requested tile or regional unit}
 
 \item{global}{Logical. Should the global file be downloaded or not.
 TRUE/FALSE, FALSE by default}
 
-\item{valid_varnames}{The valid names of the files available for download
-(inherited by 'download_tiles()')}
+\item{h90m_varnames}{character vector. the valid names of the hydrography90m
+files available for download, (inherited by 'download_tiles()')}
 
-\item{valid_tile_ids}{The valid IDs of the tiles available for download
-(inherited by 'download_tiles()')}
+\item{h90m_tile_id}{character vector. The valid IDs of the hydrography90m
+regular tiles available for download (inherited by 'download_tiles()')}
 
 \item{valid_file_formats}{The valid file types of the files available
 for download

@@ -6,7 +6,7 @@
 \usage{
 extract_from_gpkg(
   data_dir,
-  subc_ids,
+  subc_id,
   subc_layer,
   variables,
   out_dir = NULL,
@@ -16,11 +16,11 @@ extract_from_gpkg(
 \arguments{
 \item{data_dir}{character. Path to the directory containing all input data}
 
-\item{subc_ids}{A vector of sub-catchment IDs or "all".
-If "all", the .gpkg values are extracted for all the segments
-of the given .gpkg layer. The stream segment ids are the same as the
+\item{subc_id}{a numeric vector of sub-catchment IDs or "all".
+If "all", the attribute table is extracted for all the stream segments of
+the input .gpkg layer. The stream segment IDs are the same as the
 sub-catchment IDs. A vector of the sub-catchment IDs can be acquired
-from the extract_ids() function, by sub-setting the resulting data.frame.}
+from the extract_ids() function, by sub-setting the resulting data.frame}
 
 \item{subc_layer}{character. Full path to the sub-catchment ID .tif layer}
 
@@ -51,7 +51,7 @@ DATADIR <- "path/to/test_data"
 # Download the test data
 download_test_data(DATADIR)
 
-my_dt <- extract_from_gpkg(data_dir=DATADIR, subc_ids="all")
+my_dt <- extract_from_gpkg(data_dir=DATADIR, subc_id="all")
 
 }
 \author{

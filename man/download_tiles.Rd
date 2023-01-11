@@ -19,9 +19,9 @@ download_tiles(
 
 \item{file_format}{character. Format of the requested file ("tif" or "gpkg")}
 
-\item{tile_id}{id of the requested tile (character)}
+\item{tile_id}{character vector. The IDs of the requested tiles}
 
-\item{reg_unit_id}{id of the requested regional unit (character)}
+\item{reg_unit_id}{character vector. The IDs of the requested regional units}
 
 \item{global}{Should the global file be downloaded or not.
 TRUE/FALSE, FALSE by default (logical)}

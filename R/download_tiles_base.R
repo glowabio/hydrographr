@@ -4,7 +4,7 @@
 #'
 #' @param variable character vector of variable names
 #' @param file_format character. Format of the requested file ("tif" or "gpkg")
-#' @param tile_id id of the requested tile (character)
+#' @param tile_id character. The ID of the requested tile or regional unit
 #' @param global Should the global file be downloaded or not.
 #' TRUE/FALSE, FALSE by default
 #' @param download_dir character. The directory where the files will be downloaded

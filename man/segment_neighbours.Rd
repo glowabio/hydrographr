@@ -6,7 +6,7 @@
 \usage{
 segment_neighbours(
   g,
-  segment_id = NULL,
+  subc_id = NULL,
   variable = NULL,
   stat = NULL,
   attach_only = FALSE,
@@ -19,11 +19,11 @@ segment_neighbours(
 \arguments{
 \item{g}{A directed graph (igraph object).}
 
-\item{segment_id}{The input segment IDs as a numerical vector
+\item{subc_id}{The input sub-catchment IDs as a numerical vector
 for which to search the connected segments.}
 
 \item{variable}{Optional. One or more attribute(s) or variable(s) of the
-input graph that should be reported for each output segment_id ("to_stream").}
+input graph that should be reported for each output subc_id ("to_stream").}
 
 \item{stat}{One of mean, median, min, max, sd (without quotes).
 Aggregates (or summarizes) the variables for the neighbourhood
@@ -34,9 +34,9 @@ the next five upstream segments or sub-catchments).}
 only attached to each for each segment without any further aggregation.}
 
 \item{order}{The neighbouring order as in igraph::ego.
-Order=1 would be immediate neighbours of the input segementID,
+Order=1 would be immediate neighbours of the input sub-catchment IDs,
 order=2 would be the order 1 plus the immediate neighbours of
-those segementIDs in order 1, and so on.}
+those sub-catchment IDs in order 1, and so on.}
 
 \item{mode}{One of "in", "out", or "all". "in" reports only
 upstream neighbouring segments, "out" reports only the downstream segments,
@@ -82,7 +82,7 @@ g <- read_geopackage(paste0(DATADIR, "/order_vect_59.gpkg"), type="net", g=T)
 # Get the upstream segment neighbours in the 5th order
 and report the length and source elevation
 for the neighbours of each input segment
-segment_neighbours(g, segment_id=segment_id,
+segment_neighbours(g, subc_id=subc_id,
                    order=5, mode="in", n_cores=1,
                    variable=c("length", "source_elev"),
                    attach_only=T)
@@ -90,7 +90,7 @@ segment_neighbours(g, segment_id=segment_id,
 # Get the downstream segment neighbours in the 5th order
 and calculate the median length and source elevation
 across the neighbours of each input segment
-segment_neighbours(my_graph, segment_id=segment_id,
+segment_neighbours(my_graph, subc_id=subc_id,
                    order=2, mode="out", n_cores=1,
                    variable=c("length", "source_elev"),
                    stat=median)
@@ -98,7 +98,7 @@ segment_neighbours(my_graph, segment_id=segment_id,
 Get the up-and downstream segment neighbours in the 5th order
 and report the median length and source elevation
 for the neighbours of each input segment
-segment_neighbours(my_graph, segment_id=segment_id,
+segment_neighbours(my_graph, subc_id=subc_id,
                    order=2, mode="all", n_cores=1,
                    variable=c("length", "source_elev"),
                    stat=mean, attach_only=T)

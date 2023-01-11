@@ -3,8 +3,8 @@
 #'
 #' @param variable character vector of variable names
 #' @param file_format character. Format of the requested file ("tif" or "gpkg")
-#' @param tile_id id of the requested tile (character)
-#' @param reg_unit_id id of the requested regional unit (character)
+#' @param tile_id character vector. The IDs of the requested tiles
+#' @param reg_unit_id character vector. The IDs of the requested regional units
 #' @param global Should the global file be downloaded or not.
 #' TRUE/FALSE, FALSE by default (logical)
 #' @param download_dir character. The directory where the files will be downloaded
@@ -66,7 +66,7 @@ download_tiles <- function(variable, file_format = "tif",
     is.na(file_size_table_sep$grass_module)] <- ""
   # Get the valid names of the hydrography variables
   # to check that the requested variable exists
-  valid_varnames <- sort(unique(sub("_[^_]+$", "",
+  h90m_varnames <- sort(unique(sub("_[^_]+$", "",
                                     file_size_table_sep$varname_tile)))
   # Get the valid file_formats of the hydrography variables
   # to check that the requested variable exists
@@ -74,10 +74,10 @@ download_tiles <- function(variable, file_format = "tif",
 
   # Get the valid tile ids of the hydrography
   # to check that the requested tile exists
-  valid_tile_ids <- unique(str_extract(
+  h90m_tile_id <- unique(str_extract(
     file_size_table$file_path, "h[0-9]+v[0-9]+"))
 
-  valid_tile_ids <- valid_tile_ids[!is.na(valid_tile_ids)]
+  h90m_tile_id <- h90m_tile_id[!is.na(h90m_tile_id)]
 
   variable_size_sum <- 0
 
@@ -108,8 +108,8 @@ download_tiles <- function(variable, file_format = "tif",
                                         file_format = file_format,
                                         tile_id = itile,
                                         global = global,
-                                        valid_varnames = valid_varnames,
-                                        valid_tile_ids = valid_tile_ids,
+                                        h90m_varnames = h90m_varnames,
+                                        h90m_tile_id = h90m_tile_id,
                                         valid_file_formats = valid_file_formats,
                                         file_size_table_sep = file_size_table_sep)
 

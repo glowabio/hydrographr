@@ -6,11 +6,11 @@
 #' the output is loaded into R.
 #'
 #' @param data_dir character. Path to the directory containing all input data
-#' @param subc_ids A vector of sub-catchment IDs or "all".
-#' If "all", the .gpkg values are extracted for all the segments
-#' of the given .gpkg layer. The stream segment ids are the same as the
+#' @param subc_id a numeric vector of sub-catchment IDs or "all".
+#' If "all", the attribute table is extracted for all the stream segments of
+#' the input .gpkg layer. The stream segment IDs are the same as the
 #' sub-catchment IDs. A vector of the sub-catchment IDs can be acquired
-#' from the extract_ids() function, by sub-setting the resulting data.frame.
+#' from the extract_ids() function, by sub-setting the resulting data.frame
 #' @param subc_layer character. Full path to the sub-catchment ID .tif layer
 #' @param variables Character vector of one or multiple .gpkg file names,
 #' e.g. "order_vect_point_h18v04.gpkg".
@@ -41,17 +41,17 @@
 #' # Download the test data
 #' download_test_data(DATADIR)
 #'
-#' my_dt <- extract_from_gpkg(data_dir=DATADIR, subc_ids="all")
+#' my_dt <- extract_from_gpkg(data_dir=DATADIR, subc_id="all")
 #'
 
-extract_from_gpkg <- function(data_dir, subc_ids, subc_layer, variables,
+extract_from_gpkg <- function(data_dir, subc_id, subc_layer, variables,
                               out_dir = NULL, n_cores = NULL) {
 
   # Introductory steps
 
   # check if the input is vector
-  if (!is.vector(subc_ids)) {
-    print("subc_ids should be either a vector of ids, or \"all\" ")
+  if (!is.vector(subc_id)) {
+    print("subc_id should be either a vector of ids, or \"all\" ")
   }
   if (!is.vector(variables)) {
     print("The variables should be provided in a vector format")
@@ -67,16 +67,16 @@ extract_from_gpkg <- function(data_dir, subc_ids, subc_layer, variables,
   calc_all <- 1
 
   # Create file with reclassification rules for the r.reclass function
-  if (!identical(subc_ids, "all")) {
+  if (!identical(subc_id, "all")) {
     calc_all <- 0
-    reclass <- rbind.data.frame(data.frame(str_c(subc_ids, " = ", 1)),
+    reclass <- rbind.data.frame(data.frame(str_c(subc_id, " = ", 1)),
                                 "* = NULL")
     fwrite(reclass, paste0(data_dir, "/tmp/reclass_rules.txt"), sep = "\t",
            row.names = FALSE, quote = FALSE, col.names = FALSE)
 
-    # Format subc_ids vector so that it can be read
+    # Format subc_id vector so that it can be read
     # as an array in the bash script
-    subc_ids <- paste(unique(subc_ids), collapse = " ")
+    subc_id <- paste(unique(subc_id), collapse = " ")
 
   }
 
@@ -92,7 +92,7 @@ extract_from_gpkg <- function(data_dir, subc_ids, subc_layer, variables,
     # Get the variable names
     varnames <- gsub("gpkg", variables)
 
-    # Format subc_ids vector so that it can be read
+    # Format subc_id vector so that it can be read
     # as an array in the bash script
     variables_array <- paste(unique(variables), collapse = " ")
 
@@ -112,7 +112,7 @@ extract_from_gpkg <- function(data_dir, subc_ids, subc_layer, variables,
     # containing the grass functions
     processx::run(system.file("sh", "extract_from_gpkg.sh",
                     package = "hydrographr"),
-        args = c(data_dir, subc_ids, subc_layer,
+        args = c(data_dir, subc_id, subc_layer,
         variables_array, calc_all, n_cores),
         echo = FALSE)$stdout
 

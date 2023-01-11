@@ -11,17 +11,17 @@
 #' along with the stream length for all connected segments.
 #'
 #' @param g A directed graph (igraph object).
-#' @param segment_id The input segment IDs as a numerical vector
+#' @param subc_id The input sub-catchment IDs as a numerical vector
 #' for which to search the connected segments.
 #' @param order The neighbouring order as in igraph::ego.
-#' Order=1 would be immediate neighbours of the input segementID,
+#' Order=1 would be immediate neighbours of the input sub-catchment IDs,
 #' order=2 would be the order 1 plus the immediate neighbours of
-#' those segementIDs in order 1, and so on.
+#' those sub-catchment IDs in order 1, and so on.
 #' @param mode One of "in", "out", or "all". "in" reports only
 #' upstream neighbouring segments, "out" reports only the downstream segments,
 #' and "all" does both.
 #' @param variable Optional. One or more attribute(s) or variable(s) of the
-#' input graph that should be reported for each output segment_id ("to_stream").
+#' input graph that should be reported for each output subc_id ("to_stream").
 #' @param attach_only Logical. If TRUE then the selected variables will be
 #' only attached to each for each segment without any further aggregation.
 #' @param stat One of mean, median, min, max, sd (without quotes).
@@ -67,7 +67,7 @@
 #' # Get the upstream segment neighbours in the 5th order
 #' and report the length and source elevation
 #' for the neighbours of each input segment
-#' segment_neighbours(g, segment_id=segment_id,
+#' segment_neighbours(g, subc_id=subc_id,
 #'                    order=5, mode="in", n_cores=1,
 #'                    variable=c("length", "source_elev"),
 #'                    attach_only=T)
@@ -75,7 +75,7 @@
 #' # Get the downstream segment neighbours in the 5th order
 #' and calculate the median length and source elevation
 #' across the neighbours of each input segment
-#' segment_neighbours(my_graph, segment_id=segment_id,
+#' segment_neighbours(my_graph, subc_id=subc_id,
 #'                    order=2, mode="out", n_cores=1,
 #'                    variable=c("length", "source_elev"),
 #'                    stat=median)
@@ -83,7 +83,7 @@
 #' Get the up-and downstream segment neighbours in the 5th order
 #' and report the median length and source elevation
 #' for the neighbours of each input segment
-#' segment_neighbours(my_graph, segment_id=segment_id,
+#' segment_neighbours(my_graph, subc_id=subc_id,
 #'                    order=2, mode="all", n_cores=1,
 #'                    variable=c("length", "source_elev"),
 #'                    stat=mean, attach_only=T)
@@ -92,7 +92,7 @@
 
 
 
-segment_neighbours <- function(g, segment_id = NULL,
+segment_neighbours <- function(g, subc_id = NULL,
                               variable = NULL, stat = NULL,
                               attach_only = FALSE, order = 5,
                               mode = "in", n_cores = 1,
@@ -107,17 +107,17 @@ segment_neighbours <- function(g, segment_id = NULL,
     "The input graph must be a directed graph."
     )
 
-  if (missing(segment_id)) stop(
+  if (missing(subc_id)) stop(
     "Please provide at least one segment ID of the input graph.
-    The segment_id must be a numeric vector."
+    The subc_id must be a numeric vector."
     )
 
-  if (is.data.frame(segment_id) == TRUE) stop(
-    "The segment_id must be a numeric vector."
+  if (is.data.frame(subc_id) == TRUE) stop(
+    "The subc_id must be a numeric vector."
     )
 
   if (hasArg(n_cores)) {
-    if (length(segment_id) > 1 && n_cores == 0)  stop(
+    if (length(subc_id) > 1 && n_cores == 0)  stop(
       "You have specified multiple segments but zero workers.
       Please specify at least n_cores=1,
       or leave it empty to allow an automatic setup.")
@@ -135,14 +135,14 @@ segment_neighbours <- function(g, segment_id = NULL,
   options(future.globals.maxSize = maxsize * 1024^2)
 
   #  Remove any duplicate segmenrIDs
-  segment_id <- segment_id[!duplicated(segment_id)]
+  subc_id <- subc_id[!duplicated(subc_id)]
 
   # Set up parallel backend if multiple segments
-  if (length(segment_id) > 1) {
+  if (length(subc_id) > 1) {
     cat("Setting up parallel backend...\n")
     registerDoFuture()
     # If n_cores not specified, use all-2
-    if (length(segment_id) > 1 && missing(n_cores)) {
+    if (length(subc_id) > 1 && missing(n_cores)) {
       # n_cores <- detectCores(logical=F)-2
       n_cores <- 1
     }
@@ -159,11 +159,11 @@ segment_neighbours <- function(g, segment_id = NULL,
 
   cat("Finding stream segments within neighbourhood order", order, "\n")
 
-  l <- future_sapply(as.character(segment_id), function(x) {
+  l <- future_sapply(as.character(subc_id), function(x) {
     ego(g, nodes = x, order, mode = mode)
     }
     )
-  # ego_out <- ego(g, nodes=as.character(segment_id), order, mode = mode)
+  # ego_out <- ego(g, nodes=as.character(subc_id), order, mode = mode)
 
   # Reduce list items
   l <- future_lapply(l, as_ids)
@@ -210,7 +210,7 @@ segment_neighbours <- function(g, segment_id = NULL,
       return(dt_join)
       # Else aggregate the variables to each "from" stream
     } else if (attach_only == FALSE && !missing(stat))   {
-      cat("Aggregating variable(s)", variable, "for each segment_id.\n")
+      cat("Aggregating variable(s)", variable, "for each subc_id.\n")
 
       dt_agg <- dt_join[, lapply(.SD, stat, na.rm = TRUE),
                         .SDcols = variable,

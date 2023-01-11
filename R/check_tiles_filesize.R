@@ -3,13 +3,13 @@
 #'
 #' @param variable Vector of variable names (as character)
 #' @param file_format character. Format of the requested file ("tif" or "gpkg")
-#' @param tile_id The ID of the requested tile or regional unit (as character)
+#' @param tile_id character. The ID of the requested tile or regional unit
 #' @param global Logical. Should the global file be downloaded or not.
 #' TRUE/FALSE, FALSE by default
-#' @param valid_varnames The valid names of the files available for download
-#' (inherited by 'download_tiles()')
-#' @param valid_tile_ids The valid IDs of the tiles available for download
-#' (inherited by 'download_tiles()')
+#' @param h90m_varnames character vector. the valid names of the hydrography90m
+#' files available for download, (inherited by 'download_tiles()')
+#' @param h90m_tile_id character vector. The valid IDs of the hydrography90m
+#' regular tiles available for download (inherited by 'download_tiles()')
 #' @param valid_file_formats The valid file types of the files available
 #' for download
 #' (inherited by 'download_tiles()')
@@ -24,11 +24,11 @@
 
 check_tiles_filesize <- function(variable, file_format = "tif",
                                  tile_id = NULL, reg_unit_id = NULL,
-                                 global = FALSE, valid_varnames, valid_tile_ids,
+                                 global = FALSE, h90m_varnames, h90m_tile_id,
                                  valid_file_formats, file_size_table_sep) {
 
   # Check if the given variable name is valid
-  match.arg(variable, choices = valid_varnames)
+  match.arg(variable, choices = h90m_varnames)
 
   # Check that the requested file_format is a tif or gpkg
   match.arg(file_format, choices = c("tif", "gpkg"))
@@ -48,7 +48,7 @@ check_tiles_filesize <- function(variable, file_format = "tif",
     } else if (variable != "regional_unit") {
 
       # Check tile_id argument for the rest of the variables
-      match.arg(tile_id, choices = valid_tile_ids)
+      match.arg(tile_id, choices = h90m_tile_id)
 
     }
   }

@@ -21,7 +21,7 @@ download_tiles_base(
 
 \item{file_format}{character. Format of the requested file ("tif" or "gpkg")}
 
-\item{tile_id}{id of the requested tile (character)}
+\item{tile_id}{character. The ID of the requested tile or regional unit}
 
 \item{global}{Should the global file be downloaded or not.
 TRUE/FALSE, FALSE by default}
