@@ -1,6 +1,8 @@
 #' Calculates the upstream basin taking each point as the outlet
 #'
-#' @param data Data.frame of snapped coordinates
+#' @param data a data.frame or data.table with lat/lon coordinates in WGS84,
+#' which have been snapped to the stream network.
+#' The snapping can be done using the function 'snap_to_network'
 #' @param id Name of the column containing the occurrence/site id
 #' @param lon Name of the longitude column (WGS 84)
 #' @param lat Name of the latitude column (WGS 84)

@@ -2,7 +2,7 @@
 #' or a minimum flow accumulation.
 #'
 #'
-#' @param data Data.frame with lat/lon coordinates in WGS84.
+#' @param data a data.frame or data.table with lat/lon coordinates in WGS84
 #' @param lon Column name of longitude coordinates as character vector.
 #' @param lat  Column name of latitude coordinates as character vector.
 #' @param site_id  Column name of a unique ID as character vector; Optional

@@ -3,8 +3,7 @@
 #' the data using download_tiles_base() or download_tiles().
 #' Input is a point data frame.
 #'
-#' @param data A data.frame or data.table with the latitude (lat) and
-#' longitude (lon) columns
+#' @param data a data.frame or data.table with lat/lon coordinates in WGS84
 #' @param lon Name of the longitude column as character string
 #' @param lat Name of the latitude column as character string
 #' @importFrom stringi stri_rand_strings

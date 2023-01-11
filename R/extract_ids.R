@@ -3,7 +3,7 @@
 #' Extracts the ID value of the basin and/or sub-catchment raster layer at a
 #' given point location.
 #'
-#' @param data A data.frame or data.table with lat/lon coordinates in WGS84
+#' @param data a data.frame or data.table with lat/lon coordinates in WGS84
 #' @param lon Column name of longitude coordinates as a character vector
 #' @param lat Column name of latitude coordinates as a character vector
 #' @param site_id  Column name of the unique ID as a character vector
