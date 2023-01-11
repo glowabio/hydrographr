@@ -3,7 +3,9 @@
 #' For each segment, report those upstream, downstream, or up-and
 #' downstream segments that are connected to one or multiple input
 #' segments within a specified neighbour order, with the option to
-#' summarize attributes across these segments.
+#' summarize attributes across these segments. Note that the stream
+#' segment and sub-catchment IDs are identical, and for consistency,
+#' we use the term "subc_id".
 #'
 #' This function can also be used to create the connectivity table
 #' for Marxan by using variable="length" and attach_only=TRUE.
@@ -11,8 +13,8 @@
 #' along with the stream length for all connected segments.
 #'
 #' @param g A directed graph (igraph object).
-#' @param subc_id The input sub-catchment IDs as a numerical vector
-#' for which to search the connected segments.
+#' @param subc_id The input sub-catchment IDs (=stream segment IDs) as a
+#' numerical vector for which to search the connected segments.
 #' @param order The neighbouring order as in igraph::ego.
 #' Order=1 would be immediate neighbours of the input sub-catchment IDs,
 #' order=2 would be the order 1 plus the immediate neighbours of
@@ -55,14 +57,13 @@
 #' @examples
 #' library(hydrographr)
 #'
-#' # Specify the working directory of the test data
-#' DATADIR <- "path/to/test_data"
-#'
-#' # Download the test data
-#' download_test_data(DATADIR)
+#' # Download test data into temporary R folder
+#' my_directory <- tempdir()
+#' download_test_data(my_directory)
 #'
 #' # Load the stream network as graph
-#' g <- read_geopackage(paste0(DATADIR, "/order_vect_59.gpkg"), type="net", g=T)
+#' g <- read_geopackage(paste0(my_directory, "/order_vect_59.gpkg"),
+#' type="net", g=T)
 #'
 #' # Get the upstream segment neighbours in the 5th order
 #' and report the length and source elevation

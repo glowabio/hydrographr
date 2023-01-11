@@ -1,7 +1,7 @@
 
 #' Read a GeoPackage file
 #'
-#' Read a Geopackage vector file from disk either as a table (data.table),
+#' Read a GeoPackage vector file from disk either as a table (data.table),
 #' as a directed graph object (igraph), a spatial dataframe (sf)
 #' or a SpatVect object (terra).
 #'
@@ -13,12 +13,13 @@
 #' to import from the GeoPackage.
 #' This is set automatically for the Hydrography90m data,
 #' and needs to be specified for any other data.
-#' @param dt If TRUE, import the GeoPackage as a data.table.
-#' @param g If TRUE, import the GeoPackage as a directed graph (igraph object).
-#' Only possible for a network.
-#' @param sf If TRUE, import the GeoPackage as a spatial dataframe (sf object).
-#' @param SpatVect If TRUE, import the GeoPackage as a
-#' SpatVecteor (terra object).
+#' @param as_dt If TRUE, import the GeoPackage as a data.table.
+#' @param as_graph If TRUE, import the GeoPackage as a directed graph
+#' (igraph object). Only possible for a network.
+#' @param as_sf If TRUE, import the GeoPackage as a spatial dataframe
+#' (sf object).
+#' @param as_SpatVect If TRUE, import the GeoPackage as a
+#' SpatVector (terra object).
 
 #' @importFrom DBI dbConnect dbListTables dbGetQuery dbDisconnect
 #' @importFrom RSQLite SQLite
@@ -29,22 +30,34 @@
 #' @export
 #'
 #' @examples
+#' ibrary(hydrographr)
+#'
+#' # Download test data into temporary R folder
+#' my_directory <- tempdir()
+#' download_test_data(my_directory)
+#'
 #' # Read the stream network as a graph
-#' my_graph <- read_geopackage("order_vect_59.gpkg", type="net", g=T)
+#' my_graph <- read_geopackage(paste0(my_directory, "/order_vect_59.gpkg"),
+#' type="net", as_graph=T)
 #'
 #' # Read the stream network as a data.table
-#' my_dt <- read_geopackage("order_vect_59.gpkg", type="net", dt=T)
+#' my_dt <- read_geopackage(paste0(my_directory, "/order_vect_59.gpkg"),
+#' type="net", as_dt=T)
 #'
 #' # Read the sub-catchments as a data.table
-#' my_dt <- read_geopackage("sub_catchment_59.gpkg", type="catch", dt=T)
+#' my_dt <- read_geopackage(paste0(my_directory, "/order_vect_59.gpkg"),
+#' type="catch", as_dt=T)
 #'
 #' # Read the basin as a SF-object
-#' my_sf <- read_geopackage("basin_59.gpkg", type="basin", sf=T)
+#' my_sf <- read_geopackage(paste0(my_directory, "/order_vect_59.gpkg"),
+#' type="basin", as_sf=T)
 #'
 #'#' # Read the basin as SpatVect object
-#' my_sf <- read_geopackage("basin_59.gpkg", type="basin", SpatVect=T)
+#' my_sf <- read_geopackage(paste0(my_directory, "/order_vect_59.gpkg"),
+#' type="basin", as_SpatVect=T)
 #' # Read the outlets as data.table
-#' my_sf <- read_geopackage("outlet_59.gpkg", type="outlet", sf=T)
+#' my_sf <- read_geopackage(paste0(my_directory, "/order_vect_59.gpkg"),
+#' type="outlet", as_sf=T)
 #'
 #' @author Sami Domisch
 
@@ -52,8 +65,8 @@
 
 # Import a geopackage from disk as a data.table
 read_geopackage <- function(filename, type = NULL, SQL_table = NULL,
-                            dt = FALSE, g = FALSE, sf = FALSE,
-                            SpatVect = FALSE) {
+                            as_dt = FALSE, as_graph = FALSE, as_sf = FALSE,
+                            as_SpatVect = FALSE) {
 
   # Test input arguments
   if (missing(filename)) stop("Please specify the input geopackage file.")
@@ -61,17 +74,18 @@ read_geopackage <- function(filename, type = NULL, SQL_table = NULL,
     "Input must be a GeoPackage file."
     )
   # If all options are missing
-  if (dt == FALSE && g == FALSE && sf == FALSE && SpatVect == FALSE) {
+  if (as_dt == FALSE && as_graph == FALSE && as_sf == FALSE
+      && as_SpatVect == FALSE) {
     stop("Please select one output type.\n")
   }
   if (missing(type)) stop(
     "Please specify 'net' or 'catch' as the input file type."
     )
   if (!any(c("net", "catch", "basin", "outlet") %in% type)) stop(
-    "Please specify the input file type: 
+    "Please specify the input file type:
     one of 'net', 'catch', 'basin' or 'outlet'."
     )
-  if (any(c("catch", "basin", "outlet") %in% type) && g == TRUE) stop(
+  if (any(c("catch", "basin", "outlet") %in% type) && as_graph == TRUE) stop(
     "A graph can only be created from a network.")
 
 
@@ -79,9 +93,9 @@ read_geopackage <- function(filename, type = NULL, SQL_table = NULL,
   # only set this only within the function
   options(scipen = 999)
 
-  if (dt == TRUE || g == TRUE) {
-    if (dt == TRUE && g == FALSE)  cat("Importing as a data.table...\n")
-    if (g == TRUE)  cat("Importing as a graph...\n")
+  if (as_dt == TRUE || as_graph == TRUE) {
+   if (as_dt == TRUE && as_graph == FALSE) cat("Importing as a data.table...\n")
+   if (as_graph == TRUE) cat("Importing as a graph...\n")
 
   # create a connection to the SQLite database
   cat("Opening SQL connection...\n")
@@ -121,22 +135,22 @@ read_geopackage <- function(filename, type = NULL, SQL_table = NULL,
   cat("Closing SQL connection...\n")
   dbDisconnect(conn) # close db connection
 
-  if (dt == TRUE && g == FALSE) {
+  if (as_dt == TRUE && as_graph == FALSE) {
     return(network_table)
     }
 
-  if (g == TRUE && type == "net") { # only for network
+  if (as_graph == TRUE && type == "net") { # only for network
     cat("Building graph...\n")
     g_out <- graph_from_data_frame(network_table, directed = TRUE)
     return(g_out)
     }
 
-} else if (sf == TRUE) {
+} else if (as_sf == TRUE) {
     cat("Importing as a sf spatial dataframe...\n")
     # tibble=F to avoid exponential numbers
     sf <- read_sf(filename, as_tibble = FALSE)
     return(sf)
-    } else if (SpatVect == TRUE) {
+    } else if (as_SpatVect == TRUE) {
     cat("Importing as a terra SpatVect object...\n")
     sf <- read_sf(filename)
     vect <- vect(sf)
