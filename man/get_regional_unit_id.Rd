@@ -10,8 +10,7 @@ Input is a point data frame.}
 get_regional_unit_id(data, lon, lat, quiet = TRUE)
 }
 \arguments{
-\item{data}{A data.frame or data.table with the latitude (lat) and
-longitude (lon) columns}
+\item{data}{a data.frame or data.table with lat/lon coordinates in WGS84}
 
 \item{lon}{Name of the longitude column as character string}
 

@@ -15,7 +15,7 @@ extract_ids(
 )
 }
 \arguments{
-\item{data}{A data.frame or data.table with lat/lon coordinates in WGS84}
+\item{data}{a data.frame or data.table with lat/lon coordinates in WGS84}
 
 \item{lon}{Column name of longitude coordinates as a character vector}
 

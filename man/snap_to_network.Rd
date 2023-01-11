@@ -19,7 +19,7 @@ snap_to_network(
 )
 }
 \arguments{
-\item{data}{Data.frame with lat/lon coordinates in WGS84.}
+\item{data}{a data.frame or data.table with lat/lon coordinates in WGS84}
 
 \item{lon}{Column name of longitude coordinates as character vector.}
 
