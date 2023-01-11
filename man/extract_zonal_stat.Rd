@@ -25,7 +25,7 @@ of the given sub-catchment raster layer. A vector of the sub-catchment IDs
 can be acquired from the extract_ids() function, and by sub-setting
 the resulting data.frame.}
 
-\item{subc_layer}{Character. Full path to the sub-catchment ID .tif layer}
+\item{subc_layer}{character. Full path to the sub-catchment ID .tif layer}
 
 \item{variables}{Character vector. Variable file names,
 e.g. "slope_grad_dw_cel_h00v00.tif". Variable names should remain

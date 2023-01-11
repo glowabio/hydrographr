@@ -7,13 +7,13 @@
 report_no_data(data_dir, variables, n_cores = NULL)
 }
 \arguments{
-\item{data_dir}{Character. Path to the directory containing all input data.}
+\item{data_dir}{character. Path to the directory containing all input data}
 
-\item{variables}{Character vector. The names of the raster files.
+\item{variables}{Character vector. The names of the raster files,
 e.g. slope_grad_dw_cel_h00v00.tif.}
 
 \item{n_cores}{Numeric. Number of cores used for parallelization. If NULL,
-available cores - 1 will be used.}
+available cores - 1 will be used}
 }
 \description{
 This function reports the defined NoData value of a raster layer. The NoData

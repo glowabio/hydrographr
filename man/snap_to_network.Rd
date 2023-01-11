@@ -10,8 +10,8 @@ snap_to_network(
   lon,
   lat,
   site_id,
-  stream_path,
-  accu_path = NULL,
+  stream_layer,
+  accu_layer = NULL,
   calc = "dist",
   dist = 500,
   accu = 0.5,
@@ -28,12 +28,13 @@ snap_to_network(
 \item{site_id}{Column name of a unique ID as character vector; Optional
 an ID for the data points can be defined.}
 
-\item{stream_path}{Full path of the stream network .tif file}
+\item{stream_layer}{character. Full path of the stream network .gpkg file}
 
-\item{accu_path}{Full path of the flow accumulation .tif file. Needed if
-the point should be snapped to next stream segment with a value higher than
-the flow accumulation threshold. This avoids points to snap to small stream
-tributaries.}
+\item{accu_layer}{character. Full path of the flow accumulation .tif file.
+Needed if the point should be snapped to the next stream segment having
+an accumulation value higher than the flow accumulation threshold
+(set by 'accumulation'). This prevents points from being snapped to small
+stream tributaries.}
 
 \item{calc}{Options "dist", "accu", or "both". Default is "dist".
 Defines if the points are snapped using the distance or flow accumulation.
@@ -86,8 +87,8 @@ snapped_coordinates <- snap_to_network(data = species_occurrence,
                                        lon = "longitude",
                                        lat = "latitude",
                                        site_id = "occurrence_id",
-                                       stream_path = stream_vect,
-                                       accu_path = flow_rast,
+                                       stream_layer = stream_vect,
+                                       accu_layer = flow_rast,
                                        calc = "both",
                                        dist = 300,
                                        accu = 0.8)

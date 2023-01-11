@@ -4,7 +4,7 @@
 \alias{merge_tiles}
 \title{Merge multiple raster or spatial vector objects}
 \usage{
-merge_tiles(tile_dir, out_dir, rraster_read = TRUE, rvector_read = FALSE)
+merge_tiles(tile_dir, out_dir, read_raster = TRUE, read_vector = FALSE)
 }
 \arguments{
 \item{tile_dir}{character. The directory containing the raster tiles or
@@ -12,11 +12,12 @@ spatial vectors to be merged}
 
 \item{out_dir}{character. The directory where the output will be stored}
 
-\item{rraster_read}{If TRUE merged raster .tif layer gets read into R.
-TRUE is set by default}
+\item{read_raster}{logical. If TRUE, the merged raster .tif layer gets read
+into R. If FALSE, the layer is only stored on disk. Default is TRUE}
 
-\item{rvector_read}{If TRUE merged spatial vector gets read into R.
-FALSE is set by default and if TRUE rraster_read needs to be set to FALSE}
+\item{read_vector}{logical. If TRUE, the merged spatial vector gets read
+into R. In this case, read_raster needs to be set to FALSE.
+If FALSE, the vector is only stored on disk. Default is FALSE}
 }
 \value{
 A .tif raster file or spatial vector object that is always written
@@ -27,11 +28,14 @@ Merge multiple raster or spatial vector objects from disk
 to form a new raster or spatial vector object with a larger spatial extent.
 A directory with at least a raster .tif or spatial vector geopackage file
 must be provided.
-If rraster`_`read = TRUE (default), the outputs are a .tif
+If read`_`raster = TRUE (default), the outputs are a .tif
 (saved under out`_`dir) and a SpatRaster (terra package) object,
-otherwise if rraster`_`read = FALSE, the .tif file is the only output.
-If rvector`_`read = TRUE, the outputs are a .gpkg (saved under out`_`dir)
+otherwise if read`_`raster = FALSE, the .tif file is the only output.
+If read`_`vector = TRUE, the outputs are a .gpkg (saved under out`_`dir)
 and a SpatVector (terra package) object,
-otherwise if rvector`_`read = FALSE (default),
+otherwise if read`_`vector = FALSE (default),
 the .gpkg file is the only output
+}
+\author{
+Thomas Tomiczek
 }

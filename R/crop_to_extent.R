@@ -9,7 +9,7 @@
 #' least a cutline source (vector_layer) or a bounding box (bounding_box)
 #' must be provided. The output is always written to disk, and can be
 #' optionally loaded directly into R as a SpatRaster (terra package) object
-#' (using  rcrop_read = TRUE).
+#' (using read = TRUE).
 #'
 #' @param raster_layer character. Full path to the input raster .tif layer
 #' @param vector_layer character. Full path to a vector layer that is used as a
@@ -19,9 +19,8 @@
 #' or other spatial object.
 #' @param out_dir character. The directory where the output will be stored
 #' @param file_name character. Name of the cropped output raster .tif file
-#' @param rcrop_read logical. If TRUE (default), then the cropped raster .tif
-#' layer gets read into R. Else the cropped .tif file will be only written to
-#' disk
+#' @param read logical. If TRUE, the cropped raster .tif layer gets read into R.
+#' If FALSE, the layer is only stored on disk. Default is TRUE
 #'
 #' @importFrom processx run
 #' @importFrom terra rast
@@ -30,7 +29,7 @@
 #'
 #' @return The function returns always a .tif raster file written to disk.
 #' Optionally, a SpatRaster (terra object) can be loaded into R with
-#' rcrop_read = TRUE.
+#' read = TRUE.
 #'
 #' @author
 #'
@@ -49,13 +48,13 @@
 #' "/spi_1264942.tif"),
 #' vector_layer = paste0(DATADIR, "/basin_59.gpkg"),
 #' output_path = "/my/output/path/spi_basin_cropped.tif"),
-#' rcrop_read = TRUE)
+#' read = TRUE)
 
 crop_to_extent <- function(raster_layer,
                            vector_layer = NULL,
                            bounding_box = NULL,
                            out_dir, file_name,
-                           rcrop_read = TRUE) {
+                           read = TRUE) {
 
   # Check that an input path and an output path were provided
   if (missing(raster_layer))
@@ -129,8 +128,8 @@ crop_to_extent <- function(raster_layer,
                      wsl_sh_cl_file),
             echo = FALSE)
       } else if (!is.null(bounding_box)) {
-        # Check if bounding_box is a vector with corner coordinate values, if FALSE
-        # try to extract the values from an spatial object
+        # Check if bounding_box is a vector with corner coordinate values,
+        # if FALSE try to extract the values from an spatial object
         if (is.vector(bounding_box) && length(bounding_box) == 4) {
           xmin <- bounding_box[1]
           ymin <- bounding_box[2]
@@ -153,7 +152,7 @@ crop_to_extent <- function(raster_layer,
             echo = FALSE)
       }
     }
-    if (rcrop_read == TRUE) {
+    if (read == TRUE) {
       # Read cropped .tif layer
       cat("Cropped raster saved under: ", output_path)
       crop_rast <- rast(output_path)

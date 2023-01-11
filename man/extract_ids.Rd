@@ -9,27 +9,27 @@ extract_ids(
   lon,
   lat,
   site_id = NULL,
-  basin_path = NULL,
-  subc_path = NULL,
+  basin_layer = NULL,
+  subc_layer = NULL,
   quiet = TRUE
 )
 }
 \arguments{
-\item{data}{A data.frame or data.table with lat/lon coordinates in WGS84.}
+\item{data}{A data.frame or data.table with lat/lon coordinates in WGS84}
 
-\item{lon}{Column name of longitude coordinates as a character vector.}
+\item{lon}{Column name of longitude coordinates as a character vector}
 
-\item{lat}{Column name of latitude coordinates as a character vector.}
+\item{lat}{Column name of latitude coordinates as a character vector}
 
-\item{site_id}{Column name of the unique ID as a character vector.
-Alternatively, an ID for the point location can be defined.}
+\item{site_id}{Column name of the unique ID as a character vector
+Alternatively, an ID for the point location can be defined}
 
-\item{basin_path}{Full path to the basin ID .tif layer on disk.}
+\item{basin_layer}{character. Full path to the basin ID .tif layer}
 
-\item{subc_path}{Full path to the sub-catchment ID .tif layer on disk.}
+\item{subc_layer}{character. Full path to the sub-catchment ID .tif layer}
 
 \item{quiet}{Whether the standard output will be printed or not (deafult
-is TRUE).}
+is TRUE)}
 }
 \description{
 Extracts the ID value of the basin and/or sub-catchment raster layer at a
@@ -66,8 +66,8 @@ hydrography90m_ids <- extract_ids(data = species_occurrence,
                                   lon = "longitude",
                                   lat = "latitude",
                                   site_id = "occurrence_id",
-                                  subc_path = subc_rast,
-                                  basin_path = basin_rast)
+                                  subc_layer = subc_rast,
+                                  basin_layer = basin_rast)
 
 # Show the output table
 hydrography90m_ids

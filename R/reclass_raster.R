@@ -16,13 +16,14 @@
 
 #' @param recl_layer character. Full path of the output .tif layer
 #' of the reclassified raster file
-#' @param read If TRUE (default), then the reclassified raster .tif layer
+#' @param read logical. If TRUE, then the reclassified raster .tif layer
 #' gets read into R as a SpatRaster (terra object)
-#' @param nodata The Nodata value of the new .tif layer. The default value
-#' is -9999
-#' @param type Data type; Options are Byte, Int16, UInt16, Int32, UInt32,
-#' CInt16, CInt32. Int32 is set by default
-#' @param compress Compression type: DEFLATE or LZW. DEFLATE is set by default
+#' If FALSE, the layer is only stored on disk. Default is TRUE
+#' @param no_data numeric. The no_data value of the new .tif layer.
+#' Default is -9999
+#' @param type character. Data type; Options are Byte, Int16, UInt16, Int32,
+#' UInt32,CInt16, CInt32. Default is Int32
+#' @param compress Compression type: DEFLATE or LZW. Default is DEFLATE
 #'
 #' @importFrom stringi stri_rand_strings
 #' @importFrom data.table fwrite
@@ -56,7 +57,7 @@
 
 reclass_raster <- function(data, rast_val, new_val, rast_path,
                            recl_layer, read = TRUE,
-                           nodata = -9999, type = "Int32",
+                           no_data = -9999, type = "Int32",
                            compress = "DEFLATE", quiet = TRUE) {
   # Check operating system
   system <- get_os()
@@ -151,7 +152,7 @@ reclass_raster <- function(data, rast_val, new_val, rast_path,
   processx::run(system.file("sh", "reclass_raster.sh",
                            package = "hydrographr"),
       args = c(rast_path, rules_path, recl_layer,
-                             nodata, type, compress),
+                             no_data, type, compress),
       echo = !quiet)
 
   } else {
@@ -170,7 +171,7 @@ reclass_raster <- function(data, rast_val, new_val, rast_path,
     processx::run(system.file("bat", "reclass_raster.bat",
                     package = "hydrographr"),
         args = c(wsl_rast_path, wsl_rules_path, wsl_recl_layer,
-                 nodata, type, compress, wsl_sh_file),
+                 no_data, type, compress, wsl_sh_file),
         echo = !quiet)
 
   }

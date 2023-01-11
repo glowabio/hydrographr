@@ -24,7 +24,8 @@ get_upstream_catchment(
 
 \item{lat}{Name of the latitude column (WGS 84)}
 
-\item{direction_layer}{Full path to raster file with the direction variable}
+\item{direction_layer}{character. Full path to raster file with the
+direction variable}
 
 \item{out_path}{Full path to the directory where the output(s)
 will be stored.

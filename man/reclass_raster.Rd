@@ -11,7 +11,7 @@ reclass_raster(
   rast_path,
   recl_layer,
   read = TRUE,
-  nodata = -9999,
+  no_data = -9999,
   type = "Int32",
   compress = "DEFLATE",
   quiet = TRUE
@@ -26,19 +26,20 @@ reclass_raster(
 
 \item{rast_path}{Full path to the input raster .tif layer.}
 
-\item{recl_layer}{Full path of the output .tif layer
-of the reclassified raster file.}
+\item{recl_layer}{character. Full path of the output .tif layer
+of the reclassified raster file}
 
-\item{read}{If TRUE (default), then the reclassified raster .tif layer
-gets read into R as a SpatRaster (terra object)}
+\item{read}{logical. If TRUE, then the reclassified raster .tif layer
+gets read into R as a SpatRaster (terra object)
+If FALSE, the layer is only stored on disk. Default is TRUE}
 
-\item{nodata}{The Nodata value of the new .tif layer. The default value
-is -9999.}
+\item{no_data}{numeric. The no_data value of the new .tif layer.
+Default is -9999}
 
-\item{type}{Data type; Options are Byte, Int16, UInt16, Int32, UInt32,
-CInt16, CInt32. Int32 is set by default.}
+\item{type}{character. Data type; Options are Byte, Int16, UInt16, Int32,
+UInt32,CInt16, CInt32. Default is Int32}
 
-\item{compress}{Compression type: DEFLATE or LZW. DEFLATE is set by default.}
+\item{compress}{Compression type: DEFLATE or LZW. Default is DEFLATE}
 }
 \description{
 Reclassifies an integer raster .tif layer using the r.reclass function of

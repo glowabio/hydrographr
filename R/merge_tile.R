@@ -4,21 +4,22 @@
 #' to form a new raster or spatial vector object with a larger spatial extent.
 #' A directory with at least a raster .tif or spatial vector geopackage file
 #' must be provided.
-#' If rraster`_`read = TRUE (default), the outputs are a .tif
+#' If read`_`raster = TRUE (default), the outputs are a .tif
 #' (saved under out`_`dir) and a SpatRaster (terra package) object,
-#' otherwise if rraster`_`read = FALSE, the .tif file is the only output.
-#' If rvector`_`read = TRUE, the outputs are a .gpkg (saved under out`_`dir)
+#' otherwise if read`_`raster = FALSE, the .tif file is the only output.
+#' If read`_`vector = TRUE, the outputs are a .gpkg (saved under out`_`dir)
 #' and a SpatVector (terra package) object,
-#' otherwise if rvector`_`read = FALSE (default),
+#' otherwise if read`_`vector = FALSE (default),
 #' the .gpkg file is the only output
 
 #' @param tile_dir character. The directory containing the raster tiles or
 #' spatial vectors to be merged
 #' @param out_dir character. The directory where the output will be stored
-#' @param rraster_read If TRUE merged raster .tif layer gets read into R.
-#' TRUE is set by default
-#' @param rvector_read If TRUE merged spatial vector gets read into R.
-#' FALSE is set by default and if TRUE rraster_read needs to be set to FALSE
+#' @param read_raster logical. If TRUE, the merged raster .tif layer gets read
+#' into R. If FALSE, the layer is only stored on disk. Default is TRUE
+#' @param read_vector logical. If TRUE, the merged spatial vector gets read
+#' into R. In this case, read_raster needs to be set to FALSE.
+#' If FALSE, the vector is only stored on disk. Default is FALSE
 #' @importFrom processx run
 #' @importFrom terra rast
 #' @importFrom terra vect
@@ -31,11 +32,11 @@
 #'
 #'
 #'
-#' @author
+#' @author Thomas Tomiczek
 #'
 
 merge_tiles <- function(tile_dir, out_dir,
-rraster_read = TRUE, rvector_read = FALSE) {
+read_raster = TRUE, read_vector = FALSE) {
 
   # Make bash scripts executable
   make_sh_exec()
@@ -71,14 +72,14 @@ rraster_read = TRUE, rvector_read = FALSE) {
        }
     }
 
-  if (rraster_read == TRUE) {
+  if (read_raster == TRUE) {
       # Print message
       cat("Merged file saved under: ", out_dir)
       # Read merged .tif layer
       merged_tiles <- rast(paste0(out_dir, "/", "basin.tif"))
 
       return(merged_tiles)
-    } else if (rvector_read == TRUE) {
+    } else if (read_vector == TRUE) {
 
       # Print message
       cat("Merged file saved under: ", out_dir)

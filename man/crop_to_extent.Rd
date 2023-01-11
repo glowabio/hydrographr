@@ -5,18 +5,18 @@
 \title{Crop a raster layer to a specific extent on disk}
 \usage{
 crop_to_extent(
-  raster_path,
-  vector_path = NULL,
+  raster_layer,
+  vector_layer = NULL,
   bounding_box = NULL,
   out_dir,
   file_name,
-  rcrop_read = TRUE
+  read = TRUE
 )
 }
 \arguments{
-\item{raster_path}{character. Path to the raster .tif layer}
+\item{raster_layer}{character. Full path to the input raster .tif layer}
 
-\item{vector_path}{character. Path to a vector layer that is used as a
+\item{vector_layer}{character. Full path to a vector layer that is used as a
 cutline data source (similar to a mask operation)}
 
 \item{bounding_box}{numeric vector of the coordinates of the corners of a
@@ -27,13 +27,13 @@ or other spatial object.}
 
 \item{file_name}{character. Name of the cropped output raster .tif file}
 
-\item{rcrop_read}{logical. If TRUE (default), then the cropped raster .tif layer
-gets read into R. Else the cropped .tif file will be only written to disk}
+\item{read}{logical. If TRUE, the cropped raster .tif layer gets read into R.
+If FALSE, the layer is only stored on disk. Default is TRUE}
 }
 \value{
 The function returns always a .tif raster file written to disk.
 Optionally, a SpatRaster (terra object) can be loaded into R with
-rcrop_read = TRUE.
+read = TRUE.
 }
 \description{
 This function crops an input raster layer directly on disk,
@@ -42,10 +42,10 @@ crops a raster .tif to a polygon border line if a vector layer
 (cutline source) is provided, otherwise if a bounding box is provided
 (xmin, ymin, xmax, ymax coordinates or a spatial object from which to extract
 a bounding box), the raster is cropped to the extent of the bounding box. At
-least a cutline source (vector_path) or a bounding box (bounding_box)
+least a cutline source (vector_layer) or a bounding box (bounding_box)
 must be provided. The output is always written to disk, and can be
 optionally loaded directly into R as a SpatRaster (terra package) object
-(using  rcrop_read = TRUE).
+(using read = TRUE).
 }
 \examples{
 library(hydrographr)
@@ -58,8 +58,9 @@ DATADIR <- "path/to/test_data"
 download_test_data(DATADIR)
 
 # Crop the Stream Power Index to the basin
-spi_basin <- crop_to_extent(raster_path=paste0(DATADIR, "/spi_1264942.tif"),
-vector_path = paste0(DATADIR, "/basin_59.gpkg"),
-output_path="/my/output/path/spi_basin_cropped.tif"),
-rcrop_read = TRUE)
+spi_basin <- crop_to_extent(raster_layer = paste0(DATADIR,
+"/spi_1264942.tif"),
+vector_layer = paste0(DATADIR, "/basin_59.gpkg"),
+output_path = "/my/output/path/spi_basin_cropped.tif"),
+read = TRUE)
 }

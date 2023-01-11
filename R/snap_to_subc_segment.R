@@ -15,10 +15,10 @@
 #' NULL sub-catchment ID will be extracted automatically beforehand
 #' @param basin_layer character. Full path to the basin ID .tif layer
 #' @param subc_layer character. Full path to the sub-catchment ID .tif layer
-#' @param stream_path Full path of stream network .gpkg file.
+#' @param stream_layer character. Full path of the stream network .gpkg file
 #' @param cores Number of cores used for parallelization. By default the process
-#' does not run in parallel.
-#' @param quiet Whether the standard output will be printed or not.
+#' does not run in parallel
+#' @param quiet Whether the standard output will be printed or not
 #'
 #' @importFrom parallel detectCores
 #' @importFrom stringi stri_rand_strings
@@ -86,7 +86,7 @@
 #'                                             subc_id = "subcatchment_id",
 #'                                             basin_layer = basin_rast,
 #'                                             subc_layer = subc_rast,
-#'                                             stream_path = stream_vect,
+#'                                             stream_layer = stream_vect,
 #'                                             cores = 2)
 #' # Show head of output table
 #' head(snapped_coordinates)
@@ -100,7 +100,7 @@
 #'                                             site_id = "occurrence_id",
 #'                                             basin_layer = basin_rast,
 #'                                             subc_layer = subc_rast,
-#'                                             stream_path = stream_vect,
+#'                                             stream_layer = stream_vect,
 #'                                             cores = 2)
 #' # Show head of output table
 #' head(snapped_coordinates)
@@ -109,13 +109,13 @@
 
 snap_to_subc_segment <- function(data, lon, lat, site_id, basin_id = NULL,
                                  subc_id = NULL, basin_layer, subc_layer,
-                                 stream_path, cores = 1, quiet = TRUE) {
+                                 stream_layer, cores = 1, quiet = TRUE) {
   # Check operating system
   system <- get_os()
 
   # Check if any of the arguments is missing
   for (arg in  c(data, lon, lat, site_id, basin_layer, subc_layer,
-                stream_path)) {
+                stream_layer)) {
     if (missing(arg))
       stop(paste0(quote(arg), " is missing."))
     }
@@ -160,7 +160,7 @@ snap_to_subc_segment <- function(data, lon, lat, site_id, basin_id = NULL,
 
 
    # Check if paths exists
-  for (path in c(basin_layer, subc_layer, stream_path)) {
+  for (path in c(basin_layer, subc_layer, stream_layer)) {
    if (!file.exists(path))
      stop(paste0("File path: ", path, " does not exist."))
   }
@@ -172,8 +172,8 @@ snap_to_subc_segment <- function(data, lon, lat, site_id, basin_id = NULL,
   }
 
   # Check if basin_layer and subc_layer ends with .gpkg
-  if (!endsWith(stream_path, ".gpkg"))
-    stop(paste0("File path: ", stream_path, " does not end with .gpkg"))
+  if (!endsWith(stream_layer, ".gpkg"))
+    stop(paste0("File path: ", stream_layer, " does not end with .gpkg"))
 
   # Check if value of cores numeric
   if (!is.numeric(cores))
@@ -217,7 +217,7 @@ snap_to_subc_segment <- function(data, lon, lat, site_id, basin_id = NULL,
     # Join with data and select columns needed for the bash script
     ids <- data %>%
       left_join(., subc_basin_ids, by = c(lon, lat)) %>%
-      select(matches(c(site_id, lon, lat, basin_id)),  subcatchment_id)
+      select(matches(c(site_id, lon, lat, basin_id)), subcatchment_id)
 #
   } else {
     # Select columns needed for the bash script
@@ -242,7 +242,7 @@ snap_to_subc_segment <- function(data, lon, lat, site_id, basin_id = NULL,
 
     processx::run(system.file("sh", "snap_to_subc_segment.sh",
                     package = "hydrographr"),
-        args = c(ids_tmp_path, lon, lat, basin_layer, subc_layer, stream_path,
+        args = c(ids_tmp_path, lon, lat, basin_layer, subc_layer, stream_layer,
                  cores, snap_tmp_path,  tempdir()),
         echo = !quiet)
 
@@ -255,7 +255,7 @@ snap_to_subc_segment <- function(data, lon, lat, site_id, basin_id = NULL,
     wsl_ids_tmp_path <- fix_path(ids_tmp_path)
     wsl_basin_layer <- fix_path(basin_layer)
     wsl_subc_layer <- fix_path(subc_layer)
-    wsl_stream_path <- fix_path(stream_path)
+    wsl_stream_layer <- fix_path(stream_layer)
     wsl_snap_tmp_path <- fix_path(snap_tmp_path)
     wsl_tmp_path <- fix_path(tempdir())
     wsl_sh_file <- fix_path(system.file("sh", "snap_to_subc_segment.sh",
@@ -264,7 +264,7 @@ snap_to_subc_segment <- function(data, lon, lat, site_id, basin_id = NULL,
     processx::run(system.file("bat", "snap_to_subc_segment.bat",
                     package = "hydrographr"),
         args = c(wsl_ids_tmp_path, lon, lat, wsl_basin_layer,
-                 wsl_subc_layer, wsl_stream_path, cores,
+                 wsl_subc_layer, wsl_stream_layer, cores,
                  wsl_snap_tmp_path, wsl_tmp_path, wsl_sh_file),
         echo = !quiet)
   }

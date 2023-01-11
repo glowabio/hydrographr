@@ -11,9 +11,9 @@ snap_to_subc_segment(
   site_id,
   basin_id = NULL,
   subc_id = NULL,
-  basin_path,
-  subc_path,
-  stream_path,
+  basin_layer,
+  subc_layer,
+  stream_layer,
   cores = 1,
   quiet = TRUE
 )
@@ -21,29 +21,29 @@ snap_to_subc_segment(
 \arguments{
 \item{data}{Data.frame with lat/lon columns in WGS84.}
 
-\item{lon}{Column name of longitude coordinates as character string.}
+\item{lon}{Column name of longitude coordinates as character string}
 
-\item{lat}{Column name of latitude coordinates as character string.}
+\item{lat}{Column name of latitude coordinates as character string}
 
 \item{site_id}{Column name of unique site IDs as character string. Each row
-of the column needs to have an unique ID.}
+of the column needs to have an unique ID}
 
 \item{basin_id}{Column name of basin IDs as character string. If NULL
-basin ID will be extracted automatically beforehand.}
+basin ID will be extracted automatically beforehand}
 
 \item{subc_id}{Column name of sub-catchment IDs as character string. If
-NULL sub-catchment ID will be extracted automatically beforehand.}
+NULL sub-catchment ID will be extracted automatically beforehand}
 
-\item{basin_path}{Full path of the basin .tif layer.}
+\item{basin_layer}{character. Full path to the basin ID .tif layer}
 
-\item{subc_path}{Full path of the sub-catchment .tif layer.}
+\item{subc_layer}{character. Full path to the sub-catchment ID .tif layer}
 
-\item{stream_path}{Full path of stream network .gpkg file.}
+\item{stream_layer}{character. Full path of the stream network .gpkg file}
 
 \item{cores}{Number of cores used for parallelization. By default the process
-does not run in parallel.}
+does not run in parallel}
 
-\item{quiet}{Whether the standard output will be printed or not.}
+\item{quiet}{Whether the standard output will be printed or not}
 }
 \description{
 Snaps data points to the stream segment of the
@@ -82,8 +82,8 @@ hydrography90m_ids <- extract_ids(data = species_occurence,
                                   lon = "longitude",
                                   lat = "latitude",
                                   site_id = "occurrence_id",
-                                  subc_path = subc_rast,
-                                  basin_path = basin_rast)
+                                  subc_layer = subc_rast,
+                                  basin_layer = basin_rast)
 
 # Snap data points to the stream segment of the provided sub-catchment ID
 snapped_coordinates <- snap_to_subc_segment(data = hydrography90m_ids,
@@ -92,9 +92,9 @@ snapped_coordinates <- snap_to_subc_segment(data = hydrography90m_ids,
                                             site_id = "occurrence_id",
                                             basin_id = "basin_id",
                                             subc_id = "subcatchment_id",
-                                            basin_path = basin_rast,
-                                            subc_path = subc_rast,
-                                            stream_path = stream_vect,
+                                            basin_layer = basin_rast,
+                                            subc_layer = subc_rast,
+                                            stream_layer = stream_vect,
                                             cores = 2)
 # Show head of output table
 head(snapped_coordinates)
@@ -106,9 +106,9 @@ snapped_coordinates <- snap_to_subc_segment(data = species_occurence,
                                             lon = "longitude",
                                             lat = "latitude",
                                             site_id = "occurrence_id",
-                                            basin_path = basin_rast,
-                                            subc_path = subc_rast,
-                                            stream_path = stream_vect,
+                                            basin_layer = basin_rast,
+                                            subc_layer = subc_rast,
+                                            stream_layer = stream_vect,
                                             cores = 2)
 # Show head of output table
 head(snapped_coordinates)
