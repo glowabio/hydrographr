@@ -8,7 +8,7 @@ snap_to_subc_segment(
   data,
   lon,
   lat,
-  site_id,
+  id,
   basin_id = NULL,
   subc_id = NULL,
   basin_layer,
@@ -19,20 +19,21 @@ snap_to_subc_segment(
 )
 }
 \arguments{
-\item{data}{Data.frame with lat/lon columns in WGS84.}
+\item{data}{a data.frame or data.table with lat/lon coordinates in WGS84}
 
-\item{lon}{Column name of longitude coordinates as character string}
+\item{lon}{character. The name of the column with the longitude coordinates}
 
-\item{lat}{Column name of latitude coordinates as character string}
+\item{lat}{character. The name of the column with the latitude coordinates}
 
-\item{site_id}{Column name of unique site IDs as character string. Each row
-of the column needs to have an unique ID}
+\item{id}{character. The name of a column containing unique IDs for each row
+of "data" (e.g., occurrence or site IDs)}
 
-\item{basin_id}{Column name of basin IDs as character string. If NULL
-basin ID will be extracted automatically beforehand}
+\item{basin_id}{character. The name of the column with the basin IDs.
+If NULL, the basin IDs will be extracted automatically. Default is NULL}
 
-\item{subc_id}{Column name of sub-catchment IDs as character string. If
-NULL sub-catchment ID will be extracted automatically beforehand}
+\item{subc_id}{character. The name of the column with the sub-catchment IDs.
+If NULL, the sub-catchment IDs will be extracted automatically.
+Default is NULL}
 
 \item{basin_layer}{character. Full path to the basin ID .tif layer}
 
@@ -81,7 +82,7 @@ stream_vect <- paste0(my_directory,
 hydrography90m_ids <- extract_ids(data = species_occurence,
                                   lon = "longitude",
                                   lat = "latitude",
-                                  site_id = "occurrence_id",
+                                  id = "occurrence_id",
                                   subc_layer = subc_rast,
                                   basin_layer = basin_rast)
 
@@ -89,7 +90,7 @@ hydrography90m_ids <- extract_ids(data = species_occurence,
 snapped_coordinates <- snap_to_subc_segment(data = hydrography90m_ids,
                                             lon = "longitude",
                                             lat = "latitude",
-                                            site_id = "occurrence_id",
+                                            id = "occurrence_id",
                                             basin_id = "basin_id",
                                             subc_id = "subcatchment_id",
                                             basin_layer = basin_rast,
@@ -105,7 +106,7 @@ head(snapped_coordinates)
 snapped_coordinates <- snap_to_subc_segment(data = species_occurence,
                                             lon = "longitude",
                                             lat = "latitude",
-                                            site_id = "occurrence_id",
+                                            id = "occurrence_id",
                                             basin_layer = basin_rast,
                                             subc_layer = subc_rast,
                                             stream_layer = stream_vect,

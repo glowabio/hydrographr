@@ -4,10 +4,10 @@
 #' given point location.
 #'
 #' @param data a data.frame or data.table with lat/lon coordinates in WGS84
-#' @param lon Column name of longitude coordinates as a character vector
-#' @param lat Column name of latitude coordinates as a character vector
-#' @param site_id  Column name of the unique ID as a character vector
-#' Alternatively, an ID for the point location can be defined
+#' @param lon character. The name of the column with the longitude coordinates
+#' @param lat character. The name of the column with the latitude coordinates
+#' @param id character. The name of a column containing unique IDs for each row
+#' of "data" (e.g., occurrence or site IDs)
 #' @param basin_layer character. Full path to the basin ID .tif layer
 #' @param subc_layer character. Full path to the sub-catchment ID .tif layer
 #' @param quiet Whether the standard output will be printed or not (deafult
@@ -54,7 +54,7 @@
 #' hydrography90m_ids <- extract_ids(data = species_occurrence,
 #'                                   lon = "longitude",
 #'                                   lat = "latitude",
-#'                                   site_id = "occurrence_id",
+#'                                   id = "occurrence_id",
 #'                                   subc_layer = subc_rast,
 #'                                   basin_layer = basin_rast)
 #'
@@ -62,7 +62,7 @@
 #' hydrography90m_ids
 
 
-extract_ids <- function(data, lon, lat, site_id = NULL, basin_layer = NULL,
+extract_ids <- function(data, lon, lat, id = NULL, basin_layer = NULL,
                         subc_layer = NULL, quiet = TRUE) {
 
   # Check if input data is of type data.frame,
@@ -72,14 +72,14 @@ extract_ids <- function(data, lon, lat, site_id = NULL, basin_layer = NULL,
 
   # Check if lon, lat, side_id, basin_id, and subc_id column names
   # are character vectors
-  for (name in  c(lon, lat, site_id)) {
+  for (name in  c(lon, lat, id)) {
     if (!is.null(name))
         if (!is.character(name))
           stop(paste0("Column name ", name, " is not a character vector."))
   }
 
-  # Check if lon, lat, site_id, basin_id, and subc_id column names exist
-  for (name in c(lon, lat, site_id)) {
+  # Check if lon, lat, id, basin_id, and subc_id column names exist
+  for (name in c(lon, lat, id)) {
     if (!is.null(name))
       if (is.null(data[[name]]))
         stop(paste0("Column name '", name, "' does not exist."))
@@ -106,7 +106,7 @@ extract_ids <- function(data, lon, lat, site_id = NULL, basin_layer = NULL,
   # points_dataset.txt and ids.txt file
   rand_string <- stri_rand_strings(n = 1, length = 8, pattern = "[A-Za-z0-9]")
   # Select columns with lon/lat coordinates
-  if (is.null(site_id)) {
+  if (is.null(id)) {
     coord <- data %>%
       select(matches(c(lon, lat)))
     # Remove duplicated rows across entire data frame
@@ -114,7 +114,7 @@ extract_ids <- function(data, lon, lat, site_id = NULL, basin_layer = NULL,
 
   } else {
     coord <- data %>%
-      select(matches(c(lon, lat, site_id)))
+      select(matches(c(lon, lat, id)))
     # Remove duplicated rows across entire data frame
     coord <- coord[!duplicated(coord), ]
 

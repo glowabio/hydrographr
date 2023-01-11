@@ -4,8 +4,8 @@
 #' Input is a point data frame.
 #'
 #' @param data a data.frame or data.table with lat/lon coordinates in WGS84
-#' @param lon Name of the longitude column as character string
-#' @param lat Name of the latitude column as character string
+#' @param lon character. The name of the column with the longitude coordinates
+#' @param lat character. The name of the column with the latitude coordinates
 #' @importFrom stringi stri_rand_strings
 #' @importFrom dplyr select
 #' @importFrom data.table fread
@@ -75,7 +75,7 @@ get_regional_unit_id <- function(data, lon, lat, quiet = TRUE) {
 
   if (system == "linux" || system == "osx") {
 
-    run(system.file("sh", "get_regional_unit_id.sh",
+    processx::run(system.file("sh", "get_regional_unit_id.sh",
                   package = "hydrographr"),
       args = c(coord_tmp_path, lon, lat,
                reg_unit_file,  ids_tmp_path),
@@ -92,7 +92,7 @@ get_regional_unit_id <- function(data, lon, lat, quiet = TRUE) {
                                         "get_regional_unit_id.sh",
                                         package = "hydrographr"))
 
-    run(system.file("bat", "get_regional_unit_id.bat",
+    processx::run(system.file("bat", "get_regional_unit_id.bat",
                     package = "hydrographr"),
         args = c(wsl_coord_tmp_path, lon, lat,
                  wsl_reg_unit_file, wsl_ids_tmp_path,

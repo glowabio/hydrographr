@@ -64,3 +64,6 @@ vector_layer = paste0(DATADIR, "/basin_59.gpkg"),
 output_path = "/my/output/path/spi_basin_cropped.tif"),
 read = TRUE)
 }
+\author{
+Yusdiel Torres-Cambas
+}

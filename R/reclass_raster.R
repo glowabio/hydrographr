@@ -10,8 +10,9 @@
 #' the next integer which is not always desired.
 #'#'
 #' @param data a data.frame or data.table with the present and new raster values
-#' @param rast_val Column name of present raster values as character string
-#' @param new_val Column name of new raster values as character string
+#' @param rast_val character. The name of the column with the present
+#' raster values
+#' @param new_val character. The name of the column with the new raster values
 #' @param rast_path Full path to the input raster .tif layer
 
 #' @param recl_layer character. Full path of the output .tif layer

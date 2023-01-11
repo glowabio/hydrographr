@@ -21,9 +21,9 @@ snap_to_network(
 \arguments{
 \item{data}{a data.frame or data.table with lat/lon coordinates in WGS84}
 
-\item{lon}{Column name of longitude coordinates as character vector.}
+\item{lon}{character. The name of the column with the longitude coordinates}
 
-\item{lat}{Column name of latitude coordinates as character vector.}
+\item{lat}{character. The name of the column with the latitude coordinates}
 
 \item{site_id}{Column name of a unique ID as character vector; Optional
 an ID for the data points can be defined.}

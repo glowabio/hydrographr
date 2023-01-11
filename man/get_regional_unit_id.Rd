@@ -12,9 +12,9 @@ get_regional_unit_id(data, lon, lat, quiet = TRUE)
 \arguments{
 \item{data}{a data.frame or data.table with lat/lon coordinates in WGS84}
 
-\item{lon}{Name of the longitude column as character string}
+\item{lon}{character. The name of the column with the longitude coordinates}
 
-\item{lat}{Name of the latitude column as character string}
+\item{lat}{character. The name of the column with the latitude coordinates}
 }
 \description{
 Identifies the IDs of the regional units within the Hydrography90m data

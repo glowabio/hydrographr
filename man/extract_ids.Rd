@@ -8,7 +8,7 @@ extract_ids(
   data,
   lon,
   lat,
-  site_id = NULL,
+  id = NULL,
   basin_layer = NULL,
   subc_layer = NULL,
   quiet = TRUE
@@ -17,12 +17,12 @@ extract_ids(
 \arguments{
 \item{data}{a data.frame or data.table with lat/lon coordinates in WGS84}
 
-\item{lon}{Column name of longitude coordinates as a character vector}
+\item{lon}{character. The name of the column with the longitude coordinates}
 
-\item{lat}{Column name of latitude coordinates as a character vector}
+\item{lat}{character. The name of the column with the latitude coordinates}
 
-\item{site_id}{Column name of the unique ID as a character vector
-Alternatively, an ID for the point location can be defined}
+\item{id}{character. The name of a column containing unique IDs for each row
+of "data" (e.g., occurrence or site IDs)}
 
 \item{basin_layer}{character. Full path to the basin ID .tif layer}
 
@@ -65,7 +65,7 @@ subc_rast <- paste0(tempdir(),
 hydrography90m_ids <- extract_ids(data = species_occurrence,
                                   lon = "longitude",
                                   lat = "latitude",
-                                  site_id = "occurrence_id",
+                                  id = "occurrence_id",
                                   subc_layer = subc_rast,
                                   basin_layer = basin_rast)
 

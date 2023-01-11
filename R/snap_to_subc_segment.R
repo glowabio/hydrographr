@@ -4,15 +4,16 @@
 #' Snaps data points to the stream segment of the
 #' sub-catchment the data point is located.
 
-#' @param data Data.frame with lat/lon columns in WGS84.
-#' @param lon Column name of longitude coordinates as character string
-#' @param lat Column name of latitude coordinates as character string
-#' @param site_id Column name of unique site IDs as character string. Each row
-#' of the column needs to have an unique ID
-#' @param basin_id Column name of basin IDs as character string. If NULL
-#' basin ID will be extracted automatically beforehand
-#' @param subc_id Column name of sub-catchment IDs as character string. If
-#' NULL sub-catchment ID will be extracted automatically beforehand
+#' @param data a data.frame or data.table with lat/lon coordinates in WGS84
+#' @param lon character. The name of the column with the longitude coordinates
+#' @param lat character. The name of the column with the latitude coordinates
+#' @param id character. The name of a column containing unique IDs for each row
+#' of "data" (e.g., occurrence or site IDs)
+#' @param basin_id character. The name of the column with the basin IDs.
+#' If NULL, the basin IDs will be extracted automatically. Default is NULL
+#' @param subc_id character. The name of the column with the sub-catchment IDs.
+#' If NULL, the sub-catchment IDs will be extracted automatically.
+#' Default is NULL
 #' @param basin_layer character. Full path to the basin ID .tif layer
 #' @param subc_layer character. Full path to the sub-catchment ID .tif layer
 #' @param stream_layer character. Full path of the stream network .gpkg file
@@ -73,7 +74,7 @@
 #' hydrography90m_ids <- extract_ids(data = species_occurence,
 #'                                   lon = "longitude",
 #'                                   lat = "latitude",
-#'                                   site_id = "occurrence_id",
+#'                                   id = "occurrence_id",
 #'                                   subc_layer = subc_rast,
 #'                                   basin_layer = basin_rast)
 #'
@@ -81,7 +82,7 @@
 #' snapped_coordinates <- snap_to_subc_segment(data = hydrography90m_ids,
 #'                                             lon = "longitude",
 #'                                             lat = "latitude",
-#'                                             site_id = "occurrence_id",
+#'                                             id = "occurrence_id",
 #'                                             basin_id = "basin_id",
 #'                                             subc_id = "subcatchment_id",
 #'                                             basin_layer = basin_rast,
@@ -97,7 +98,7 @@
 #' snapped_coordinates <- snap_to_subc_segment(data = species_occurence,
 #'                                             lon = "longitude",
 #'                                             lat = "latitude",
-#'                                             site_id = "occurrence_id",
+#'                                             id = "occurrence_id",
 #'                                             basin_layer = basin_rast,
 #'                                             subc_layer = subc_rast,
 #'                                             stream_layer = stream_vect,
@@ -107,14 +108,14 @@
 #'
 
 
-snap_to_subc_segment <- function(data, lon, lat, site_id, basin_id = NULL,
+snap_to_subc_segment <- function(data, lon, lat, id, basin_id = NULL,
                                  subc_id = NULL, basin_layer, subc_layer,
                                  stream_layer, cores = 1, quiet = TRUE) {
   # Check operating system
   system <- get_os()
 
   # Check if any of the arguments is missing
-  for (arg in  c(data, lon, lat, site_id, basin_layer, subc_layer,
+  for (arg in  c(data, lon, lat, id, basin_layer, subc_layer,
                 stream_layer)) {
     if (missing(arg))
       stop(paste0(quote(arg), " is missing."))
@@ -125,9 +126,9 @@ snap_to_subc_segment <- function(data, lon, lat, site_id, basin_id = NULL,
   if (!is(data, "data.frame"))
     stop("data: Has to be of class 'data.frame'.")
 
-  # Check if lon, lat, site_id, basin_id, and subc_id column names
+  # Check if lon, lat, id, basin_id, and subc_id column names
   # are character strings
-  for (name in  c(lon, lat, site_id)) {
+  for (name in  c(lon, lat, id)) {
   if (!is.character(name))
     stop(paste0("Column name ", name, " is not a character string."))
   }
@@ -140,8 +141,8 @@ snap_to_subc_segment <- function(data, lon, lat, site_id, basin_id = NULL,
     if (!is.character(subc_id))
       stop(paste0("Column name ", subc_id, " is not a character string."))
 
-  # Check if lon, lat, site_id, basin_id, and subc_id column names exist
-  for (name in c(lon, lat, site_id)) {
+  # Check if lon, lat, id, basin_id, and subc_id column names exist
+  for (name in c(lon, lat, id)) {
     if (is.null(data[[name]]))
       stop(paste0("Column name '", name, "' does not exist."))
   }
@@ -154,9 +155,9 @@ snap_to_subc_segment <- function(data, lon, lat, site_id, basin_id = NULL,
     if (is.null(data[[subc_id]]))
       stop(paste0("Column name '", subc_id, "' does not exist."))
 
-  # Check site_id for duplicated IDs
-  if (length(unique(data[[site_id]])) != length(data[[site_id]]))
-    stop(paste0("Column '", site_id, "' has rows with duplicated IDs."))
+  # Check id for duplicated IDs
+  if (length(unique(data[[id]])) != length(data[[id]]))
+    stop(paste0("Column '", id, "' has rows with duplicated IDs."))
 
 
    # Check if paths exists
@@ -197,7 +198,7 @@ snap_to_subc_segment <- function(data, lon, lat, site_id, basin_id = NULL,
                                   basin_layer = basin_layer, quiet = quiet)
     # Join with data and select columns needed for the bash script
     ids <- left_join(data, subc_basin_ids, by = c(lon, lat)) %>%
-      select(matches(c(site_id, lon, lat)), basin_id, subcatchment_id)
+      select(matches(c(id, lon, lat)), basin_id, subcatchment_id)
 
   } else if (is.null(basin_id) && !is.null(subc_id)) {
     # Extract basin ids
@@ -206,7 +207,7 @@ snap_to_subc_segment <- function(data, lon, lat, site_id, basin_id = NULL,
                              basin_layer = basin_layer, quiet = quiet)
     # Join with data and select columns needed for the bash script
     ids <- left_join(data, subc_basin_ids, by = c(lon, lat)) %>%
-      select(matches(c(site_id, lon, lat)), basin_id, matches(subc_id))
+      select(matches(c(id, lon, lat)), basin_id, matches(subc_id))
 
 
   } else if (!is.null(basin_id) && is.null(subc_id)) {
@@ -217,12 +218,12 @@ snap_to_subc_segment <- function(data, lon, lat, site_id, basin_id = NULL,
     # Join with data and select columns needed for the bash script
     ids <- data %>%
       left_join(., subc_basin_ids, by = c(lon, lat)) %>%
-      select(matches(c(site_id, lon, lat, basin_id)), subcatchment_id)
+      select(matches(c(id, lon, lat, basin_id)), subcatchment_id)
 #
   } else {
     # Select columns needed for the bash script
     ids <- data %>%
-      select(matches(c(site_id, lon, lat, basin_id, subc_id)))
+      select(matches(c(id, lon, lat, basin_id, subc_id)))
   }
 
   # Create random string to attach to the file name of the temporary

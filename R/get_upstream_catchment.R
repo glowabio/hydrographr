@@ -3,9 +3,10 @@
 #' @param data a data.frame or data.table with lat/lon coordinates in WGS84,
 #' which have been snapped to the stream network.
 #' The snapping can be done using the function 'snap_to_network'
-#' @param id Name of the column containing the occurrence/site id
-#' @param lon Name of the longitude column (WGS 84)
-#' @param lat Name of the latitude column (WGS 84)
+#' @param id character. The name of a column containing unique IDs for each row
+#' of "data" (e.g., occurrence or site IDs)
+#' @param lon character. The name of the column with the longitude coordinates
+#' @param lat character. The name of the column with the latitude coordinates
 #' @param direction_layer character. Full path to raster file with the
 #' direction variable
 #' @param out_path Full path to the directory where the output(s)
@@ -64,7 +65,7 @@
 #' snapped_coordinates <- snap_to_subc_segment(data = species_occurence,
 #'                                             lon = "longitude",
 #'                                             lat = "latitude",
-#'                                             site_id = "occurrence_id",
+#'                                             id = "occurrence_id",
 #'                                             basin_path = basin_rast,
 #'                                             subc_path = subc_rast,
 #'                                             stream_path = stream_vect,

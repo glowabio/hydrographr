@@ -20,9 +20,10 @@ reclass_raster(
 \arguments{
 \item{data}{a data.frame or data.table with the present and new raster values}
 
-\item{rast_val}{Column name of present raster values as character string}
+\item{rast_val}{character. The name of the column with the present
+raster values}
 
-\item{new_val}{Column name of new raster values as character string}
+\item{new_val}{character. The name of the column with the new raster values}
 
 \item{rast_path}{Full path to the input raster .tif layer}
 

@@ -31,7 +31,7 @@
 #' Optionally, a SpatRaster (terra object) can be loaded into R with
 #' read = TRUE.
 #'
-#' @author
+#' @author Yusdiel Torres-Cambas
 #'
 #' @examples
 #' library(hydrographr)
@@ -78,7 +78,7 @@ crop_to_extent <- function(raster_layer,
         # Call external gdalwarp command from GDAL library. Cut through
         # the border line option
         cat("Cropping...\n")
-        run(system.file("sh", "crop_to_extent_cl.sh",
+        processx::run(system.file("sh", "crop_to_extent_cl.sh",
                         package = "hydrographr"),
             args = c(raster_layer, vector_layer, output_path),
             echo = FALSE)
