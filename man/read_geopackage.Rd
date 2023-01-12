@@ -2,7 +2,7 @@
 % Please edit documentation in R/read_geopackage.R
 \name{read_geopackage}
 \alias{read_geopackage}
-\title{Read a GeoPackage file}
+\title{Reads a GeoPackage file}
 \usage{
 read_geopackage(
   filename,
@@ -38,7 +38,7 @@ and needs to be specified for any other data.}
 SpatVector (terra object).}
 }
 \description{
-Read a GeoPackage vector file from disk either as a table (data.table),
+Reads a GeoPackage vector file from disk either as a table (data.table),
 as a directed graph object (igraph), a spatial dataframe (sf)
 or a SpatVect object (terra).
 }

@@ -34,9 +34,11 @@ direction variable}
 will be stored.
 To identify the upstream catchment the output file name includes the site id.}
 
-\item{n_cores}{Numeric. Number of cores used for parallelization.}
+\item{n_cores}{numeric. Number of cores used for parallelization.
+If NULL, available cores - 1 will be used.}
 
-\item{quiet}{If FALSE, process is printed}
+\item{quiet}{logical. If FALSE, the standard output will be printed.
+Default is TRUE.}
 }
 \description{
 Calculates the upstream basin taking each point as the outlet
@@ -74,7 +76,7 @@ snapped_coordinates <- snap_to_subc_segment(data = species_occurence,
                                             basin_path = basin_rast,
                                             subc_path = subc_rast,
                                             stream_path = stream_vect,
-                                            cores = 2)
+                                            n_cores = 2)
 
 # Define full path to the direction .tif
 direction_rast <- paste0(my_directory,

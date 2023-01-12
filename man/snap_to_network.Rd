@@ -9,24 +9,24 @@ snap_to_network(
   data,
   lon,
   lat,
-  site_id,
+  id,
   stream_layer,
   accu_layer = NULL,
-  calc = "dist",
-  dist = 500,
-  accu = 0.5,
+  method = "distance",
+  distance = 500,
+  accumulation = 0.5,
   quiet = TRUE
 )
 }
 \arguments{
-\item{data}{a data.frame or data.table with lat/lon coordinates in WGS84}
+\item{data}{a data.frame or data.table with lat/lon coordinates in WGS84.}
 
-\item{lon}{character. The name of the column with the longitude coordinates}
+\item{lon}{character. The name of the column with the longitude coordinates.}
 
-\item{lat}{character. The name of the column with the latitude coordinates}
+\item{lat}{character. The name of the column with the latitude coordinates.}
 
-\item{site_id}{Column name of a unique ID as character vector; Optional
-an ID for the data points can be defined.}
+\item{id}{character. The name of a column containing unique IDs for
+each row of "data" (e.g., occurrence or site IDs).}
 
 \item{stream_layer}{character. Full path of the stream network .gpkg file}
 
@@ -36,19 +36,21 @@ an accumulation value higher than the flow accumulation threshold
 (set by 'accumulation'). This prevents points from being snapped to small
 stream tributaries.}
 
-\item{calc}{Options "dist", "accu", or "both". Default is "dist".
-Defines if the points are snapped using the distance or flow accumulation.
-If calc is set to "both" the output will contain the new coordinates for both
-calculations.}
+\item{method}{character. One of "distance", "accumulation", or "both".
+Defines if the points are snapped using the distance or flow accumulation
+(see "Details" for more information). If method is set to "both" the output
+will contain the new coordinates for both calculations.
+Default is "distance".}
 
-\item{dist}{Maximum radius in meters; Point will be snapped to the next
-stream within a defined radius. By default the distance is 500 meter.}
+\item{distance}{numeric. Maximum radius in meters. The points will be
+snapped to the next stream within this radius. Default is 500.}
 
-\item{accu}{Minimum flow accumulation; Point will be snapped to the next
-stream with a flow accumulation equal or higher than the given value. By
-default the flow accumulation value is set to 0.5.}
+\item{accumulation}{numeric. Minimum flow accumulation. Points will be
+snapped to the next stream with a flow accumulation equal or higher than the
+given value. Default is 0.5.}
 
-\item{quiet}{Logical; Whether the standard output will be printed or not.}
+\item{quiet}{logical. If FALSE, the standard output will be printed.
+Default is TRUE.}
 }
 \description{
 Snap data points to the next stream segment within a defined radius
@@ -57,7 +59,7 @@ or a minimum flow accumulation.
 \details{
 The function makes use of the r.stream.snap command available in GRASS GIS to
 simultaneously a number of points to a stream network. A distance threshold
-can be specified and points will be snap to any stream segment within this
+can be specified and points will be snapped to any stream segment within this
 distance radius. However, to avoid snapping to small tributaries, an
 accumulation threshold can be used and the snapping occurs on stream segment
 with equal or higher accumulation threshold and within the given distance
@@ -86,12 +88,12 @@ flow_rast <- paste0(my_directory,
 snapped_coordinates <- snap_to_network(data = species_occurrence,
                                        lon = "longitude",
                                        lat = "latitude",
-                                       site_id = "occurrence_id",
+                                       id = "occurrence_id",
                                        stream_layer = stream_vect,
                                        accu_layer = flow_rast,
-                                       calc = "both",
-                                       dist = 300,
-                                       accu = 0.8)
+                                       method = "both",
+                                       distance = 300,
+                                       accumulation = 0.8)
 
 # Show head of output table
 head(snapped_coordinates)

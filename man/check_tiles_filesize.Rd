@@ -13,32 +13,31 @@ check_tiles_filesize(
   global = FALSE,
   h90m_varnames,
   h90m_tile_id,
-  valid_file_formats,
+  h90m_file_formats,
   file_size_table_sep
 )
 }
 \arguments{
-\item{variable}{character vector of variable names}
+\item{variable}{character vector of variable names.}
 
-\item{file_format}{character. Format of the requested file ("tif" or "gpkg")}
+\item{file_format}{character. Format of the requested file ("tif" or "gpkg").}
 
-\item{tile_id}{character. The ID of the requested tile or regional unit}
+\item{tile_id}{character. The ID of the requested tile or regional unit.}
 
-\item{global}{Logical. Should the global file be downloaded or not.
-TRUE/FALSE, FALSE by default}
+\item{global}{logical. If TRUE, the global extent file is downloaded.
+Default is FALSE.}
 
 \item{h90m_varnames}{character vector. the valid names of the hydrography90m
-files available for download, (inherited by 'download_tiles()')}
+files available for download, (inherited by 'download_tiles()').}
 
-\item{h90m_tile_id}{character vector. The valid IDs of the hydrography90m
-regular tiles available for download (inherited by 'download_tiles()')}
+\item{h90m_tile_id}{character vector. The valid IDs of the hydrography90m.
+regular tiles available for download (inherited by 'download_tiles()').}
 
-\item{valid_file_formats}{The valid file types of the files available
-for download
-(inherited by 'download_tiles()')}
+\item{h90m_file_formats}{character vector. The valid file types of the files
+available for download (inherited by 'download_tiles()').}
 
-\item{file_size_table_sep}{The lookup table of file sizes
-(inherited by 'download_tiles()')}
+\item{file_size_table_sep}{data.frame. Lookup table including file names
+and sizes (inherited by 'download_tiles()').}
 }
 \description{
 Check the size of single files before downloading.

@@ -17,22 +17,23 @@ download_tiles_base(
 )
 }
 \arguments{
-\item{variable}{character vector of variable names}
+\item{variable}{character vector of variable names.}
 
-\item{file_format}{character. Format of the requested file ("tif" or "gpkg")}
+\item{file_format}{character. Format of the requested file ("tif" or "gpkg").}
 
-\item{tile_id}{character. The ID of the requested tile or regional unit}
+\item{tile_id}{character. The ID of the requested tile or regional unit.}
 
-\item{global}{Should the global file be downloaded or not.
-TRUE/FALSE, FALSE by default}
+\item{global}{logical. If TRUE, the global extent file is downloaded.
+Default is FALSE.}
 
-\item{download_dir}{character. The directory where the files will be downloaded}
+\item{download_dir}{character. The directory where the files will be
+downloaded.}
 
-\item{file_size_table_sep}{lookup table of file sizes
-(inherited by 'download_tiles()')}
+\item{file_size_table_sep}{data.frame. Lookup table including file names
+and sizes (inherited by 'download_tiles()').}
 
 \item{server_url}{character. url to the the home download folder
-in either Nimbus or GDrive (inherited by 'download_tiles()')}
+in either Nimbus or GDrive (inherited by 'download_tiles()').}
 }
 \description{
 Downloads a single file from

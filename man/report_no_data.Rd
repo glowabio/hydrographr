@@ -12,8 +12,8 @@ report_no_data(data_dir, var_layer, n_cores = NULL)
 \item{var_layer}{character vector of variable raster layers on disk,
 e.g. "slope_grad_dw_cel_h00v00.tif".}
 
-\item{n_cores}{Numeric. Number of cores used for parallelization. If NULL,
-available cores - 1 will be used}
+\item{n_cores}{numeric. Number of cores used for parallelization.
+If NULL, available cores - 1 will be used.}
 }
 \description{
 This function reports the defined NoData value of a raster layer. The NoData

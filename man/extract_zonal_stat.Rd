@@ -17,7 +17,7 @@ extract_zonal_stat(
 )
 }
 \arguments{
-\item{data_dir}{character. Path to the directory containing all input data}
+\item{data_dir}{character. Path to the directory containing all input data.}
 
 \item{subc_ids}{Vector of sub-catchment IDs or "all".
 If "all", zonal statistics are calculated for all sub-catchments
@@ -25,14 +25,13 @@ of the given sub-catchment raster layer. A vector of the sub-catchment IDs
 can be acquired from the extract_ids() function, and by sub-setting
 the resulting data.frame.}
 
-\item{subc_layer}{character. Full path to the sub-catchment ID .tif layer}
+\item{subc_layer}{character. Full path to the sub-catchment ID .tif layer.}
 
 \item{var_layer}{character vector of variable raster layers on disk,
-e.g. "slope_grad_dw_cel_h00v00.tif". Variable names should remain
-intact in file names, even after file processing,
-i.e., slope_grad_dw_cel should appear in the file name.
-The files should be cropped to the extent of the sub-catchment layer to
-speed up the computation.}
+e.g. "slope_grad_dw_cel_h00v00.tif". Variable names should remain intact in
+file names, even after file processing, i.e., slope_grad_dw_cel should appear
+in the file name. The files should be cropped to the extent of the
+sub-catchment layer to speed up the computation.}
 
 \item{out_dir}{character. The directory where the output will be stored.
 If the out_dir and file_name are specified, the output table will be stored
@@ -42,10 +41,11 @@ loaded in R and not stored on disk.}
 \item{file_name}{character. Name of the .csv file where the output table
 will be stored. out_dir should also be specified for this purpose.}
 
-\item{n_cores}{Numeric. Number of cores used for parallelization. If NULL,
-the physical available CPUs - 1 are used.}
+\item{n_cores}{numeric. Number of cores used for parallelization.
+If NULL, available cores - 1 will be used.}
 
-\item{quiet}{Logical. Whether the standard output will be printed or not.}
+\item{quiet}{logical. If FALSE, the standard output will be printed.
+Default is TRUE.}
 }
 \description{
 This function can be used to aggregate data across a set (or all)

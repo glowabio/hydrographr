@@ -9,13 +9,13 @@ on disk.}
 set_no_data(data_dir, var_layer, no_data)
 }
 \arguments{
-\item{data_dir}{character. Path to the directory containing all input layers}
+\item{data_dir}{character. Path to the directory containing all input data.}
 
-\item{var_layer}{character vector of var_layer layers on disk,
+\item{var_layer}{character vector of variable layers on disk,
 e.g. c("sti_h16v02.tif", "slope_grad_dw_cel_h00v00.tif").
 The original files will be overwritten.}
 
-\item{no_data}{numeric. The desired NoData value}
+\item{no_data}{numeric. The desired NoData value.}
 }
 \description{
 Change or set the NoData value for a raster layer.

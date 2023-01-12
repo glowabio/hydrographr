@@ -14,37 +14,38 @@ snap_to_subc_segment(
   basin_layer,
   subc_layer,
   stream_layer,
-  cores = 1,
+  n_cores = 1,
   quiet = TRUE
 )
 }
 \arguments{
-\item{data}{a data.frame or data.table with lat/lon coordinates in WGS84}
+\item{data}{a data.frame or data.table with lat/lon coordinates in WGS84.}
 
-\item{lon}{character. The name of the column with the longitude coordinates}
+\item{lon}{character. The name of the column with the longitude coordinates.}
 
-\item{lat}{character. The name of the column with the latitude coordinates}
+\item{lat}{character. The name of the column with the latitude coordinates.}
 
 \item{id}{character. The name of a column containing unique IDs for each row
-of "data" (e.g., occurrence or site IDs)}
+of "data" (e.g., occurrence or site IDs).}
 
 \item{basin_id}{character. The name of the column with the basin IDs.
 If NULL, the basin IDs will be extracted automatically. Default is NULL}
 
 \item{subc_id}{character. The name of the column with the sub-catchment IDs.
 If NULL, the sub-catchment IDs will be extracted automatically.
-Default is NULL}
+Default is NULL.}
 
-\item{basin_layer}{character. Full path to the basin ID .tif layer}
+\item{basin_layer}{character. Full path to the basin ID .tif layer.}
 
-\item{subc_layer}{character. Full path to the sub-catchment ID .tif layer}
+\item{subc_layer}{character. Full path to the sub-catchment ID .tif layer.}
 
-\item{stream_layer}{character. Full path of the stream network .gpkg file}
+\item{stream_layer}{character. Full path of the stream network .gpkg file.}
 
-\item{cores}{Number of cores used for parallelization. By default the process
-does not run in parallel}
+\item{n_cores}{numeric. Number of cores used for parallelization.
+Default is 1.}
 
-\item{quiet}{Whether the standard output will be printed or not}
+\item{quiet}{logical. If FALSE, the standard output will be printed.
+Default is TRUE.}
 }
 \description{
 Snaps data points to the stream segment of the
@@ -96,7 +97,7 @@ snapped_coordinates <- snap_to_subc_segment(data = hydrography90m_ids,
                                             basin_layer = basin_rast,
                                             subc_layer = subc_rast,
                                             stream_layer = stream_vect,
-                                            cores = 2)
+                                            n_cores = 2)
 # Show head of output table
 head(snapped_coordinates)
 
@@ -110,7 +111,7 @@ snapped_coordinates <- snap_to_subc_segment(data = species_occurence,
                                             basin_layer = basin_rast,
                                             subc_layer = subc_rast,
                                             stream_layer = stream_vect,
-                                            cores = 2)
+                                            n_cores = 2)
 # Show head of output table
 head(snapped_coordinates)
 

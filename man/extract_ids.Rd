@@ -28,8 +28,8 @@ of "data" (e.g., occurrence or site IDs)}
 
 \item{subc_layer}{character. Full path to the sub-catchment ID .tif layer}
 
-\item{quiet}{Whether the standard output will be printed or not (deafult
-is TRUE)}
+\item{quiet}{logical. If FALSE, the standard output will be printed.
+Default is TRUE.}
 }
 \description{
 Extracts the ID value of the basin and/or sub-catchment raster layer at a

@@ -15,18 +15,19 @@ download_tiles(
 )
 }
 \arguments{
-\item{variable}{character vector of variable names}
+\item{variable}{character vector of variable names.}
 
-\item{file_format}{character. Format of the requested file ("tif" or "gpkg")}
+\item{file_format}{character. Format of the requested file ("tif" or "gpkg").}
 
-\item{tile_id}{character vector. The IDs of the requested tiles}
+\item{tile_id}{character vector. The IDs of the requested tiles.}
 
-\item{reg_unit_id}{character vector. The IDs of the requested regional units}
+\item{reg_unit_id}{character vector. The IDs of the requested regional units.}
 
-\item{global}{Should the global file be downloaded or not.
-TRUE/FALSE, FALSE by default (logical)}
+\item{global}{logical. If TRUE, the global extent file is downloaded.
+Default is FALSE.}
 
-\item{download_dir}{character. The directory where the files will be downloaded}
+\item{download_dir}{character. The directory where the files will be
+downloaded.}
 }
 \description{
 Downloads multiple files from Nimbus

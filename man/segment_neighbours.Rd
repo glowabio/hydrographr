@@ -7,53 +7,54 @@
 segment_neighbours(
   g,
   subc_id = NULL,
-  variable = NULL,
+  var_layer = NULL,
   stat = NULL,
   attach_only = FALSE,
   order = 5,
   mode = "in",
   n_cores = 1,
-  maxsize = 1500
+  max_size = 1500
 )
 }
 \arguments{
-\item{g}{A directed graph (igraph object).}
+\item{g}{igraph object. A directed graph.}
 
-\item{subc_id}{The input sub-catchment IDs (=stream segment IDs) as a
-numerical vector for which to search the connected segments.}
+\item{subc_id}{numeric vector of the input sub-catchment IDs
+(=stream segment IDs) for which to search the connected segments.}
 
-\item{variable}{optional. One or more attribute(s) or variable(s) of the
-input graph that should be reported for each output subc_id ("to_stream").}
+\item{var_layer}{character vector. One or more attributes (variable layers)
+of the input graph that should be reported for each output segment_id
+("to_stream"). Optional.}
 
-\item{stat}{One of mean, median, min, max, sd (without quotes).
-Aggregates (or summarizes) the variables for the neighbourhood
-of each input segment ("stream", e.g., the average land cover in
-the next five upstream segments or sub-catchments).}
+\item{stat}{one of the functions mean, median, min, max, sd (without quotes).
+Aggregates (or summarizes) the variables for the neighbourhood of each input
+segment ("stream", e.g., the average land cover in the next five upstream
+segments or sub-catchments). Default is NULL.}
 
-\item{attach_only}{Logical. If TRUE then the selected variables will be
-only attached to each for each segment without any further aggregation.}
+\item{attach_only}{logical. If TRUE, the selected variables will be only
+attached to each segment without any further aggregation. Default is FALSE.}
 
-\item{order}{The neighbouring order as in igraph::ego.
-Order=1 would be immediate neighbours of the input sub-catchment IDs,
-order=2 would be the order 1 plus the immediate neighbours of
+\item{order}{numeric. The neighbouring order as in igraph::ego.
+Order = 1 would be immediate neighbours of the input sub-catchment IDs,
+order = 2 would be the order 1 plus the immediate neighbours of
 those sub-catchment IDs in order 1, and so on.}
 
-\item{mode}{One of "in", "out", or "all". "in" reports only
-upstream neighbouring segments, "out" reports only the downstream segments,
-and "all" does both.}
+\item{mode}{character. One of "in", "out", or "all". "in" returns only
+upstream neighbouring segments, "out" returns only the downstream segments,
+and "all" returns both.}
 
-\item{n_cores}{Optional. Specify the number of CPUs for internal
-parallelization in the case of multiple stream segments / outlets.
-Defaults to 1. In case the graph is very large, and many segments
-are used as an input, setting n_cores to a higher value can speed up
-the computation. This comes however at the cost of possible RAM limitations
-and even slower processing since the large data will be copied to each CPU.
-Hence consider testing with n_cores=1 first.}
+\item{n_cores}{numeric. Number of cores used for parallelization
+in the case of multiple stream segments / outlets. Default is 1.
+Currently, the parallelization process requires copying the data to each
+core. In case the graph is very large, and many segments are
+used as an input, setting n_cores to a higher value can speed up the
+computation. This comes however at the cost of possible RAM limitations
+and even slower processing since the large data will be copied to each core.
+Hence consider testing with n_cores = 1 first. Optional.}
 
-\item{maxsize}{Optional. Specify the maximum size of the data passed to the
-parallel backend in MB. Defaults to 1500 (1.5 GB).
-Consider a higher value for
-large study areas (more than one 20°x20° tile).}
+\item{max_size}{numeric. Specifies the maximum size of the data passed to the
+parallel back-end in MB. Default is 1500 (1.5 GB). Consider a higher value
+for large study areas (more than one 20°x20° tile). Optional.}
 }
 \description{
 For each segment, report those upstream, downstream, or up-and
@@ -65,7 +66,7 @@ we use the term "subc_id".
 }
 \details{
 This function can also be used to create the connectivity table
-for Marxan by using variable="length" and attach_only=TRUE.
+for Marxan by using var_layer="length" and attach_only=TRUE.
 The resulting table reports the connectivity from each segment,
 along with the stream length for all connected segments.
 }
@@ -78,31 +79,31 @@ download_test_data(my_directory)
 
 # Load the stream network as graph
 g <- read_geopackage(paste0(my_directory, "/order_vect_59.gpkg"),
-type="net", g=T)
+type = "net", g = T)
 
 # Get the upstream segment neighbours in the 5th order
 and report the length and source elevation
 for the neighbours of each input segment
-segment_neighbours(g, subc_id=subc_id,
-                   order=5, mode="in", n_cores=1,
-                   variable=c("length", "source_elev"),
-                   attach_only=T)
+segment_neighbours(g, subc_id = subc_id,
+                   order = 5, mode = "in", n_cores = 1,
+                   var_layer = c("length", "source_elev"),
+                   attach_only = T)
 
 # Get the downstream segment neighbours in the 5th order
 and calculate the median length and source elevation
 across the neighbours of each input segment
-segment_neighbours(my_graph, subc_id=subc_id,
-                   order=2, mode="out", n_cores=1,
-                   variable=c("length", "source_elev"),
-                   stat=median)
+segment_neighbours(my_graph, subc_id = subc_id,
+                   order = 2, mode ="out", n_cores = 1,
+                   var_layer = c("length", "source_elev"),
+                   stat = median)
 
 Get the up-and downstream segment neighbours in the 5th order
 and report the median length and source elevation
 for the neighbours of each input segment
-segment_neighbours(my_graph, subc_id=subc_id,
-                   order=2, mode="all", n_cores=1,
-                   variable=c("length", "source_elev"),
-                   stat=mean, attach_only=T)
+segment_neighbours(my_graph, subc_id = subc_id,
+                   order = 2, mode = "all", n_cores = 1,
+                   var_layer = c("length", "source_elev"),
+                   stat = mean, attach_only = T)
 
 }
 \author{

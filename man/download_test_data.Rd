@@ -8,7 +8,7 @@ download_test_data(download_dir = ".")
 }
 \arguments{
 \item{download_dir}{character. The directory where the files will be
-downloaded}
+downloaded.}
 }
 \description{
 The test data contains all Hydrography90m and species point observation data

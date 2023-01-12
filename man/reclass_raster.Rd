@@ -52,7 +52,6 @@ If the input raster layer has floating point values, you should multiply
 the input data by some factor (e.g. 1000) to achieve integer values,
 otherwise the GRASS GIS r.reclass will round the raster values down to
 the next integer which is not always desired.
-#'
 }
 \examples{
 # Set directory for test data
