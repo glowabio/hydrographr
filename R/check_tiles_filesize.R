@@ -1,20 +1,19 @@
 #' Check the size of single files before downloading.
 #' It is called and inherits arguments by the function 'download_tiles()'
 #'
-#' @param variable character vector of variable names
-#' @param file_format character. Format of the requested file ("tif" or "gpkg")
-#' @param tile_id character. The ID of the requested tile or regional unit
-#' @param global Logical. Should the global file be downloaded or not.
-#' TRUE/FALSE, FALSE by default
+#' @param variable character vector of variable names.
+#' @param file_format character. Format of the requested file ("tif" or "gpkg").
+#' @param tile_id character. The ID of the requested tile or regional unit.
+#' @param global logical. If TRUE, the global extent file is downloaded.
+#' Default is FALSE.
 #' @param h90m_varnames character vector. the valid names of the hydrography90m
-#' files available for download, (inherited by 'download_tiles()')
-#' @param h90m_tile_id character vector. The valid IDs of the hydrography90m
-#' regular tiles available for download (inherited by 'download_tiles()')
-#' @param valid_file_formats The valid file types of the files available
-#' for download
-#' (inherited by 'download_tiles()')
-#' @param file_size_table_sep The lookup table of file sizes
-#' (inherited by 'download_tiles()')
+#' files available for download, (inherited by 'download_tiles()').
+#' @param h90m_tile_id character vector. The valid IDs of the hydrography90m.
+#' regular tiles available for download (inherited by 'download_tiles()').
+#' @param h90m_file_formats character vector. The valid file types of the files
+#' available for download (inherited by 'download_tiles()').
+#' @param file_size_table_sep data.frame. Lookup table including file names
+#' and sizes (inherited by 'download_tiles()').
 #'
 #' @importFrom stringr str_split_fixed
 #' @keywords internal
@@ -25,7 +24,7 @@
 check_tiles_filesize <- function(variable, file_format = "tif",
                                  tile_id = NULL, reg_unit_id = NULL,
                                  global = FALSE, h90m_varnames, h90m_tile_id,
-                                 valid_file_formats, file_size_table_sep) {
+                                 h90m_file_formats, file_size_table_sep) {
 
   # Check if the given variable name is valid
   match.arg(variable, choices = h90m_varnames)
@@ -62,7 +61,7 @@ check_tiles_filesize <- function(variable, file_format = "tif",
   # to check that the requested file_format exists
   valid_file_format_var <- unique(
     str_split_fixed(
-      valid_file_formats[grep(paste0(variable, "_"), valid_file_formats)],
+      h90m_file_formats[grep(paste0(variable, "_"), h90m_file_formats)],
       "\\.", 2)[, 2])
 
   # Check that the requested file_format is among the valid ones

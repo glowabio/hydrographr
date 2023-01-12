@@ -4,22 +4,23 @@
 #' Snaps data points to the stream segment of the
 #' sub-catchment the data point is located.
 
-#' @param data a data.frame or data.table with lat/lon coordinates in WGS84
-#' @param lon character. The name of the column with the longitude coordinates
-#' @param lat character. The name of the column with the latitude coordinates
+#' @param data a data.frame or data.table with lat/lon coordinates in WGS84.
+#' @param lon character. The name of the column with the longitude coordinates.
+#' @param lat character. The name of the column with the latitude coordinates.
 #' @param id character. The name of a column containing unique IDs for each row
-#' of "data" (e.g., occurrence or site IDs)
+#' of "data" (e.g., occurrence or site IDs).
 #' @param basin_id character. The name of the column with the basin IDs.
 #' If NULL, the basin IDs will be extracted automatically. Default is NULL
 #' @param subc_id character. The name of the column with the sub-catchment IDs.
 #' If NULL, the sub-catchment IDs will be extracted automatically.
-#' Default is NULL
-#' @param basin_layer character. Full path to the basin ID .tif layer
-#' @param subc_layer character. Full path to the sub-catchment ID .tif layer
-#' @param stream_layer character. Full path of the stream network .gpkg file
-#' @param cores Number of cores used for parallelization. By default the process
-#' does not run in parallel
-#' @param quiet Whether the standard output will be printed or not
+#' Default is NULL.
+#' @param basin_layer character. Full path to the basin ID .tif layer.
+#' @param subc_layer character. Full path to the sub-catchment ID .tif layer.
+#' @param stream_layer character. Full path of the stream network .gpkg file.
+#' @param n_cores numeric. Number of cores used for parallelization.
+#' Default is 1.
+#' @param quiet logical. If FALSE, the standard output will be printed.
+#' Default is TRUE.
 #'
 #' @importFrom parallel detectCores
 #' @importFrom stringi stri_rand_strings
@@ -88,7 +89,7 @@
 #'                                             basin_layer = basin_rast,
 #'                                             subc_layer = subc_rast,
 #'                                             stream_layer = stream_vect,
-#'                                             cores = 2)
+#'                                             n_cores = 2)
 #' # Show head of output table
 #' head(snapped_coordinates)
 #'
@@ -102,7 +103,7 @@
 #'                                             basin_layer = basin_rast,
 #'                                             subc_layer = subc_rast,
 #'                                             stream_layer = stream_vect,
-#'                                             cores = 2)
+#'                                             n_cores = 2)
 #' # Show head of output table
 #' head(snapped_coordinates)
 #'
@@ -110,7 +111,7 @@
 
 snap_to_subc_segment <- function(data, lon, lat, id, basin_id = NULL,
                                  subc_id = NULL, basin_layer, subc_layer,
-                                 stream_layer, cores = 1, quiet = TRUE) {
+                                 stream_layer, n_cores = 1, quiet = TRUE) {
   # Check operating system
   system <- get_os()
 
@@ -176,13 +177,13 @@ snap_to_subc_segment <- function(data, lon, lat, id, basin_id = NULL,
   if (!endsWith(stream_layer, ".gpkg"))
     stop(paste0("File path: ", stream_layer, " does not end with .gpkg"))
 
-  # Check if value of cores numeric
-  if (!is.numeric(cores))
-    stop("cores: Value has to be numeric.")
+  # Check if value of n_cores numeric
+  if (!is.numeric(n_cores))
+    stop("n_cores: Value has to be numeric.")
 
   # Check if cpus are available.
-  if (cores >= detectCores()) {
-    stop("Number of cores set is higher than number of available cores.")
+  if (n_cores >= detectCores()) {
+    stop("Number of n_cores set is higher than number of available cores.")
   }
 
   # Check if quiet is logical
@@ -244,7 +245,7 @@ snap_to_subc_segment <- function(data, lon, lat, id, basin_id = NULL,
     processx::run(system.file("sh", "snap_to_subc_segment.sh",
                     package = "hydrographr"),
         args = c(ids_tmp_path, lon, lat, basin_layer, subc_layer, stream_layer,
-                 cores, snap_tmp_path,  tempdir()),
+                 n_cores, snap_tmp_path,  tempdir()),
         echo = !quiet)
 
 
@@ -265,7 +266,7 @@ snap_to_subc_segment <- function(data, lon, lat, id, basin_id = NULL,
     processx::run(system.file("bat", "snap_to_subc_segment.bat",
                     package = "hydrographr"),
         args = c(wsl_ids_tmp_path, lon, lat, wsl_basin_layer,
-                 wsl_subc_layer, wsl_stream_layer, cores,
+                 wsl_subc_layer, wsl_stream_layer, n_cores,
                  wsl_snap_tmp_path, wsl_tmp_path, wsl_sh_file),
         echo = !quiet)
   }

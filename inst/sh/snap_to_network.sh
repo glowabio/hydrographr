@@ -15,7 +15,7 @@ export STR=$4
 export ACC=$5
 
 ## What to calculate
-export CALC=$6
+export METHOD=$6
 
 ## radius distance
 export rdist=$7
@@ -60,7 +60,7 @@ v.in.ogr --o input=$DIR/ref_points_${RAND_STRING}.gpkg layer=ref_points output=r
 r.in.gdal input=$STR output=stream
 
 
-if [ "$CALC" = "dist" ]
+if [ "$METHOD" = "distance" ]
 then
 
     r.stream.snap --o input=ref_points output=snap_points stream_rast=stream \
@@ -85,7 +85,7 @@ then
 fi
 
 
-if [ "$CALC" = "accu" ]
+if [ "$METHOD" = "accumulation" ]
 then
     r.in.gdal input=$ACC output=accum
     r.stream.snap --o input=ref_points output=snap_points stream_rast=stream \
@@ -110,7 +110,7 @@ then
 fi
 
 
-if [ "$CALC" = "both" ]
+if [ "$METHOD" = "both" ]
 then
 
     r.stream.snap --o input=ref_points output=snap_points_d stream_rast=stream \

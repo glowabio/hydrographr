@@ -2,27 +2,29 @@
 #' or a minimum flow accumulation.
 #'
 #'
-#' @param data a data.frame or data.table with lat/lon coordinates in WGS84
-#' @param lon character. The name of the column with the longitude coordinates
-#' @param lat character. The name of the column with the latitude coordinates
-#' @param site_id  Column name of a unique ID as character vector; Optional
-#' an ID for the data points can be defined.
+#' @param data a data.frame or data.table with lat/lon coordinates in WGS84.
+#' @param lon character. The name of the column with the longitude coordinates.
+#' @param lat character. The name of the column with the latitude coordinates.
+#' @param id  character. The name of a column containing unique IDs for
+#' each row of "data" (e.g., occurrence or site IDs).
 #' @param stream_layer character. Full path of the stream network .gpkg file
 #' @param accu_layer character. Full path of the flow accumulation .tif file.
 #' Needed if the point should be snapped to the next stream segment having
 #' an accumulation value higher than the flow accumulation threshold
 #' (set by 'accumulation'). This prevents points from being snapped to small
 #' stream tributaries.
-#' @param calc Options "dist", "accu", or "both". Default is "dist".
-#' Defines if the points are snapped using the distance or flow accumulation.
-#' If calc is set to "both" the output will contain the new coordinates for both
-#' calculations.
-#' @param dist Maximum radius in meters; Point will be snapped to the next
-#' stream within a defined radius. By default the distance is 500 meter.
-#' @param accu Minimum flow accumulation; Point will be snapped to the next
-#' stream with a flow accumulation equal or higher than the given value. By
-#' default the flow accumulation value is set to 0.5.
-#' @param quiet Logical; Whether the standard output will be printed or not.
+#' @param method character. One of "distance", "accumulation", or "both".
+#' Defines if the points are snapped using the distance or flow accumulation
+#' (see "Details" for more information). If method is set to "both" the output
+#' will contain the new coordinates for both calculations.
+#' Default is "distance".
+#' @param distance numeric. Maximum radius in meters. The points will be
+#' snapped to the next stream within this radius. Default is 500.
+#' @param accumulation numeric. Minimum flow accumulation. Points will be
+#' snapped to the next stream with a flow accumulation equal or higher than the
+#' given value. Default is 0.5.
+#' @param quiet logical. If FALSE, the standard output will be printed.
+#' Default is TRUE.
 #' @importFrom stringi stri_rand_strings
 #' @importFrom dplyr select left_join
 #' @importFrom data.table fread
@@ -35,7 +37,7 @@
 #' @details
 #' The function makes use of the r.stream.snap command available in GRASS GIS to
 #' simultaneously a number of points to a stream network. A distance threshold
-#' can be specified and points will be snap to any stream segment within this
+#' can be specified and points will be snapped to any stream segment within this
 #' distance radius. However, to avoid snapping to small tributaries, an
 #' accumulation threshold can be used and the snapping occurs on stream segment
 #' with equal or higher accumulation threshold and within the given distance
@@ -67,21 +69,21 @@
 #' snapped_coordinates <- snap_to_network(data = species_occurrence,
 #'                                        lon = "longitude",
 #'                                        lat = "latitude",
-#'                                        site_id = "occurrence_id",
+#'                                        id = "occurrence_id",
 #'                                        stream_layer = stream_vect,
 #'                                        accu_layer = flow_rast,
-#'                                        calc = "both",
-#'                                        dist = 300,
-#'                                        accu = 0.8)
+#'                                        method = "both",
+#'                                        distance = 300,
+#'                                        accumulation = 0.8)
 #'
 #' # Show head of output table
 #' head(snapped_coordinates)
 #'
 
 
-snap_to_network <- function(data, lon, lat, site_id, stream_layer,
-                            accu_layer = NULL, calc = "dist", dist = 500,
-                            accu = 0.5, quiet = TRUE) {
+snap_to_network <- function(data, lon, lat, id, stream_layer,
+                            accu_layer = NULL, method = "distance", distance = 500,
+                            accumulation = 0.5, quiet = TRUE) {
   # Check if data.frame is defined
   if (missing(data))
     stop("Input data is missing.")
@@ -110,8 +112,8 @@ snap_to_network <- function(data, lon, lat, site_id, stream_layer,
     stop(paste0("Column name '", lon, "' does not exist."))
   if (is.null(data[[lat]]))
     stop(paste0("Column name '", lat, "' does not exist."))
-  if (is.null(data[[site_id]]))
-    stop(paste0("Column name '", site_id, "' does not exist."))
+  if (is.null(data[[id]]))
+    stop(paste0("Column name '", id, "' does not exist."))
 
   # Check if values of the lon/lat columns are numeric
   if (!is.numeric(data[[lon]]))
@@ -125,8 +127,8 @@ snap_to_network <- function(data, lon, lat, site_id, stream_layer,
   if (missing(stream_layer))
     stop("stream_layer is missing.")
   # Check if accu_layer is defined
-  # If calc is set to "accu" or "both"
-  if (calc == "accu" || calc == "both")
+  # If method is set to "accumulation" or "both"
+  if (method == "accumulation" || method == "both")
     if (is.null(accu_layer))
       stop(paste0("accu_layer is missing."))
 
@@ -146,15 +148,15 @@ snap_to_network <- function(data, lon, lat, site_id, stream_layer,
   if (!endsWith(accu_layer, ".tif"))
     stop("accu_layer: Flow accumulation raster is not a .tif file.")
 
-  # Check if calc is set probably
-  if (!(calc == "dist" || calc == "accu" || calc == "both"))
-    stop("calc: Has to be 'dist', 'accu', or 'both'.")
+  # Check if method is set properly
+  if (!(method == "distance" || method == "accumulation" || method == "both"))
+    stop("method: Has to be 'distance', 'accumulation', or 'both'.")
 
-  # Check if values of dist and accu are numeric
-  if (!is.numeric(dist))
-    stop("dist: Value has to be numeric.")
-  if (!is.numeric(accu))
-    stop("accu: Value has to be numeric.")
+  # Check if values of distance and accumulation are numeric
+  if (!is.numeric(distance))
+    stop("distance: Value has to be numeric.")
+  if (!is.numeric(accumulation))
+    stop("accumulation: Value has to be numeric.")
 
   # Check if quiet is logical
   if (!is.logical(quiet))
@@ -192,7 +194,7 @@ snap_to_network <- function(data, lon, lat, site_id, stream_layer,
     processx::run(system.file("sh", "snap_to_network.sh",
                     package = "hydrographr"),
         args = c(coord_tmp_path, lon, lat,
-                 stream_layer, accu_layer, calc, dist, accu,
+                 stream_layer, accu_layer, method, distance, accumulation,
                  snap_tmp_path, tempdir()),
         echo = !quiet)
 
@@ -213,7 +215,7 @@ snap_to_network <- function(data, lon, lat, site_id, stream_layer,
     processx::run(system.file("bat", "snap_to_network.bat",
                     package = "hydrographr"),
         args = c(wsl_coord_tmp_path, lon, lat,
-                 wsl_stream_layer, wsl_accu_layer, calc, dist, accu,
+                 wsl_stream_layer, wsl_accu_layer, method, distance, accumulation,
                  wsl_snap_tmp_path, wsl_tmp_path, wsl_sh_file),
         echo = !quiet)
   }
@@ -222,10 +224,10 @@ snap_to_network <- function(data, lon, lat, site_id, stream_layer,
                          keepLeadingZeros = TRUE,
                          header = TRUE, sep = " ")
 
-  # Join with site_id
-  if (!is.null(site_id)) {
+  # Join with id
+  if (!is.null(id)) {
     coord <- data %>%
-      select(matches(c(site_id, lon, lat)))
+      select(matches(c(id, lon, lat)))
     snapped_coord <- left_join(coord, snapped_coord, by = c(lon, lat))
   }
 

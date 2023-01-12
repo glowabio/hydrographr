@@ -2,16 +2,17 @@
 #' https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4?path=%2F.
 #' It is called and inherits arguments by the function 'download_tiles()'.
 #'
-#' @param variable character vector of variable names
-#' @param file_format character. Format of the requested file ("tif" or "gpkg")
-#' @param tile_id character. The ID of the requested tile or regional unit
-#' @param global Should the global file be downloaded or not.
-#' TRUE/FALSE, FALSE by default
-#' @param download_dir character. The directory where the files will be downloaded
-#' @param file_size_table_sep lookup table of file sizes
-#' (inherited by 'download_tiles()')
+#' @param variable character vector of variable names.
+#' @param file_format character. Format of the requested file ("tif" or "gpkg").
+#' @param tile_id character. The ID of the requested tile or regional unit.
+#' @param global logical. If TRUE, the global extent file is downloaded.
+#' Default is FALSE.
+#' @param download_dir character. The directory where the files will be
+#' downloaded.
+#' @param file_size_table_sep data.frame. Lookup table including file names
+#' and sizes (inherited by 'download_tiles()').
 #' @param server_url character. url to the the home download folder
-#' in either Nimbus or GDrive (inherited by 'download_tiles()')
+#' in either Nimbus or GDrive (inherited by 'download_tiles()').
 #' @keywords internal
 #'
 

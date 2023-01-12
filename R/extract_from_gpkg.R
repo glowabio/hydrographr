@@ -19,8 +19,8 @@
 #' files in this location, named after their input variable vector files
 #' (e.g. "/path/to/stats_order_vect_point_h18v04.csv").
 #' If NULL, the output is only loaded in R and not stored on disk.
-#' @param n_cores Numeric. Number of cores for parallelization. Defaults to
-#' detectCores() - 1.
+#' @param n_cores numeric. Number of cores used for parallelization.
+#' If NULL, available cores - 1 will be used.
 #'
 #' @importFrom data.table fread fwrite
 #' @importFrom processx run

@@ -12,36 +12,36 @@
 #' The resulting table reports the connectivity from each segment,
 #' along with the stream length for all connected segments.
 #'
-#' @param g igraph object. A directed graph
+#' @param g igraph object. A directed graph.
 #' @param subc_id numeric vector of the input sub-catchment IDs
-#' (=stream segment IDs) for which to search the connected segments
-#' @param order The neighbouring order as in igraph::ego.
-#' Order=1 would be immediate neighbours of the input sub-catchment IDs,
-#' order=2 would be the order 1 plus the immediate neighbours of
-#' those sub-catchment IDs in order 1, and so on
-#' @param mode One of "in", "out", or "all". "in" reports only
-#' upstream neighbouring segments, "out" reports only the downstream segments,
-#' and "all" does both
+#' (=stream segment IDs) for which to search the connected segments.
+#' @param order numeric. The neighbouring order as in igraph::ego.
+#' Order = 1 would be immediate neighbours of the input sub-catchment IDs,
+#' order = 2 would be the order 1 plus the immediate neighbours of
+#' those sub-catchment IDs in order 1, and so on.
+#' @param mode character. One of "in", "out", or "all". "in" returns only
+#' upstream neighbouring segments, "out" returns only the downstream segments,
+#' and "all" returns both.
 #' @param var_layer character vector. One or more attributes (variable layers)
 #' of the input graph that should be reported for each output segment_id
-#' ("to_stream"). Optional
-#' @param attach_only Logical. If TRUE then the selected variables will be
-#' only attached to each for each segment without any further aggregation.
-#' @param stat One of mean, median, min, max, sd (without quotes).
-#' Aggregates (or summarizes) the variables for the neighbourhood
-#' of each input segment ("stream", e.g., the average land cover in
-#' the next five upstream segments or sub-catchments).
-#' @param n_cores Optional. Specify the number of CPUs for internal
-#' parallelization in the case of multiple stream segments / outlets.
-#' Defaults to 1. In case the graph is very large, and many segments
-#' are used as an input, setting n_cores to a higher value can speed up
-#' the computation. This comes however at the cost of possible RAM limitations
-#' and even slower processing since the large data will be copied to each CPU.
-#' Hence consider testing with n_cores=1 first.
-#' @param maxsize Optional. Specify the maximum size of the data passed to the
-#' parallel backend in MB. Defaults to 1500 (1.5 GB).
-#' Consider a higher value for
-#' large study areas (more than one 20°x20° tile).
+#' ("to_stream"). Optional.
+#' @param attach_only logical. If TRUE, the selected variables will be only
+#' attached to each segment without any further aggregation. Default is FALSE.
+#' @param stat one of the functions mean, median, min, max, sd (without quotes).
+#' Aggregates (or summarizes) the variables for the neighbourhood of each input
+#' segment ("stream", e.g., the average land cover in the next five upstream
+#' segments or sub-catchments). Default is NULL.
+#' @param n_cores numeric. Number of cores used for parallelization
+#' in the case of multiple stream segments / outlets. Default is 1.
+#' Currently, the parallelization process requires copying the data to each
+#' core. In case the graph is very large, and many segments are
+#' used as an input, setting n_cores to a higher value can speed up the
+#' computation. This comes however at the cost of possible RAM limitations
+#' and even slower processing since the large data will be copied to each core.
+#' Hence consider testing with n_cores = 1 first. Optional.
+#' @param max_size numeric. Specifies the maximum size of the data passed to the
+#' parallel back-end in MB. Default is 1500 (1.5 GB). Consider a higher value
+#' for large study areas (more than one 20°x20° tile). Optional.
 #'
 #' @importFrom future plan multisession multicore
 #' @importFrom doFuture registerDoFuture
@@ -85,10 +85,10 @@
 #' Get the up-and downstream segment neighbours in the 5th order
 #' and report the median length and source elevation
 #' for the neighbours of each input segment
-#' segment_neighbours(my_graph, subc_id=subc_id,
-#'                    order=2, mode="all", n_cores=1,
-#'                    var_layer=c("length", "source_elev"),
-#'                    stat=mean, attach_only=T)
+#' segment_neighbours(my_graph, subc_id = subc_id,
+#'                    order = 2, mode = "all", n_cores = 1,
+#'                    var_layer = c("length", "source_elev"),
+#'                    stat = mean, attach_only = T)
 #'
 #' @author Sami Domisch
 
@@ -98,7 +98,7 @@ segment_neighbours <- function(g, subc_id = NULL,
                               var_layer = NULL, stat = NULL,
                               attach_only = FALSE, order = 5,
                               mode = "in", n_cores = 1,
-                              maxsize = 1500) {
+                              max_size = 1500) {
 
   # Check input arguments
   if (class(g) != "igraph") stop(
@@ -134,7 +134,7 @@ segment_neighbours <- function(g, subc_id = NULL,
   # maxmem <- memuse::Sys.meminfo()$totalram@size-1
   # Define the size of the onjects passed to future:
   # 1500*1024^2=1572864000 , i.e. 1.5GB for one tile
-  options(future.globals.maxSize = maxsize * 1024^2)
+  options(future.globals.max_size = max_size * 1024^2)
 
   #  Remove any duplicate segmenrIDs
   subc_id <- subc_id[!duplicated(subc_id)]

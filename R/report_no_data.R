@@ -9,8 +9,8 @@
 #' @param data_dir character. Path to the directory containing all input data
 #' @param var_layer character vector of variable raster layers on disk,
 #' e.g. "slope_grad_dw_cel_h00v00.tif".
-#' @param n_cores Numeric. Number of cores used for parallelization. If NULL,
-#' available cores - 1 will be used
+#' @param n_cores numeric. Number of cores used for parallelization.
+#' If NULL, available cores - 1 will be used.
 #' @importFrom processx run
 #' @importFrom tidyr separate
 #' @importFrom parallel detectCores

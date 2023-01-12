@@ -10,8 +10,8 @@
 #' of "data" (e.g., occurrence or site IDs)
 #' @param basin_layer character. Full path to the basin ID .tif layer
 #' @param subc_layer character. Full path to the sub-catchment ID .tif layer
-#' @param quiet Whether the standard output will be printed or not (deafult
-#' is TRUE)
+#' @param quiet logical. If FALSE, the standard output will be printed.
+#' Default is TRUE.
 #'
 #' @importFrom stringi stri_rand_strings
 #' @importFrom dplyr select

@@ -8,13 +8,12 @@
 #' the input data by some factor (e.g. 1000) to achieve integer values,
 #' otherwise the GRASS GIS r.reclass will round the raster values down to
 #' the next integer which is not always desired.
-#'#'
+#'
 #' @param data a data.frame or data.table with the present and new raster values
 #' @param rast_val character. The name of the column with the present
 #' raster values
 #' @param new_val character. The name of the column with the new raster values
 #' @param rast_path Full path to the input raster .tif layer
-
 #' @param recl_layer character. Full path of the output .tif layer
 #' of the reclassified raster file
 #' @param read logical. If TRUE, then the reclassified raster .tif layer

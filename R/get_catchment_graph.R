@@ -9,33 +9,36 @@
 #' By switching the mode to either "in", "out" or "all", only the upstream,
 #' downstream or all connected segments will be returned.
 #'
-#' @param g igraph object. A directed graph
+#' @param g igraph object. A directed graph.
 #' @param subc_id numeric vector of a single or multiple IDs,
 #' e.g (c(ID1, ID2, ID3, ...). The sub-catchment (equivalent to stream segment)
 #' IDs for which to delineate the upstream drainage area.
 #' If empty, then outlets will be used as sub-catchment IDs
 #' (with outlet = TRUE). Note that you can browse the entire network online at
 #' https://geo.igb-berlin.de/maps/351/view and to left hand side, select the
-#' "Stream segment ID"  layer and click on the map to get the ID. Optional
-#' @param outlet logical. If TRUE, then the outlets of the given network graph
-#' will be used as additional input subc_ids.
-#' Outlets will be identified internally as those stream segments that do not
-#' have any downstream connected segment
-#' @param as_graph logical. If TRUE then the output will be a new graph
-#' or a list of new graphs with the original attributes,
-#' If FALSE (the default), then the output will be a new data.table,
-#' or a list of data.tables. List objects are named after the subc_ids.
-#' @param mode character. Can be either "in", "out" or "all". "in" will
-#' delineate the upstream catchment, "out" delineates the downstream catchment
-#' (all segments that are reachable from the given input segment), and
-#' "all" does both.
-#' @param n_cores numeric. Optional. Specify the number of CPUs for internal
-#' parallelization in the case of multiple stream segments / outlets. Defaults
-#' to 1. Setting a higher number is might be slower in the end, as the data has
-#' to be provided to each CPU (worker) which can take time.
-#' @param maxsize Optional. Specify the maximum size of the data passed to the
-#' parallel backend in MB. Defaults to 1500 (1.5 GB). Consider a higher value
-#' for large study areas (more than one 20°x20° tile).
+#' "Stream segment ID"  layer and click on the map to get the ID. Optional.
+#' @param outlet logical. If TRUE, the outlets of the given network graph will
+#' be used as additional input subc_ids. Outlets will be identified internally
+#' as those stream segments that do not have any downstream connected segment.
+#' Default is FALSE.
+#' @param as_graph logical. If TRUE, the output will be a new graph or a list
+#' of new graphs with the original attributes. If FALSE, the output  will be a
+#' new data.table or a list of data.tables. List objects are named after the
+#' subc_ids. Default is FALSE.
+#' @param mode character. One of "in", "out" or "all". "in" returns the
+#' upstream catchment, "out" returns the downstream catchment (all catchments
+#' that are reachable from the given input segment), and "all" returns both.
+#' @param n_cores numeric. Number of cores used for parallelization
+#' in the case of multiple stream segments / outlets. Default is 1.
+#' Currently, the parallelization process requires copying the data to each
+#' core. In case the graph is very large, and many segments are
+#' used as an input, setting n_cores to a higher value can speed up the
+#' computation. This comes however at the cost of possible RAM limitations
+#' and even slower processing since the large data will be copied to each core.
+#' Hence consider testing with n_cores = 1 first. Optional.
+#' @param max_size numeric. Specifies the maximum size of the data passed to the
+#' parallel back-end in MB. Default is 1500 (1.5 GB). Consider a higher value
+#' for large study areas (more than one 20°x20° tile). Optional.
 #'
 #' @return A graph or data.table that reports all subc_ids.
 #' In case of multiple input segments, the results are stored in a list.
@@ -65,7 +68,7 @@
 #' subc_id = "513855877"
 #' # Get the upstream catchment as a graph
 #' g_up <- get_catchment_graph(g, subc_id = subc_id, mode = "in",
-#'                             outlet = FALSE, as_graph = TRUE, n_cores =1)
+#'                             outlet = FALSE, as_graph = TRUE, n_cores = 1)
 #'
 #' # Get the downstream segments as a data.table,
 #' g_down <- get_catchment_graph(g, subc_id = subc_id, mode = "out",
@@ -73,13 +76,13 @@
 #'
 #' # Get the catchments of all outlets in the study area as a graph
 #' g_all <- get_catchment_graph(g, mode = "in", outlet = TRUE, as_graph = TRUE,
-#'                              n_cores=1)
+#'                              n_cores = 1)
 #'
 #' @author Sami Domisch
 
 
 get_catchment_graph <- function(g, subc_id = NULL, outlet = FALSE,
-mode = NULL, as_graph = FALSE, n_cores = 1, maxsize = 1500) {
+mode = NULL, as_graph = FALSE, n_cores = 1, max_size = 1500) {
 
   # Check input arguments
   if (class(g) != "igraph")     stop("Input must be an igraph object.")
@@ -106,9 +109,9 @@ mode = NULL, as_graph = FALSE, n_cores = 1, maxsize = 1500) {
 
   # Set available RAM for future.apply
   # maxmem <- memuse::Sys.meminfo()$totalram@size-1
-  # Define the size of the onjects passed to future:
+  # Define the size of the objects passed to future:
   # 1500*1024^2=1572864000 , i.e. 1.5GB for one tile
-  options(future.globals.maxSize = maxsize * 1024^2)
+  options(future.globals.max_size = max_size * 1024^2)
   # Avoid exponential numbers in the table and IDs,
   # only set this only within the function
   options(scipen = 999)

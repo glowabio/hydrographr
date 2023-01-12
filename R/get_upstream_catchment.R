@@ -12,9 +12,10 @@
 #' @param out_path Full path to the directory where the output(s)
 #' will be stored.
 #' To identify the upstream catchment the output file name includes the site id.
-#' @param n_cores Numeric. Number of cores used for parallelization.
-#' @param quiet If FALSE, process is printed
-#'
+#' @param n_cores numeric. Number of cores used for parallelization.
+#' If NULL, available cores - 1 will be used.
+#' @param quiet logical. If FALSE, the standard output will be printed.
+#' Default is TRUE.
 #' @importFrom stringi stri_rand_strings
 #' @importFrom dplyr select
 #' @importFrom data.table fread fwrite
@@ -69,7 +70,7 @@
 #'                                             basin_path = basin_rast,
 #'                                             subc_path = subc_rast,
 #'                                             stream_path = stream_vect,
-#'                                             cores = 2)
+#'                                             n_cores = 2)
 #'
 #' # Define full path to the direction .tif
 #' direction_rast <- paste0(my_directory,

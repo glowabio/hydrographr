@@ -2,11 +2,11 @@
 #' The change happens in-place, meaning that the original file is overwritten
 #' on disk.
 #'
-#' @param data_dir character. Path to the directory containing all input layers
-#' @param var_layer character vector of var_layer layers on disk,
+#' @param data_dir character. Path to the directory containing all input data.
+#' @param var_layer character vector of variable layers on disk,
 #' e.g. c("sti_h16v02.tif", "slope_grad_dw_cel_h00v00.tif").
 #' The original files will be overwritten.
-#' @param no_data numeric. The desired NoData value
+#' @param no_data numeric. The desired NoData value.
 #'
 #' @importFrom processx run
 #' @importFrom stringr str_split

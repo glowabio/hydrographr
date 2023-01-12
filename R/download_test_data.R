@@ -9,7 +9,7 @@
 #' with this function to a desired path.
 #'
 #' @param download_dir character. The directory where the files will be
-#' downloaded
+#' downloaded.
 #' @author Afroditi Grigoropoulou
 #' @export
 #'

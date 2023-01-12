@@ -1,13 +1,14 @@
 #' Downloads multiple files from Nimbus
 #' by calling the function download_tiles_base in a loop.
 #'
-#' @param variable character vector of variable names
-#' @param file_format character. Format of the requested file ("tif" or "gpkg")
-#' @param tile_id character vector. The IDs of the requested tiles
-#' @param reg_unit_id character vector. The IDs of the requested regional units
-#' @param global Should the global file be downloaded or not.
-#' TRUE/FALSE, FALSE by default (logical)
-#' @param download_dir character. The directory where the files will be downloaded
+#' @param variable character vector of variable names.
+#' @param file_format character. Format of the requested file ("tif" or "gpkg").
+#' @param tile_id character vector. The IDs of the requested tiles.
+#' @param reg_unit_id character vector. The IDs of the requested regional units.
+#' @param global logical. If TRUE, the global extent file is downloaded.
+#' Default is FALSE.
+#' @param download_dir character. The directory where the files will be
+#' downloaded.
 #' @importFrom tidyr separate
 #' @importFrom stringr str_split_fixed str_extract
 #'
@@ -70,7 +71,7 @@ download_tiles <- function(variable, file_format = "tif",
                                     file_size_table_sep$varname_tile)))
   # Get the valid file_formats of the hydrography variables
   # to check that the requested variable exists
-  valid_file_formats <- sort(unique(file_size_table_sep$varname_tile))
+  h90m_file_formats <- sort(unique(file_size_table_sep$varname_tile))
 
   # Get the valid tile ids of the hydrography
   # to check that the requested tile exists
@@ -110,7 +111,7 @@ download_tiles <- function(variable, file_format = "tif",
                                         global = global,
                                         h90m_varnames = h90m_varnames,
                                         h90m_tile_id = h90m_tile_id,
-                                        valid_file_formats = valid_file_formats,
+                                        h90m_file_formats = h90m_file_formats,
                                         file_size_table_sep = file_size_table_sep)
 
       tile_size_sum <- tile_size_sum + tile_size
