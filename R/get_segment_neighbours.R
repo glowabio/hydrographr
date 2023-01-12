@@ -8,22 +8,23 @@
 #' we use the term "subc_id".
 #'
 #' This function can also be used to create the connectivity table
-#' for Marxan by using variable="length" and attach_only=TRUE.
+#' for Marxan by using var_layer="length" and attach_only=TRUE.
 #' The resulting table reports the connectivity from each segment,
 #' along with the stream length for all connected segments.
 #'
-#' @param g A directed graph (igraph object).
-#' @param subc_id The input sub-catchment IDs (=stream segment IDs) as a
-#' numerical vector for which to search the connected segments.
+#' @param g igraph object. A directed graph
+#' @param subc_id numeric vector of the input sub-catchment IDs
+#' (=stream segment IDs) for which to search the connected segments
 #' @param order The neighbouring order as in igraph::ego.
 #' Order=1 would be immediate neighbours of the input sub-catchment IDs,
 #' order=2 would be the order 1 plus the immediate neighbours of
-#' those sub-catchment IDs in order 1, and so on.
+#' those sub-catchment IDs in order 1, and so on
 #' @param mode One of "in", "out", or "all". "in" reports only
 #' upstream neighbouring segments, "out" reports only the downstream segments,
-#' and "all" does both.
-#' @param variable optional. One or more attribute(s) or variable(s) of the
-#' input graph that should be reported for each output subc_id ("to_stream").
+#' and "all" does both
+#' @param var_layer character vector. One or more attributes (variable layers)
+#' of the input graph that should be reported for each output segment_id
+#' ("to_stream"). Optional
 #' @param attach_only Logical. If TRUE then the selected variables will be
 #' only attached to each for each segment without any further aggregation.
 #' @param stat One of mean, median, min, max, sd (without quotes).
@@ -63,30 +64,30 @@
 #'
 #' # Load the stream network as graph
 #' g <- read_geopackage(paste0(my_directory, "/order_vect_59.gpkg"),
-#' type="net", g=T)
+#' type = "net", g = T)
 #'
 #' # Get the upstream segment neighbours in the 5th order
 #' and report the length and source elevation
 #' for the neighbours of each input segment
-#' segment_neighbours(g, subc_id=subc_id,
-#'                    order=5, mode="in", n_cores=1,
-#'                    variable=c("length", "source_elev"),
-#'                    attach_only=T)
+#' segment_neighbours(g, subc_id = subc_id,
+#'                    order = 5, mode = "in", n_cores = 1,
+#'                    var_layer = c("length", "source_elev"),
+#'                    attach_only = T)
 #'
 #' # Get the downstream segment neighbours in the 5th order
 #' and calculate the median length and source elevation
 #' across the neighbours of each input segment
-#' segment_neighbours(my_graph, subc_id=subc_id,
-#'                    order=2, mode="out", n_cores=1,
-#'                    variable=c("length", "source_elev"),
-#'                    stat=median)
+#' segment_neighbours(my_graph, subc_id = subc_id,
+#'                    order = 2, mode ="out", n_cores = 1,
+#'                    var_layer = c("length", "source_elev"),
+#'                    stat = median)
 #'
 #' Get the up-and downstream segment neighbours in the 5th order
 #' and report the median length and source elevation
 #' for the neighbours of each input segment
 #' segment_neighbours(my_graph, subc_id=subc_id,
 #'                    order=2, mode="all", n_cores=1,
-#'                    variable=c("length", "source_elev"),
+#'                    var_layer=c("length", "source_elev"),
 #'                    stat=mean, attach_only=T)
 #'
 #' @author Sami Domisch
@@ -94,7 +95,7 @@
 
 
 segment_neighbours <- function(g, subc_id = NULL,
-                              variable = NULL, stat = NULL,
+                              var_layer = NULL, stat = NULL,
                               attach_only = FALSE, order = 5,
                               mode = "in", n_cores = 1,
                               maxsize = 1500) {
@@ -124,9 +125,9 @@ segment_neighbours <- function(g, subc_id = NULL,
       or leave it empty to allow an automatic setup.")
   }
 
-  if (attach_only == TRUE && missing(variable)) stop(
-    "No variable specified that should be attached to the stream segments.
-    Please provide at least one variable from the input graph.")
+  if (attach_only == TRUE && missing(var_layer)) stop(
+    "No var_layer specified that should be attached to the stream segments.
+    Please provide at least one var_layer from the input graph.")
 
 
   # Set available RAM for future.apply
@@ -186,13 +187,13 @@ segment_neighbours <- function(g, subc_id = NULL,
   dt <- unique(dt) # remove any duplicates, if any
 
   # If aggregation was defined:
-  if (!missing(variable)) {
+  if (!missing(var_layer)) {
 
 
-    cat("Attaching the attribute(s)", variable, "\n")
+    cat("Attaching the attribute(s)", var_layer, "\n")
     # Get the attributes for all edges of the full graph
     lookup_dt <- as.data.table(
-      as_long_data_frame(g)[c("ver[el[, 1], ]", variable)])
+      as_long_data_frame(g)[c("ver[el[, 1], ]", var_layer)])
     names(lookup_dt)[1] <- "to_stream"
 
     # Merge the network attributes and sort:
@@ -204,17 +205,17 @@ segment_neighbours <- function(g, subc_id = NULL,
     # Remove the from-stream, self-reference
     dt_join <- dt_join[dt_join$stream != dt_join$to_stream, ]
     # Set col order
-    setcolorder(dt_join, c("stream", "to_stream", variable))
+    setcolorder(dt_join, c("stream", "to_stream", var_layer))
 
     # Export only attached data
     if (attach_only == TRUE) {
       return(dt_join)
-      # Else aggregate the variables to each "from" stream
+      # Else aggregate the var_layers to each "from" stream
     } else if (attach_only == FALSE && !missing(stat))   {
-      cat("Aggregating variable(s)", variable, "for each subc_id.\n")
+      cat("Aggregating variable(s)", var_layer, "for each subc_id.\n")
 
       dt_agg <- dt_join[, lapply(.SD, stat, na.rm = TRUE),
-                        .SDcols = variable,
+                        .SDcols = var_layer,
                         by = "stream"]
       dt_agg <- dt_agg[order(-rank(stream))]
       return(dt_agg)

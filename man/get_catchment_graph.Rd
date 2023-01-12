@@ -52,28 +52,29 @@ for large study areas (more than one 20°x20° tile).}
 }
 \value{
 A graph or datatable that reports all subc_ids.
-In case of multiple input segements, the results are stored in a list.
+In case of multiple input segments, the results are stored in a list.
 }
 \description{
 Subset the network graph by extracting the upstream, downstream or entire
-catchment, for one or multiple stream segments.
-The function will return either one or more data.tables or
-graph objects for each input stream segment.
+catchment, for one or multiple stream segments. The function will return
+either one or more data.tables or graph objects for each input stream
+segment. Note that the stream segment and sub-catchment IDs are identical,
+and for consistency, we use the term "subc_id".
 }
 \details{
 By switching the mode to either "in", "out" or "all", only the upstream,
 downstream or all connected segments will be returned.
 }
 \examples{
-# Specify the path for the test data
-DATADIR="path/to/directory"
+library(hydrographr)
 
-# Load example data
-download_test_data(DATADIR)
+# Download test data into temporary R folder
+my_directory <- tempdir()
+download_test_data(my_directory)
 
 # Load stream network as a graph
-g <- read_geopackage(paste0(DATADIR, "/order_vect_59.gpkg"), type = "net",
-                     g = TRUE)
+g <- read_geopackage(paste0(my_directory, "/order_vect_59.gpkg"),
+                            type = "net", as_graph = TRUE)
 
 # Pick a random subc_id
 subc_id = "513855877"

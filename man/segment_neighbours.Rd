@@ -19,8 +19,8 @@ segment_neighbours(
 \arguments{
 \item{g}{A directed graph (igraph object).}
 
-\item{subc_id}{The input sub-catchment IDs as a numerical vector
-for which to search the connected segments.}
+\item{subc_id}{The input sub-catchment IDs (=stream segment IDs) as a
+numerical vector for which to search the connected segments.}
 
 \item{variable}{optional. One or more attribute(s) or variable(s) of the
 input graph that should be reported for each output subc_id ("to_stream").}
@@ -59,7 +59,9 @@ large study areas (more than one 20°x20° tile).}
 For each segment, report those upstream, downstream, or up-and
 downstream segments that are connected to one or multiple input
 segments within a specified neighbour order, with the option to
-summarize attributes across these segments.
+summarize attributes across these segments. Note that the stream
+segment and sub-catchment IDs are identical, and for consistency,
+we use the term "subc_id".
 }
 \details{
 This function can also be used to create the connectivity table
@@ -70,14 +72,13 @@ along with the stream length for all connected segments.
 \examples{
 library(hydrographr)
 
-# Specify the working directory of the test data
-DATADIR <- "path/to/test_data"
-
-# Download the test data
-download_test_data(DATADIR)
+# Download test data into temporary R folder
+my_directory <- tempdir()
+download_test_data(my_directory)
 
 # Load the stream network as graph
-g <- read_geopackage(paste0(DATADIR, "/order_vect_59.gpkg"), type="net", g=T)
+g <- read_geopackage(paste0(my_directory, "/order_vect_59.gpkg"),
+type="net", g=T)
 
 # Get the upstream segment neighbours in the 5th order
 and report the length and source elevation

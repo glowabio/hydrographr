@@ -8,10 +8,10 @@ read_geopackage(
   filename,
   type = NULL,
   SQL_table = NULL,
-  dt = FALSE,
-  g = FALSE,
-  sf = FALSE,
-  SpatVect = FALSE
+  as_dt = FALSE,
+  as_graph = FALSE,
+  as_sf = FALSE,
+  as_SpatVect = FALSE
 )
 }
 \arguments{
@@ -26,38 +26,51 @@ to import from the GeoPackage.
 This is set automatically for the Hydrography90m data,
 and needs to be specified for any other data.}
 
-\item{dt}{If TRUE, import the GeoPackage as a data.table.}
+\item{as_dt}{If TRUE, import the GeoPackage as a data.table.}
 
-\item{g}{If TRUE, import the GeoPackage as a directed graph (igraph object).
-Only possible for a network.}
+\item{as_graph}{If TRUE, import the GeoPackage as a directed graph
+(igraph object). Only possible for a network.}
 
-\item{sf}{If TRUE, import the GeoPackage as a spatial dataframe (sf object).}
+\item{as_sf}{If TRUE, import the GeoPackage as a spatial dataframe
+(sf object).}
 
-\item{SpatVect}{If TRUE, import the GeoPackage as a
-SpatVecteor (terra object).}
+\item{as_SpatVect}{If TRUE, import the GeoPackage as a
+SpatVector (terra object).}
 }
 \description{
-Read a Geopackage vector file from disk either as a table (data.table),
+Read a GeoPackage vector file from disk either as a table (data.table),
 as a directed graph object (igraph), a spatial dataframe (sf)
 or a SpatVect object (terra).
 }
 \examples{
+ibrary(hydrographr)
+
+# Download test data into temporary R folder
+my_directory <- tempdir()
+download_test_data(my_directory)
+
 # Read the stream network as a graph
-my_graph <- read_geopackage("order_vect_59.gpkg", type="net", g=T)
+my_graph <- read_geopackage(paste0(my_directory, "/order_vect_59.gpkg"),
+type="net", as_graph=T)
 
 # Read the stream network as a data.table
-my_dt <- read_geopackage("order_vect_59.gpkg", type="net", dt=T)
+my_dt <- read_geopackage(paste0(my_directory, "/order_vect_59.gpkg"),
+type="net", as_dt=T)
 
 # Read the sub-catchments as a data.table
-my_dt <- read_geopackage("sub_catchment_59.gpkg", type="catch", dt=T)
+my_dt <- read_geopackage(paste0(my_directory, "/order_vect_59.gpkg"),
+type="catch", as_dt=T)
 
 # Read the basin as a SF-object
-my_sf <- read_geopackage("basin_59.gpkg", type="basin", sf=T)
+my_sf <- read_geopackage(paste0(my_directory, "/order_vect_59.gpkg"),
+type="basin", as_sf=T)
 
 #' # Read the basin as SpatVect object
-my_sf <- read_geopackage("basin_59.gpkg", type="basin", SpatVect=T)
+my_sf <- read_geopackage(paste0(my_directory, "/order_vect_59.gpkg"),
+type="basin", as_SpatVect=T)
 # Read the outlets as data.table
-my_sf <- read_geopackage("outlet_59.gpkg", type="outlet", sf=T)
+my_sf <- read_geopackage(paste0(my_directory, "/order_vect_59.gpkg"),
+type="outlet", as_sf=T)
 
 }
 \author{

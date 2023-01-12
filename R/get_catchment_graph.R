@@ -9,28 +9,27 @@
 #' By switching the mode to either "in", "out" or "all", only the upstream,
 #' downstream or all connected segments will be returned.
 #'
-#' @param g A directed graph (igraph object).
-#' @param subc_id Optional.
-#' The sub-catchments (equivalent to stream segment) IDs for which
-#' to delineate the upstream drainage area. Can be a single ID or a vector of
-#' multiple IDs (c(ID1, ID2, ID3, ...).
+#' @param g igraph object. A directed graph
+#' @param subc_id numeric vector of a single or multiple IDs,
+#' e.g (c(ID1, ID2, ID3, ...). The sub-catchment (equivalent to stream segment)
+#' IDs for which to delineate the upstream drainage area.
 #' If empty, then outlets will be used as sub-catchment IDs
-#' (with outlet=TRUE). Note that you can browse the entire network online at
+#' (with outlet = TRUE). Note that you can browse the entire network online at
 #' https://geo.igb-berlin.de/maps/351/view and to left hand side, select the
-#' "Stream segment ID"  layer and click on the map to get the ID.
-#' @param outlet Logical. If TRUE, then the outlets of the given network graph
+#' "Stream segment ID"  layer and click on the map to get the ID. Optional
+#' @param outlet logical. If TRUE, then the outlets of the given network graph
 #' will be used as additional input subc_ids.
 #' Outlets will be identified internally as those stream segments that do not
-#' have any downstream connected segment.
-#' @param as_graph Logical. If TRUE then the output will be a new graph
+#' have any downstream connected segment
+#' @param as_graph logical. If TRUE then the output will be a new graph
 #' or a list of new graphs with the original attributes,
 #' If FALSE (the default), then the output will be a new data.table,
 #' or a list of data.tables. List objects are named after the subc_ids.
-#' @param mode Can be either "in", "out" or "all". "in" will delineate
-#' the upstream catchment, "out" delineates the downstream catchment
+#' @param mode character. Can be either "in", "out" or "all". "in" will
+#' delineate the upstream catchment, "out" delineates the downstream catchment
 #' (all segments that are reachable from the given input segment), and
 #' "all" does both.
-#' @param n_cores Optional. Specify the number of CPUs for internal
+#' @param n_cores numeric. Optional. Specify the number of CPUs for internal
 #' parallelization in the case of multiple stream segments / outlets. Defaults
 #' to 1. Setting a higher number is might be slower in the end, as the data has
 #' to be provided to each CPU (worker) which can take time.
@@ -38,7 +37,7 @@
 #' parallel backend in MB. Defaults to 1500 (1.5 GB). Consider a higher value
 #' for large study areas (more than one 20°x20° tile).
 #'
-#' @return A graph or datatable that reports all subc_ids.
+#' @return A graph or data.table that reports all subc_ids.
 #' In case of multiple input segments, the results are stored in a list.
 #'
 #' @importFrom future plan multisession multicore sequential
