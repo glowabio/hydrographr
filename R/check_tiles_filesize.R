@@ -1,4 +1,4 @@
-#' Check the size of single files before downloading.
+#' Internal function that checks the size of single files before downloading.
 #' It is called and inherits arguments by the function 'download_tiles()'
 #'
 #' @param variable character vector of variable names.

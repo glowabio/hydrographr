@@ -1,4 +1,4 @@
-#' Extract values from the stream order .gpkg files.
+#' Extracts values from the stream order .gpkg files.
 #'
 #' The function reads the attribute table of the stream network GeoPackage file
 #' (.gpkg) stored on disk and extracts the data for one or more (or all) input

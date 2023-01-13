@@ -2,7 +2,7 @@
 % Please edit documentation in R/check_tiles_filesize.R
 \name{check_tiles_filesize}
 \alias{check_tiles_filesize}
-\title{Check the size of single files before downloading.
+\title{Internal function that checks the size of single files before downloading.
 It is called and inherits arguments by the function 'download_tiles()'}
 \usage{
 check_tiles_filesize(
@@ -40,7 +40,7 @@ available for download (inherited by 'download_tiles()').}
 and sizes (inherited by 'download_tiles()').}
 }
 \description{
-Check the size of single files before downloading.
+Internal function that checks the size of single files before downloading.
 It is called and inherits arguments by the function 'download_tiles()'
 }
 \keyword{internal}

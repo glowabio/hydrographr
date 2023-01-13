@@ -43,7 +43,7 @@ as a directed graph object (igraph), a spatial dataframe (sf)
 or a SpatVect object (terra).
 }
 \examples{
-ibrary(hydrographr)
+library(hydrographr)
 
 # Download test data into temporary R folder
 my_directory <- tempdir()
@@ -51,26 +51,26 @@ download_test_data(my_directory)
 
 # Read the stream network as a graph
 my_graph <- read_geopackage(paste0(my_directory, "/order_vect_59.gpkg"),
-type="net", as_graph=T)
+type = "net", as_graph = T)
 
 # Read the stream network as a data.table
 my_dt <- read_geopackage(paste0(my_directory, "/order_vect_59.gpkg"),
-type="net", as_dt=T)
+type = "net", as_dt = T)
 
 # Read the sub-catchments as a data.table
 my_dt <- read_geopackage(paste0(my_directory, "/order_vect_59.gpkg"),
-type="subc", as_dt=T)
+type = "subc", as_dt = T)
 
 # Read the basin as a SF-object
 my_sf <- read_geopackage(paste0(my_directory, "/order_vect_59.gpkg"),
-type="basin", as_sf=T)
+type = "basin", as_sf = T)
 
 #' # Read the basin as SpatVect object
 my_sf <- read_geopackage(paste0(my_directory, "/order_vect_59.gpkg"),
-type="basin", as_SpatVect=T)
+type = "basin", as_SpatVect = T)
 # Read the outlets as data.table
 my_sf <- read_geopackage(paste0(my_directory, "/order_vect_59.gpkg"),
-type="outlet", as_sf=T)
+type = "outlet", as_sf = T)
 
 }
 \author{

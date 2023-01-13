@@ -1,14 +1,14 @@
-#' @title Crop a raster layer to a specific extent on disk
+#' @title Crops a raster layer to a specific extent on disk
 #'
 #' @description This function crops an input raster layer directly on disk,
-#' i.e. the input layer does not be needed to be loaded into R. The function
-#' crops a raster .tif to a polygon border line if a vector layer
-#' (cutline source) is provided, otherwise if a bounding box is provided
+#' i.e. the input layer does not need to be loaded into R. The raster .tif is
+#' cropped to a polygon border line if a vector layer (cutline source) is
+#' provided, otherwise if a bounding box is provided
 #' (xmin, ymin, xmax, ymax coordinates or a spatial object from which to extract
 #' a bounding box), the raster is cropped to the extent of the bounding box. At
 #' least a cutline source (vector_layer) or a bounding box (bounding_box)
-#' must be provided. The output is always written to disk, and can be
-#' optionally loaded directly into R as a SpatRaster (terra package) object
+#' should be provided. The output is always written to disk, and can be
+#' optionally loaded into R as a SpatRaster (terra package) object
 #' (using read = TRUE).
 #'
 #' @param raster_layer character. Full path to the input raster .tif layer

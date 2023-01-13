@@ -8,7 +8,7 @@
 #' @param global logical. If TRUE, the global extent file is downloaded.
 #' Default is FALSE.
 #' @param download_dir character. The directory where the files will be
-#' downloaded.
+#' downloaded. Default is the working directory.
 #' @importFrom tidyr separate
 #' @importFrom stringr str_split_fixed str_extract
 #'

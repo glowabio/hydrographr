@@ -1,5 +1,6 @@
-#' Downloads a single file from
-#' https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4?path=%2F.
+#' Internal function that downloads a single file from
+#' https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4?path=%2F or the
+#' GDrive folder.
 #' It is called and inherits arguments by the function 'download_tiles()'.
 #'
 #' @param variable character vector of variable names.
@@ -8,7 +9,7 @@
 #' @param global logical. If TRUE, the global extent file is downloaded.
 #' Default is FALSE.
 #' @param download_dir character. The directory where the files will be
-#' downloaded.
+#' downloaded. Default is the working directory.
 #' @param file_size_table_sep data.frame. Lookup table including file names
 #' and sizes (inherited by 'download_tiles()').
 #' @param server_url character. url to the the home download folder
