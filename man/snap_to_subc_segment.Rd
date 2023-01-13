@@ -2,7 +2,7 @@
 % Please edit documentation in R/snap_to_subc_segment.R
 \name{snap_to_subc_segment}
 \alias{snap_to_subc_segment}
-\title{Snaps data points to the stream segment within the sub-catchment}
+\title{Snap points to stream segment within the sub-catchment}
 \usage{
 snap_to_subc_segment(
   data,

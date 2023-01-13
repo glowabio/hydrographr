@@ -2,7 +2,7 @@
 % Please edit documentation in R/extract_from_gpkg.R
 \name{extract_from_gpkg}
 \alias{extract_from_gpkg}
-\title{Extracts values from the stream order .gpkg files.}
+\title{Extract values from the stream order .gpkg files.}
 \usage{
 extract_from_gpkg(
   data_dir,

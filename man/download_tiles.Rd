@@ -2,8 +2,7 @@
 % Please edit documentation in R/download_tiles.R
 \name{download_tiles}
 \alias{download_tiles}
-\title{Downloads multiple files from Nimbus
-by calling the function download_tiles_base in a loop.}
+\title{Download files of the Hydrography90m dataset}
 \usage{
 download_tiles(
   variable,
@@ -30,8 +29,12 @@ Default is FALSE.}
 downloaded. Default is the working directory.}
 }
 \description{
-Downloads multiple files from Nimbus
-by calling the function download_tiles_base in a loop.
+The function downloads files of the Hydrography90m
+dataset, available at https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4?path=%2F .
+The files will be stored in the folder architecture of the above domain.
+Multiple regular tile or regional unit files can be requested in a single
+call of the function. The tile or regional unit IDs can be obtained
+using the functions "get_tile_id" and "get_regional_unit_id" respectively.
 }
 \examples{
 # Download data for two variables in three regular tiles

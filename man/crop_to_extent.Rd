@@ -2,7 +2,7 @@
 % Please edit documentation in R/crop_to_extent.R
 \name{crop_to_extent}
 \alias{crop_to_extent}
-\title{Crops a raster layer to a specific extent on disk}
+\title{Crop raster to extent}
 \usage{
 crop_to_extent(
   raster_layer,

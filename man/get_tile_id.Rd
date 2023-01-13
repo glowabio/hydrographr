@@ -2,9 +2,7 @@
 % Please edit documentation in R/get_tile_id.R
 \name{get_tile_id}
 \alias{get_tile_id}
-\title{Identifies the ids of the tiles within the Hydrography90m data in which the
-given points are located. The IDs are required to then download
-the data using download_tiles(). Input is a point data frame.}
+\title{Get the Hydrography90m regular tile ID}
 \usage{
 get_tile_id(data, lon, lat)
 }
@@ -16,8 +14,8 @@ get_tile_id(data, lon, lat)
 \item{lat}{character. The name of the column with the latitude coordinates.}
 }
 \description{
-Identifies the ids of the tiles within the Hydrography90m data in which the
-given points are located. The IDs are required to then download
+Identifies the ids of the tiles within the Hydrography90m data
+in which the given points are located. The IDs are required to then download
 the data using download_tiles(). Input is a point data frame.
 }
 \examples{

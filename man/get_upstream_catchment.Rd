@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_upstream_catchment.R
 \name{get_upstream_catchment}
 \alias{get_upstream_catchment}
-\title{Calculates the upstream basin taking each point as the outlet}
+\title{Calculate upstream basin}
 \usage{
 get_upstream_catchment(
   data,
@@ -18,7 +18,7 @@ get_upstream_catchment(
 \arguments{
 \item{data}{a data.frame or data.table with lat/lon coordinates in WGS84,
 which have been snapped to the stream network.
-The snapping can be done using the function 'snap_to_network'}
+The snapping can be done using the function 'snap_to_network'.}
 
 \item{id}{character. The name of a column containing unique IDs for each row
 of "data" (e.g., occurrence or site IDs).}
@@ -41,7 +41,8 @@ If NULL, available cores - 1 will be used.}
 Default is TRUE.}
 }
 \description{
-Calculates the upstream basin taking each point as the outlet
+Calculates the upstream basin of a given point, considering the
+point as the outlet.
 }
 \examples{
 # Download test data into temporary R folder

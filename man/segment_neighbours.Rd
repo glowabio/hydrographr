@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_segment_neighbours.R
 \name{segment_neighbours}
 \alias{segment_neighbours}
-\title{Gets stream segment neighbours}
+\title{Get stream segment neighbours}
 \usage{
 segment_neighbours(
   g,
@@ -63,8 +63,7 @@ segments within a specified neighbour order, with the option to
 summarize attributes across these segments. Note that the stream
 segment and sub-catchment IDs are identical, and for consistency,
 we use the term "subc_id".
-}
-\details{
+
 This function can also be used to create the connectivity table
 for Marxan by using var_layer="length" and attach_only=TRUE.
 The resulting table reports the connectivity from each segment,

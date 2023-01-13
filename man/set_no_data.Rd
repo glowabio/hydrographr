@@ -2,9 +2,7 @@
 % Please edit documentation in R/set_no_data.R
 \name{set_no_data}
 \alias{set_no_data}
-\title{Change or set the NoData value for a raster layer.
-The change happens in-place, meaning that the original file is overwritten
-on disk.}
+\title{Set no data value}
 \usage{
 set_no_data(data_dir, var_layer, no_data)
 }

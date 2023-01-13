@@ -2,10 +2,7 @@
 % Please edit documentation in R/get_regional_unit_id.R
 \name{get_regional_unit_id}
 \alias{get_regional_unit_id}
-\title{Identifies the IDs of the regional units within the Hydrography90m data
-in which the input points are located. The IDs are required to then download
-the data using download_tiles().
-Input is a point data frame.}
+\title{Get Hydrography90m regional unit IDs}
 \usage{
 get_regional_unit_id(data, lon, lat, quiet = TRUE)
 }

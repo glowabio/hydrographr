@@ -62,8 +62,7 @@ catchment, for one or multiple stream segments. The function will return
 either one or more data.tables or graph objects for each input stream
 segment. Note that the stream segment and sub-catchment IDs are identical,
 and for consistency, we use the term "subc_id".
-}
-\details{
+
 By switching the mode to either "in", "out" or "all", only the upstream,
 downstream or all connected segments will be returned.
 }

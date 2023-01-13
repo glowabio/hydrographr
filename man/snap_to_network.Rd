@@ -2,8 +2,7 @@
 % Please edit documentation in R/snap_to_network.R
 \name{snap_to_network}
 \alias{snap_to_network}
-\title{Snap data points to the next stream segment within a defined radius
-or a minimum flow accumulation.}
+\title{Snap points to stream segment based on distance or flow accumulation}
 \usage{
 snap_to_network(
   data,
@@ -53,7 +52,7 @@ given value. Default is 0.5.}
 Default is TRUE.}
 }
 \description{
-Snap data points to the next stream segment within a defined radius
+Snap points to the next stream segment within a defined radius
 or a minimum flow accumulation.
 }
 \details{

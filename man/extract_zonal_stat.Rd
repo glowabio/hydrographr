@@ -2,8 +2,7 @@
 % Please edit documentation in R/extract_zonal_stat.R
 \name{extract_zonal_stat}
 \alias{extract_zonal_stat}
-\title{Calculate zonal statistics based on one or more environmental variable
-raster .tif layers.}
+\title{Calculate zonal statistics}
 \usage{
 extract_zonal_stat(
   data_dir,
@@ -48,6 +47,8 @@ multiple .tif files are provided to var_layer.}
 Default is TRUE.}
 }
 \description{
+Calculate zonal statistics based on one or more environmental variable
+raster .tif layers.
 This function can be used to aggregate data across a set (or all)
 sub-catchments. The sub-catchment raster (.tif) input file is stored on disk.
 The output is a data.table which is loaded into R.

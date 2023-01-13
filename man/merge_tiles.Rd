@@ -2,7 +2,7 @@
 % Please edit documentation in R/merge_tile.R
 \name{merge_tiles}
 \alias{merge_tiles}
-\title{Merges multiple raster or spatial vector objects}
+\title{Merge raster or vector objects}
 \usage{
 merge_tiles(tile_dir, out_dir, read_raster = TRUE, read_vector = FALSE)
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/report_no_data.R
 \name{report_no_data}
 \alias{report_no_data}
-\title{Reports NoData value of raster layers.}
+\title{Report NoData value}
 \usage{
 report_no_data(data_dir, var_layer, n_cores = NULL)
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/download_test_data.R
 \name{download_test_data}
 \alias{download_test_data}
-\title{Downloads the test data for the Hydrography90m dataset}
+\title{Download test data}
 \usage{
 download_test_data(download_dir = ".")
 }
@@ -11,14 +11,17 @@ download_test_data(download_dir = ".")
 downloaded. Default location is the working directory.}
 }
 \description{
-The test data contains all Hydrography90m and species point observation data
-for a small geographic extent to test the functions.
-}
-\details{
+Download the test data of the package, which includes all
+Hydrography90m and species point observation data
+for a small geographic extent, to test the functions.
+
 The test data is available at
 https://drive.google.com/file/d/1kYNWXmtVm6X7MZLISOePGpvxB1pk1scD/view?usp=share_link
 and can be automatically downloaded and unzipped
 with this function to a desired path.
+}
+\details{
+Downloads the test data for the Hydrography90m dataset
 }
 \examples{
 # Download the test data to the current working directory

@@ -2,7 +2,7 @@
 % Please edit documentation in R/extract_ids.R
 \name{extract_ids}
 \alias{extract_ids}
-\title{Extract sub-catchment and/or basin IDs for a point location}
+\title{Extract sub-catchment and/or basin IDs}
 \usage{
 extract_ids(
   data,

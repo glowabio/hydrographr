@@ -2,7 +2,7 @@
 % Please edit documentation in R/reclass_raster.R
 \name{reclass_raster}
 \alias{reclass_raster}
-\title{Reclassification of an integer raster layer}
+\title{Reclassify an integer raster layer}
 \usage{
 reclass_raster(
   data,
@@ -44,15 +44,7 @@ UInt32,CInt16, CInt32. Default is Int32.}
 \item{compress}{Compression type: DEFLATE or LZW. Default is DEFLATE.}
 }
 \description{
-Reclassifies an integer raster .tif layer using the r.reclass function of
-GRASS GIS. To reclassify the raster layer the present raster values
-and the new raster values have to be defined.
-}
-\details{
-If the input raster layer has floating point values, you should multiply
-the input data by some factor (e.g. 1000) to achieve integer values,
-otherwise the GRASS GIS r.reclass will round the raster values down to
-the next integer which is not always desired.
+Reclassify an integer raster layer
 }
 \examples{
 # Set directory for test data
