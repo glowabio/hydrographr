@@ -1,4 +1,4 @@
-#' Report NoData value of raster layers.
+#' Reports NoData value of raster layers.
 #'
 #' This function reports the defined NoData value of a raster layer. The NoData
 #' value of a raster layer represents the absence of data. In computations the
@@ -6,11 +6,11 @@
 #' be reported or the Nodata value will be ignored and a value is computed from
 #' the available values of a specified location.
 #'
-#' @param data_dir character. Path to the directory containing all input data
+#' @param data_dir character. Path to the directory containing all input data.
 #' @param var_layer character vector of variable raster layers on disk,
 #' e.g. "slope_grad_dw_cel_h00v00.tif".
-#' @param n_cores numeric. Number of cores used for parallelization.
-#' If NULL, available cores - 1 will be used.
+#' @param n_cores numeric. Number of cores used for parallelization, in case
+#' multiple .tif files are provided to var_layer.
 #' @importFrom processx run
 #' @importFrom tidyr separate
 #' @importFrom parallel detectCores
@@ -44,7 +44,7 @@ report_no_data <- function(data_dir, var_layer, n_cores = NULL) {
   if (is.null(n_cores)) {
 
     #  Detect number of available cores
-    n_cores <- detectCores() - 1
+    n_cores <- detectCores(logical = FALSE) - 1
 
   }
 

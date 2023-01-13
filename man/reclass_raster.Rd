@@ -18,29 +18,30 @@ reclass_raster(
 )
 }
 \arguments{
-\item{data}{a data.frame or data.table with the present and new raster values}
+\item{data}{a data.frame or data.table with the present and new raster
+values.}
 
 \item{rast_val}{character. The name of the column with the present
-raster values}
+raster values.}
 
-\item{new_val}{character. The name of the column with the new raster values}
+\item{new_val}{character. The name of the column with the new raster values.}
 
-\item{rast_path}{Full path to the input raster .tif layer}
+\item{rast_path}{Full path to the input raster .tif layer.}
 
 \item{recl_layer}{character. Full path of the output .tif layer
-of the reclassified raster file}
+of the reclassified raster file.}
 
 \item{read}{logical. If TRUE, then the reclassified raster .tif layer
-gets read into R as a SpatRaster (terra object)
-If FALSE, the layer is only stored on disk. Default is TRUE}
+gets read into R as a SpatRaster (terra object).
+If FALSE, the layer is only stored on disk. Default is TRUE.}
 
 \item{no_data}{numeric. The no_data value of the new .tif layer.
-Default is -9999}
+Default is -9999.}
 
 \item{type}{character. Data type; Options are Byte, Int16, UInt16, Int32,
-UInt32,CInt16, CInt32. Default is Int32}
+UInt32,CInt16, CInt32. Default is Int32.}
 
-\item{compress}{Compression type: DEFLATE or LZW. Default is DEFLATE}
+\item{compress}{Compression type: DEFLATE or LZW. Default is DEFLATE.}
 }
 \description{
 Reclassifies an integer raster .tif layer using the r.reclass function of

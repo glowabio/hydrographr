@@ -14,21 +14,21 @@ crop_to_extent(
 )
 }
 \arguments{
-\item{raster_layer}{character. Full path to the input raster .tif layer}
+\item{raster_layer}{character. Full path to the input raster .tif layer.}
 
 \item{vector_layer}{character. Full path to a vector layer that is used as a
-cutline data source (similar to a mask operation)}
+cutline data source (similar to a mask operation).}
 
 \item{bounding_box}{numeric vector of the coordinates of the corners of a
 bounding box (xmin, ymin, xmax, ymax), SpatRaster, SpatVector,
 or other spatial object.}
 
-\item{out_dir}{character. The directory where the output will be stored}
+\item{out_dir}{character. The directory where the output will be stored.}
 
-\item{file_name}{character. Name of the cropped output raster .tif file}
+\item{file_name}{character. Name of the cropped output raster .tif file.}
 
 \item{read}{logical. If TRUE, the cropped raster .tif layer gets read into R.
-If FALSE, the layer is only stored on disk. Default is TRUE}
+If FALSE, the layer is only stored on disk. Default is TRUE.}
 }
 \value{
 The function returns always a .tif raster file written to disk.

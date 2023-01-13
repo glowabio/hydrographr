@@ -2,18 +2,18 @@
 % Please edit documentation in R/report_no_data.R
 \name{report_no_data}
 \alias{report_no_data}
-\title{Report NoData value of raster layers.}
+\title{Reports NoData value of raster layers.}
 \usage{
 report_no_data(data_dir, var_layer, n_cores = NULL)
 }
 \arguments{
-\item{data_dir}{character. Path to the directory containing all input data}
+\item{data_dir}{character. Path to the directory containing all input data.}
 
 \item{var_layer}{character vector of variable raster layers on disk,
 e.g. "slope_grad_dw_cel_h00v00.tif".}
 
-\item{n_cores}{numeric. Number of cores used for parallelization.
-If NULL, available cores - 1 will be used.}
+\item{n_cores}{numeric. Number of cores used for parallelization, in case
+multiple .tif files are provided to var_layer.}
 }
 \description{
 This function reports the defined NoData value of a raster layer. The NoData

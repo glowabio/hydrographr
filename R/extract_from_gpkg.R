@@ -5,21 +5,22 @@
 #' sub-catchment (i.e. stream segment) IDs. The output is a data.table, and only
 #' the output is loaded into R.
 #'
-#' @param data_dir character. Path to the directory containing all input data
+#' @param data_dir character. Path to the directory containing all input data.
 #' @param subc_id a numeric vector of sub-catchment IDs or "all".
 #' If "all", the attribute table is extracted for all the stream segments of
 #' the input .gpkg layer. The stream segment IDs are the same as the
 #' sub-catchment IDs. A vector of the sub-catchment IDs can be acquired
-#' from the extract_ids() function, by sub-setting the resulting data.frame
+#' from the extract_ids() function, by sub-setting the resulting data.frame.
 #' @param subc_layer character. Full path to the sub-catchment ID .tif layer
 #' @param var_layer character vector of .gpkg files on disk,
-#' e.g. "order_vect_point_h18v04.gpkg"
+#' e.g. "order_vect_point_h18v04.gpkg".
 #' @param out_dir character. The directory where the output will be stored.
 #' If the out_dir is specified, the attribute tables will be stored as .csv
 #' files in this location, named after their input variable vector files
 #' (e.g. "/path/to/stats_order_vect_point_h18v04.csv").
 #' If NULL, the output is only loaded in R and not stored on disk.
-#' @param n_cores numeric. Number of cores used for parallelization.
+#' @param n_cores numeric. Number of cores used for parallelization, in case
+#' multiple .gpkg files are provided to var_layer.
 #' If NULL, available cores - 1 will be used.
 #'
 #' @importFrom data.table fread fwrite
@@ -34,15 +35,20 @@
 #'
 #' @examples
 #' library(hydrographr)
+#' # Download test data into temporary R folder
+#' download_test_data(tempdir())
 #'
-#' # Specify the working directory of the test data
-#' DATADIR <- "path/to/test_data"
+#' # Define the input data directory
+#' data_dir <- paste0(tempdir(),"/hydrography90m_test_data/")
 #'
-#' # Download the test data
-#' download_test_data(DATADIR)
+#' # Extract the attribute table of the file order_vect_59.gpkg for all the
+#' # sub-catchment IDs of the subcatchment_1264942.tif raster layer
+#' attribute_table <- extract_from_gpkg(data_dir = data_dir, subc_id = "all",
+#' subc_layer = "subcatchment_1264942.tif", var_layer = "order_vect_59.gpkg")
 #'
-#' my_dt <- extract_from_gpkg(data_dir=DATADIR, subc_id="all")
-#'
+#' # Show the output table
+#' attribute_table
+
 
 extract_from_gpkg <- function(data_dir, subc_id, subc_layer, var_layer,
                               out_dir = NULL, n_cores = NULL) {
@@ -84,7 +90,7 @@ extract_from_gpkg <- function(data_dir, subc_id, subc_layer, var_layer,
   if (is.null(n_cores)) {
 
     #  Detect number of available cores
-    n_cores <- detectCores() - 1
+    n_cores <- detectCores(logical = FALSE) - 1
 
   }
 

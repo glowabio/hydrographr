@@ -3,13 +3,13 @@
 #' Extracts the ID value of the basin and/or sub-catchment raster layer at a
 #' given point location.
 #'
-#' @param data a data.frame or data.table with lat/lon coordinates in WGS84
-#' @param lon character. The name of the column with the longitude coordinates
-#' @param lat character. The name of the column with the latitude coordinates
+#' @param data a data.frame or data.table with lat/lon coordinates in WGS84.
+#' @param lon character. The name of the column with the longitude coordinates.
+#' @param lat character. The name of the column with the latitude coordinates.
 #' @param id character. The name of a column containing unique IDs for each row
-#' of "data" (e.g., occurrence or site IDs)
-#' @param basin_layer character. Full path to the basin ID .tif layer
-#' @param subc_layer character. Full path to the sub-catchment ID .tif layer
+#' of "data" (e.g., occurrence or site IDs).
+#' @param basin_layer character. Full path to the basin ID .tif layer.
+#' @param subc_layer character. Full path to the sub-catchment ID .tif layer.
 #' @param quiet logical. If FALSE, the standard output will be printed.
 #' Default is TRUE.
 #'
@@ -36,7 +36,7 @@
 #' \url{https://gdal.org/programs/gdallocationinfo.html}
 #'
 #' @examples
-#' # Download test data into temporary R folder
+#' # Download test data into the temporary R folder
 #' download_test_data(tempdir())
 #'
 #' # Load occurrence data

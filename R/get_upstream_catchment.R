@@ -4,11 +4,11 @@
 #' which have been snapped to the stream network.
 #' The snapping can be done using the function 'snap_to_network'
 #' @param id character. The name of a column containing unique IDs for each row
-#' of "data" (e.g., occurrence or site IDs)
-#' @param lon character. The name of the column with the longitude coordinates
-#' @param lat character. The name of the column with the latitude coordinates
+#' of "data" (e.g., occurrence or site IDs).
+#' @param lon character. The name of the column with the longitude coordinates.
+#' @param lat character. The name of the column with the latitude coordinates.
 #' @param direction_layer character. Full path to raster file with the
-#' direction variable
+#' direction variable.
 #' @param out_path Full path to the directory where the output(s)
 #' will be stored.
 #' To identify the upstream catchment the output file name includes the site id.
@@ -164,7 +164,7 @@ get_upstream_catchment <- function(data, id, lon, lat, direction_layer = NULL,
 
 
   # Setting up parallelization if n_cores is not provided
-  n_cores <- ifelse(is.null(n_cores), detectCores() - 1, n_cores)
+  n_cores <- ifelse(is.null(n_cores), detectCores(logical = FALSE) - 1, n_cores)
 
   # Check operating system
   system <- get_os()

@@ -27,7 +27,7 @@ download_tiles(
 Default is FALSE.}
 
 \item{download_dir}{character. The directory where the files will be
-downloaded.}
+downloaded. Default is the working directory.}
 }
 \description{
 Downloads multiple files from Nimbus

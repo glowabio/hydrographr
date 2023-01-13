@@ -1,15 +1,29 @@
-
-#' Identifies the ids of the tiles in which the given points are located.
-#' Input is a point data frame.
-#' @param data data.frame with the lat lon columns
-#' @param lon Name of the longitude column
-#' @param lat Name of the latitude column
+#' Identifies the ids of the tiles within the Hydrography90m data in which the
+#' given points are located. The IDs are required to then download
+#' the data using download_tiles(). Input is a point data frame.
+#'
+#' @param data a data.frame or data.table with lat/lon coordinates in WGS84.
+#' @param lon character. The name of the column with the longitude coordinates.
+#' @param lat character. The name of the column with the latitude coordinates.
 #' @importFrom data.table fread
 #' @author Afroditi Grigoropoulou
 #' @export
 #'
+#' @examples
+#' library(hydrographr)
+#' library(data.table)
 #'
-# Get tile id when the input is a point data frame
+#' # Download the test data into the temporary R folder
+#' download_test_data(tempdir())
+#'
+#' # Load species occurrence data
+#' species_occurrence <- read.table(
+#' paste0(tempdir(), "/hydrography90m_test_data/spdata_1264942.txt"),
+#' header = TRUE)
+#'
+#' # Get the tile ID
+#' my_IDs <- get_tile_id(data = species_occurrence,
+#'                       lon="longitude", lat="latitude")
 
 get_tile_id <- function(data, lon, lat) {
 

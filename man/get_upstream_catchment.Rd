@@ -21,14 +21,14 @@ which have been snapped to the stream network.
 The snapping can be done using the function 'snap_to_network'}
 
 \item{id}{character. The name of a column containing unique IDs for each row
-of "data" (e.g., occurrence or site IDs)}
+of "data" (e.g., occurrence or site IDs).}
 
-\item{lon}{character. The name of the column with the longitude coordinates}
+\item{lon}{character. The name of the column with the longitude coordinates.}
 
-\item{lat}{character. The name of the column with the latitude coordinates}
+\item{lat}{character. The name of the column with the latitude coordinates.}
 
 \item{direction_layer}{character. Full path to raster file with the
-direction variable}
+direction variable.}
 
 \item{out_path}{Full path to the directory where the output(s)
 will be stored.

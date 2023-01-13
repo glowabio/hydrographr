@@ -1,11 +1,11 @@
 #' Identifies the IDs of the regional units within the Hydrography90m data
 #' in which the input points are located. The IDs are required to then download
-#' the data using download_tiles_base() or download_tiles().
+#' the data using download_tiles().
 #' Input is a point data frame.
 #'
-#' @param data a data.frame or data.table with lat/lon coordinates in WGS84
-#' @param lon character. The name of the column with the longitude coordinates
-#' @param lat character. The name of the column with the latitude coordinates
+#' @param data a data.frame or data.table with lat/lon coordinates in WGS84.
+#' @param lon character. The name of the column with the longitude coordinates.
+#' @param lat character. The name of the column with the latitude coordinates.
 #' @importFrom stringi stri_rand_strings
 #' @importFrom dplyr select
 #' @importFrom data.table fread

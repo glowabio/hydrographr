@@ -15,18 +15,18 @@ extract_ids(
 )
 }
 \arguments{
-\item{data}{a data.frame or data.table with lat/lon coordinates in WGS84}
+\item{data}{a data.frame or data.table with lat/lon coordinates in WGS84.}
 
-\item{lon}{character. The name of the column with the longitude coordinates}
+\item{lon}{character. The name of the column with the longitude coordinates.}
 
-\item{lat}{character. The name of the column with the latitude coordinates}
+\item{lat}{character. The name of the column with the latitude coordinates.}
 
 \item{id}{character. The name of a column containing unique IDs for each row
-of "data" (e.g., occurrence or site IDs)}
+of "data" (e.g., occurrence or site IDs).}
 
-\item{basin_layer}{character. Full path to the basin ID .tif layer}
+\item{basin_layer}{character. Full path to the basin ID .tif layer.}
 
-\item{subc_layer}{character. Full path to the sub-catchment ID .tif layer}
+\item{subc_layer}{character. Full path to the sub-catchment ID .tif layer.}
 
 \item{quiet}{logical. If FALSE, the standard output will be printed.
 Default is TRUE.}
@@ -47,7 +47,7 @@ as e.g. environmental information that is stored in the input raster file.
 Duplicated rows will be removed.
 }
 \examples{
-# Download test data into temporary R folder
+# Download test data into the temporary R folder
 download_test_data(tempdir())
 
 # Load occurrence data

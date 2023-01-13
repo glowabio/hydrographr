@@ -4,22 +4,22 @@
 \alias{get_regional_unit_id}
 \title{Identifies the IDs of the regional units within the Hydrography90m data
 in which the input points are located. The IDs are required to then download
-the data using download_tiles_base() or download_tiles().
+the data using download_tiles().
 Input is a point data frame.}
 \usage{
 get_regional_unit_id(data, lon, lat, quiet = TRUE)
 }
 \arguments{
-\item{data}{a data.frame or data.table with lat/lon coordinates in WGS84}
+\item{data}{a data.frame or data.table with lat/lon coordinates in WGS84.}
 
-\item{lon}{character. The name of the column with the longitude coordinates}
+\item{lon}{character. The name of the column with the longitude coordinates.}
 
-\item{lat}{character. The name of the column with the latitude coordinates}
+\item{lat}{character. The name of the column with the latitude coordinates.}
 }
 \description{
 Identifies the IDs of the regional units within the Hydrography90m data
 in which the input points are located. The IDs are required to then download
-the data using download_tiles_base() or download_tiles().
+the data using download_tiles().
 Input is a point data frame.
 }
 \examples{

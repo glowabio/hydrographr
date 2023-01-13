@@ -1,4 +1,4 @@
-#' @title  Merge multiple raster or spatial vector objects
+#' @title  Merges multiple raster or spatial vector objects
 
 #' @description Merge multiple raster or spatial vector objects from disk
 #' to form a new raster or spatial vector object with a larger spatial extent.
@@ -10,16 +10,16 @@
 #' If read`_`vector = TRUE, the outputs are a .gpkg (saved under out`_`dir)
 #' and a SpatVector (terra package) object,
 #' otherwise if read`_`vector = FALSE (default),
-#' the .gpkg file is the only output
+#' the .gpkg file is the only output.
 
 #' @param tile_dir character. The directory containing the raster tiles or
-#' spatial vectors to be merged
-#' @param out_dir character. The directory where the output will be stored
+#' spatial vectors to be merged.
+#' @param out_dir character. The directory where the output will be stored.
 #' @param read_raster logical. If TRUE, the merged raster .tif layer gets read
-#' into R. If FALSE, the layer is only stored on disk. Default is TRUE
+#' into R. If FALSE, the layer is only stored on disk. Default is TRUE.
 #' @param read_vector logical. If TRUE, the merged spatial vector gets read
 #' into R. In this case, read_raster needs to be set to FALSE.
-#' If FALSE, the vector is only stored on disk. Default is FALSE
+#' If FALSE, the vector is only stored on disk. Default is FALSE.
 #' @importFrom processx run
 #' @importFrom terra rast
 #' @importFrom terra vect

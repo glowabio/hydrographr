@@ -2,22 +2,22 @@
 % Please edit documentation in R/merge_tile.R
 \name{merge_tiles}
 \alias{merge_tiles}
-\title{Merge multiple raster or spatial vector objects}
+\title{Merges multiple raster or spatial vector objects}
 \usage{
 merge_tiles(tile_dir, out_dir, read_raster = TRUE, read_vector = FALSE)
 }
 \arguments{
 \item{tile_dir}{character. The directory containing the raster tiles or
-spatial vectors to be merged}
+spatial vectors to be merged.}
 
-\item{out_dir}{character. The directory where the output will be stored}
+\item{out_dir}{character. The directory where the output will be stored.}
 
 \item{read_raster}{logical. If TRUE, the merged raster .tif layer gets read
-into R. If FALSE, the layer is only stored on disk. Default is TRUE}
+into R. If FALSE, the layer is only stored on disk. Default is TRUE.}
 
 \item{read_vector}{logical. If TRUE, the merged spatial vector gets read
 into R. In this case, read_raster needs to be set to FALSE.
-If FALSE, the vector is only stored on disk. Default is FALSE}
+If FALSE, the vector is only stored on disk. Default is FALSE.}
 }
 \value{
 A .tif raster file or spatial vector object that is always written
@@ -34,7 +34,7 @@ otherwise if read`_`raster = FALSE, the .tif file is the only output.
 If read`_`vector = TRUE, the outputs are a .gpkg (saved under out`_`dir)
 and a SpatVector (terra package) object,
 otherwise if read`_`vector = FALSE (default),
-the .gpkg file is the only output
+the .gpkg file is the only output.
 }
 \author{
 Thomas Tomiczek

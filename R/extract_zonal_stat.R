@@ -23,8 +23,8 @@
 #' loaded in R and not stored on disk.
 #' @param file_name character. Name of the .csv file where the output table
 #' will be stored. out_dir should also be specified for this purpose.
-#' @param n_cores numeric. Number of cores used for parallelization.
-#' If NULL, available cores - 1 will be used.
+#' @param n_cores numeric. Number of cores used for parallelization, in case
+#' multiple .tif files are provided to var_layer.
 #' @param quiet logical. If FALSE, the standard output will be printed.
 #' Default is TRUE.
 #'

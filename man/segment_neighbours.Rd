@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_segment_neighbours.R
 \name{segment_neighbours}
 \alias{segment_neighbours}
-\title{Get stream segment neighbours}
+\title{Gets stream segment neighbours}
 \usage{
 segment_neighbours(
   g,
@@ -57,7 +57,7 @@ parallel back-end in MB. Default is 1500 (1.5 GB). Consider a higher value
 for large study areas (more than one 20°x20° tile). Optional.}
 }
 \description{
-For each segment, report those upstream, downstream, or up-and
+For each segment, reports those upstream, downstream, or up-and
 downstream segments that are connected to one or multiple input
 segments within a specified neighbour order, with the option to
 summarize attributes across these segments. Note that the stream

@@ -2,21 +2,39 @@
 % Please edit documentation in R/get_tile_id.R
 \name{get_tile_id}
 \alias{get_tile_id}
-\title{Identifies the ids of the tiles in which the given points are located.
-Input is a point data frame.}
+\title{Identifies the ids of the tiles within the Hydrography90m data in which the
+given points are located. The IDs are required to then download
+the data using download_tiles(). Input is a point data frame.}
 \usage{
 get_tile_id(data, lon, lat)
 }
 \arguments{
-\item{data}{data.frame with the lat lon columns}
+\item{data}{a data.frame or data.table with lat/lon coordinates in WGS84.}
 
-\item{lon}{Name of the longitude column}
+\item{lon}{character. The name of the column with the longitude coordinates.}
 
-\item{lat}{Name of the latitude column}
+\item{lat}{character. The name of the column with the latitude coordinates.}
 }
 \description{
-Identifies the ids of the tiles in which the given points are located.
-Input is a point data frame.
+Identifies the ids of the tiles within the Hydrography90m data in which the
+given points are located. The IDs are required to then download
+the data using download_tiles(). Input is a point data frame.
+}
+\examples{
+library(hydrographr)
+library(data.table)
+
+# Download the test data into the temporary R folder
+download_test_data(tempdir())
+
+# Load species occurrence data
+species_occurrence <- read.table(
+paste0(tempdir(), "/hydrography90m_test_data/spdata_1264942.txt"),
+header = TRUE)
+
+# Get the tile ID
+my_IDs <- get_tile_id(data = species_occurrence,
+                      lon="longitude", lat="latitude")
 }
 \author{
 Afroditi Grigoropoulou

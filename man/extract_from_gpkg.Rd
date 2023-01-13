@@ -2,7 +2,7 @@
 % Please edit documentation in R/extract_from_gpkg.R
 \name{extract_from_gpkg}
 \alias{extract_from_gpkg}
-\title{Extract values from the stream order .gpkg files.}
+\title{Extracts values from the stream order .gpkg files.}
 \usage{
 extract_from_gpkg(
   data_dir,
@@ -14,18 +14,18 @@ extract_from_gpkg(
 )
 }
 \arguments{
-\item{data_dir}{character. Path to the directory containing all input data}
+\item{data_dir}{character. Path to the directory containing all input data.}
 
 \item{subc_id}{a numeric vector of sub-catchment IDs or "all".
 If "all", the attribute table is extracted for all the stream segments of
 the input .gpkg layer. The stream segment IDs are the same as the
 sub-catchment IDs. A vector of the sub-catchment IDs can be acquired
-from the extract_ids() function, by sub-setting the resulting data.frame}
+from the extract_ids() function, by sub-setting the resulting data.frame.}
 
 \item{subc_layer}{character. Full path to the sub-catchment ID .tif layer}
 
 \item{var_layer}{character vector of .gpkg files on disk,
-e.g. "order_vect_point_h18v04.gpkg"}
+e.g. "order_vect_point_h18v04.gpkg".}
 
 \item{out_dir}{character. The directory where the output will be stored.
 If the out_dir is specified, the attribute tables will be stored as .csv
@@ -33,7 +33,8 @@ files in this location, named after their input variable vector files
 (e.g. "/path/to/stats_order_vect_point_h18v04.csv").
 If NULL, the output is only loaded in R and not stored on disk.}
 
-\item{n_cores}{numeric. Number of cores used for parallelization.
+\item{n_cores}{numeric. Number of cores used for parallelization, in case
+multiple .gpkg files are provided to var_layer.
 If NULL, available cores - 1 will be used.}
 }
 \description{
@@ -44,15 +45,19 @@ the output is loaded into R.
 }
 \examples{
 library(hydrographr)
+# Download test data into temporary R folder
+download_test_data(tempdir())
 
-# Specify the working directory of the test data
-DATADIR <- "path/to/test_data"
+# Define the input data directory
+data_dir <- paste0(tempdir(),"/hydrography90m_test_data/")
 
-# Download the test data
-download_test_data(DATADIR)
+# Extract the attribute table of the file order_vect_59.gpkg for all the
+# sub-catchment IDs of the subcatchment_1264942.tif raster layer
+attribute_table <- extract_from_gpkg(data_dir = data_dir, subc_id = "all",
+subc_layer = "subcatchment_1264942.tif", var_layer = "order_vect_59.gpkg")
 
-my_dt <- extract_from_gpkg(data_dir=DATADIR, subc_id="all")
-
+# Show the output table
+attribute_table
 }
 \author{
 Afroditi Grigoropoulou, Jaime Garcia Marquez

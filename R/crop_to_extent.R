@@ -11,16 +11,16 @@
 #' optionally loaded into R as a SpatRaster (terra package) object
 #' (using read = TRUE).
 #'
-#' @param raster_layer character. Full path to the input raster .tif layer
+#' @param raster_layer character. Full path to the input raster .tif layer.
 #' @param vector_layer character. Full path to a vector layer that is used as a
-#' cutline data source (similar to a mask operation)
+#' cutline data source (similar to a mask operation).
 #' @param bounding_box numeric vector of the coordinates of the corners of a
 #' bounding box (xmin, ymin, xmax, ymax), SpatRaster, SpatVector,
 #' or other spatial object.
-#' @param out_dir character. The directory where the output will be stored
-#' @param file_name character. Name of the cropped output raster .tif file
+#' @param out_dir character. The directory where the output will be stored.
+#' @param file_name character. Name of the cropped output raster .tif file.
 #' @param read logical. If TRUE, the cropped raster .tif layer gets read into R.
-#' If FALSE, the layer is only stored on disk. Default is TRUE
+#' If FALSE, the layer is only stored on disk. Default is TRUE.
 #'
 #' @importFrom processx run
 #' @importFrom terra rast

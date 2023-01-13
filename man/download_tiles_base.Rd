@@ -2,8 +2,9 @@
 % Please edit documentation in R/download_tiles_base.R
 \name{download_tiles_base}
 \alias{download_tiles_base}
-\title{Downloads a single file from
-https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4?path=%2F.
+\title{Internal function that downloads a single file from
+https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4?path=%2F or the
+GDrive folder.
 It is called and inherits arguments by the function 'download_tiles()'.}
 \usage{
 download_tiles_base(
@@ -27,7 +28,7 @@ download_tiles_base(
 Default is FALSE.}
 
 \item{download_dir}{character. The directory where the files will be
-downloaded.}
+downloaded. Default is the working directory.}
 
 \item{file_size_table_sep}{data.frame. Lookup table including file names
 and sizes (inherited by 'download_tiles()').}
@@ -36,8 +37,9 @@ and sizes (inherited by 'download_tiles()').}
 in either Nimbus or GDrive (inherited by 'download_tiles()').}
 }
 \description{
-Downloads a single file from
-https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4?path=%2F.
+Internal function that downloads a single file from
+https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4?path=%2F or the
+GDrive folder.
 It is called and inherits arguments by the function 'download_tiles()'.
 }
 \keyword{internal}

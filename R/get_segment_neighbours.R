@@ -1,6 +1,6 @@
-#' Get stream segment neighbours
+#' Gets stream segment neighbours
 #'
-#' For each segment, report those upstream, downstream, or up-and
+#' For each segment, reports those upstream, downstream, or up-and
 #' downstream segments that are connected to one or multiple input
 #' segments within a specified neighbour order, with the option to
 #' summarize attributes across these segments. Note that the stream
