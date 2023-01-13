@@ -2,7 +2,7 @@
 #'
 #' @param data a data.frame or data.table with lat/lon coordinates in WGS84,
 #' which have been snapped to the stream network.
-#' The snapping can be done using the function 'snap_to_network'
+#' The snapping can be done using the function 'snap_to_network'.
 #' @param id character. The name of a column containing unique IDs for each row
 #' of "data" (e.g., occurrence or site IDs).
 #' @param lon character. The name of the column with the longitude coordinates.
