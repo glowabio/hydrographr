@@ -5,21 +5,21 @@
 #' as a directed graph object (igraph), a spatial dataframe (sf)
 #' or a SpatVect object (terra).
 #'
-#' @param filename Name of the GeoPackage file to import,
-#' e.g. "order_vect_segment_h00v00.gpkg"
-#' @param type Either "net" for importing a network, "catch" for sub-catchments,
-#' "basin" for drainage basins, or "outlet" for outlet points.
-#' @param SQL_table Optional. Name of the specific data
-#' to import from the GeoPackage.
-#' This is set automatically for the Hydrography90m data,
-#' and needs to be specified for any other data.
-#' @param as_dt If TRUE, import the GeoPackage as a data.table.
-#' @param as_graph If TRUE, import the GeoPackage as a directed graph
-#' (igraph object). Only possible for a network.
-#' @param as_sf If TRUE, import the GeoPackage as a spatial dataframe
-#' (sf object).
-#' @param as_SpatVect If TRUE, import the GeoPackage as a
-#' SpatVector (terra object).
+#' @param file_name character. Name of the GeoPackage file to import,
+#' e.g. "order_vect_segment_h00v00.gpkg".
+#' @param type character. Either "net" for importing a network, "subc" for
+#' sub-catchments, "basin" for drainage basins, or "outlet" for outlet points.
+#' @param SQL_table character. Name of the specific data to import from the
+#' GeoPackage. This is set automatically for the Hydrography90m data,
+#' but needs to be specified for any other data. Optional.
+#' @param as_dt logical. If TRUE, import the GeoPackage as a data.table.
+#' Default is FALSE.
+#' @param as_graph "logical. If TRUE, import the GeoPackage as a directed graph
+#' (igraph object). Only possible for a network layer. Default is FALSE.
+#' @param as_sf logical. If TRUE, import the GeoPackage as a spatial dataframe
+#' (sf object). Default is FALSE.
+#' @param as_SpatVect logical. If TRUE, import the GeoPackage as a
+#' SpatVector (terra object). Default is FALSE.
 
 #' @importFrom DBI dbConnect dbListTables dbGetQuery dbDisconnect
 #' @importFrom RSQLite SQLite
@@ -46,7 +46,7 @@
 #'
 #' # Read the sub-catchments as a data.table
 #' my_dt <- read_geopackage(paste0(my_directory, "/order_vect_59.gpkg"),
-#' type="catch", as_dt=T)
+#' type="subc", as_dt=T)
 #'
 #' # Read the basin as a SF-object
 #' my_sf <- read_geopackage(paste0(my_directory, "/order_vect_59.gpkg"),
@@ -64,13 +64,13 @@
 
 
 # Import a geopackage from disk as a data.table
-read_geopackage <- function(filename, type = NULL, SQL_table = NULL,
+read_geopackage <- function(file_name, type = NULL, SQL_table = NULL,
                             as_dt = FALSE, as_graph = FALSE, as_sf = FALSE,
                             as_SpatVect = FALSE) {
 
   # Test input arguments
-  if (missing(filename)) stop("Please specify the input geopackage file.")
-  if (!grepl(".gpkg", filename, fixed = TRUE)) stop(
+  if (missing(file_name)) stop("Please specify the input geopackage file.")
+  if (!grepl(".gpkg", file_name, fixed = TRUE)) stop(
     "Input must be a GeoPackage file."
     )
   # If all options are missing
@@ -79,13 +79,13 @@ read_geopackage <- function(filename, type = NULL, SQL_table = NULL,
     stop("Please select one output type.\n")
   }
   if (missing(type)) stop(
-    "Please specify 'net' or 'catch' as the input file type."
+    "Please specify 'net' or 'subc' as the input file type."
     )
-  if (!any(c("net", "catch", "basin", "outlet") %in% type)) stop(
+  if (!any(c("net", "subc", "basin", "outlet") %in% type)) stop(
     "Please specify the input file type:
-    one of 'net', 'catch', 'basin' or 'outlet'."
+    one of 'net', 'subc', 'basin' or 'outlet'."
     )
-  if (any(c("catch", "basin", "outlet") %in% type) && as_graph == TRUE) stop(
+  if (any(c("subc", "basin", "outlet") %in% type) && as_graph == TRUE) stop(
     "A graph can only be created from a network.")
 
 
@@ -99,14 +99,14 @@ read_geopackage <- function(filename, type = NULL, SQL_table = NULL,
 
   # create a connection to the SQLite database
   cat("Opening SQL connection...\n")
-  conn <- dbConnect(drv = RSQLite::SQLite(), dbname = filename) # get connection
+  conn <- dbConnect(drv = RSQLite::SQLite(), dbname = file_name) # get connection
   # SQL_table <- dbListTables(conn)
   # list all tables
   # specify the layer name
   if (missing(SQL_table)) {
     if (type == "net") {
       SQL_table <- "merged"
-        } else if (type == "catch") {
+        } else if (type == "subc") {
           SQL_table <- "sub_catchment"
         } else if (type == "basin") {
           SQL_table <- "basin"
@@ -148,11 +148,11 @@ read_geopackage <- function(filename, type = NULL, SQL_table = NULL,
 } else if (as_sf == TRUE) {
     cat("Importing as a sf spatial dataframe...\n")
     # tibble=F to avoid exponential numbers
-    sf <- read_sf(filename, as_tibble = FALSE)
+    sf <- read_sf(file_name, as_tibble = FALSE)
     return(sf)
     } else if (as_SpatVect == TRUE) {
     cat("Importing as a terra SpatVect object...\n")
-    sf <- read_sf(filename)
+    sf <- read_sf(file_name)
     vect <- vect(sf)
     return(vect)
     }

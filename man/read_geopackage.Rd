@@ -5,7 +5,7 @@
 \title{Reads a GeoPackage file}
 \usage{
 read_geopackage(
-  filename,
+  file_name,
   type = NULL,
   SQL_table = NULL,
   as_dt = FALSE,
@@ -15,27 +15,27 @@ read_geopackage(
 )
 }
 \arguments{
-\item{filename}{Name of the GeoPackage file to import,
-e.g. "order_vect_segment_h00v00.gpkg"}
+\item{file_name}{character. Name of the GeoPackage file to import,
+e.g. "order_vect_segment_h00v00.gpkg".}
 
-\item{type}{Either "net" for importing a network, "catch" for sub-catchments,
-"basin" for drainage basins, or "outlet" for outlet points.}
+\item{type}{character. Either "net" for importing a network, "subc" for
+sub-catchments, "basin" for drainage basins, or "outlet" for outlet points.}
 
-\item{SQL_table}{Optional. Name of the specific data
-to import from the GeoPackage.
-This is set automatically for the Hydrography90m data,
-and needs to be specified for any other data.}
+\item{SQL_table}{character. Name of the specific data to import from the
+GeoPackage. This is set automatically for the Hydrography90m data,
+but needs to be specified for any other data. Optional.}
 
-\item{as_dt}{If TRUE, import the GeoPackage as a data.table.}
+\item{as_dt}{logical. If TRUE, import the GeoPackage as a data.table.
+Default is FALSE.}
 
-\item{as_graph}{If TRUE, import the GeoPackage as a directed graph
-(igraph object). Only possible for a network.}
+\item{as_graph}{"logical. If TRUE, import the GeoPackage as a directed graph
+(igraph object). Only possible for a network layer. Default is FALSE.}
 
-\item{as_sf}{If TRUE, import the GeoPackage as a spatial dataframe
-(sf object).}
+\item{as_sf}{logical. If TRUE, import the GeoPackage as a spatial dataframe
+(sf object). Default is FALSE.}
 
-\item{as_SpatVect}{If TRUE, import the GeoPackage as a
-SpatVector (terra object).}
+\item{as_SpatVect}{logical. If TRUE, import the GeoPackage as a
+SpatVector (terra object). Default is FALSE.}
 }
 \description{
 Reads a GeoPackage vector file from disk either as a table (data.table),
@@ -59,7 +59,7 @@ type="net", as_dt=T)
 
 # Read the sub-catchments as a data.table
 my_dt <- read_geopackage(paste0(my_directory, "/order_vect_59.gpkg"),
-type="catch", as_dt=T)
+type="subc", as_dt=T)
 
 # Read the basin as a SF-object
 my_sf <- read_geopackage(paste0(my_directory, "/order_vect_59.gpkg"),
