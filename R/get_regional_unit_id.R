@@ -1,4 +1,6 @@
-#' Identifies the IDs of the regional units within the Hydrography90m data
+#' @title Get Hydrography90m regional unit IDs
+#'
+#' @description Identifies the IDs of the regional units within the Hydrography90m data
 #' in which the input points are located. The IDs are required to then download
 #' the data using download_tiles().
 #' Input is a point data frame.

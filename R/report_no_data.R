@@ -1,6 +1,6 @@
-#' Reports NoData value of raster layers.
+#' @title Report NoData value
 #'
-#' This function reports the defined NoData value of a raster layer. The NoData
+#' @description This function reports the defined NoData value of a raster layer. The NoData
 #' value of a raster layer represents the absence of data. In computations the
 #' NoData value can be treated in different ways. Either the NoData value will
 #' be reported or the Nodata value will be ignored and a value is computed from

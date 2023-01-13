@@ -1,5 +1,5 @@
-#' @title  Merges multiple raster or spatial vector objects
-
+#' @title  Merge raster or vector objects
+#'
 #' @description Merge multiple raster or spatial vector objects from disk
 #' to form a new raster or spatial vector object with a larger spatial extent.
 #' A directory with at least a raster .tif or spatial vector geopackage file

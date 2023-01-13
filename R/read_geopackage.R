@@ -1,8 +1,7 @@
-
-#' Reads a GeoPackage file
+#' @title Read a GeoPackage file
 #'
-#' Reads a GeoPackage vector file from disk either as a table (data.table),
-#' as a directed graph object (igraph), a spatial dataframe (sf)
+#' @description Reads a GeoPackage vector file from disk either as a table
+#' (data.table), as a directed graph object (igraph), a spatial dataframe (sf)
 #' or a SpatVect object (terra).
 #'
 #' @param file_name character. Name of the GeoPackage file to import,

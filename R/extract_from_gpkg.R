@@ -1,6 +1,6 @@
-#' Extracts values from the stream order .gpkg files.
+#' @title Extract values from the stream order .gpkg files.
 #'
-#' The function reads the attribute table of the stream network GeoPackage file
+#' @description The function reads the attribute table of the stream network GeoPackage file
 #' (.gpkg) stored on disk and extracts the data for one or more (or all) input
 #' sub-catchment (i.e. stream segment) IDs. The output is a data.table, and only
 #' the output is loaded into R.

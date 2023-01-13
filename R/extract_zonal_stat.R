@@ -1,6 +1,7 @@
-#' Calculate zonal statistics based on one or more environmental variable
-#' raster .tif layers.
+#' @title Calculate zonal statistics
 #'
+#' @description Calculate zonal statistics based on one or more environmental variable
+#' raster .tif layers.
 #' This function can be used to aggregate data across a set (or all)
 #' sub-catchments. The sub-catchment raster (.tif) input file is stored on disk.
 #' The output is a data.table which is loaded into R.

@@ -1,7 +1,10 @@
 #' Downloads the test data for the Hydrography90m dataset
 #'
-#' The test data contains all Hydrography90m and species point observation data
-#' for a small geographic extent to test the functions.
+#' @title Download test data
+#'
+#' @description Download the test data of the package, which includes all
+#' Hydrography90m and species point observation data
+#' for a small geographic extent, to test the functions.
 #'
 #' The test data is available at
 #' https://drive.google.com/file/d/1kYNWXmtVm6X7MZLISOePGpvxB1pk1scD/view?usp=share_link

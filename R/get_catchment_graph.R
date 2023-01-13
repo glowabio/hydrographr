@@ -1,6 +1,6 @@
-#' Get catchment from graph
+#' @title Get catchment from graph
 #'
-#' Subset the network graph by extracting the upstream, downstream or entire
+#' @description Subset the network graph by extracting the upstream, downstream or entire
 #' catchment, for one or multiple stream segments. The function will return
 #' either one or more data.tables or graph objects for each input stream
 #' segment. Note that the stream segment and sub-catchment IDs are identical,

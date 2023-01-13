@@ -1,4 +1,4 @@
-#' Snaps data points to the stream segment within the sub-catchment
+#' @title Snap points to stream segment within the sub-catchment
 #'
 #' @description
 #' Snaps data points to the stream segment of the

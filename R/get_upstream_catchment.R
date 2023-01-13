@@ -1,4 +1,7 @@
-#' Calculates the upstream basin taking each point as the outlet
+#' @title Calculate upstream basin
+
+#' @description Calculates the upstream basin of a given point, considering the
+#' point as the outlet.
 #'
 #' @param data a data.frame or data.table with lat/lon coordinates in WGS84,
 #' which have been snapped to the stream network.

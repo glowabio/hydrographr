@@ -1,4 +1,4 @@
-#' @title Crops a raster layer to a specific extent on disk
+#' @title Crop raster to extent
 #'
 #' @description This function crops an input raster layer directly on disk,
 #' i.e. the input layer does not need to be loaded into R. The raster .tif is

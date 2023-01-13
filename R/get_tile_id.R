@@ -1,5 +1,7 @@
-#' Identifies the ids of the tiles within the Hydrography90m data in which the
-#' given points are located. The IDs are required to then download
+#' @title Get the Hydrography90m regular tile ID
+#'
+#' @description Identifies the ids of the tiles within the Hydrography90m data
+#' in which the given points are located. The IDs are required to then download
 #' the data using download_tiles(). Input is a point data frame.
 #'
 #' @param data a data.frame or data.table with lat/lon coordinates in WGS84.

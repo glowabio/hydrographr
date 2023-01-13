@@ -1,6 +1,7 @@
-#' Snap data points to the next stream segment within a defined radius
-#' or a minimum flow accumulation.
+#' @title Snap points to stream segment based on distance or flow accumulation
 #'
+#' @description Snap points to the next stream segment within a defined radius
+#' or a minimum flow accumulation.
 #'
 #' @param data a data.frame or data.table with lat/lon coordinates in WGS84.
 #' @param lon character. The name of the column with the longitude coordinates.

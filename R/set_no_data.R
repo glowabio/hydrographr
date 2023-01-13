@@ -1,4 +1,6 @@
-#' Change or set the NoData value for a raster layer.
+#' @title Set no data value
+
+#' @description Change or set the NoData value for a raster layer.
 #' The change happens in-place, meaning that the original file is overwritten
 #' on disk.
 #'

@@ -1,6 +1,6 @@
-#' Extract sub-catchment and/or basin IDs for a point location
+#' @title Extract sub-catchment and/or basin IDs
 #'
-#' Extracts the ID value of the basin and/or sub-catchment raster layer at a
+#' @description Extracts the ID value of the basin and/or sub-catchment raster layer at a
 #' given point location.
 #'
 #' @param data a data.frame or data.table with lat/lon coordinates in WGS84.
