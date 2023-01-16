@@ -22,53 +22,107 @@
 #' @param n_cores numeric. Number of cores used for parallelization, in case
 #' multiple .gpkg files are provided to var_layer.
 #' If NULL, available cores - 1 will be used.
+#' @param quiet logical. If FALSE, the standard output will be printed.
+#' Default is TRUE.
 #'
 #' @importFrom data.table fread fwrite
 #' @importFrom processx run
 #' @importFrom rlang is_missing
-#' @importFrom parallel detectCores
+#' @importFrom stringi stri_rand_strings
 #' @importFrom stringr str_c
+#' @importFrom parallel detectCores
 #' @import dplyr
-#'
-#' @author Afroditi Grigoropoulou, Jaime Garcia Marquez
 #' @export
 #'
-#' @examples
-#' library(hydrographr)
-#' # Download test data into temporary R folder
-#' download_test_data(tempdir())
+#' @author Afroditi Grigoropoulou, Jaime Garcia Marquez, Maria M. Üblacker
 #'
-#' # Define the input data directory
-#' data_dir <- paste0(tempdir(),"/hydrography90m_test_data/")
+#' @references
+#' \url{https://grass.osgeo.org/grass82/manuals/v.in.ogr.html}
+#'
+#' @examples
+#  # Download test data into temporary R folder
+#' my_directory <- tempdir()
+#' download_test_data(my_directory)
+#'
+#' # Define path to the directory containing all input data
+#' test_data <- paste0(my_directory, "/hydrography90m_test_data")
+#'
+#' # Define sub-catchment ID layer
+#' subc_raster <- paste0(my_directory, "/hydrography90m_test_data",
+#'                   "/subcatchment_1264942.tif")
 #'
 #' # Extract the attribute table of the file order_vect_59.gpkg for all the
 #' # sub-catchment IDs of the subcatchment_1264942.tif raster layer
-#' attribute_table <- extract_from_gpkg(data_dir = data_dir, subc_id = "all",
-#' subc_layer = "subcatchment_1264942.tif", var_layer = "order_vect_59.gpkg")
+#' attribute_table <- extract_from_gpkg(data_dir = test_data,
+#'                                      subc_id = "all",
+#'                                      subc_layer = subc_raster,
+#'                                      var_layer = "order_vect_59.gpkg",
+#'                                      n_cores = 1)
 #'
 #' # Show the output table
 #' attribute_table
 
 
 extract_from_gpkg <- function(data_dir, subc_id, subc_layer, var_layer,
-                              out_dir = NULL, n_cores = NULL) {
+                              out_dir = NULL, n_cores = NULL, quiet = TRUE) {
 
-  # Introductory steps
+  # Check if one of the arguments is missing
+  if (missing(data_dir))
+    stop("data_dir is missing.")
 
-  # check if the input is vector
-  if (!is.vector(subc_id)) {
-    print("subc_id should be either a vector of ids, or \"all\" ")
+  if (missing(subc_id))
+    stop("data_id is missing.")
+
+  if (missing(subc_layer))
+    stop("subc_layer is missing.")
+
+  if (missing(var_layer))
+    stop("var_layer is missing.")
+
+  # Check if paths exists
+    if (!file.exists(data_dir))
+      stop(paste0("Path: ", data_dir, " does not exist."))
+
+
+  if (!is.null(out_dir))
+    if (!file.exists(data_dir))
+      stop(paste0("Path: ", out_dir, " does not exist."))
+
+  # Check if the input is vector
+  if (!is.vector(subc_id))
+    stop("subc_id should be either a vector of ids, or 'all'")
+
+  # Check if file exists
+    if (!file.exists(subc_layer))
+      stop(paste0("File path: ", subc_layer, " does not exist."))
+
+  # Check if subc_layer ends with .tif
+  if (!endsWith(subc_layer, ".tif"))
+    stop("subc_layer: Sub-catchment ID layer is not a .tif file.")
+
+  # Check if the input is vector
+  if (!is.vector(var_layer))
+    stop("The var_layer should be provided in a vector format.")
+
+  for(name in var_layer) {
+
+  file <- paste(data_dir, name, sep = "/")
+
+  if (!file.exists(file))
+    stop(paste0("File: ", file, " does not exist."))
+
   }
-  if (!is.vector(var_layer)) {
-    print("The var_layer should be provided in a vector format")
-  }
 
+  # Check if n_cores is numeric
+  if (!is.null(n_cores))
+    if (!is.numeric(n_cores))
+      stop(paste0("n_cores: Has to be numeric."))
 
+  # Create random string to attach to the tmp folder
+  rand_string <- stri_rand_strings(n = 1, length = 8, pattern = "[A-Za-z0-9]")
+  tmp <- paste0("/tmp_", rand_string)
   # Create temporary output directories
-  dir.create(paste0(data_dir, "/tmp"), showWarnings = FALSE)
-
-  # Make bash scripts executable
-  make_sh_exec()
+  dir.create(paste0(data_dir, tmp), showWarnings = FALSE)
 
   calc_all <- 1
 
@@ -77,12 +131,12 @@ extract_from_gpkg <- function(data_dir, subc_id, subc_layer, var_layer,
     calc_all <- 0
     reclass <- rbind.data.frame(data.frame(str_c(subc_id, " = ", 1)),
                                 "* = NULL")
-    fwrite(reclass, paste0(data_dir, "/tmp/reclass_rules.txt"), sep = "\t",
+    fwrite(reclass, paste0(data_dir, tmp, "/reclass_rules.txt"), sep = "\t",
            row.names = FALSE, quote = FALSE, col.names = FALSE)
 
     # Format subc_id vector so that it can be read
     # as an array in the bash script
-    subc_id <- paste(unique(subc_id), collapse = " ")
+    subc_id <- paste(unique(subc_id), collapse = "/")
 
   }
 
@@ -96,41 +150,69 @@ extract_from_gpkg <- function(data_dir, subc_id, subc_layer, var_layer,
 
 
     # Get the variable names
-    varnames <- gsub("gpkg", var_layer)
+    varnames <- gsub("gpkg", "", var_layer)
 
     # Format subc_id vector so that it can be read
     # as an array in the bash script
-    var_layer_array <- paste(unique(var_layer), collapse = " ")
+    var_layer_array <- paste(unique(var_layer), collapse = "/")
 
 
     # Delete output files if they exist
     for (varname in varnames) {
 
-      if (file.exists(paste0(data_dir, "/tmp/r_univar/stats_",
+      if (file.exists(paste0(data_dir, tmp, "/r_univar/stats_",
                              varname, ".csv"))) {
-        file.remove(paste0(data_dir, "/tmp/r_univar/stats_",
+        file.remove(paste0(data_dir, tmp, "/r_univar/stats_",
                            varname, ".csv"))
       }
     }
 
+    # Check operating system
+    system <- get_os()
 
-    # Call the external .sh script extract_from_gpkg.sh
-    # containing the grass functions
-    processx::run(system.file("sh", "extract_from_gpkg.sh",
-                    package = "hydrographr"),
-        args = c(data_dir, subc_id, subc_layer,
-        var_layer_array, calc_all, n_cores),
-        echo = FALSE)$stdout
+    # Make bash scripts executable
+    make_sh_exec()
 
-    out_filenames <- list.files(paste0(data_dir, "/tmp/r_univar/"),
+    # Run the zonal statistics function
+
+    if (system == "linux" || system == "osx") {
+      # Call the external .sh script extract_from_gpkg.sh
+      # containing the grass functions
+      processx::run(system.file("sh", "extract_from_gpkg.sh",
+                                package = "hydrographr"),
+                    args = c(data_dir, subc_id, subc_layer,
+                             var_layer_array, calc_all, n_cores, rand_string),
+                    echo = !quiet)
+
+    } else {
+
+      # Check if WSL and Ubuntu are installed
+      check_wsl()
+      # Change paths for WSL
+      wsl_data_dir <- fix_path(data_dir)
+      wsl_subc_layer <- fix_path(subc_layer)
+      wsl_sh_file <- fix_path(system.file("sh", "extract_from_gpkg.sh",
+                                          package = "hydrographr"))
+
+      # Open GRASS GIS session on WSL
+      # Call the external .sh script extract_from_gpkg.sh
+      processx::run(system.file("bat", "extract_from_gpkg.bat",
+                                package = "hydrographr"),
+                    args = c(wsl_data_dir, subc_id, wsl_subc_layer,
+                             var_layer_array, calc_all, n_cores, rand_string,
+                             wsl_sh_file),
+                    echo = !quiet)
+
+    }
+
+    out_filenames <- list.files(paste0(data_dir, tmp),
                                 pattern = "stats_.*.csv", full.names = TRUE)
 
     out_files <- lapply(out_filenames, fread)
 
-    var_table <- setDT(
-      unlist(out_files, recursive = FALSE),
-      check.names = TRUE
-    )[]
+    var_table <- setDT(unlist(out_files, recursive = FALSE),
+                       check.names = TRUE) %>%
+      select(!starts_with("subc_id."))
 
 
   # Write out table if requested
@@ -141,7 +223,7 @@ extract_from_gpkg <- function(data_dir, subc_id, subc_layer, var_layer,
 
 
   # Delete temporary output directory
-  unlink(paste0(data_dir, "/tmp/"), recursive = TRUE)
+  unlink(paste0(data_dir, tmp, "/"), recursive = TRUE)
 
   # Return table
   return(var_table)

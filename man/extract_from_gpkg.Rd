@@ -10,7 +10,8 @@ extract_from_gpkg(
   subc_layer,
   var_layer,
   out_dir = NULL,
-  n_cores = NULL
+  n_cores = NULL,
+  quiet = TRUE
 )
 }
 \arguments{
@@ -36,6 +37,9 @@ If NULL, the output is only loaded in R and not stored on disk.}
 \item{n_cores}{numeric. Number of cores used for parallelization, in case
 multiple .gpkg files are provided to var_layer.
 If NULL, available cores - 1 will be used.}
+
+\item{quiet}{logical. If FALSE, the standard output will be printed.
+Default is TRUE.}
 }
 \description{
 The function reads the attribute table of the stream network GeoPackage file
@@ -44,21 +48,30 @@ sub-catchment (i.e. stream segment) IDs. The output is a data.table, and only
 the output is loaded into R.
 }
 \examples{
-library(hydrographr)
-# Download test data into temporary R folder
-download_test_data(tempdir())
+my_directory <- tempdir()
+download_test_data(my_directory)
 
-# Define the input data directory
-data_dir <- paste0(tempdir(),"/hydrography90m_test_data/")
+# Define path to the directory containing all input data
+test_data <- paste0(my_directory, "/hydrography90m_test_data")
+
+# Define sub-catchment ID layer
+subc_raster <- paste0(my_directory, "/hydrography90m_test_data",
+                  "/subcatchment_1264942.tif")
 
 # Extract the attribute table of the file order_vect_59.gpkg for all the
 # sub-catchment IDs of the subcatchment_1264942.tif raster layer
-attribute_table <- extract_from_gpkg(data_dir = data_dir, subc_id = "all",
-subc_layer = "subcatchment_1264942.tif", var_layer = "order_vect_59.gpkg")
+attribute_table <- extract_from_gpkg(data_dir = test_data,
+                                     subc_id = "all",
+                                     subc_layer = subc_raster,
+                                     var_layer = "order_vect_59.gpkg",
+                                     n_cores = 1)
 
 # Show the output table
 attribute_table
 }
+\references{
+\url{https://grass.osgeo.org/grass82/manuals/v.in.ogr.html}
+}
 \author{
-Afroditi Grigoropoulou, Jaime Garcia Marquez
+Afroditi Grigoropoulou, Jaime Garcia Marquez, Maria M. Üblacker
 }
