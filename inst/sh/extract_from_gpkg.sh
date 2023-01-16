@@ -1,13 +1,14 @@
 #!/bin/bash
 
 export DATADIR=$1
-declare -a SUBC_IDS=($2)
+declare -a SUBC_IDS=($(echo $2 | tr "/" "\n"))
 export SUBC_LAYER=$3
-export VARS=($4)
+export VARS=($(echo $4 | tr "/" "\n"))
 export CALC_ALL=$5
 export NCORES=$6
+export RSTRING=$7
 
-export OUTDIR=$DATADIR/tmp
+export OUTDIR=$DATADIR/tmp_${RSTRING}
 
 # In case of the order_vect files, which have a different structure
 
@@ -18,9 +19,9 @@ extract_from_gpkg(){
 
   export VARNAME=$(basename $VAR .gpkg)
 
-  grass78 -f --gtext --tmp-location $SUBC_LAYER   <<'EOF'
+  grass -f --text --tmp-location $SUBC_LAYER   <<'EOF'
 
-  export LAYER_NAME=$(ogrinfo -al -so order_vect_point_h00v04.gpkg | grep "Layer name:" | awk '{print $3}')
+  export LAYER_NAME=$(ogrinfo -al -so $DATADIR/$VAR | grep "Layer name:" | awk '{print $3}')
   VARNAME=$(basename $VAR .gpkg)
 
   if [ $CALC_ALL == 0 ]; then
@@ -46,18 +47,17 @@ extract_from_gpkg(){
   fi
 
   # The array ($SUBC_IDS) must be comma separated for v.in.ogr to work
-  v.in.ogr -r --o input=$DATADIR/$VAR layer=SELECT \
+  v.in.ogr -r --o input=$DATADIR/$VAR layer=$LAYER_NAME \
   output=stre_cl type=line key=stream where="stream IN ($SUBC_IDS)"
 
 
   v.db.select stre_cl column=stream,strahler,horton,shreve,hack,topo_dim,scheidegger,drwal_old,length,stright,sinosoid,cum_length,out_dist,source_elev,outlet_elev,elev_drop,out_drop,gradient    \
-  file=$OUTDIR/stats_${VARNAME}.csv separator=comma  --overwrite
+  file=$OUTDIR/stats_${VARNAME}_tmp.csv separator=comma  --overwrite
 
   # Replace the column name 'stream' by 'subc_id'
-  sed -i 's/stream/subc_id/g'  $OUTDIR/stats_${VARNAME}.csv
+  sed -i 's/stream/subc_id/g'  $OUTDIR/stats_${VARNAME}_tmp.csv
 
-
-  EOF
+EOF
 
   # Sort variables to later join them in R
   sort -k 1n $OUTDIR/stats_${VARNAME}_tmp.csv > $OUTDIR/stats_${VARNAME}.csv  && rm -f  $OUTDIR/stats_${VARNAME}_tmp.csv
@@ -69,5 +69,3 @@ export -f extract_from_gpkg
 
 # VARS should be provided as an array from R
 parallel -j $NCORES extract_from_gpkg ::: ${VARS[*]}
-
-
