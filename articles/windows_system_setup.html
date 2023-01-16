@@ -225,6 +225,13 @@ GRASS GIS.</p>
 <span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="va">$GRASSEXEC</span>  g.extension  extension=r.stream.snap</span>
 <span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="va">$GRASSEXEC</span>  g.extension  extension=r.stream.basins</span></code></pre></div>
 <p><strong>GNU parallel</strong></p>
+<p>GNU parallel is a shell tool for executing jobs in parallel on
+multiple cores. For a faster processing, some of the
+<code>hydrographr</code> functions such as
+<code><a href="../reference/snap_to_subc_segment.html">snap_to_subc_segment()</a></code> and
+<code><a href="../reference/extract_zonal_stat.html">extract_zonal_stat()</a></code> have GNU parallel implemented. For
+more information check the <a href="https://www.gnu.org/software/parallel/" class="external-link">GNU parallel</a>
+website.</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Download the latest version of GNU parallel </span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">wget</span> http://ftp.gnu.org/gnu/parallel/parallel-latest.tar.bz2</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -281,10 +288,11 @@ GRASS GIS.</p>
 <span id="cb9-54"><a href="#cb9-54" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  THANK YOU SO MUCH</span></span>
 <span id="cb9-55"><a href="#cb9-55" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-56"><a href="#cb9-56" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; It is really appreciated. The citation notice is now silenced.</span></span></code></pre></div>
-<p><strong>dos2unix</strong> The Windows systems uses different text
-file line endings than the Linux systems. Dos2Unix is a package that
-contains commands for converting line endings in a text file from
-Windows to Linux and vice versa.</p>
+<p><strong>dos2unix</strong></p>
+<p>The Windows systems uses different text file line endings than the
+Linux systems. Dos2Unix is a package that contains commands for
+converting line endings in a text file from Windows to Linux and vice
+versa.</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Install dos2unix</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install <span class="at">-y</span> dos2unix</span></code></pre></div>
 </div>

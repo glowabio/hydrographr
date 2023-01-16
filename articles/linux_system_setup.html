@@ -136,6 +136,13 @@ GRASS GIS.</p>
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="va">$GRASSEXEC</span>  g.extension  extension=r.stream.snap</span>
 <span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="va">$GRASSEXEC</span>  g.extension  extension=r.stream.basins</span></code></pre></div>
 <p><strong>GNU parallel</strong></p>
+<p>GNU parallel is a shell tool for executing jobs in parallel on
+multiple cores. For a faster processing, some of the
+<code>hydrographr</code> functions such as
+<code><a href="../reference/snap_to_subc_segment.html">snap_to_subc_segment()</a></code> and
+<code><a href="../reference/extract_zonal_stat.html">extract_zonal_stat()</a></code> have GNU parallel implemented. For
+more information check the <a href="https://www.gnu.org/software/parallel/" class="external-link">GNU parallel</a>
+website.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Download the latest version of GNU parallel </span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">wget</span> http://ftp.gnu.org/gnu/parallel/parallel-latest.tar.bz2</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
