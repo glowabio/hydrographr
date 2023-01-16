@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">hydrographr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.9004</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.9007</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -63,30 +63,19 @@
 
       <dl><dt>
           
-          <code><a href="check_tiles_filesize.html">check_tiles_filesize()</a></code> 
-        </dt>
-        <dd>Checks the size of single files. It is called and inherits arguments by the function 'download_tiles()'</dd>
-      </dl><dl><dt>
-          
           <code><a href="crop_to_extent.html">crop_to_extent()</a></code> 
         </dt>
-        <dd>crop_to_extent</dd>
+        <dd>Crop raster to extent</dd>
       </dl><dl><dt>
           
           <code><a href="download_test_data.html">download_test_data()</a></code> 
         </dt>
-        <dd>Downloads the test data for the Hydrography90m dataset</dd>
+        <dd>Download test data</dd>
       </dl><dl><dt>
           
           <code><a href="download_tiles.html">download_tiles()</a></code> 
         </dt>
-        <dd>Downloads multiple files from Nimbus by calling the function download_tiles_base in a loop.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="download_tiles_base.html">download_tiles_base()</a></code> 
-        </dt>
-        <dd>Downloads a single file from https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4?path=<!-- %2F. -->
-It is called and inherits arguments by the function 'download_tiles()'.</dd>
+        <dd>Download files of the Hydrography90m dataset</dd>
       </dl><dl><dt>
           
           <code><a href="extract_from_gpkg.html">extract_from_gpkg()</a></code> 
@@ -96,12 +85,12 @@ It is called and inherits arguments by the function 'download_tiles()'.</dd>
           
           <code><a href="extract_ids.html">extract_ids()</a></code> 
         </dt>
-        <dd>Adds sub-catchment and/or basin IDs to a dataframe of points</dd>
+        <dd>Extract sub-catchment and/or basin IDs</dd>
       </dl><dl><dt>
           
           <code><a href="extract_zonal_stat.html">extract_zonal_stat()</a></code> 
         </dt>
-        <dd>Calculate zonal statistics based on environmental variable raster and vector layers.</dd>
+        <dd>Calculate zonal statistics</dd>
       </dl><dl><dt>
           
           <code><a href="get_catchment_graph.html">get_catchment_graph()</a></code> 
@@ -111,17 +100,22 @@ It is called and inherits arguments by the function 'download_tiles()'.</dd>
           
           <code><a href="get_regional_unit_id.html">get_regional_unit_id()</a></code> 
         </dt>
-        <dd>Identifies the ids of the regional units in which the given points are located. Input is a point data frame.</dd>
+        <dd>Get Hydrography90m regional unit IDs</dd>
       </dl><dl><dt>
           
           <code><a href="get_tile_id.html">get_tile_id()</a></code> 
         </dt>
-        <dd>Identifies the ids of the tiles in which the given points are located. Input is a point data frame.</dd>
+        <dd>Get the Hydrography90m regular tile ID</dd>
+      </dl><dl><dt>
+          
+          <code><a href="get_upstream_catchment.html">get_upstream_catchment()</a></code> 
+        </dt>
+        <dd>Calculate upstream basin</dd>
       </dl><dl><dt>
           
           <code><a href="merge_tiles.html">merge_tiles()</a></code> 
         </dt>
-        <dd>merge_tiles</dd>
+        <dd>Merge raster or vector objects</dd>
       </dl><dl><dt>
           
           <code><a href="read_geopackage.html">read_geopackage()</a></code> 
@@ -131,12 +125,32 @@ It is called and inherits arguments by the function 'download_tiles()'.</dd>
           
           <code><a href="reclass_raster.html">reclass_raster()</a></code> 
         </dt>
-        <dd>Reclassification of an integer raster layer</dd>
+        <dd>Reclassify an integer raster layer</dd>
+      </dl><dl><dt>
+          
+          <code><a href="report_no_data.html">report_no_data()</a></code> 
+        </dt>
+        <dd>Report NoData value</dd>
       </dl><dl><dt>
           
           <code><a href="segment_neighbours.html">segment_neighbours()</a></code> 
         </dt>
         <dd>Get stream segment neighbours</dd>
+      </dl><dl><dt>
+          
+          <code><a href="set_no_data.html">set_no_data()</a></code> 
+        </dt>
+        <dd>Set no data value</dd>
+      </dl><dl><dt>
+          
+          <code><a href="snap_to_network.html">snap_to_network()</a></code> 
+        </dt>
+        <dd>Snap points to stream segment based on distance or flow accumulation</dd>
+      </dl><dl><dt>
+          
+          <code><a href="snap_to_subc_segment.html">snap_to_subc_segment()</a></code> 
+        </dt>
+        <dd>Snap points to stream segment within the sub-catchment</dd>
       </dl></div>
   </main></div>
 
