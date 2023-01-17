@@ -20,22 +20,24 @@ the data using download_tiles().
 Input is a point data frame.
 }
 \examples{
-library(hydrographr)
-library(data.table)
-
-# Specify the working directory of the test data
-DATADIR <- "path/to/test_data"
-
-# Download the test data
-download_test_data(DATADIR)
+# Download test data into temporary R folder
+# or define a different directory
+my_directory <- tempdir()
+download_test_data(my_directory)
 
 # Read the species data
-species <- fread(paste0(DATADIR, "/spdata_1264942.txt"))
+library(data.table)
+species_occurence <- fread(paste0(my_directory, "/hydrography90m_test_data",
+                                  "/spdata_1264942.txt"))
 
 # Get the regional unit ID
-my_IDs <- get_regional_unit_id(species, lon="longitude", lat="latitude")
-
-
+my_IDs <- get_regional_unit_id(species_occurence, lon = "longitude",
+                              lat = "latitude")
+# Show IDs
+my_IDs
+}
+\references{
+\url{https://gdal.org/programs/gdallocationinfo.html}
 }
 \author{
 Afroditi Grigoropoulou
