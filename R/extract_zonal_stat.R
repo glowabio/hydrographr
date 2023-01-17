@@ -7,7 +7,7 @@
 #' The output is a data.table which is loaded into R.
 #'
 #' @param data_dir character. Path to the directory containing all input data.
-#' @param subc_ids Vector of sub-catchment IDs or "all".
+#' @param subc_id Vector of sub-catchment IDs or "all".
 #' If "all", zonal statistics are calculated for all sub-catchments
 #' of the given sub-catchment raster layer. A vector of the sub-catchment IDs
 #' can be acquired from the extract_ids() function, and by sub-setting
@@ -46,40 +46,45 @@
 #' \url{https://grass.osgeo.org/grass82/manuals/r.univar.html}
 #'
 #' @examples
-#' # Specify the working directory of the test data
-#' my_directory <- getwd()
-#'
-#' # Download the test data
+#' # Download test data into temporary R folder
+#' # or define a different directory
+#' my_directory <- tempdir()
 #' download_test_data(my_directory)
+#'
+#' # Define full path to the sub-catchment ID .tif layer
+#' subc_raster <-  paste0(my_directory, "/hydrography90m_test_data",
+#'                        "/subcatchment_1264942.tif")
+#'
+#' # Define the directory where the output will be stored
+#' output_folder <- paste0(my_directory, "/hydrography90m_test_data/output")
+#' # Create output folder if it doesn't exist
+#' if(!dir.exists(output_folder)) dir.create(output_folder)
 #'
 #' # Calculate the zonal statistics for all sub-catchments for two variables
 #' stat <- extract_zonal_stat(data_dir = paste0(my_directory,
 #'                                              "/hydrography90m_test_data"),
-#'                            subc_ids = subc_ids <- c(513837216, 513841103,
-#'                                                     513850467, 513868394,
-#'                                                     513870312),
-#'                            subc_layer = paste0(my_directory,
-#'                                                "/hydrography90m_test_data",
-#'                                                "/subcatchment_1264942.tif"),
+#'                            subc_id = c(513837216, 513841103,
+#'                                        513850467, 513868394,
+#'                                        513870312),
+#'                            subc_layer = subc_raster,
 #'                            var_layer = c("spi_1264942.tif",
 #'                                          "sti_1264942.tif"),
-#'                            out_dir = paste0(my_directory,
-#'                                      "/hydrography90m_test_data/output/"),
+#'                            out_dir = output_folder,
 #'                            file_name = "zonal_statistics.csv",
 #'                            n_cores = 2)
 #' # Show output table
 #' stat
 #'
 
-extract_zonal_stat <- function(data_dir,  subc_ids, subc_layer, var_layer,
+extract_zonal_stat <- function(data_dir,  subc_id, subc_layer, var_layer,
                                out_dir = NULL, file_name = NULL, n_cores = NULL,
                                quiet = TRUE) {
 
   # Introductory steps
 
   # check if the input is vector
-  if (!is.vector(subc_ids)) {
-    print("subc_ids should be either a vector of ids, or \"all\" ")
+  if (!is.vector(subc_id)) {
+    print("subc_id should be either a vector of ids, or \"all\" ")
   }
   if (!is.vector(var_layer)) {
     print("The var_layer should be provided in a character vector format")
@@ -87,15 +92,20 @@ extract_zonal_stat <- function(data_dir,  subc_ids, subc_layer, var_layer,
 
 
   # Check if paths exist
-  for (path in c(subc_layer, data_dir)) {
-    if (!file.exists(path))
-      stop(paste0("File path: ", path, " does not exist."))
-  }
+  if (!file.exists(data_dir))
+    stop(paste0("Path: ", data_dir, " does not exist."))
+
+  if (!file.exists(subc_layer))
+     stop(paste0("File path: ", subc_layer, " does not exist."))
 
   # Check if subc_layer ends with .tif
-  for (path in c(subc_layer, var_layer)) {
-    if (!endsWith(path, ".tif"))
-      stop(paste0("File path: ", path, " does not end with .tif"))
+  if (!endsWith(subc_layer, ".tif"))
+    stop(paste0("File path: ", subc_layer, " does not end with .tif"))
+  # Check if var_layer exist
+  for (name in var_layer){
+    file <- paste(data_dir, name, sep ="/")
+    if (!file.exists(file))
+      stop(paste0("File: ", var_layer, " does not exist."))
   }
 
   # Create random string to attach to the tmp folder
@@ -109,16 +119,16 @@ extract_zonal_stat <- function(data_dir,  subc_ids, subc_layer, var_layer,
   calc_all <- 1
 
   # Create file with reclassification rules for the r.reclass function
-  if (!identical(subc_ids, "all")) {
+  if (!identical(subc_id, "all")) {
     calc_all <- 0
-    reclass <- rbind.data.frame(data.frame(str_c(subc_ids, " = ", 1)),
+    reclass <- rbind.data.frame(data.frame(str_c(subc_id, " = ", 1)),
                                 "* = NULL")
     fwrite(reclass, paste0(data_dir, tmp, "/reclass_rules.txt"), sep = "\t",
            row.names = FALSE, quote = FALSE, col.names = FALSE)
 
-    # Format subc_ids vector so that it can be read
+    # Format subc_id vector so that it can be read
     # as an array in the bash script
-    subc_ids <- paste(unique(subc_ids), collapse = "/")
+    subc_id <- paste(unique(subc_id), collapse = "/")
 
   }
 
@@ -143,7 +153,7 @@ extract_zonal_stat <- function(data_dir,  subc_ids, subc_layer, var_layer,
     }
   }
 
-  # Format subc_ids vector so that it can be read
+  # Format subc_id vector so that it can be read
   # as an array in the bash script
   var_layer_array <- paste(unique(var_layer), collapse = "/")
 
@@ -167,7 +177,7 @@ extract_zonal_stat <- function(data_dir,  subc_ids, subc_layer, var_layer,
     # containing the grass functions
     processx::run(system.file("sh", "extract_zonal_stat.sh",
                   package = "hydrographr"),
-                  args = c(data_dir, subc_ids, subc_layer,
+                  args = c(data_dir, subc_id, subc_layer,
                            var_layer_array, calc_all, n_cores, rand_string),
                   echo = !quiet)
 
@@ -184,7 +194,7 @@ extract_zonal_stat <- function(data_dir,  subc_ids, subc_layer, var_layer,
       # Call external GRASS GIS command r.reclass
       processx::run(system.file("bat", "extract_zonal_stat.bat",
                                 package = "hydrographr"),
-                    args = c(wsl_data_dir, subc_ids, wsl_subc_layer,
+                    args = c(wsl_data_dir, subc_id, wsl_subc_layer,
                              var_layer_array, calc_all, n_cores, rand_string,
                              wsl_sh_file),
                     echo = !quiet)
