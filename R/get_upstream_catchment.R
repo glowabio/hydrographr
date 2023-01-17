@@ -12,8 +12,7 @@
 #' @param lat character. The name of the column with the latitude coordinates.
 #' @param direction_layer character. Full path to raster file with the
 #' direction variable.
-#' @param out_path Full path to the directory where the output(s)
-#' will be stored.
+#' @param out_dir Full path to the directory where the output(s) will be stored.
 #' To identify the upstream catchment the output file name includes the site id.
 #' @param n_cores numeric. Number of cores used for parallelization.
 #' If NULL, available cores - 1 will be used.
@@ -41,7 +40,8 @@
 #' \code{\link{extract_ids}} to extract basin and sub-catchment IDs.
 #'
 #' @examples
-#' # Download test data into temporary R folder
+#'# Download test data into temporary R folder
+#' # or define a different directory
 #' my_directory <- tempdir()
 #' download_test_data(my_directory)
 #'
@@ -51,18 +51,19 @@
 #'
 #' # Load occurrence data
 #' species_occurence <- read.table(paste0(my_directory,
-#'                             "/hydrography90m_test_data/spdata_1264942.txt"),
-#'                              header = TRUE)
+#'                                        "/hydrography90m_test_data",
+#'                                        "/spdata_1264942.txt"),
+#'                               header = TRUE)
 #'
 #' # Define full path to the basin and sub-catchments raster layer
-#' basin_rast <- paste0(my_directory,
-#'                      "/hydrography90m_test_data/basin_1264942.tif")
-#' subc_rast <- paste0(my_directory,
-#'                     "/hydrography90m_test_data/subcatchment_1264942.tif")
+#' basin_raster <- paste0(my_directory,
+#'                        "/hydrography90m_test_data/basin_1264942.tif")
+#' subc_raster <- paste0(my_directory,
+#'                       "/hydrography90m_test_data/subcatchment_1264942.tif")
 #'
 #' # Define full path to the vector file of the stream network
-#' stream_vect <- paste0(my_directory,
-#'                       "/hydrography90m_test_data/order_vect_59.gpkg")
+#' stream_vector <- paste0(my_directory,
+#'                         "/hydrography90m_test_data/order_vect_59.gpkg")
 #'
 #' # Automatically extract the basin and sub-catchment IDs and
 #' # snap the data points to the stream segment
@@ -70,29 +71,28 @@
 #'                                             lon = "longitude",
 #'                                             lat = "latitude",
 #'                                             id = "occurrence_id",
-#'                                             basin_path = basin_rast,
-#'                                             subc_path = subc_rast,
-#'                                             stream_path = stream_vect,
+#'                                             basin_layer = basin_raster,
+#'                                             subc_layer = subc_raster,
+#'                                             stream_layer = stream_vector,
 #'                                             n_cores = 2)
 #'
 #' # Define full path to the direction .tif
-#' direction_rast <- paste0(my_directory,
-#'                         "/hydrography90m_test_data/direction_1264942.tif")
+#' direction_raster <- paste0(my_directory,
+#'                            "/hydrography90m_test_data/direction_1264942.tif")
 #' # Define the path for the output file(s)
-#' output <-  paste0(my_directory, "/upstream_catchments")
-#' if(!dir.exists(output)) dir.create(output)
+#' output_folder <-  paste0(my_directory, "/upstream_catchments")
+#' if(!dir.exists(output_folder)) dir.create(output_folder)
 #' # Get the upstream catchment for each point location
-#' get_upstream_catchment(hydrography90m_ids,
-#'                        lon = "longitude",
-#'                        lat = "latitude",
+#' get_upstream_catchment(snapped_coordinates,
+#'                        lon = "lon_snap",
+#'                        lat = "lat_snap",
 #'                        id = "occurrence_id",
-#'                        direction_layer = dir_rast,
-#'                        out_path = output,
-#'                        n_cores = 2)
-#'
+#'                        direction_layer = direction_raster,
+#'                        out_dir = output_folder,
+
 
 get_upstream_catchment <- function(data, id, lon, lat, direction_layer = NULL,
-                                   out_path = NULL, n_cores = NULL,
+                                   out_dir = NULL, n_cores = NULL,
                                    quiet = TRUE) {
 
   # Check if data.frame is defined
@@ -138,8 +138,8 @@ get_upstream_catchment <- function(data, id, lon, lat, direction_layer = NULL,
   if (!file.exists(direction_layer))
     stop(paste0("direction_layer: ", direction_layer, " does not exist."))
   # Check if accu_path exists
-    if (!dir.exists(out_path))
-      stop(paste0("out_path: ", out_path, " does not exist."))
+    if (!dir.exists(out_dir))
+      stop(paste0("out_dir: ", out_dir, " does not exist."))
 
   # Check if direction_layer ends with .tif
   if (!endsWith(direction_layer, ".tif"))
@@ -183,7 +183,7 @@ get_upstream_catchment <- function(data, id, lon, lat, direction_layer = NULL,
     processx::run(system.file("sh", "get_upstream_catchment.sh",
                               package = "hydrographr"),
                   args = c(coord_tmp_path, id, lon, lat, direction_layer,
-                           out_path, n_cores),
+                           out_dir, n_cores),
                   echo = !quiet)
 
   } else {
@@ -193,7 +193,7 @@ get_upstream_catchment <- function(data, id, lon, lat, direction_layer = NULL,
     wsl_coord_tmp_path <- fix_path(coord_tmp_path)
     wsl_dire_path <- ifelse(is.null(direction_layer), 0,
                             fix_path(direction_layer))
-    wsl_out_path <- fix_path(out_path)
+    wsl_out_dir <- fix_path(out_dir)
     wsl_sh_file <- fix_path(
       system.file("sh", "get_upstream_catchment.sh",
                   package = "hydrographr"))
@@ -201,7 +201,7 @@ get_upstream_catchment <- function(data, id, lon, lat, direction_layer = NULL,
     run(system.file("bat", "get_upstream_catchment.bat",
                                 package = "hydrographr"),
                     args = c(wsl_coord_tmp_path, id, lon, lat, wsl_dire_path,
-                             wsl_out_path, n_cores, wsl_sh_file),
+                             wsl_out_dir, n_cores, wsl_sh_file),
                     echo = !quiet)
 
   }
@@ -210,6 +210,6 @@ get_upstream_catchment <- function(data, id, lon, lat, direction_layer = NULL,
   file.remove(coord_tmp_path)
 
   # Print output location
-  print(paste0("The output is in ", out_path))
+  print(paste0("The output is in ", out_dir))
 
 }

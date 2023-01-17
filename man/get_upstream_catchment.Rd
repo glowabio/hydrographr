@@ -10,7 +10,7 @@ get_upstream_catchment(
   lon,
   lat,
   direction_layer = NULL,
-  out_path = NULL,
+  out_dir = NULL,
   n_cores = NULL,
   quiet = TRUE
 )
@@ -30,8 +30,7 @@ of "data" (e.g., occurrence or site IDs).}
 \item{direction_layer}{character. Full path to raster file with the
 direction variable.}
 
-\item{out_path}{Full path to the directory where the output(s)
-will be stored.
+\item{out_dir}{Full path to the directory where the output(s) will be stored.
 To identify the upstream catchment the output file name includes the site id.}
 
 \item{n_cores}{numeric. Number of cores used for parallelization.
@@ -46,6 +45,7 @@ point as the outlet.
 }
 \examples{
 # Download test data into temporary R folder
+# or define a different directory
 my_directory <- tempdir()
 download_test_data(my_directory)
 
@@ -55,18 +55,19 @@ download_test_data(my_directory)
 
 # Load occurrence data
 species_occurence <- read.table(paste0(my_directory,
-                            "/hydrography90m_test_data/spdata_1264942.txt"),
-                             header = TRUE)
+                                       "/hydrography90m_test_data",
+                                       "/spdata_1264942.txt"),
+                              header = TRUE)
 
 # Define full path to the basin and sub-catchments raster layer
-basin_rast <- paste0(my_directory,
-                     "/hydrography90m_test_data/basin_1264942.tif")
-subc_rast <- paste0(my_directory,
-                    "/hydrography90m_test_data/subcatchment_1264942.tif")
+basin_raster <- paste0(my_directory,
+                       "/hydrography90m_test_data/basin_1264942.tif")
+subc_raster <- paste0(my_directory,
+                      "/hydrography90m_test_data/subcatchment_1264942.tif")
 
 # Define full path to the vector file of the stream network
-stream_vect <- paste0(my_directory,
-                      "/hydrography90m_test_data/order_vect_59.gpkg")
+stream_vector <- paste0(my_directory,
+                        "/hydrography90m_test_data/order_vect_59.gpkg")
 
 # Automatically extract the basin and sub-catchment IDs and
 # snap the data points to the stream segment
@@ -74,26 +75,24 @@ snapped_coordinates <- snap_to_subc_segment(data = species_occurence,
                                             lon = "longitude",
                                             lat = "latitude",
                                             id = "occurrence_id",
-                                            basin_path = basin_rast,
-                                            subc_path = subc_rast,
-                                            stream_path = stream_vect,
+                                            basin_layer = basin_raster,
+                                            subc_layer = subc_raster,
+                                            stream_layer = stream_vector,
                                             n_cores = 2)
 
 # Define full path to the direction .tif
-direction_rast <- paste0(my_directory,
-                        "/hydrography90m_test_data/direction_1264942.tif")
+direction_raster <- paste0(my_directory,
+                           "/hydrography90m_test_data/direction_1264942.tif")
 # Define the path for the output file(s)
-output <-  paste0(my_directory, "/upstream_catchments")
-if(!dir.exists(output)) dir.create(output)
+output_folder <-  paste0(my_directory, "/upstream_catchments")
+if(!dir.exists(output_folder)) dir.create(output_folder)
 # Get the upstream catchment for each point location
-get_upstream_catchment(hydrography90m_ids,
-                       lon = "longitude",
-                       lat = "latitude",
+get_upstream_catchment(snapped_coordinates,
+                       lon = "lon_snap",
+                       lat = "lat_snap",
                        id = "occurrence_id",
-                       direction_layer = dir_rast,
-                       out_path = output,
-                       n_cores = 2)
-
+                       direction_layer = direction_raster,
+                       out_dir = output_folder,
 }
 \references{
 \url{https://grass.osgeo.org/grass82/manuals/r.water.outlet.html}
