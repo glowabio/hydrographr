@@ -1,8 +1,8 @@
 #' @title Get catchment from graph
 #'
-#' @description Subset the network graph by extracting the upstream, downstream or entire
-#' catchment, for one or multiple stream segments. The function will return
-#' either one or more data.tables or graph objects for each input stream
+#' @description Subset the network graph by extracting the upstream, downstream
+#' or entire catchment, for one or multiple stream segments. The function will
+#' return either one or more data.tables or graph objects for each input stream
 #' segment. Note that the stream segment and sub-catchment IDs are identical,
 #' and for consistency, we use the term "subc_id".
 #'
@@ -53,16 +53,23 @@
 #' @importFrom memuse Sys.meminfo
 #' @export
 #'
-#' @examples
-#' library(hydrographr)
+#' @author Sami Domisch
 #'
+#' @references
+#' Csardi G, Nepusz T: The igraph software package for complex network research,
+#' InterJournal, Complex Systems 1695. 2006. \url{https://igraph.org}
+#'
+#' @examples
 #' # Download test data into temporary R folder
+#' # or define a different directory
 #' my_directory <- tempdir()
 #' download_test_data(my_directory)
 #'
 #' # Load stream network as a graph
-#' g <- read_geopackage(paste0(my_directory, "/order_vect_59.gpkg"),
-#'                             type = "net", as_graph = TRUE)
+#' g <- read_geopackage(paste0(my_directory, "/hydrography90m_test_data",
+#'                             "/order_vect_59.gpkg"),
+#'                      type = "net",
+#'                      as_graph = TRUE)
 #'
 #' # Pick a random subc_id
 #' subc_id = "513855877"
@@ -78,33 +85,35 @@
 #' g_all <- get_catchment_graph(g, mode = "in", outlet = TRUE, as_graph = TRUE,
 #'                              n_cores = 1)
 #'
-#' @author Sami Domisch
 
 
-get_catchment_graph <- function(g, subc_id = NULL, outlet = FALSE,
-mode = NULL, as_graph = FALSE, n_cores = 1, max_size = 1500) {
+
+get_catchment_graph <- function(g, subc_id = NULL, outlet = FALSE, mode = NULL,
+                                as_graph = FALSE, n_cores = 1,
+                                max_size = 1500) {
 
   # Check input arguments
-  if (class(g) != "igraph")     stop("Input must be an igraph object.")
+  if (class(g) != "igraph")
+    stop("Input must be an igraph object.")
 
-  if (!is_directed(g)) stop("The input graph must be a directed graph.")
+  if (!is_directed(g))
+    stop("The input graph must be a directed graph.")
 
-  if (missing(subc_id) && outlet == FALSE) stop(
-        "Please provide at least one segment ID of the input graph,
-        or set outlet=TRUE. The subc_id must be a numeric vector."
-        )
+  if (missing(subc_id) && outlet == FALSE)
+    stop("Please provide at least one segment ID of the input graph,
+        or set outlet=TRUE. The subc_id must be a numeric vector.")
 
 
-  if (missing(mode)) stop("Please provide the mode as 'in', 'out' or 'all'.")
+  if (missing(mode))
+    stop("Please provide the mode as 'in', 'out' or 'all'.")
 
-  if (is.data.frame(subc_id) == TRUE) stop(
-    "The subc_id must be a numeric vector.")
+  if (is.data.frame(subc_id) == TRUE)
+    stop("The subc_id must be a numeric vector.")
 
   if (hasArg(n_cores)) {
-  if (length(subc_id) > 1 && n_cores == 0)  stop(
-    "You have specified multiple segments but zero workers.
-    Please specify at least n_cores=1,
-     or leave it empty to allow enable the automatic setup.")
+  if (length(subc_id) > 1 && n_cores == 0)
+    stop( "You have specified multiple segments but zero workers. Please specify
+    at least n_cores=1,or leave it empty to allow enable the automatic setup.")
   }
 
   # Set available RAM for future.apply
@@ -124,7 +133,8 @@ mode = NULL, as_graph = FALSE, n_cores = 1, max_size = 1500) {
     # The Hydrograhy90m outlets are coded as "-1"
     outlet <- which(degree(g, v = V(g), mode = "out") == 0, useNames = TRUE)
     # Stop if no outlets found.
-    if (length(outlet) == 0) stop("No outlets found.")
+    if (length(outlet) == 0)
+      stop("No outlets found.")
 
     # If no subc_ids provided, then use the outlets as the subc_ids
     if (missing(subc_id) && length(outlet) >= 1) {
