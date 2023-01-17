@@ -10,7 +10,8 @@ crop_to_extent(
   bounding_box = NULL,
   out_dir,
   file_name,
-  read = TRUE
+  read = TRUE,
+  quiet = TRUE
 )
 }
 \arguments{
@@ -29,6 +30,9 @@ or other spatial object.}
 
 \item{read}{logical. If TRUE, the cropped raster .tif layer gets read into R.
 If FALSE, the layer is only stored on disk. Default is TRUE.}
+
+\item{quiet}{logical. If FALSE, the standard output will be printed.
+Default is TRUE.}
 }
 \value{
 The function returns always a .tif raster file written to disk.
@@ -48,21 +52,22 @@ optionally loaded into R as a SpatRaster (terra package) object
 (using read = TRUE).
 }
 \examples{
-library(hydrographr)
-library(data.table)
+# Download test data into temporary R folder
+my_directory <- tempdir()
+download_test_data(my_directory)
 
-# Specify the working directory of the test data
-DATADIR <- "path/to/test_data"
-
-# Download the test data
-download_test_data(DATADIR)
+# Define full path to the input raster .tif layer ans vector layer
+spi_raster <- paste0(my_directory, "/hydrography90m_test_data",
+                     "/spi_1264942.tif"))
+basin_vector <- paste0(my_directory, "/hydrography90m_test_data",
+                      "/basin_59.gpkg"))
 
 # Crop the Stream Power Index to the basin
-spi_basin <- crop_to_extent(raster_layer = paste0(DATADIR,
-"/spi_1264942.tif"),
-vector_layer = paste0(DATADIR, "/basin_59.gpkg"),
-output_path = "/my/output/path/spi_basin_cropped.tif"),
-read = TRUE)
+spi_basin <- crop_to_extent(raster_layer = spi_raster,
+                            vector_layer = basin_vector,
+                            out_dir = my_directory,
+                            file_name = "spi_basin_cropped.tif",
+                            read = TRUE)
 }
 \author{
 Yusdiel Torres-Cambas

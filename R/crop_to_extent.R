@@ -21,7 +21,8 @@
 #' @param file_name character. Name of the cropped output raster .tif file.
 #' @param read logical. If TRUE, the cropped raster .tif layer gets read into R.
 #' If FALSE, the layer is only stored on disk. Default is TRUE.
-#'
+#' @param quiet logical. If FALSE, the standard output will be printed.
+#' Default is TRUE.
 #' @importFrom processx run
 #' @importFrom terra rast
 #' @importFrom terra ext
@@ -34,27 +35,26 @@
 #' @author Yusdiel Torres-Cambas
 #'
 #' @examples
-#' library(hydrographr)
-#' library(data.table)
+#' # Download test data into temporary R folder
+#' my_directory <- tempdir()
+#' download_test_data(my_directory)
 #'
-#' # Specify the working directory of the test data
-#' DATADIR <- "path/to/test_data"
-#'
-#' # Download the test data
-#' download_test_data(DATADIR)
+#' # Define full path to the input raster .tif layer ans vector layer
+#' spi_raster <- paste0(my_directory, "/hydrography90m_test_data",
+#'                      "/spi_1264942.tif")
+#' basin_vector <- paste0(my_directory, "/hydrography90m_test_data",
+#'                       "/basin_59.gpkg")
 #'
 #' # Crop the Stream Power Index to the basin
-#' spi_basin <- crop_to_extent(raster_layer = paste0(DATADIR,
-#' "/spi_1264942.tif"),
-#' vector_layer = paste0(DATADIR, "/basin_59.gpkg"),
-#' output_path = "/my/output/path/spi_basin_cropped.tif"),
-#' read = TRUE)
+#' spi_basin <- crop_to_extent(raster_layer = spi_raster,
+#'                             vector_layer = basin_vector,
+#'                             out_dir = my_directory,
+#'                             file_name = "spi_basin_cropped.tif",
+#'                             read = TRUE)
 
-crop_to_extent <- function(raster_layer,
-                           vector_layer = NULL,
-                           bounding_box = NULL,
-                           out_dir, file_name,
-                           read = TRUE) {
+crop_to_extent <- function(raster_layer, vector_layer = NULL,
+                           bounding_box = NULL, out_dir, file_name,
+                           read = TRUE, quiet = TRUE) {
 
   # Check that an input path and an output path were provided
   if (missing(raster_layer))
@@ -65,16 +65,43 @@ crop_to_extent <- function(raster_layer,
     stop("Please provide a name for the output file")
   # Check that at least a cutline source or a bounding box coordinates are
   # provided
-  if (is.null(vector_layer) && is.null(bounding_box)) {
+  if (is.null(vector_layer) && is.null(bounding_box))
     stop("Please provide at least a cutline source, a bounding box
           coordinates or an spatial object from which extract an extent")
-  } else {
-    # Compose output_path by combining out_dir and file_name
-    output_path <- paste0(out_dir, "/", file_name)
-    # Check operating system
-    system <- get_os()
-    if (system == "linux" || system == "osx") {
-      if (!is.null(vector_layer)) {
+
+  # Check if file path exists
+  if (!file.exists(raster_layer))
+    stop(paste0("File path: ", raster_layer, " does not exist."))
+
+  if (!is.null(vector_layer))
+  if (!file.exists(vector_layer))
+    stop(paste0("File path: ", vector_layer, " does not exist."))
+
+  # Check if path exists
+  if (!dir.exists(out_dir))
+    stop(paste0("Path: ", out_dir, " does not exist."))
+
+  # Check if raster_layer ends with .tif
+  if (!endsWith(raster_layer, ".tif"))
+    stop("raster_layer: Input raster is not a .tif file.")
+
+  # Check if quiet is logical
+  if (!is.logical(quiet))
+    stop("quiet: Has to be TRUE or FALSE.")
+
+  # Check if quiet is logical
+  if (!is.logical(read))
+    stop("read: Has to be TRUE or FALSE.")
+
+  # Compose output_path by combining out_dir and file_name
+  output_path <- paste0(out_dir, "/", file_name)
+  # Check operating system
+  system <- get_os()
+  # Make bash scripts executable
+  make_sh_exec()
+
+  if (system == "linux" || system == "osx") {
+    if (!is.null(vector_layer)) {
         # Call external gdalwarp command from GDAL library. Cut through
         # the border line option
         cat("Cropping...\n")
@@ -82,7 +109,7 @@ crop_to_extent <- function(raster_layer,
                         package = "hydrographr"),
             args = c(raster_layer, vector_layer, output_path),
             echo = FALSE)
-      } else if (!is.null(bounding_box)) {
+        } else if (!is.null(bounding_box)) {
       # Check if bounding_box is a vector with corner coordinate values,
       # if FALSE try to extract the values from a spatial object
         if (is.vector(bounding_box) && length(bounding_box) == 4) {
@@ -97,6 +124,7 @@ crop_to_extent <- function(raster_layer,
           xmax <- bb[2]
           ymax <- bb[4]
         }
+
         # Call external gdalwarp command from GDAL library.
         # Cut through a polygon extent
         cat("Cropping...\n")
@@ -104,9 +132,9 @@ crop_to_extent <- function(raster_layer,
                         package = "hydrographr"),
             args = c(raster_layer, xmin, ymin,
                      xmax, ymax, output_path),
-            echo = FALSE)
-      }
-    } else if (system == "windows") {
+            echo = !quiet)
+        }
+    } else {
       # Check if WSL and Ubuntu are installed
       check_wsl()
       # Change paths for WSL
@@ -126,7 +154,7 @@ crop_to_extent <- function(raster_layer,
                         package = "hydrographr"),
             args = c(wsl_raster_layer, wsl_vector_layer, wsl_output_path,
                      wsl_sh_cl_file),
-            echo = FALSE)
+            echo = !quiet)
       } else if (!is.null(bounding_box)) {
         # Check if bounding_box is a vector with corner coordinate values,
         # if FALSE try to extract the values from an spatial object
@@ -149,17 +177,19 @@ crop_to_extent <- function(raster_layer,
                         package = "hydrographr"),
             args = c(wsl_raster_layer, xmin, ymin,
                      xmax, ymax, wsl_output_path, wsl_sh_bb_file),
-            echo = FALSE)
+            echo = !quiet)
       }
-    }
+      }
+
     if (read == TRUE) {
       # Read cropped .tif layer
       cat("Cropped raster saved under: ", output_path)
       crop_rast <- rast(output_path)
       return(crop_rast)
+
     } else {
       # Print message
       cat("Cropped raster saved under: ", output_path)
     }
-  }
 }
+
