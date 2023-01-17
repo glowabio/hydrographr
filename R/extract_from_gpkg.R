@@ -86,7 +86,7 @@ extract_from_gpkg <- function(data_dir, subc_id, subc_layer, var_layer,
 
 
   if (!is.null(out_dir))
-    if (!file.exists(data_dir))
+    if (!file.exists(out_dir))
       stop(paste0("Path: ", out_dir, " does not exist."))
 
   # Check if the input is vector
@@ -110,7 +110,7 @@ extract_from_gpkg <- function(data_dir, subc_id, subc_layer, var_layer,
   file <- paste(data_dir, name, sep = "/")
 
   if (!file.exists(file))
-    stop(paste0("File: ", file, " does not exist."))
+    stop(paste0("File: ", var_layer, " does not exist."))
 
   }
 
