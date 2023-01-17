@@ -6,7 +6,7 @@
 \usage{
 extract_zonal_stat(
   data_dir,
-  subc_ids,
+  subc_id,
   subc_layer,
   var_layer,
   out_dir = NULL,
@@ -18,7 +18,7 @@ extract_zonal_stat(
 \arguments{
 \item{data_dir}{character. Path to the directory containing all input data.}
 
-\item{subc_ids}{Vector of sub-catchment IDs or "all".
+\item{subc_id}{Vector of sub-catchment IDs or "all".
 If "all", zonal statistics are calculated for all sub-catchments
 of the given sub-catchment raster layer. A vector of the sub-catchment IDs
 can be acquired from the extract_ids() function, and by sub-setting
@@ -54,25 +54,30 @@ sub-catchments. The sub-catchment raster (.tif) input file is stored on disk.
 The output is a data.table which is loaded into R.
 }
 \examples{
-# Specify the working directory of the test data
-my_directory <- getwd()
-
-# Download the test data
+# Download test data into temporary R folder
+# or define a different directory
+my_directory <- tempdir()
 download_test_data(my_directory)
+
+# Define full path to the sub-catchment ID .tif layer
+subc_raster <-  paste0(my_directory, "/hydrography90m_test_data",
+                       "/subcatchment_1264942.tif")
+
+# Define the directory where the output will be stored
+output_folder <- paste0(my_directory, "/hydrography90m_test_data/output")
+# Create output folder if it doesn't exist
+if(!dir.exists(output_folder)) dir.create(output_folder)
 
 # Calculate the zonal statistics for all sub-catchments for two variables
 stat <- extract_zonal_stat(data_dir = paste0(my_directory,
                                              "/hydrography90m_test_data"),
-                           subc_ids = subc_ids <- c(513837216, 513841103,
-                                                    513850467, 513868394,
-                                                    513870312),
-                           subc_layer = paste0(my_directory,
-                                               "/hydrography90m_test_data",
-                                               "/subcatchment_1264942.tif"),
+                           subc_id = c(513837216, 513841103,
+                                       513850467, 513868394,
+                                       513870312),
+                           subc_layer = subc_raster,
                            var_layer = c("spi_1264942.tif",
                                          "sti_1264942.tif"),
-                           out_dir = paste0(my_directory,
-                                     "/hydrography90m_test_data/output/"),
+                           out_dir = output_folder,
                            file_name = "zonal_statistics.csv",
                            n_cores = 2)
 # Show output table
