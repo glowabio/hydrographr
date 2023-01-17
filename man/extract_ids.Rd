@@ -48,6 +48,7 @@ Duplicated rows will be removed.
 }
 \examples{
 # Download test data into the temporary R folder
+# or define a different directory
 my_directory <- tempdir()
 download_test_data(my_directory)
 

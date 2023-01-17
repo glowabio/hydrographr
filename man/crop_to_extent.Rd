@@ -53,14 +53,15 @@ optionally loaded into R as a SpatRaster (terra package) object
 }
 \examples{
 # Download test data into temporary R folder
+# or define a different directory
 my_directory <- tempdir()
 download_test_data(my_directory)
 
 # Define full path to the input raster .tif layer ans vector layer
 spi_raster <- paste0(my_directory, "/hydrography90m_test_data",
-                     "/spi_1264942.tif"))
+                     "/spi_1264942.tif")
 basin_vector <- paste0(my_directory, "/hydrography90m_test_data",
-                      "/basin_59.gpkg"))
+                      "/basin_59.gpkg")
 
 # Crop the Stream Power Index to the basin
 spi_basin <- crop_to_extent(raster_layer = spi_raster,
