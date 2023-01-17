@@ -24,12 +24,13 @@ the available values of a specified location.
 }
 \examples{
 # Download test data into temporary R folder
+# or define a different directory
 my_directory <- tempdir()
 download_test_data(my_directory)
 
 # Report the NoData value
 report_no_data(data_dir = paste0(my_directory, "/hydrography90m_test_data"),
-               variable = c("subcatchment_1264942.tif", "flow_1264942.tif",
+               var_layer = c("subcatchment_1264942.tif", "flow_1264942.tif",
                              "spi_1264942.tif"),
                n_core = 2)
 

@@ -23,12 +23,13 @@
 #'
 #' @examples
 #' # Download test data into temporary R folder
+#' # or define a different directory
 #' my_directory <- tempdir()
 #' download_test_data(my_directory)
 #'
 #' # Report the NoData value
 #' report_no_data(data_dir = paste0(my_directory, "/hydrography90m_test_data"),
-#'                variable = c("subcatchment_1264942.tif", "flow_1264942.tif",
+#'                var_layer = c("subcatchment_1264942.tif", "flow_1264942.tif",
 #'                              "spi_1264942.tif"),
 #'                n_core = 2)
 #'
@@ -39,6 +40,15 @@ report_no_data <- function(data_dir, var_layer, n_cores = NULL) {
   # Check if path exists
   if (!dir.exists(data_dir))
     stop(paste0(data_dir, " does not exist."))
+
+  for(name in var_layer) {
+
+    file <- paste(data_dir, name, sep = "/")
+
+    if (!file.exists(file))
+      stop(paste0("File: ", var_layer, " does not exist."))
+
+  }
 
   # Setting up parallelization if n_cores is not provided
   if (is.null(n_cores)) {
