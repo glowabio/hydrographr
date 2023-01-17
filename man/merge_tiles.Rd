@@ -7,8 +7,8 @@
 merge_tiles(tile_dir, out_dir, read_raster = TRUE, read_vector = FALSE)
 }
 \arguments{
-\item{tile_dir}{character. The directory containing the raster tiles or
-spatial vectors to be merged.}
+\item{tile_dir}{character. The directory containing only the raster or
+spatial vectors tiles, which should be merged.}
 
 \item{out_dir}{character. The directory where the output will be stored.}
 
@@ -28,13 +28,39 @@ Merge multiple raster or spatial vector objects from disk
 to form a new raster or spatial vector object with a larger spatial extent.
 A directory with at least a raster .tif or spatial vector geopackage file
 must be provided.
-If read`_`raster = TRUE (default), the outputs are a .tif
-(saved under out`_`dir) and a SpatRaster (terra package) object,
-otherwise if read`_`raster = FALSE, the .tif file is the only output.
-If read`_`vector = TRUE, the outputs are a .gpkg (saved under out`_`dir)
-and a SpatVector (terra package) object,
-otherwise if read`_`vector = FALSE (default),
-the .gpkg file is the only output.
+If read_raster = TRUE (default), the outputs are a .tif
+(saved under out_dir) and a SpatRaster (terra package) object, otherwise if
+read_raster = FALSE, the .tif file is the only output. If read_vector = TRUE,
+the outputs are a .gpkg (saved under out_dir) and a SpatVector
+(terra package) object, otherwise if read_vector = FALSE (default), the .gpkg
+file is the only output.
+}
+\examples{
+# Download tiles into temporary R folder
+# or define a different directory
+my_directory <- tempdir()
+download_tiles(variable = "basin",
+               file_format = "tif",
+               tile_id = c("h22v08","h22v10"),
+               download_dir = my_directory)
+
+# Define output folder
+output_folder <- paste0(my_directory, "merged_tiles")
+# Creat ouput folder if it doesn't exist
+if(!dir.exists(output_folder)) dir.create(output_folder)
+# Merge tiles
+merged_tiles <- merge_tiles(tile_dir = my_directory,
+                            out_dir = ouput_folder)
+
+}
+\references{
+\url{https://gdal.org/programs/gdalbuildvrt.html}
+
+\url{https://gdal.org/programs/gdal_translate.html}
+
+\url{https://gdal.org/programs/ogrmerge.html#ogrmerge}
+
+\url{https://gdal.org/programs/ogr2ogr.html}
 }
 \author{
 Thomas Tomiczek
