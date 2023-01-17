@@ -37,17 +37,20 @@
 #'
 #' @examples
 #' # Download test data into the temporary R folder
-#' download_test_data(tempdir())
+#' # or define a different directory
+#' my_directory <- tempdir()
+#' download_test_data(my_directory)
 #'
 #' # Load occurrence data
-#' species_occurrence <- read.table(
-#' paste0(tempdir(), "/hydrography90m_test_data/spdata_1264942.txt"),
-#' header = TRUE)
+#' species_occurrence <- read.table(paste0(my_directory,
+#'                                         "/hydrography90m_test_data",
+#'                                         "/spdata_1264942.txt"),
+#'                                  header = TRUE)
 #'
 #' # Define full path to the basin and sub-catchments raster layer
-#' basin_rast <- paste0(tempdir(),
+#' basin_raster <- paste0(my_directory,
 #'                      "/hydrography90m_test_data/basin_1264942.tif")
-#' subc_rast <- paste0(tempdir(),
+#' subc_raster <- paste0(my_directory,
 #'                     "/hydrography90m_test_data/basin_1264942.tif")
 #'
 #' # Extract basin and sub-catchment IDs from the Hydrography90m layers
@@ -55,8 +58,8 @@
 #'                                   lon = "longitude",
 #'                                   lat = "latitude",
 #'                                   id = "occurrence_id",
-#'                                   subc_layer = subc_rast,
-#'                                   basin_layer = basin_rast)
+#'                                   subc_layer = subc_raster,
+#'                                   basin_layer = basin_raster)
 #'
 #' # Show the output table
 #' hydrography90m_ids
