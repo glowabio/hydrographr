@@ -48,6 +48,7 @@ sub-catchment (i.e. stream segment) IDs. The output is a data.table, and only
 the output is loaded into R.
 }
 \examples{
+# Download test data into temporary R folder
 # or define a different directory
 my_directory <- tempdir()
 download_test_data(my_directory)

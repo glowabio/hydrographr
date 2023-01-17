@@ -31,10 +31,8 @@ species_occurrence <- read.table(paste0(my_directory,
                                  header = TRUE)
 
 # Get the tile ID
-my_IDs <- get_tile_id(data = species_occurrence,
-                      lon = "longitude", lat = "latitude")
-# Show IDs
-my_IDs
+get_tile_id(data = species_occurrence,
+            lon = "longitude", lat = "latitude")
 }
 \author{
 Afroditi Grigoropoulou

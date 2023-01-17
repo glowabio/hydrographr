@@ -26,15 +26,14 @@ my_directory <- tempdir()
 download_test_data(my_directory)
 
 # Read the species data
-library(data.table)
-species_occurence <- fread(paste0(my_directory, "/hydrography90m_test_data",
-                                  "/spdata_1264942.txt"))
+species_occurence <- read.table(paste0(my_directory,
+                                       "/hydrography90m_test_data",
+                                       "/spdata_1264942.txt"),
+                              header = TRUE)
 
 # Get the regional unit ID
-my_IDs <- get_regional_unit_id(species_occurence, lon = "longitude",
-                              lat = "latitude")
-# Show IDs
-my_IDs
+get_regional_unit_id(species_occurence, lon = "longitude",
+                    lat = "latitude")
 }
 \references{
 \url{https://gdal.org/programs/gdallocationinfo.html}
