@@ -54,79 +54,79 @@
 #' @importFrom memuse Sys.meminfo
 #' @export
 #'
+#' @author Sami Domisch
+#'
+#' @references
+#' Csardi G, Nepusz T: The igraph software package for complex network research,
+#' InterJournal, Complex Systems 1695. 2006. \url{https://igraph.org}
 #'
 #' @examples
-#' library(hydrographr)
-#'
 #' # Download test data into temporary R folder
+#' # or define a different directory
 #' my_directory <- tempdir()
 #' download_test_data(my_directory)
 #'
 #' # Load the stream network as graph
-#' g <- read_geopackage(paste0(my_directory, "/order_vect_59.gpkg"),
-#' type = "net", g = T)
+#' g <- read_geopackage(paste0(my_directory, "/hydrography90m_test_data",
+#'                              "/order_vect_59.gpkg"),
+#'                       type = "net",
+#'                       as_graph = TRUE)
 #'
 #' # Get the upstream segment neighbours in the 5th order
-#' and report the length and source elevation
-#' for the neighbours of each input segment
-#' segment_neighbours(g, subc_id = subc_id,
-#'                    order = 5, mode = "in", n_cores = 1,
-#'                    var_layer = c("length", "source_elev"),
-#'                    attach_only = T)
+#' # and report the length and source elevation
+#' # for the neighbours of each input segment
+#' get_segment_neighbours(g, subc_id = subc_id,
+#'                        order = 5, mode = "in", n_cores = 1,
+#'                        var_layer = c("length", "source_elev"),
+#'                        attach_only = TRUE)
 #'
 #' # Get the downstream segment neighbours in the 5th order
-#' and calculate the median length and source elevation
-#' across the neighbours of each input segment
-#' segment_neighbours(my_graph, subc_id = subc_id,
-#'                    order = 2, mode ="out", n_cores = 1,
-#'                    var_layer = c("length", "source_elev"),
-#'                    stat = median)
+#' # and calculate the median length and source elevation
+#' # across the neighbours of each input segment
+#' get_segment_neighbours(g, subc_id = subc_id,
+#'                        order = 2, mode ="out", n_cores = 1,
+#'                        var_layer = c("length", "source_elev"),
+#'                        stat = median)
 #'
-#' Get the up-and downstream segment neighbours in the 5th order
-#' and report the median length and source elevation
-#' for the neighbours of each input segment
-#' segment_neighbours(my_graph, subc_id = subc_id,
-#'                    order = 2, mode = "all", n_cores = 1,
-#'                    var_layer = c("length", "source_elev"),
-#'                    stat = mean, attach_only = T)
+#' # Get the up-and downstream segment neighbours in the 5th order
+#' # and report the median length and source elevation
+#' # for the neighbours of each input segment
+#' get_segment_neighbours(g, subc_id = subc_id,order = 2,
+#'                        mode = "all", n_cores = 1,
+#'                        var_layer = c("length", "source_elev"),
+#'                        stat = mean, attach_only = TRUE)
 #'
-#' @author Sami Domisch
 
 
 
-segment_neighbours <- function(g, subc_id = NULL,
-                              var_layer = NULL, stat = NULL,
-                              attach_only = FALSE, order = 5,
-                              mode = "in", n_cores = 1,
-                              max_size = 1500) {
+
+get_segment_neighbours <- function(g, subc_id = NULL,var_layer = NULL,
+                                   stat = NULL, attach_only = FALSE, order = 5,
+                                   mode = "in", n_cores = 1, max_size = 1500) {
 
   # Check input arguments
-  if (class(g) != "igraph") stop(
-    "Input must be an igraph object. Please create the graph first."
-    )
+  if (class(g) != "igraph")
+    stop("Input must be an igraph object. Please create the graph first.")
 
-  if (!is_directed(g)) stop(
-    "The input graph must be a directed graph."
-    )
+  if (!is_directed(g))
+    stop("The input graph must be a directed graph.")
 
-  if (missing(subc_id)) stop(
-    "Please provide at least one segment ID of the input graph.
-    The subc_id must be a numeric vector."
-    )
+  if (missing(subc_id))
+    stop("Please provide at least one segment ID of the input graph.
+    The subc_id must be a numeric vector.")
 
-  if (is.data.frame(subc_id) == TRUE) stop(
-    "The subc_id must be a numeric vector."
-    )
+  if (is.data.frame(subc_id) == TRUE)
+    stop("The subc_id must be a numeric vector.")
 
   if (hasArg(n_cores)) {
-    if (length(subc_id) > 1 && n_cores == 0)  stop(
-      "You have specified multiple segments but zero workers.
-      Please specify at least n_cores=1,
-      or leave it empty to allow an automatic setup.")
+    if (length(subc_id) > 1 && n_cores == 0)
+      stop("You have specified multiple segments but zero workers. Please
+      specify at least n_cores=1, or leave it empty to allow an automatic
+      setup.")
   }
 
-  if (attach_only == TRUE && missing(var_layer)) stop(
-    "No var_layer specified that should be attached to the stream segments.
+  if (attach_only == TRUE && missing(var_layer))
+    stop("No var_layer specified that should be attached to the stream segments.
     Please provide at least one var_layer from the input graph.")
 
 
