@@ -17,20 +17,9 @@
 #' downloaded. Default is the working directory.
 #' @importFrom tidyr separate
 #' @importFrom stringr str_split_fixed str_extract
+#' @export
 #'
-#' @examples
-#' # Download data for two variables in three regular tiles
-#' # to the current working directory
-#' download_tiles(variable = c("sti", "stream_dist_up_farth"),
-#' file_format = "tif",
-#' tile_id = c("h00v02","h16v02", "h16v04"))
-#'
-#' # Download the global .tif layer for the variable "direction"
-#' # to a specific (existing) directory
-#' download_tiles(variable = "direction",
-#' file_format = "tif",
-#' global = TRUE,
-#' download_dir = "/path/to/directory/")
+#' @author Afroditi Grigoropoulou
 #'
 #' @references Amatulli G., Garcia Marquez J., Sethi T., Kiesel J.,
 #' Grigoropoulou A., Üblacker M., Shen L. & Domisch S. (2022-08-09 )
@@ -38,8 +27,24 @@
 #' IGB Leibniz-Institute of Freshwater Ecology and Inland Fisheries.
 #' dataset. https://doi.org/10.18728/igb-fred-762.1
 #'
-#' @export
+#' @examples
+#' # Download data for two variables in three regular tiles
+#' # to the current working directory
+#' download_tiles(variable = c("sti", "stream_dist_up_farth"),
+#'                file_format = "tif",
+#'                tile_id = c("h00v02","h16v02", "h16v04"))
 #'
+#' # Download the global .tif layer for the variable "direction"
+#' # to a specific (existing) directory
+#' # Define directory
+#' my_directory <- tempdir()
+#' # Download layer
+#' download_tiles(variable = "direction",
+#'                file_format = "tif",
+#'                global = TRUE,
+#'                download_dir = my_directory)
+#'
+
 
 
 download_tiles <- function(variable, file_format = "tif",
@@ -133,7 +138,7 @@ download_tiles <- function(variable, file_format = "tif",
   arg <- readline(prompt = paste0("Download size is ",
                                   round(variable_size_sum / 1000000, 2),
                                   " MB. Please type \"y\" if you are ready to smash it\n
-or \"n\" if you'd rather not to, and then press Enter \n"))
+                                  or \"n\" if you'd rather not to, and then press Enter \n"))
 
   if (arg == "y") {
 
@@ -181,6 +186,9 @@ or \"n\" if you'd rather not to, and then press Enter \n"))
       }
     }
     cat("Please cite the Hydrography90m publication:\n
-        Amatulli, G., Garcia Marquez, J., Sethi, T., Kiesel, J., Grigoropoulou, A., Üblacker, M. M., Shen, L. Q., and Domisch, S.: Hydrography90m: a new high-resolution global hydrographic dataset, Earth Syst. Sci. Data, 14, 4525–4550, https://doi.org/10.5194/essd-14-4525-2022, 2022.")
+        Amatulli, G., Garcia Marquez, J., Sethi, T., Kiesel, J., Grigoropoulou, A.,
+        Üblacker, M. M., Shen, L. Q., and Domisch, S.: Hydrography90m: a new
+        high-resolution global hydrographic dataset, Earth Syst. Sci. Data, 14,
+        4525–4550, https://doi.org/10.5194/essd-14-4525-2022, 2022.")
   }
 }
