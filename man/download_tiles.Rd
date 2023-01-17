@@ -40,15 +40,18 @@ using the functions "get_tile_id" and "get_regional_unit_id" respectively.
 # Download data for two variables in three regular tiles
 # to the current working directory
 download_tiles(variable = c("sti", "stream_dist_up_farth"),
-file_format = "tif",
-tile_id = c("h00v02","h16v02", "h16v04"))
+               file_format = "tif",
+               tile_id = c("h00v02","h16v02", "h16v04"))
 
 # Download the global .tif layer for the variable "direction"
 # to a specific (existing) directory
+# Define directory
+my_directory <- tempdir()
+# Download layer
 download_tiles(variable = "direction",
-file_format = "tif",
-global = TRUE,
-download_dir = "/path/to/directory/")
+               file_format = "tif",
+               global = TRUE,
+               download_dir = my_directory)
 
 }
 \references{
@@ -57,4 +60,7 @@ Grigoropoulou A., Üblacker M., Shen L. & Domisch S. (2022-08-09 )
 Hydrography90m: A new high-resolution global hydrographic dataset.
 IGB Leibniz-Institute of Freshwater Ecology and Inland Fisheries.
 dataset. https://doi.org/10.18728/igb-fred-762.1
+}
+\author{
+Afroditi Grigoropoulou
 }
