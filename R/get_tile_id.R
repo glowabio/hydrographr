@@ -8,24 +8,27 @@
 #' @param lon character. The name of the column with the longitude coordinates.
 #' @param lat character. The name of the column with the latitude coordinates.
 #' @importFrom data.table fread
-#' @author Afroditi Grigoropoulou
 #' @export
 #'
-#' @examples
-#' library(hydrographr)
-#' library(data.table)
+#' @author Afroditi Grigoropoulou
 #'
-#' # Download the test data into the temporary R folder
-#' download_test_data(tempdir())
+#' @examples
+#' # Download test data into temporary R folder
+#' # or define a different directory
+#' my_directory <- tempdir()
+#' download_test_data(my_directory)
 #'
 #' # Load species occurrence data
-#' species_occurrence <- read.table(
-#' paste0(tempdir(), "/hydrography90m_test_data/spdata_1264942.txt"),
-#' header = TRUE)
+#' species_occurrence <- read.table(paste0(my_directory,
+#'                                        "/hydrography90m_test_data",
+#'                                        "/spdata_1264942.txt"),
+#'                                  header = TRUE)
 #'
 #' # Get the tile ID
 #' my_IDs <- get_tile_id(data = species_occurrence,
-#'                       lon="longitude", lat="latitude")
+#'                       lon = "longitude", lat = "latitude")
+#' # Show IDs
+#' my_IDs
 
 get_tile_id <- function(data, lon, lat) {
 
