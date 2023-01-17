@@ -44,13 +44,16 @@ download_tiles(variable = "basin",
                tile_id = c("h22v08","h22v10"),
                download_dir = my_directory)
 
+# Define folder containing only the tiles, which should me merged
+tiles_folder <- paste0(my_directory, "/r.watershed/basin_tiles20d")
 # Define output folder
-output_folder <- paste0(my_directory, "merged_tiles")
+output_folder <- paste0(my_directory, "/merged_tiles")
 # Creat ouput folder if it doesn't exist
 if(!dir.exists(output_folder)) dir.create(output_folder)
+
 # Merge tiles
-merged_tiles <- merge_tiles(tile_dir = my_directory,
-                            out_dir = ouput_folder)
+merged_tiles <- merge_tiles(tile_dir = tiles_folder,
+                            out_dir = output_folder)
 
 }
 \references{
