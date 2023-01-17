@@ -25,10 +25,9 @@
 #'                                  header = TRUE)
 #'
 #' # Get the tile ID
-#' my_IDs <- get_tile_id(data = species_occurrence,
-#'                       lon = "longitude", lat = "latitude")
-#' # Show IDs
-#' my_IDs
+#' get_tile_id(data = species_occurrence,
+#'             lon = "longitude", lat = "latitude")
+
 
 get_tile_id <- function(data, lon, lat) {
 
