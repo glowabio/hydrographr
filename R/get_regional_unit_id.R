@@ -14,26 +14,27 @@
 #' @importFrom processx run
 #' @export
 #'
-#' @examples
-#' library(hydrographr)
-#' library(data.table)
-#'
-#' # Specify the working directory of the test data
-#' DATADIR <- "path/to/test_data"
-#'
-#' # Download the test data
-#' download_test_data(DATADIR)
-#'
-#' # Read the species data
-#' species <- fread(paste0(DATADIR, "/spdata_1264942.txt"))
-#'
-#' # Get the regional unit ID
-#' my_IDs <- get_regional_unit_id(species, lon="longitude", lat="latitude")
-#'
-#'
 #' @author Afroditi Grigoropoulou
 #'
-
+#' @references
+#' \url{https://gdal.org/programs/gdallocationinfo.html}
+#'
+#' @examples
+#' # Download test data into temporary R folder
+#' # or define a different directory
+#' my_directory <- tempdir()
+#' download_test_data(my_directory)
+#'
+#' # Read the species data
+#' library(data.table)
+#' species_occurence <- fread(paste0(my_directory, "/hydrography90m_test_data",
+#'                                   "/spdata_1264942.txt"))
+#'
+#' # Get the regional unit ID
+#'my_IDs <- get_regional_unit_id(species_occurence, lon = "longitude",
+#'                               lat = "latitude")
+#' # Show IDs
+#' my_IDs
 
 # provide points as an input and get the regional units
 # where the points belong (without the full extent)
