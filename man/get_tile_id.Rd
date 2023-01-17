@@ -19,20 +19,22 @@ in which the given points are located. The IDs are required to then download
 the data using download_tiles(). Input is a point data frame.
 }
 \examples{
-library(hydrographr)
-library(data.table)
-
-# Download the test data into the temporary R folder
-download_test_data(tempdir())
+# Download test data into temporary R folder
+# or define a different directory
+my_directory <- tempdir()
+download_test_data(my_directory)
 
 # Load species occurrence data
-species_occurrence <- read.table(
-paste0(tempdir(), "/hydrography90m_test_data/spdata_1264942.txt"),
-header = TRUE)
+species_occurrence <- read.table(paste0(my_directory,
+                                       "/hydrography90m_test_data",
+                                       "/spdata_1264942.txt"),
+                                 header = TRUE)
 
 # Get the tile ID
 my_IDs <- get_tile_id(data = species_occurrence,
-                      lon="longitude", lat="latitude")
+                      lon = "longitude", lat = "latitude")
+# Show IDs
+my_IDs
 }
 \author{
 Afroditi Grigoropoulou
