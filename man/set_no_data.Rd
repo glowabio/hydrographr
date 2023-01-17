@@ -4,7 +4,7 @@
 \alias{set_no_data}
 \title{Set no data value}
 \usage{
-set_no_data(data_dir, var_layer, no_data)
+set_no_data(data_dir, var_layer, no_data, quiet = TRUE)
 }
 \arguments{
 \item{data_dir}{character. Path to the directory containing all input data.}
@@ -14,6 +14,9 @@ e.g. c("sti_h16v02.tif", "slope_grad_dw_cel_h00v00.tif").
 The original files will be overwritten.}
 
 \item{no_data}{numeric. The desired NoData value.}
+
+\item{quiet}{logical. If FALSE, the standard output will be printed.
+Default is TRUE.}
 }
 \description{
 Change or set the NoData value for a raster layer.
@@ -22,6 +25,7 @@ on disk.
 }
 \examples{
 # Download test data into temporary R folder
+# or define a different directory
 my_directory <- tempdir()
 download_test_data(my_directory)
 
@@ -30,6 +34,9 @@ set_no_data(data_dir = paste0(my_directory, "/hydrography90m_test_data"),
             var_layer = "cti_1264942.tif",
             no_data = -9999)
 
+}
+\references{
+\url{https://gdal.org/programs/gdal_edit.html}
 }
 \author{
 Afroditi Grigoropoulou, Maria M. Üblacker
