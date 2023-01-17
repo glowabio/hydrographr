@@ -29,11 +29,12 @@
 #' @export
 #'
 #' @examples
-#' library(hydrographr)
-#'
 #' # Download test data into temporary R folder
+#' # or define a different directory
 #' my_directory <- tempdir()
 #' download_test_data(my_directory)
+#'
+#' # Define
 #'
 #' # Read the stream network as a graph
 #' my_graph <- read_geopackage(paste0(my_directory, "/order_vect_59.gpkg"),
@@ -68,24 +69,27 @@ read_geopackage <- function(file_name, type = NULL, SQL_table = NULL,
                             as_SpatVect = FALSE) {
 
   # Test input arguments
-  if (missing(file_name)) stop("Please specify the input geopackage file.")
-  if (!grepl(".gpkg", file_name, fixed = TRUE)) stop(
-    "Input must be a GeoPackage file."
-    )
+  if (missing(file_name))
+    stop("Please specify the input geopackage file.")
+
+  if (!grepl(".gpkg", file_name, fixed = TRUE))
+    stop("Input must be a GeoPackage file.")
+
   # If all options are missing
   if (as_dt == FALSE && as_graph == FALSE && as_sf == FALSE
       && as_SpatVect == FALSE) {
     stop("Please select one output type.\n")
   }
-  if (missing(type)) stop(
-    "Please specify 'net' or 'subc' as the input file type."
-    )
-  if (!any(c("net", "subc", "basin", "outlet") %in% type)) stop(
-    "Please specify the input file type:
-    one of 'net', 'subc', 'basin' or 'outlet'."
-    )
-  if (any(c("subc", "basin", "outlet") %in% type) && as_graph == TRUE) stop(
-    "A graph can only be created from a network.")
+
+  if (missing(type))
+    stop("Please specify 'net' or 'subc' as the input file type.")
+
+  if (!any(c("net", "subc", "basin", "outlet") %in% type))
+    stop("Please specify the input file type: one of 'net',
+         'subc', 'basin' or 'outlet'.")
+
+  if (any(c("subc", "basin", "outlet") %in% type) && as_graph == TRUE)
+    stop("A graph can only be created from a network.")
 
 
   # Avoid exponential numbers in the table and IDs,
