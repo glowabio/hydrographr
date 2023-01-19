@@ -91,7 +91,7 @@
 #' # Get the up-and downstream segment neighbours in the 5th order
 #' # and report the median length and source elevation
 #' # for the neighbours of each input segment
-#' get_segment_neighbours(g = my_graph, subc_id = subc_id,order = 2,
+#' get_segment_neighbours(g = my_graph, subc_id = subc_id, order = 2,
 #'                        mode = "all", n_cores = 1,
 #'                        var_layer = c("length", "source_elev"),
 #'                        stat = mean, attach_only = TRUE)
