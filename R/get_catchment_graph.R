@@ -60,30 +60,30 @@
 #' InterJournal, Complex Systems 1695. 2006. \url{https://igraph.org}
 #'
 #' @examples
-#' # Download test data into temporary R folder
+#' # Download test data into the temporary R folder
 #' # or define a different directory
 #' my_directory <- tempdir()
 #' download_test_data(my_directory)
 #'
 #' # Load stream network as a graph
-#' g <- read_geopackage(paste0(my_directory, "/hydrography90m_test_data",
-#'                             "/order_vect_59.gpkg"),
-#'                      type = "net",
-#'                      as_graph = TRUE)
+#' my_graph <- read_geopackage(gpkg = paste0(my_directory,
+#'                                          "/hydrography90m_test_data",
+#'                                          "/order_vect_1264942.gpkg"),
+#'                            import_as = "graph")
 #'
 #' # Pick a random subc_id
 #' subc_id = "513855877"
 #' # Get the upstream catchment as a graph
-#' g_up <- get_catchment_graph(g, subc_id = subc_id, mode = "in",
+#' g_up <- get_catchment_graph(g = my_graph, subc_id = subc_id, mode = "in",
 #'                             outlet = FALSE, as_graph = TRUE, n_cores = 1)
 #'
 #' # Get the downstream segments as a data.table,
-#' g_down <- get_catchment_graph(g, subc_id = subc_id, mode = "out",
+#' g_down <- get_catchment_graph(g = my_graph, subc_id = subc_id, mode = "out",
 #'                               outlet = FALSE, as_graph = FALSE, n_cores = 1)
 #'
 #' # Get the catchments of all outlets in the study area as a graph
-#' g_all <- get_catchment_graph(g, mode = "in", outlet = TRUE, as_graph = TRUE,
-#'                              n_cores = 1)
+#' g_all <- get_catchment_graph(g = my_graph, mode = "in", outlet = TRUE,
+#'                              as_graph = TRUE, n_cores = 1)
 #'
 
 
