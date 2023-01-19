@@ -2,31 +2,26 @@
 #'
 #' @description Merge multiple raster or spatial vector objects from disk
 #' to form a new raster or spatial vector object with a larger spatial extent.
-#' A directory with at least a raster .tif or spatial vector geopackage file
-#' must be provided.
-#' If read_raster = TRUE (default), the outputs are a .tif
-#' (saved under out_dir) and a SpatRaster (terra package) object, otherwise if
-#' read_raster = FALSE, the .tif file is the only output. If read_vector = TRUE,
-#' the outputs are a .gpkg (saved under out_dir) and a SpatVector
-#' (terra package) object, otherwise if read_vector = FALSE (default), the .gpkg
-#' file is the only output.
+#' A directory with at least two raster .tif or spatial vector geopackage files
+#' should be provided.
+#' Depending on the input, the output is a .tif or a .gpkg file (saved under
+#' out_dir). If read = TRUE, the output is read into R as a SpatRaster
+#' (terra package) object in case of .tif files, or as a SpatVector
+#' (terra package) object in case of .gpkg files.
 
 #' @param tile_dir character. The directory containing only the raster or
 #' spatial vectors tiles, which should be merged.
 #' @param tile_names character. The names of the files to be merged,
-#' including the file extension (.tif or .gpkg )
+#' including the file extension (.tif or .gpkg).
 #' @param out_dir character. The directory where the output will be stored.
 #' @param file_name character. Name of the merged output file, including the
-#' file extension (.tif or .gpkg)
-#' @param read_raster logical. If TRUE, the merged raster .tif layer gets read
-#' into R. If FALSE, the layer is only stored on disk. Default is TRUE.
-#' @param read_vector logical. If TRUE, the merged spatial vector gets read
-#' into R. In this case, read_raster needs to be set to FALSE.
-#' If FALSE, the vector is only stored on disk. Default is FALSE.
-#' @include utils.R
+#' file extension (.tif or .gpkg).
+#' @param read logical. If TRUE, the merged layer gets read
+#' into R. If FALSE, the layer is only stored on disk. Default is FALSE.
 #' @importFrom processx run
 #' @importFrom terra rast
 #' @importFrom terra vect
+#' @importFrom tools file_ext
 #' @export
 #'
 #' @references
@@ -38,10 +33,10 @@
 #'
 #' \url{https://gdal.org/programs/ogr2ogr.html}
 #'
-#' @author Thomas Tomiczek, Jaime Garcia Marquez
+#' @author Thomas Tomiczek, Jaime Garcia Marquez, Afroditi Grigoropoulou
 #'
-#' @return A .tif raster file or spatial vector object that is always written
-#' to disk, and optionally loaded into R.
+#' @return A .tif raster file or .gpkg spatial vector object that is always
+#' written to disk, and optionally loaded into R.
 #'
 #' @examples
 #' # Download tiles into temporary R folder
@@ -59,13 +54,17 @@
 #' # Create output folder if it doesn't exist
 #' if(!dir.exists(output_folder)) dir.create(output_folder)
 #'
+#'
 #' # Merge tiles
 #' merged_tiles <- merge_tiles(tile_dir = tiles_folder,
-#'                             out_dir = output_folder)
+#'                             tile_names = c("h22v08", "h22v10"),
+#'                             out_dir = output_folder,
+#'                             file_name = "basin_merged.tif",
+#'                             read = TRUE)
 #'
 
 merge_tiles <- function(tile_dir, tile_names, out_dir, file_name,
-                        read_raster = TRUE, read_vector = FALSE) {
+                        read = FALSE) {
   # Check if paths exist
   if (!dir.exists(tile_dir))
     stop(paste0("Path: ", tile_dir, " does not exist."))
@@ -73,8 +72,12 @@ merge_tiles <- function(tile_dir, tile_names, out_dir, file_name,
   if (!dir.exists(out_dir))
     stop(paste0("Path: ", out_dir, " does not exist."))
 
-  if (read_raster == TRUE && read_vector == TRUE)
-    stop("One of read_raster and read_vector has to be FALSE")
+  # Check if tile_names exist
+  for (name in tile_names){
+    file <- paste(tile_dir, name, sep ="/")
+    if (!file.exists(file))
+      stop(paste0("File: ", file, " does not exist."))
+  }
 
       # Check operating system
       system <- hydrographr:::get_os()
@@ -105,29 +108,34 @@ merge_tiles <- function(tile_dir, tile_names, out_dir, file_name,
 
        processx::run(system.file("bat", "merge_tiles.bat",
                     package = "hydrographr"),
-        args = c(wsl_tile_dir, wsl_out_dir, wsl_sh_file),
+        args = c(wsl_tile_dir, tile_names_array, wsl_out_dir, file_name,
+                 wsl_sh_file),
         echo = TRUE)
        }
 
+  # Print message
+  cat("Merged file saved under: ", out_dir,"\n")
 
-  if (read_raster == TRUE) {
-      # Print message
-      cat("Merged file saved under: ", out_dir)
-      # Read merged .tif layer
-      merged_tiles <- rast(paste0(out_dir, "/", "basin.tif"))
+  if (read == TRUE) {
 
-      return(merged_tiles)
-    } else if (read_vector == TRUE) {
+    # Print message
+    cat("Loading merged file\n")
 
-      # Print message
-      cat("Merged file saved under: ", out_dir)
-      # Read merged vector layer
-      merged_tiles <- vect(paste0(out_dir, "/", "basin_dissolved.gpkg"))
+    # Identify if merged file is .tif or .gpkg
+    file_extension <- file_ext(paste0(out_dir, "/", file_name))
 
-      return(merged_tiles)
+    # Read merged layer
+    if(file_extension == "tif") {
+      merged_tiles <- rast(paste0(out_dir, "/", file_name))
 
-    } else {
-      # Print message
-      cat("Merged file saved under: ", out_dir)
+    } else if(file_extension == "gpkg") {
+      merged_tiles <- vect(paste0(out_dir, "/", file_name))
+
     }
+
+    return(merged_tiles)
+
+  }
+
+
  }

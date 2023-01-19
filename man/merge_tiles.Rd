@@ -4,49 +4,36 @@
 \alias{merge_tiles}
 \title{Merge raster or vector objects}
 \usage{
-merge_tiles(
-  tile_dir,
-  tile_names,
-  out_dir,
-  file_name,
-  read_raster = TRUE,
-  read_vector = FALSE
-)
+merge_tiles(tile_dir, tile_names, out_dir, file_name, read = FALSE)
 }
 \arguments{
 \item{tile_dir}{character. The directory containing only the raster or
 spatial vectors tiles, which should be merged.}
 
 \item{tile_names}{character. The names of the files to be merged,
-including the file extension (.tif or .gpkg )}
+including the file extension (.tif or .gpkg).}
 
 \item{out_dir}{character. The directory where the output will be stored.}
 
 \item{file_name}{character. Name of the merged output file, including the
-file extension (.tif or .gpkg)}
+file extension (.tif or .gpkg).}
 
-\item{read_raster}{logical. If TRUE, the merged raster .tif layer gets read
-into R. If FALSE, the layer is only stored on disk. Default is TRUE.}
-
-\item{read_vector}{logical. If TRUE, the merged spatial vector gets read
-into R. In this case, read_raster needs to be set to FALSE.
-If FALSE, the vector is only stored on disk. Default is FALSE.}
+\item{read}{logical. If TRUE, the merged layer gets read
+into R. If FALSE, the layer is only stored on disk. Default is FALSE.}
 }
 \value{
-A .tif raster file or spatial vector object that is always written
-to disk, and optionally loaded into R.
+A .tif raster file or .gpkg spatial vector object that is always
+written to disk, and optionally loaded into R.
 }
 \description{
 Merge multiple raster or spatial vector objects from disk
 to form a new raster or spatial vector object with a larger spatial extent.
-A directory with at least a raster .tif or spatial vector geopackage file
-must be provided.
-If read_raster = TRUE (default), the outputs are a .tif
-(saved under out_dir) and a SpatRaster (terra package) object, otherwise if
-read_raster = FALSE, the .tif file is the only output. If read_vector = TRUE,
-the outputs are a .gpkg (saved under out_dir) and a SpatVector
-(terra package) object, otherwise if read_vector = FALSE (default), the .gpkg
-file is the only output.
+A directory with at least two raster .tif or spatial vector geopackage files
+should be provided.
+Depending on the input, the output is a .tif or a .gpkg file (saved under
+out_dir). If read = TRUE, the output is read into R as a SpatRaster
+(terra package) object in case of .tif files, or as a SpatVector
+(terra package) object in case of .gpkg files.
 }
 \examples{
 # Download tiles into temporary R folder
@@ -64,9 +51,13 @@ output_folder <- paste0(my_directory, "/merged_tiles")
 # Create output folder if it doesn't exist
 if(!dir.exists(output_folder)) dir.create(output_folder)
 
+
 # Merge tiles
 merged_tiles <- merge_tiles(tile_dir = tiles_folder,
-                            out_dir = output_folder)
+                            tile_names = c("h22v08", "h22v10"),
+                            out_dir = output_folder,
+                            file_name = "basin_merged.tif",
+                            read = TRUE)
 
 }
 \references{
@@ -79,5 +70,5 @@ merged_tiles <- merge_tiles(tile_dir = tiles_folder,
 \url{https://gdal.org/programs/ogr2ogr.html}
 }
 \author{
-Thomas Tomiczek, Jaime Garcia Marquez
+Thomas Tomiczek, Jaime Garcia Marquez, Afroditi Grigoropoulou
 }
