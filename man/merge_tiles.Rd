@@ -4,13 +4,26 @@
 \alias{merge_tiles}
 \title{Merge raster or vector objects}
 \usage{
-merge_tiles(tile_dir, out_dir, read_raster = TRUE, read_vector = FALSE)
+merge_tiles(
+  tile_dir,
+  tile_names,
+  out_dir,
+  file_name,
+  read_raster = TRUE,
+  read_vector = FALSE
+)
 }
 \arguments{
 \item{tile_dir}{character. The directory containing only the raster or
 spatial vectors tiles, which should be merged.}
 
+\item{tile_names}{character. The names of the files to be merged,
+including the file extension (.tif or .gpkg )}
+
 \item{out_dir}{character. The directory where the output will be stored.}
+
+\item{file_name}{character. Name of the merged output file, including the
+file extension (.tif or .gpkg)}
 
 \item{read_raster}{logical. If TRUE, the merged raster .tif layer gets read
 into R. If FALSE, the layer is only stored on disk. Default is TRUE.}
@@ -48,7 +61,7 @@ download_tiles(variable = "basin",
 tiles_folder <- paste0(my_directory, "/r.watershed/basin_tiles20d")
 # Define output folder
 output_folder <- paste0(my_directory, "/merged_tiles")
-# Creat ouput folder if it doesn't exist
+# Create output folder if it doesn't exist
 if(!dir.exists(output_folder)) dir.create(output_folder)
 
 # Merge tiles
@@ -66,5 +79,5 @@ merged_tiles <- merge_tiles(tile_dir = tiles_folder,
 \url{https://gdal.org/programs/ogr2ogr.html}
 }
 \author{
-Thomas Tomiczek
+Thomas Tomiczek, Jaime Garcia Marquez
 }

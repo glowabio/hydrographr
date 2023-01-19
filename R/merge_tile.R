@@ -13,7 +13,11 @@
 
 #' @param tile_dir character. The directory containing only the raster or
 #' spatial vectors tiles, which should be merged.
+#' @param tile_names character. The names of the files to be merged,
+#' including the file extension (.tif or .gpkg )
 #' @param out_dir character. The directory where the output will be stored.
+#' @param file_name character. Name of the merged output file, including the
+#' file extension (.tif or .gpkg)
 #' @param read_raster logical. If TRUE, the merged raster .tif layer gets read
 #' into R. If FALSE, the layer is only stored on disk. Default is TRUE.
 #' @param read_vector logical. If TRUE, the merged spatial vector gets read
@@ -33,7 +37,7 @@
 #'
 #' \url{https://gdal.org/programs/ogr2ogr.html}
 #'
-#' @author Thomas Tomiczek
+#' @author Thomas Tomiczek, Jaime Garcia Marquez
 #'
 #' @return A .tif raster file or spatial vector object that is always written
 #' to disk, and optionally loaded into R.
@@ -51,7 +55,7 @@
 #' tiles_folder <- paste0(my_directory, "/r.watershed/basin_tiles20d")
 #' # Define output folder
 #' output_folder <- paste0(my_directory, "/merged_tiles")
-#' # Creat ouput folder if it doesn't exist
+#' # Create output folder if it doesn't exist
 #' if(!dir.exists(output_folder)) dir.create(output_folder)
 #'
 #' # Merge tiles
@@ -59,9 +63,9 @@
 #'                             out_dir = output_folder)
 #'
 
-merge_tiles <- function(tile_dir, out_dir,
+merge_tiles <- function(tile_dir, tile_names, out_dir, file_name,
                         read_raster = TRUE, read_vector = FALSE) {
-  # Check if paths exists
+  # Check if paths exist
   if (!dir.exists(tile_dir))
     stop(paste0("Path: ", tile_dir, " does not exist."))
 
@@ -77,10 +81,15 @@ merge_tiles <- function(tile_dir, out_dir,
       # Make bash scripts executable
       make_sh_exec()
 
+      # Format tile_names vector so that it can be read
+      # as an array in the bash script
+      tile_names_array <- paste(unique(tile_names), collapse = ",")
+
+
       if (system == "linux" || system == "osx") {
         merge_tiles <- processx::run(system.file("sh", "merge_tiles.sh",
                             package = "hydrographr"),
-                    args = c(tile_dir, out_dir),
+                    args = c(tile_dir, tile_names_array, out_dir, file_name),
                     echo = FALSE)
 
        } else {
