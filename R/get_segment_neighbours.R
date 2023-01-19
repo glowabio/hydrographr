@@ -67,15 +67,15 @@
 #' download_test_data(my_directory)
 #'
 #' # Load the stream network as graph
-#' g <- read_geopackage(paste0(my_directory, "/hydrography90m_test_data",
-#'                              "/order_vect_59.gpkg"),
-#'                       type = "net",
-#'                       as_graph = TRUE)
+#' my_graph <- read_geopackage(gpkg= paste0(my_directory,
+#'                                          "/hydrography90m_test_data",
+#'                                          "/order_vect_1264942.gpkg"),
+#'                             import_as = "graph")
 #'
 #' # Get the upstream segment neighbours in the 5th order
 #' # and report the length and source elevation
 #' # for the neighbours of each input segment
-#' get_segment_neighbours(g, subc_id = subc_id,
+#' get_segment_neighbours(g = my_graph, subc_id = subc_id,
 #'                        order = 5, mode = "in", n_cores = 1,
 #'                        var_layer = c("length", "source_elev"),
 #'                        attach_only = TRUE)
@@ -83,7 +83,7 @@
 #' # Get the downstream segment neighbours in the 5th order
 #' # and calculate the median length and source elevation
 #' # across the neighbours of each input segment
-#' get_segment_neighbours(g, subc_id = subc_id,
+#' get_segment_neighbours(g = my_graph, subc_id = subc_id,
 #'                        order = 2, mode ="out", n_cores = 1,
 #'                        var_layer = c("length", "source_elev"),
 #'                        stat = median)
@@ -91,7 +91,7 @@
 #' # Get the up-and downstream segment neighbours in the 5th order
 #' # and report the median length and source elevation
 #' # for the neighbours of each input segment
-#' get_segment_neighbours(g, subc_id = subc_id,order = 2,
+#' get_segment_neighbours(g = my_graph, subc_id = subc_id,order = 2,
 #'                        mode = "all", n_cores = 1,
 #'                        var_layer = c("length", "source_elev"),
 #'                        stat = mean, attach_only = TRUE)
