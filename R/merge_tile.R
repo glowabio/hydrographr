@@ -23,6 +23,7 @@
 #' @param read_vector logical. If TRUE, the merged spatial vector gets read
 #' into R. In this case, read_raster needs to be set to FALSE.
 #' If FALSE, the vector is only stored on disk. Default is FALSE.
+#' @include utils.R
 #' @importFrom processx run
 #' @importFrom terra rast
 #' @importFrom terra vect
@@ -76,7 +77,7 @@ merge_tiles <- function(tile_dir, tile_names, out_dir, file_name,
     stop("One of read_raster and read_vector has to be FALSE")
 
       # Check operating system
-      system <- get_os()
+      system <- hydrographr:::get_os()
 
       # Make bash scripts executable
       make_sh_exec()
