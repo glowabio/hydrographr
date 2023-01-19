@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # directory where input files are located
 export dir=$1
@@ -13,7 +13,7 @@ export out=$3
 export outname=$4
 
 # remove the output file if it exists
-[[ -f $out/${outname}  ]] && rm $out/${outname}
+[ -f $out/${outname}  ] && rm $out/${outname}
 
 # create an array of all files needed (with complete path)
 g=( $(echo $files | sed 's/,/ /g') )
@@ -22,14 +22,14 @@ farray=( $(for i in ${g[@]}; do find $dir -name "$i"; done) )
 
 # merge
 f=${farray[0]}
-if [[ ${f: -4} == ".tif" ]]
+if [ ${f: -4} == ".tif" ]
 then
     export outname_base=$(basename $outname .tif)
     gdalbuildvrt -overwrite $out/merge_${outname_base}.vrt ${farray[@]}
     gdal_translate  -co COMPRESS=DEFLATE -co ZLEVEL=9 \
     $out/merge_${outname_base}.vrt $out/${outname}
     rm $out/merge_${outname_base}.vrt
-elif [[ ${f: -4} == "gpkg" ]]
+elif [ ${f: -4} == "gpkg" ]
 then
     export outname_base=$(basename $outname .gpkg)
     ogrmerge.py -single -progress -skipfailures -overwrite_ds -f GPKG \
