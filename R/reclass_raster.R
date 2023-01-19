@@ -1,6 +1,6 @@
 #' @title Reclassify an integer raster layer
 #'
-#' @decription Reclassifies an integer raster .tif layer using the r.reclass
+#' @description Reclassifies an integer raster .tif layer using the r.reclass
 #' function of GRASS GIS. To reclassify the raster layer the present raster
 #' values and the new raster values have to be defined.
 #'

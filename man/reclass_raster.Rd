@@ -44,7 +44,14 @@ UInt32,CInt16, CInt32. Default is Int32.}
 \item{compress}{Compression type: DEFLATE or LZW. Default is DEFLATE.}
 }
 \description{
-Reclassify an integer raster layer
+Reclassifies an integer raster .tif layer using the r.reclass
+function of GRASS GIS. To reclassify the raster layer the present raster
+values and the new raster values have to be defined.
+
+If the input raster layer has floating point values, you should multiply
+the input data by some factor (e.g. 1000) to achieve integer values,
+otherwise the GRASS GIS r.reclass will round the raster values down to
+the next integer which is not always desired.
 }
 \examples{
 # Set directory for test data
