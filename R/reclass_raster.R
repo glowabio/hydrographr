@@ -14,7 +14,7 @@
 #' @param rast_val character. The name of the column with the present
 #' raster values.
 #' @param new_val character. The name of the column with the new raster values.
-#' @param rast_path Full path to the input raster .tif layer.
+#' @param raster_layer Full path to the input raster .tif layer.
 #' @param recl_layer character. Full path of the output .tif layer
 #' of the reclassified raster file.
 #' @param read logical. If TRUE, then the reclassified raster .tif layer
@@ -32,31 +32,45 @@
 #' @importFrom terra rast
 #' @export
 #'
-#' @examples
-#' # Set directory for test data
-#' DATADIR <- "/path/to/test_data"
-#'
-#' # Download test data
-#' download_test_data(DATADIR)
-#'
-#' # Read the stream order for each sub-catchment as a data.table.
-#' my_dt <- read_geopackage("order_vect_59.gpkg", type="net", dt=T)
-#'
-#' # Select the stream segment ID and and the Strahler stream order
-#' str_ord <- my_dt[,c("stream", "strahler")]
-#'
-#' # Reclassify the stream network to obtain the Strahler stream order raster
-#' str_ord_rast <- reclass_raster(str_ord, rast_val = "stream",
-#' new_val = "strahler", rast_path =  "/DATADIR/stream_1264942.tif",
-#' recl_layer = "/path/to/output.tif")
-#'
+#' @author Maria M. Üblacker
 #'
 #' @references
 #' https://grass.osgeo.org/grass82/manuals/r.reclass.html
 #'
-#' @author Maria Üblacker
+#'
+#' @examples
+#' # Download test data into the temporary R folder
+#' # or define a different directory
+#' my_directory <- tempdir()
+#' download_test_data(my_directory)
+#'
+#' # Read the stream order for each sub-catchment as a data.table
+#' my_dt <- read_geopackage(gpkg= paste0(my_directory,
+#'                                          "/hydrography90m_test_data",
+#'                                          "/order_vect_1264942.gpkg"),
+#'                          import_as = "data.table")
+#'
+#'
+#' # Select the stream segment ID and and the Strahler stream order
+#' str_ord <- my_dt[,c("stream", "strahler")]
+#'
+#' # Define input and output raster layer
+#' stream_raster <- paste0(my_directory,
+#'                         "/hydrography90m_test_data/stream_1264942.tif")
+#'
+#' recl_raster <- paste0(my_directory,
+#'                       "/hydrography90m_test_data/reclassified_raster.tif")
+#'
+#' # Reclassify the stream network to obtain the Strahler stream order raster
+#' str_ord_rast <- reclass_raster(data = str_ord,
+#'                                rast_val = "stream",
+#'                                new_val = "strahler",
+#'                                raster_layer = stream_raster,
+#'                                recl_layer = recl_raster)
+#'
 
-reclass_raster <- function(data, rast_val, new_val, rast_path,
+
+reclass_raster <- function(data, rast_val, new_val, raster_layer,
                            recl_layer, read = TRUE,
                            no_data = -9999, type = "Int32",
                            compress = "DEFLATE", quiet = TRUE) {
@@ -94,21 +108,21 @@ reclass_raster <- function(data, rast_val, new_val, rast_path,
     stop(paste0("new_val: Values of column ", new_val,
     " have to be integers."))
 
-  # Check if rast_path is defined
-  if (missing(rast_path))
-    stop("rast_path: Path of the input raster layer is missing.")
+  # Check if raster_layer is defined
+  if (missing(raster_layer))
+    stop("raster_layer: Path of the input raster layer is missing.")
 
-  # Check if rast_path and exists
-  if (!file.exists(rast_path))
-    stop(paste0("rast_path: ", rast_path, " does not exist."))
+  # Check if raster_layer and exists
+  if (!file.exists(raster_layer))
+    stop(paste0("raster_layer: ", raster_layer, " does not exist."))
 
-  # Check if rast_path ends and recl_layer with .tif
-  if (!endsWith(rast_path, ".tif"))
-    stop("rast_path: Input raster is not a .tif file.")
+  # Check if raster_layer ends and recl_layer with .tif
+  if (!endsWith(raster_layer, ".tif"))
+    stop("raster_layer: Input raster is not a .tif file.")
     if (!endsWith(recl_layer, ".tif"))
       stop("recl_layer: Output raster file path needs to end with .tif.")
 
-  # Check if rast_path is defined
+  # Check if recl_layer is defined
   if (missing(recl_layer))
     stop("recl_layer: Path for the output raster layer is missing.")
 
@@ -152,7 +166,7 @@ reclass_raster <- function(data, rast_val, new_val, rast_path,
   # Call external GRASS GIS command r.reclass
   processx::run(system.file("sh", "reclass_raster.sh",
                            package = "hydrographr"),
-      args = c(rast_path, rules_path, recl_layer,
+      args = c(raster_layer, rules_path, recl_layer,
                              no_data, type, compress),
       echo = !quiet)
 
@@ -160,7 +174,7 @@ reclass_raster <- function(data, rast_val, new_val, rast_path,
     # Check if WSL and Ubuntu are installed
     check_wsl()
     # Change paths for WSL
-    wsl_rast_path <- fix_path(rast_path)
+    wsl_raster_layer <- fix_path(raster_layer)
     wsl_recl_layer <- fix_path(recl_layer)
     wsl_rules_path <- fix_path(rules_path)
     wsl_sh_file <- fix_path(
@@ -171,7 +185,7 @@ reclass_raster <- function(data, rast_val, new_val, rast_path,
     # Call external GRASS GIS command r.reclass
     processx::run(system.file("bat", "reclass_raster.bat",
                     package = "hydrographr"),
-        args = c(wsl_rast_path, wsl_rules_path, wsl_recl_layer,
+        args = c(wsl_raster_layer, wsl_rules_path, wsl_recl_layer,
                  no_data, type, compress, wsl_sh_file),
         echo = !quiet)
 
