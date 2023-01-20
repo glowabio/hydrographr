@@ -68,7 +68,7 @@
 #' # Load stream network as a graph
 #' my_graph <- read_geopackage(gpkg = paste0(my_directory,
 #'                                          "/hydrography90m_test_data",
-#'                                          "/order_vect_1264942.gpkg"),
+#'                                          "/order_vect_59.gpkg"),
 #'                            import_as = "graph")
 #'
 #' # Pick a random subc_id

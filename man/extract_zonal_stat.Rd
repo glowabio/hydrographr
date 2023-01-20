@@ -54,7 +54,7 @@ sub-catchments. The sub-catchment raster (.tif) input file is stored on disk.
 The output is a data.table which is loaded into R.
 }
 \examples{
-# Download test data into temporary R folder
+# Download test data into the temporary R folder
 # or define a different directory
 my_directory <- tempdir()
 download_test_data(my_directory)

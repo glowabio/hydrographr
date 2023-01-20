@@ -22,7 +22,7 @@
 #' \url{https://gdal.org/programs/gdal_edit.html}
 #'
 #' @examples
-#' # Download test data into temporary R folder
+#' # Download test data into the temporary R folder
 #' # or define a different directory
 #' my_directory <- tempdir()
 #' download_test_data(my_directory)

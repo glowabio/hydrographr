@@ -39,7 +39,7 @@
 #' written to disk, and optionally loaded into R.
 #'
 #' @examples
-#' # Download tiles into temporary R folder
+#' # Download tiles into the temporary R folder
 #' # or define a different directory
 #' my_directory <- tempdir()
 #' download_tiles(variable = "basin",

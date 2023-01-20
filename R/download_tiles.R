@@ -35,7 +35,7 @@
 #'                tile_id = c("h00v02","h16v02", "h16v04"))
 #'
 #' # Download the global .tif layer for the variable "direction"
-#' # to a specific (existing) directory
+#' # into the temporary R folder or define a different directory
 #' # Define directory
 #' my_directory <- tempdir()
 #' # Download layer

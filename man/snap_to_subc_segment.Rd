@@ -63,7 +63,8 @@ place.This operation creates a new node on the vector line (i.e. stream
 segment) from which the new snapped coordinates can be extracted.
 }
 \examples{
-# Download test data into temporary R folder
+# Download test data into the temporary R folder
+# or define a different directory
 my_directory <- tempdir()
 download_test_data(my_directory)
 

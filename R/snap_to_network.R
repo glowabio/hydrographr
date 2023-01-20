@@ -50,7 +50,8 @@
 #' \link[https://grass.osgeo.org/grass78/manuals/addons/r.stream.snap.html]
 #'
 #' @examples
-#' # Download test data into temporary R folder
+#' # Download test data into the temporary R folder
+#' # or define a different directory
 #' my_directory <- tempdir()
 #' download_test_data(my_directory)
 #'

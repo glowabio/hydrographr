@@ -62,7 +62,7 @@ download_test_data(my_directory)
 # Read the stream order for each sub-catchment as a data.table
 my_dt <- read_geopackage(gpkg= paste0(my_directory,
                                          "/hydrography90m_test_data",
-                                         "/order_vect_1264942.gpkg"),
+                                         "/order_vect_59.gpkg"),
                          import_as = "data.table")
 
 

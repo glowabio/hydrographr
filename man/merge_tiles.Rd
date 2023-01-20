@@ -36,7 +36,7 @@ out_dir). If read = TRUE, the output is read into R as a SpatRaster
 (terra package) object in case of .gpkg files.
 }
 \examples{
-# Download tiles into temporary R folder
+# Download tiles into the temporary R folder
 # or define a different directory
 my_directory <- tempdir()
 download_tiles(variable = "basin",
