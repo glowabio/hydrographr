@@ -18,7 +18,7 @@ extract_zonal_stat(){
 
     export VARNAME=$(basename $VAR .tif)
 
-grass -f --text --tmp-location $SUBC_LAYER   <<'EOF'
+grass -f --gtext --tmp-location $SUBC_LAYER   <<'EOF'
 
 
     # Read in subcatchment raster
