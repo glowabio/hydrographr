@@ -8,7 +8,7 @@ reclass_raster(
   data,
   rast_val,
   new_val,
-  rast_path,
+  raster_layer,
   recl_layer,
   read = TRUE,
   no_data = -9999,
@@ -26,7 +26,7 @@ raster values.}
 
 \item{new_val}{character. The name of the column with the new raster values.}
 
-\item{rast_path}{Full path to the input raster .tif layer.}
+\item{raster_layer}{Full path to the input raster .tif layer.}
 
 \item{recl_layer}{character. Full path of the output .tif layer
 of the reclassified raster file.}
@@ -47,28 +47,39 @@ UInt32,CInt16, CInt32. Default is Int32.}
 Reclassify an integer raster layer
 }
 \examples{
-# Set directory for test data
-DATADIR <- "/path/to/test_data"
+# Download test data into the temporary R folder
+# or define a different directory
+my_directory <- tempdir()
+download_test_data(my_directory)
 
-# Download test data
-download_test_data(DATADIR)
+# Read the stream order for each sub-catchment as a data.table
+my_dt <- read_geopackage(gpkg= paste0(my_directory,
+                                         "/hydrography90m_test_data",
+                                         "/order_vect_1264942.gpkg"),
+                         import_as = "data.table")
 
-# Read the stream order for each sub-catchment as a data.table.
-my_dt <- read_geopackage("order_vect_59.gpkg", type="net", dt=T)
 
 # Select the stream segment ID and and the Strahler stream order
 str_ord <- my_dt[,c("stream", "strahler")]
 
-# Reclassify the stream network to obtain the Strahler stream order raster
-str_ord_rast <- reclass_raster(str_ord, rast_val = "stream",
-new_val = "strahler", rast_path =  "/DATADIR/stream_1264942.tif",
-recl_layer = "/path/to/output.tif")
+# Define input and output raster layer
+stream_raster <- paste0(my_directory,
+                        "/hydrography90m_test_data/stream_1264942.tif")
 
+recl_raster <- paste0(my_directory,
+                      "/hydrography90m_test_data/reclassified_raster.tif")
+
+# Reclassify the stream network to obtain the Strahler stream order raster
+str_ord_rast <- reclass_raster(data = str_ord,
+                               rast_val = "stream",
+                               new_val = "strahler",
+                               raster_layer = stream_raster,
+                               recl_layer = recl_raster)
 
 }
 \references{
 https://grass.osgeo.org/grass82/manuals/r.reclass.html
 }
 \author{
-Maria Üblacker
+Maria M. Üblacker
 }
