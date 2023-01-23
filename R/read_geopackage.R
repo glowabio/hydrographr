@@ -15,7 +15,9 @@
 #' the GeoPackage. A specific data layer only needs to be defined if the
 #' GeoPackage contains multiple layers. To see the available layers the function
 #' st_layers() from the R package 'sf' can be used. Optional. Default is NULL.
-#' @importFrom data.table as.data.table
+#' @importFrom DBI dbConnect dbListTables dbGetQuery dbDisconnect
+#' @importFrom RSQLite SQLite
+#' @importFrom data.table setDT
 #' @importFrom igraph graph_from_data_frame
 #' @importFrom sf st_layers read_sf
 #' @importFrom terra vect
@@ -87,50 +89,64 @@ read_geopackage <- function(gpkg, import_as = "data.table", layer_name = NULL) {
   # Avoid exponential numbers in the table and IDs,
   # only set this only within the function
   options(scipen = 999)
-  # Print message
-  if (import_as == "data.table")
-    cat("Importing as a data.table...\n")
 
-  if ( import_as == "graph")
-    cat("Importing as a graph...\n")
+  if (import_as == "data.table" || import_as == "graph") {
 
-  if ( import_as == "sf")
-    cat("Importing as a sf spatial dataframe...\n")
+    # Print message
+    if (import_as == "data.table")
+      cat("Importing as a data.table...\n")
 
-  if (import_as == "SpatVect")
-      cat("Importing as a terra SpatVect object...\n")
+    if ( import_as == "graph")
+      cat("Importing as a graph...\n")
 
-  sf_layer <- read_sf(gpkg, as_tibble = FALSE, layer = layer_name)
+    # Create a connection to the SQLite database
+    cat("Opening SQL connection...\n")
+    conn <- dbConnect(drv = RSQLite::SQLite(), dbname = gpkg)
+    # List all tables
+    # layer_name <- dbListTables(conn
 
-  # Convert to data.table
-  network_table <- as.data.table(sf_layer)
+    # Read the database
+    cat("Reading GeoPackage file...\n")
+    network_table <- dbGetQuery(conn = conn,
+                                statement = paste0("SELECT * FROM '",
+                                                   layer_name, "'"))
+    # Convert to data.table
+    setDT(network_table)
 
-  # If vertices is NULL, then the first two columns of the data.frame
-  # are used as a symbolic edge list and additional columns as edge attributes.
-  # The names of the attributes are taken from the names of the columns.
-  # Remove the columns for the subsequent igraph functions.
+    # If vertices is NULL, then the first two columns of the data.frame
+    # are used as a symbolic edge list and additional columns as edge attributes.
+    # The names of the attributes are taken from the names of the columns.
+    # Remove the columns for the subsequent igraph functions.
 
-  # Which columns to remove:
-  keep_these <- which(network_table[, !names(network_table) %in%
+    # Which columns to remove:
+    keep_these <- which(network_table[, !names(network_table) %in%
                                         c("fid", "geom", "cat")] == TRUE)
-  network_table <- network_table[, ..keep_these]
+    network_table <- network_table[, ..keep_these]
 
-  if (import_as == "data.table") {
+    # Close db connection
+    cat("Closing SQL connection...\n")
+    dbDisconnect(conn)
+
+    if (import_as == "data.table") {
     return(network_table)
     }
 
-  if (import_as == "graph") { # only for network
-    cat("Building graph...\n")
-    g_out <- graph_from_data_frame(network_table, directed = TRUE)
-    return(g_out)
-    }
+    if (import_as == "graph") { # only for network
+      cat("Building graph...\n")
+      g_out <- graph_from_data_frame(network_table, directed = TRUE)
+      return(g_out)
+      }
 
-  if (import_as == "sf") {
-    return(sf_layer)
-    }
+  } else if (import_as == "sf") {
+    cat("Importing as a sf spatial dataframe...\n")
+    # tibble=F to avoid exponential numbers
+    sf <- read_sf(gpkg, as_tibble = FALSE)
+    return(sf)
 
-  if (import_as == "SpatVect") {
-    vect <- vect(sf_layer)
+  } else if (import_as == "SpatVect") {
+    cat("Importing as a terra SpatVect object...\n")
+    sf <- read_sf(gpkg)
+    vect <- vect(sf)
     return(vect)
     }
 
