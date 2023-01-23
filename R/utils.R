@@ -38,7 +38,7 @@ get_os <- function() {
 make_sh_exec <- function() {
   sh_files <- list.files(system.file("sh", package = "hydrographr"),
                       pattern = "\\.sh", full.names = TRUE)
-  lapply(sh_files, function(x) system(command = paste0("chmod u+x ", x)))
+  lapply(sh_files, function(x) system(command = paste0("chmod u+x ", "'", x, "'")))
 
 }
 
@@ -82,7 +82,9 @@ fix_path <- function(path) {
   mnt <- paste0("/mnt/", tolower(substr(drive, 1, 1)))
 
   path %>%
-  stri_replace_all_fixed(., "\\", "/") %>%
-  stri_replace_first_fixed(., drive, mnt)
+    stri_replace_all_fixed(., "\\", "/") %>%
+    stri_replace_first_fixed(., drive, mnt) %>%
+    stri_replace_first_fixed(., "Program Files", "PROGRA~1") %>%
+    stri_replace_first_fixed(., "Program Files (x86)", "PROGRA~2")
 
 }
