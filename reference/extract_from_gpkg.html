@@ -16,7 +16,7 @@ the output is loaded into R."><!-- mathjax --><script src="https://cdnjs.cloudfl
     
     <a class="navbar-brand me-2" href="../index.html">hydrographr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.9007</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -73,7 +73,8 @@ the output is loaded into R.</p>
 <span>  <span class="va">subc_layer</span>,</span>
 <span>  <span class="va">var_layer</span>,</span>
 <span>  out_dir <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  n_cores <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  n_cores <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  quiet <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -113,25 +114,42 @@ If NULL, the output is only loaded in R and not stored on disk.</p></dd>
 multiple .gpkg files are provided to var_layer.
 If NULL, available cores - 1 will be used.</p></dd>
 
+
+<dt>quiet</dt>
+<dd><p>logical. If FALSE, the standard output will be printed.
+Default is TRUE.</p></dd>
+
 </dl></div>
     <div class="section level2">
+    <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
+    <p><a href="https://grass.osgeo.org/grass82/manuals/v.in.ogr.html" class="external-link">https://grass.osgeo.org/grass82/manuals/v.in.ogr.html</a></p>
+    </div>
+    <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
-    <p>Afroditi Grigoropoulou, Jaime Garcia Marquez</p>
+    <p>Afroditi Grigoropoulou, Jaime Garcia Marquez, Maria M. Üblacker</p>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://glowabio.github.io/hydrographr/" class="external-link">hydrographr</a></span><span class="op">)</span></span>
-<span><span class="co"># Download test data into temporary R folder</span></span>
-<span><span class="fu"><a href="download_test_data.html">download_test_data</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># Download test data into temporary R folder</span></span>
+<span><span class="co"># or define a different directory</span></span>
+<span><span class="va">my_directory</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="download_test_data.html">download_test_data</a></span><span class="op">(</span><span class="va">my_directory</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Define the input data directory</span></span>
-<span><span class="va">data_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>,<span class="st">"/hydrography90m_test_data/"</span><span class="op">)</span></span>
+<span><span class="co"># Define path to the directory containing all input data</span></span>
+<span><span class="va">test_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">my_directory</span>, <span class="st">"/hydrography90m_test_data"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Define sub-catchment ID layer</span></span>
+<span><span class="va">subc_raster</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">my_directory</span>, <span class="st">"/hydrography90m_test_data"</span>,</span>
+<span>                  <span class="st">"/subcatchment_1264942.tif"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Extract the attribute table of the file order_vect_59.gpkg for all the</span></span>
 <span><span class="co"># sub-catchment IDs of the subcatchment_1264942.tif raster layer</span></span>
-<span><span class="va">attribute_table</span> <span class="op">&lt;-</span> <span class="fu">extract_from_gpkg</span><span class="op">(</span>data_dir <span class="op">=</span> <span class="va">data_dir</span>, subc_id <span class="op">=</span> <span class="st">"all"</span>,</span>
-<span>subc_layer <span class="op">=</span> <span class="st">"subcatchment_1264942.tif"</span>, var_layer <span class="op">=</span> <span class="st">"order_vect_59.gpkg"</span><span class="op">)</span></span>
+<span><span class="va">attribute_table</span> <span class="op">&lt;-</span> <span class="fu">extract_from_gpkg</span><span class="op">(</span>data_dir <span class="op">=</span> <span class="va">test_data</span>,</span>
+<span>                                     subc_id <span class="op">=</span> <span class="st">"all"</span>,</span>
+<span>                                     subc_layer <span class="op">=</span> <span class="va">subc_raster</span>,</span>
+<span>                                     var_layer <span class="op">=</span> <span class="st">"order_vect_59.gpkg"</span>,</span>
+<span>                                     n_cores <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Show the output table</span></span>
 <span><span class="va">attribute_table</span></span></code></pre></div>

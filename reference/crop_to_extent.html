@@ -28,7 +28,7 @@ optionally loaded into R as a SpatRaster (terra package) object
     
     <a class="navbar-brand me-2" href="../index.html">hydrographr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.9007</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -91,7 +91,8 @@ optionally loaded into R as a SpatRaster (terra package) object
 <span>  bounding_box <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">out_dir</span>,</span>
 <span>  <span class="va">file_name</span>,</span>
-<span>  read <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  read <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  quiet <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -124,6 +125,11 @@ or other spatial object.</p></dd>
 <dd><p>logical. If TRUE, the cropped raster .tif layer gets read into R.
 If FALSE, the layer is only stored on disk. Default is TRUE.</p></dd>
 
+
+<dt>quiet</dt>
+<dd><p>logical. If FALSE, the standard output will be printed.
+Default is TRUE.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -140,7 +146,23 @@ read = TRUE.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># Download test data into the temporary R folder</span></span>
+<span><span class="co"># or define a different directory</span></span>
+<span><span class="va">my_directory</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="download_test_data.html">download_test_data</a></span><span class="op">(</span><span class="va">my_directory</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Define full path to the input raster .tif layer ans vector layer</span></span>
+<span><span class="va">spi_raster</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">my_directory</span>, <span class="st">"/hydrography90m_test_data"</span>,</span>
+<span>                     <span class="st">"/spi_1264942.tif"</span><span class="op">)</span></span>
+<span><span class="va">basin_vector</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">my_directory</span>, <span class="st">"/hydrography90m_test_data"</span>,</span>
+<span>                      <span class="st">"/basin_59.gpkg"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Crop the Stream Power Index to the basin</span></span>
+<span><span class="va">spi_basin</span> <span class="op">&lt;-</span> <span class="fu">crop_to_extent</span><span class="op">(</span>raster_layer <span class="op">=</span> <span class="va">spi_raster</span>,</span>
+<span>                            vector_layer <span class="op">=</span> <span class="va">basin_vector</span>,</span>
+<span>                            out_dir <span class="op">=</span> <span class="va">my_directory</span>,</span>
+<span>                            file_name <span class="op">=</span> <span class="st">"spi_basin_cropped.tif"</span>,</span>
+<span>                            read <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>

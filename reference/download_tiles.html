@@ -20,7 +20,7 @@ using the functions "get_tile_id" and "get_regional_unit_id" respectively.'><!--
     
     <a class="navbar-brand me-2" href="../index.html">hydrographr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.9007</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -119,21 +119,28 @@ Hydrography90m: A new high-resolution global hydrographic dataset.
 IGB Leibniz-Institute of Freshwater Ecology and Inland Fisheries.
 dataset. https://doi.org/10.18728/igb-fred-762.1</p>
     </div>
+    <div class="section level2">
+    <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
+    <p>Afroditi Grigoropoulou</p>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># Download data for two variables in three regular tiles</span></span>
 <span><span class="co"># to the current working directory</span></span>
 <span><span class="fu">download_tiles</span><span class="op">(</span>variable <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sti"</span>, <span class="st">"stream_dist_up_farth"</span><span class="op">)</span>,</span>
-<span>file_format <span class="op">=</span> <span class="st">"tif"</span>,</span>
-<span>tile_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"h00v02"</span>,<span class="st">"h16v02"</span>, <span class="st">"h16v04"</span><span class="op">)</span><span class="op">)</span></span>
+<span>               file_format <span class="op">=</span> <span class="st">"tif"</span>,</span>
+<span>               tile_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"h00v02"</span>,<span class="st">"h16v02"</span>, <span class="st">"h16v04"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Download the global .tif layer for the variable "direction"</span></span>
-<span><span class="co"># to a specific (existing) directory</span></span>
+<span><span class="co"># into the temporary R folder or define a different directory</span></span>
+<span><span class="co"># Define directory</span></span>
+<span><span class="va">my_directory</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co"># Download layer</span></span>
 <span><span class="fu">download_tiles</span><span class="op">(</span>variable <span class="op">=</span> <span class="st">"direction"</span>,</span>
-<span>file_format <span class="op">=</span> <span class="st">"tif"</span>,</span>
-<span>global <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>download_dir <span class="op">=</span> <span class="st">"/path/to/directory/"</span><span class="op">)</span></span>
+<span>               file_format <span class="op">=</span> <span class="st">"tif"</span>,</span>
+<span>               global <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>               download_dir <span class="op">=</span> <span class="va">my_directory</span><span class="op">)</span></span>
 <span></span></code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

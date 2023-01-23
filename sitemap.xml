@@ -64,6 +64,9 @@
     <loc>/reference/get_regional_unit_id.html</loc>
   </url>
   <url>
+    <loc>/reference/get_segment_neighbours.html</loc>
+  </url>
+  <url>
     <loc>/reference/get_tile_id.html</loc>
   </url>
   <url>
@@ -86,9 +89,6 @@
   </url>
   <url>
     <loc>/reference/report_no_data.html</loc>
-  </url>
-  <url>
-    <loc>/reference/segment_neighbours.html</loc>
   </url>
   <url>
     <loc>/reference/set_no_data.html</loc>

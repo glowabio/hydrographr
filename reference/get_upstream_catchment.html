@@ -12,7 +12,7 @@ point as the outlet."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/
     
     <a class="navbar-brand me-2" href="../index.html">hydrographr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.9007</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -67,7 +67,7 @@ point as the outlet.</p>
 <span>  <span class="va">lon</span>,</span>
 <span>  <span class="va">lat</span>,</span>
 <span>  direction_layer <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  out_path <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  out_dir <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  n_cores <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  quiet <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -99,9 +99,8 @@ of "data" (e.g., occurrence or site IDs).</p></dd>
 direction variable.</p></dd>
 
 
-<dt>out_path</dt>
-<dd><p>Full path to the directory where the output(s)
-will be stored.
+<dt>out_dir</dt>
+<dd><p>Full path to the directory where the output(s) will be stored.
 To identify the upstream catchment the output file name includes the site id.</p></dd>
 
 
@@ -136,55 +135,7 @@ segment within the sub-catchment the point is located.
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># Download test data into temporary R folder</span></span>
-<span><span class="va">my_directory</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu"><a href="download_test_data.html">download_test_data</a></span><span class="op">(</span><span class="va">my_directory</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Before running the function get_upstream_catchment(), snap the points to</span></span>
-<span><span class="co"># to the stream segment. There are multiple ways to snap the points. Here is</span></span>
-<span><span class="co"># one example:</span></span>
-<span></span>
-<span><span class="co"># Load occurrence data</span></span>
-<span><span class="va">species_occurence</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.table</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">my_directory</span>,</span>
-<span>                            <span class="st">"/hydrography90m_test_data/spdata_1264942.txt"</span><span class="op">)</span>,</span>
-<span>                             header <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Define full path to the basin and sub-catchments raster layer</span></span>
-<span><span class="va">basin_rast</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">my_directory</span>,</span>
-<span>                     <span class="st">"/hydrography90m_test_data/basin_1264942.tif"</span><span class="op">)</span></span>
-<span><span class="va">subc_rast</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">my_directory</span>,</span>
-<span>                    <span class="st">"/hydrography90m_test_data/subcatchment_1264942.tif"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Define full path to the vector file of the stream network</span></span>
-<span><span class="va">stream_vect</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">my_directory</span>,</span>
-<span>                      <span class="st">"/hydrography90m_test_data/order_vect_59.gpkg"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Automatically extract the basin and sub-catchment IDs and</span></span>
-<span><span class="co"># snap the data points to the stream segment</span></span>
-<span><span class="va">snapped_coordinates</span> <span class="op">&lt;-</span> <span class="fu"><a href="snap_to_subc_segment.html">snap_to_subc_segment</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">species_occurence</span>,</span>
-<span>                                            lon <span class="op">=</span> <span class="st">"longitude"</span>,</span>
-<span>                                            lat <span class="op">=</span> <span class="st">"latitude"</span>,</span>
-<span>                                            id <span class="op">=</span> <span class="st">"occurrence_id"</span>,</span>
-<span>                                            basin_path <span class="op">=</span> <span class="va">basin_rast</span>,</span>
-<span>                                            subc_path <span class="op">=</span> <span class="va">subc_rast</span>,</span>
-<span>                                            stream_path <span class="op">=</span> <span class="va">stream_vect</span>,</span>
-<span>                                            n_cores <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Define full path to the direction .tif</span></span>
-<span><span class="va">direction_rast</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">my_directory</span>,</span>
-<span>                        <span class="st">"/hydrography90m_test_data/direction_1264942.tif"</span><span class="op">)</span></span>
-<span><span class="co"># Define the path for the output file(s)</span></span>
-<span><span class="va">output</span> <span class="op">&lt;-</span>  <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">my_directory</span>, <span class="st">"/upstream_catchments"</span><span class="op">)</span></span>
-<span><span class="kw">if</span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.exists</a></span><span class="op">(</span><span class="va">output</span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="va">output</span><span class="op">)</span></span>
-<span><span class="co"># Get the upstream catchment for each point location</span></span>
-<span><span class="fu">get_upstream_catchment</span><span class="op">(</span><span class="va">hydrography90m_ids</span>,</span>
-<span>                       lon <span class="op">=</span> <span class="st">"longitude"</span>,</span>
-<span>                       lat <span class="op">=</span> <span class="st">"latitude"</span>,</span>
-<span>                       id <span class="op">=</span> <span class="st">"occurrence_id"</span>,</span>
-<span>                       direction_layer <span class="op">=</span> <span class="va">dir_rast</span>,</span>
-<span>                       out_path <span class="op">=</span> <span class="va">output</span>,</span>
-<span>                       n_cores <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
-<span></span></code></pre></div>
+    
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>

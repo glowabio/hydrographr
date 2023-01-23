@@ -8,7 +8,7 @@ we use the term "subc_id".
 This function can also be used to create the connectivity table
 for Marxan by using var_layer="length" and attach_only=TRUE.
 The resulting table reports the connectivity from each segment,
-along with the stream length for all connected segments.'><title>Get stream segment neighbours — segment_neighbours • hydrographr</title><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.1.3/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.1.3/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous"><!-- bootstrap-toc --><script src="https://cdn.rawgit.com/afeld/bootstrap-toc/v1.0.1/dist/bootstrap-toc.min.js"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Get stream segment neighbours — segment_neighbours"><meta property="og:description" content='For each segment, reports those upstream, downstream, or up-and
+along with the stream length for all connected segments.'><title>Get stream segment neighbours — get_segment_neighbours • hydrographr</title><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.1.3/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.1.3/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous"><!-- bootstrap-toc --><script src="https://cdn.rawgit.com/afeld/bootstrap-toc/v1.0.1/dist/bootstrap-toc.min.js"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Get stream segment neighbours — get_segment_neighbours"><meta property="og:description" content='For each segment, reports those upstream, downstream, or up-and
 downstream segments that are connected to one or multiple input
 segments within a specified neighbour order, with the option to
 summarize attributes across these segments. Note that the stream
@@ -28,7 +28,7 @@ along with the stream length for all connected segments.'><!-- mathjax --><scrip
     
     <a class="navbar-brand me-2" href="../index.html">hydrographr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.9007</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -67,7 +67,7 @@ along with the stream length for all connected segments.'><!-- mathjax --><scrip
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Get stream segment neighbours</h1>
       <small class="dont-index">Source: <a href="https://github.com/glowabio/hydrographr/blob/HEAD/R/get_segment_neighbours.R" class="external-link"><code>R/get_segment_neighbours.R</code></a></small>
-      <div class="d-none name"><code>segment_neighbours.Rd</code></div>
+      <div class="d-none name"><code>get_segment_neighbours.Rd</code></div>
     </div>
 
     <div class="ref-description section level2">
@@ -85,7 +85,7 @@ along with the stream length for all connected segments.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">segment_neighbours</span><span class="op">(</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_segment_neighbours</span><span class="op">(</span></span>
 <span>  <span class="va">g</span>,</span>
 <span>  subc_id <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  var_layer <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -158,13 +158,52 @@ for large study areas (more than one 20°x20° tile). Optional.</p></dd>
 
 </dl></div>
     <div class="section level2">
+    <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
+    <p>Csardi G, Nepusz T: The igraph software package for complex network research,
+InterJournal, Complex Systems 1695. 2006. <a href="https://igraph.org" class="external-link">https://igraph.org</a></p>
+    </div>
+    <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
     <p>Sami Domisch</p>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># Download test data into the temporary R folder</span></span>
+<span><span class="co"># or define a different directory</span></span>
+<span><span class="va">my_directory</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="download_test_data.html">download_test_data</a></span><span class="op">(</span><span class="va">my_directory</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Load the stream network as graph</span></span>
+<span><span class="va">my_graph</span> <span class="op">&lt;-</span> <span class="fu"><a href="read_geopackage.html">read_geopackage</a></span><span class="op">(</span>gpkg<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">my_directory</span>,</span>
+<span>                                         <span class="st">"/hydrography90m_test_data"</span>,</span>
+<span>                                         <span class="st">"/order_vect_59.gpkg"</span><span class="op">)</span>,</span>
+<span>                            import_as <span class="op">=</span> <span class="st">"graph"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Get the upstream segment neighbours in the 5th order</span></span>
+<span><span class="co"># and report the length and source elevation</span></span>
+<span><span class="co"># for the neighbours of each input segment</span></span>
+<span><span class="fu">get_segment_neighbours</span><span class="op">(</span>g <span class="op">=</span> <span class="va">my_graph</span>, subc_id <span class="op">=</span> <span class="va">subc_id</span>,</span>
+<span>                       order <span class="op">=</span> <span class="fl">5</span>, mode <span class="op">=</span> <span class="st">"in"</span>, n_cores <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>                       var_layer <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"length"</span>, <span class="st">"source_elev"</span><span class="op">)</span>,</span>
+<span>                       attach_only <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Get the downstream segment neighbours in the 5th order</span></span>
+<span><span class="co"># and calculate the median length and source elevation</span></span>
+<span><span class="co"># across the neighbours of each input segment</span></span>
+<span><span class="fu">get_segment_neighbours</span><span class="op">(</span>g <span class="op">=</span> <span class="va">my_graph</span>, subc_id <span class="op">=</span> <span class="va">subc_id</span>,</span>
+<span>                       order <span class="op">=</span> <span class="fl">2</span>, mode <span class="op">=</span><span class="st">"out"</span>, n_cores <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>                       var_layer <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"length"</span>, <span class="st">"source_elev"</span><span class="op">)</span>,</span>
+<span>                       stat <span class="op">=</span> <span class="va">median</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Get the up-and downstream segment neighbours in the 5th order</span></span>
+<span><span class="co"># and report the median length and source elevation</span></span>
+<span><span class="co"># for the neighbours of each input segment</span></span>
+<span><span class="fu">get_segment_neighbours</span><span class="op">(</span>g <span class="op">=</span> <span class="va">my_graph</span>, subc_id <span class="op">=</span> <span class="va">subc_id</span>, order <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>                       mode <span class="op">=</span> <span class="st">"all"</span>, n_cores <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>                       var_layer <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"length"</span>, <span class="st">"source_elev"</span><span class="op">)</span>,</span>
+<span>                       stat <span class="op">=</span> <span class="va">mean</span>, attach_only <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span></code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>

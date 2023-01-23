@@ -14,7 +14,7 @@ or a SpatVect object (terra)."><!-- mathjax --><script src="https://cdnjs.cloudf
     
     <a class="navbar-brand me-2" href="../index.html">hydrographr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.9007</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -64,90 +64,68 @@ or a SpatVect object (terra).</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">read_geopackage</span><span class="op">(</span></span>
-<span>  <span class="va">file_name</span>,</span>
-<span>  type <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  SQL_table <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  as_dt <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  as_graph <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  as_sf <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  as_SpatVect <span class="op">=</span> <span class="cn">FALSE</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">read_geopackage</span><span class="op">(</span><span class="va">gpkg</span>, import_as <span class="op">=</span> <span class="st">"data.table"</span>, layer_name <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
-    <dl><dt>file_name</dt>
-<dd><p>character. Name of the GeoPackage file to import,
-e.g. "order_vect_segment_h00v00.gpkg".</p></dd>
+    <dl><dt>gpkg</dt>
+<dd><p>character. Full path of the GeoPackage file.</p></dd>
 
 
-<dt>type</dt>
-<dd><p>character. Either "net" for importing a network, "subc" for
-sub-catchments, "basin" for drainage basins, or "outlet" for outlet points.</p></dd>
+<dt>import_as</dt>
+<dd><p>character. "data.table", "graph", "sf", or "SpatVect".
+"data.table" imports data as a data.table. "graph" imports the layer as a
+directed graph (igraph object). This option is only possible for a network
+layer (e.g. the stream network). "sf" imports the layer as a  spatial data
+frame (sf object). "SpatVect" imports the layer as a SpatVector (terra
+object). Default is "data.table".</p></dd>
 
 
-<dt>SQL_table</dt>
-<dd><p>character. Name of the specific data to import from the
-GeoPackage. This is set automatically for the Hydrography90m data,
-but needs to be specified for any other data. Optional.</p></dd>
-
-
-<dt>as_dt</dt>
-<dd><p>logical. If TRUE, import the GeoPackage as a data.table.
-Default is FALSE.</p></dd>
-
-
-<dt>as_graph</dt>
-<dd><p>"logical. If TRUE, import the GeoPackage as a directed graph
-(igraph object). Only possible for a network layer. Default is FALSE.</p></dd>
-
-
-<dt>as_sf</dt>
-<dd><p>logical. If TRUE, import the GeoPackage as a spatial dataframe
-(sf object). Default is FALSE.</p></dd>
-
-
-<dt>as_SpatVect</dt>
-<dd><p>logical. If TRUE, import the GeoPackage as a
-SpatVector (terra object). Default is FALSE.</p></dd>
+<dt>layer_name</dt>
+<dd><p>character. Name of the specific data layer to import from
+the GeoPackage. A specific data layer only needs to be defined if the
+GeoPackage contains multiple layers. To see the available layers the function
+st_layers() from the R package 'sf' can be used. Optional. Default is NULL.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
-    <p>Sami Domisch</p>
+    <p>Sami Domisch, Maria M.Üblacker</p>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://glowabio.github.io/hydrographr/" class="external-link">hydrographr</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Download test data into temporary R folder</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># Download test data into the temporary R folder</span></span>
+<span><span class="co"># or define a different directory</span></span>
 <span><span class="va">my_directory</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="download_test_data.html">download_test_data</a></span><span class="op">(</span><span class="va">my_directory</span><span class="op">)</span></span>
 <span></span>
+<span></span>
 <span><span class="co"># Read the stream network as a graph</span></span>
-<span><span class="va">my_graph</span> <span class="op">&lt;-</span> <span class="fu">read_geopackage</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">my_directory</span>, <span class="st">"/order_vect_59.gpkg"</span><span class="op">)</span>,</span>
-<span>type <span class="op">=</span> <span class="st">"net"</span>, as_graph <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span>
+<span><span class="va">my_graph</span> <span class="op">&lt;-</span> <span class="fu">read_geopackage</span><span class="op">(</span>gpkg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">my_directory</span>,</span>
+<span>                                          <span class="st">"/hydrography90m_test_data"</span>,</span>
+<span>                                          <span class="st">"/order_vect_59.gpkg"</span><span class="op">)</span>,</span>
+<span>                            import_as <span class="op">=</span> <span class="st">"graph"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Read the stream network as a data.table</span></span>
-<span><span class="va">my_dt</span> <span class="op">&lt;-</span> <span class="fu">read_geopackage</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">my_directory</span>, <span class="st">"/order_vect_59.gpkg"</span><span class="op">)</span>,</span>
-<span>type <span class="op">=</span> <span class="st">"net"</span>, as_dt <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span>
+<span><span class="va">my_dt</span> <span class="op">&lt;-</span> <span class="fu">read_geopackage</span><span class="op">(</span>gpkg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">my_directory</span>,</span>
+<span>                                       <span class="st">"/hydrography90m_test_data"</span>,</span>
+<span>                                       <span class="st">"/order_vect_59.gpkg"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Read the sub-catchments as a data.table</span></span>
-<span><span class="va">my_dt</span> <span class="op">&lt;-</span> <span class="fu">read_geopackage</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">my_directory</span>, <span class="st">"/order_vect_59.gpkg"</span><span class="op">)</span>,</span>
-<span>type <span class="op">=</span> <span class="st">"subc"</span>, as_dt <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Read the basin as a SF-object</span></span>
-<span><span class="va">my_sf</span> <span class="op">&lt;-</span> <span class="fu">read_geopackage</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">my_directory</span>, <span class="st">"/order_vect_59.gpkg"</span><span class="op">)</span>,</span>
-<span>type <span class="op">=</span> <span class="st">"basin"</span>, as_sf <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span>
+<span><span class="co"># Read the sub-catchments as a SF-object</span></span>
+<span><span class="va">my_sf</span> <span class="op">&lt;-</span> <span class="fu">read_geopackage</span><span class="op">(</span>gpkg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">my_directory</span>,</span>
+<span>                                       <span class="st">"/hydrography90m_test_data"</span>,</span>
+<span>                                       <span class="st">"/sub_catchment_59.gpkg"</span><span class="op">)</span>,</span>
+<span>                         import_as <span class="op">=</span> <span class="st">"sf"</span>,</span>
+<span>                         layer_name <span class="op">=</span> <span class="st">"sub_catchment"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co">#' # Read the basin as SpatVect object</span></span>
-<span><span class="va">my_sf</span> <span class="op">&lt;-</span> <span class="fu">read_geopackage</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">my_directory</span>, <span class="st">"/order_vect_59.gpkg"</span><span class="op">)</span>,</span>
-<span>type <span class="op">=</span> <span class="st">"basin"</span>, as_SpatVect <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span>
-<span><span class="co"># Read the outlets as data.table</span></span>
-<span><span class="va">my_sf</span> <span class="op">&lt;-</span> <span class="fu">read_geopackage</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">my_directory</span>, <span class="st">"/order_vect_59.gpkg"</span><span class="op">)</span>,</span>
-<span>type <span class="op">=</span> <span class="st">"outlet"</span>, as_sf <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span>
+<span><span class="co"># Read the basin as SpatVect object</span></span>
+<span><span class="va">my_sv</span> <span class="op">&lt;-</span> <span class="fu">read_geopackage</span><span class="op">(</span>gpkg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">my_directory</span>,</span>
+<span>                                       <span class="st">"/hydrography90m_test_data"</span>,</span>
+<span>                                       <span class="st">"/basin_59.gpkg"</span><span class="op">)</span>,</span>
+<span>                         import_as <span class="op">=</span> <span class="st">"SpatVect"</span><span class="op">)</span></span>
 <span></span></code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
