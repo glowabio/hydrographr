@@ -103,7 +103,7 @@ Next, you need to tell your system to pull down the latest list of software from
 
 ```{bash, eval=FALSE}
 # Update the packages list
-sudo apt update
+sudo apt update && sudo apt upgrade
 ```
 
 Now you are ready to install`GDAL`, `GRASS GIS` and GNU `parallel`. Copy and paste the commands below into your console and follow the instructions to install the tools.
