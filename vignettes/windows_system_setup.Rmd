@@ -152,6 +152,8 @@ $GRASSEXEC  g.extension  extension=r.stream.basins
 
 **GNU parallel**
 
+GNU parallel is a shell tool for executing jobs in parallel on multiple cores. For a faster processing, some of the `hydrographr` functions such as `snap_to_subc_segment()` and `extract_zonal_stat()` have GNU parallel implemented. For more information check the [GNU parallel](https://www.gnu.org/software/parallel/) website.
+
 ```{bash, eval=FALSE}
 # Download the latest version of GNU parallel 
 wget http://ftp.gnu.org/gnu/parallel/parallel-latest.tar.bz2
@@ -212,6 +214,7 @@ will cite
 ```
 
 **dos2unix**
+
 The Windows systems uses different text file line endings than the Linux systems. Dos2Unix is a package that contains commands for converting line endings in a text file from Windows to Linux and vice versa.
 
 ```{bash, eval=FALSE}
