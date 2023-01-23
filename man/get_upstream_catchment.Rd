@@ -93,6 +93,7 @@ get_upstream_catchment(snapped_coordinates,
                        id = "occurrence_id",
                        direction_layer = direction_raster,
                        out_dir = output_folder,
+                       n_cores = 2)
 }
 \references{
 \url{https://grass.osgeo.org/grass82/manuals/r.water.outlet.html}
