@@ -41,10 +41,6 @@
 
 get_regional_unit_id <- function(data, lon, lat, quiet = TRUE) {
 
-  system <- get_os()
-
-  # Make bash scripts executable
-  make_sh_exec()
 
   # global file of regional units ids
   reg_unit_file <- paste0(tempdir(), "/regional_unit_ovr.tif")
@@ -76,7 +72,13 @@ get_regional_unit_id <- function(data, lon, lat, quiet = TRUE) {
   # Path for tmp regional unit ids text file
   ids_tmp_path <- paste0(tempdir(), "/reg_unit_ids", rand_string, ".txt")
 
-  if (system == "linux" || system == "osx") {
+  # Check operating system
+  sys_os <- get_os()
+
+  # Make bash scripts executable
+  make_sh_exec()
+
+  if (sys_os == "linux" || sys_os == "osx") {
 
     processx::run(system.file("sh", "get_regional_unit_id.sh",
                   package = "hydrographr"),

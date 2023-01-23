@@ -113,8 +113,6 @@
 snap_to_subc_segment <- function(data, lon, lat, id, basin_id = NULL,
                                  subc_id = NULL, basin_layer, subc_layer,
                                  stream_layer, n_cores = 1, quiet = TRUE) {
-  # Check operating system
-  system <- get_os()
 
   # Check if any of the arguments is missing
   for (arg in  c(data, lon, lat, id, basin_layer, subc_layer,
@@ -238,10 +236,12 @@ snap_to_subc_segment <- function(data, lon, lat, id, basin_id = NULL,
   # Path for tmp regional unit ids text file
   snap_tmp_path <- paste0(tempdir(), "/snapped_points", rand_string, ".csv")
 
+  # Check operating system
+  sys_os <- get_os()
   # Make bash scripts executable
   make_sh_exec()
 
-  if (system == "linux" || system == "osx") {
+  if (sys_os == "linux" || sys_os == "osx") {
 
     processx::run(system.file("sh", "snap_to_subc_segment.sh",
                     package = "hydrographr"),

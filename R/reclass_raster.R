@@ -75,7 +75,7 @@ reclass_raster <- function(data, rast_val, new_val, raster_layer,
                            no_data = -9999, type = "Int32",
                            compress = "DEFLATE", quiet = TRUE) {
   # Check operating system
-  system <- get_os()
+  sys_os <- get_os()
   # Check if data.frame is defined
   if (missing(data))
     stop("data: Input data.frame is missing.")
@@ -161,7 +161,7 @@ reclass_raster <- function(data, rast_val, new_val, raster_layer,
   # Write rules as a .txt file to the temporary folder
   fwrite(rules, rules_path, sep = " ", col.names = FALSE)
 
-  if (system == "linux" || system == "osx") {
+  if (sys_os == "linux" || sys_os == "osx") {
   # Open GRASS GIS session
   # Call external GRASS GIS command r.reclass
   processx::run(system.file("sh", "reclass_raster.sh",

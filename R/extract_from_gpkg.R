@@ -169,14 +169,14 @@ extract_from_gpkg <- function(data_dir, subc_id, subc_layer, var_layer,
     }
 
     # Check operating system
-    system <- get_os()
+    sys_os <- get_os()
 
     # Make bash scripts executable
     make_sh_exec()
 
     # Run the zonal statistics function
 
-    if (system == "linux" || system == "osx") {
+    if (sys_os == "linux" || sys_os == "osx") {
       # Call the external .sh script extract_from_gpkg.sh
       # containing the grass functions
       processx::run(system.file("sh", "extract_from_gpkg.sh",

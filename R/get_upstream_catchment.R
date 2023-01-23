@@ -170,13 +170,13 @@ get_upstream_catchment <- function(data, id, lon, lat, direction_layer = NULL,
   n_cores <- ifelse(is.null(n_cores), detectCores(logical = FALSE) - 1, n_cores)
 
   # Check operating system
-  system <- get_os()
+  sys_os <- get_os()
 
   # Make bash scripts executable
   make_sh_exec()
 
 
-  if (system == "linux" || system == "osx") {
+  if (sys_os == "linux" || sys_os == "osx") {
 
     # Call the external .sh script get_upstream_catchment() containing the
     # GRASS functions

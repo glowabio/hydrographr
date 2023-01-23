@@ -48,12 +48,12 @@ set_no_data <- function(data_dir, var_layer, no_data, quiet = TRUE) {
     stop("no_data: Value has to be numeric.")
 
   # Check operating system
-  system <- get_os()
+   sys_os  <- get_os()
 
   # Make bash scripts executable
   make_sh_exec()
 
-  if (system == "linux" || system == "osx") {
+  if (sys_os  == "linux" ||  sys_os  == "osx") {
   # Call the external .sh script set_no_data.sh
   # containing the gdal function
   output <- processx::run(system.file("sh", "set_no_data.sh",

@@ -63,12 +63,12 @@ report_no_data <- function(data_dir, var_layer, n_cores = NULL) {
   var_layer_array <- paste(unique(var_layer), collapse = "/")
 
   # Check operating system
-  system <- get_os()
+  sys_os <- get_os()
 
   # Make bash scripts executable
   make_sh_exec()
 
-  if (system == "linux" || system == "osx") {
+  if (sys_os == "linux" || sys_os == "osx") {
   # Call the external .sh script report_no_data()
   reports <- processx::run(system.file("sh", "report_no_data.sh",
                              package = "hydrographr"),

@@ -97,11 +97,11 @@ crop_to_extent <- function(raster_layer, vector_layer = NULL,
   # Compose output_path by combining out_dir and file_name
   output_path <- paste0(out_dir, "/", file_name)
   # Check operating system
-  system <- get_os()
+  sys_os <- get_os()
   # Make bash scripts executable
   make_sh_exec()
 
-  if (system == "linux" || system == "osx") {
+  if (sys_os == "linux" || sys_os == "osx") {
     if (!is.null(vector_layer)) {
         # Call external gdalwarp command from GDAL library. Cut through
         # the border line option

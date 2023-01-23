@@ -80,7 +80,7 @@ merge_tiles <- function(tile_dir, tile_names, out_dir, file_name,
   }
 
       # Check operating system
-      system <- hydrographr:::get_os()
+      sys_os <- hydrographr:::get_os()
 
       # Make bash scripts executable
       make_sh_exec()
@@ -90,7 +90,7 @@ merge_tiles <- function(tile_dir, tile_names, out_dir, file_name,
       tile_names_array <- paste(unique(tile_names), collapse = ",")
 
 
-      if (system == "linux" || system == "osx") {
+      if (sys_os == "linux" || sys_os == "osx") {
         merge_tiles <- processx::run(system.file("sh", "merge_tiles.sh",
                             package = "hydrographr"),
                     args = c(tile_dir, tile_names_array, out_dir, file_name),

@@ -131,12 +131,12 @@ extract_ids <- function(data, lon, lat, id = NULL, basin_layer = NULL,
   ids_tmp_path <- paste0(tempdir(), "/ids_", rand_string, ".txt")
 
   # Check operating system
-  system <- get_os()
+  sys_os <- get_os()
 
   # Make bash scripts executable
   make_sh_exec()
 
-  if (system == "linux" || system == "osx") {
+  if (sys_os == "linux" || sys_os == "osx") {
 
     # Convert null arguments to 0 so that bash can evaluate the variables
     subc_layer <- ifelse(is.null(subc_layer), 0, subc_layer)

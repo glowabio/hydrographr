@@ -164,11 +164,6 @@ snap_to_network <- function(data, lon, lat, id, stream_layer,
   if (!is.logical(quiet))
     stop("quiet: Has to be TRUE or FALSE.")
 
-  # Check operating system
-  system <- get_os()
-  # Make bash scripts executable
-  make_sh_exec()
-
   # Create random string to attach to the file name of the temporary
   # output coordinates and input ids file
   rand_string <- stri_rand_strings(n = 1, length = 8, pattern = "[A-Za-z0-9]")
@@ -187,7 +182,12 @@ snap_to_network <- function(data, lon, lat, id, stream_layer,
   # Path for tmp regional unit ids text file
   snap_tmp_path <- paste0(tempdir(), "/snapped_points", rand_string, ".txt")
 
-  if (system == "linux" || system == "osx") {
+  # Check operating system
+  sys_os <- get_os()
+  # Make bash scripts executable
+  make_sh_exec()
+
+  if (sys_os == "linux" || sys_os == "osx") {
 
     # Convert NULL argument to "NA" so that the bash script can evaluate
     # the argument
