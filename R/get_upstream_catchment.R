@@ -89,6 +89,7 @@
 #'                        id = "occurrence_id",
 #'                        direction_layer = direction_raster,
 #'                        out_dir = output_folder,
+#'                        n_cores = 2)
 
 
 get_upstream_catchment <- function(data, id, lon, lat, direction_layer = NULL,
