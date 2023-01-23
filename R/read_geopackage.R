@@ -35,26 +35,26 @@
 #' # Read the stream network as a graph
 #' my_graph <- read_geopackage(gpkg = paste0(my_directory,
 #'                                           "/hydrography90m_test_data",
-#'                                           "/order_vect_1264942.gpkg"),
+#'                                           "/order_vect_59.gpkg"),
 #'                             import_as = "graph")
 #'
 #' # Read the stream network as a data.table
 #' my_dt <- read_geopackage(gpkg = paste0(my_directory,
 #'                                        "/hydrography90m_test_data",
-#'                                        "/order_vect_1264942.gpkg"))
+#'                                        "/order_vect_59.gpkg"))
 #'
 #'
 #' # Read the sub-catchments as a SF-object
 #' my_sf <- read_geopackage(gpkg = paste0(my_directory,
 #'                                        "/hydrography90m_test_data",
-#'                                        "/sub_catchment_1264942.gpkg"),
+#'                                        "/sub_catchment_59.gpkg"),
 #'                          import_as = "sf",
-#'                          layer_name = "sub_catchment_1264942")
+#'                          layer_name = "sub_catchment")
 #'
 #' # Read the basin as SpatVect object
 #' my_sv <- read_geopackage(gpkg = paste0(my_directory,
 #'                                        "/hydrography90m_test_data",
-#'                                        "/basin_1264942.gpkg"),
+#'                                        "/basin_59.gpkg"),
 #'                          import_as = "SpatVect")
 #'
 
