@@ -10,6 +10,7 @@ extract_from_gpkg(
   subc_layer,
   var_layer,
   out_dir = NULL,
+  file_name = NULL,
   n_cores = NULL,
   quiet = TRUE
 )
@@ -33,6 +34,9 @@ If the out_dir is specified, the attribute tables will be stored as .csv
 files in this location, named after their input variable vector files
 (e.g. "/path/to/stats_order_vect_point_h18v04.csv").
 If NULL, the output is only loaded in R and not stored on disk.}
+
+\item{file_name}{character. Name of the .csv file where the output table
+will be stored. out_dir should also be specified for this purpose.}
 
 \item{n_cores}{numeric. Number of cores used for parallelization, in case
 multiple .gpkg files are provided to var_layer.
