@@ -15,8 +15,10 @@
 #' the GeoPackage. A specific data layer only needs to be defined if the
 #' GeoPackage contains multiple layers. To see the available layers the function
 #' st_layers() from the R package 'sf' can be used. Optional. Default is NULL.
-#' @param subc_id numeric. Vector of the sub-catchment IDs (c(ID1, ID2, ...)
-#' for which the attributes of the GeoPackage should be reported.
+#' @param subc_id numeric. Vector of the sub-catchment (or stream segment) IDs
+#' in the form of (c(ID1, ID2, ...) for which the spatial objects or attributes
+#' of the GeoPackage should be reported. Currently only implemented for the
+#' stream network GeoPackage file.
 #' @importFrom DBI dbConnect dbListTables dbGetQuery dbDisconnect
 #' @importFrom RSQLite SQLite
 #' @importFrom data.table setDT
@@ -45,6 +47,11 @@
 #'                                        "/hydrography90m_test_data",
 #'                                        "/order_vect_59.gpkg"))
 #'
+#' # Read the stream network as a data.table for specific IDs
+#' my_dt <- read_geopackage(gpkg = paste0(my_directory,
+#'                                        "/hydrography90m_test_data",
+#'                                        "/order_vect_59.gpkg"),
+#'                                        subc_id = c(513833203, 513833594))
 #'
 #' # Read the sub-catchments as a SF-object
 #' my_sf <- read_geopackage(gpkg = paste0(my_directory,
@@ -150,12 +157,24 @@ read_geopackage <- function(gpkg, import_as = "data.table", layer_name = NULL,
   } else if (import_as == "sf") {
     cat("Importing as a sf spatial dataframe...\n")
     # tibble=F to avoid exponential numbers
+    if (missing(subc_id)) {
     sf <- read_sf(gpkg, as_tibble = FALSE)
+    } else {
+    subc_id2 <- paste(subc_id, collapse = ", ")
+    sf <- read_sf(gpkg, query=paste0("SELECT * FROM ",
+                                "merged", " WHERE stream in (", subc_id2, ")"))
+    }
     return(sf)
 
   } else if (import_as == "SpatVect") {
     cat("Importing as a terra SpatVect object...\n")
+    if (missing(subc_id)) {
     sf <- read_sf(gpkg)
+    } else {
+    subc_id2 <- paste(subc_id, collapse = ", ")
+    sf <- read_sf(gpkg, query=paste0("SELECT * FROM ",
+                                "merged", " WHERE stream in (", subc_id2, ")"))
+    }
     vect <- vect(sf)
     return(vect)
     }
