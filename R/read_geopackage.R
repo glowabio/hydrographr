@@ -15,6 +15,8 @@
 #' the GeoPackage. A specific data layer only needs to be defined if the
 #' GeoPackage contains multiple layers. To see the available layers the function
 #' st_layers() from the R package 'sf' can be used. Optional. Default is NULL.
+#' @param subc_id numeric. Vector of the sub-catchment IDs (c(ID1, ID2, ...)
+#' for which the attributes of the GeoPackage should be reported.
 #' @importFrom DBI dbConnect dbListTables dbGetQuery dbDisconnect
 #' @importFrom RSQLite SQLite
 #' @importFrom data.table setDT
@@ -62,7 +64,8 @@
 
 
 # Import a geopackage from disk as a data.table
-read_geopackage <- function(gpkg, import_as = "data.table", layer_name = NULL) {
+read_geopackage <- function(gpkg, import_as = "data.table", layer_name = NULL,
+                            subc_id = NULL) {
 
   # Test input arguments
   if (!file.exists(gpkg))
@@ -107,9 +110,16 @@ read_geopackage <- function(gpkg, import_as = "data.table", layer_name = NULL) {
 
     # Read the database
     cat("Reading GeoPackage file...\n")
+    if (missing(subc_id)) {
     network_table <- dbGetQuery(conn = conn,
                                 statement = paste0("SELECT * FROM '",
                                                    layer_name, "'"))
+    } else {
+      subc_id2 <- paste(subc_id, collapse = ", ")
+      network_table <- dbGetQuery(conn=conn, statement=paste0("SELECT * FROM ",
+                                "merged", " WHERE stream in (", subc_id2, ")"))
+    }
+
     # Convert to data.table
     setDT(network_table)
 
