@@ -62,7 +62,7 @@ sudo apt install gdal-bin python3-gdal
 
 **GRASS GIS**
 
-GRASS GIS is a powerful raster, vector, and geospatial processing engine including tools for terrain and ecosystem modeling, hydrology and the processing of satellite and aerial imagery. For more detailed installation instructions check the [GRASS GIS users wiki](https://grasswiki.osgeo.org/wiki/Installation_Guide#Ubuntu) or the [GRASS GIS](https://grass.osgeo.org/) website.
+GRASS GIS is a powerful raster, vector, and geospatial processing engine including tools for terrain and ecosystem modeling, hydrology and the processing of satellite and aerial imagery. For more detailed installation instructions check the [GRASS GIS users wiki](https://grasswiki.osgeo.org/wiki/Installation_Guide#Ubuntu) or the [GRASS GIS](https://grass.osgeo.org/) website. Please, make sure that you have grass8.2 installed.
 
 ```{bash, eval=FALSE}
 # Install GRASS GIS

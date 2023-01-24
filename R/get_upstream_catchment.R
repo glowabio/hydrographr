@@ -40,7 +40,7 @@
 #' \code{\link{extract_ids}} to extract basin and sub-catchment IDs.
 #'
 #' @examples
-#'# Download test data into temporary R folder
+#' # Download test data into temporary R folder
 #' # or define a different directory
 #' my_directory <- tempdir()
 #' download_test_data(my_directory)
@@ -89,6 +89,7 @@
 #'                        id = "occurrence_id",
 #'                        direction_layer = direction_raster,
 #'                        out_dir = output_folder,
+#'                        n_cores = 2)
 
 
 get_upstream_catchment <- function(data, id, lon, lat, direction_layer = NULL,
