@@ -46,16 +46,16 @@ get_regional_unit_id <- function(data, lon, lat, quiet = TRUE) {
   if (!is(data, "data.frame"))
     stop("data: Has to be of class 'data.frame'.")
 
-  # Check if lon, lat, side_id, basin_id, and subc_id column names
+  # Check if lon, lat, column names
   # are character vectors
-  for (name in  c(lon, lat, id)) {
+  for (name in  c(lon, lat)) {
     if (!is.null(name))
       if (!is.character(name))
         stop(paste0("Column name ", name, " is not a character vector."))
   }
 
-  # Check if lon, lat, id, basin_id, and subc_id column names exist
-  for (name in c(lon, lat, id)) {
+  # Check if lon, lat, column names exist
+  for (name in c(lon, lat)) {
     if (!is.null(name))
       if (is.null(data[[name]]))
         stop(paste0("Column name '", name, "' does not exist."))
