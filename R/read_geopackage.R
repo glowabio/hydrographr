@@ -21,8 +21,8 @@
 #' implemented for the stream network GeoPackage file. Optional. Default is NULL.
 #' @param name character. The attribute table column name of the stream segment
 #' ("stream"), sub-catchment ("ID"), basin ("ID") or outlet ("ID") column which
-#' is used for subsetting the GeoPackage prior importing. Optional. Defaults
-#' to "stream".
+#' is used for subsetting the GeoPackage prior importing. Optional. Default is
+#' "stream".
 #' @importFrom DBI dbConnect dbListTables dbGetQuery dbDisconnect
 #' @importFrom RSQLite SQLite
 #' @importFrom data.table setDT

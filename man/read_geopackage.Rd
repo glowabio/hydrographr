@@ -4,7 +4,13 @@
 \alias{read_geopackage}
 \title{Read a GeoPackage file}
 \usage{
-read_geopackage(gpkg, import_as = "data.table", layer_name = NULL)
+read_geopackage(
+  gpkg,
+  import_as = "data.table",
+  layer_name = NULL,
+  subc_id = NULL,
+  name = "stream"
+)
 }
 \arguments{
 \item{gpkg}{character. Full path of the GeoPackage file.}
@@ -20,11 +26,21 @@ object). Default is "data.table".}
 the GeoPackage. A specific data layer only needs to be defined if the
 GeoPackage contains multiple layers. To see the available layers the function
 st_layers() from the R package 'sf' can be used. Optional. Default is NULL.}
+
+\item{subc_id}{numeric. Vector of the sub-catchment (or stream
+segment) IDs in the form of (c(ID1, ID2, ...) for which the spatial objects
+or attributes of the GeoPackage should be imported. Currently only
+implemented for the stream network GeoPackage file. Optional. Default is NULL.}
+
+\item{name}{character. The attribute table column name of the stream segment
+("stream"), sub-catchment ("ID"), basin ("ID") or outlet ("ID") column which
+is used for subsetting the GeoPackage prior importing. Optional. Default is
+"stream".}
 }
 \description{
-Reads a GeoPackage vector file from disk either as a table
-(data.table), as a directed graph object (igraph), a spatial dataframe (sf)
-or a SpatVect object (terra).
+Reads an entire, or only a subset of a GeoPackage vector file
+from disk either as a table #' (data.table), as a directed graph object
+(igraph), a spatial dataframe (sf) or a SpatVect object (terra).
 }
 \examples{
 # Download test data into the temporary R folder
@@ -37,26 +53,39 @@ download_test_data(my_directory)
 my_graph <- read_geopackage(gpkg = paste0(my_directory,
                                           "/hydrography90m_test_data",
                                           "/order_vect_59.gpkg"),
-                            import_as = "graph")
+                                          import_as = "graph")
 
 # Read the stream network as a data.table
 my_dt <- read_geopackage(gpkg = paste0(my_directory,
                                        "/hydrography90m_test_data",
                                        "/order_vect_59.gpkg"))
 
+# Read the stream network as a data.table for specific IDs
+my_dt <- read_geopackage(gpkg = paste0(my_directory,
+                                       "/hydrography90m_test_data",
+                                       "/order_vect_59.gpkg"),
+                                       subc_id = c(513833203, 513833594))
 
 # Read the sub-catchments as a SF-object
 my_sf <- read_geopackage(gpkg = paste0(my_directory,
                                        "/hydrography90m_test_data",
                                        "/sub_catchment_59.gpkg"),
-                         import_as = "sf",
-                         layer_name = "sub_catchment")
+                                       import_as = "sf",
+                                       layer_name = "sub_catchment")
+
+# Read a subset of sub-catchments as a SF-object
+my_sf <- read_geopackage(gpkg = paste0(my_directory,
+                                       "/hydrography90m_test_data",
+                                       "/sub_catchment_59.gpkg"),
+                                       import_as = "sf",
+                                       subc_id = c(513833203, 513833594),
+                                       name = "ID")
 
 # Read the basin as SpatVect object
 my_sv <- read_geopackage(gpkg = paste0(my_directory,
                                        "/hydrography90m_test_data",
                                        "/basin_59.gpkg"),
-                         import_as = "SpatVect")
+                                       import_as = "SpatVect")
 
 }
 \author{
