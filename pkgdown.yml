@@ -1,9 +1,9 @@
-pandoc: '2.18'
+pandoc: 2.19.2
 pkgdown: 2.0.6
 pkgdown_sha: ~
 articles:
   hydrographr: hydrographr.html
   linux_system_setup: linux_system_setup.html
   windows_system_setup: windows_system_setup.html
-last_built: 2023-01-23T14:36Z
+last_built: 2023-01-26T15:07Z
 
