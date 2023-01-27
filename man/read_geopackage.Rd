@@ -29,8 +29,7 @@ st_layers() from the R package 'sf' can be used. Optional. Default is NULL.}
 
 \item{subc_id}{numeric. Vector of the sub-catchment (or stream
 segment) IDs in the form of (c(ID1, ID2, ...) for which the spatial objects
-or attributes of the GeoPackage should be imported. Currently only
-implemented for the stream network GeoPackage file. Optional. Default is NULL.}
+or attributes of the GeoPackage should be imported. Optional. Default is NULL.}
 
 \item{name}{character. The attribute table column name of the stream segment
 ("stream"), sub-catchment ("ID"), basin ("ID") or outlet ("ID") column which
@@ -39,7 +38,7 @@ is used for subsetting the GeoPackage prior importing. Optional. Default is
 }
 \description{
 Reads an entire, or only a subset of a GeoPackage vector file
-from disk either as a table #' (data.table), as a directed graph object
+from disk either as a table (data.table), as a directed graph object
 (igraph), a spatial dataframe (sf) or a SpatVect object (terra).
 }
 \examples{
