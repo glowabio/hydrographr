@@ -15,7 +15,7 @@ install.packages("remotes")
 remotes::install_github("glowabio/hydrographr")
 library(hydrographr)
 ```
-The pdf manual of the `hydrographr` package can be downloaded [here](https://github.com/glowabio/hydrographr/tree/main/man/pdf/hydrographr_1.0.1.pdf).
+The pdf manual of the `hydrographr` package can be downloaded [here](https://github.com/glowabio/hydrographr/tree/main/man/pdf/hydrographr_1.0.2.pdf).
 
 We thank [NFDI4Biodiversity](https://www.nfdi4biodiversity.org/en/) and [NFDI4Earth](https://www.nfdi4earth.de/) for providing the funding that helped us getting the hydrographr package together!
 
