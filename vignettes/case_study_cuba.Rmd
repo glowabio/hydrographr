@@ -40,7 +40,7 @@ library(leafem)
 
 
 
-Load required libraries
+Load the required libraries
 ```{r}
 library(hydrographr)
 library(terra)
