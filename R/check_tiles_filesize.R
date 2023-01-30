@@ -68,7 +68,8 @@ check_tiles_filesize <- function(variable, file_format = "tif",
   match.arg(file_format, choices = valid_file_format_var)
 
   # Grep the filesize of the requested file from the lookup table
-  file_size <- file_size_table_sep[varname_tile == varname, ]$file_size
+  file_size <- file_size_table_sep[file_size_table_sep$varname_tile ==
+                                     varname, ]$file_size
 
   file_size
 }

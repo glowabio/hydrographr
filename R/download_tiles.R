@@ -164,7 +164,8 @@ download_tiles <- function(variable, file_format = "tif",
       },
       warning = function(c) {
         # Get gdrive file id of the README.txt file
-        readme_id <- file_size_table_sep[varname_tile == "README.txt", ]$file_id
+        readme_id <- file_size_table_sep[file_size_table_sep$varname_tile ==
+                                           "README.txt", ]$file_id
         # Download README.txt file
         download.file(paste0(gdrive_path, readme_id),
                       destfile = paste0(download_dir, "/README.txt"))

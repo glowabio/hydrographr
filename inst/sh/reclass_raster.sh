@@ -8,7 +8,7 @@ export TYPE=$5
 export COMP=$6
 
 # Start GRASS GIS session
-grass -f --text --tmp-location  $RASTER   <<'EOF'
+grass -f --gtext --tmp-location  $RASTER   <<'EOF'
 
     # Load raster input file
     r.in.gdal --o input=$RASTER  output=raster    --overwrite
