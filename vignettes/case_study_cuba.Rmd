@@ -195,7 +195,7 @@ tile_dirs_tif <- tile_dirs[-2]
 tile_dirs_gpkg <- tile_dirs[2]
 ```
 
-```{r}
+```{r, eval = FALSE}
 # Merge the files in a loop
 for(idir in tile_dirs_tif) {
   # Get input file extension
