@@ -29,25 +29,22 @@ download_tiles_base <- function(variable, file_format = "tif",
 
   # Find grass module to build the download link
   # and to create the download destination folder
-  grass_module <- file_size_table_sep[file_size_table_sep$varname_tile ==
-                                        varname, ]$grass_module
+  grass_module <- file_size_table_sep[file_size_table_sep$varname_tile == varname,]$grass_module
 
   # Find folder name to build the download link
   # and to create the download destination folder
-  foldername <- file_size_table_sep[file_size_table_sep$varname_tile ==
-                                      varname, ]$foldername
+  foldername <- file_size_table_sep[file_size_table_sep$varname_tile == varname,]$foldername
 
   # Get file path with parent folder structure
-  file_path <- str_c(
-    file_size_table_sep[file_size_table_sep$varname_tile == varname,
-                                         c(grass_module, foldername, varname)],
-                     collapse = "/")
+  file_path <- str_c(file_size_table_sep %>%
+    filter(varname_tile == varname) %>%
+    select(grass_module, foldername, varname_tile), collapse = "/")
 
   # Get parent folder structure to reproduce it in the download path
-  folder_structure <- str_c(
-    file_size_table_sep[file_size_table_sep$varname_tile == varname,
-                                                c(grass_module, foldername)],
-                            collapse = "/")
+  folder_structure <- str_c(file_size_table_sep %>%
+                              filter(varname_tile == varname) %>%
+                              select(grass_module, foldername),
+                              collapse = "/")
 
   # Create download directories
   dir.create(paste0(download_dir, "/", folder_structure),
@@ -71,8 +68,7 @@ download_tiles_base <- function(variable, file_format = "tif",
   if (server_url == gdrive_path || varname == "cti_ovr.tif") {
 
     # Get GDrive file id from the lookup table
-    file_id <- file_size_table_sep[file_size_table_sep$varname_tile ==
-                                     varname, ]$file_id
+    file_id <- file_size_table_sep[file_size_table_sep$varname_tile == varname, ]$file_id
     print(varname)
 
     # The addition of &confirm=t in the download link
