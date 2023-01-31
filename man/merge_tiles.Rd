@@ -4,10 +4,17 @@
 \alias{merge_tiles}
 \title{Merge raster or vector objects}
 \usage{
-merge_tiles(tile_dir, tile_names, out_dir, file_name, read = FALSE)
+merge_tiles(
+  tile_dir,
+  tile_names,
+  out_dir,
+  file_name,
+  read = FALSE,
+  quiet = TRUE
+)
 }
 \arguments{
-\item{tile_dir}{character. The directory containing only the raster or
+\item{tile_dir}{character. The directory containing the raster or
 spatial vectors tiles, which should be merged.}
 
 \item{tile_names}{character. The names of the files to be merged,
@@ -20,6 +27,9 @@ file extension (.tif or .gpkg).}
 
 \item{read}{logical. If TRUE, the merged layer gets read
 into R. If FALSE, the layer is only stored on disk. Default is FALSE.}
+
+\item{quiet}{logical. If FALSE, the standard output will be printed.
+Default is TRUE.}
 }
 \value{
 A .tif raster file or .gpkg spatial vector object that is always

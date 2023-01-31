@@ -9,7 +9,7 @@
 #' (terra package) object in case of .tif files, or as a SpatVector
 #' (terra package) object in case of .gpkg files.
 
-#' @param tile_dir character. The directory containing only the raster or
+#' @param tile_dir character. The directory containing the raster or
 #' spatial vectors tiles, which should be merged.
 #' @param tile_names character. The names of the files to be merged,
 #' including the file extension (.tif or .gpkg).
@@ -18,6 +18,9 @@
 #' file extension (.tif or .gpkg).
 #' @param read logical. If TRUE, the merged layer gets read
 #' into R. If FALSE, the layer is only stored on disk. Default is FALSE.
+#' @param quiet logical. If FALSE, the standard output will be printed.
+#' Default is TRUE.
+#'
 #' @importFrom processx run
 #' @importFrom terra rast
 #' @importFrom terra vect
@@ -64,7 +67,7 @@
 #'
 
 merge_tiles <- function(tile_dir, tile_names, out_dir, file_name,
-                        read = FALSE) {
+                        read = FALSE, quiet = TRUE) {
   # Check if paths exist
   if (!dir.exists(tile_dir))
     stop(paste0("Path: ", tile_dir, " does not exist."))
@@ -87,14 +90,14 @@ merge_tiles <- function(tile_dir, tile_names, out_dir, file_name,
 
       # Format tile_names vector so that it can be read
       # as an array in the bash script
-      tile_names_array <- paste(unique(tile_names), collapse = ",")
+      tile_names_array <- paste(unique(tile_names), collapse = "/")
 
 
       if (sys_os == "linux" || sys_os == "osx") {
-        merge_tiles <- processx::run(system.file("sh", "merge_tiles.sh",
-                            package = "hydrographr"),
-                    args = c(tile_dir, tile_names_array, out_dir, file_name),
-                    echo = FALSE)
+        processx::run(system.file("sh", "merge_tiles.sh",
+                                  package = "hydrographr"),
+                      args = c(tile_dir, tile_names_array, out_dir, file_name),
+                      echo = !quiet)
 
        } else {
        # Check if WSL and Ubuntu are installed
@@ -107,10 +110,10 @@ merge_tiles <- function(tile_dir, tile_names, out_dir, file_name,
                     package = "hydrographr"))
 
        processx::run(system.file("bat", "merge_tiles.bat",
-                    package = "hydrographr"),
+                                 package = "hydrographr"),
         args = c(wsl_tile_dir, tile_names_array, wsl_out_dir, file_name,
                  wsl_sh_file),
-        echo = TRUE)
+        echo = !quiet)
        }
 
   # Print message
