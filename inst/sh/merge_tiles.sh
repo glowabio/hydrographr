@@ -4,7 +4,7 @@
 export dir=$1
 
 # list of file names (tif or gpkg) separated by commas
-export files=$2
+export files=($(echo $2 | tr "/" ","))
 
 # directory for output file
 export out=$3
