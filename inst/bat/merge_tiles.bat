@@ -1,4 +1,4 @@
-@echo on
+@echo off
 
 set WSLENV=%1 %2 %3 %4 %5
 set SHDIR=%5
