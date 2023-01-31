@@ -100,7 +100,7 @@ head(snapped_coordinates)
 
 }
 \references{
-\link[https://grass.osgeo.org/grass78/manuals/addons/r.stream.snap.html]
+\url{https://grass.osgeo.org/grass78/manuals/addons/r.stream.snap.html}
 }
 \author{
 Maria M. Üblacker, Jaime Garcia Marquez

@@ -47,7 +47,7 @@
 #' @author Maria M. Üblacker, Jaime Garcia Marquez
 #'
 #' @references
-#' \link[https://grass.osgeo.org/grass78/manuals/addons/r.stream.snap.html]
+#' \url{https://grass.osgeo.org/grass78/manuals/addons/r.stream.snap.html}
 #'
 #' @examples
 #' # Download test data into the temporary R folder
