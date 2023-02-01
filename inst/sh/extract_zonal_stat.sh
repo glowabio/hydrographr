@@ -1,7 +1,7 @@
 #!/bin/bash
 
 export DATADIR=$1
-declare -a SUBC_IDS=($(echo $2 | tr "/" "\n"))
+# declare -a SUBC_IDS=($(echo $2 | tr "/" "\n"))
 export SUBC_LAYER=$3
 declare VARS=($(echo $4 | tr "/" "\n"))
 export CALC_ALL=$5
@@ -35,7 +35,7 @@ grass -f --gtext --tmp-location $SUBC_LAYER   <<'EOF'
 
     fi
 
-    # Calculate the statistics of the given variable for each microbasin and save in a temporary .csv file
+    # Calculate the statistics of the given variable for each subcatchment and save in a temporary .csv file
     # Read in variable raster
     r.external  input=$DATADIR/$VAR  output=$VARNAME --overwrite  --qq
 
@@ -49,7 +49,10 @@ grass -f --gtext --tmp-location $SUBC_LAYER   <<'EOF'
 EOF
 
 # Sort variables to later join them in R
-sort -k 1n $OUTDIR/stats_${VARNAME}_tmp.csv > $OUTDIR/stats_${VARNAME}.csv  && rm -f  $OUTDIR/stats_${VARNAME}_tmp.csv
+# sort -k 1 $OUTDIR/stats_${VARNAME}_tmp.csv > $OUTDIR/stats_${VARNAME}.csv  #&& rm -f  $OUTDIR/stats_${VARNAME}_tmp.csv
+head -n 1 $OUTDIR/stats_${VARNAME}_tmp.csv && tail -n +2 $OUTDIR/stats_${VARNAME}_tmp.csv | \
+  sort > $OUTDIR/stats_${VARNAME}.csv  && rm -f  $OUTDIR/stats_${VARNAME}_tmp.csv
+
 
 }
 

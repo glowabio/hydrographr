@@ -126,10 +126,6 @@ extract_zonal_stat <- function(data_dir,  subc_id, subc_layer, var_layer,
     fwrite(reclass, paste0(data_dir, tmp, "/reclass_rules.txt"), sep = "\t",
            row.names = FALSE, quote = FALSE, col.names = FALSE)
 
-    # Format subc_id vector so that it can be read
-    # as an array in the bash script
-    subc_id <- paste(unique(subc_id), collapse = "/")
-
   }
 
   # Setting up parallelization if n_cores is not provided
@@ -177,7 +173,7 @@ extract_zonal_stat <- function(data_dir,  subc_id, subc_layer, var_layer,
     # containing the grass functions
     processx::run(system.file("sh", "extract_zonal_stat.sh",
                   package = "hydrographr"),
-                  args = c(data_dir, subc_id, subc_layer,
+                  args = c(data_dir, subc_layer,
                            var_layer_array, calc_all, n_cores, rand_string),
                   echo = !quiet)
 
@@ -194,7 +190,7 @@ extract_zonal_stat <- function(data_dir,  subc_id, subc_layer, var_layer,
       # Call external GRASS GIS command r.reclass
       processx::run(system.file("bat", "extract_zonal_stat.bat",
                                 package = "hydrographr"),
-                    args = c(wsl_data_dir, subc_id, wsl_subc_layer,
+                    args = c(wsl_data_dir, wsl_subc_layer,
                              var_layer_array, calc_all, n_cores, rand_string,
                              wsl_sh_file),
                     echo = !quiet)
@@ -220,7 +216,7 @@ extract_zonal_stat <- function(data_dir,  subc_id, subc_layer, var_layer,
   }
 
   # Delete temporary output directory
-  unlink(paste0(data_dir, tmp, "/"), recursive = TRUE)
+  # unlink(paste0(data_dir, tmp, "/"), recursive = TRUE)
 
   # Return table
   return(var_table)
