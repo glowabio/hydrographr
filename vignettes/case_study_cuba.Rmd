@@ -17,6 +17,13 @@ editor_options:
     wrap: 72
 ---
 
+### Introduction
+
+The following example showcases the functionality of the hydrographr package along a species distribution modelling (SDM) workflow. 
+We will use an SDM to predict the suitable habitats of a dragonfly species in Cuba. 
+We will start by defining the regular tiles of the Hydrography90m where the occurrence points of the species are located. Afterwards we will download the Hydrography90m and CHELSA BIOCLIM layers of the predictor variables, crop them and merge them, if necessary. Then, we will aggregate the variable values within each sub-catchment of the study area, keeping as predictors their mean and SD per sub-catchment. Using the random forest algorithm, we will build a simple SDM and predict where the species could potentially occur. Finally, we will reclassify the layer of all the sub-catchments in the study area. creating a habitat suitability map. 
+
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE,  
                       out.width='50%', fig.align='center')
@@ -37,7 +44,7 @@ library(webshot)
 library(mapview)
 ```
 
-### Introduction
+
 
 Load required libraries
 
@@ -125,7 +132,7 @@ m <- leaflet() %>%
 m
 ```
 
-![](images/cuba_map.png)
+![](/home/afroditi/Documents/PhD/scripts/hydrographr/man/figures/cuba_map.png)
 
 Get the ID of the tile where the points are located using the function
 get_tile_id. This function downloads and uses the auxiliary file that
@@ -215,7 +222,7 @@ Crop the 2 tiles for all the variables to the bounding box of Cuba
 # Define directories containing the input layers
 tile_dirs_hydro <- list.dirs(paste0(wdir, "/data"),
                        recursive = TRUE, full.names = TRUE)
-tile_dirs_hydro <- tile_dirs_hydro[grep("tiles20d", tile_dirs)]
+tile_dirs_hydro <- tile_dirs_hydro[grep("tiles20d", tile_dirs_hydro)]
 tile_dirs_chelsa <- list.dirs(paste0(wdir, "/data/chelsa_bioclim"),
                        recursive = TRUE, full.names = TRUE)
 tile_dirs <- c(tile_dirs_hydro, tile_dirs_chelsa)
@@ -638,7 +645,7 @@ leaflet() %>% addTiles() %>%
                       weight = 5, opacity = 1) 
 ```
 
-![](images/prediction.png){width="800"}
+![](/home/afroditi/Documents/PhD/scripts/hydrographr/man/figures/prediction.png){width="800"}
 
 ```{r, include = FALSE, eval = FALSE}
 mapshot(p, file = paste0(wdir, "/prediction.png"))
@@ -653,4 +660,4 @@ If we zoom in to the habitat suitability map, we can observe the
 sub-catchments that could offer a suitable habitat to the species in a
 more detailed view.
 
-![](images/predictionzoom2.png){width="800"}
+![](/home/afroditi/Documents/PhD/scripts/hydrographr/man/figures/prediction_zoom.png){width="800"}
