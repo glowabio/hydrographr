@@ -1,0 +1,656 @@
+---
+title: "Case study"
+subtitle: "Processing of spatial data before and after a Species Distribution Model"
+author: ""
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Case study}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+#bibliography: literature.bib
+link-citations: yes
+linkcolor: blue
+#csl: copernicus.csl
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE,  
+                      out.width='50%', fig.align='center')
+knitr::opts_knit$set(root.dir = "/home/afroditi/Documents/PhD/hydrographr_case_study")
+library(hydrographr)
+library(terra)
+library(tools)
+library(data.table)
+library(dplyr)
+library(stringr)
+library(ranger)
+library(knitr)
+library(kableExtra)
+library(leaflet)
+library(leafem)
+library(htmlwidgets)
+library(webshot)
+library(mapview)
+```
+
+### Introduction
+
+Load required libraries
+
+```{r}
+library(hydrographr)
+library(terra)
+library(tools)
+library(data.table)
+library(dplyr)
+library(stringr)
+library(ranger)
+library(leafem)
+```
+
+Define working directory
+
+```{r, echo = FALSE}
+wdir <- "/home/afroditi/Documents/PhD/hydrographr_case_study"
+setwd(wdir)
+```
+
+```{r, eval = FALSE}
+wdir <- "my/working/directory"
+setwd(wdir)
+```
+
+Download dataset including insect occurrence records from
+<https://fred.igb-berlin.de/data/package/691>
+
+```{r, eval = FALSE}
+download.file("https://fred.igb-berlin.de/data/file_download/1395", 
+              destfile = paste0(wdir, "/data/spdata_cuba.csv"))
+              
+```
+
+Import dataset and dplyr::select occurrences of the species of interest,
+sampled after the year 1980 (to match with the climate data)
+
+```{r}
+spdata <- fread(paste0(wdir, "/data/spdata_cuba.csv"), sep = "\t", fill = TRUE) %>% 
+          filter(species == "Hypolestes_trinitatis") %>% 
+          filter(year > 1980)
+              
+```
+
+Subset columns
+
+```{r}
+spdata <- spdata %>% 
+  dplyr::select(c("occurrence_ID", "species", "longitude", "latitude", "year"))
+
+```
+
+```{r, eval = F}
+spdata
+```
+
+```{r, echo=F}
+kbl(spdata) %>%                        
+  kable_styling(bootstrap_options = "striped", full_width = F, position = "left") %>%      scroll_box(width = "500px", height = "200px")
+```
+
+Let's visualise the species occurrences on the map of Cuba
+
+```{r}
+# Convert species data to a spatial vector object to plot the points
+spdata_vect <- vect(spdata, geom=c("longitude", "latitude"))
+```
+
+```{r, include = FALSE, eval = FALSE}
+m <- leaflet() %>%
+  addProviderTiles('Esri.WorldShadedRelief') %>%
+  setMaxBounds(bbox[1], bbox[2], bbox[3], bbox[4]) %>%
+  addCircles(data = spdata_vect, color = "purple")
+
+saveWidget(m, file=paste0(wdir, "/cuba_map.html"))
+```
+
+```{r, eval = FALSE}
+m <- leaflet() %>%
+  addProviderTiles('Esri.WorldShadedRelief') %>%
+  setMaxBounds(bbox[1], bbox[2], bbox[3], bbox[4]) %>%
+  addCircles(data = spdata_vect, color = "purple")
+
+m
+```
+
+![](images/cuba_map.png)
+
+Get the ID of the tile where the points are located using the function
+get_tile_id. This function downloads and uses the auxiliary file that
+contains all the regional units globally.
+
+```{r, eval = FALSE}
+tile_id <- get_tile_id(data = spdata, lon = "longitude", lat = "latitude")
+```
+
+```{r, echo = FALSE}
+tile_id <- c("h08v06", "h10v04", "h10v06")
+```
+
+```{r}
+tile_id
+```
+
+Currently the function returns all the tiles of the regional unit where
+the input points are located. However some of them may be far from the
+study area and hence not always needed. Please double check which tile
+IDs are relevant for your purpose using the Tile map found
+[here](https://hydrography.org/hydrography90m/hydrography90m_layers/).
+
+In our case, we will need only the tiles with the IDs "h08v06" and
+"h10v06".
+
+```{r}
+tile_id <- tile_id[c(1,3)]
+```
+
+Let's define the Hydrography90m variables that we would like to
+download.
+
+```{r}
+# Variables in raster format
+vars_tif <- c("sub_catchment", "basin", "slope_curv_max_dw_cel")
+# Variables in vector format
+vars_gpkg <- c("order_vect_point")
+```
+
+```{r, eval = FALSE}
+# Download the .tif tiles of the desired variables
+download_tiles(variable = vars_tif, tile_id = tile_id, file_format = "tif",
+              download_dir = "data")
+
+# Download the .gpkg tiles of the desired variables
+download_tiles(variable = vars_gpkg, tile_id = tile_id, file_format = "gpkg",
+              download_dir = "data")
+```
+
+Then download the CHELSA present and future BIOCLIM variables
+
+```{r}
+# Create download directory
+dir.create(paste(wdir, "/data/chelsa_bioclim"))
+```
+
+```{r, eval = FALSE}
+# Extend timeout to 1000s to allow uninterrupted downloading
+options(timeout = 1000)
+
+# Download
+download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio12_1981-2010_V.2.1.tif",
+destfile = "data/chelsa_bioclim/bio12_1981-2010.tif")
+download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio15_1981-2010_V.2.1.tif",
+destfile = "data/chelsa_bioclim/bio15_1981-2010.tif")
+download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio1_1981-2010_V.2.1.tif",
+destfile = "data/chelsa_bioclim/bio1_1981-2010.tif")
+download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/2041-2070/IPSL-CM6A-LR/ssp370/bio/CHELSA_bio12_2041-2070_ipsl-cm6a-lr_ssp370_V.2.1.tif",
+destfile = "data/chelsa_bioclim/bio12_IPSL-CM6A-LR_ssp370_2041-2070.tif")
+download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/2041-2070/IPSL-CM6A-LR/ssp370/bio/CHELSA_bio15_2041-2070_ipsl-cm6a-lr_ssp370_V.2.1.tif",
+destfile = "data/chelsa_bioclim/bio15_IPSL-CM6A-LR_ssp370_2041-2070.tif")
+download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/2041-2070/IPSL-CM6A-LR/ssp370/bio/CHELSA_bio1_2041-2070_ipsl-cm6a-lr_ssp370_V.2.1.tif",
+destfile = "data/chelsa_bioclim/bio1_IPSL-CM6A-LR_ssp370_2041-2070.tif")
+```
+
+After having downloaded all the layers, we define the extent (bounding
+box) of the study area to crop them
+
+```{r}
+bbox = c(-84.9749110583, 19.8554808619, -74.1780248685, 23.1886107447)
+```
+
+Crop the 2 tiles for all the variables to the bounding box of Cuba
+
+```{r}
+# Define directories containing the input layers
+tile_dirs_hydro <- list.dirs(paste0(wdir, "/data"),
+                       recursive = TRUE, full.names = TRUE)
+tile_dirs_hydro <- tile_dirs_hydro[grep("tiles20d", tile_dirs)]
+tile_dirs_chelsa <- list.dirs(paste0(wdir, "/data/chelsa_bioclim"),
+                       recursive = TRUE, full.names = TRUE)
+tile_dirs <- c(tile_dirs_hydro, tile_dirs_chelsa)
+tile_dirs
+```
+
+Crop raster tiles of the Hydrography90m. Store output in the same
+directory as the input files
+
+```{r, eval = FALSE}
+for(idir in tile_dirs) {
+  # only choose rasters
+  tiles <- list.files(idir, pattern = ".tif", full.names = TRUE)
+  for(itile in tiles) {
+      crop_to_extent(
+        raster_layer = itile,
+        bounding_box = bbox,
+        out_dir = idir,
+        file_name = paste0(str_remove(basename(itile), ".tif"), "_crop.tif"),
+        read = FALSE,
+        quiet = FALSE)
+  }
+}
+```
+
+Merge the cropped raster tiles
+
+```{r}
+# Define output directory for merged files
+out_dir <- "data/tiles_crop_merged"
+# Create the directory
+dir.create(out_dir)
+# Define the directories that only contain .tif files
+tile_dirs_tif <- tile_dirs[-2]
+tile_dirs_gpkg <- tile_dirs[2]
+```
+
+```{r, eval = FALSE}
+# Merge the files in a loop
+for(idir in tile_dirs_tif) {
+  # Get input file extension
+  file_extension <- file_ext(list.files(idir, full.names = FALSE)[1])
+
+  # Assign file extension to output files
+  ivar_name <- paste0(
+    str_remove(basename(idir), "_tiles20d"), ".", file_extension
+  )
+
+  merge_tiles(tile_dir = idir,
+              tile_names = list.files(idir, full.names = FALSE,
+                                      pattern = "_crop.tif"),
+              out_dir = out_dir,
+              file_name = ivar_name,
+              read = FALSE)
+}
+```
+
+\
+Crop the CHELSA files
+
+```{r, echo = FALSE}
+tiles <- list.files("/home/afroditi/Documents/PhD/hydrographr_case_study/data/chelsa_bioclim", pattern = "MPI", full.names = TRUE)
+  for(itile in tiles) {
+      crop_to_extent(
+        raster_layer = itile,
+        bounding_box = bbox,
+        out_dir = out_dir,
+        file_name = basename(itile),
+        read = FALSE,
+        quiet = TRUE)
+  }
+```
+
+Extract the ids of the basins and sub-catchments where the points are
+located
+
+```{r}
+spdata_ids <- extract_ids(data = spdata, lon = "longitude", lat = "latitude",
+                               id = "occurrence_ID", quiet = FALSE,
+                               subc_layer = paste0(
+                                wdir,"/data/tiles_crop_merged/sub_catchment.tif"
+                               ),
+                               basin_layer = paste0(
+                                wdir, "/data/tiles_crop_merged/basin.tif"
+                               ))
+```
+
+```{r}
+knitr::kable(head(spdata_ids),
+ caption = "The species data have now their corresponding basin and sub-catchment ids")
+```
+
+Extract the zonal statistics of the hydrography90m variables for all the
+sub-catchments of the study area. Caution, don't increase the number of
+cores to more than 3
+
+```{r}
+# Define input var_layers for the extract_zonal_stat() function
+var_layers <- list.files("data/tiles_crop_merged")[c(2:7,9)]
+# var_layers <- list.files("data/tiles_crop_merged")[c(3,5,7)]
+var_layers
+```
+
+```{r, eval = FALSE}
+stats_table_zon <- extract_zonal_stat(
+                    data_dir = paste0(
+                                wdir,"/data/tiles_crop_merged/"),
+                   subc_layer = paste0(wdir,
+                          "/data/tiles_crop_merged/sub_catchment.tif"),
+                   subc_id = "all",
+                   var_layer = var_layers,
+                   file_name = paste0(wdir, "/data/zonal_stats.csv"),
+                   n_cores = 1)
+```
+
+The function reports the NoData values that are used in the calculation
+of the zonal statistics of each variable.
+
+```{r, echo = FALSE}
+# Read the previously created file
+stats_table_zon <- fread(paste0(wdir, "/data/zonal_stats.csv"))
+```
+
+Let's inspect the resulting table
+
+```{r, eval = FALSE}
+head(stats_table_zon)
+```
+
+```{r, echo = FALSE}
+kbl(head(stats_table_zon)) %>%
+  kable_styling(bootstrap_options = "striped", full_width = F, position = "left") %>%      scroll_box(width = "1000px", height = "200px")
+```
+
+```{r}
+colnames(stats_table_zon)
+```
+
+We will keep only the mean and sd of each variable of the stats_table,
+to use them as predictors in the species distribution model
+
+```{r}
+stats_table_zon <- stats_table_zon %>%
+  dplyr::select(contains(c("subc", "_mean", "_sd"))) %>%
+  rename('subcatchment_id' = 'subc_id')
+
+```
+
+```{r, echo = FALSE}
+# Read in the .gpkg databases of the two tiles, filtering only the
+# sub-catchments of the study area. These can be found in the stats_table
+
+stats_gpkg_h08v06 <- read_geopackage(
+  "data/r.stream.order/order_vect_tiles20d/order_vect_point_h08v06.gpkg",
+  subc_id = stats_table_zon$subcatchment_id) %>%
+  rename('subcatchment_id' = 'stream')
+
+stats_gpkg_h10v06 <- read_geopackage(
+  "data/r.stream.order/order_vect_tiles20d/order_vect_point_h10v06.gpkg",
+  subc_id = stats_table_zon$subcatchment_id) %>%
+  rename('subcatchment_id' = 'stream')
+```
+
+Then we join the two .gpkg databases and select the columns
+"subcatchment_id" and "length". We will use the length of the stream as
+an indicator of the sub-catchment size
+
+```{r, echo = FALSE}
+stats_gpkg <- rbind(stats_gpkg_h08v06, stats_gpkg_h10v06) %>%
+  dplyr::select(c("subcatchment_id", "length"))
+
+# Clear up memory
+rm(stats_gpkg_h08v06, stats_gpkg_h10v06); gc()
+
+```
+
+Join the stats_table with the .gpkg database
+
+```{r}
+stats_table <- left_join(stats_table_zon, stats_gpkg, by = "subcatchment_id")
+```
+
+The values in the original raster files were scaled, so we need to
+re-scale them before the modelling
+
+We define the following functions:
+
+```{r}
+slope_scale <- function(x, na.rm = F) (x * 0.000001)
+clim_scale <- function(x, na.rm = F) (x * 0.1)
+offset <- function(x, na.rm = F) (x - 273.15)
+```
+
+... and apply them to rescale the values
+
+```{r}
+stats_table <- stats_table  %>%
+  mutate(across(contains("slope_curv_max_dw_cel"), slope_scale)) %>%
+  mutate(across(starts_with("bio"), clim_scale))  %>%
+  mutate(across(matches("bio1_.*_mean"), offset))
+```
+
+```{r, include = FALSE}
+knitr::kable(head(stats_table))
+```
+
+```{r}
+kbl(head(stats_table)) %>% 
+   kable_styling(bootstrap_options = "striped", full_width = F, position = "left")
+```
+
+Check if there are NAs in the rows of the table
+
+```{r}
+knitr::kable(head(stats_table[is.na(stats_table$slope_curv_max_dw_cel_mean),]))
+```
+
+```{r}
+knitr::kable(head(stats_table[is.na(stats_table$length),]))
+```
+
+There are streams with NA in the length column. Should we convert them
+to 0?
+
+```{r}
+stats_table$length[is.na(stats_table$length)] <- 0
+
+```
+
+```{r}
+# Exclude NAs for now
+stats_table <-stats_table[!is.na(stats_table$slope_curv_max_dw_cel_mean),]
+```
+
+<!-- # the order_vect_point id 422875962 is different than the subcatchment id in this case -->
+
+<!-- # and slope gets NA -->
+
+We split the dataset into two datasets, according to present and future
+BIOCLIM variables.
+
+```{r}
+stats_table_present <- stats_table %>%
+  dplyr::select(!contains("IPSL")) %>%
+  rename(bio1_mean = bio1_1981.2010_mean,
+         bio1_sd = bio1_1981.2010_sd,
+         bio12_mean = bio12_1981.2010_mean,
+         bio12_sd = bio12_1981.2010_sd,
+         bio15_mean = bio15_1981.2010_mean,
+         bio15_sd = bio15_1981.2010_sd)
+
+stats_table_future <- stats_table %>%
+  dplyr::select(!contains("1981")) %>%
+  rename(bio1_mean = bio1_IPSL.CM6A.LR_ssp370_2041.2070_mean,
+         bio1_sd = bio1_IPSL.CM6A.LR_ssp370_2041.2070_sd,
+         bio12_mean = bio12_IPSL.CM6A.LR_ssp370_2041.2070_mean,
+         bio12_sd = bio12_IPSL.CM6A.LR_ssp370_2041.2070_sd,
+         bio15_mean = bio15_IPSL.CM6A.LR_ssp370_2041.2070_mean,
+         bio15_sd = bio15_IPSL.CM6A.LR_ssp370_2041.2070_sd)
+
+# Clear up memory
+# rm(stats_table) ; gc()
+
+```
+
+The classification model needs at least two classes, in this case
+presences and absences. We will sample 10,000 random sub-catchments that
+will be used as pseudoabsences in the model. The filtering that takes
+place before the sampling assures that we will avoid sampling
+sub-catchments with known presences of the species
+
+```{r}
+pseudoabs <- stats_table_present %>%
+  filter(!subcatchment_id %in% spdata_ids$subcatchment_id) %>%
+  sample_n(10000)
+
+head(pseudoabs)
+```
+
+We join the species occurrences with the present environmental variables
+table
+
+```{r}
+presence <- left_join(spdata_ids, stats_table_present, by = "subcatchment_id")
+```
+
+We then join the predictors of the presences and those of the
+pseudoabsences, to obtain the modelling data table
+
+```{r}
+
+data_model <- data.table::rbindlist(list(presence, pseudoabs), fill = TRUE)
+
+```
+
+```{r}
+# Define a binary column of presence-absence (0-1)
+data_model$occurrence <- ifelse(!is.na(data_model$occurrence_ID), 1, 0)
+# Convert to factor for random forest
+data_model$occurrence <- as.factor(data_model$occurrence)
+
+knitr::kable(head(data_model))
+
+```
+
+We split the data into train and test
+
+```{r}
+
+set.seed(17)
+
+#obtain stratified training sample
+train_idx <- sample(nrow(data_model), 2/3 * nrow(data_model))
+data_train <- data_model[train_idx, ]
+data_test <- data_model[-train_idx, ]
+```
+
+We will use the ranger random forest algorithm (Wright & Ziegler, 2017)
+to build a species distribution model. Random forest can handle huge
+quantities of data and is therefore scalable to larger datasets. As our
+dataset is highly imbalanced towards the pseudo-absence data, we will
+apply the down-sampling method for presence-only data in the modelling
+process (Valavi et al., 2021). Down-sampling works by balancing the
+training data, which contain significantly more absence that presence
+points. Following this approach, the classification-RF model will use
+the same number of pseudo-absences as presence points in each
+classification tree, by sampling with replacement (bootstrapping) from
+the full pseudo-absence set (Valavi et al., 2021).
+
+Let's define the sample size of each classification tree as a proportion
+of the whole training set, based on the number of presences.
+
+```{r}
+# number of presence records:
+pres_num <- as.numeric(table(data_train$occurrence)["1"])
+sample_size <- c("0" = pres_num / nrow(data_train),
+                 "1" = pres_num / nrow(data_train))
+sample_size
+```
+
+Run and inspect the model.
+
+```{r}
+model <- ranger(data_train$occurrence ~ .,
+                 data = data_train[, 6:14],
+                 num.trees = 1000,
+                 mtry= 6,
+                 replace = T,
+                 sample.fraction = sample_size,
+                 oob.error = T,
+                 keep.inbag = T,
+                 num.threads = 4,
+                 importance ='impurity',
+                 probability = T)
+
+model
+```
+
+The model can be evaluated based on the OOB prediction error. This
+metric lies on the fact that the data points that are not used in
+training a tree can be used to test the tree. The errors on the OOB
+samples are called the **out-of-bag errors**.
+
+We will now predict to the table of all the sub-catchments across Cuba,
+including the future BIOCLIM variables.
+
+```{r}
+pred <- predict(model, data = stats_table_future[,!1])
+```
+
+We will now reclassify the sub-catchment raster based on the predicted
+probabilities of occurrence, to visualise the potential suitable
+habitats of the species. For this purpose we will use the
+'reclass_raster' function. The function requires a table with the
+reclassification rules (i.e., subc_id = predicted_occurrence), the
+values of which need to be integers.
+
+First, let's join the probabilities of presence in each sub-catchment
+with the corresponding sub-catchment IDs, to create a table with
+reclassification rules
+
+```{r}
+prediction <- data.table(subcatchment_id = stats_table_future$subcatchment_id,
+                         pred_occur = as.numeric(pred$predictions[,2]))
+head(prediction)
+```
+
+and multiply the probability values by 100
+
+```{r}
+prediction$pred_occur <- as.integer(round(prediction$pred_occur, 2) * 100)
+```
+
+We can now reclassify the sub-catchment raster
+
+```{r}
+reclass_raster(
+  data = prediction,
+  rast_val = "subcatchment_id",
+  new_val = "pred_occur",
+  raster_layer = paste0(wdir, "/data/tiles_crop_merged/sub_catchment.tif"),
+  recl_layer = paste0(wdir, "/data/prediction.tif"),
+  read = FALSE)
+```
+
+Let's plot the habitat suitability map, and add the presence points
+
+```{r, eval = FALSE}
+
+leaflet() %>% addTiles() %>%
+  setMaxBounds(bbox[1], bbox[2], bbox[3], bbox[4]) %>% 
+    addGeotiff(
+  file = paste0(wdir, "/data/prediction.tif"), opacity = 1,
+   colorOptions = colorOptions(
+                  palette = hcl.colors(256, palette = "inferno"),
+                  na.color = "transparent"
+                  )
+  ) %>%
+  leaflet::addCircles(data = spdata_vect, color = "turquoise", stroke = TRUE, 
+                      weight = 5, opacity = 1) 
+```
+
+![](images/prediction.png){width="800"}
+
+```{r, include = FALSE, eval = FALSE}
+mapshot(p, file = paste0(wdir, "/prediction.png"))
+
+```
+
+```{r, include = FALSE, eval = FALSE}
+saveWidget(p, paste0(wdir, "/prediction.html"))
+```
+
+If we zoom in to the habitat suitability map, we can observe the
+sub-catchments that could offer a suitable habitat to the species in a
+more detailed view.
+
+![](images/predictionzoom2.png){width="800"}
