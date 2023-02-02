@@ -8,7 +8,7 @@
 #' @param lat character. The name of the column with the latitude coordinates.
 #' @param id  character. The name of a column containing unique IDs for
 #' each row of "data" (e.g., occurrence or site IDs).
-#' @param stream_layer character. Full path of the stream network .gpkg file
+#' @param stream_layer character. Full path of the stream network .tif file
 #' @param accu_layer character. Full path of the flow accumulation .tif file.
 #' Needed if the point should be snapped to the next stream segment having
 #' an accumulation value higher than the flow accumulation threshold
@@ -56,14 +56,14 @@
 #' download_test_data(my_directory)
 #'
 #' # Load occurrence data
-#' species_occurence <- read.table(paste0(my_directory,
+#' species_occurrence <- read.table(paste0(my_directory,
 #'                             "/hydrography90m_test_data/spdata_1264942.txt"),
 #'                               header = TRUE)
 #'
-#' # Define full path to flow accumulation
-#' stream_rast <- paste0(my_directory,
+#' # Define full path to stream network and flow accumulation
+#' stream_raster <- paste0(my_directory,
 #'                      "/hydrography90m_test_data/stream_1264942.tif")
-#' flow_rast <- paste0(my_directory,
+#' flow_raster <- paste0(my_directory,
 #'                      "/hydrography90m_test_data/flow_1264942.tif")
 #'
 #' # To calculate the new (snapped) coordinates for a radius and a flow
@@ -72,8 +72,8 @@
 #'                                        lon = "longitude",
 #'                                        lat = "latitude",
 #'                                        id = "occurrence_id",
-#'                                        stream_layer = stream_vect,
-#'                                        accu_layer = flow_rast,
+#'                                        stream_layer = stream_rasterr,
+#'                                        accu_layer = flow_raster,
 #'                                        method = "both",
 #'                                        distance = 300,
 #'                                        accumulation = 0.8)
@@ -234,7 +234,7 @@ snap_to_network <- function(data, lon, lat, id, stream_layer,
   }
 
   # Remove files in the tmp folder
-  file.remove(coord_tmp_path, snap_tmp_path)
+  #file.remove(coord_tmp_path, snap_tmp_path)
 
   # Return snapped coordinates
   return(snapped_coord)
