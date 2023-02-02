@@ -216,7 +216,7 @@ extract_zonal_stat <- function(data_dir,  subc_id, subc_layer, var_layer,
   }
 
   # Delete temporary output directory
-  # unlink(paste0(data_dir, tmp, "/"), recursive = TRUE)
+  unlink(paste0(data_dir, tmp, "/"), recursive = TRUE)
 
   # Return table
   return(var_table)
