@@ -51,7 +51,6 @@ EOF
 LC_ALL=C sort -k 1n -t',' $OUTDIR/stats_${VARNAME}_tmp.csv > $OUTDIR/stats_${VARNAME}.csv  && rm -f  $OUTDIR/stats_${VARNAME}_tmp.csv
 
 
-
 }
 
 
