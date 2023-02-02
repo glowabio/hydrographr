@@ -69,6 +69,8 @@ then
     r.what map=stream points=snap_points separator=comma \
         | awk -F, '{print $4}' > $DIR/stream_ID_${RAND_STRING}.txt
 
+    sed -i 's/*/NA/g' $DIR/stream_ID_${RAND_STRING}.txt
+
     v.out.ascii -c input=snap_points separator=space | awk '{print $1, $2}' \
         > $DIR/snap_coords_${RAND_STRING}.txt
 
@@ -93,6 +95,8 @@ then
 
     r.what map=stream points=snap_points separator=comma \
         | awk -F, '{print $4}' > $DIR/stream_ID_${RAND_STRING}.txt
+    
+    sed -i 's/*/NA/g' $DIR/stream_ID_${RAND_STRING}.txt
 
     v.out.ascii -c input=snap_points separator=space | awk '{print $1, $2}' \
         > $DIR/snap_coords_${RAND_STRING}.txt
@@ -123,9 +127,13 @@ then
     r.what map=stream points=snap_points_d separator=comma \
         | awk -F, '{print $4}' > $DIR/stream_ID_${RAND_STRING}_d.txt
 
+    sed -i 's/*/NA/g' $DIR/stream_ID_${RAND_STRING}_d.txt
+    
     r.what map=stream points=snap_points_a separator=comma \
         | awk -F, '{print $4}' > $DIR/stream_ID_${RAND_STRING}_a.txt
 
+    sed -i 's/*/NA/g' $DIR/stream_ID_${RAND_STRING}_a.txt
+    
     v.out.ascii -c input=snap_points_d separator=space | awk '{print $1, $2}' \
         > $DIR/snap_coords_${RAND_STRING}_d.txt
 
