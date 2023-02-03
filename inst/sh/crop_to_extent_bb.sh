@@ -13,5 +13,5 @@ export R_OUTPUT=$6
 # the coordinates of the corner of a bounding box
 # and R_OUTPUT the path to the cropped raster
 
-gdalwarp -te $XMIN $YMIN $XMAX $YMAX $R_INPUT $R_OUTPUT -co COMPRESS=LZW -co ZLEVEL=9 -dstnodata -9999 \
+gdalwarp -te $XMIN $YMIN $XMAX $YMAX $R_INPUT $R_OUTPUT -co COMPRESS=LZW -co ZLEVEL=9 -dstnodata -9999999 \
  -overwrite
