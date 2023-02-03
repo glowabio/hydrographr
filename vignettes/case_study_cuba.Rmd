@@ -433,7 +433,7 @@ stats_table_zon <- stats_table_zon %>%
 
 Read in the .gpkg databases of the two tiles, filtering only the sub-catchments of the study area. 
 Their IDs can be retrieved from the stats_table
-```{r}
+```{r, eval = FALSE}
 stats_gpkg_h08v06 <- read_geopackage(
   "data/r.stream.order/order_vect_tiles20d/order_vect_point_h08v06.gpkg",
   subc_id = stats_table_zon$subcatchment_id) %>%
@@ -443,6 +443,33 @@ stats_gpkg_h10v06 <- read_geopackage(
   "data/r.stream.order/order_vect_tiles20d/order_vect_point_h10v06.gpkg",
   subc_id = stats_table_zon$subcatchment_id) %>%
   rename('subcatchment_id' = 'stream')
+```
+
+
+```{r, include = FALSE, eval = FALSE}
+# We used these lines to write out the filtered .gpkg files as data.tables, 
+# so that the size of data in the repository is smaller
+fwrite(stats_gpkg_h08v06, sep = ",", row.names = FALSE, quote = FALSE,
+  paste0(wdir, 
+  "/data/r.stream.order/order_vect_tiles20d/order_vect_point_h08v06.csv"))
+fwrite(stats_gpkg_h10v06, sep = ",", row.names = FALSE, quote = FALSE,
+  paste0(wdir, 
+  "/data/r.stream.order/order_vect_tiles20d/order_vect_point_h10v06.csv"))
+
+```
+
+
+```{r, echo = FALSE}
+# These are the lines that actually run. 
+# They read the pre-filtered gpkg which was exported as a csv in the previous 
+# step. The result is the same as if we ran "read_geopackage" in the .gpkg files
+stats_gpkg_h08v06 <- fread(paste0(wdir,
+  "/data/r.stream.order/order_vect_tiles20d/order_vect_point_h08v06.csv"), 
+  sep = ",")
+
+stats_gpkg_h10v06 <- fread(paste0(wdir,
+  "/data/r.stream.order/order_vect_tiles20d/order_vect_point_h10v06.csv"), 
+  sep = ",")
 ```
 
 Then we join the two .gpkg databases and select the columns
