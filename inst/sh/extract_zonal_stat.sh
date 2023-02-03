@@ -1,12 +1,11 @@
 #!/bin/bash
 
 export DATADIR=$1
-# declare -a SUBC_IDS=($(echo $2 | tr "/" "\n"))
-export SUBC_LAYER=$3
-declare VARS=($(echo $4 | tr "/" "\n"))
-export CALC_ALL=$5
-export NCORES=$6
-export RSTRING=$7
+export SUBC_LAYER=$2
+declare VARS=($(echo $3 | tr "/" "\n"))
+export CALC_ALL=$4
+export NCORES=$5
+export RSTRING=$6
 
 export TMPTAX=$DATADIR/tmp_${RSTRING}
 export OUTDIR=$DATADIR/tmp_${RSTRING}/r_univar
@@ -49,9 +48,7 @@ grass -f --gtext --tmp-location $SUBC_LAYER   <<'EOF'
 EOF
 
 # Sort variables to later join them in R
-# sort -k 1 $OUTDIR/stats_${VARNAME}_tmp.csv > $OUTDIR/stats_${VARNAME}.csv  #&& rm -f  $OUTDIR/stats_${VARNAME}_tmp.csv
-head -n 1 $OUTDIR/stats_${VARNAME}_tmp.csv && tail -n +2 $OUTDIR/stats_${VARNAME}_tmp.csv | \
-  sort > $OUTDIR/stats_${VARNAME}.csv  && rm -f  $OUTDIR/stats_${VARNAME}_tmp.csv
+LC_ALL=C sort -k 1n -t',' $OUTDIR/stats_${VARNAME}_tmp.csv > $OUTDIR/stats_${VARNAME}.csv  && rm -f  $OUTDIR/stats_${VARNAME}_tmp.csv
 
 
 }
