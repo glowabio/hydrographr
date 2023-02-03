@@ -33,7 +33,7 @@
 #' @export
 #'
 #' @note
-#' Duplicated rows will be removed.
+#' Duplicated rows will be removed from the input data.
 #'
 #' @details
 #' The function makes use of the r.stream.snap command available in GRASS GIS to
@@ -43,6 +43,13 @@
 #' accumulation threshold can be used and the snapping occurs on stream segment
 #' with equal or higher accumulation threshold and within the given distance
 #' radius.
+#'
+#' @returns
+#' Returns a data.frame with the snapped coordinates and the sub-catchment ID
+#' of the snapped stream segment. If the sub-catchment ID is NA, no stream segment
+#' was found within the given distance (method = "distance") or no stream segment
+#' wad found within the given distance and a flow accumulation equal or higher
+#' than the given threshold (method = "accumulation").
 #'
 #' @author Maria M. Üblacker, Jaime Garcia Marquez
 #'
@@ -72,7 +79,7 @@
 #'                                        lon = "longitude",
 #'                                        lat = "latitude",
 #'                                        id = "occurrence_id",
-#'                                        stream_layer = stream_rasterr,
+#'                                        stream_layer = stream_raster,
 #'                                        accu_layer = flow_raster,
 #'                                        method = "both",
 #'                                        distance = 300,

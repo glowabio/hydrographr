@@ -27,7 +27,7 @@ snap_to_network(
 \item{id}{character. The name of a column containing unique IDs for
 each row of "data" (e.g., occurrence or site IDs).}
 
-\item{stream_layer}{character. Full path of the stream network .gpkg file}
+\item{stream_layer}{character. Full path of the stream network .tif file}
 
 \item{accu_layer}{character. Full path of the flow accumulation .tif file.
 Needed if the point should be snapped to the next stream segment having
@@ -51,6 +51,13 @@ given value. Default is 0.5.}
 \item{quiet}{logical. If FALSE, the standard output will be printed.
 Default is TRUE.}
 }
+\value{
+Returns a data.frame with the snapped coordinates and the sub-catchment ID
+of the snapped stream segment. If the sub-catchment ID is NA, no stream segment
+was found within the given distance (method = "distance") or no stream segment
+wad found within the given distance and a flow accumulation equal or higher
+than the given threshold (method = "accumulation").
+}
 \description{
 Snap points to the next stream segment within a defined radius
 or a minimum flow accumulation.
@@ -65,7 +72,7 @@ with equal or higher accumulation threshold and within the given distance
 radius.
 }
 \note{
-Duplicated rows will be removed.
+Duplicated rows will be removed from the input data.
 }
 \examples{
 # Download test data into the temporary R folder
@@ -74,14 +81,14 @@ my_directory <- tempdir()
 download_test_data(my_directory)
 
 # Load occurrence data
-species_occurence <- read.table(paste0(my_directory,
+species_occurrence <- read.table(paste0(my_directory,
                             "/hydrography90m_test_data/spdata_1264942.txt"),
                               header = TRUE)
 
-# Define full path to flow accumulation
-stream_rast <- paste0(my_directory,
+# Define full path to stream network and flow accumulation
+stream_raster <- paste0(my_directory,
                      "/hydrography90m_test_data/stream_1264942.tif")
-flow_rast <- paste0(my_directory,
+flow_raster <- paste0(my_directory,
                      "/hydrography90m_test_data/flow_1264942.tif")
 
 # To calculate the new (snapped) coordinates for a radius and a flow
@@ -89,8 +96,8 @@ snapped_coordinates <- snap_to_network(data = species_occurrence,
                                        lon = "longitude",
                                        lat = "latitude",
                                        id = "occurrence_id",
-                                       stream_layer = stream_vect,
-                                       accu_layer = flow_rast,
+                                       stream_layer = stream_raster,
+                                       accu_layer = flow_raster,
                                        method = "both",
                                        distance = 300,
                                        accumulation = 0.8)
