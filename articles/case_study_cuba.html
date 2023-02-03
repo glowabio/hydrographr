@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">hydrographr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.6</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.7</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -78,7 +78,7 @@
 data before and after a Species Distribution Model</h3>
                         <h4 data-toc-skip class="author"></h4>
             
-            <h4 data-toc-skip class="date">2023-02-02</h4>
+            <h4 data-toc-skip class="date">2023-02-03</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/glowabio/hydrographr/blob/HEAD/vignettes/case_study_cuba.Rmd" class="external-link"><code>vignettes/case_study_cuba.Rmd</code></a></small>
       <div class="d-none name"><code>case_study_cuba.Rmd</code></div>
@@ -102,7 +102,6 @@ Using the random forest algorithm, we will build a simple SDM and
 predict where the species could potentially occur. Finally, we will
 reclassify the layer of all the sub-catchments in the study area.
 creating a habitat suitability map.</p>
-<p>library(filesstrings)</p>
 <p>Load required libraries</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://glowabio.github.io/hydrographr/" class="external-link">hydrographr</a></span><span class="op">)</span></span>
@@ -1077,8 +1076,7 @@ located</p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">spdata_ids</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_ids.html">extract_ids</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">spdata</span>, lon <span class="op">=</span> <span class="st">"longitude"</span>, lat <span class="op">=</span> <span class="st">"latitude"</span>,</span>
 <span>                               id <span class="op">=</span> <span class="st">"occurrence_ID"</span>, quiet <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>                               subc_layer <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span>
-<span>                                <span class="va">wdir</span>,<span class="st">"/data/tiles_crop_merged/sub_catchment.tif"</span></span>
+<span>                               subc_layer <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span> <span class="va">out_dir</span>, <span class="st">"/sub_catchment.tif"</span></span>
 <span>                               <span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">spdata_ids</span><span class="op">)</span>,</span>
@@ -1209,8 +1207,8 @@ NoData values:</p>
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/report_no_data.html">report_no_data</a></span><span class="op">(</span>data_dir <span class="op">=</span> <span class="va">out_dir</span>, var_layer <span class="op">=</span> <span class="va">var_layers</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##                                    Raster  NoData</span></span>
 <span><span class="co">## 1                      bio1_1981-2010.tif       0</span></span>
-<span><span class="co">## 2  bio1_IPSL-CM6A-LR_ssp370_2041-2070.tif       0</span></span>
-<span><span class="co">## 3                     bio12_1981-2010.tif       0</span></span>
+<span><span class="co">## 2                     bio12_1981-2010.tif       0</span></span>
+<span><span class="co">## 3  bio1_IPSL-CM6A-LR_ssp370_2041-2070.tif       0</span></span>
 <span><span class="co">## 4 bio12_IPSL-CM6A-LR_ssp370_2041-2070.tif       0</span></span>
 <span><span class="co">## 5                     bio15_1981-2010.tif       0</span></span>
 <span><span class="co">## 6 bio15_IPSL-CM6A-LR_ssp370_2041-2070.tif       0</span></span>
@@ -2066,8 +2064,8 @@ model</p>
 “subcatchment_id” and “length”. We will use the length of the stream as
 an indicator of the sub-catchment size</p>
 <pre><code><span><span class="co">##            used  (Mb) gc trigger  (Mb) max used  (Mb)</span></span>
-<span><span class="co">## Ncells  4561617 243.7    9539617 509.5  7312058 390.6</span></span>
-<span><span class="co">## Vcells 24078704 183.8   68278073 521.0 56409116 430.4</span></span></code></pre>
+<span><span class="co">## Ncells  4561670 243.7    7728037 412.8  7710887 411.9</span></span>
+<span><span class="co">## Vcells 24078821 183.8   68278241 521.0 56409233 430.4</span></span></code></pre>
 <p>Join the stats_table with the .gpkg database</p>
 <div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">stats_table</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">stats_table_zon</span>, <span class="va">stats_gpkg</span>, by <span class="op">=</span> <span class="st">"subcatchment_id"</span><span class="op">)</span></span></code></pre></div>
@@ -2536,19 +2534,19 @@ sub-catchments with known presences of the species</p>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">pseudoabs</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##    subcatchment_id bio1_mean bio12_mean bio15_mean slope_curv_max_dw_cel_mean</span></span>
-<span><span class="co">## 1:       422891943  26.20000   1116.719   53.07500               -0.068542812</span></span>
-<span><span class="co">## 2:       399668885  25.05000   1443.017   58.07778               -0.024215306</span></span>
-<span><span class="co">## 3:       422566323  25.45000   1356.662   57.57308               -0.002795308</span></span>
-<span><span class="co">## 4:       422484184  25.15000   1290.852   52.95238               -0.004075571</span></span>
-<span><span class="co">## 5:       399685818  24.83750   1371.338   50.06250               -0.011537562</span></span>
-<span><span class="co">## 6:       422660949  26.05448   1076.637   43.93284               -0.001277134</span></span>
-<span><span class="co">##       bio1_sd  bio12_sd   bio15_sd slope_curv_max_dw_cel_sd    length</span></span>
-<span><span class="co">## 1: 0.10606602 7.1774141 0.04330127              0.092309639  301.3977</span></span>
-<span><span class="co">## 2: 0.00000000 2.4402300 0.14358720              0.041625260  548.3325</span></span>
-<span><span class="co">## 3: 0.00000000 1.4910185 0.08113470              0.004310199  218.4368</span></span>
-<span><span class="co">## 4: 0.00000000 3.6341789 0.08518354              0.004954116  674.5090</span></span>
-<span><span class="co">## 5: 0.03307189 6.1844437 0.16535946              0.030927666  337.1209</span></span>
-<span><span class="co">## 6: 0.02068120 0.5827971 0.18559148              0.002042452 1467.5992</span></span></code></pre>
+<span><span class="co">## 1:       422867437  25.05370   1561.463   53.90000               -0.036281704</span></span>
+<span><span class="co">## 2:       422723590  25.99138   1229.441   59.74138               -0.018778621</span></span>
+<span><span class="co">## 3:       399926006  24.83750   1539.300   61.08750               -0.029291875</span></span>
+<span><span class="co">## 4:       422626427  25.85000   1408.600   68.40000               -0.005704417</span></span>
+<span><span class="co">## 5:       399646212  25.05000   1328.500   45.60000               -0.003081250</span></span>
+<span><span class="co">## 6:       422821177  26.05000   1377.283   52.75510               -0.004789031</span></span>
+<span><span class="co">##       bio1_sd bio12_sd   bio15_sd slope_curv_max_dw_cel_sd    length</span></span>
+<span><span class="co">## 1: 0.01888526 9.537961 0.00000000              0.061372943  565.2232</span></span>
+<span><span class="co">## 2: 0.04925123 2.905823 0.04925123              0.030140907  529.9398</span></span>
+<span><span class="co">## 3: 0.03307189 1.322876 0.03307189              0.033257387  252.0581</span></span>
+<span><span class="co">## 4: 0.00000000 0.000000 0.00000000              0.009545765  252.6313</span></span>
+<span><span class="co">## 5: 0.00000000 0.000000 0.00000000              0.011374924  218.0533</span></span>
+<span><span class="co">## 6: 0.00000000 6.680187 0.10012487              0.009311064 1546.1096</span></span></code></pre>
 <p>We join the species occurrences with the present environmental
 variables table</p>
 <div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
@@ -2934,7 +2932,7 @@ presences.</p>
 <span><span class="co">## Target node size:                 10 </span></span>
 <span><span class="co">## Variable importance mode:         impurity </span></span>
 <span><span class="co">## Splitrule:                        gini </span></span>
-<span><span class="co">## OOB prediction error (Brier s.):  0.1007708</span></span></code></pre>
+<span><span class="co">## OOB prediction error (Brier s.):  0.09970632</span></span></code></pre>
 <p>The model can be evaluated based on the OOB prediction error. This
 metric lies on the fact that the data points that are not used in
 training a tree can be used to test the tree. The errors on the OOB
@@ -2957,12 +2955,12 @@ reclassification rules</p>
 <span>                         pred_occur <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">pred</span><span class="op">$</span><span class="va">predictions</span><span class="op">[</span>,<span class="fl">2</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">prediction</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##    subcatchment_id pred_occur</span></span>
-<span><span class="co">## 1:       399592461 0.03579762</span></span>
-<span><span class="co">## 2:       399592865 0.03608095</span></span>
-<span><span class="co">## 3:       399593700 0.07217698</span></span>
-<span><span class="co">## 4:       399593701 0.06620437</span></span>
-<span><span class="co">## 5:       399593817 0.04084524</span></span>
-<span><span class="co">## 6:       399593818 0.07163532</span></span></code></pre>
+<span><span class="co">## 1:       399592461 0.04384405</span></span>
+<span><span class="co">## 2:       399592865 0.04118214</span></span>
+<span><span class="co">## 3:       399593700 0.07691032</span></span>
+<span><span class="co">## 4:       399593701 0.07159008</span></span>
+<span><span class="co">## 5:       399593817 0.04775357</span></span>
+<span><span class="co">## 6:       399593818 0.07481508</span></span></code></pre>
 <p>and multiply the probability values by 100</p>
 <div class="sourceCode" id="cb63"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">prediction</span><span class="op">$</span><span class="va">pred_occur</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">prediction</span><span class="op">$</span><span class="va">pred_occur</span>, <span class="fl">2</span><span class="op">)</span> <span class="op">*</span> <span class="fl">100</span><span class="op">)</span></span></code></pre></div>
@@ -2972,7 +2970,7 @@ reclassification rules</p>
 <span>  data <span class="op">=</span> <span class="va">prediction</span>,</span>
 <span>  rast_val <span class="op">=</span> <span class="st">"subcatchment_id"</span>,</span>
 <span>  new_val <span class="op">=</span> <span class="st">"pred_occur"</span>,</span>
-<span>  raster_layer <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data/tiles_crop_merged/sub_catchment.tif"</span><span class="op">)</span>,</span>
+<span>  raster_layer <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">out_dir</span>, <span class="st">"/sub_catchment.tif"</span><span class="op">)</span>,</span>
 <span>  recl_layer <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data/prediction.tif"</span><span class="op">)</span>,</span>
 <span>  read <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "Reclassified raster saved under: /home/afroditi/Documents/PhD/hydrographr_case_study/data/prediction.tif"</span></span></code></pre>

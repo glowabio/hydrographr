@@ -12,7 +12,7 @@ or a minimum flow accumulation."><!-- mathjax --><script src="https://cdnjs.clou
     
     <a class="navbar-brand me-2" href="../index.html">hydrographr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.6</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.7</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -96,7 +96,7 @@ each row of "data" (e.g., occurrence or site IDs).</p></dd>
 
 
 <dt>stream_layer</dt>
-<dd><p>character. Full path of the stream network .gpkg file</p></dd>
+<dd><p>character. Full path of the stream network .tif file</p></dd>
 
 
 <dt>accu_layer</dt>
@@ -132,6 +132,16 @@ Default is TRUE.</p></dd>
 
 </dl></div>
     <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    
+
+<p>Returns a data.frame with the snapped coordinates and the sub-catchment ID
+of the snapped stream segment. If the sub-catchment ID is NA, no stream segment
+was found within the given distance (method = "distance") or no stream segment
+wad found within the given distance and a flow accumulation equal or higher
+than the given threshold (method = "accumulation").</p>
+    </div>
+    <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>The function makes use of the r.stream.snap command available in GRASS GIS to
 simultaneously a number of points to a stream network. A distance threshold
@@ -143,7 +153,7 @@ radius.</p>
     </div>
     <div class="section level2">
     <h2 id="note">Note<a class="anchor" aria-label="anchor" href="#note"></a></h2>
-    <p>Duplicated rows will be removed.</p>
+    <p>Duplicated rows will be removed from the input data.</p>
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
@@ -162,14 +172,14 @@ radius.</p>
 <span><span class="fu"><a href="download_test_data.html">download_test_data</a></span><span class="op">(</span><span class="va">my_directory</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Load occurrence data</span></span>
-<span><span class="va">species_occurence</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.table</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">my_directory</span>,</span>
+<span><span class="va">species_occurrence</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.table</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">my_directory</span>,</span>
 <span>                            <span class="st">"/hydrography90m_test_data/spdata_1264942.txt"</span><span class="op">)</span>,</span>
 <span>                              header <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Define full path to flow accumulation</span></span>
-<span><span class="va">stream_rast</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">my_directory</span>,</span>
+<span><span class="co"># Define full path to stream network and flow accumulation</span></span>
+<span><span class="va">stream_raster</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">my_directory</span>,</span>
 <span>                     <span class="st">"/hydrography90m_test_data/stream_1264942.tif"</span><span class="op">)</span></span>
-<span><span class="va">flow_rast</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">my_directory</span>,</span>
+<span><span class="va">flow_raster</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">my_directory</span>,</span>
 <span>                     <span class="st">"/hydrography90m_test_data/flow_1264942.tif"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># To calculate the new (snapped) coordinates for a radius and a flow</span></span>
@@ -177,8 +187,8 @@ radius.</p>
 <span>                                       lon <span class="op">=</span> <span class="st">"longitude"</span>,</span>
 <span>                                       lat <span class="op">=</span> <span class="st">"latitude"</span>,</span>
 <span>                                       id <span class="op">=</span> <span class="st">"occurrence_id"</span>,</span>
-<span>                                       stream_layer <span class="op">=</span> <span class="va">stream_vect</span>,</span>
-<span>                                       accu_layer <span class="op">=</span> <span class="va">flow_rast</span>,</span>
+<span>                                       stream_layer <span class="op">=</span> <span class="va">stream_raster</span>,</span>
+<span>                                       accu_layer <span class="op">=</span> <span class="va">flow_raster</span>,</span>
 <span>                                       method <span class="op">=</span> <span class="st">"both"</span>,</span>
 <span>                                       distance <span class="op">=</span> <span class="fl">300</span>,</span>
 <span>                                       accumulation <span class="op">=</span> <span class="fl">0.8</span><span class="op">)</span></span>
