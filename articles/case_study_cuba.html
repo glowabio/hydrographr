@@ -98,7 +98,7 @@ will download the Hydrography90m and CHELSA BIOCLIM layers of the
 predictor variables, crop them and merge them, if necessary. Then, we
 will aggregate the variable values within each sub-catchment of the
 study area, keeping as predictors their mean and SD per sub-catchment.
-Using the random forest algorithm, we will build a simple SDM and
+Using the random forest (RF) algorithm, we will build a simple SDM and
 predict where the species could potentially occur. Finally, we will
 reclassify the layer of all the sub-catchments in the study area.
 creating a habitat suitability map.</p>
@@ -111,7 +111,9 @@ creating a habitat suitability map.</p>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">tools</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://stringr.tidyverse.org" class="external-link">stringr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/imbs-hl/ranger" class="external-link">ranger</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/r-spatial/leafem" class="external-link">leafem</a></span><span class="op">)</span></span></code></pre></div>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rstudio.github.io/leaflet/" class="external-link">leaflet</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/r-spatial/leafem" class="external-link">leafem</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">leafletCN</span><span class="op">)</span></span></code></pre></div>
 <p>Define working directory</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">wdir</span> <span class="op">&lt;-</span> <span class="st">"my/working/directory"</span></span>
@@ -898,10 +900,10 @@ Hypolestes_trinitatis
 <code class="sourceCode R"><span><span class="co"># Convert species data to a spatial vector object to plot the points</span></span>
 <span><span class="va">spdata_vect</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/vect.html" class="external-link">vect</a></span><span class="op">(</span><span class="va">spdata</span>, geom<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"longitude"</span>, <span class="st">"latitude"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu">leaflet</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu">addProviderTiles</span><span class="op">(</span><span class="st">'Esri.WorldShadedRelief'</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu">setMaxBounds</span><span class="op">(</span><span class="va">bbox</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, <span class="va">bbox</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>, <span class="va">bbox</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span>, <span class="va">bbox</span><span class="op">[</span><span class="fl">4</span><span class="op">]</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu">addCircles</span><span class="op">(</span>data <span class="op">=</span> <span class="va">spdata_vect</span>, color <span class="op">=</span> <span class="st">"purple"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/leaflet/man/leaflet.html" class="external-link">leaflet</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/leaflet/man/addProviderTiles.html" class="external-link">addProviderTiles</a></span><span class="op">(</span><span class="st">'Esri.WorldShadedRelief'</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/leaflet/man/map-methods.html" class="external-link">setMaxBounds</a></span><span class="op">(</span><span class="va">bbox</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, <span class="va">bbox</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>, <span class="va">bbox</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span>, <span class="va">bbox</span><span class="op">[</span><span class="fl">4</span><span class="op">]</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/leaflet/man/map-layers.html" class="external-link">addCircles</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">spdata_vect</span>, color <span class="op">=</span> <span class="st">"purple"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">m</span></span></code></pre></div>
 <p><img src="../reference/figures/cuba_map.png"></p>
@@ -992,9 +994,9 @@ xmax, ymax)</p>
 <p>… and the final output directory</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Define output directory for merged files</span></span>
-<span><span class="va">out_dir</span> <span class="op">&lt;-</span> <span class="st">"data/final_layers"</span></span>
+<span><span class="va">layer_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data/final_layers"</span><span class="op">)</span></span>
 <span><span class="co"># Create the directory</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="va">out_dir</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="va">layer_dir</span><span class="op">)</span></span></code></pre></div>
 <p>We then crop the files using the function <em>crop_to_extent()</em>
 in a loop</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
@@ -1004,19 +1006,11 @@ in a loop</p>
 <span>    <span class="fu"><a href="../reference/crop_to_extent.html">crop_to_extent</a></span><span class="op">(</span></span>
 <span>      raster_layer <span class="op">=</span> <span class="va">ifile</span>,</span>
 <span>      bounding_box <span class="op">=</span> <span class="va">bbox</span>,</span>
-<span>      out_dir <span class="op">=</span> <span class="va">out_dir</span>,</span>
+<span>      out_dir <span class="op">=</span> <span class="va">layer_dir</span>,</span>
 <span>      file_name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/basename.html" class="external-link">basename</a></span><span class="op">(</span><span class="va">ifile</span><span class="op">)</span>,</span>
 <span>      read <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>      quiet <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<pre><code><span><span class="co">## Cropping...</span></span>
-<span><span class="co">## Cropped raster saved under:  data/final_layers/bio1_1981-2010.tifCropping...</span></span>
-<span><span class="co">## Cropped raster saved under:  data/final_layers/bio1_IPSL-CM6A-LR_ssp370_2041-2070.tifCropping...</span></span>
-<span><span class="co">## Cropped raster saved under:  data/final_layers/bio12_1981-2010.tifCropping...</span></span>
-<span><span class="co">## Cropped raster saved under:  data/final_layers/bio12_IPSL-CM6A-LR_ssp370_2041-2070.tifCropping...</span></span>
-<span><span class="co">## Cropped raster saved under:  data/final_layers/bio15_1981-2010.tifCropping...</span></span>
-<span><span class="co">## Cropped raster saved under:  data/final_layers/bio15_IPSL-CM6A-LR_ssp370_2041-2070.tifCropping...</span></span>
-<span><span class="co">## Cropped raster saved under:  data/final_layers/CHELSA_bio1_2041-2070_ipsl-cm6a-lr_ssp370_V.2.1.tif</span></span></code></pre>
 <p>However, the hydrographic variable <em>slope_curv_max_dw_cel</em>
 (the maximum curvature between the highest upstream, the focal, and the
 downstream cell) is split across two tiles. We highly recommend to first
@@ -1025,7 +1019,7 @@ afterwards merge them into one file.</p>
 <p>Again, we will first define the input directories, but this time we
 will store the cropped files in the same directory as the input files,
 as there is an extra step before reaching to the final output.</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">dirs_h90m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.dirs</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data"</span><span class="op">)</span>,</span>
 <span>                       recursive <span class="op">=</span> <span class="cn">TRUE</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
@@ -1037,10 +1031,10 @@ as there is an extra step before reaching to the final output.</p>
 <span><span class="co">## [3] "/home/afroditi/Documents/PhD/hydrographr_case_study/data/r.stream.slope/slope_curv_max_dw_cel_tiles20d"</span></span>
 <span><span class="co">## [4] "/home/afroditi/Documents/PhD/hydrographr_case_study/data/r.watershed/basin_tiles20d"                   </span></span>
 <span><span class="co">## [5] "/home/afroditi/Documents/PhD/hydrographr_case_study/data/r.watershed/sub_catchment_tiles20d"</span></span></code></pre>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">for</span><span class="op">(</span><span class="va">idir</span> <span class="kw">in</span> <span class="va">dirs_h90m</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="co"># only choose rasters</span></span>
-<span>  <span class="va">tiles</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">idir</span>, pattern <span class="op">=</span> <span class="st">".tif"</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span>  <span class="va">tiles</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">idir</span>, pattern <span class="op">=</span> <span class="st">".tif$"</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span>  <span class="kw">for</span><span class="op">(</span><span class="va">itile</span> <span class="kw">in</span> <span class="va">tiles</span><span class="op">)</span> <span class="op">{</span></span>
 <span>      <span class="fu"><a href="../reference/crop_to_extent.html">crop_to_extent</a></span><span class="op">(</span></span>
 <span>        raster_layer <span class="op">=</span> <span class="va">itile</span>,</span>
@@ -1052,7 +1046,7 @@ as there is an extra step before reaching to the final output.</p>
 <span>  <span class="op">}</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p>The cropped tiles of the variable now need to be merged together.</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Merge the files in a loop</span></span>
 <span><span class="kw">for</span><span class="op">(</span><span class="va">idir</span> <span class="kw">in</span> <span class="va">dirs_h90m</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="co"># Get input file extension</span></span>
@@ -1067,18 +1061,18 @@ as there is an extra step before reaching to the final output.</p>
 <span>  <span class="fu"><a href="../reference/merge_tiles.html">merge_tiles</a></span><span class="op">(</span>tile_dir <span class="op">=</span> <span class="va">idir</span>,</span>
 <span>              tile_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">idir</span>, full.names <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>                                      pattern <span class="op">=</span> <span class="st">"_crop.tif"</span><span class="op">)</span>,</span>
-<span>              out_dir <span class="op">=</span> <span class="va">out_dir</span>,</span>
+<span>              out_dir <span class="op">=</span> <span class="va">layer_dir</span>,</span>
 <span>              file_name <span class="op">=</span> <span class="va">ivar_name</span>,</span>
 <span>              read <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p>Extract the ids of the sub-catchments where the points are
 located</p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">spdata_ids</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_ids.html">extract_ids</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">spdata</span>, lon <span class="op">=</span> <span class="st">"longitude"</span>, lat <span class="op">=</span> <span class="st">"latitude"</span>,</span>
 <span>                               id <span class="op">=</span> <span class="st">"occurrence_ID"</span>, quiet <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>                               subc_layer <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span> <span class="va">out_dir</span>, <span class="st">"/sub_catchment.tif"</span></span>
+<span>                               subc_layer <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">layer_dir</span>, <span class="st">"/sub_catchment.tif"</span></span>
 <span>                               <span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">spdata_ids</span><span class="op">)</span>,</span>
 <span> caption <span class="op">=</span> <span class="st">"The species data have now their corresponding sub-catchment ids"</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
@@ -1189,10 +1183,10 @@ subcatchment_id
 <p>Extract the zonal statistics of the hydrography90m variables for all
 the sub-catchments of the study area. Caution, don’t increase the number
 of cores to more than 3</p>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Define input var_layers for the extract_zonal_stat() function</span></span>
-<span><span class="va">var_layers</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">out_dir</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span><span class="op">:</span><span class="fl">7</span>,<span class="fl">9</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="co"># var_layers &lt;- list.files(out_dir)[c(3,5,7)]</span></span>
+<span><span class="va">var_layers</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">layer_dir</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="fl">9</span><span class="op">]</span></span>
+<span><span class="co"># var_layers &lt;- list.files(layer_dir)[c(3,5,7)]</span></span>
 <span><span class="va">var_layers</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "bio1_1981-2010.tif"                     </span></span>
 <span><span class="co">## [2] "bio1_IPSL-CM6A-LR_ssp370_2041-2070.tif" </span></span>
@@ -1200,36 +1194,36 @@ of cores to more than 3</p>
 <span><span class="co">## [4] "bio12_IPSL-CM6A-LR_ssp370_2041-2070.tif"</span></span>
 <span><span class="co">## [5] "bio15_1981-2010.tif"                    </span></span>
 <span><span class="co">## [6] "bio15_IPSL-CM6A-LR_ssp370_2041-2070.tif"</span></span>
-<span><span class="co">## [7] "slope_curv_max_dw_cel.tif"</span></span></code></pre>
+<span><span class="co">## [7] "slope_curv_max_dw_cel.tif"              </span></span>
+<span><span class="co">## [8] "slope_curv_max_dw_cel.tif.aux.xml"      </span></span>
+<span><span class="co">## [9] "sub_catchment.tif"</span></span></code></pre>
 <p>A good practice before aggregating the variables is to check their
 NoData values:</p>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/report_no_data.html">report_no_data</a></span><span class="op">(</span>data_dir <span class="op">=</span> <span class="va">out_dir</span>, var_layer <span class="op">=</span> <span class="va">var_layers</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##                                    Raster  NoData</span></span>
-<span><span class="co">## 1                      bio1_1981-2010.tif       0</span></span>
-<span><span class="co">## 2                     bio12_1981-2010.tif       0</span></span>
-<span><span class="co">## 3  bio1_IPSL-CM6A-LR_ssp370_2041-2070.tif       0</span></span>
-<span><span class="co">## 4 bio12_IPSL-CM6A-LR_ssp370_2041-2070.tif       0</span></span>
-<span><span class="co">## 5                     bio15_1981-2010.tif       0</span></span>
-<span><span class="co">## 6 bio15_IPSL-CM6A-LR_ssp370_2041-2070.tif       0</span></span>
-<span><span class="co">## 7               slope_curv_max_dw_cel.tif -999999</span></span></code></pre>
-<p>In this case we need to modify the no data value of the
-slope_curv_max_dw_cel.tif, as it is within the range of its values.</p>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/set_no_data.html">set_no_data</a></span><span class="op">(</span>data_dir <span class="op">=</span> <span class="va">out_dir</span>, var_layer <span class="op">=</span> <span class="st">"slope_curv_max_dw_cel.tif"</span>, no_data <span class="op">=</span> <span class="op">-</span><span class="fl">999999</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] "No data value was changed to -999999 for the file slope_curv_max_dw_cel.tif"</span></span></code></pre>
-<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">stats_table_zon</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_zonal_stat.html">extract_zonal_stat</a></span><span class="op">(</span></span>
-<span>                    data_dir <span class="op">=</span> <span class="va">out_dir</span>,</span>
-<span>                   subc_layer <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">out_dir</span>, <span class="st">"/sub_catchment.tif"</span><span class="op">)</span>,</span>
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/report_no_data.html">report_no_data</a></span><span class="op">(</span>data_dir <span class="op">=</span> <span class="va">layer_dir</span>, var_layer <span class="op">=</span> <span class="va">var_layers</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##                                    Raster   NoData</span></span>
+<span><span class="co">## 1                     bio12_1981-2010.tif        0</span></span>
+<span><span class="co">## 2                      bio1_1981-2010.tif        0</span></span>
+<span><span class="co">## 3 bio12_IPSL-CM6A-LR_ssp370_2041-2070.tif        0</span></span>
+<span><span class="co">## 4  bio1_IPSL-CM6A-LR_ssp370_2041-2070.tif        0</span></span>
+<span><span class="co">## 5                     bio15_1981-2010.tif        0</span></span>
+<span><span class="co">## 6 bio15_IPSL-CM6A-LR_ssp370_2041-2070.tif        0</span></span>
+<span><span class="co">## 7               slope_curv_max_dw_cel.tif -9999999</span></span>
+<span><span class="co">## 8       slope_curv_max_dw_cel.tif.aux.xml         </span></span>
+<span><span class="co">## 9                       sub_catchment.tif        0</span></span></code></pre>
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Run the function that returns the zonal statistics</span></span>
+<span><span class="va">stats_table_zon</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_zonal_stat.html">extract_zonal_stat</a></span><span class="op">(</span></span>
+<span>                    data_dir <span class="op">=</span> <span class="va">layer_dir</span>,</span>
+<span>                   subc_layer <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">layer_dir</span>, <span class="st">"/sub_catchment.tif"</span><span class="op">)</span>,</span>
 <span>                   subc_id <span class="op">=</span> <span class="st">"all"</span>,</span>
 <span>                   var_layer <span class="op">=</span> <span class="va">var_layers</span>,</span>
 <span>                   file_name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data/zonal_stats.csv"</span><span class="op">)</span>,</span>
 <span>                   n_cores <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
-<p>The function reports the NoData values that are used in the
+<p>The function also reports the NoData values that are used in the
 calculation of the zonal statistics of each variable.</p>
 <p>Let’s inspect the resulting table</p>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">stats_table_zon</span><span class="op">)</span></span></code></pre></div>
 <div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:200px; overflow-x: scroll; width:1000px; ">
 <table class="table table table-striped" style="width: auto !important; ">
@@ -1342,6 +1336,21 @@ slope_curv_max_dw_cel_mean
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 slope_curv_max_dw_cel_sd
 </th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+spi_min
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+spi_max
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+spi_range
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+spi_mean
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+spi_sd
+</th>
 </tr></thead>
 <tbody>
 <tr>
@@ -1448,10 +1457,25 @@ slope_curv_max_dw_cel_sd
 85749
 </td>
 <td style="text-align:right;">
--2493.237
+-2472.034
 </td>
 <td style="text-align:right;">
-12028.203
+12038.554
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+44
+</td>
+<td style="text-align:right;">
+44
+</td>
+<td style="text-align:right;">
+6.655367
+</td>
+<td style="text-align:right;">
+9.411190
 </td>
 </tr>
 <tr>
@@ -1558,10 +1582,25 @@ slope_curv_max_dw_cel_sd
 58528
 </td>
 <td style="text-align:right;">
--3981.915
+-3907.630
 </td>
 <td style="text-align:right;">
-12885.806
+12947.641
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+70
+</td>
+<td style="text-align:right;">
+70
+</td>
+<td style="text-align:right;">
+8.925926
+</td>
+<td style="text-align:right;">
+13.105251
 </td>
 </tr>
 <tr>
@@ -1673,6 +1712,21 @@ slope_curv_max_dw_cel_sd
 <td style="text-align:right;">
 7115.013
 </td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:right;">
+12
+</td>
+<td style="text-align:right;">
+2.439189
+</td>
+<td style="text-align:right;">
+2.916000
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -1782,6 +1836,21 @@ slope_curv_max_dw_cel_sd
 </td>
 <td style="text-align:right;">
 4235.546
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+10
+</td>
+<td style="text-align:right;">
+2.142857
+</td>
+<td style="text-align:right;">
+3.481731
 </td>
 </tr>
 <tr>
@@ -1893,6 +1962,21 @@ slope_curv_max_dw_cel_sd
 <td style="text-align:right;">
 9093.644
 </td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+19
+</td>
+<td style="text-align:right;">
+19
+</td>
+<td style="text-align:right;">
+2.660494
+</td>
+<td style="text-align:right;">
+3.961487
+</td>
 </tr>
 <tr>
 <td style="text-align:right;">
@@ -2003,11 +2087,26 @@ slope_curv_max_dw_cel_sd
 <td style="text-align:right;">
 4232.800
 </td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1.200000
+</td>
+<td style="text-align:right;">
+0.400000
+</td>
 </tr>
 </tbody>
 </table>
 </div>
-<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">stats_table_zon</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##  [1] "subc_id"                                  </span></span>
 <span><span class="co">##  [2] "bio1_1981.2010_min"                       </span></span>
@@ -2044,18 +2143,36 @@ slope_curv_max_dw_cel_sd
 <span><span class="co">## [33] "slope_curv_max_dw_cel_max"                </span></span>
 <span><span class="co">## [34] "slope_curv_max_dw_cel_range"              </span></span>
 <span><span class="co">## [35] "slope_curv_max_dw_cel_mean"               </span></span>
-<span><span class="co">## [36] "slope_curv_max_dw_cel_sd"</span></span></code></pre>
+<span><span class="co">## [36] "slope_curv_max_dw_cel_sd"                 </span></span>
+<span><span class="co">## [37] "spi_min"                                  </span></span>
+<span><span class="co">## [38] "spi_max"                                  </span></span>
+<span><span class="co">## [39] "spi_range"                                </span></span>
+<span><span class="co">## [40] "spi_mean"                                 </span></span>
+<span><span class="co">## [41] "spi_sd"</span></span></code></pre>
 <p>We will keep only the mean and sd of each variable of the
 stats_table, to use them as predictors in the species distribution
 model</p>
-<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">stats_table_zon</span> <span class="op">&lt;-</span> <span class="va">stats_table_zon</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">contains</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"subc"</span>, <span class="st">"_mean"</span>, <span class="st">"_sd"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span><span class="st">'subcatchment_id'</span> <span class="op">=</span> <span class="st">'subc_id'</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Read in the .gpkg databases of the two tiles, filtering only the</span></span>
+<span><span class="co"># sub-catchments of the study area. These can be found in the stats_table</span></span>
+<span></span>
+<span><span class="va">stats_gpkg_h08v06</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_geopackage.html">read_geopackage</a></span><span class="op">(</span></span>
+<span>  <span class="st">"data/r.stream.order/order_vect_tiles20d/order_vect_point_h08v06.gpkg"</span>,</span>
+<span>  subc_id <span class="op">=</span> <span class="va">stats_table_zon</span><span class="op">$</span><span class="va">subcatchment_id</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span><span class="st">'subcatchment_id'</span> <span class="op">=</span> <span class="st">'stream'</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Importing as a data.table...</span></span>
 <span><span class="co">## Opening SQL connection...</span></span>
 <span><span class="co">## Reading GeoPackage file...</span></span>
 <span><span class="co">## Closing SQL connection...</span></span></code></pre>
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">stats_gpkg_h10v06</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_geopackage.html">read_geopackage</a></span><span class="op">(</span></span>
+<span>  <span class="st">"data/r.stream.order/order_vect_tiles20d/order_vect_point_h10v06.gpkg"</span>,</span>
+<span>  subc_id <span class="op">=</span> <span class="va">stats_table_zon</span><span class="op">$</span><span class="va">subcatchment_id</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span><span class="st">'subcatchment_id'</span> <span class="op">=</span> <span class="st">'stream'</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Importing as a data.table...</span></span>
 <span><span class="co">## Opening SQL connection...</span></span>
 <span><span class="co">## Reading GeoPackage file...</span></span>
@@ -2064,75 +2181,81 @@ model</p>
 “subcatchment_id” and “length”. We will use the length of the stream as
 an indicator of the sub-catchment size</p>
 <pre><code><span><span class="co">##            used  (Mb) gc trigger  (Mb) max used  (Mb)</span></span>
-<span><span class="co">## Ncells  4561670 243.7    7728037 412.8  7710887 411.9</span></span>
-<span><span class="co">## Vcells 24078821 183.8   68278241 521.0 56409233 430.4</span></span></code></pre>
+<span><span class="co">## Ncells  4559563 243.6    9052577 483.5  5761350 307.7</span></span>
+<span><span class="co">## Vcells 26108523 199.2   66659795 508.6 55364511 422.4</span></span></code></pre>
 <p>Join the stats_table with the .gpkg database</p>
-<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">stats_table</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">stats_table_zon</span>, <span class="va">stats_gpkg</span>, by <span class="op">=</span> <span class="st">"subcatchment_id"</span><span class="op">)</span></span></code></pre></div>
 <p>The values in the original raster files were scaled, so we need to
 re-scale them before the modelling</p>
 <p>We define the following functions:</p>
-<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">slope_scale</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">na.rm</span> <span class="op">=</span> <span class="cn">F</span><span class="op">)</span> <span class="op">(</span><span class="va">x</span> <span class="op">*</span> <span class="fl">0.000001</span><span class="op">)</span></span>
 <span><span class="va">clim_scale</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">na.rm</span> <span class="op">=</span> <span class="cn">F</span><span class="op">)</span> <span class="op">(</span><span class="va">x</span> <span class="op">*</span> <span class="fl">0.1</span><span class="op">)</span></span>
 <span><span class="va">offset</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">na.rm</span> <span class="op">=</span> <span class="cn">F</span><span class="op">)</span> <span class="op">(</span><span class="va">x</span> <span class="op">-</span> <span class="fl">273.15</span><span class="op">)</span></span></code></pre></div>
 <p>… and apply them to rescale the values</p>
-<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">stats_table</span> <span class="op">&lt;-</span> <span class="va">stats_table</span>  <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">contains</a></span><span class="op">(</span><span class="st">"slope_curv_max_dw_cel"</span><span class="op">)</span>, <span class="va">slope_scale</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"bio"</span><span class="op">)</span>, <span class="va">clim_scale</span><span class="op">)</span><span class="op">)</span>  <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">matches</a></span><span class="op">(</span><span class="st">"bio1_.*_mean"</span><span class="op">)</span>, <span class="va">offset</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">kbl</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">stats_table</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>   <span class="fu">kable_styling</span><span class="op">(</span>bootstrap_options <span class="op">=</span> <span class="st">"striped"</span>, full_width <span class="op">=</span> <span class="cn">F</span>, position <span class="op">=</span> <span class="st">"left"</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">stats_table</span><span class="op">)</span></span></code></pre></div>
+<div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:200px; overflow-x: scroll; width:1000px; ">
 <table class="table table table-striped" style="width: auto !important; ">
 <thead><tr>
-<th style="text-align:right;">
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 subcatchment_id
 </th>
-<th style="text-align:right;">
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 bio1_1981.2010_mean
 </th>
-<th style="text-align:right;">
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 bio1_IPSL.CM6A.LR_ssp370_2041.2070_mean
 </th>
-<th style="text-align:right;">
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 bio12_1981.2010_mean
 </th>
-<th style="text-align:right;">
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 bio12_IPSL.CM6A.LR_ssp370_2041.2070_mean
 </th>
-<th style="text-align:right;">
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 bio15_1981.2010_mean
 </th>
-<th style="text-align:right;">
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 bio15_IPSL.CM6A.LR_ssp370_2041.2070_mean
 </th>
-<th style="text-align:right;">
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 slope_curv_max_dw_cel_mean
 </th>
-<th style="text-align:right;">
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+spi_mean
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 bio1_1981.2010_sd
 </th>
-<th style="text-align:right;">
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 bio1_IPSL.CM6A.LR_ssp370_2041.2070_sd
 </th>
-<th style="text-align:right;">
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 bio12_1981.2010_sd
 </th>
-<th style="text-align:right;">
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 bio12_IPSL.CM6A.LR_ssp370_2041.2070_sd
 </th>
-<th style="text-align:right;">
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 bio15_1981.2010_sd
 </th>
-<th style="text-align:right;">
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 bio15_IPSL.CM6A.LR_ssp370_2041.2070_sd
 </th>
-<th style="text-align:right;">
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 slope_curv_max_dw_cel_sd
 </th>
-<th style="text-align:right;">
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+spi_sd
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 length
 </th>
 </tr></thead>
@@ -2160,7 +2283,10 @@ length
 37.40225
 </td>
 <td style="text-align:right;">
--0.0024932
+-0.0024720
+</td>
+<td style="text-align:right;">
+6.655367
 </td>
 <td style="text-align:right;">
 0
@@ -2181,7 +2307,10 @@ length
 0.0623077
 </td>
 <td style="text-align:right;">
-0.0120282
+0.0120386
+</td>
+<td style="text-align:right;">
+9.411190
 </td>
 <td style="text-align:right;">
 3827.3302
@@ -2210,7 +2339,10 @@ length
 37.30610
 </td>
 <td style="text-align:right;">
--0.0039819
+-0.0039076
+</td>
+<td style="text-align:right;">
+8.925926
 </td>
 <td style="text-align:right;">
 0
@@ -2231,7 +2363,10 @@ length
 0.0239286
 </td>
 <td style="text-align:right;">
-0.0128858
+0.0129476
+</td>
+<td style="text-align:right;">
+13.105251
 </td>
 <td style="text-align:right;">
 2911.9507
@@ -2263,6 +2398,9 @@ length
 -0.0011602
 </td>
 <td style="text-align:right;">
+2.439189
+</td>
+<td style="text-align:right;">
 0
 </td>
 <td style="text-align:right;">
@@ -2282,6 +2420,9 @@ length
 </td>
 <td style="text-align:right;">
 0.0071150
+</td>
+<td style="text-align:right;">
+2.916000
 </td>
 <td style="text-align:right;">
 1903.8027
@@ -2313,6 +2454,9 @@ length
 -0.0020463
 </td>
 <td style="text-align:right;">
+2.142857
+</td>
+<td style="text-align:right;">
 0
 </td>
 <td style="text-align:right;">
@@ -2332,6 +2476,9 @@ length
 </td>
 <td style="text-align:right;">
 0.0042355
+</td>
+<td style="text-align:right;">
+3.481731
 </td>
 <td style="text-align:right;">
 1057.3782
@@ -2363,6 +2510,9 @@ length
 -0.0022349
 </td>
 <td style="text-align:right;">
+2.660494
+</td>
+<td style="text-align:right;">
 0
 </td>
 <td style="text-align:right;">
@@ -2382,6 +2532,9 @@ length
 </td>
 <td style="text-align:right;">
 0.0090936
+</td>
+<td style="text-align:right;">
+3.961487
 </td>
 <td style="text-align:right;">
 2343.3823
@@ -2413,6 +2566,9 @@ length
 0.0021164
 </td>
 <td style="text-align:right;">
+1.200000
+</td>
+<td style="text-align:right;">
 0
 </td>
 <td style="text-align:right;">
@@ -2434,14 +2590,18 @@ length
 0.0042328
 </td>
 <td style="text-align:right;">
+0.400000
+</td>
+<td style="text-align:right;">
 812.9898
 </td>
 </tr>
 </tbody>
 </table>
+</div>
 <p>Check if there are NAs in the rows of the table</p>
-<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">stats_table</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">stats_table</span><span class="op">$</span><span class="va">length</span><span class="op">)</span>,<span class="op">]</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">stats_table</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">stats_table</span><span class="op">$</span><span class="va">length</span><span class="op">)</span>,<span class="op">]</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
 <thead><tr>
 <th style="text-align:right;">
@@ -2469,6 +2629,9 @@ bio15_IPSL.CM6A.LR_ssp370_2041.2070_mean
 slope_curv_max_dw_cel_mean
 </th>
 <th style="text-align:right;">
+spi_mean
+</th>
+<th style="text-align:right;">
 bio1_1981.2010_sd
 </th>
 <th style="text-align:right;">
@@ -2490,6 +2653,9 @@ bio15_IPSL.CM6A.LR_ssp370_2041.2070_sd
 slope_curv_max_dw_cel_sd
 </th>
 <th style="text-align:right;">
+spi_sd
+</th>
+<th style="text-align:right;">
 length
 </th>
 </tr></thead>
@@ -2497,11 +2663,141 @@ length
 </table>
 <p>There are streams with NA in the length column. Should we convert
 them to 0?</p>
-<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">stats_table</span><span class="op">$</span><span class="va">length</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">stats_table</span><span class="op">$</span><span class="va">length</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">0</span></span></code></pre></div>
+<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">stats_table</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">stats_table</span><span class="op">$</span><span class="va">slope_curv_max_dw_cel_mean</span><span class="op">)</span>,<span class="op">]</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##    subcatchment_id bio1_1981.2010_mean bio1_IPSL.CM6A.LR_ssp370_2041.2070_mean</span></span>
+<span><span class="co">## 1:       399596764               25.45                                   27.35</span></span>
+<span><span class="co">## 2:       399597046               25.55                                   27.55</span></span>
+<span><span class="co">## 3:       399604194               25.35                                   27.35</span></span>
+<span><span class="co">## 4:       399607973               25.35                                   27.25</span></span>
+<span><span class="co">## 5:       399611470               25.35                                   27.25</span></span>
+<span><span class="co">## 6:       399614825               25.45                                   27.45</span></span>
+<span><span class="co">##    bio12_1981.2010_mean bio12_IPSL.CM6A.LR_ssp370_2041.2070_mean</span></span>
+<span><span class="co">## 1:               1110.4                                   1054.3</span></span>
+<span><span class="co">## 2:               1362.3                                   1261.1</span></span>
+<span><span class="co">## 3:               1117.2                                   1059.8</span></span>
+<span><span class="co">## 4:               1130.5                                   1074.5</span></span>
+<span><span class="co">## 5:               1149.3                                   1086.0</span></span>
+<span><span class="co">## 6:               1305.2                                   1207.6</span></span>
+<span><span class="co">##    bio15_1981.2010_mean bio15_IPSL.CM6A.LR_ssp370_2041.2070_mean</span></span>
+<span><span class="co">## 1:                 41.8                                     36.6</span></span>
+<span><span class="co">## 2:                 49.3                                     42.9</span></span>
+<span><span class="co">## 3:                 42.9                                     38.9</span></span>
+<span><span class="co">## 4:                 43.2                                     38.6</span></span>
+<span><span class="co">## 5:                 44.5                                     39.0</span></span>
+<span><span class="co">## 6:                 50.2                                     43.9</span></span>
+<span><span class="co">##    slope_curv_max_dw_cel_mean spi_mean bio1_1981.2010_sd</span></span>
+<span><span class="co">## 1:                         NA       NA                 0</span></span>
+<span><span class="co">## 2:                         NA       NA                 0</span></span>
+<span><span class="co">## 3:                         NA       NA                 0</span></span>
+<span><span class="co">## 4:                         NA       NA                 0</span></span>
+<span><span class="co">## 5:                         NA       NA                 0</span></span>
+<span><span class="co">## 6:                         NA       NA                 0</span></span>
+<span><span class="co">##    bio1_IPSL.CM6A.LR_ssp370_2041.2070_sd bio12_1981.2010_sd</span></span>
+<span><span class="co">## 1:                                     0                  0</span></span>
+<span><span class="co">## 2:                                     0                  0</span></span>
+<span><span class="co">## 3:                                     0                  0</span></span>
+<span><span class="co">## 4:                                     0                  0</span></span>
+<span><span class="co">## 5:                                     0                  0</span></span>
+<span><span class="co">## 6:                                     0                  0</span></span>
+<span><span class="co">##    bio12_IPSL.CM6A.LR_ssp370_2041.2070_sd bio15_1981.2010_sd</span></span>
+<span><span class="co">## 1:                                      0                  0</span></span>
+<span><span class="co">## 2:                                      0                  0</span></span>
+<span><span class="co">## 3:                                      0                  0</span></span>
+<span><span class="co">## 4:                                      0                  0</span></span>
+<span><span class="co">## 5:                                      0                  0</span></span>
+<span><span class="co">## 6:                                      0                  0</span></span>
+<span><span class="co">##    bio15_IPSL.CM6A.LR_ssp370_2041.2070_sd slope_curv_max_dw_cel_sd spi_sd</span></span>
+<span><span class="co">## 1:                                      0                       NA     NA</span></span>
+<span><span class="co">## 2:                                      0                       NA     NA</span></span>
+<span><span class="co">## 3:                                      0                       NA     NA</span></span>
+<span><span class="co">## 4:                                      0                       NA     NA</span></span>
+<span><span class="co">## 5:                                      0                       NA     NA</span></span>
+<span><span class="co">## 6:                                      0                       NA     NA</span></span>
+<span><span class="co">##    length</span></span>
+<span><span class="co">## 1:      0</span></span>
+<span><span class="co">## 2:      0</span></span>
+<span><span class="co">## 3:      0</span></span>
+<span><span class="co">## 4:      0</span></span>
+<span><span class="co">## 5:      0</span></span>
+<span><span class="co">## 6:      0</span></span></code></pre>
+<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">stats_table</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">stats_table</span><span class="op">$</span><span class="va">spi_mean</span><span class="op">)</span>,<span class="op">]</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##    subcatchment_id bio1_1981.2010_mean bio1_IPSL.CM6A.LR_ssp370_2041.2070_mean</span></span>
+<span><span class="co">## 1:       399596764               25.45                                   27.35</span></span>
+<span><span class="co">## 2:       399597046               25.55                                   27.55</span></span>
+<span><span class="co">## 3:       399604194               25.35                                   27.35</span></span>
+<span><span class="co">## 4:       399607973               25.35                                   27.25</span></span>
+<span><span class="co">## 5:       399611470               25.35                                   27.25</span></span>
+<span><span class="co">## 6:       399614825               25.45                                   27.45</span></span>
+<span><span class="co">##    bio12_1981.2010_mean bio12_IPSL.CM6A.LR_ssp370_2041.2070_mean</span></span>
+<span><span class="co">## 1:               1110.4                                   1054.3</span></span>
+<span><span class="co">## 2:               1362.3                                   1261.1</span></span>
+<span><span class="co">## 3:               1117.2                                   1059.8</span></span>
+<span><span class="co">## 4:               1130.5                                   1074.5</span></span>
+<span><span class="co">## 5:               1149.3                                   1086.0</span></span>
+<span><span class="co">## 6:               1305.2                                   1207.6</span></span>
+<span><span class="co">##    bio15_1981.2010_mean bio15_IPSL.CM6A.LR_ssp370_2041.2070_mean</span></span>
+<span><span class="co">## 1:                 41.8                                     36.6</span></span>
+<span><span class="co">## 2:                 49.3                                     42.9</span></span>
+<span><span class="co">## 3:                 42.9                                     38.9</span></span>
+<span><span class="co">## 4:                 43.2                                     38.6</span></span>
+<span><span class="co">## 5:                 44.5                                     39.0</span></span>
+<span><span class="co">## 6:                 50.2                                     43.9</span></span>
+<span><span class="co">##    slope_curv_max_dw_cel_mean spi_mean bio1_1981.2010_sd</span></span>
+<span><span class="co">## 1:                         NA       NA                 0</span></span>
+<span><span class="co">## 2:                         NA       NA                 0</span></span>
+<span><span class="co">## 3:                         NA       NA                 0</span></span>
+<span><span class="co">## 4:                         NA       NA                 0</span></span>
+<span><span class="co">## 5:                         NA       NA                 0</span></span>
+<span><span class="co">## 6:                         NA       NA                 0</span></span>
+<span><span class="co">##    bio1_IPSL.CM6A.LR_ssp370_2041.2070_sd bio12_1981.2010_sd</span></span>
+<span><span class="co">## 1:                                     0                  0</span></span>
+<span><span class="co">## 2:                                     0                  0</span></span>
+<span><span class="co">## 3:                                     0                  0</span></span>
+<span><span class="co">## 4:                                     0                  0</span></span>
+<span><span class="co">## 5:                                     0                  0</span></span>
+<span><span class="co">## 6:                                     0                  0</span></span>
+<span><span class="co">##    bio12_IPSL.CM6A.LR_ssp370_2041.2070_sd bio15_1981.2010_sd</span></span>
+<span><span class="co">## 1:                                      0                  0</span></span>
+<span><span class="co">## 2:                                      0                  0</span></span>
+<span><span class="co">## 3:                                      0                  0</span></span>
+<span><span class="co">## 4:                                      0                  0</span></span>
+<span><span class="co">## 5:                                      0                  0</span></span>
+<span><span class="co">## 6:                                      0                  0</span></span>
+<span><span class="co">##    bio15_IPSL.CM6A.LR_ssp370_2041.2070_sd slope_curv_max_dw_cel_sd spi_sd</span></span>
+<span><span class="co">## 1:                                      0                       NA     NA</span></span>
+<span><span class="co">## 2:                                      0                       NA     NA</span></span>
+<span><span class="co">## 3:                                      0                       NA     NA</span></span>
+<span><span class="co">## 4:                                      0                       NA     NA</span></span>
+<span><span class="co">## 5:                                      0                       NA     NA</span></span>
+<span><span class="co">## 6:                                      0                       NA     NA</span></span>
+<span><span class="co">##    length</span></span>
+<span><span class="co">## 1:      0</span></span>
+<span><span class="co">## 2:      0</span></span>
+<span><span class="co">## 3:      0</span></span>
+<span><span class="co">## 4:      0</span></span>
+<span><span class="co">## 5:      0</span></span>
+<span><span class="co">## 6:      0</span></span></code></pre>
+<p>If we check the IDs of the sub-catchments that have null values for
+both variables, we observe that they are identical:</p>
+<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">stats_table</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">stats_table</span><span class="op">$</span><span class="va">spi_mean</span><span class="op">)</span>,<span class="op">]</span><span class="op">$</span><span class="va">subcatchment_id</span> <span class="op">==</span> <span class="va">stats_table</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">stats_table</span><span class="op">$</span><span class="va">slope_curv_max_dw_cel_mean</span><span class="op">)</span>,<span class="op">]</span><span class="op">$</span><span class="va">subcatchment_id</span></span></code></pre></div>
+<pre><code><span><span class="co">##  [1] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE</span></span>
+<span><span class="co">## [16] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE</span></span>
+<span><span class="co">## [31] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE</span></span></code></pre>
+<p>This happens because the variables are not defined for a few
+single-pixel sub-catchments, which are outlets. We will remove these
+sub-catchments, as the model will not be able to handle the no data
+values.</p>
+<div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">stats_table</span> <span class="op">&lt;-</span> <span class="va">stats_table</span><span class="op">[</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">stats_table</span><span class="op">$</span><span class="va">slope_curv_max_dw_cel_mean</span><span class="op">)</span>,<span class="op">]</span></span></code></pre></div>
 <p>We split the dataset into two datasets, according to present and
-future BIOCLIM variables.</p>
-<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
+future BIOCLIM variables. The first will be used in the training of the
+model and the second in the prediction of future suitable habitats</p>
+<div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">stats_table_present</span> <span class="op">&lt;-</span> <span class="va">stats_table</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">contains</a></span><span class="op">(</span><span class="st">"IPSL"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span>bio1_mean <span class="op">=</span> <span class="va">bio1_1981.2010_mean</span>,</span>
@@ -2527,83 +2823,348 @@ presences and absences. We will sample 10,000 random sub-catchments that
 will be used as pseudoabsences in the model. The filtering that takes
 place before the sampling assures that we will avoid sampling
 sub-catchments with known presences of the species</p>
-<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pseudoabs</span> <span class="op">&lt;-</span> <span class="va">stats_table_present</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="va">subcatchment_id</span> <span class="op"><a href="https://rdrr.io/pkg/terra/man/match.html" class="external-link">%in%</a></span> <span class="va">spdata_ids</span><span class="op">$</span><span class="va">subcatchment_id</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/sample_n.html" class="external-link">sample_n</a></span><span class="op">(</span><span class="fl">10000</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">pseudoabs</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##    subcatchment_id bio1_mean bio12_mean bio15_mean slope_curv_max_dw_cel_mean</span></span>
-<span><span class="co">## 1:       422867437  25.05370   1561.463   53.90000               -0.036281704</span></span>
-<span><span class="co">## 2:       422723590  25.99138   1229.441   59.74138               -0.018778621</span></span>
-<span><span class="co">## 3:       399926006  24.83750   1539.300   61.08750               -0.029291875</span></span>
-<span><span class="co">## 4:       422626427  25.85000   1408.600   68.40000               -0.005704417</span></span>
-<span><span class="co">## 5:       399646212  25.05000   1328.500   45.60000               -0.003081250</span></span>
-<span><span class="co">## 6:       422821177  26.05000   1377.283   52.75510               -0.004789031</span></span>
-<span><span class="co">##       bio1_sd bio12_sd   bio15_sd slope_curv_max_dw_cel_sd    length</span></span>
-<span><span class="co">## 1: 0.01888526 9.537961 0.00000000              0.061372943  565.2232</span></span>
-<span><span class="co">## 2: 0.04925123 2.905823 0.04925123              0.030140907  529.9398</span></span>
-<span><span class="co">## 3: 0.03307189 1.322876 0.03307189              0.033257387  252.0581</span></span>
-<span><span class="co">## 4: 0.00000000 0.000000 0.00000000              0.009545765  252.6313</span></span>
-<span><span class="co">## 5: 0.00000000 0.000000 0.00000000              0.011374924  218.0533</span></span>
-<span><span class="co">## 6: 0.00000000 6.680187 0.10012487              0.009311064 1546.1096</span></span></code></pre>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/sample_n.html" class="external-link">sample_n</a></span><span class="op">(</span><span class="fl">10000</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb57"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">pseudoabs</span><span class="op">)</span></span></code></pre></div>
+<div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:200px; overflow-x: scroll; width:1000px; ">
+<table class="table table table-striped" style="width: auto !important; ">
+<thead><tr>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+subcatchment_id
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+bio1_mean
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+bio12_mean
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+bio15_mean
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+slope_curv_max_dw_cel_mean
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+spi_mean
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+bio1_sd
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+bio12_sd
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+bio15_sd
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+slope_curv_max_dw_cel_sd
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+spi_sd
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+length
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:right;">
+399913840
+</td>
+<td style="text-align:right;">
+23.67778
+</td>
+<td style="text-align:right;">
+1716.967
+</td>
+<td style="text-align:right;">
+62.06111
+</td>
+<td style="text-align:right;">
+-0.1848908
+</td>
+<td style="text-align:right;">
+20.5000000
+</td>
+<td style="text-align:right;">
+0.5362478
+</td>
+<td style="text-align:right;">
+3.802485
+</td>
+<td style="text-align:right;">
+0.0487498
+</td>
+<td style="text-align:right;">
+0.2058397
+</td>
+<td style="text-align:right;">
+17.591823
+</td>
+<td style="text-align:right;">
+310.5767
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+399607400
+</td>
+<td style="text-align:right;">
+25.34048
+</td>
+<td style="text-align:right;">
+1436.410
+</td>
+<td style="text-align:right;">
+52.25714
+</td>
+<td style="text-align:right;">
+-0.0213312
+</td>
+<td style="text-align:right;">
+0.8095238
+</td>
+<td style="text-align:right;">
+0.0293544
+</td>
+<td style="text-align:right;">
+3.111561
+</td>
+<td style="text-align:right;">
+0.1761261
+</td>
+<td style="text-align:right;">
+0.0298976
+</td>
+<td style="text-align:right;">
+1.005653
+</td>
+<td style="text-align:right;">
+217.9992
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+422850315
+</td>
+<td style="text-align:right;">
+26.35000
+</td>
+<td style="text-align:right;">
+1246.927
+</td>
+<td style="text-align:right;">
+48.18039
+</td>
+<td style="text-align:right;">
+-0.0096591
+</td>
+<td style="text-align:right;">
+0.6274510
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+4.936303
+</td>
+<td style="text-align:right;">
+0.0594735
+</td>
+<td style="text-align:right;">
+0.0124398
+</td>
+<td style="text-align:right;">
+1.494576
+</td>
+<td style="text-align:right;">
+726.6178
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+399689432
+</td>
+<td style="text-align:right;">
+24.75000
+</td>
+<td style="text-align:right;">
+1431.500
+</td>
+<td style="text-align:right;">
+53.40000
+</td>
+<td style="text-align:right;">
+-0.0183658
+</td>
+<td style="text-align:right;">
+1.3333333
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0285507
+</td>
+<td style="text-align:right;">
+1.247219
+</td>
+<td style="text-align:right;">
+85.5105
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+399879620
+</td>
+<td style="text-align:right;">
+25.19687
+</td>
+<td style="text-align:right;">
+1456.419
+</td>
+<td style="text-align:right;">
+58.14375
+</td>
+<td style="text-align:right;">
+-0.0264106
+</td>
+<td style="text-align:right;">
+1.4687500
+</td>
+<td style="text-align:right;">
+0.0499022
+</td>
+<td style="text-align:right;">
+8.191705
+</td>
+<td style="text-align:right;">
+0.1818954
+</td>
+<td style="text-align:right;">
+0.0531176
+</td>
+<td style="text-align:right;">
+1.600476
+</td>
+<td style="text-align:right;">
+470.2424
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+422581430
+</td>
+<td style="text-align:right;">
+24.85000
+</td>
+<td style="text-align:right;">
+1563.391
+</td>
+<td style="text-align:right;">
+64.90000
+</td>
+<td style="text-align:right;">
+-0.0170052
+</td>
+<td style="text-align:right;">
+11.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+1.157941
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0245655
+</td>
+<td style="text-align:right;">
+14.352700
+</td>
+<td style="text-align:right;">
+310.7513
+</td>
+</tr>
+</tbody>
+</table>
+</div>
 <p>We join the species occurrences with the present environmental
 variables table</p>
-<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb58"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">presence</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">spdata_ids</span>, <span class="va">stats_table_present</span>, by <span class="op">=</span> <span class="st">"subcatchment_id"</span><span class="op">)</span></span></code></pre></div>
 <p>We then join the predictors of the presences and those of the
 pseudoabsences, to obtain the modelling data table</p>
-<div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb59"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">data_model</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/rbindlist.html" class="external-link">rbindlist</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">presence</span>, <span class="va">pseudoabs</span><span class="op">)</span>, fill <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Define a binary column of presence-absence (0-1)</span></span>
-<span><span class="va">data_model</span><span class="op">$</span><span class="va">occurrence</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">data_model</span><span class="op">$</span><span class="va">occurrence_ID</span><span class="op">)</span>, <span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span></span>
-<span><span class="co"># Convert to factor for random forest</span></span>
-<span><span class="va">data_model</span><span class="op">$</span><span class="va">occurrence</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/is.bool.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">data_model</span><span class="op">$</span><span class="va">occurrence</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">data_model</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
+<p>Define a binary column of presence-absence (0-1) and set it to
+factor</p>
+<div class="sourceCode" id="cb60"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">data_model</span><span class="op">$</span><span class="va">occurrence</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">data_model</span><span class="op">$</span><span class="va">occurrence_ID</span><span class="op">)</span>, <span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span></span>
+<span><span class="va">data_model</span><span class="op">$</span><span class="va">occurrence</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/is.bool.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">data_model</span><span class="op">$</span><span class="va">occurrence</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb61"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">data_model</span><span class="op">)</span></span></code></pre></div>
+<div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:200px; overflow-x: scroll; width:1000px; ">
+<table class="table table table-striped" style="width: auto !important; ">
 <thead><tr>
-<th style="text-align:right;">
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 longitude
 </th>
-<th style="text-align:right;">
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 latitude
 </th>
-<th style="text-align:right;">
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 occurrence_ID
 </th>
-<th style="text-align:right;">
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 subcatchment_id
 </th>
-<th style="text-align:right;">
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 bio1_mean
 </th>
-<th style="text-align:right;">
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 bio12_mean
 </th>
-<th style="text-align:right;">
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 bio15_mean
 </th>
-<th style="text-align:right;">
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 slope_curv_max_dw_cel_mean
 </th>
-<th style="text-align:right;">
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+spi_mean
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 bio1_sd
 </th>
-<th style="text-align:right;">
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 bio12_sd
 </th>
-<th style="text-align:right;">
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 bio15_sd
 </th>
-<th style="text-align:right;">
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 slope_curv_max_dw_cel_sd
 </th>
-<th style="text-align:right;">
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+spi_sd
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 length
 </th>
-<th style="text-align:left;">
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
 occurrence
 </th>
 </tr></thead>
@@ -2634,6 +3195,9 @@ occurrence
 -0.0324294
 </td>
 <td style="text-align:right;">
+59.8148148
+</td>
+<td style="text-align:right;">
 0.0755410
 </td>
 <td style="text-align:right;">
@@ -2644,6 +3208,9 @@ occurrence
 </td>
 <td style="text-align:right;">
 0.0783162
+</td>
+<td style="text-align:right;">
+123.190018
 </td>
 <td style="text-align:right;">
 388.5433
@@ -2678,6 +3245,9 @@ occurrence
 -0.0349241
 </td>
 <td style="text-align:right;">
+7.2666667
+</td>
+<td style="text-align:right;">
 0.0339935
 </td>
 <td style="text-align:right;">
@@ -2688,6 +3258,9 @@ occurrence
 </td>
 <td style="text-align:right;">
 0.0576330
+</td>
+<td style="text-align:right;">
+6.677990
 </td>
 <td style="text-align:right;">
 434.9116
@@ -2722,6 +3295,9 @@ occurrence
 -0.0280889
 </td>
 <td style="text-align:right;">
+1.8666667
+</td>
+<td style="text-align:right;">
 0.0400000
 </td>
 <td style="text-align:right;">
@@ -2732,6 +3308,9 @@ occurrence
 </td>
 <td style="text-align:right;">
 0.0361340
+</td>
+<td style="text-align:right;">
+1.746107
 </td>
 <td style="text-align:right;">
 300.6135
@@ -2766,6 +3345,9 @@ occurrence
 -0.0020064
 </td>
 <td style="text-align:right;">
+0.3571429
+</td>
+<td style="text-align:right;">
 0.0000000
 </td>
 <td style="text-align:right;">
@@ -2776,6 +3358,9 @@ occurrence
 </td>
 <td style="text-align:right;">
 0.0026065
+</td>
+<td style="text-align:right;">
+0.610286
 </td>
 <td style="text-align:right;">
 311.3841
@@ -2810,6 +3395,9 @@ occurrence
 -0.0927082
 </td>
 <td style="text-align:right;">
+132.1470588
+</td>
+<td style="text-align:right;">
 0.0882353
 </td>
 <td style="text-align:right;">
@@ -2820,6 +3408,9 @@ occurrence
 </td>
 <td style="text-align:right;">
 0.1779599
+</td>
+<td style="text-align:right;">
+307.500371
 </td>
 <td style="text-align:right;">
 514.4451
@@ -2854,6 +3445,9 @@ occurrence
 -0.1552392
 </td>
 <td style="text-align:right;">
+53.7500000
+</td>
+<td style="text-align:right;">
 0.0000000
 </td>
 <td style="text-align:right;">
@@ -2866,6 +3460,9 @@ occurrence
 0.1703503
 </td>
 <td style="text-align:right;">
+88.485521
+</td>
+<td style="text-align:right;">
 126.9131
 </td>
 <td style="text-align:left;">
@@ -2874,20 +3471,26 @@ occurrence
 </tr>
 </tbody>
 </table>
-<p>We split the data into train and test</p>
-<div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">17</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co">#obtain stratified training sample</span></span>
+</div>
+<p>In this step, there are two alternatives: Either we split the data
+into train and test sets:</p>
+<div class="sourceCode" id="cb62"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">17</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb63"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#obtain stratified training sample</span></span>
 <span><span class="va">train_idx</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data_model</span><span class="op">)</span>, <span class="fl">2</span><span class="op">/</span><span class="fl">3</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data_model</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">data_train</span> <span class="op">&lt;-</span> <span class="va">data_model</span><span class="op">[</span><span class="va">train_idx</span>, <span class="op">]</span></span>
 <span><span class="va">data_test</span> <span class="op">&lt;-</span> <span class="va">data_model</span><span class="op">[</span><span class="op">-</span><span class="va">train_idx</span>, <span class="op">]</span></span></code></pre></div>
-<p>We will use the ranger random forest algorithm (Wright &amp; Ziegler,
-2017) to build a species distribution model. Random forest can handle
-huge quantities of data and is therefore scalable to larger datasets. As
-our dataset is highly imbalanced towards the pseudo-absence data, we
-will apply the down-sampling method for presence-only data in the
-modelling process (Valavi et al., 2021). Down-sampling works by
+<p>…or we use the whole dataset as the training set, since RF performs
+intrinsic evaluation in every tree</p>
+<div class="sourceCode" id="cb64"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">data_train</span> <span class="op">&lt;-</span> <span class="va">data_model</span></span></code></pre></div>
+<p>We will use the ranger random forest (RF) algorithm (Wright &amp;
+Ziegler, 2017) to build a species distribution model. Random forest can
+handle huge quantities of data and is therefore scalable to larger
+datasets. As our dataset is highly imbalanced towards the pseudo-absence
+data, we will apply the down-sampling method for presence-only data in
+the modelling process (Valavi et al., 2021). Down-sampling works by
 balancing the training data, which contain significantly more absence
 that presence points. Following this approach, the classification-RF
 model will use the same number of pseudo-absences as presence points in
@@ -2896,16 +3499,16 @@ from the full pseudo-absence set (Valavi et al., 2021).</p>
 <p>Let’s define the sample size of each classification tree as a
 proportion of the whole training set, based on the number of
 presences.</p>
-<div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb65"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># number of presence records:</span></span>
 <span><span class="va">pres_num</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">data_train</span><span class="op">$</span><span class="va">occurrence</span><span class="op">)</span><span class="op">[</span><span class="st">"1"</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="va">sample_size</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"0"</span> <span class="op">=</span> <span class="va">pres_num</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data_train</span><span class="op">)</span>,</span>
 <span>                 <span class="st">"1"</span> <span class="op">=</span> <span class="va">pres_num</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data_train</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">sample_size</span></span></code></pre></div>
 <pre><code><span><span class="co">##           0           1 </span></span>
-<span><span class="co">## 0.004480956 0.004480956</span></span></code></pre>
+<span><span class="co">## 0.004281589 0.004281589</span></span></code></pre>
 <p>Run and inspect the model.</p>
-<div class="sourceCode" id="cb58"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb67"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/ranger/man/ranger.html" class="external-link">ranger</a></span><span class="op">(</span><span class="va">data_train</span><span class="op">$</span><span class="va">occurrence</span> <span class="op">~</span> <span class="va">.</span>,</span>
 <span>                 data <span class="op">=</span> <span class="va">data_train</span><span class="op">[</span>, <span class="fl">6</span><span class="op">:</span><span class="fl">14</span><span class="op">]</span>,</span>
 <span>                 num.trees <span class="op">=</span> <span class="fl">1000</span>,</span>
@@ -2926,20 +3529,20 @@ presences.</p>
 <span><span class="co">## </span></span>
 <span><span class="co">## Type:                             Probability estimation </span></span>
 <span><span class="co">## Number of trees:                  1000 </span></span>
-<span><span class="co">## Sample size:                      6695 </span></span>
-<span><span class="co">## Number of independent variables:  8 </span></span>
+<span><span class="co">## Sample size:                      10043 </span></span>
+<span><span class="co">## Number of independent variables:  9 </span></span>
 <span><span class="co">## Mtry:                             6 </span></span>
 <span><span class="co">## Target node size:                 10 </span></span>
 <span><span class="co">## Variable importance mode:         impurity </span></span>
 <span><span class="co">## Splitrule:                        gini </span></span>
-<span><span class="co">## OOB prediction error (Brier s.):  0.09970632</span></span></code></pre>
+<span><span class="co">## OOB prediction error (Brier s.):  0.09255828</span></span></code></pre>
 <p>The model can be evaluated based on the OOB prediction error. This
 metric lies on the fact that the data points that are not used in
 training a tree can be used to test the tree. The errors on the OOB
 samples are called the <strong>out-of-bag errors</strong>.</p>
 <p>We will now predict to the table of all the sub-catchments across
 Cuba, including the future BIOCLIM variables.</p>
-<div class="sourceCode" id="cb60"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb69"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">model</span>, data <span class="op">=</span> <span class="va">stats_table_future</span><span class="op">[</span>,<span class="op">!</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
 <p>We will now reclassify the sub-catchment raster based on the
 predicted probabilities of occurrence, to visualise the potential
@@ -2950,44 +3553,58 @@ values of which need to be integers.</p>
 <p>First, let’s join the probabilities of presence in each sub-catchment
 with the corresponding sub-catchment IDs, to create a table with
 reclassification rules</p>
-<div class="sourceCode" id="cb61"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb70"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">prediction</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></span><span class="op">(</span>subcatchment_id <span class="op">=</span> <span class="va">stats_table_future</span><span class="op">$</span><span class="va">subcatchment_id</span>,</span>
 <span>                         pred_occur <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">pred</span><span class="op">$</span><span class="va">predictions</span><span class="op">[</span>,<span class="fl">2</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">prediction</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##    subcatchment_id pred_occur</span></span>
-<span><span class="co">## 1:       399592461 0.04384405</span></span>
-<span><span class="co">## 2:       399592865 0.04118214</span></span>
-<span><span class="co">## 3:       399593700 0.07691032</span></span>
-<span><span class="co">## 4:       399593701 0.07159008</span></span>
-<span><span class="co">## 5:       399593817 0.04775357</span></span>
-<span><span class="co">## 6:       399593818 0.07481508</span></span></code></pre>
+<span><span class="co">## 1:       399592461 0.02719365</span></span>
+<span><span class="co">## 2:       399592865 0.02703730</span></span>
+<span><span class="co">## 3:       399593700 0.03550714</span></span>
+<span><span class="co">## 4:       399593701 0.03180714</span></span>
+<span><span class="co">## 5:       399593817 0.02870913</span></span>
+<span><span class="co">## 6:       399593818 0.08221865</span></span></code></pre>
 <p>and multiply the probability values by 100</p>
-<div class="sourceCode" id="cb63"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb72"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">prediction</span><span class="op">$</span><span class="va">pred_occur</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">prediction</span><span class="op">$</span><span class="va">pred_occur</span>, <span class="fl">2</span><span class="op">)</span> <span class="op">*</span> <span class="fl">100</span><span class="op">)</span></span></code></pre></div>
 <p>We can now reclassify the sub-catchment raster</p>
-<div class="sourceCode" id="cb64"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb73"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/reclass_raster.html">reclass_raster</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">prediction</span>,</span>
 <span>  rast_val <span class="op">=</span> <span class="st">"subcatchment_id"</span>,</span>
 <span>  new_val <span class="op">=</span> <span class="st">"pred_occur"</span>,</span>
-<span>  raster_layer <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">out_dir</span>, <span class="st">"/sub_catchment.tif"</span><span class="op">)</span>,</span>
-<span>  recl_layer <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data/prediction.tif"</span><span class="op">)</span>,</span>
+<span>  raster_layer <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">layer_dir</span>, <span class="st">"/sub_catchment.tif"</span><span class="op">)</span>,</span>
+<span>  recl_layer <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/prediction.tif"</span><span class="op">)</span>,</span>
 <span>  read <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] "Reclassified raster saved under: /home/afroditi/Documents/PhD/hydrographr_case_study/data/prediction.tif"</span></span></code></pre>
-<p>Let’s plot the habitat suitability map, and add the presence
+<pre><code><span><span class="co">## [1] "Reclassified raster saved under: /home/afroditi/Documents/PhD/hydrographr_case_study/prediction.tif"</span></span></code></pre>
+<p>Let’s plot the future habitat suitability map, and add the presence
 points</p>
-<div class="sourceCode" id="cb66"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">leaflet</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">addTiles</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu">setMaxBounds</span><span class="op">(</span><span class="va">bbox</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, <span class="va">bbox</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>, <span class="va">bbox</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span>, <span class="va">bbox</span><span class="op">[</span><span class="fl">4</span><span class="op">]</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>    <span class="fu"><a href="https://r-spatial.github.io/leafem/reference/addGeotiff.html" class="external-link">addGeotiff</a></span><span class="op">(</span></span>
-<span>  file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data/prediction.tif"</span><span class="op">)</span>, opacity <span class="op">=</span> <span class="fl">1</span>,</span>
+<div class="sourceCode" id="cb75"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Define colour palette</span></span>
+<span><span class="va">num_pal</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/leaflet/man/colorNumeric.html" class="external-link">colorNumeric</a></span><span class="op">(</span></span>
+<span>  <span class="fu">viridisLite</span><span class="fu">::</span><span class="fu"><a href="https://sjmgarnier.github.io/viridisLite/reference/viridis.html" class="external-link">inferno</a></span><span class="op">(</span><span class="fl">256</span><span class="op">)</span></span>
+<span>  , domain <span class="op">=</span> <span class="va">prediction</span><span class="op">$</span><span class="va">pred_occur</span></span>
+<span>  , na.color <span class="op">=</span> <span class="st">"transparent"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/leaflet/man/leaflet.html" class="external-link">leaflet</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/leaflet/man/map-layers.html" class="external-link">addTiles</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/leaflet/man/map-methods.html" class="external-link">setMaxBounds</a></span><span class="op">(</span><span class="va">bbox</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, <span class="va">bbox</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>, <span class="va">bbox</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span>, <span class="va">bbox</span><span class="op">[</span><span class="fl">4</span><span class="op">]</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>    <span class="fu">leafem</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/leafem/reference/addGeotiff.html" class="external-link">addGeotiff</a></span><span class="op">(</span></span>
+<span>  file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/prediction.tif"</span><span class="op">)</span>, opacity <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>   colorOptions <span class="op">=</span> <span class="fu"><a href="https://r-spatial.github.io/leafem/reference/colorOptions.html" class="external-link">colorOptions</a></span><span class="op">(</span></span>
 <span>                  palette <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/palettes.html" class="external-link">hcl.colors</a></span><span class="op">(</span><span class="fl">256</span>, palette <span class="op">=</span> <span class="st">"inferno"</span><span class="op">)</span>,</span>
 <span>                  na.color <span class="op">=</span> <span class="st">"transparent"</span></span>
-<span>                  <span class="op">)</span></span>
+<span>                  <span class="op">)</span> <span class="co"># read external raster file without loading it to R</span></span>
 <span>  <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu">leaflet</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/leaflet/man/map-layers.html" class="external-link">addCircles</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">spdata_vect</span>, color <span class="op">=</span> <span class="st">"turquoise"</span>, stroke <span class="op">=</span> <span class="cn">TRUE</span>, </span>
-<span>                      weight <span class="op">=</span> <span class="fl">5</span>, opacity <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> </span></code></pre></div>
+<span>                      weight <span class="op">=</span> <span class="fl">5</span>, opacity <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="co"># add points</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/leaflet/man/addLegend.html" class="external-link">addLegend</a></span><span class="op">(</span>pal <span class="op">=</span> <span class="va">num_pal</span>, </span>
+<span>           values <span class="op">=</span> <span class="va">prediction</span><span class="op">$</span><span class="va">pred_occur</span>, </span>
+<span>           labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/palette.html" class="external-link">palette</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>           title <span class="op">=</span> <span class="st">"Future habitat suitability map&lt;/br&gt;for Hypolestes trinitatis"</span>,</span>
+<span>           position <span class="op">=</span> <span class="st">"bottomleft"</span>, opacity <span class="op">=</span> <span class="fl">1</span>, labFormat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/leaflet/man/addLegend.html" class="external-link">labelFormat</a></span><span class="op">(</span>suffix <span class="op">=</span> <span class="st">"%"</span><span class="op">)</span><span class="op">)</span>  <span class="co"># add a legend</span></span>
+<span></span>
+<span><span class="va">p</span></span></code></pre></div>
 <p><img src="../reference/figures/prediction.png" width="800"></p>
 <p>If we zoom in to the habitat suitability map, we can observe the
 sub-catchments that could offer a suitable habitat to the species in a
