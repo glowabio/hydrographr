@@ -24,7 +24,7 @@ package along a species distribution modelling (SDM) workflow. We will
 use an SDM to predict the suitable habitats of a dragonfly species in
 Cuba. We will start by defining the regular tiles of the Hydrography90m
 where the occurrence points of the species are located. Afterwards we
-will download the Hydrography90m and CHELSA BIOCLIM layers of the
+will download the Hydrography90m and CHELSA Bioclim layers of the
 predictor variables, crop them and merge them, if necessary. Then, we
 will aggregate the variable values within each sub-catchment of the
 study area, keeping as predictors their mean and SD per sub-catchment.
@@ -211,7 +211,7 @@ download_tiles(variable = vars_gpkg, tile_id = tile_id, file_format = "gpkg",
               download_dir = "data")
 ```
 
-Then download the CHELSA present and future BIOCLIM variables
+Then download the CHELSA present and future Bioclim variables
 
 ```{r}
 # Create download directory
@@ -320,6 +320,8 @@ for(idir in dirs_h90m) {
 }
 ```
 
+### Merging
+
 The cropped tiles of the variable now need to be merged together.
 
 ```{r, eval = FALSE}
@@ -343,7 +345,10 @@ for(idir in dirs_h90m) {
 }
 ```
 
-Extract the ids of the sub-catchments where the points are located
+### Extraction of sub-catchment IDs
+
+Extract the IDs of the sub-catchments where the points are located. This step is crucial, as many of the functions that we will later use require a vector of sub-catchment IDs as input. 
+Note that the function  *extract_ids()* can be used to extract the values at specific points of any raster file provided to the argument *subc_layer*. It can be safely used to query very large raster files, as these are not loaded into R. 
 
 ```{r}
 spdata_ids <- extract_ids(data = spdata, lon = "longitude", lat = "latitude",
@@ -358,9 +363,11 @@ knitr::kable(head(spdata_ids),
  caption = "The species data have now their corresponding sub-catchment ids")
 ```
 
-Extract the zonal statistics of the hydrography90m variables for all the
+### Aggregation of environmental layers
+
+We will calculate the zonal statistics of the Hydrography90m and the CHELSA Bioclim variables for all the
 sub-catchments of the study area. Caution, don't increase the number of
-cores to more than 3
+cores to more than 3 as this can cause memory errors
 
 ```{r}
 # Define input var_layers for the extract_zonal_stat() function
@@ -381,11 +388,11 @@ report_no_data(data_dir = layer_dir, var_layer = var_layers)
 # Run the function that returns the zonal statistics
 stats_table_zon <- extract_zonal_stat(
                     data_dir = layer_dir,
-                   subc_layer = paste0(layer_dir, "/sub_catchment.tif"),
-                   subc_id = "all",
-                   var_layer = var_layers,
-                   file_name = paste0(wdir, "/data/zonal_stats.csv"),
-                   n_cores = 1)
+                    subc_layer = paste0(layer_dir, "/sub_catchment.tif"),
+                    subc_id = "all",
+                    var_layer = var_layers,
+                    file_name = paste0(wdir, "/data/zonal_stats.csv"),
+                    n_cores = 3)
 ```
 
 The function also reports the NoData values that are used in the calculation
@@ -421,10 +428,11 @@ stats_table_zon <- stats_table_zon %>%
 
 ```
 
-```{r}
-# Read in the .gpkg databases of the two tiles, filtering only the
-# sub-catchments of the study area. These can be found in the stats_table
+### Reading vector files
 
+Read in the .gpkg databases of the two tiles, filtering only the sub-catchments of the study area. 
+Their IDs can be retrieved from the stats_table
+```{r}
 stats_gpkg_h08v06 <- read_geopackage(
   "data/r.stream.order/order_vect_tiles20d/order_vect_point_h08v06.gpkg",
   subc_id = stats_table_zon$subcatchment_id) %>%
@@ -448,6 +456,8 @@ stats_gpkg <- rbind(stats_gpkg_h08v06, stats_gpkg_h10v06) %>%
 rm(stats_gpkg_h08v06, stats_gpkg_h10v06); gc()
 
 ```
+
+### Prepare data for modelling
 
 Join the stats_table with the .gpkg database
 
@@ -526,7 +536,7 @@ stats_table <- stats_table[!is.na(stats_table$slope_curv_max_dw_cel_mean),]
 
 
 We split the dataset into two datasets, according to present and future
-BIOCLIM variables. The first will be used in the training of the model and the second in the prediction of future suitable habitats
+Bioclim variables. The first will be used in the training of the model and the second in the prediction of future suitable habitats
 
 ```{r}
 stats_table_present <- stats_table %>%
@@ -623,6 +633,7 @@ data_test <- data_model[-train_idx, ]
 data_train <- data_model
 ```
 
+### A simple SDM using Random Forest
 
 We will use the ranger random forest (RF) algorithm (Wright & Ziegler, 2017)
 to build a species distribution model. Random forest can handle huge
@@ -670,8 +681,10 @@ metric lies on the fact that the data points that are not used in
 training a tree can be used to test the tree. The errors on the OOB
 samples are called the **out-of-bag errors**.
 
+### Model prediction
+
 We will now predict to the table of all the sub-catchments across Cuba,
-including the future BIOCLIM variables.
+including the future Bioclim variables.
 
 ```{r}
 pred <- predict(model, data = stats_table_future[,!1])
