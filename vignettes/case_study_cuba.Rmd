@@ -116,7 +116,8 @@ spdata
 
 ```{r, echo=F}
 kbl(spdata) %>%                        
-  kable_styling(bootstrap_options = "striped", full_width = F, position = "left") %>%      scroll_box(width = "500px", height = "200px")
+  kable_styling(bootstrap_options = "striped", full_width = F, position = "left") %>%     
+  scroll_box(width = "500px", height = "200px")
 ```
 
 Let's visualise the species occurrences on the map
@@ -182,13 +183,12 @@ tile_id <- tile_id[c(1,3)]
 
 Let's define the Hydrography90m variables that we would like to
 download. We will use the variables
-[*slope_curv_max_dw_cel*](https://geo.igb-berlin.de/maps/new?layer=geonode:hydrography90m_v1_slope_curv_max_dw_cel_cog&view=True)(maximum
+[slope_curv_max_dw_cel](https://geo.igb-berlin.de/maps/new?layer=geonode:hydrography90m_v1_slope_curv_max_dw_cel_cog&view=True) (maximum
 curvature between the highest upstream, focal and downstream cell) and
-[*spi*](https://geo.igb-berlin.de/maps/new?layer=geonode:hydrography90m_v1_spi_cog&view=True)(Stream
-Power Index)as predictors in our model. Additionally, we will download
+[spi](https://geo.igb-berlin.de/maps/new?layer=geonode:hydrography90m_v1_spi_cog&view=True) (Stream
+Power Index) as predictors in our model. Additionally, we will download
 the
-[*sub_catchment*](https://geo.igb-berlin.de/maps/new?layer=geonode:hydrography90m_v1_sub_catchment_cog&view=True)
-layer, which is the necessary base-layer for the workflow.
+[sub_catchment](https://geo.igb-berlin.de/maps/new?layer=geonode:hydrography90m_v1_sub_catchment_cog&view=True) layer, which is the necessary base-layer for the workflow.
 
 A list of all available Hydrography90m variables, as well as details and
 visualisations are available
@@ -411,7 +411,8 @@ head(stats_table_zon)
 
 ```{r, echo = FALSE}
 kbl(head(stats_table_zon)) %>%
-  kable_styling(bootstrap_options = "striped", full_width = F, position = "left") %>%      scroll_box(width = "1000px", height = "200px")
+  kable_styling(bootstrap_options = "striped", full_width = F, position = "left") %>% 
+  scroll_box(width = "800px", height = "200px")
 ```
 
 ```{r}
@@ -448,7 +449,7 @@ Then we join the two .gpkg databases and select the columns
 "subcatchment_id" and "length". We will use the length of the stream as
 an indicator of the sub-catchment size
 
-```{r, echo = FALSE}
+```{r}
 stats_gpkg <- rbind(stats_gpkg_h08v06, stats_gpkg_h10v06) %>%
   dplyr::select(c("subcatchment_id", "length"))
 
@@ -492,33 +493,48 @@ head(stats_table)
 ```{r, echo = FALSE}
 kbl(head(stats_table)) %>% 
   kable_styling(bootstrap_options = "striped", full_width = F, position = "left") %>%      
-  scroll_box(width = "1000px", height = "200px")
+  scroll_box(width = "800px", height = "200px")
 ```
 
-Check if there are NAs in the rows of the table
+<!-- Check if there are NAs in the rows of the table -->
+
+<!-- ```{r, eval = FALSE} -->
+<!-- head(stats_table[is.na(stats_table$length),]) -->
+<!-- ``` -->
+
+
+<!-- ```{r, echo = FALSE} -->
+<!-- kbl(head(stats_table[is.na(stats_table$length), ])) %>%                         -->
+<!--   kable_styling(bootstrap_options = "striped", full_width = F, position = "left") %>%      -->
+<!--   scroll_box(width = "800px", height = "200px") -->
+<!-- ``` -->
+
+<!-- There are streams with NA in the length column. Should we convert them -->
+<!-- to 0? -->
+
+<!-- ```{r} -->
+<!-- stats_table$length[is.na(stats_table$length)] <- 0 -->
+<!-- ``` -->
 
 ```{r, eval = FALSE}
-head(stats_table[is.na(stats_table$length),])
-```
-
-
-```{r, echo = FALSE}
-knitr::kable(head(stats_table[is.na(stats_table$length),]))
-```
-
-There are streams with NA in the length column. Should we convert them
-to 0?
-
-```{r}
-stats_table$length[is.na(stats_table$length)] <- 0
-```
-
-```{r}
 head(stats_table[is.na(stats_table$slope_curv_max_dw_cel_mean),])
 ```
 
-```{r}
+```{r, echo = FALSE}
+kbl(head(stats_table[is.na(stats_table$slope_curv_max_dw_cel_mean), ])) %>%                        
+  kable_styling(bootstrap_options = "striped", full_width = F, position = "left") %>%     
+  scroll_box(width = "800px", height = "200px")
+```
+
+
+```{r, eval = FALSE}
 head(stats_table[is.na(stats_table$spi_mean),])
+```
+
+```{r, echo = FALSE}
+kbl(head(stats_table[is.na(stats_table$spi_mean),])) %>%                        
+  kable_styling(bootstrap_options = "striped", full_width = F, position = "left") %>%     
+  scroll_box(width = "800px", height = "200px")
 ```
 
 If we check the IDs of the sub-catchments that have null values for both variables, we observe that they are identical:
@@ -581,7 +597,7 @@ head(pseudoabs)
 ```{r, echo = FALSE}
 kbl(head(pseudoabs)) %>% 
   kable_styling(bootstrap_options = "striped", full_width = F, position = "left") %>%      
-  scroll_box(width = "1000px", height = "200px")
+  scroll_box(width = "800px", height = "200px")
 ```
 
 
@@ -612,7 +628,7 @@ head(data_model)
 ```{r, echo = FALSE}
 kbl(head(data_model)) %>% 
   kable_styling(bootstrap_options = "striped", full_width = F, position = "left") %>%      
-  scroll_box(width = "1000px", height = "200px")
+  scroll_box(width = "800px", height = "200px")
 ```
 
 In this step, there are two alternatives:
