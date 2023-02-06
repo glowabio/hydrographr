@@ -78,7 +78,7 @@
 data before and after a Species Distribution Model</h3>
                         <h4 data-toc-skip class="author"></h4>
             
-            <h4 data-toc-skip class="date">2023-02-03</h4>
+            <h4 data-toc-skip class="date">2023-02-06</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/glowabio/hydrographr/blob/HEAD/vignettes/case_study_cuba.Rmd" class="external-link"><code>vignettes/case_study_cuba.Rmd</code></a></small>
       <div class="d-none name"><code>case_study_cuba.Rmd</code></div>
@@ -100,8 +100,17 @@ will aggregate the variable values within each sub-catchment of the
 study area, keeping as predictors their mean and SD per sub-catchment.
 Using the random forest (RF) algorithm, we will build a simple SDM and
 predict where the species could potentially occur. Finally, we will
-reclassify the layer of all the sub-catchments in the study area.
+reclassify the layer of all the sub-catchments in the study area,
 creating a habitat suitability map.</p>
+<p><em>Hypolestes trinitatis</em> is a damselfly species endemic to
+Cuba. The species inhabits rivers and streams located in forest areas at
+the main mountain ranges of eastern and central Cuba. The presence of
+riparian forests as well as clean and well oxygenated water seems to be
+important ecological conditions required by <em>H. trinitatis</em>.
+Larvae can be found clinging to boulders and cobbles in the river bed at
+fast-flowing water stream segments and pre-reproductive adults of both
+sex and sexually mature females remain most of the time in the
+vegetation of the riparian forest where they find shelter and prey.</p>
 <p>Load required libraries</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://glowabio.github.io/hydrographr/" class="external-link">hydrographr</a></span><span class="op">)</span></span>
@@ -1218,13 +1227,13 @@ NoData values:</p>
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/report_no_data.html">report_no_data</a></span><span class="op">(</span>data_dir <span class="op">=</span> <span class="va">layer_dir</span>, var_layer <span class="op">=</span> <span class="va">var_layers</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##                                    Raster   NoData</span></span>
-<span><span class="co">## 1                      bio1_1981-2010.tif        0</span></span>
-<span><span class="co">## 2                     bio12_1981-2010.tif        0</span></span>
-<span><span class="co">## 3  bio1_IPSL-CM6A-LR_ssp370_2041-2070.tif        0</span></span>
-<span><span class="co">## 4 bio12_IPSL-CM6A-LR_ssp370_2041-2070.tif        0</span></span>
-<span><span class="co">## 5 bio15_IPSL-CM6A-LR_ssp370_2041-2070.tif        0</span></span>
-<span><span class="co">## 6                     bio15_1981-2010.tif        0</span></span>
-<span><span class="co">## 7               slope_curv_max_dw_cel.tif -9999999</span></span>
+<span><span class="co">## 1                     bio15_1981-2010.tif        0</span></span>
+<span><span class="co">## 2                      bio1_1981-2010.tif        0</span></span>
+<span><span class="co">## 3                     bio12_1981-2010.tif        0</span></span>
+<span><span class="co">## 4  bio1_IPSL-CM6A-LR_ssp370_2041-2070.tif        0</span></span>
+<span><span class="co">## 5 bio12_IPSL-CM6A-LR_ssp370_2041-2070.tif        0</span></span>
+<span><span class="co">## 6               slope_curv_max_dw_cel.tif -9999999</span></span>
+<span><span class="co">## 7 bio15_IPSL-CM6A-LR_ssp370_2041-2070.tif        0</span></span>
 <span><span class="co">## 8                                 spi.tif -9999999</span></span></code></pre>
 <div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Run the function that returns the zonal statistics</span></span>
@@ -2198,8 +2207,8 @@ an indicator of the sub-catchment size</p>
 <span><span class="co"># Clear up memory</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">stats_gpkg_h08v06</span>, <span class="va">stats_gpkg_h10v06</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/base/gc.html" class="external-link">gc</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##            used  (Mb) gc trigger  (Mb) max used  (Mb)</span></span>
-<span><span class="co">## Ncells  4554276 243.3    9056782 483.7  5517085 294.7</span></span>
-<span><span class="co">## Vcells 25637622 195.6   55484070 423.4 48433098 369.6</span></span></code></pre>
+<span><span class="co">## Ncells  4554310 243.3    9057178 483.8  5516495 294.7</span></span>
+<span><span class="co">## Vcells 25638080 195.7   55484730 423.4 48433556 369.6</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="prepare-data-for-modelling">Prepare data for modelling<a class="anchor" aria-label="anchor" href="#prepare-data-for-modelling"></a>
@@ -3525,230 +3534,230 @@ length
 <tbody>
 <tr>
 <td style="text-align:right;">
-422673249
+422856867
+</td>
+<td style="text-align:right;">
+24.14038
+</td>
+<td style="text-align:right;">
+1487.087
+</td>
+<td style="text-align:right;">
+36.86154
+</td>
+<td style="text-align:right;">
+-0.0413346
+</td>
+<td style="text-align:right;">
+100.192308
+</td>
+<td style="text-align:right;">
+0.0294802
+</td>
+<td style="text-align:right;">
+6.3972058
+</td>
+<td style="text-align:right;">
+0.1179208
+</td>
+<td style="text-align:right;">
+0.0963596
+</td>
+<td style="text-align:right;">
+224.5840633
+</td>
+<td style="text-align:right;">
+776.4452
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+422595144
 </td>
 <td style="text-align:right;">
 25.35000
 </td>
 <td style="text-align:right;">
-1323.775
+1468.687
 </td>
 <td style="text-align:right;">
-61.95833
+60.51304
 </td>
 <td style="text-align:right;">
--0.0051210
+-0.0063677
 </td>
 <td style="text-align:right;">
-0.4166667
+1.173913
 </td>
 <td style="text-align:right;">
 0.0000000
 </td>
 <td style="text-align:right;">
-0.1479020
+0.4078622
 </td>
 <td style="text-align:right;">
-0.0493007
+0.0611793
 </td>
 <td style="text-align:right;">
-0.0069492
+0.0101247
 </td>
 <td style="text-align:right;">
-0.4930066
+1.7607354
 </td>
 <td style="text-align:right;">
-218.7375
+276.8201
 </td>
 </tr>
 <tr>
 <td style="text-align:right;">
-422668979
+422591090
 </td>
 <td style="text-align:right;">
-25.15000
+24.99667
 </td>
 <td style="text-align:right;">
-1379.300
+1396.413
 </td>
 <td style="text-align:right;">
-60.70000
+66.19333
 </td>
 <td style="text-align:right;">
--0.0245806
+-0.0219019
 </td>
 <td style="text-align:right;">
-2.8000000
+1.200000
 </td>
 <td style="text-align:right;">
-0.0000000
+0.0498888
 </td>
 <td style="text-align:right;">
-0.0000000
+2.4445495
 </td>
 <td style="text-align:right;">
-0.0000000
+0.0997775
 </td>
 <td style="text-align:right;">
-0.0313090
+0.0417547
 </td>
 <td style="text-align:right;">
-4.2142615
+0.9797959
 </td>
 <td style="text-align:right;">
-656.1742
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-422690940
-</td>
-<td style="text-align:right;">
-25.55000
-</td>
-<td style="text-align:right;">
-1264.000
-</td>
-<td style="text-align:right;">
-58.80000
-</td>
-<td style="text-align:right;">
--0.0141990
-</td>
-<td style="text-align:right;">
-3.4375000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0212589
-</td>
-<td style="text-align:right;">
-5.4310306
-</td>
-<td style="text-align:right;">
-426.1482
+338.5923
 </td>
 </tr>
 <tr>
 <td style="text-align:right;">
-399779525
+399677171
+</td>
+<td style="text-align:right;">
+24.74250
+</td>
+<td style="text-align:right;">
+1360.618
+</td>
+<td style="text-align:right;">
+52.72250
+</td>
+<td style="text-align:right;">
+-0.0583338
+</td>
+<td style="text-align:right;">
+4.200000
+</td>
+<td style="text-align:right;">
+0.0263391
+</td>
+<td style="text-align:right;">
+4.9780964
+</td>
+<td style="text-align:right;">
+0.0790174
+</td>
+<td style="text-align:right;">
+0.0895937
+</td>
+<td style="text-align:right;">
+7.2636079
+</td>
+<td style="text-align:right;">
+780.0552
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+399775985
+</td>
+<td style="text-align:right;">
+24.95000
+</td>
+<td style="text-align:right;">
+1383.600
+</td>
+<td style="text-align:right;">
+64.20000
+</td>
+<td style="text-align:right;">
+-0.0033257
+</td>
+<td style="text-align:right;">
+26.625000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0080420
+</td>
+<td style="text-align:right;">
+68.9346384
+</td>
+<td style="text-align:right;">
+344.0647
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+422497319
 </td>
 <td style="text-align:right;">
 24.75000
 </td>
 <td style="text-align:right;">
-1334.230
+1357.700
 </td>
 <td style="text-align:right;">
-60.25455
+61.10000
 </td>
 <td style="text-align:right;">
--0.0074002
+-0.0090596
 </td>
 <td style="text-align:right;">
-96.3333333
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.7103072
-</td>
-<td style="text-align:right;">
-0.0555464
-</td>
-<td style="text-align:right;">
-0.0118665
-</td>
-<td style="text-align:right;">
-229.1536029
-</td>
-<td style="text-align:right;">
-508.6901
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-422815316
-</td>
-<td style="text-align:right;">
-24.84231
-</td>
-<td style="text-align:right;">
-1888.254
-</td>
-<td style="text-align:right;">
-46.70000
-</td>
-<td style="text-align:right;">
--0.0382301
-</td>
-<td style="text-align:right;">
-271.3846154
-</td>
-<td style="text-align:right;">
-0.0266469
-</td>
-<td style="text-align:right;">
-3.6701740
-</td>
-<td style="text-align:right;">
-0.0784465
-</td>
-<td style="text-align:right;">
-0.0843695
-</td>
-<td style="text-align:right;">
-460.8930359
-</td>
-<td style="text-align:right;">
-387.7333
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-422559738
-</td>
-<td style="text-align:right;">
-24.26429
-</td>
-<td style="text-align:right;">
-1610.800
-</td>
-<td style="text-align:right;">
-65.90000
-</td>
-<td style="text-align:right;">
--0.0153792
-</td>
-<td style="text-align:right;">
-0.9142857
-</td>
-<td style="text-align:right;">
-0.0349927
-</td>
-<td style="text-align:right;">
-5.8787754
+31.000000
 </td>
 <td style="text-align:right;">
 0.0000000
 </td>
 <td style="text-align:right;">
-0.0252745
+0.0000000
 </td>
 <td style="text-align:right;">
-1.2955182
+0.0000000
 </td>
 <td style="text-align:right;">
-562.9909
+0.0312370
+</td>
+<td style="text-align:right;">
+36.7532312
+</td>
+<td style="text-align:right;">
+171.3873
 </td>
 </tr>
 </tbody>
@@ -4192,7 +4201,7 @@ presences.</p>
 <span><span class="co">## Target node size:                 10 </span></span>
 <span><span class="co">## Variable importance mode:         impurity </span></span>
 <span><span class="co">## Splitrule:                        gini </span></span>
-<span><span class="co">## OOB prediction error (Brier s.):  0.09093839</span></span></code></pre>
+<span><span class="co">## OOB prediction error (Brier s.):  0.08995457</span></span></code></pre>
 <p>The model can be evaluated based on the OOB prediction error. This
 metric lies on the fact that the data points that are not used in
 training a tree can be used to test the tree. The errors on the OOB
@@ -4219,12 +4228,12 @@ reclassification rules</p>
 <span>                         pred_occur <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">pred</span><span class="op">$</span><span class="va">predictions</span><span class="op">[</span>,<span class="fl">2</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">prediction</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##    subcatchment_id pred_occur</span></span>
-<span><span class="co">## 1:       399592461 0.02888492</span></span>
-<span><span class="co">## 2:       399592865 0.02879603</span></span>
-<span><span class="co">## 3:       399593700 0.03926627</span></span>
-<span><span class="co">## 4:       399593701 0.03629960</span></span>
-<span><span class="co">## 5:       399593817 0.03028214</span></span>
-<span><span class="co">## 6:       399593818 0.09269167</span></span></code></pre>
+<span><span class="co">## 1:       399592461 0.02554246</span></span>
+<span><span class="co">## 2:       399592865 0.02631746</span></span>
+<span><span class="co">## 3:       399593700 0.03642817</span></span>
+<span><span class="co">## 4:       399593701 0.03559127</span></span>
+<span><span class="co">## 5:       399593817 0.02645079</span></span>
+<span><span class="co">## 6:       399593818 0.08097698</span></span></code></pre>
 <p>and multiply the probability values by 100</p>
 <div class="sourceCode" id="cb66"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">prediction</span><span class="op">$</span><span class="va">pred_occur</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">prediction</span><span class="op">$</span><span class="va">pred_occur</span>, <span class="fl">2</span><span class="op">)</span> <span class="op">*</span> <span class="fl">100</span><span class="op">)</span></span></code></pre></div>
