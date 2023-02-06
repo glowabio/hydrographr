@@ -30,8 +30,18 @@ will aggregate the variable values within each sub-catchment of the
 study area, keeping as predictors their mean and SD per sub-catchment.
 Using the random forest (RF) algorithm, we will build a simple SDM and
 predict where the species could potentially occur. Finally, we will
-reclassify the layer of all the sub-catchments in the study area.
+reclassify the layer of all the sub-catchments in the study area,
 creating a habitat suitability map.
+
+*Hypolestes trinitatis* is a damselfly species endemic to Cuba. The
+species inhabits rivers and streams located in forest areas at the main
+mountain ranges of eastern and central Cuba. The presence of riparian
+forests as well as clean and well oxygenated water seems to be important
+ecological conditions required by *H. trinitatis*. Larvae can be found
+clinging to boulders and cobbles in the river bed at fast-flowing water
+stream segments and pre-reproductive adults of both sex and sexually
+mature females remain most of the time in the vegetation of the riparian
+forest where they find shelter and prey.
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE,  
@@ -183,12 +193,14 @@ tile_id <- tile_id[c(1,3)]
 
 Let's define the Hydrography90m variables that we would like to
 download. We will use the variables
-[slope_curv_max_dw_cel](https://geo.igb-berlin.de/maps/new?layer=geonode:hydrography90m_v1_slope_curv_max_dw_cel_cog&view=True) (maximum
-curvature between the highest upstream, focal and downstream cell) and
-[spi](https://geo.igb-berlin.de/maps/new?layer=geonode:hydrography90m_v1_spi_cog&view=True) (Stream
-Power Index) as predictors in our model. Additionally, we will download
-the
-[sub_catchment](https://geo.igb-berlin.de/maps/new?layer=geonode:hydrography90m_v1_sub_catchment_cog&view=True) layer, which is the necessary base-layer for the workflow.
+[slope_curv_max_dw_cel](https://geo.igb-berlin.de/maps/new?layer=geonode:hydrography90m_v1_slope_curv_max_dw_cel_cog&view=True)
+(maximum curvature between the highest upstream, focal and downstream
+cell) and
+[spi](https://geo.igb-berlin.de/maps/new?layer=geonode:hydrography90m_v1_spi_cog&view=True)
+(Stream Power Index) as predictors in our model. Additionally, we will
+download the
+[sub_catchment](https://geo.igb-berlin.de/maps/new?layer=geonode:hydrography90m_v1_sub_catchment_cog&view=True)
+layer, which is the necessary base-layer for the workflow.
 
 A list of all available Hydrography90m variables, as well as details and
 visualisations are available
@@ -347,8 +359,12 @@ for(idir in dirs_h90m) {
 
 ### Extraction of sub-catchment IDs
 
-Extract the IDs of the sub-catchments where the points are located. This step is crucial, as many of the functions that we will later use require a vector of sub-catchment IDs as input. 
-Note that the function  *extract_ids()* can be used to extract the values at specific points of any raster file provided to the argument *subc_layer*. It can be safely used to query very large raster files, as these are not loaded into R. 
+Extract the IDs of the sub-catchments where the points are located. This
+step is crucial, as many of the functions that we will later use require
+a vector of sub-catchment IDs as input. Note that the function
+*extract_ids()* can be used to extract the values at specific points of
+any raster file provided to the argument *subc_layer*. It can be safely
+used to query very large raster files, as these are not loaded into R.
 
 ```{r}
 spdata_ids <- extract_ids(data = spdata, lon = "longitude", lat = "latitude",
@@ -365,9 +381,10 @@ knitr::kable(head(spdata_ids),
 
 ### Aggregation of environmental layers
 
-We will calculate the zonal statistics of the Hydrography90m and the CHELSA Bioclim variables for all the
-sub-catchments of the study area. Caution, don't increase the number of
-cores to more than 3 as this can cause memory errors
+We will calculate the zonal statistics of the Hydrography90m and the
+CHELSA Bioclim variables for all the sub-catchments of the study area.
+Caution, don't increase the number of cores to more than 3 as this can
+cause memory errors
 
 ```{r}
 # Define input var_layers for the extract_zonal_stat() function
@@ -383,7 +400,6 @@ NoData values:
 report_no_data(data_dir = layer_dir, var_layer = var_layers)
 ```
 
-
 ```{r, eval = FALSE}
 # Run the function that returns the zonal statistics
 stats_table_zon <- extract_zonal_stat(
@@ -395,8 +411,8 @@ stats_table_zon <- extract_zonal_stat(
                     n_cores = 3)
 ```
 
-The function also reports the NoData values that are used in the calculation
-of the zonal statistics of each variable.
+The function also reports the NoData values that are used in the
+calculation of the zonal statistics of each variable.
 
 ```{r, echo = FALSE}
 # Read the previously created file
@@ -431,8 +447,10 @@ stats_table_zon <- stats_table_zon %>%
 
 ### Reading vector files
 
-Read in the .gpkg databases of the two tiles, filtering only the sub-catchments of the study area. 
-Their IDs can be retrieved from the stats_table
+Read in the .gpkg databases of the two tiles, filtering only the
+sub-catchments of the study area. Their IDs can be retrieved from the
+stats_table
+
 ```{r, eval = FALSE}
 stats_gpkg_h08v06 <- read_geopackage(
   "data/r.stream.order/order_vect_tiles20d/order_vect_point_h08v06.gpkg",
@@ -445,7 +463,6 @@ stats_gpkg_h10v06 <- read_geopackage(
   rename('subcatchment_id' = 'stream')
 ```
 
-
 ```{r, include = FALSE, eval = FALSE}
 # We used these lines to write out the filtered .gpkg files as data.tables, 
 # so that the size of data in the repository is smaller
@@ -457,7 +474,6 @@ fwrite(stats_gpkg_h10v06, sep = ",", row.names = FALSE, quote = FALSE,
   "/data/r.stream.order/order_vect_tiles20d/order_vect_point_h10v06.csv"))
 
 ```
-
 
 ```{r, echo = FALSE}
 # These are the lines that actually run. 
@@ -526,21 +542,29 @@ kbl(head(stats_table)) %>%
 <!-- Check if there are NAs in the rows of the table -->
 
 <!-- ```{r, eval = FALSE} -->
+
 <!-- head(stats_table[is.na(stats_table$length),]) -->
+
 <!-- ``` -->
 
-
 <!-- ```{r, echo = FALSE} -->
+
 <!-- kbl(head(stats_table[is.na(stats_table$length), ])) %>%                         -->
+
 <!--   kable_styling(bootstrap_options = "striped", full_width = F, position = "left") %>%      -->
+
 <!--   scroll_box(width = "800px", height = "200px") -->
+
 <!-- ``` -->
 
 <!-- There are streams with NA in the length column. Should we convert them -->
+
 <!-- to 0? -->
 
 <!-- ```{r} -->
+
 <!-- stats_table$length[is.na(stats_table$length)] <- 0 -->
+
 <!-- ``` -->
 
 ```{r, eval = FALSE}
@@ -553,7 +577,6 @@ kbl(head(stats_table[is.na(stats_table$slope_curv_max_dw_cel_mean), ])) %>%
   scroll_box(width = "800px", height = "200px")
 ```
 
-
 ```{r, eval = FALSE}
 head(stats_table[is.na(stats_table$spi_mean),])
 ```
@@ -564,22 +587,25 @@ kbl(head(stats_table[is.na(stats_table$spi_mean),])) %>%
   scroll_box(width = "800px", height = "200px")
 ```
 
-If we check the IDs of the sub-catchments that have null values for both variables, we observe that they are identical:
+If we check the IDs of the sub-catchments that have null values for both
+variables, we observe that they are identical:
 
 ```{r}
 stats_table[is.na(stats_table$spi_mean),]$subcatchment_id == stats_table[is.na(stats_table$slope_curv_max_dw_cel_mean),]$subcatchment_id
 ```
 
-This happens because the variables are not defined for a few single-pixel sub-catchments, which are outlets.
-We will remove these sub-catchments, as the model will not be able to handle the no data values.
+This happens because the variables are not defined for a few
+single-pixel sub-catchments, which are outlets. We will remove these
+sub-catchments, as the model will not be able to handle the no data
+values.
 
 ```{r}
 stats_table <- stats_table[!is.na(stats_table$slope_curv_max_dw_cel_mean),]
 ```
 
-
 We split the dataset into two datasets, according to present and future
-Bioclim variables. The first will be used in the training of the model and the second in the prediction of future suitable habitats
+Bioclim variables. The first will be used in the training of the model
+and the second in the prediction of future suitable habitats
 
 ```{r}
 stats_table_present <- stats_table %>%
@@ -627,7 +653,6 @@ kbl(head(pseudoabs)) %>%
   scroll_box(width = "800px", height = "200px")
 ```
 
-
 We join the species occurrences with the present environmental variables
 table
 
@@ -643,6 +668,7 @@ data_model <- data.table::rbindlist(list(presence, pseudoabs), fill = TRUE)
 ```
 
 Define a binary column of presence-absence (0-1) and set it to factor
+
 ```{r}
 data_model$occurrence <- ifelse(!is.na(data_model$occurrence_ID), 1, 0)
 data_model$occurrence <- as.factor(data_model$occurrence)
@@ -658,12 +684,13 @@ kbl(head(data_model)) %>%
   scroll_box(width = "800px", height = "200px")
 ```
 
-In this step, there are two alternatives:
-Either we split the data into train and test sets:
+In this step, there are two alternatives: Either we split the data into
+train and test sets:
 
 ```{r}
 set.seed(17)
 ```
+
 ```{r, eval = FALSE}
 #obtain stratified training sample
 train_idx <- sample(nrow(data_model), 2/3 * nrow(data_model))
@@ -671,24 +698,26 @@ data_train <- data_model[train_idx, ]
 data_test <- data_model[-train_idx, ]
 ```
 
-...or we use the whole dataset as the training set, since RF performs intrinsic evaluation in every tree
+...or we use the whole dataset as the training set, since RF performs
+intrinsic evaluation in every tree
+
 ```{r}
 data_train <- data_model
 ```
 
 ### A simple SDM using Random Forest
 
-We will use the ranger random forest (RF) algorithm (Wright & Ziegler, 2017)
-to build a species distribution model. Random forest can handle huge
-quantities of data and is therefore scalable to larger datasets. As our
-dataset is highly imbalanced towards the pseudo-absence data, we will
-apply the down-sampling method for presence-only data in the modelling
-process (Valavi et al., 2021). Down-sampling works by balancing the
-training data, which contain significantly more absence that presence
-points. Following this approach, the classification-RF model will use
-the same number of pseudo-absences as presence points in each
-classification tree, by sampling with replacement (bootstrapping) from
-the full pseudo-absence set (Valavi et al., 2021).
+We will use the ranger random forest (RF) algorithm (Wright & Ziegler,
+2017) to build a species distribution model. Random forest can handle
+huge quantities of data and is therefore scalable to larger datasets. As
+our dataset is highly imbalanced towards the pseudo-absence data, we
+will apply the down-sampling method for presence-only data in the
+modelling process (Valavi et al., 2021). Down-sampling works by
+balancing the training data, which contain significantly more absence
+that presence points. Following this approach, the classification-RF
+model will use the same number of pseudo-absences as presence points in
+each classification tree, by sampling with replacement (bootstrapping)
+from the full pseudo-absence set (Valavi et al., 2021).
 
 Let's define the sample size of each classification tree as a proportion
 of the whole training set, based on the number of presences.
@@ -768,7 +797,8 @@ reclass_raster(
   read = FALSE)
 ```
 
-Let's plot the future habitat suitability map, and add the presence points
+Let's plot the future habitat suitability map, and add the presence
+points
 
 ```{r, eval = FALSE}
 # Define colour palette
@@ -799,7 +829,6 @@ p
 ```
 
 ![](/home/afroditi/Documents/PhD/scripts/hydrographr/man/figures/prediction.png){width="800"}
-
 
 ```{r, include = FALSE, eval = FALSE}
 saveWidget(p, paste0(wdir, "/prediction.html"))
