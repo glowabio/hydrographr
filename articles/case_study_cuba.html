@@ -111,6 +111,7 @@ Larvae can be found clinging to boulders and cobbles in the river bed at
 fast-flowing water stream segments and pre-reproductive adults of both
 sex and sexually mature females remain most of the time in the
 vegetation of the riparian forest where they find shelter and prey.</p>
+<p>Let’s get started!</p>
 <p>Load required libraries</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://glowabio.github.io/hydrographr/" class="external-link">hydrographr</a></span><span class="op">)</span></span>
@@ -121,8 +122,7 @@ vegetation of the riparian forest where they find shelter and prey.</p>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://stringr.tidyverse.org" class="external-link">stringr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/imbs-hl/ranger" class="external-link">ranger</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rstudio.github.io/leaflet/" class="external-link">leaflet</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/r-spatial/leafem" class="external-link">leafem</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">leafletCN</span><span class="op">)</span></span></code></pre></div>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/r-spatial/leafem" class="external-link">leafem</a></span><span class="op">)</span></span></code></pre></div>
 <p>Define working directory</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">wdir</span> <span class="op">&lt;-</span> <span class="st">"my/working/directory"</span></span>
@@ -999,7 +999,7 @@ xmax, ymax)</p>
 <code class="sourceCode R"><span><span class="va">dirs_chelsa</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.dirs</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data/chelsa_bioclim"</span><span class="op">)</span>,</span>
 <span>                       recursive <span class="op">=</span> <span class="cn">TRUE</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">dirs_chelsa</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] "/home/afroditi/Documents/PhD/hydrographr_case_study/data/chelsa_bioclim"</span></span></code></pre>
+<pre><code><span><span class="co">## character(0)</span></span></code></pre>
 <p>… and the final output directory</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Define output directory for merged files</span></span>
@@ -1035,10 +1035,7 @@ as there is an extra step before reaching to the final output.</p>
 <span><span class="va">dirs_h90m</span> <span class="op">&lt;-</span> <span class="va">dirs_h90m</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grep</a></span><span class="op">(</span><span class="st">"tiles20d"</span>, <span class="va">dirs_h90m</span><span class="op">)</span><span class="op">]</span></span>
 <span></span>
 <span><span class="va">dirs_h90m</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] "/home/afroditi/Documents/PhD/hydrographr_case_study/data/flow.index/spi_tiles20d"                      </span></span>
-<span><span class="co">## [2] "/home/afroditi/Documents/PhD/hydrographr_case_study/data/r.stream.order/order_vect_tiles20d"           </span></span>
-<span><span class="co">## [3] "/home/afroditi/Documents/PhD/hydrographr_case_study/data/r.stream.slope/slope_curv_max_dw_cel_tiles20d"</span></span>
-<span><span class="co">## [4] "/home/afroditi/Documents/PhD/hydrographr_case_study/data/r.watershed/sub_catchment_tiles20d"</span></span></code></pre>
+<pre><code><span><span class="co">## [1] "/home/afroditi/Documents/PhD/hydrographr_case_study/data/r.stream.order/order_vect_tiles20d"</span></span></code></pre>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">for</span><span class="op">(</span><span class="va">idir</span> <span class="kw">in</span> <span class="va">dirs_h90m</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="co"># only choose rasters</span></span>
@@ -1208,7 +1205,9 @@ subcatchment_id
 <p>We will calculate the zonal statistics of the Hydrography90m and the
 CHELSA Bioclim variables for all the sub-catchments of the study area.
 Caution, don’t increase the number of cores to more than 3 as this can
-cause memory errors</p>
+cause memory problems. However, this highly depends to the number of
+sub-catchments as well. We recommend to test the function with different
+parameters to find out what works best for your case.</p>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Define input var_layers for the extract_zonal_stat() function</span></span>
 <span><span class="va">var_layers</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">layer_dir</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="fl">9</span><span class="op">]</span></span>
@@ -1227,13 +1226,13 @@ NoData values:</p>
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/report_no_data.html">report_no_data</a></span><span class="op">(</span>data_dir <span class="op">=</span> <span class="va">layer_dir</span>, var_layer <span class="op">=</span> <span class="va">var_layers</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##                                    Raster   NoData</span></span>
-<span><span class="co">## 1                     bio15_1981-2010.tif        0</span></span>
-<span><span class="co">## 2                      bio1_1981-2010.tif        0</span></span>
-<span><span class="co">## 3                     bio12_1981-2010.tif        0</span></span>
-<span><span class="co">## 4  bio1_IPSL-CM6A-LR_ssp370_2041-2070.tif        0</span></span>
-<span><span class="co">## 5 bio12_IPSL-CM6A-LR_ssp370_2041-2070.tif        0</span></span>
-<span><span class="co">## 6               slope_curv_max_dw_cel.tif -9999999</span></span>
-<span><span class="co">## 7 bio15_IPSL-CM6A-LR_ssp370_2041-2070.tif        0</span></span>
+<span><span class="co">## 1                      bio1_1981-2010.tif        0</span></span>
+<span><span class="co">## 2 bio15_IPSL-CM6A-LR_ssp370_2041-2070.tif        0</span></span>
+<span><span class="co">## 3  bio1_IPSL-CM6A-LR_ssp370_2041-2070.tif        0</span></span>
+<span><span class="co">## 4                     bio12_1981-2010.tif        0</span></span>
+<span><span class="co">## 5                     bio15_1981-2010.tif        0</span></span>
+<span><span class="co">## 6 bio12_IPSL-CM6A-LR_ssp370_2041-2070.tif        0</span></span>
+<span><span class="co">## 7               slope_curv_max_dw_cel.tif -9999999</span></span>
 <span><span class="co">## 8                                 spi.tif -9999999</span></span></code></pre>
 <div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Run the function that returns the zonal statistics</span></span>
@@ -1243,7 +1242,7 @@ NoData values:</p>
 <span>                    subc_id <span class="op">=</span> <span class="st">"all"</span>,</span>
 <span>                    var_layer <span class="op">=</span> <span class="va">var_layers</span>,</span>
 <span>                    file_name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data/zonal_stats.csv"</span><span class="op">)</span>,</span>
-<span>                    n_cores <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
+<span>                    n_cores <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
 <p>The function also reports the NoData values that are used in the
 calculation of the zonal statistics of each variable.</p>
 <p>Let’s inspect the resulting table</p>
@@ -2207,8 +2206,8 @@ an indicator of the sub-catchment size</p>
 <span><span class="co"># Clear up memory</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">stats_gpkg_h08v06</span>, <span class="va">stats_gpkg_h10v06</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/base/gc.html" class="external-link">gc</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##            used  (Mb) gc trigger  (Mb) max used  (Mb)</span></span>
-<span><span class="co">## Ncells  4554310 243.3    9057178 483.8  5516495 294.7</span></span>
-<span><span class="co">## Vcells 25638080 195.7   55484730 423.4 48433556 369.6</span></span></code></pre>
+<span><span class="co">## Ncells  4553565 243.2    9054930 483.6  5516742 294.7</span></span>
+<span><span class="co">## Vcells 25636561 195.6   55482528 423.3 48432037 369.6</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="prepare-data-for-modelling">Prepare data for modelling<a class="anchor" aria-label="anchor" href="#prepare-data-for-modelling"></a>
@@ -3534,230 +3533,230 @@ length
 <tbody>
 <tr>
 <td style="text-align:right;">
-422856867
+399760420
 </td>
 <td style="text-align:right;">
-24.14038
+22.75000
 </td>
 <td style="text-align:right;">
-1487.087
+1479.600
 </td>
 <td style="text-align:right;">
-36.86154
+52.20000
 </td>
 <td style="text-align:right;">
--0.0413346
+-0.1469571
 </td>
 <td style="text-align:right;">
-100.192308
+29.3000000
 </td>
 <td style="text-align:right;">
-0.0294802
+0.0000000
 </td>
 <td style="text-align:right;">
-6.3972058
+0.000000
 </td>
 <td style="text-align:right;">
-0.1179208
+0.0000000
 </td>
 <td style="text-align:right;">
-0.0963596
+0.2147039
 </td>
 <td style="text-align:right;">
-224.5840633
+32.5946315
 </td>
 <td style="text-align:right;">
-776.4452
+310.4441
 </td>
 </tr>
 <tr>
 <td style="text-align:right;">
-422595144
+422562631
 </td>
 <td style="text-align:right;">
-25.35000
+25.45000
 </td>
 <td style="text-align:right;">
-1468.687
+1367.756
 </td>
 <td style="text-align:right;">
-60.51304
+55.61852
 </td>
 <td style="text-align:right;">
--0.0063677
+-0.0065207
 </td>
 <td style="text-align:right;">
-1.173913
+0.4444444
 </td>
 <td style="text-align:right;">
 0.0000000
 </td>
 <td style="text-align:right;">
-0.4078622
+5.127510
 </td>
 <td style="text-align:right;">
-0.0611793
+0.0388448
 </td>
 <td style="text-align:right;">
-0.0101247
+0.0119042
 </td>
 <td style="text-align:right;">
-1.7607354
+0.5665577
 </td>
 <td style="text-align:right;">
-276.8201
+252.3033
 </td>
 </tr>
 <tr>
 <td style="text-align:right;">
-422591090
+422735949
 </td>
 <td style="text-align:right;">
-24.99667
+25.56000
 </td>
 <td style="text-align:right;">
-1396.413
+1315.930
 </td>
 <td style="text-align:right;">
-66.19333
+56.53000
 </td>
 <td style="text-align:right;">
--0.0219019
+-0.0108601
 </td>
 <td style="text-align:right;">
-1.200000
+3.2000000
 </td>
 <td style="text-align:right;">
-0.0498888
+0.0300000
 </td>
 <td style="text-align:right;">
-2.4445495
+4.081801
 </td>
 <td style="text-align:right;">
-0.0997775
+0.1100000
 </td>
 <td style="text-align:right;">
-0.0417547
+0.0190966
 </td>
 <td style="text-align:right;">
-0.9797959
+4.7180504
 </td>
 <td style="text-align:right;">
-338.5923
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-399677171
-</td>
-<td style="text-align:right;">
-24.74250
-</td>
-<td style="text-align:right;">
-1360.618
-</td>
-<td style="text-align:right;">
-52.72250
-</td>
-<td style="text-align:right;">
--0.0583338
-</td>
-<td style="text-align:right;">
-4.200000
-</td>
-<td style="text-align:right;">
-0.0263391
-</td>
-<td style="text-align:right;">
-4.9780964
-</td>
-<td style="text-align:right;">
-0.0790174
-</td>
-<td style="text-align:right;">
-0.0895937
-</td>
-<td style="text-align:right;">
-7.2636079
-</td>
-<td style="text-align:right;">
-780.0552
+433.4295
 </td>
 </tr>
 <tr>
 <td style="text-align:right;">
-399775985
+422712770
 </td>
 <td style="text-align:right;">
-24.95000
+25.65000
 </td>
 <td style="text-align:right;">
-1383.600
+1341.600
 </td>
 <td style="text-align:right;">
-64.20000
+59.70000
 </td>
 <td style="text-align:right;">
--0.0033257
+-0.0079899
 </td>
 <td style="text-align:right;">
-26.625000
-</td>
-<td style="text-align:right;">
-0.0000000
+0.8108108
 </td>
 <td style="text-align:right;">
 0.0000000
 </td>
 <td style="text-align:right;">
+0.000000
+</td>
+<td style="text-align:right;">
 0.0000000
 </td>
 <td style="text-align:right;">
-0.0080420
+0.0130706
 </td>
 <td style="text-align:right;">
-68.9346384
+1.4301358
 </td>
 <td style="text-align:right;">
-344.0647
+426.3545
 </td>
 </tr>
 <tr>
 <td style="text-align:right;">
-422497319
+422505303
 </td>
 <td style="text-align:right;">
-24.75000
+25.65000
 </td>
 <td style="text-align:right;">
-1357.700
+1292.833
 </td>
 <td style="text-align:right;">
-61.10000
+46.46667
 </td>
 <td style="text-align:right;">
--0.0090596
+-0.0023749
 </td>
 <td style="text-align:right;">
-31.000000
-</td>
-<td style="text-align:right;">
-0.0000000
+4.1481481
 </td>
 <td style="text-align:right;">
 0.0000000
 </td>
 <td style="text-align:right;">
-0.0000000
+1.508495
 </td>
 <td style="text-align:right;">
-0.0312370
+0.0471405
 </td>
 <td style="text-align:right;">
-36.7532312
+0.0034706
 </td>
 <td style="text-align:right;">
-171.3873
+7.6965779
+</td>
+<td style="text-align:right;">
+641.7324
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+422800352
+</td>
+<td style="text-align:right;">
+24.92273
+</td>
+<td style="text-align:right;">
+1889.736
+</td>
+<td style="text-align:right;">
+42.36364
+</td>
+<td style="text-align:right;">
+-0.0989903
+</td>
+<td style="text-align:right;">
+262.6818182
+</td>
+<td style="text-align:right;">
+0.2489648
+</td>
+<td style="text-align:right;">
+10.008385
+</td>
+<td style="text-align:right;">
+0.1493789
+</td>
+<td style="text-align:right;">
+0.1899956
+</td>
+<td style="text-align:right;">
+636.6739844
+</td>
+<td style="text-align:right;">
+554.1213
 </td>
 </tr>
 </tbody>
@@ -4201,7 +4200,7 @@ presences.</p>
 <span><span class="co">## Target node size:                 10 </span></span>
 <span><span class="co">## Variable importance mode:         impurity </span></span>
 <span><span class="co">## Splitrule:                        gini </span></span>
-<span><span class="co">## OOB prediction error (Brier s.):  0.08995457</span></span></code></pre>
+<span><span class="co">## OOB prediction error (Brier s.):  0.08862874</span></span></code></pre>
 <p>The model can be evaluated based on the OOB prediction error. This
 metric lies on the fact that the data points that are not used in
 training a tree can be used to test the tree. The errors on the OOB
@@ -4228,12 +4227,12 @@ reclassification rules</p>
 <span>                         pred_occur <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">pred</span><span class="op">$</span><span class="va">predictions</span><span class="op">[</span>,<span class="fl">2</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">prediction</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##    subcatchment_id pred_occur</span></span>
-<span><span class="co">## 1:       399592461 0.02554246</span></span>
-<span><span class="co">## 2:       399592865 0.02631746</span></span>
-<span><span class="co">## 3:       399593700 0.03642817</span></span>
-<span><span class="co">## 4:       399593701 0.03559127</span></span>
-<span><span class="co">## 5:       399593817 0.02645079</span></span>
-<span><span class="co">## 6:       399593818 0.08097698</span></span></code></pre>
+<span><span class="co">## 1:       399592461 0.02436468</span></span>
+<span><span class="co">## 2:       399592865 0.02486468</span></span>
+<span><span class="co">## 3:       399593700 0.03260040</span></span>
+<span><span class="co">## 4:       399593701 0.02490635</span></span>
+<span><span class="co">## 5:       399593817 0.02270635</span></span>
+<span><span class="co">## 6:       399593818 0.07742579</span></span></code></pre>
 <p>and multiply the probability values by 100</p>
 <div class="sourceCode" id="cb66"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">prediction</span><span class="op">$</span><span class="va">pred_occur</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">prediction</span><span class="op">$</span><span class="va">pred_occur</span>, <span class="fl">2</span><span class="op">)</span> <span class="op">*</span> <span class="fl">100</span><span class="op">)</span></span></code></pre></div>
