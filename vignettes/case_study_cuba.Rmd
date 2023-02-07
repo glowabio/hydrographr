@@ -39,9 +39,11 @@ mountain ranges of eastern and central Cuba. The presence of riparian
 forests as well as clean and well oxygenated water seems to be important
 ecological conditions required by *H. trinitatis*. Larvae can be found
 clinging to boulders and cobbles in the river bed at fast-flowing water
-stream segments and pre-reproductive adults of both sex and sexually
+stream segments and pre-reproductive adults of both sexes and sexually
 mature females remain most of the time in the vegetation of the riparian
 forest where they find shelter and prey.
+
+Let's get started!
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE,  
@@ -58,7 +60,6 @@ library(knitr)
 library(kableExtra)
 library(leaflet)
 library(leafem)
-library(leafletCN)
 library(htmlwidgets)
 library(mapview)
 ```
@@ -75,7 +76,6 @@ library(stringr)
 library(ranger)
 library(leaflet)
 library(leafem)
-library(leafletCN)
 ```
 
 Define working directory
@@ -384,7 +384,9 @@ knitr::kable(head(spdata_ids),
 We will calculate the zonal statistics of the Hydrography90m and the
 CHELSA Bioclim variables for all the sub-catchments of the study area.
 Caution, don't increase the number of cores to more than 3 as this can
-cause memory errors
+cause memory problems. However, this highly depends to the number of
+sub-catchments as well. We recommend to test the function with different
+parameters to find out what works best for your case.
 
 ```{r}
 # Define input var_layers for the extract_zonal_stat() function
@@ -408,7 +410,7 @@ stats_table_zon <- extract_zonal_stat(
                     subc_id = "all",
                     var_layer = var_layers,
                     file_name = paste0(wdir, "/data/zonal_stats.csv"),
-                    n_cores = 3)
+                    n_cores = 2)
 ```
 
 The function also reports the NoData values that are used in the
