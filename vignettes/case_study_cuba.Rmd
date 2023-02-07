@@ -8,14 +8,20 @@ vignette: >
   %\VignetteIndexEntry{Case study}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
-#bibliography: literature.bib
+bibliography: /home/afroditi/Documents/PhD/scripts/hydrographr/man/references.bib
 link-citations: yes
 linkcolor: blue
-#csl: copernicus.csl
+# csl: copernicus.csl
+nocite: '@*'
 editor_options: 
   markdown: 
     wrap: 72
 ---
+
+```{r, include = FALSE, eval = FALSE}
+# writes out the references for all packages
+knitr::write_bib(file = 'packages.bib')
+```
 
 ### Introduction
 
@@ -841,3 +847,5 @@ sub-catchments that could offer a suitable habitat to the species in a
 more detailed view.
 
 ![](/home/afroditi/Documents/PhD/scripts/hydrographr/man/figures/prediction_zoom.png){width="800"}
+
+### References
