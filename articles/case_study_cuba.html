@@ -1226,13 +1226,13 @@ NoData values:</p>
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/report_no_data.html">report_no_data</a></span><span class="op">(</span>data_dir <span class="op">=</span> <span class="va">layer_dir</span>, var_layer <span class="op">=</span> <span class="va">var_layers</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##                                    Raster   NoData</span></span>
-<span><span class="co">## 1                     bio15_1981-2010.tif        0</span></span>
+<span><span class="co">## 1                      bio1_1981-2010.tif        0</span></span>
 <span><span class="co">## 2  bio1_IPSL-CM6A-LR_ssp370_2041-2070.tif        0</span></span>
-<span><span class="co">## 3                      bio1_1981-2010.tif        0</span></span>
-<span><span class="co">## 4                     bio12_1981-2010.tif        0</span></span>
-<span><span class="co">## 5 bio12_IPSL-CM6A-LR_ssp370_2041-2070.tif        0</span></span>
-<span><span class="co">## 6 bio15_IPSL-CM6A-LR_ssp370_2041-2070.tif        0</span></span>
-<span><span class="co">## 7               slope_curv_max_dw_cel.tif -9999999</span></span>
+<span><span class="co">## 3                     bio12_1981-2010.tif        0</span></span>
+<span><span class="co">## 4 bio12_IPSL-CM6A-LR_ssp370_2041-2070.tif        0</span></span>
+<span><span class="co">## 5                     bio15_1981-2010.tif        0</span></span>
+<span><span class="co">## 6               slope_curv_max_dw_cel.tif -9999999</span></span>
+<span><span class="co">## 7 bio15_IPSL-CM6A-LR_ssp370_2041-2070.tif        0</span></span>
 <span><span class="co">## 8                                 spi.tif -9999999</span></span></code></pre>
 <div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Run the function that returns the zonal statistics</span></span>
@@ -2206,8 +2206,8 @@ an indicator of the sub-catchment size</p>
 <span><span class="co"># Clear up memory</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">stats_gpkg_h08v06</span>, <span class="va">stats_gpkg_h10v06</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/base/gc.html" class="external-link">gc</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##            used  (Mb) gc trigger  (Mb) max used  (Mb)</span></span>
-<span><span class="co">## Ncells  4553565 243.2    9055074 483.6  5516551 294.7</span></span>
-<span><span class="co">## Vcells 25636562 195.6   55482530 423.3 48432038 369.6</span></span></code></pre>
+<span><span class="co">## Ncells  4553599 243.2    9041602 482.9  5334122 284.9</span></span>
+<span><span class="co">## Vcells 25636499 195.6   58356105 445.3 48381243 369.2</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="prepare-data-for-modelling">Prepare data for modelling<a class="anchor" aria-label="anchor" href="#prepare-data-for-modelling"></a>
@@ -3533,25 +3533,63 @@ length
 <tbody>
 <tr>
 <td style="text-align:right;">
-422669473
+400290989
 </td>
 <td style="text-align:right;">
-26.15000
+25.95
 </td>
 <td style="text-align:right;">
-1062.100
+1283.654
 </td>
 <td style="text-align:right;">
-46.20000
+57.96154
 </td>
 <td style="text-align:right;">
--0.0052948
+-0.0067952
 </td>
 <td style="text-align:right;">
-0.1818182
+3.7692308
 </td>
 <td style="text-align:right;">
-0.0000000
+0
+</td>
+<td style="text-align:right;">
+1.339986
+</td>
+<td style="text-align:right;">
+0.0788227
+</td>
+<td style="text-align:right;">
+0.0105676
+</td>
+<td style="text-align:right;">
+6.9299112
+</td>
+<td style="text-align:right;">
+551.76398
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+399840920
+</td>
+<td style="text-align:right;">
+24.95
+</td>
+<td style="text-align:right;">
+1411.600
+</td>
+<td style="text-align:right;">
+65.10000
+</td>
+<td style="text-align:right;">
+-0.0030871
+</td>
+<td style="text-align:right;">
+0.2777778
+</td>
+<td style="text-align:right;">
+0
 </td>
 <td style="text-align:right;">
 0.000000
@@ -3560,203 +3598,165 @@ length
 0.0000000
 </td>
 <td style="text-align:right;">
-0.0117214
+0.0057818
 </td>
 <td style="text-align:right;">
-0.3856946
+0.5583264
 </td>
 <td style="text-align:right;">
-126.4579
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-422756071
-</td>
-<td style="text-align:right;">
-26.35000
-</td>
-<td style="text-align:right;">
-1125.589
-</td>
-<td style="text-align:right;">
-61.12063
-</td>
-<td style="text-align:right;">
--0.0034219
-</td>
-<td style="text-align:right;">
-7.8730159
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-2.654503
-</td>
-<td style="text-align:right;">
-0.0404684
-</td>
-<td style="text-align:right;">
-0.0055016
-</td>
-<td style="text-align:right;">
-18.7806825
-</td>
-<td style="text-align:right;">
-967.8947
+85.71935
 </td>
 </tr>
 <tr>
 <td style="text-align:right;">
-422487178
+422676867
 </td>
 <td style="text-align:right;">
-25.15000
+25.95
 </td>
 <td style="text-align:right;">
-1359.418
+1063.589
 </td>
 <td style="text-align:right;">
-53.37273
+43.14286
 </td>
 <td style="text-align:right;">
--0.0017985
+-0.0016270
 </td>
 <td style="text-align:right;">
-0.4545455
+11.6984127
 </td>
 <td style="text-align:right;">
-0.0000000
+0
 </td>
 <td style="text-align:right;">
-9.284182
+3.023617
 </td>
 <td style="text-align:right;">
-0.0962091
+0.0903508
 </td>
 <td style="text-align:right;">
-0.0040079
+0.0026741
 </td>
 <td style="text-align:right;">
-0.6555548
+21.6887323
 </td>
 <td style="text-align:right;">
-297.0689
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-422686746
-</td>
-<td style="text-align:right;">
-25.85000
-</td>
-<td style="text-align:right;">
-1347.278
-</td>
-<td style="text-align:right;">
-64.30000
-</td>
-<td style="text-align:right;">
--0.0067778
-</td>
-<td style="text-align:right;">
-0.5217391
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-1.042554
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0104394
-</td>
-<td style="text-align:right;">
-0.8782178
-</td>
-<td style="text-align:right;">
-386.1426
+1306.72829
 </td>
 </tr>
 <tr>
 <td style="text-align:right;">
-399911938
+422570130
 </td>
 <td style="text-align:right;">
-25.45000
+25.55
 </td>
 <td style="text-align:right;">
-1236.800
+1400.996
 </td>
 <td style="text-align:right;">
-59.00000
+52.06522
 </td>
 <td style="text-align:right;">
--0.0020193
+-0.0031902
 </td>
 <td style="text-align:right;">
-0.5135135
+10.3478261
 </td>
 <td style="text-align:right;">
-0.0000000
+0
 </td>
 <td style="text-align:right;">
-0.000000
+1.099201
 </td>
 <td style="text-align:right;">
-0.0000000
+0.0758069
 </td>
 <td style="text-align:right;">
-0.0035074
+0.0046699
 </td>
 <td style="text-align:right;">
-0.9759714
+14.2114733
 </td>
 <td style="text-align:right;">
-430.1357
+655.33982
 </td>
 </tr>
 <tr>
 <td style="text-align:right;">
-400041816
+400299990
 </td>
 <td style="text-align:right;">
-25.49194
+25.95
 </td>
 <td style="text-align:right;">
-1380.587
+1398.133
 </td>
 <td style="text-align:right;">
-60.49677
+55.49333
 </td>
 <td style="text-align:right;">
--0.0027285
+-0.0049036
 </td>
 <td style="text-align:right;">
-2.2258065
+0.2666667
 </td>
 <td style="text-align:right;">
-0.0493454
+0
 </td>
 <td style="text-align:right;">
-4.382792
+1.010390
 </td>
 <td style="text-align:right;">
-0.0739829
+0.0249444
 </td>
 <td style="text-align:right;">
-0.0055497
+0.0111789
 </td>
 <td style="text-align:right;">
-3.5533689
+0.4422166
 </td>
 <td style="text-align:right;">
-682.2677
+218.63945
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+399710538
+</td>
+<td style="text-align:right;">
+24.85
+</td>
+<td style="text-align:right;">
+1360.174
+</td>
+<td style="text-align:right;">
+58.48372
+</td>
+<td style="text-align:right;">
+-0.0052302
+</td>
+<td style="text-align:right;">
+0.8372093
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+4.973656
+</td>
+<td style="text-align:right;">
+0.1539106
+</td>
+<td style="text-align:right;">
+0.0072466
+</td>
+<td style="text-align:right;">
+1.3627986
+</td>
+<td style="text-align:right;">
+872.46553
 </td>
 </tr>
 </tbody>
@@ -4200,7 +4200,7 @@ presences.</p>
 <span><span class="co">## Target node size:                 10 </span></span>
 <span><span class="co">## Variable importance mode:         impurity </span></span>
 <span><span class="co">## Splitrule:                        gini </span></span>
-<span><span class="co">## OOB prediction error (Brier s.):  0.09022818</span></span></code></pre>
+<span><span class="co">## OOB prediction error (Brier s.):  0.09242484</span></span></code></pre>
 <p>The model can be evaluated based on the OOB prediction error. This
 metric lies on the fact that the data points that are not used in
 training a tree can be used to test the tree. The errors on the OOB
@@ -4227,12 +4227,12 @@ reclassification rules</p>
 <span>                         pred_occur <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">pred</span><span class="op">$</span><span class="va">predictions</span><span class="op">[</span>,<span class="fl">2</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">prediction</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##    subcatchment_id pred_occur</span></span>
-<span><span class="co">## 1:       399592461 0.01745873</span></span>
-<span><span class="co">## 2:       399592865 0.01725873</span></span>
-<span><span class="co">## 3:       399593700 0.02915397</span></span>
-<span><span class="co">## 4:       399593701 0.02551825</span></span>
-<span><span class="co">## 5:       399593817 0.02079921</span></span>
-<span><span class="co">## 6:       399593818 0.08406230</span></span></code></pre>
+<span><span class="co">## 1:       399592461 0.01971905</span></span>
+<span><span class="co">## 2:       399592865 0.01878571</span></span>
+<span><span class="co">## 3:       399593700 0.03418571</span></span>
+<span><span class="co">## 4:       399593701 0.02936071</span></span>
+<span><span class="co">## 5:       399593817 0.02241905</span></span>
+<span><span class="co">## 6:       399593818 0.09714127</span></span></code></pre>
 <p>and multiply the probability values by 100</p>
 <div class="sourceCode" id="cb66"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">prediction</span><span class="op">$</span><span class="va">pred_occur</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">prediction</span><span class="op">$</span><span class="va">pred_occur</span>, <span class="fl">2</span><span class="op">)</span> <span class="op">*</span> <span class="fl">100</span><span class="op">)</span></span></code></pre></div>
@@ -4279,6 +4279,106 @@ points</p>
 sub-catchments that could offer a suitable habitat to the species in a
 more detailed view.</p>
 <p><img src="../reference/figures/prediction_zoom.png" width="800"></p>
+</div>
+<div class="section level3 unnumbered">
+<h3 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+</h3>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-amatulli2022hydrography90m" class="csl-entry">
+Amatulli, Giuseppe, Jaime Garcia Marquez, Tushar Sethi, Jens Kiesel,
+Afroditi Grigoropoulou, Maria M Üblacker, Longzhu Q Shen, and Sami
+Domisch. 2022. <span>“Hydrography90m: A New High-Resolution Global
+Hydrographic Dataset.”</span> <em>Earth System Science Data</em> 14
+(10): 4525–50.
+</div>
+<div id="ref-R-leafem" class="csl-entry">
+Appelhans, Tim. 2022. <em>Leafem: Leaflet Extensions for Mapview</em>.
+<a href="https://CRAN.R-project.org/package=leafem" class="external-link">https://CRAN.R-project.org/package=leafem</a>.
+</div>
+<div id="ref-R-mapview" class="csl-entry">
+Appelhans, Tim, Florian Detsch, Christoph Reudenbach, and Stefan
+Woellauer. 2022. <em>Mapview: Interactive Viewing of Spatial Data in
+r</em>. <a href="https://github.com/r-spatial/mapview" class="external-link">https://github.com/r-spatial/mapview</a>.
+</div>
+<div id="ref-R-leaflet" class="csl-entry">
+Cheng, Joe, Barret Schloerke, Bhaskar Karambelkar, and Yihui Xie. 2023.
+<em>Leaflet: Create Interactive Web Maps with the JavaScript Leaflet
+Library</em>. <a href="https://rstudio.github.io/leaflet/" class="external-link">https://rstudio.github.io/leaflet/</a>.
+</div>
+<div id="ref-R-data.table" class="csl-entry">
+Dowle, Matt, and Arun Srinivasan. 2022. <em>Data.table: Extension of
+‘Data.frame‘</em>. <a href="https://CRAN.R-project.org/package=data.table" class="external-link">https://CRAN.R-project.org/package=data.table</a>.
+</div>
+<div id="ref-R-terra" class="csl-entry">
+Hijmans, Robert J. 2023. <em>Terra: Spatial Data Analysis</em>. <a href="https://rspatial.org/terra/" class="external-link">https://rspatial.org/terra/</a>.
+</div>
+<div id="ref-R-base" class="csl-entry">
+R Core Team. 2022. <em>R: A Language and Environment for Statistical
+Computing</em>. Vienna, Austria: R Foundation for Statistical Computing.
+<a href="https://www.R-project.org/" class="external-link">https://www.R-project.org/</a>.
+</div>
+<div id="ref-torres2016conservation" class="csl-entry">
+Torres-Cambas, Yusdiel, Martiño Cabana-Otero, M Olalla Lorenzo-Carballa,
+and Adolfo Cordero-Rivera. 2016. <span>“Conservation Status and
+Protection of Three Antillean Endemic Damselflies.”</span> <em>Journal
+of Insect Conservation</em> 20: 277–84.
+</div>
+<div id="ref-ETOcuba" class="csl-entry">
+Torres-Cambas, Yusdiel, and Juan Carlos Salazar Salina. 2022.
+<span>“Ephemeroptera, Trichoptera and Odonata of Cuba.”</span> <a href="https://doi.org/10.18728/igb-fred-778.3" class="external-link uri">https://doi.org/10.18728/igb-fred-778.3</a>. <a href="https://doi.org/10.18728/igb-fred-778.3" class="external-link">https://doi.org/10.18728/igb-fred-778.3</a>.
+</div>
+<div id="ref-R-hydrographr" class="csl-entry">
+Üblacker, Maria, Afroditi Grigoropoulou, Jaime Garcia Marquez, Yusdiel
+Torres Cambas, Christoph Schürz, Mathieu Floury, Thomas Tomiczek,
+Vanessa Bremerich, Giuseppe Amatulli, and Sami Domisch. 2023.
+<em>Hydrographr: Scalable Hydrographic Data Processing in r</em>. <a href="https://glowabio.github.io/hydrographr/" class="external-link">https://glowabio.github.io/hydrographr/</a>.
+</div>
+<div id="ref-R-htmlwidgets" class="csl-entry">
+Vaidyanathan, Ramnath, Yihui Xie, JJ Allaire, Joe Cheng, Carson Sievert,
+and Kenton Russell. 2023. <em>Htmlwidgets: HTML Widgets for r</em>. <a href="https://github.com/ramnathv/htmlwidgets" class="external-link">https://github.com/ramnathv/htmlwidgets</a>.
+</div>
+<div id="ref-valavi2021modelling" class="csl-entry">
+Valavi, Roozbeh, Jane Elith, José J Lahoz-Monfort, and Gurutzeta
+Guillera-Arroita. 2021. <span>“Modelling Species Presence-Only Data with
+Random Forests.”</span> <em>Ecography</em> 44 (12): 1731–42.
+</div>
+<div id="ref-R-stringr" class="csl-entry">
+Wickham, Hadley. 2022. <em>Stringr: Simple, Consistent Wrappers for
+Common String Operations</em>. <a href="https://CRAN.R-project.org/package=stringr" class="external-link">https://CRAN.R-project.org/package=stringr</a>.
+</div>
+<div id="ref-R-dplyr" class="csl-entry">
+Wickham, Hadley, Romain François, Lionel Henry, and Kirill Müller. 2022.
+<em>Dplyr: A Grammar of Data Manipulation</em>. <a href="https://CRAN.R-project.org/package=dplyr" class="external-link">https://CRAN.R-project.org/package=dplyr</a>.
+</div>
+<div id="ref-R-ranger" class="csl-entry">
+Wright, Marvin N., Stefan Wager, and Philipp Probst. 2022. <em>Ranger: A
+Fast Implementation of Random Forests</em>. <a href="https://github.com/imbs-hl/ranger" class="external-link">https://github.com/imbs-hl/ranger</a>.
+</div>
+<div id="ref-ranger2017" class="csl-entry">
+Wright, Marvin N., and Andreas Ziegler. 2017. <span>“<span class="nocase">ranger</span>: A Fast Implementation of Random Forests
+for High Dimensional Data in <span>C++</span> and
+<span>R</span>.”</span> <em>Journal of Statistical Software</em> 77 (1):
+1–17. <a href="https://doi.org/10.18637/jss.v077.i01" class="external-link">https://doi.org/10.18637/jss.v077.i01</a>.
+</div>
+<div id="ref-knitr2014" class="csl-entry">
+Xie, Yihui. 2014. <span>“Knitr: A Comprehensive Tool for Reproducible
+Research in <span>R</span>.”</span> In <em>Implementing Reproducible
+Computational Research</em>, edited by Victoria Stodden, Friedrich
+Leisch, and Roger D. Peng. Chapman; Hall/CRC.
+</div>
+<div id="ref-knitr2015" class="csl-entry">
+———. 2015. <em>Dynamic Documents with <span>R</span> and Knitr</em>. 2nd
+ed. Boca Raton, Florida: Chapman; Hall/CRC. <a href="https://yihui.org/knitr/" class="external-link">https://yihui.org/knitr/</a>.
+</div>
+<div id="ref-R-knitr" class="csl-entry">
+———. 2023. <em>Knitr: A General-Purpose Package for Dynamic Report
+Generation in r</em>. <a href="https://yihui.org/knitr/" class="external-link">https://yihui.org/knitr/</a>.
+</div>
+<div id="ref-R-kableExtra" class="csl-entry">
+Zhu, Hao. 2021. <em>kableExtra: Construct Complex Table with Kable and
+Pipe Syntax</em>. <a href="https://CRAN.R-project.org/package=kableExtra" class="external-link">https://CRAN.R-project.org/package=kableExtra</a>.
+</div>
+</div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>
