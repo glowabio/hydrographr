@@ -78,7 +78,7 @@
 data before and after a Species Distribution Model</h3>
                         <h4 data-toc-skip class="author"></h4>
             
-            <h4 data-toc-skip class="date">2023-02-06</h4>
+            <h4 data-toc-skip class="date">2023-02-07</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/glowabio/hydrographr/blob/HEAD/vignettes/case_study_cuba.Rmd" class="external-link"><code>vignettes/case_study_cuba.Rmd</code></a></small>
       <div class="d-none name"><code>case_study_cuba.Rmd</code></div>
@@ -109,7 +109,7 @@ riparian forests as well as clean and well oxygenated water seems to be
 important ecological conditions required by <em>H. trinitatis</em>.
 Larvae can be found clinging to boulders and cobbles in the river bed at
 fast-flowing water stream segments and pre-reproductive adults of both
-sex and sexually mature females remain most of the time in the
+sexes and sexually mature females remain most of the time in the
 vegetation of the riparian forest where they find shelter and prey.</p>
 <p>Let’s get started!</p>
 <p>Load required libraries</p>
@@ -1226,12 +1226,12 @@ NoData values:</p>
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/report_no_data.html">report_no_data</a></span><span class="op">(</span>data_dir <span class="op">=</span> <span class="va">layer_dir</span>, var_layer <span class="op">=</span> <span class="va">var_layers</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##                                    Raster   NoData</span></span>
-<span><span class="co">## 1                      bio1_1981-2010.tif        0</span></span>
-<span><span class="co">## 2 bio15_IPSL-CM6A-LR_ssp370_2041-2070.tif        0</span></span>
-<span><span class="co">## 3  bio1_IPSL-CM6A-LR_ssp370_2041-2070.tif        0</span></span>
+<span><span class="co">## 1                     bio15_1981-2010.tif        0</span></span>
+<span><span class="co">## 2  bio1_IPSL-CM6A-LR_ssp370_2041-2070.tif        0</span></span>
+<span><span class="co">## 3                      bio1_1981-2010.tif        0</span></span>
 <span><span class="co">## 4                     bio12_1981-2010.tif        0</span></span>
-<span><span class="co">## 5                     bio15_1981-2010.tif        0</span></span>
-<span><span class="co">## 6 bio12_IPSL-CM6A-LR_ssp370_2041-2070.tif        0</span></span>
+<span><span class="co">## 5 bio12_IPSL-CM6A-LR_ssp370_2041-2070.tif        0</span></span>
+<span><span class="co">## 6 bio15_IPSL-CM6A-LR_ssp370_2041-2070.tif        0</span></span>
 <span><span class="co">## 7               slope_curv_max_dw_cel.tif -9999999</span></span>
 <span><span class="co">## 8                                 spi.tif -9999999</span></span></code></pre>
 <div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
@@ -2206,8 +2206,8 @@ an indicator of the sub-catchment size</p>
 <span><span class="co"># Clear up memory</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">stats_gpkg_h08v06</span>, <span class="va">stats_gpkg_h10v06</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/base/gc.html" class="external-link">gc</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##            used  (Mb) gc trigger  (Mb) max used  (Mb)</span></span>
-<span><span class="co">## Ncells  4553565 243.2    9054930 483.6  5516742 294.7</span></span>
-<span><span class="co">## Vcells 25636561 195.6   55482528 423.3 48432037 369.6</span></span></code></pre>
+<span><span class="co">## Ncells  4553565 243.2    9055074 483.6  5516551 294.7</span></span>
+<span><span class="co">## Vcells 25636562 195.6   55482530 423.3 48432038 369.6</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="prepare-data-for-modelling">Prepare data for modelling<a class="anchor" aria-label="anchor" href="#prepare-data-for-modelling"></a>
@@ -3533,22 +3533,22 @@ length
 <tbody>
 <tr>
 <td style="text-align:right;">
-399760420
+422669473
 </td>
 <td style="text-align:right;">
-22.75000
+26.15000
 </td>
 <td style="text-align:right;">
-1479.600
+1062.100
 </td>
 <td style="text-align:right;">
-52.20000
+46.20000
 </td>
 <td style="text-align:right;">
--0.1469571
+-0.0052948
 </td>
 <td style="text-align:right;">
-29.3000000
+0.1818182
 </td>
 <td style="text-align:right;">
 0.0000000
@@ -3560,109 +3560,147 @@ length
 0.0000000
 </td>
 <td style="text-align:right;">
-0.2147039
+0.0117214
 </td>
 <td style="text-align:right;">
-32.5946315
+0.3856946
 </td>
 <td style="text-align:right;">
-310.4441
+126.4579
 </td>
 </tr>
 <tr>
 <td style="text-align:right;">
-422562631
+422756071
+</td>
+<td style="text-align:right;">
+26.35000
+</td>
+<td style="text-align:right;">
+1125.589
+</td>
+<td style="text-align:right;">
+61.12063
+</td>
+<td style="text-align:right;">
+-0.0034219
+</td>
+<td style="text-align:right;">
+7.8730159
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+2.654503
+</td>
+<td style="text-align:right;">
+0.0404684
+</td>
+<td style="text-align:right;">
+0.0055016
+</td>
+<td style="text-align:right;">
+18.7806825
+</td>
+<td style="text-align:right;">
+967.8947
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+422487178
+</td>
+<td style="text-align:right;">
+25.15000
+</td>
+<td style="text-align:right;">
+1359.418
+</td>
+<td style="text-align:right;">
+53.37273
+</td>
+<td style="text-align:right;">
+-0.0017985
+</td>
+<td style="text-align:right;">
+0.4545455
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+9.284182
+</td>
+<td style="text-align:right;">
+0.0962091
+</td>
+<td style="text-align:right;">
+0.0040079
+</td>
+<td style="text-align:right;">
+0.6555548
+</td>
+<td style="text-align:right;">
+297.0689
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+422686746
+</td>
+<td style="text-align:right;">
+25.85000
+</td>
+<td style="text-align:right;">
+1347.278
+</td>
+<td style="text-align:right;">
+64.30000
+</td>
+<td style="text-align:right;">
+-0.0067778
+</td>
+<td style="text-align:right;">
+0.5217391
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+1.042554
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0104394
+</td>
+<td style="text-align:right;">
+0.8782178
+</td>
+<td style="text-align:right;">
+386.1426
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+399911938
 </td>
 <td style="text-align:right;">
 25.45000
 </td>
 <td style="text-align:right;">
-1367.756
+1236.800
 </td>
 <td style="text-align:right;">
-55.61852
+59.00000
 </td>
 <td style="text-align:right;">
--0.0065207
+-0.0020193
 </td>
 <td style="text-align:right;">
-0.4444444
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-5.127510
-</td>
-<td style="text-align:right;">
-0.0388448
-</td>
-<td style="text-align:right;">
-0.0119042
-</td>
-<td style="text-align:right;">
-0.5665577
-</td>
-<td style="text-align:right;">
-252.3033
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-422735949
-</td>
-<td style="text-align:right;">
-25.56000
-</td>
-<td style="text-align:right;">
-1315.930
-</td>
-<td style="text-align:right;">
-56.53000
-</td>
-<td style="text-align:right;">
--0.0108601
-</td>
-<td style="text-align:right;">
-3.2000000
-</td>
-<td style="text-align:right;">
-0.0300000
-</td>
-<td style="text-align:right;">
-4.081801
-</td>
-<td style="text-align:right;">
-0.1100000
-</td>
-<td style="text-align:right;">
-0.0190966
-</td>
-<td style="text-align:right;">
-4.7180504
-</td>
-<td style="text-align:right;">
-433.4295
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-422712770
-</td>
-<td style="text-align:right;">
-25.65000
-</td>
-<td style="text-align:right;">
-1341.600
-</td>
-<td style="text-align:right;">
-59.70000
-</td>
-<td style="text-align:right;">
--0.0079899
-</td>
-<td style="text-align:right;">
-0.8108108
+0.5135135
 </td>
 <td style="text-align:right;">
 0.0000000
@@ -3674,89 +3712,51 @@ length
 0.0000000
 </td>
 <td style="text-align:right;">
-0.0130706
+0.0035074
 </td>
 <td style="text-align:right;">
-1.4301358
+0.9759714
 </td>
 <td style="text-align:right;">
-426.3545
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-422505303
-</td>
-<td style="text-align:right;">
-25.65000
-</td>
-<td style="text-align:right;">
-1292.833
-</td>
-<td style="text-align:right;">
-46.46667
-</td>
-<td style="text-align:right;">
--0.0023749
-</td>
-<td style="text-align:right;">
-4.1481481
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-1.508495
-</td>
-<td style="text-align:right;">
-0.0471405
-</td>
-<td style="text-align:right;">
-0.0034706
-</td>
-<td style="text-align:right;">
-7.6965779
-</td>
-<td style="text-align:right;">
-641.7324
+430.1357
 </td>
 </tr>
 <tr>
 <td style="text-align:right;">
-422800352
+400041816
 </td>
 <td style="text-align:right;">
-24.92273
+25.49194
 </td>
 <td style="text-align:right;">
-1889.736
+1380.587
 </td>
 <td style="text-align:right;">
-42.36364
+60.49677
 </td>
 <td style="text-align:right;">
--0.0989903
+-0.0027285
 </td>
 <td style="text-align:right;">
-262.6818182
+2.2258065
 </td>
 <td style="text-align:right;">
-0.2489648
+0.0493454
 </td>
 <td style="text-align:right;">
-10.008385
+4.382792
 </td>
 <td style="text-align:right;">
-0.1493789
+0.0739829
 </td>
 <td style="text-align:right;">
-0.1899956
+0.0055497
 </td>
 <td style="text-align:right;">
-636.6739844
+3.5533689
 </td>
 <td style="text-align:right;">
-554.1213
+682.2677
 </td>
 </tr>
 </tbody>
@@ -4200,7 +4200,7 @@ presences.</p>
 <span><span class="co">## Target node size:                 10 </span></span>
 <span><span class="co">## Variable importance mode:         impurity </span></span>
 <span><span class="co">## Splitrule:                        gini </span></span>
-<span><span class="co">## OOB prediction error (Brier s.):  0.08862874</span></span></code></pre>
+<span><span class="co">## OOB prediction error (Brier s.):  0.09022818</span></span></code></pre>
 <p>The model can be evaluated based on the OOB prediction error. This
 metric lies on the fact that the data points that are not used in
 training a tree can be used to test the tree. The errors on the OOB
@@ -4227,12 +4227,12 @@ reclassification rules</p>
 <span>                         pred_occur <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">pred</span><span class="op">$</span><span class="va">predictions</span><span class="op">[</span>,<span class="fl">2</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">prediction</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##    subcatchment_id pred_occur</span></span>
-<span><span class="co">## 1:       399592461 0.02436468</span></span>
-<span><span class="co">## 2:       399592865 0.02486468</span></span>
-<span><span class="co">## 3:       399593700 0.03260040</span></span>
-<span><span class="co">## 4:       399593701 0.02490635</span></span>
-<span><span class="co">## 5:       399593817 0.02270635</span></span>
-<span><span class="co">## 6:       399593818 0.07742579</span></span></code></pre>
+<span><span class="co">## 1:       399592461 0.01745873</span></span>
+<span><span class="co">## 2:       399592865 0.01725873</span></span>
+<span><span class="co">## 3:       399593700 0.02915397</span></span>
+<span><span class="co">## 4:       399593701 0.02551825</span></span>
+<span><span class="co">## 5:       399593817 0.02079921</span></span>
+<span><span class="co">## 6:       399593818 0.08406230</span></span></code></pre>
 <p>and multiply the probability values by 100</p>
 <div class="sourceCode" id="cb66"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">prediction</span><span class="op">$</span><span class="va">pred_occur</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">prediction</span><span class="op">$</span><span class="va">pred_occur</span>, <span class="fl">2</span><span class="op">)</span> <span class="op">*</span> <span class="fl">100</span><span class="op">)</span></span></code></pre></div>
