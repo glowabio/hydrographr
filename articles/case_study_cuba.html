@@ -78,7 +78,7 @@
 data before and after a Species Distribution Model</h3>
                         <h4 data-toc-skip class="author"></h4>
             
-            <h4 data-toc-skip class="date">2023-02-07</h4>
+            <h4 data-toc-skip class="date">2023-02-09</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/glowabio/hydrographr/blob/HEAD/vignettes/case_study_cuba.Rmd" class="external-link"><code>vignettes/case_study_cuba.Rmd</code></a></small>
       <div class="d-none name"><code>case_study_cuba.Rmd</code></div>
@@ -93,15 +93,16 @@ data before and after a Species Distribution Model</h3>
 package along a species distribution modelling (SDM) workflow. We will
 use an SDM to predict the suitable habitats of a dragonfly species in
 Cuba. We will start by defining the regular tiles of the Hydrography90m
-where the occurrence points of the species are located. Afterwards we
-will download the Hydrography90m and CHELSA Bioclim layers of the
-predictor variables, crop them and merge them, if necessary. Then, we
-will aggregate the variable values within each sub-catchment of the
-study area, keeping as predictors their mean and SD per sub-catchment.
-Using the random forest (RF) algorithm, we will build a simple SDM and
-predict where the species could potentially occur. Finally, we will
-reclassify the layer of all the sub-catchments in the study area,
-creating a habitat suitability map.</p>
+(Amatulli et al., 2022) where the occurrence points of the species are
+located. Afterwards we will download the Hydrography90m and CHELSA
+Bioclim (Karger &amp; Zimmermann, 2019) layers of the predictor
+variables, crop them and merge them, if necessary. Then, we will
+aggregate the variable values within each sub-catchment of the study
+area, keeping as predictors their mean and SD per sub-catchment. Using
+the random forest (RF) algorithm, we will build a simple SDM and predict
+where the species could potentially occur. Finally, we will reclassify
+the layer of all the sub-catchments in the study area, creating a
+habitat suitability map.</p>
 <p><em>Hypolestes trinitatis</em> is a damselfly species endemic to
 Cuba. The species inhabits rivers and streams located in forest areas at
 the main mountain ranges of eastern and central Cuba. The presence of
@@ -1226,12 +1227,12 @@ NoData values:</p>
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/report_no_data.html">report_no_data</a></span><span class="op">(</span>data_dir <span class="op">=</span> <span class="va">layer_dir</span>, var_layer <span class="op">=</span> <span class="va">var_layers</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##                                    Raster   NoData</span></span>
-<span><span class="co">## 1  bio1_IPSL-CM6A-LR_ssp370_2041-2070.tif        0</span></span>
-<span><span class="co">## 2                      bio1_1981-2010.tif        0</span></span>
-<span><span class="co">## 3                     bio12_1981-2010.tif        0</span></span>
-<span><span class="co">## 4                     bio15_1981-2010.tif        0</span></span>
-<span><span class="co">## 5 bio15_IPSL-CM6A-LR_ssp370_2041-2070.tif        0</span></span>
-<span><span class="co">## 6 bio12_IPSL-CM6A-LR_ssp370_2041-2070.tif        0</span></span>
+<span><span class="co">## 1                     bio15_1981-2010.tif        0</span></span>
+<span><span class="co">## 2  bio1_IPSL-CM6A-LR_ssp370_2041-2070.tif        0</span></span>
+<span><span class="co">## 3 bio12_IPSL-CM6A-LR_ssp370_2041-2070.tif        0</span></span>
+<span><span class="co">## 4                     bio12_1981-2010.tif        0</span></span>
+<span><span class="co">## 5                      bio1_1981-2010.tif        0</span></span>
+<span><span class="co">## 6 bio15_IPSL-CM6A-LR_ssp370_2041-2070.tif        0</span></span>
 <span><span class="co">## 7               slope_curv_max_dw_cel.tif -9999999</span></span>
 <span><span class="co">## 8                                 spi.tif -9999999</span></span></code></pre>
 <div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
@@ -2206,8 +2207,8 @@ an indicator of the sub-catchment size</p>
 <span><span class="co"># Clear up memory</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">stats_gpkg_h08v06</span>, <span class="va">stats_gpkg_h10v06</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/base/gc.html" class="external-link">gc</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##            used  (Mb) gc trigger  (Mb) max used  (Mb)</span></span>
-<span><span class="co">## Ncells  4553599 243.2    9041591 482.9  5334300 284.9</span></span>
-<span><span class="co">## Vcells 25636499 195.6   58356105 445.3 48381243 369.2</span></span></code></pre>
+<span><span class="co">## Ncells  4553600 243.2    9041522 482.9  5334238 284.9</span></span>
+<span><span class="co">## Vcells 25636517 195.6   58356126 445.3 48381261 369.2</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="prepare-data-for-modelling">Prepare data for modelling<a class="anchor" aria-label="anchor" href="#prepare-data-for-modelling"></a>
@@ -3533,230 +3534,230 @@ length
 <tbody>
 <tr>
 <td style="text-align:right;">
-422816224
-</td>
-<td style="text-align:right;">
-25.95364
-</td>
-<td style="text-align:right;">
-1250.195
-</td>
-<td style="text-align:right;">
-54.34727
-</td>
-<td style="text-align:right;">
--0.0077081
-</td>
-<td style="text-align:right;">
-23.1818182
-</td>
-<td style="text-align:right;">
-0.0187193
-</td>
-<td style="text-align:right;">
-5.2186177
-</td>
-<td style="text-align:right;">
-0.0499256
-</td>
-<td style="text-align:right;">
-0.0129659
-</td>
-<td style="text-align:right;">
-42.081346
-</td>
-<td style="text-align:right;">
-1378.14271
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-422680096
-</td>
-<td style="text-align:right;">
-26.01316
-</td>
-<td style="text-align:right;">
-1048.347
-</td>
-<td style="text-align:right;">
-41.83684
-</td>
-<td style="text-align:right;">
--0.0042464
-</td>
-<td style="text-align:right;">
-1.4210526
-</td>
-<td style="text-align:right;">
-0.0482376
-</td>
-<td style="text-align:right;">
-4.7755263
-</td>
-<td style="text-align:right;">
-0.0482376
-</td>
-<td style="text-align:right;">
-0.0106271
-</td>
-<td style="text-align:right;">
-5.388250
-</td>
-<td style="text-align:right;">
-86.52434
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-399666003
+399663003
 </td>
 <td style="text-align:right;">
 25.05000
 </td>
 <td style="text-align:right;">
-1304.600
+1291.400
 </td>
 <td style="text-align:right;">
-47.10000
+53.30000
 </td>
 <td style="text-align:right;">
--0.0196905
+-0.0072646
 </td>
 <td style="text-align:right;">
-0.5333333
-</td>
-<td style="text-align:right;">
-0.0000000
+0.4166667
 </td>
 <td style="text-align:right;">
 0.0000000
 </td>
 <td style="text-align:right;">
+0.000000
+</td>
+<td style="text-align:right;">
 0.0000000
 </td>
 <td style="text-align:right;">
-0.0265794
+0.0083190
 </td>
 <td style="text-align:right;">
-0.718022
+0.7592028
 </td>
 <td style="text-align:right;">
-218.07427
+337.04161
 </td>
 </tr>
 <tr>
 <td style="text-align:right;">
-422753614
+399915152
 </td>
 <td style="text-align:right;">
-26.15000
+25.25000
 </td>
 <td style="text-align:right;">
-1132.077
+1326.500
 </td>
 <td style="text-align:right;">
-54.40333
+63.50000
 </td>
 <td style="text-align:right;">
--0.0114760
+-0.0086175
 </td>
 <td style="text-align:right;">
-27.2666667
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.1256538
-</td>
-<td style="text-align:right;">
-0.0179505
-</td>
-<td style="text-align:right;">
-0.0169856
-</td>
-<td style="text-align:right;">
-50.121142
-</td>
-<td style="text-align:right;">
-817.71968
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-400077347
-</td>
-<td style="text-align:right;">
-25.76250
-</td>
-<td style="text-align:right;">
-1276.588
-</td>
-<td style="text-align:right;">
-58.31250
-</td>
-<td style="text-align:right;">
--0.0035542
-</td>
-<td style="text-align:right;">
-0.6562500
-</td>
-<td style="text-align:right;">
-0.0330719
-</td>
-<td style="text-align:right;">
-2.4142481
-</td>
-<td style="text-align:right;">
-0.0330719
-</td>
-<td style="text-align:right;">
-0.0062268
-</td>
-<td style="text-align:right;">
-1.214737
-</td>
-<td style="text-align:right;">
-636.68806
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-422483273
-</td>
-<td style="text-align:right;">
-24.65000
-</td>
-<td style="text-align:right;">
-1399.296
-</td>
-<td style="text-align:right;">
-55.27600
-</td>
-<td style="text-align:right;">
--0.0063648
-</td>
-<td style="text-align:right;">
-0.6000000
+0.5000000
 </td>
 <td style="text-align:right;">
 0.0000000
 </td>
 <td style="text-align:right;">
-0.7269003
+0.000000
 </td>
 <td style="text-align:right;">
-0.0649923
+0.0000000
 </td>
 <td style="text-align:right;">
-0.0102470
+0.0178710
 </td>
 <td style="text-align:right;">
-1.356466
+0.5000000
 </td>
 <td style="text-align:right;">
-211.38042
+126.01933
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+422749563
+</td>
+<td style="text-align:right;">
+25.95000
+</td>
+<td style="text-align:right;">
+1193.900
+</td>
+<td style="text-align:right;">
+45.14000
+</td>
+<td style="text-align:right;">
+-0.0195049
+</td>
+<td style="text-align:right;">
+68.7333333
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.000000
+</td>
+<td style="text-align:right;">
+0.1200000
+</td>
+<td style="text-align:right;">
+0.0265231
+</td>
+<td style="text-align:right;">
+116.6450266
+</td>
+<td style="text-align:right;">
+426.71916
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+422553110
+</td>
+<td style="text-align:right;">
+24.95000
+</td>
+<td style="text-align:right;">
+1352.654
+</td>
+<td style="text-align:right;">
+64.90000
+</td>
+<td style="text-align:right;">
+-0.0168124
+</td>
+<td style="text-align:right;">
+1.2500000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+4.239144
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0251438
+</td>
+<td style="text-align:right;">
+1.5951937
+</td>
+<td style="text-align:right;">
+402.95641
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+422826119
+</td>
+<td style="text-align:right;">
+24.99545
+</td>
+<td style="text-align:right;">
+2202.336
+</td>
+<td style="text-align:right;">
+27.83636
+</td>
+<td style="text-align:right;">
+-0.1193546
+</td>
+<td style="text-align:right;">
+6.0909091
+</td>
+<td style="text-align:right;">
+0.1157084
+</td>
+<td style="text-align:right;">
+19.593286
+</td>
+<td style="text-align:right;">
+0.0771389
+</td>
+<td style="text-align:right;">
+0.1969273
+</td>
+<td style="text-align:right;">
+4.6211873
+</td>
+<td style="text-align:right;">
+87.01643
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+422765709
+</td>
+<td style="text-align:right;">
+26.25000
+</td>
+<td style="text-align:right;">
+1003.605
+</td>
+<td style="text-align:right;">
+58.79756
+</td>
+<td style="text-align:right;">
+-0.0022088
+</td>
+<td style="text-align:right;">
+6.7073171
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+1.000232
+</td>
+<td style="text-align:right;">
+0.0154257
+</td>
+<td style="text-align:right;">
+0.0043544
+</td>
+<td style="text-align:right;">
+13.2853191
+</td>
+<td style="text-align:right;">
+732.65883
 </td>
 </tr>
 </tbody>
@@ -4200,7 +4201,7 @@ presences.</p>
 <span><span class="co">## Target node size:                 10 </span></span>
 <span><span class="co">## Variable importance mode:         impurity </span></span>
 <span><span class="co">## Splitrule:                        gini </span></span>
-<span><span class="co">## OOB prediction error (Brier s.):  0.09154686</span></span></code></pre>
+<span><span class="co">## OOB prediction error (Brier s.):  0.09231099</span></span></code></pre>
 <p>The model can be evaluated based on the OOB prediction error. This
 metric lies on the fact that the data points that are not used in
 training a tree can be used to test the tree. The errors on the OOB
@@ -4227,12 +4228,12 @@ reclassification rules</p>
 <span>                         pred_occur <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">pred</span><span class="op">$</span><span class="va">predictions</span><span class="op">[</span>,<span class="fl">2</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">prediction</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##    subcatchment_id pred_occur</span></span>
-<span><span class="co">## 1:       399592461 0.02178333</span></span>
-<span><span class="co">## 2:       399592865 0.02178333</span></span>
-<span><span class="co">## 3:       399593700 0.03076151</span></span>
-<span><span class="co">## 4:       399593701 0.02479405</span></span>
-<span><span class="co">## 5:       399593817 0.02081310</span></span>
-<span><span class="co">## 6:       399593818 0.08958214</span></span></code></pre>
+<span><span class="co">## 1:       399592461 0.02143095</span></span>
+<span><span class="co">## 2:       399592865 0.02298810</span></span>
+<span><span class="co">## 3:       399593700 0.03257857</span></span>
+<span><span class="co">## 4:       399593701 0.03019365</span></span>
+<span><span class="co">## 5:       399593817 0.02491190</span></span>
+<span><span class="co">## 6:       399593818 0.08140476</span></span></code></pre>
 <p>and multiply the probability values by 100</p>
 <div class="sourceCode" id="cb66"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">prediction</span><span class="op">$</span><span class="va">pred_occur</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">prediction</span><span class="op">$</span><span class="va">pred_occur</span>, <span class="fl">2</span><span class="op">)</span> <span class="op">*</span> <span class="fl">100</span><span class="op">)</span></span></code></pre></div>
@@ -4311,6 +4312,12 @@ Dowle, Matt, and Arun Srinivasan. 2022. <em>Data.table: Extension of
 </div>
 <div id="ref-R-terra" class="csl-entry">
 Hijmans, Robert J. 2023. <em>Terra: Spatial Data Analysis</em>. <a href="https://rspatial.org/terra/" class="external-link">https://rspatial.org/terra/</a>.
+</div>
+<div id="ref-karger2019climatologies" class="csl-entry">
+Karger, Dirk Nikolaus, and Niklaus E Zimmermann. 2019.
+<span>“Climatologies at High Resolution for the Earth Land Surface Areas
+CHELSA V1. 2: Technical Specification.”</span> <em>Swiss Federal
+Research Institute WSL, Switzerland</em>.
 </div>
 <div id="ref-R-base" class="csl-entry">
 R Core Team. 2022. <em>R: A Language and Environment for Statistical
