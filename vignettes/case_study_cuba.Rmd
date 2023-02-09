@@ -29,15 +29,16 @@ The following example showcases the functionality of the hydrographr
 package along a species distribution modelling (SDM) workflow. We will
 use an SDM to predict the suitable habitats of a dragonfly species in
 Cuba. We will start by defining the regular tiles of the Hydrography90m
-where the occurrence points of the species are located. Afterwards we
-will download the Hydrography90m and CHELSA Bioclim layers of the
-predictor variables, crop them and merge them, if necessary. Then, we
-will aggregate the variable values within each sub-catchment of the
-study area, keeping as predictors their mean and SD per sub-catchment.
-Using the random forest (RF) algorithm, we will build a simple SDM and
-predict where the species could potentially occur. Finally, we will
-reclassify the layer of all the sub-catchments in the study area,
-creating a habitat suitability map.
+(Amatulli et al., 2022) where the occurrence points of the species are
+located. Afterwards we will download the Hydrography90m and CHELSA
+Bioclim (Karger & Zimmermann, 2019) layers of the predictor variables,
+crop them and merge them, if necessary. Then, we will aggregate the
+variable values within each sub-catchment of the study area, keeping as
+predictors their mean and SD per sub-catchment. Using the random forest
+(RF) algorithm, we will build a simple SDM and predict where the species
+could potentially occur. Finally, we will reclassify the layer of all
+the sub-catchments in the study area, creating a habitat suitability
+map.
 
 *Hypolestes trinitatis* is a damselfly species endemic to Cuba. The
 species inhabits rivers and streams located in forest areas at the main
