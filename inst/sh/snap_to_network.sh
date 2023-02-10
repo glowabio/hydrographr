@@ -69,7 +69,7 @@ export op=$(ogrinfo -so -al $DIR/ref_points_${RAND_STRING}.gpkg \
     | awk '/Feature/ {print $3}')
 
 ##  do the snapping in GRASS
-grass -f --gtext --tmp-location $STR # <<'EOF'
+grass -f --gtext --tmp-location $STR  <<'EOF'
 
 # read stream raster file
 r.in.gdal input=$STR output=stream
