@@ -177,7 +177,7 @@ snap_to_network <- function(data, lon, lat, id, stream_layer,
 
   # Select columns with lon/lat coordinates
     coord <- data %>%
-      select(matches(c(lon, lat)))
+      select(matches(c(id, lon, lat)))
     # Remove duplicated rows across entire data frame
     coord <- coord[!duplicated(coord), ]
 
@@ -202,7 +202,7 @@ snap_to_network <- function(data, lon, lat, id, stream_layer,
 
     processx::run(system.file("sh", "snap_to_network.sh",
                     package = "hydrographr"),
-        args = c(coord_tmp_path, lon, lat,
+        args = c(coord_tmp_path, id, lon, lat,
                  stream_layer, accu_layer, method, distance, accumulation,
                  snap_tmp_path, tempdir()),
         echo = !quiet)
@@ -223,7 +223,7 @@ snap_to_network <- function(data, lon, lat, id, stream_layer,
 
     processx::run(system.file("bat", "snap_to_network.bat",
                     package = "hydrographr"),
-        args = c(wsl_coord_tmp_path, lon, lat,
+        args = c(wsl_coord_tmp_path, id, lon, lat,
                  wsl_stream_layer, wsl_accu_layer, method, distance, accumulation,
                  wsl_snap_tmp_path, wsl_tmp_path, wsl_sh_file),
         echo = !quiet)
@@ -233,15 +233,9 @@ snap_to_network <- function(data, lon, lat, id, stream_layer,
                          keepLeadingZeros = TRUE,
                          header = TRUE, sep = " ")
 
-  # Join with id
-  if (!is.null(id)) {
-    coord <- data %>%
-      select(matches(c(id, lon, lat)))
-    snapped_coord <- left_join(coord, snapped_coord, by = c(lon, lat))
-  }
 
   # Remove files in the tmp folder
-  #file.remove(coord_tmp_path, snap_tmp_path)
+  file.remove(coord_tmp_path, snap_tmp_path)
 
   # Return snapped coordinates
   return(snapped_coord)
