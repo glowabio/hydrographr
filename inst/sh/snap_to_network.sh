@@ -1,14 +1,14 @@
 #! /bin/bash
-export DATA=spdata_1264942.csv
-export ID=occurrence_id
-export LON=longitude
-export LAT=latitude
-export STR=cropped_tile_floury.tif
-export ACC=flow_1264942.tif
-export rdist=10
-export acct=0.8
-export SNAP=final.txt
-export DIR=/dev/shm
+#export DATA=spdata_1264942.csv
+#export ID=occurrence_id
+#export LON=longitude
+#export LAT=latitude
+#export STR=cropped_tile_floury.tif
+#export ACC=flow_1264942.tif
+#export rdist=10
+#export acct=0.8
+#export SNAP=final.txt
+#export DIR=/dev/shm
 
 
 ##  file (e.g. txt or csv) that has been generated at the beginning
