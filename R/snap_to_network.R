@@ -49,7 +49,10 @@
 #' of the snapped stream segment. If the sub-catchment ID is NA, no stream segment
 #' was found within the given distance (method = "distance") or no stream segment
 #' wad found within the given distance and a flow accumulation equal or higher
-#' than the given threshold (method = "accumulation").
+#' than the given threshold (method = "accumulation"). "out-bbox" means that the
+#' provided coordinates are not within the extend (bounding box) of the
+#' provided stream network layer.
+#'
 #'
 #' @author Maria M. Üblacker, Jaime Garcia Marquez
 #'
@@ -187,7 +190,7 @@ snap_to_network <- function(data, lon, lat, id, stream_layer,
   fwrite(coord, coord_tmp_path, col.names = TRUE,
          row.names = FALSE, quote = FALSE, sep = ",")
   # Path for tmp regional unit ids text file
-  snap_tmp_path <- paste0(tempdir(), "/snapped_points", rand_string, ".txt")
+  snap_tmp_path <- paste0(tempdir(), "/snapped_points_", rand_string, ".txt")
 
   # Check operating system
   sys_os <- get_os()
@@ -228,14 +231,14 @@ snap_to_network <- function(data, lon, lat, id, stream_layer,
                  wsl_snap_tmp_path, wsl_tmp_path, wsl_sh_file),
         echo = !quiet)
   }
-  snapped_coord <- fread(paste0(tempdir(), "/snapped_points",
+  snapped_coord <- fread(paste0(tempdir(), "/snapped_points_",
                                 rand_string, ".txt"),
                          keepLeadingZeros = TRUE,
                          header = TRUE, sep = " ")
 
 
   # Remove files in the tmp folder
-  file.remove(coord_tmp_path, snap_tmp_path)
+  #file.remove(coord_tmp_path, snap_tmp_path)
 
   # Return snapped coordinates
   return(snapped_coord)
