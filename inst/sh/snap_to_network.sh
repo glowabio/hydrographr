@@ -1,15 +1,4 @@
 #! /bin/bash
-#export DATA=spdata_1264942.csv
-#export ID=occurrence_id
-#export LON=longitude
-#export LAT=latitude
-#export STR=cropped_tile_floury.tif
-#export ACC=flow_1264942.tif
-#export rdist=1
-#export acct=5000
-#export SNAP=final.txt
-#export DIR=/dev/shm
-
 
 ##  file (e.g. txt or csv) that has been generated at the beginning
 ##  of the R function, based on the data.frame table the user provided
@@ -90,14 +79,14 @@ then
     # are all the original points in there?
     np=$(v.info snap_points | awk '/points:/{print $5}')
 
-    # if not, then identify the ids of the points left out (out of extention of 
+    # if not, then identify the ids of the points left out (out of extention of
     # stream raster file)
     if [[ $op != $np  ]]
     then
         lo=($(comm -3 \
             <(v.report -c map=ref_points option=coor | awk -F"|" '{print $1}') \
             <(v.report -c map=snap_points option=coor | awk -F"|" '{print $1}')))
-    
+
         for i in ${lo[@]}
         do
             echo "$i,out-bbox,out-bbox,,NA" > $DIR/stream_ID_${RAND_STRING}_d_tmp.txt
@@ -128,12 +117,12 @@ then
         <(printf "%s\n" subc_id_snap_dist $(awk -F, '{print $1, $5}' $DIR/stream_ID_${RAND_STRING}_d_tmp.txt | sort -gk1n | awk '{print $2}'))  \
         >  $DIR/final_tmp_${RAND_STRING}.txt
 
-    awk '{print $1, $2, $3, $4, $5, $6, $8}' \
+    awk '{print $1, $2, $3, $4, $5, $7}' \
         $DIR/final_tmp_${RAND_STRING}.txt \
         > $SNAP
 
     rm $DIR/snap_coords_${RAND_STRING}_d.txt $DIR/stream_ID_${RAND_STRING}_d_tmp.txt \
-        $DIR/final_tmp_${RAND_STRING}.txt
+       $DIR/final_tmp_${RAND_STRING}.txt
 fi
 #
 #
@@ -146,14 +135,14 @@ then
     # are all the original points in there?
     np=$(v.info snap_points | awk '/points:/{print $5}')
 
-    # if not, then identify the ids of the points left out (out of extention of 
+    # if not, then identify the ids of the points left out (out of extention of
     # stream raster file)
     if [[ $op != $np  ]]
     then
         lo=($(comm -3 \
             <(v.report -c map=ref_points option=coor | awk -F"|" '{print $1}') \
             <(v.report -c map=snap_points option=coor | awk -F"|" '{print $1}')))
-    
+
         for i in ${lo[@]}
         do
             echo "$i,out-bbox,out-bbox,,NA" > $DIR/stream_ID_${RAND_STRING}_a_tmp.txt
@@ -182,9 +171,9 @@ then
         <(sort -gk1n $DIR/coords_${RAND_STRING}.txt) \
         <(sort -gk3n $DIR/snap_coords_${RAND_STRING}_a.txt) \
         <(printf "%s\n" subc_id_snap_accu $(awk -F, '{print $1, $5}' $DIR/stream_ID_${RAND_STRING}_a_tmp.txt | sort -gk1n | awk '{print $2}'))  \
-        >  $DIR/final_tmp_${RAND_STRING}.txt 
+        >  $DIR/final_tmp_${RAND_STRING}.txt
 
-    awk '{print $1, $2, $3, $4, $5, $6, $8}' \
+    awk '{print $1, $2, $3, $4, $5, $7}' \
         $DIR/final_tmp_${RAND_STRING}.txt \
         > $SNAP
 
@@ -201,14 +190,14 @@ then
     # are all the original points in there?
     np=$(v.info snap_points_d | awk '/points:/{print $5}')
 
-    # if not, then identify the ids of the points left out (out of extention of 
+    # if not, then identify the ids of the points left out (out of extention of
     # stream raster file)
     if [[ $op != $np  ]]
     then
         lo=($(comm -3 \
             <(v.report -c map=ref_points option=coor | awk -F"|" '{print $1}') \
             <(v.report -c map=snap_points_d option=coor | awk -F"|" '{print $1}')))
-    
+
         for i in ${lo[@]}
         do
             echo "$i,out-bbox,out-bbox,,NA" > $DIR/stream_ID_${RAND_STRING}_d_tmp.txt
@@ -218,7 +207,7 @@ then
 
     r.what --o -v map=stream points=snap_points_d separator=comma \
         null_value=NA >> $DIR/stream_ID_${RAND_STRING}_d_tmp.txt
-    
+
 
     r.in.gdal input=$ACC output=accum
     r.stream.snap --o input=ref_points output=snap_points_a stream_rast=stream \
@@ -243,7 +232,7 @@ then
 
     v.out.ascii -c input=snap_points_d separator=space | awk 'NR > 1'  \
         >> $DIR/snap_coords_${RAND_STRING}_d.txt
-    
+
 
     v.out.ascii -c input=snap_points_a separator=space | awk 'NR > 1' \
         >> $DIR/snap_coords_${RAND_STRING}_a.txt
@@ -259,7 +248,7 @@ then
         <(printf "%s\n" subc_id_snap_accu $(awk -F, '{print $1, $5}' $DIR/stream_ID_${RAND_STRING}_a_tmp.txt | sort -gk1n | awk '{print $2}'))  \
         >  $DIR/final_tmp_${RAND_STRING}.txt  #$SNAP
 
-    awk '{print $1, $2, $3, $4, $5, $6, $8, $9, $10, $12}' \
+    awk '{print $1, $2, $3, $4, $5, $7, $8, $9, $11}' \
         $DIR/final_tmp_${RAND_STRING}.txt \
         > $SNAP
 
@@ -271,4 +260,4 @@ fi
 
 EOF
 
-rm $DIR/ref_points_${RAND_STRING}.gpkg 
+rm $DIR/ref_points_${RAND_STRING}.gpkg
