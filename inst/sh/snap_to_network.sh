@@ -5,8 +5,8 @@
 #export LAT=latitude
 #export STR=cropped_tile_floury.tif
 #export ACC=flow_1264942.tif
-#export rdist=10
-#export acct=0.8
+#export rdist=1
+#export acct=5000
 #export SNAP=final.txt
 #export DIR=/dev/shm
 
@@ -133,7 +133,7 @@ then
         > $SNAP
 
     rm $DIR/snap_coords_${RAND_STRING}_d.txt $DIR/stream_ID_${RAND_STRING}_d_tmp.txt \
-        $DIR/ref_points_${RAND_STRING}.gpkg $DIR/final_tmp_${RAND_STRING}.txt
+        $DIR/final_tmp_${RAND_STRING}.txt
 fi
 #
 #
@@ -188,9 +188,8 @@ then
         $DIR/final_tmp_${RAND_STRING}.txt \
         > $SNAP
 
-
     rm $DIR/snap_coords_${RAND_STRING}_*.txt $DIR/stream_ID_${RAND_STRING}_*.txt \
-        $DIR/ref_points_${RAND_STRING}.gpkg $DIR/final_tmp_${RAND_STRING}.txt
+        $DIR/final_tmp_${RAND_STRING}.txt
 fi
 
 
@@ -266,8 +265,10 @@ then
 
 
     rm $DIR/snap_coords_${RAND_STRING}_*.txt $DIR/stream_ID_${RAND_STRING}_*.txt \
-        $DIR/ref_points_${RAND_STRING}.gpkg $DIR/final_tmp_${RAND_STRING}.txt
+        $DIR/final_tmp_${RAND_STRING}.txt
 fi
 
 
 EOF
+
+rm $DIR/ref_points_${RAND_STRING}.gpkg 
