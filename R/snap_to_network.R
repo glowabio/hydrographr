@@ -238,7 +238,7 @@ snap_to_network <- function(data, lon, lat, id, stream_layer,
 
 
   # Remove files in the tmp folder
-  #file.remove(coord_tmp_path, snap_tmp_path)
+  file.remove(coord_tmp_path, snap_tmp_path)
 
   # Return snapped coordinates
   return(snapped_coord)
