@@ -56,7 +56,9 @@ Returns a data.frame with the snapped coordinates and the sub-catchment ID
 of the snapped stream segment. If the sub-catchment ID is NA, no stream segment
 was found within the given distance (method = "distance") or no stream segment
 wad found within the given distance and a flow accumulation equal or higher
-than the given threshold (method = "accumulation").
+than the given threshold (method = "accumulation"). "out-bbox" means that the
+provided coordinates are not within the extend (bounding box) of the
+provided stream network layer.
 }
 \description{
 Snap points to the next stream segment within a defined radius
