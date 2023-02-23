@@ -144,6 +144,13 @@ Let's visualise the species occurrences on the map
 spdata_vect <- vect(spdata, geom=c("longitude", "latitude"))
 ```
 
+Let's define the extent (bounding box) of the study area (xmin, ymin,
+xmax, ymax)
+
+```{r}
+bbox <- c(-84.9749110583, 19.8554808619, -74.1780248685, 23.1886107447)
+```
+
 ```{r, include = FALSE, eval = FALSE}
 m <- leaflet() %>%
   addProviderTiles('Esri.WorldShadedRelief') %>%
@@ -262,13 +269,6 @@ destfile = "data/chelsa_bioclim/bio1_IPSL-CM6A-LR_ssp370_2041-2070.tif")
 After having downloaded all the layers, we need to crop them to the
 extent of our study area. This is straightforward in the case of the
 global CHELSA layers:
-
-Let's define the extent (bounding box) of the study area (xmin, ymin,
-xmax, ymax)
-
-```{r}
-bbox <- c(-84.9749110583, 19.8554808619, -74.1780248685, 23.1886107447)
-```
 
 We define the directory containing the layers to be cropped
 
