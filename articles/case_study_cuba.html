@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">hydrographr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.7</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.8</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -78,7 +78,7 @@
 data before and after a Species Distribution Model</h3>
                         <h4 data-toc-skip class="author"></h4>
             
-            <h4 data-toc-skip class="date">2023-02-09</h4>
+            <h4 data-toc-skip class="date">2023-02-23</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/glowabio/hydrographr/blob/HEAD/vignettes/case_study_cuba.Rmd" class="external-link"><code>vignettes/case_study_cuba.Rmd</code></a></small>
       <div class="d-none name"><code>case_study_cuba.Rmd</code></div>
@@ -909,7 +909,11 @@ Hypolestes_trinitatis
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Convert species data to a spatial vector object to plot the points</span></span>
 <span><span class="va">spdata_vect</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/vect.html" class="external-link">vect</a></span><span class="op">(</span><span class="va">spdata</span>, geom<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"longitude"</span>, <span class="st">"latitude"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>Let’s define the extent (bounding box) of the study area (xmin, ymin,
+xmax, ymax)</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">bbox</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">84.9749110583</span>, <span class="fl">19.8554808619</span>, <span class="op">-</span><span class="fl">74.1780248685</span>, <span class="fl">23.1886107447</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/leaflet/man/leaflet.html" class="external-link">leaflet</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/pkg/leaflet/man/addProviderTiles.html" class="external-link">addProviderTiles</a></span><span class="op">(</span><span class="st">'Esri.WorldShadedRelief'</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/pkg/leaflet/man/map-methods.html" class="external-link">setMaxBounds</a></span><span class="op">(</span><span class="va">bbox</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, <span class="va">bbox</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>, <span class="va">bbox</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span>, <span class="va">bbox</span><span class="op">[</span><span class="fl">4</span><span class="op">]</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -927,9 +931,9 @@ these IDs using the function <em>get_tile_id()</em>. This function
 downloads and uses the auxiliary raster file that contains all the
 regional units globally, and thus requires an active internet
 connection.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">tile_id</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_tile_id.html">get_tile_id</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">spdata</span>, lon <span class="op">=</span> <span class="st">"longitude"</span>, lat <span class="op">=</span> <span class="st">"latitude"</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">tile_id</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_tile_id.html">get_tile_id</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">spdata</span>, lon <span class="op">=</span> <span class="st">"longitude"</span>, lat <span class="op">=</span> <span class="st">"latitude"</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">tile_id</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "h08v06" "h10v04" "h10v06"</span></span></code></pre>
 <p>Currently the function returns all the tiles of the regional unit
@@ -939,7 +943,7 @@ double check which tile IDs are relevant for your purpose using the
 <strong>Tile map</strong> found <a href="https://hydrography.org/hydrography90m/hydrography90m_layers/" class="external-link">here</a>.</p>
 <p>In our case, Cuba spreads across two tiles, which hold the IDs
 “h08v06” and “h10v06”, so we will keep only these two.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">tile_id</span> <span class="op">&lt;-</span> <span class="va">tile_id</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">3</span><span class="op">)</span><span class="op">]</span></span></code></pre></div>
 <p>Let’s define the Hydrography90m variables that we would like to
 download. We will use the variables <a href="https://geo.igb-berlin.de/maps/new?layer=geonode:hydrography90m_v1_slope_curv_max_dw_cel_cog&amp;view=True" class="external-link">slope_curv_max_dw_cel</a>
@@ -950,12 +954,12 @@ download the <a href="https://geo.igb-berlin.de/maps/new?layer=geonode:hydrograp
 layer, which is the necessary base-layer for the workflow.</p>
 <p>A list of all available Hydrography90m variables, as well as details
 and visualisations are available <a href="https://hydrography.org/hydrography90m/hydrography90m_layers/" class="external-link">here</a>.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Variables in raster format</span></span>
 <span><span class="va">vars_tif</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sub_catchment"</span>, <span class="st">"slope_curv_max_dw_cel"</span>, <span class="st">"spi"</span><span class="op">)</span></span>
 <span><span class="co"># Variables in vector format</span></span>
 <span><span class="va">vars_gpkg</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"order_vect_point"</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Download the .tif tiles of the desired variables</span></span>
 <span><span class="fu"><a href="../reference/download_tiles.html">download_tiles</a></span><span class="op">(</span>variable <span class="op">=</span> <span class="va">vars_tif</span>, tile_id <span class="op">=</span> <span class="va">tile_id</span>, file_format <span class="op">=</span> <span class="st">"tif"</span>,</span>
 <span>              download_dir <span class="op">=</span> <span class="st">"data"</span><span class="op">)</span></span>
@@ -964,10 +968,10 @@ and visualisations are available <a href="https://hydrography.org/hydrography90m
 <span><span class="fu"><a href="../reference/download_tiles.html">download_tiles</a></span><span class="op">(</span>variable <span class="op">=</span> <span class="va">vars_gpkg</span>, tile_id <span class="op">=</span> <span class="va">tile_id</span>, file_format <span class="op">=</span> <span class="st">"gpkg"</span>,</span>
 <span>              download_dir <span class="op">=</span> <span class="st">"data"</span><span class="op">)</span></span></code></pre></div>
 <p>Then download the CHELSA present and future Bioclim variables</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Create download directory</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data/chelsa_bioclim"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Extend timeout to 1000s to allow uninterrupted downloading</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>timeout <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></span>
 <span></span>
@@ -991,10 +995,6 @@ and visualisations are available <a href="https://hydrography.org/hydrography90m
 <p>After having downloaded all the layers, we need to crop them to the
 extent of our study area. This is straightforward in the case of the
 global CHELSA layers:</p>
-<p>Let’s define the extent (bounding box) of the study area (xmin, ymin,
-xmax, ymax)</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">bbox</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">84.9749110583</span>, <span class="fl">19.8554808619</span>, <span class="op">-</span><span class="fl">74.1780248685</span>, <span class="fl">23.1886107447</span><span class="op">)</span></span></code></pre></div>
 <p>We define the directory containing the layers to be cropped</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">dirs_chelsa</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.dirs</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data/chelsa_bioclim"</span><span class="op">)</span>,</span>
@@ -1227,13 +1227,13 @@ NoData values:</p>
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/report_no_data.html">report_no_data</a></span><span class="op">(</span>data_dir <span class="op">=</span> <span class="va">layer_dir</span>, var_layer <span class="op">=</span> <span class="va">var_layers</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##                                    Raster   NoData</span></span>
-<span><span class="co">## 1                     bio15_1981-2010.tif        0</span></span>
-<span><span class="co">## 2  bio1_IPSL-CM6A-LR_ssp370_2041-2070.tif        0</span></span>
-<span><span class="co">## 3 bio12_IPSL-CM6A-LR_ssp370_2041-2070.tif        0</span></span>
-<span><span class="co">## 4                     bio12_1981-2010.tif        0</span></span>
-<span><span class="co">## 5                      bio1_1981-2010.tif        0</span></span>
-<span><span class="co">## 6 bio15_IPSL-CM6A-LR_ssp370_2041-2070.tif        0</span></span>
-<span><span class="co">## 7               slope_curv_max_dw_cel.tif -9999999</span></span>
+<span><span class="co">## 1               slope_curv_max_dw_cel.tif -9999999</span></span>
+<span><span class="co">## 2                      bio1_1981-2010.tif        0</span></span>
+<span><span class="co">## 3  bio1_IPSL-CM6A-LR_ssp370_2041-2070.tif        0</span></span>
+<span><span class="co">## 4                     bio15_1981-2010.tif        0</span></span>
+<span><span class="co">## 5                     bio12_1981-2010.tif        0</span></span>
+<span><span class="co">## 6 bio12_IPSL-CM6A-LR_ssp370_2041-2070.tif        0</span></span>
+<span><span class="co">## 7 bio15_IPSL-CM6A-LR_ssp370_2041-2070.tif        0</span></span>
 <span><span class="co">## 8                                 spi.tif -9999999</span></span></code></pre>
 <div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Run the function that returns the zonal statistics</span></span>
@@ -2207,8 +2207,8 @@ an indicator of the sub-catchment size</p>
 <span><span class="co"># Clear up memory</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">stats_gpkg_h08v06</span>, <span class="va">stats_gpkg_h10v06</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/base/gc.html" class="external-link">gc</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##            used  (Mb) gc trigger  (Mb) max used  (Mb)</span></span>
-<span><span class="co">## Ncells  4553600 243.2    9041522 482.9  5334238 284.9</span></span>
-<span><span class="co">## Vcells 25636517 195.6   58356126 445.3 48381261 369.2</span></span></code></pre>
+<span><span class="co">## Ncells  4556577 243.4    9052442 483.5  5535284 295.7</span></span>
+<span><span class="co">## Vcells 25640753 195.7   55488556 423.4 48436195 369.6</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="prepare-data-for-modelling">Prepare data for modelling<a class="anchor" aria-label="anchor" href="#prepare-data-for-modelling"></a>
@@ -3534,25 +3534,60 @@ length
 <tbody>
 <tr>
 <td style="text-align:right;">
-399663003
+422791601
 </td>
 <td style="text-align:right;">
-25.05000
+25.03235
 </td>
 <td style="text-align:right;">
-1291.400
+1782.594
 </td>
 <td style="text-align:right;">
-53.30000
+37.54706
 </td>
 <td style="text-align:right;">
--0.0072646
+-0.0703922
 </td>
 <td style="text-align:right;">
-0.4166667
+29.94118
 </td>
 <td style="text-align:right;">
-0.0000000
+0.038122
+</td>
+<td style="text-align:right;">
+8.6536949
+</td>
+<td style="text-align:right;">
+0.1143660
+</td>
+<td style="text-align:right;">
+0.1361968
+</td>
+<td style="text-align:right;">
+49.8615384
+</td>
+<td style="text-align:right;">
+300.5212
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+422837960
+</td>
+<td style="text-align:right;">
+24.75000
+</td>
+<td style="text-align:right;">
+1654.500
+</td>
+<td style="text-align:right;">
+50.70000
+</td>
+<td style="text-align:right;">
+-0.0175495
+</td>
+<td style="text-align:right;">
+12.30000
 </td>
 <td style="text-align:right;">
 0.000000
@@ -3561,36 +3596,36 @@ length
 0.0000000
 </td>
 <td style="text-align:right;">
-0.0083190
+0.0000000
 </td>
 <td style="text-align:right;">
-0.7592028
+0.0244490
 </td>
 <td style="text-align:right;">
-337.04161
+18.9581117
+</td>
+<td style="text-align:right;">
+345.9485
 </td>
 </tr>
 <tr>
 <td style="text-align:right;">
-399915152
+422591354
 </td>
 <td style="text-align:right;">
 25.25000
 </td>
 <td style="text-align:right;">
-1326.500
+1518.100
 </td>
 <td style="text-align:right;">
-63.50000
+68.00000
 </td>
 <td style="text-align:right;">
--0.0086175
+-0.0060240
 </td>
 <td style="text-align:right;">
-0.5000000
-</td>
-<td style="text-align:right;">
-0.0000000
+100.50000
 </td>
 <td style="text-align:right;">
 0.000000
@@ -3599,165 +3634,130 @@ length
 0.0000000
 </td>
 <td style="text-align:right;">
-0.0178710
+0.0000000
 </td>
 <td style="text-align:right;">
-0.5000000
+0.0108450
 </td>
 <td style="text-align:right;">
-126.01933
+100.5000000
+</td>
+<td style="text-align:right;">
+126.2297
 </td>
 </tr>
 <tr>
 <td style="text-align:right;">
-422749563
+422592277
 </td>
 <td style="text-align:right;">
-25.95000
+25.55000
 </td>
 <td style="text-align:right;">
-1193.900
+1392.085
 </td>
 <td style="text-align:right;">
-45.14000
+50.10909
 </td>
 <td style="text-align:right;">
--0.0195049
+-0.0025585
 </td>
 <td style="text-align:right;">
-68.7333333
-</td>
-<td style="text-align:right;">
-0.0000000
+519.81818
 </td>
 <td style="text-align:right;">
 0.000000
 </td>
 <td style="text-align:right;">
-0.1200000
+0.4799755
 </td>
 <td style="text-align:right;">
-0.0265231
+0.0514259
 </td>
 <td style="text-align:right;">
-116.6450266
+0.0043101
 </td>
 <td style="text-align:right;">
-426.71916
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-422553110
+1113.4391291
 </td>
 <td style="text-align:right;">
-24.95000
-</td>
-<td style="text-align:right;">
-1352.654
-</td>
-<td style="text-align:right;">
-64.90000
-</td>
-<td style="text-align:right;">
--0.0168124
-</td>
-<td style="text-align:right;">
-1.2500000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-4.239144
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0251438
-</td>
-<td style="text-align:right;">
-1.5951937
-</td>
-<td style="text-align:right;">
-402.95641
+557.1117
 </td>
 </tr>
 <tr>
 <td style="text-align:right;">
-422826119
-</td>
-<td style="text-align:right;">
-24.99545
-</td>
-<td style="text-align:right;">
-2202.336
-</td>
-<td style="text-align:right;">
-27.83636
-</td>
-<td style="text-align:right;">
--0.1193546
-</td>
-<td style="text-align:right;">
-6.0909091
-</td>
-<td style="text-align:right;">
-0.1157084
-</td>
-<td style="text-align:right;">
-19.593286
-</td>
-<td style="text-align:right;">
-0.0771389
-</td>
-<td style="text-align:right;">
-0.1969273
-</td>
-<td style="text-align:right;">
-4.6211873
-</td>
-<td style="text-align:right;">
-87.01643
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-422765709
+422880146
 </td>
 <td style="text-align:right;">
 26.25000
 </td>
 <td style="text-align:right;">
-1003.605
+1192.371
 </td>
 <td style="text-align:right;">
-58.79756
+53.00000
 </td>
 <td style="text-align:right;">
--0.0022088
+-0.0322814
 </td>
 <td style="text-align:right;">
-6.7073171
+3.00000
+</td>
+<td style="text-align:right;">
+0.000000
+</td>
+<td style="text-align:right;">
+1.9299995
 </td>
 <td style="text-align:right;">
 0.0000000
 </td>
 <td style="text-align:right;">
-1.000232
+0.0656900
 </td>
 <td style="text-align:right;">
-0.0154257
+0.9258201
 </td>
 <td style="text-align:right;">
-0.0043544
+174.3590
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+422838321
 </td>
 <td style="text-align:right;">
-13.2853191
+24.45000
 </td>
 <td style="text-align:right;">
-732.65883
+1535.600
+</td>
+<td style="text-align:right;">
+51.80000
+</td>
+<td style="text-align:right;">
+-0.0214617
+</td>
+<td style="text-align:right;">
+236.20000
+</td>
+<td style="text-align:right;">
+0.000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0521696
+</td>
+<td style="text-align:right;">
+359.7312330
+</td>
+<td style="text-align:right;">
+261.1695
 </td>
 </tr>
 </tbody>
@@ -4201,7 +4201,7 @@ presences.</p>
 <span><span class="co">## Target node size:                 10 </span></span>
 <span><span class="co">## Variable importance mode:         impurity </span></span>
 <span><span class="co">## Splitrule:                        gini </span></span>
-<span><span class="co">## OOB prediction error (Brier s.):  0.09231099</span></span></code></pre>
+<span><span class="co">## OOB prediction error (Brier s.):  0.09250674</span></span></code></pre>
 <p>The model can be evaluated based on the OOB prediction error. This
 metric lies on the fact that the data points that are not used in
 training a tree can be used to test the tree. The errors on the OOB
@@ -4228,12 +4228,12 @@ reclassification rules</p>
 <span>                         pred_occur <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">pred</span><span class="op">$</span><span class="va">predictions</span><span class="op">[</span>,<span class="fl">2</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">prediction</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##    subcatchment_id pred_occur</span></span>
-<span><span class="co">## 1:       399592461 0.02143095</span></span>
-<span><span class="co">## 2:       399592865 0.02298810</span></span>
-<span><span class="co">## 3:       399593700 0.03257857</span></span>
-<span><span class="co">## 4:       399593701 0.03019365</span></span>
-<span><span class="co">## 5:       399593817 0.02491190</span></span>
-<span><span class="co">## 6:       399593818 0.08140476</span></span></code></pre>
+<span><span class="co">## 1:       399592461 0.03311825</span></span>
+<span><span class="co">## 2:       399592865 0.03328492</span></span>
+<span><span class="co">## 3:       399593700 0.04635794</span></span>
+<span><span class="co">## 4:       399593701 0.03917738</span></span>
+<span><span class="co">## 5:       399593817 0.03350159</span></span>
+<span><span class="co">## 6:       399593818 0.09691151</span></span></code></pre>
 <p>and multiply the probability values by 100</p>
 <div class="sourceCode" id="cb66"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">prediction</span><span class="op">$</span><span class="va">pred_occur</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">prediction</span><span class="op">$</span><span class="va">pred_occur</span>, <span class="fl">2</span><span class="op">)</span> <span class="op">*</span> <span class="fl">100</span><span class="op">)</span></span></code></pre></div>
