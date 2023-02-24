@@ -52,7 +52,7 @@ export SITE=$( awk -F, 'NR==1 {print $1}' $DATA )
 
 
 if [ "$DIST" = eucl  ] || [ "$DIST" = all  ]
-
+#why if dist=all don't we run only the fun in parallel??
 then
 
     ###  Calculate Euclidean distance between all points

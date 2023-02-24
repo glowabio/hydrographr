@@ -214,8 +214,12 @@ get_distance <- function(data, lon, lat, id, basin_id = NULL,
   ids_tmp_path <- paste0(tempdir(), "/ids_", rand_string, ".csv")
   fwrite(ids, ids_tmp_path, col.names = TRUE,
          row.names = FALSE, quote = FALSE, sep = ",")
-  # Path for tmp regional unit ids text file
-  snap_tmp_path <- paste0(tempdir(), "/snapped_points", rand_string, ".csv")
+  # Path for distances tmp dir
+  dist_tmp_dir <- paste0(tempdir(), "/distances")
+  # Create distances tmp dir
+  dir.create(dist_tmp_dir, showWarnings = FALSE)
+  # Path for tmp ids csv file
+  dist_tmp_path <- paste0(tempdir(), "/distances", rand_string, ".csv")
 
   # Check operating system
   sys_os <- get_os()
@@ -226,44 +230,11 @@ get_distance <- function(data, lon, lat, id, basin_id = NULL,
 
     processx::run(system.file("sh", "get_points_distance.sh",
                     package = "hydrographr"),
-        args = c(data_dir, data, lon, lat, basin_colname = NULL,
-                 stream_layer = NULL, basin_layer = NULL, n_cores = 1,
-                 snap_tmp_path,  tempdir(), distance),
+        args = c(data_dir, ids_tmp_path, lon, lat, basin_colname = "basin_id",
+                 stream_layer = NULL, basin_layer = basin_layer, n_cores = 1,
+                 dist_tmp_dir, distance),
         echo = !quiet)
-# ################
-#     # path - location of input/output data
-#     export DIR=$1
-#
-#     # name of input table. Must be a .csv file
-#     export DATA=$2
-#
-#     # names of lon and lat coordinates and basinID column
-#     export LON=$3
-#     export LAT=$4
-#     ### from here on all parameters are only needed for the longitudinal
-#     ### didatnce calculation
-#     export BAS_COL=$5
-#
-#     # full path to stream network gpkg file
-#     export STREAM=$6
-#
-#     # full path and name of basin .tif file
-#     export BASIN=$7
-#
-#     # number of cores if running in parallel
-#     export PAR=$8
-#
-#     # destination folder path
-#     export OUT=$9
-#
-#
-#
-#
-#
-#     # which distances to provide (eucl "euclidian", long "longitudinal", all)
-#     export DIST=${10}
 
-################
 
   } else {
 
@@ -274,7 +245,7 @@ get_distance <- function(data, lon, lat, id, basin_id = NULL,
     wsl_basin_layer <- fix_path(basin_layer)
     wsl_subc_layer <- fix_path(subc_layer)
     wsl_stream_layer <- fix_path(stream_layer)
-    wsl_snap_tmp_path <- fix_path(snap_tmp_path)
+    wsl_dist_tmp_path <- fix_path(dist_tmp_path)
     wsl_tmp_path <- fix_path(tempdir())
     wsl_sh_file <- fix_path(system.file("sh", "snap_to_subc_segment.sh",
                                         package = "hydrographr"))
@@ -283,15 +254,16 @@ get_distance <- function(data, lon, lat, id, basin_id = NULL,
                     package = "hydrographr"),
         args = c(wsl_ids_tmp_path, lon, lat, wsl_basin_layer,
                  wsl_subc_layer, wsl_stream_layer, n_cores,
-                 wsl_snap_tmp_path, wsl_tmp_path, wsl_sh_file),
+                 wsl_dist_tmp_path, wsl_tmp_path, wsl_sh_file),
         echo = !quiet)
   }
-  snapped_coord <- fread(paste0(tempdir(), "/snapped_points",
+
+  snapped_coord <- fread(paste0(tempdir(), "/distances",
                                 rand_string, ".csv"),
                          keepLeadingZeros = TRUE, header = TRUE, sep = ",")
 
   # Remove files in the tmp folder
-  file.remove(snap_tmp_path)
+  file.remove(dist_tmp_path)
 
   # Return snapped coordinates
   return(snapped_coord)
