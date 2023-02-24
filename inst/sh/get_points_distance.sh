@@ -20,9 +20,9 @@ export DATA=$2
 # names of lon and lat coordinates and basinID column
 export LON=$3
 export LAT=$4
-   ### from here on all parameters are only nedded for the longitudinal
-   ### didatnce calculation
-export BAS=$5
+   ### from here on all parameters are only needed for the longitudinal
+   ### distance calculation
+export BAS_COL=$5
 
 # full path to stream network gpkg file
 export STREAM=$6
@@ -56,7 +56,7 @@ if [ "$DIST" = eucl  ] || [ "$DIST" = all  ]
 then
 
     ###  Calculate Euclidean distance between all points
-    grass78  -f -text --tmp-location  -c EPSG:4326 <<'EOF'
+    grass78  -f -gtext --tmp-location  -c  EPSG:4326 <<'EOF'
 
     #  import points
     v.in.ogr --o input=$DIR/ref_points.gpkg layer=ref_points \
@@ -65,7 +65,7 @@ then
     #  Calculate distance, results are given in meters
     v.distance -pa from=allpoints to=allpoints upload=dist separator=comma \
         | sed -re 's/([0-9]+\.[0-9]{3})[0-9]+/\1/g' | \
-        awk -F, 'NR > 1 {print $0}' > $OUT/dist_euclidian.csv 
+        awk -F, 'NR > 1 {print $0}' > $OUT/dist_euclidian.csv
 
 EOF
 
@@ -75,7 +75,7 @@ if [ "$DIST" = long ] || [ "$DIST" = all  ]
 then
 
 # array of all ids from basins in the input data
-export basinID=($(awk -F, -v basin_col="$BAS" '
+export basinID=($(awk -F, -v basin_col="$BAS_COL" '
 NR == 1 { for (i=1; i<=NF; i++) {f[$i] = i} }
 NR > 1 {print $(f[basin_col])}' $DATA | sort | uniq))
 
@@ -98,11 +98,11 @@ export ID=$1
 echo "from_$SITE,to_$SITE,dist" > $OUTDIR/dist_fly/dist_fly_allp_${ID}.csv
 echo "from_$SITE,to_$SITE,dist" > $OUTDIR/dist_fish/dist_fish_allp_${ID}.csv
 
-grass78 -f -text --tmp-location -c $BASIN <<'EOF'
+grass78 -f -gtext --tmp-location -c $BASIN <<'EOF'
 
 # Points available in each basin
 v.in.ogr --o input=$DIR/ref_points.gpkg layer=ref_points \
-    output=benthicEU type=point  where="$BAS = ${ID}" key=$SITE  
+    output=benthicEU type=point  where="$BAS_COL = ${ID}" key=$SITE
 
 RANGE=$(v.db.select -c benthicEU col=$SITE)
 
@@ -112,7 +112,7 @@ RANGE=$(v.db.select -c benthicEU col=$SITE)
 v.in.ogr  --o input=$STREAM \
     layer=SELECT output=stre_cl type=line key=stream
 
-# Connect points to streams 
+# Connect points to streams
 # (threshold does not matter because the snapping was done before)
 v.net -s --o input=stre_cl points=benthicEU output=stream_pALL \
     operation=connect threshold=1 arc_layer=1 node_layer=2
@@ -144,7 +144,7 @@ parallel -j $PAR --delay 5 DistCalc ::: ${basinID[@]}
         for FILE in $(find $OUTDIR/dist_fish/ -name 'dist_fish_*')
         do
             awk 'FNR > 1' $FILE >> $OUT/dist_longitudinal.csv
-        done    
+        done
 
     fi
 
