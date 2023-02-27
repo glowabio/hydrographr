@@ -10,13 +10,17 @@
 #' @param id character. The name of a column containing unique IDs for each row
 #' of "data" (e.g., occurrence or site IDs).
 #' @param basin_id character. The name of the column with the basin IDs.
-#' If NULL, the basin IDs will be extracted automatically. Default is NULL
-#' @param subc_id character. The name of the column with the sub-catchment IDs.
-#' If NULL, the sub-catchment IDs will be extracted automatically.
-#' Default is NULL.
+#' If NULL and distance is set to 'network' or 'both', the basin IDs will be
+#' extracted automatically. Default is NULL.
 #' @param basin_layer character. Full path to the basin ID .tif layer.
 #' @param subc_layer character. Full path to the sub-catchment ID .tif layer.
 #' @param stream_layer character. Full path of the stream network .gpkg file.
+#' @param distance character. One of "euclidean", "network", or "both".
+#' If "euclidean", the euclidean distances between all pairs of points are
+#' calculated. If "network", the shortest path along the network between all
+#' pairs of points is calculated. (see "Details" for more information).
+#' If method is set to "both", both distance measures are calculated.
+#' Default is "both".
 #' @param n_cores numeric. Number of cores used for parallelization.
 #' Default is 1.
 #' @param quiet logical. If FALSE, the standard output will be printed.
@@ -30,20 +34,13 @@
 #' @export
 #'
 #' @details
-#' The function uses the network preparation and maintenance module of
-#' GRASS GIS (v.net), to connect a vector lines map (stream network) with a
-#' points map (occurrence/sampling points). After masking the stream segment and
-#' the sub-catchment where the target point is located, the connect operation
-#' snaps the point to the stream segment using a distance threshold. This
-#' threshold is automatically calculated as the longest distance between two
-#' points within the sub-catchment. In this way the snapping will always take
-#' place.This operation creates a new node on the vector line (i.e. stream
-#' segment) from which the new snapped coordinates can be extracted.
+#'...
 #'
 #' @author Jaime Garcia Marquez, Afroditi Grigoropoulou, Maria M. Üblacker
 #'
 #' @references
-#' \url{https://grass.osgeo.org/grass82/manuals/v.net.html}
+#' \url{https://grass.osgeo.org/grass82/manuals/v.net.allpairs.html}
+#' \url{https://grass.osgeo.org/grass82/manuals/v.distance.html}
 #'
 #' @seealso
 #' \code{\link{snap_to_network}} to snap the data points to the next stream
@@ -250,8 +247,10 @@ get_distance <- function(data, lon, lat, id, basin_id = NULL, subc_id = NULL,
   basin_id <- ifelse(is.null(basin_id), "NA", basin_id)
   stream_layer <- ifelse(is.null(stream_layer), "NA", stream_layer)
   basin_layer <- ifelse(is.null(basin_layer), "NA", basin_layer)
-  dist_eucl_tmp_path <- ifelse(is.null(dist_eucl_tmp_path), "NA", dist_eucl_tmp_path)
-  dist_net_tmp_path <- ifelse(is.null(dist_net_tmp_path), "NA", dist_net_tmp_path)
+  dist_eucl_tmp_path <- ifelse(is.null(dist_eucl_tmp_path), "NA",
+                               dist_eucl_tmp_path)
+  dist_net_tmp_path <- ifelse(is.null(dist_net_tmp_path), "NA",
+                              dist_net_tmp_path)
 
 
   # Check operating system
@@ -274,20 +273,20 @@ get_distance <- function(data, lon, lat, id, basin_id = NULL, subc_id = NULL,
     # Check if WSL and Ubuntu is installed
     check_wsl()
     # Change path for WSL
+    wsl_dist_tmp_dir <- fix_path(dist_tmp_dir)
     wsl_ids_tmp_path <- fix_path(ids_tmp_path)
-    wsl_basin_layer <- fix_path(basin_layer)
-    wsl_subc_layer <- fix_path(subc_layer)
     wsl_stream_layer <- fix_path(stream_layer)
-    wsl_dist_tmp_path <- fix_path(dist_tmp_path)
-    wsl_tmp_path <- fix_path(tempdir())
-    wsl_sh_file <- fix_path(system.file("sh", "snap_to_subc_segment.sh",
+    wsl_basin_layer <- fix_path(basin_layer)
+    wsl_dist_eucl_tmp_path <- fix_path(dist_eucl_tmp_path)
+    wsl_dist_net_tmp_path <- fix_path(dist_net_tmp_path)
+    wsl_sh_file <- fix_path(system.file("sh", "get_points_distance",
                                         package = "hydrographr"))
 
-    processx::run(system.file("bat", "snap_to_subc_segment.bat",
+    processx::run(system.file("bat", "get_points_distance.bat",
                     package = "hydrographr"),
-        args = c(wsl_ids_tmp_path, lon, lat, wsl_basin_layer,
-                 wsl_subc_layer, wsl_stream_layer, n_cores,
-                 wsl_dist_tmp_path, wsl_tmp_path, wsl_sh_file),
+        args = c(wsl_dist_tmp_dir, wsl_ids_tmp_path, lon, lat, basin_id,
+                 wsl_stream_layer, wsl_basin_layer, wsl_dist_eucl_tmp_path,
+                 wsl_dist_net_tmp_path, n_cores, distance, wsl_sh_file),
         echo = !quiet)
   }
 
@@ -303,7 +302,7 @@ get_distance <- function(data, lon, lat, id, basin_id = NULL, subc_id = NULL,
   }
 
 
-  # Return dataframes or a list of the 2 dataframes
+  # Return data frames or a list of the 2 data frames
   if(distance == "euclidean") {
     return(dist_eucl_table)
   }
@@ -318,7 +317,5 @@ get_distance <- function(data, lon, lat, id, basin_id = NULL, subc_id = NULL,
 
   # Remove files in the tmp folder
   file.remove(c(dist_eucl_tmp_path, dist_net_tmp_path))
-
-
 
 }
