@@ -260,7 +260,7 @@ get_distance <- function(data, lon, lat, id, basin_id = NULL, subc_id = NULL,
 
   if (sys_os == "linux" || sys_os == "osx") {
 
-    processx::run(system.file("sh", "get_points_distance.sh",
+    processx::run(system.file("sh", "get_distance.sh",
                     package = "hydrographr"),
         args = c(dist_tmp_dir, ids_tmp_path, lon, lat, basin_id,
                  stream_layer, basin_layer, dist_eucl_tmp_path,
@@ -279,10 +279,10 @@ get_distance <- function(data, lon, lat, id, basin_id = NULL, subc_id = NULL,
     wsl_basin_layer <- fix_path(basin_layer)
     wsl_dist_eucl_tmp_path <- fix_path(dist_eucl_tmp_path)
     wsl_dist_net_tmp_path <- fix_path(dist_net_tmp_path)
-    wsl_sh_file <- fix_path(system.file("sh", "get_points_distance",
+    wsl_sh_file <- fix_path(system.file("sh", "get_distance",
                                         package = "hydrographr"))
 
-    processx::run(system.file("bat", "get_points_distance.bat",
+    processx::run(system.file("bat", "get_distance.bat",
                     package = "hydrographr"),
         args = c(wsl_dist_tmp_dir, wsl_ids_tmp_path, lon, lat, basin_id,
                  wsl_stream_layer, wsl_basin_layer, wsl_dist_eucl_tmp_path,
