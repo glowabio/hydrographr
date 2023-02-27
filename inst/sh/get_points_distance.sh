@@ -66,7 +66,7 @@ then
   # [ ! -d $OUTDIR/dist_eucl ] && mkdir $OUTDIR/dist_eucl
 
   ### create table to store output of distance algorithms
-  echo "from_$SITE,to_$SITE,dist" > $OUTDIR/dist_eucl/dist_eucl_${ID}.csv
+  echo "from_$SITE,to_$SITE,dist" > $DIST_EUCL
 
   ###  Calculate Euclidean distance between all points
   grass78  -f -gtext --tmp-location  -c  EPSG:4326 <<'EOF'
@@ -84,7 +84,7 @@ EOF
 
 fi
 
-if [ "$DIST" = long ] || [ "$DIST" = both  ]
+if [ "$DIST" = network ] || [ "$DIST" = both  ]
 then
 
 # array of all ids from basins in the input data
@@ -92,6 +92,7 @@ export basinID=($(awk -F, -v basin_col="$BAS_COL" '
 NR == 1 { for (i=1; i<=NF; i++) {f[$i] = i} }
 NR > 1 {print $(f[basin_col])}' $DATA | sort | uniq))
 
+print $basinID
 
 # [ ! -d $OUTDIR/dist_net ] && mkdir $OUTDIR/dist_net
 
@@ -156,7 +157,7 @@ parallel -j $PAR --delay 5 DistCalc ::: ${basinID[@]}
 
     fi
 
-rm -rf $OUTDIR
+# rm -rf $OUTDIR
 
 fi
 

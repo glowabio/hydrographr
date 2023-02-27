@@ -159,8 +159,8 @@ get_distance <- function(data, lon, lat, id, basin_id = NULL, subc_id = NULL,
   if (length(unique(data[[id]])) != length(data[[id]]))
     stop(paste0("Column '", id, "' has rows with duplicated IDs."))
 
-  # Check if method is set properly
-  if (!(distance == "both" || method == "euclidean" || method == "network"))
+  # Check if distance is set properly
+  if (!(distance == "both" || distance == "euclidean" || distance == "network"))
     stop("distance: Has to be 'euclidean', 'network', or 'both'.")
 
    # Check if paths exists
@@ -224,17 +224,17 @@ get_distance <- function(data, lon, lat, id, basin_id = NULL, subc_id = NULL,
 
   # Create output directories for distance tables
   if(distance == "euclidean" || distance == "both") {
-    # Create output directory in the tmp directory
-    dir.create(paste0(tmpdir(), "/distance/dist_eucl"), showWarnings = FALSE)
-  } else if(distance == "network" || distance == "both") {
-    dir.create(paste0(tmpdir(), "/distance/dist_net"), showWarnings = FALSE)
+    dir.create(paste0(tempdir(), "/distance/dist_eucl"), showWarnings = FALSE)
+  }
+  if(distance == "network" || distance == "both") {
+    dir.create(paste0(tempdir(), "/distance/dist_net"), showWarnings = TRUE)
   }
 
   # Path for tmp euclidean distance input csv file
   dist_eucl_tmp_path <- paste0(tempdir(), "/distance/dist_eucl/dist_euclidean_", rand_string, ".csv")
 
   # Path for tmp network distance input csv file
-  dist_long_tmp_path <- paste0(tempdir(), "/distance/dist_net/dist_network_", rand_string, ".csv")
+  dist_net_tmp_path <- paste0(tempdir(), "/distance/dist_net/dist_network_", rand_string, ".csv")
 
 
 
@@ -249,7 +249,7 @@ get_distance <- function(data, lon, lat, id, basin_id = NULL, subc_id = NULL,
                     package = "hydrographr"),
         args = c(dist_tmp_dir, ids_tmp_path, lon, lat, basin_id,
                  stream_layer, basin_layer, dist_eucl_tmp_path,
-                 dist_long_tmp_path, n_cores, distance),
+                 dist_net_tmp_path, n_cores, distance),
         echo = !quiet)
 
 
@@ -275,16 +275,33 @@ get_distance <- function(data, lon, lat, id, basin_id = NULL, subc_id = NULL,
         echo = !quiet)
   }
 
-  dist_table <- fread(paste0(tempdir(), "/distance",
-                                rand_string, ".csv"),
-                         keepLeadingZeros = TRUE, header = TRUE, sep = ",")
+
+  if(distance == "euclidean" || distance == "both") {
+    dist_eucl_table <- fread(dist_eucl_tmp_path,
+                             keepLeadingZeros = TRUE, header = TRUE, sep = ",")
+
+  } else if(distance == "network" || distance == "both") {
+    dist_net_table <- fread(dist_net_tmp_path,
+                            keepLeadingZeros = TRUE, header = TRUE, sep = ",")
+  }
+
+
+  if(distance == "euclidean") {
+    return(dist_eucl_table)
+
+  } else if(distance == "network") {
+    return(dist_net_table)
+
+  } else if(distance == "both") {
+
+    return(list(dist_eucl_table, dist_net_table))
+  }
 
 
 
   # Remove files in the tmp folder
-  file.remove(dist_tmp_path)
+  # file.remove(c(dist_eucl_tmp_path, dist_net_tmp_path))
 
-  # Return snapped coordinates
-  return(dist_table)
+
 
 }
