@@ -126,7 +126,7 @@ grass -f --gtext --tmp-location $SUBCATCH <<'EOF'
 
     else
 
-        v.distance -pa from=micr_vp_${ID} to=micr_vp_${ID}  upload=dist \
+        v.distance -pas from=micr_vp_${ID} to=micr_vp_${ID}  upload=dist \
           > $DIR/dist_mat_p${ID}_${MAB}_${MIB}_${RAND_STRING}.txt
 
         # calculate maximum distance between all points in microbasin
