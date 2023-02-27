@@ -14,6 +14,7 @@ get_distance(
   basin_layer,
   subc_layer,
   stream_layer,
+  distance = "all",
   n_cores = 1,
   quiet = TRUE
 )

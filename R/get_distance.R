@@ -110,9 +110,9 @@
 #'
 
 
-get_distance <- function(data, lon, lat, id, basin_id = NULL,
-                                 subc_id = NULL, basin_layer, subc_layer,
-                                 stream_layer, n_cores = 1, quiet = TRUE) {
+get_distance <- function(data, lon, lat, id, basin_id = NULL, subc_id = NULL,
+                         basin_layer, subc_layer, stream_layer,
+                         distance = "all", n_cores = 1, quiet = TRUE) {
 
   # Check if any of the arguments is missing
   for (arg in  c(data, lon, lat, id, basin_layer, subc_layer,
@@ -159,6 +159,9 @@ get_distance <- function(data, lon, lat, id, basin_id = NULL,
   if (length(unique(data[[id]])) != length(data[[id]]))
     stop(paste0("Column '", id, "' has rows with duplicated IDs."))
 
+  # Check if method is set properly
+  if (!(distance == "both" || method == "euclidean" || method == "network"))
+    stop("distance: Has to be 'euclidean', 'network', or 'both'.")
 
    # Check if paths exists
   for (path in c(basin_layer, subc_layer, stream_layer)) {
@@ -197,9 +200,9 @@ get_distance <- function(data, lon, lat, id, basin_id = NULL,
                              subc_layer = NULL,
                              basin_layer = basin_layer, quiet = quiet)
     # Join with data and select columns needed for the bash script
+    # Note: "id" should be the first column
     ids <- left_join(data, basin_ids, by = c(lon, lat)) %>%
       select(matches(c(id, lon, lat)), basin_id)
-
 
   } else {
     # Select columns needed for the bash script
@@ -208,18 +211,32 @@ get_distance <- function(data, lon, lat, id, basin_id = NULL,
   }
 
   # Create random string to attach to the file name of the temporary
-  # output coordinates and input ids file
+  # output tables and input ids file
   rand_string <- stri_rand_strings(n = 1, length = 8, pattern = "[A-Za-z0-9]")
   # Export taxon point ids
   ids_tmp_path <- paste0(tempdir(), "/ids_", rand_string, ".csv")
   fwrite(ids, ids_tmp_path, col.names = TRUE,
          row.names = FALSE, quote = FALSE, sep = ",")
-  # Path for distances tmp dir
-  dist_tmp_dir <- paste0(tempdir(), "/distances")
-  # Create distances tmp dir
+  # Path for distance output tmp dir
+  dist_tmp_dir <- paste0(tempdir(), "/distance")
+  # Create distance general tmp dir
   dir.create(dist_tmp_dir, showWarnings = FALSE)
-  # Path for tmp ids csv file
-  dist_tmp_path <- paste0(tempdir(), "/distances", rand_string, ".csv")
+
+  # Create output directories for distance tables
+  if(distance == "euclidean" || distance == "both") {
+    # Create output directory in the tmp directory
+    dir.create(paste0(tmpdir(), "/distance/dist_eucl"), showWarnings = FALSE)
+  } else if(distance == "network" || distance == "both") {
+    dir.create(paste0(tmpdir(), "/distance/dist_net"), showWarnings = FALSE)
+  }
+
+  # Path for tmp euclidean distance input csv file
+  dist_eucl_tmp_path <- paste0(tempdir(), "/distance/dist_eucl/dist_euclidean_", rand_string, ".csv")
+
+  # Path for tmp network distance input csv file
+  dist_long_tmp_path <- paste0(tempdir(), "/distance/dist_net/dist_network_", rand_string, ".csv")
+
+
 
   # Check operating system
   sys_os <- get_os()
@@ -230,9 +247,9 @@ get_distance <- function(data, lon, lat, id, basin_id = NULL,
 
     processx::run(system.file("sh", "get_points_distance.sh",
                     package = "hydrographr"),
-        args = c(data_dir, ids_tmp_path, lon, lat, basin_colname = "basin_id",
-                 stream_layer = NULL, basin_layer = basin_layer, n_cores = 1,
-                 dist_tmp_dir, distance),
+        args = c(dist_tmp_dir, ids_tmp_path, lon, lat, basin_id,
+                 stream_layer, basin_layer, dist_eucl_tmp_path,
+                 dist_long_tmp_path, n_cores, distance),
         echo = !quiet)
 
 
@@ -258,14 +275,16 @@ get_distance <- function(data, lon, lat, id, basin_id = NULL,
         echo = !quiet)
   }
 
-  snapped_coord <- fread(paste0(tempdir(), "/distances",
+  dist_table <- fread(paste0(tempdir(), "/distance",
                                 rand_string, ".csv"),
                          keepLeadingZeros = TRUE, header = TRUE, sep = ",")
+
+
 
   # Remove files in the tmp folder
   file.remove(dist_tmp_path)
 
   # Return snapped coordinates
-  return(snapped_coord)
+  return(dist_table)
 
 }
