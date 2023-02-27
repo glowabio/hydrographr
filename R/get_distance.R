@@ -111,8 +111,10 @@
 
 
 get_distance <- function(data, lon, lat, id, basin_id = NULL, subc_id = NULL,
-                         basin_layer, subc_layer, stream_layer,
-                         distance = "all", n_cores = 1, quiet = TRUE) {
+                         basin_layer = NULL, subc_layer = NULL,
+                         stream_layer = NULL, distance = "all",
+                         n_cores = 1, quiet = TRUE) {
+
 
   # Check if any of the arguments is missing
   for (arg in  c(data, lon, lat, id, basin_layer, subc_layer,
@@ -176,8 +178,9 @@ get_distance <- function(data, lon, lat, id, basin_id = NULL, subc_id = NULL,
   }
 
   # Check if basin_layer and subc_layer ends with .gpkg
-  if (!endsWith(stream_layer, ".gpkg"))
-    stop(paste0("File path: ", stream_layer, " does not end with .gpkg"))
+  if (!is.null(stream_layer))
+    if (!endsWith(stream_layer, ".gpkg"))
+      stop(paste0("File path: ", stream_layer, " does not end with .gpkg"))
 
   # Check if value of n_cores numeric
   if (!is.numeric(n_cores))
@@ -233,13 +236,22 @@ get_distance <- function(data, lon, lat, id, basin_id = NULL, subc_id = NULL,
   }
 
   if(distance == "network" || distance == "both") {
-    dir.create(paste0(tempdir(), "/distance/dist_net"), showWarnings = TRUE)
+    dir.create(paste0(tempdir(), "/distance/dist_net"), showWarnings = FALSE)
     # Path for tmp network distance input csv file
     dist_net_tmp_path <- paste0(tempdir(),
                                 "/distance/dist_net/dist_network_",
                                 rand_string, ".csv")
 
   }
+
+
+  # Convert NULL argument to "NA" so that the bash script can evaluate
+  # the argument
+  basin_id <- ifelse(is.null(basin_id), "NA", basin_id)
+  stream_layer <- ifelse(is.null(stream_layer), "NA", stream_layer)
+  basin_layer <- ifelse(is.null(basin_layer), "NA", basin_layer)
+  dist_eucl_tmp_path <- ifelse(is.null(dist_eucl_tmp_path), "NA", dist_eucl_tmp_path)
+  dist_net_tmp_path <- ifelse(is.null(dist_net_tmp_path), "NA", dist_net_tmp_path)
 
 
   # Check operating system
@@ -305,7 +317,7 @@ get_distance <- function(data, lon, lat, id, basin_id = NULL, subc_id = NULL,
 
 
   # Remove files in the tmp folder
-  # file.remove(c(dist_eucl_tmp_path, dist_net_tmp_path))
+  file.remove(c(dist_eucl_tmp_path, dist_net_tmp_path))
 
 
 
