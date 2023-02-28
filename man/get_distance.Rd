@@ -10,10 +10,8 @@ get_distance(
   lat,
   id,
   basin_id = NULL,
-  subc_id = NULL,
-  basin_layer,
-  subc_layer,
-  stream_layer,
+  basin_layer = NULL,
+  stream_layer = NULL,
   distance = "all",
   n_cores = 1,
   quiet = TRUE
@@ -30,17 +28,19 @@ get_distance(
 of "data" (e.g., occurrence or site IDs).}
 
 \item{basin_id}{character. The name of the column with the basin IDs.
-If NULL, the basin IDs will be extracted automatically. Default is NULL}
-
-\item{subc_id}{character. The name of the column with the sub-catchment IDs.
-If NULL, the sub-catchment IDs will be extracted automatically.
-Default is NULL.}
+If NULL and distance is set to 'network' or 'both', the basin IDs will be
+extracted automatically. Default is NULL.}
 
 \item{basin_layer}{character. Full path to the basin ID .tif layer.}
 
-\item{subc_layer}{character. Full path to the sub-catchment ID .tif layer.}
-
 \item{stream_layer}{character. Full path of the stream network .gpkg file.}
+
+\item{distance}{character. One of "euclidean", "network", or "both".
+If "euclidean", the euclidean distances between all pairs of points are
+calculated. If "network", the shortest path along the network between all
+pairs of points is calculated. (see "Details" for more information).
+If method is set to "both", both distance measures are calculated.
+Default is "both".}
 
 \item{n_cores}{numeric. Number of cores used for parallelization.
 Default is 1.}
@@ -48,19 +48,19 @@ Default is 1.}
 \item{quiet}{logical. If FALSE, the standard output will be printed.
 Default is TRUE.}
 }
+\value{
+If distance='euclidean', a distance matrix of the euclidean distances between
+all the pairs of points (object of class data.frame). If distance='network',
+a data.frame with three columns: from_id, to_id, dist. The 'dist' column
+includes the distance of the shortest path along the network from the node
+from_id to the node to_id. If distance='both', a list containing both objects
+is returned.
+}
 \description{
 Calculate euclidean or along the network distance between points
 }
 \details{
-The function uses the network preparation and maintenance module of
-GRASS GIS (v.net), to connect a vector lines map (stream network) with a
-points map (occurrence/sampling points). After masking the stream segment and
-the sub-catchment where the target point is located, the connect operation
-snaps the point to the stream segment using a distance threshold. This
-threshold is automatically calculated as the longest distance between two
-points within the sub-catchment. In this way the snapping will always take
-place.This operation creates a new node on the vector line (i.e. stream
-segment) from which the new snapped coordinates can be extracted.
+...
 }
 \examples{
 # Download test data into the temporary R folder
@@ -69,43 +69,24 @@ my_directory <- tempdir()
 download_test_data(my_directory)
 
 # Load occurrence data
-species_occurence <- read.table(paste0(my_directory,
+species_occurrence <- read.table(paste0(my_directory,
                             "/hydrography90m_test_data/spdata_1264942.txt"),
                               header = TRUE)
+
 basin_rast <- paste0(my_directory,
                      "/hydrography90m_test_data/basin_1264942.tif")
-subc_rast <- paste0(my_directory,
-                    "/hydrography90m_test_data/subcatchment_1264942.tif")
+
+# Define full path to the sub-catchment raster layer
+basin_rast <- paste0(my_directory,
+                     "/hydrography90m_test_data/subcatchment_1264942.tif")
 
 # Define full path to the vector file of the stream network
 stream_vect <- paste0(my_directory,
                       "/hydrography90m_test_data/order_vect_59.gpkg")
 
-hydrography90m_ids <- extract_ids(data = species_occurence,
-                                  lon = "longitude",
-                                  lat = "latitude",
-                                  id = "occurrence_id",
-                                  subc_layer = subc_rast,
-                                  basin_layer = basin_rast)
-
-# Snap data points to the stream segment of the provided sub-catchment ID
-snapped_coordinates <- snap_to_subc_segment(data = hydrography90m_ids,
-                                            lon = "longitude",
-                                            lat = "latitude",
-                                            id = "occurrence_id",
-                                            basin_id = "basin_id",
-                                            subc_id = "subcatchment_id",
-                                            basin_layer = basin_rast,
-                                            subc_layer = subc_rast,
-                                            stream_layer = stream_vect,
-                                            n_cores = 2)
-# Show head of output table
-head(snapped_coordinates)
-
-# OR
 # Automatically extract the basin and sub-catchment IDs and
 # snap the data points to the stream segment
-snapped_coordinates <- snap_to_subc_segment(data = species_occurence,
+snapped_coordinates <- snap_to_subc_segment(data = species_occurrence,
                                             lon = "longitude",
                                             lat = "latitude",
                                             id = "occurrence_id",
@@ -116,9 +97,22 @@ snapped_coordinates <- snap_to_subc_segment(data = species_occurence,
 # Show head of output table
 head(snapped_coordinates)
 
+# Get the euclidean distance and the distance along the network between all
+# pairs of points
+distance_table <- get_distance(data = snapped_coordinates,
+                               lon = "lon_snap",
+                               lat = "lat_snap",
+                               id = "occurrence_id",
+                               basin_id = "basin_id",
+                               basin_layer = basin_rast,
+                               stream_layer = stream_vect,
+                               distance = "network",
+                               n_cores = 1,
+                               quiet = FALSE)
 }
 \references{
-\url{https://grass.osgeo.org/grass82/manuals/v.net.html}
+\url{https://grass.osgeo.org/grass82/manuals/v.net.allpairs.html}
+\url{https://grass.osgeo.org/grass82/manuals/v.distance.html}
 }
 \seealso{
 \code{\link{snap_to_network}} to snap the data points to the next stream
@@ -127,5 +121,5 @@ value.
 \code{\link{extract_ids}} to extract basin and sub-catchment IDs.
 }
 \author{
-Jaime Garcia Marquez, Afroditi Grigoropoulou, Maria M. Üblacker
+Afroditi Grigoropoulou, Maria M. Üblacker, Jaime Garcia Marquez
 }
