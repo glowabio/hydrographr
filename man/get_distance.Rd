@@ -77,8 +77,8 @@ basin_rast <- paste0(my_directory,
                      "/hydrography90m_test_data/basin_1264942.tif")
 
 # Define full path to the sub-catchment raster layer
-basin_rast <- paste0(my_directory,
-                     "/hydrography90m_test_data/subcatchment_1264942.tif")
+subc_rast <- paste0(my_directory,
+                    "/hydrography90m_test_data/subcatchment_1264942.tif")
 
 # Define full path to the vector file of the stream network
 stream_vect <- paste0(my_directory,
@@ -107,8 +107,9 @@ distance_table <- get_distance(data = snapped_coordinates,
                                basin_layer = basin_rast,
                                stream_layer = stream_vect,
                                distance = "network",
-                               n_cores = 1,
-                               quiet = FALSE)
+                               n_cores = 2)
+# Show table
+distance_table
 }
 \references{
 \url{https://grass.osgeo.org/grass82/manuals/v.net.allpairs.html}

@@ -71,8 +71,8 @@
 #'                      "/hydrography90m_test_data/basin_1264942.tif")
 #'
 #' # Define full path to the sub-catchment raster layer
-#' basin_rast <- paste0(my_directory,
-#'                      "/hydrography90m_test_data/subcatchment_1264942.tif")
+#' subc_rast <- paste0(my_directory,
+#'                     "/hydrography90m_test_data/subcatchment_1264942.tif")
 #'
 #' # Define full path to the vector file of the stream network
 #' stream_vect <- paste0(my_directory,
@@ -101,8 +101,9 @@
 #'                                basin_layer = basin_rast,
 #'                                stream_layer = stream_vect,
 #'                                distance = "network",
-#'                                n_cores = 1,
-#'                                quiet = FALSE)
+#'                                n_cores = 2)
+#' # Show table
+#' distance_table
 
 
 get_distance <- function(data, lon, lat, id, basin_id = NULL,
@@ -270,7 +271,7 @@ get_distance <- function(data, lon, lat, id, basin_id = NULL,
     wsl_basin_layer <- fix_path(basin_layer)
     wsl_dist_eucl_tmp_path <- fix_path(dist_eucl_tmp_path)
     wsl_dist_net_tmp_path <- fix_path(dist_net_tmp_path)
-    wsl_sh_file <- fix_path(system.file("sh", "get_distance",
+    wsl_sh_file <- fix_path(system.file("sh", "get_distance.sh",
                                         package = "hydrographr"))
 
     processx::run(system.file("bat", "get_distance.bat",
