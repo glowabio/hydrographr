@@ -52,14 +52,14 @@ then
   echo "from_$SITE,to_$SITE,dist" > $DIST_EUCL
 
   #  Calculate Euclidean distance between all points
-  grass78  -f -gtext --tmp-location  -c  EPSG:4326 <<'EOF'
+  grass  -f --gtext --tmp-location  EPSG:4326 <<'EOF'
 
   #  import points
   v.in.ogr --o input=$OUTDIR/ref_points.gpkg layer=ref_points \
   output=allpoints type=point key=$SITE
 
   #  Calculate distance, results are given in meters
-  v.distance -pa from=allpoints to=allpoints upload=dist separator=comma \
+  v.distance -pas from=allpoints to=allpoints upload=dist separator=comma \
       | sed -re 's/([0-9]+\.[0-9]{3})[0-9]+/\1/g' | \
       awk -F, 'NR > 1 {print $0}' > $DIST_EUCL
 
@@ -88,7 +88,7 @@ DistCalc(){
   # create table to store output of distance algorithms
   echo "from_$SITE,to_$SITE,dist" > $OUTDIR/dist_net/dist_net_${ID}.csv
 
-  grass78 -f -gtext --tmp-location -c $BASIN <<'EOF'
+  grass -f --gtext --tmp-location  $BASIN <<'EOF'
 
     # Points available in each basin
     v.in.ogr --o input=$OUTDIR/ref_points.gpkg layer=ref_points \
@@ -148,4 +148,3 @@ rm $OUTDIR/ref_points.gpkg
 
 
 exit
-
