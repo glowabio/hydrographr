@@ -115,7 +115,7 @@ DistCalc(){
     cats=$(echo $RANGE | awk '{gsub(" ",","); print $0}')
 
     # add results to table
-    v.report -c map=dist_all_${ID} layer=1 option=length units=kilometers  \
+    v.report -c map=dist_all_${ID} layer=1 option=length units=meters  \
        | awk -F',' 'BEGIN{OFS=",";} {gsub(/[|]/, ","); print $2, $3, $5}' \
        >> $OUTDIR/dist_net/dist_net_${ID}.csv
 
