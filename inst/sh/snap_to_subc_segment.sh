@@ -73,83 +73,83 @@ SnapPoint(){
 
 # id of the point
 export ID=$1
-echo $ID
+
 # identify basin ID for that point
 export MAB=$(awk -F, -v id="$ID" '$1==id {print $4}' $DATA)
 # identify sub-catchment ID for that point
 export MIB=$(awk -F, -v id="$ID" '$1==id {print $5}' $DATA)
-echo $MAB $MIB
+
 ## Set random string
 export RAND_STRING=$(xxd -l 8 -c 32 -p < /dev/random)
-echo $RAND_STRING
+
 # extract point of interest
 ogr2ogr -where "$SITE = $ID" -f GPKG $DIR/point_${ID}_${RAND_STRING}.gpkg \
     $DIR/ref_points.gpkg
 
 # extract vector line (stream reach) associated with point
-# ogr2ogr -nln orderV_bid${MAB} -nlt LINESTRING -where "stream = ${MIB}" \
-#     -f GPKG $DIR/Microb_${MIB}_${RAND_STRING}.gpkg $VECT
+ogr2ogr -nln orderV_bid${MAB} -nlt LINESTRING -where "stream = ${MIB}" \
+    -f GPKG $DIR/Microb_${MIB}_${RAND_STRING}.gpkg $VECT
 
-# # open grass session based on microbasin raster
-# grass -f --gtext --tmp-location $SUBCATCH <<'EOF'
+# open grass session based on microbasin raster
+grass -f --gtext --tmp-location $SUBCATCH <<'EOF'
 
-#     # read in point of interest
-#     v.in.ogr input=$DIR/point_${ID}_${RAND_STRING}.gpkg layer=ref_points output=point_$ID \
-#     type=point key=$SITE
+    # read in point of interest
+    v.in.ogr input=$DIR/point_${ID}_${RAND_STRING}.gpkg layer=ref_points output=point_$ID \
+    type=point key=$SITE
 
-#     # read vector line representing stream reach
-#     v.in.ogr input=$DIR/Microb_${MIB}_${RAND_STRING}.gpkg layer=orderV_bid${MAB} \
-#         output=streamReach_${MIB} type=line key=stream
+    # read vector line representing stream reach
+    v.in.ogr input=$DIR/Microb_${MIB}_${RAND_STRING}.gpkg layer=orderV_bid${MAB} \
+        output=streamReach_${MIB} type=line key=stream
 
-#     # Raster with microbasins
-#     r.in.gdal input=$SUBCATCH output=micb
+    # Raster with microbasins
+    r.in.gdal input=$SUBCATCH output=micb
 
-#     # extract microbasin of stream reach $MIB as raster
-#     r.mapcalc --o "micr_${ID} = if(micb != ${MIB}, null(), 1)"
+    # extract microbasin of stream reach $MIB as raster
+    r.mapcalc --o "micr_${ID} = if(micb != ${MIB}, null(), 1)"
 
-#     # make the raster a vector points
-#     r.to.vect --o input=micr_${ID} output=micr_vp_${ID} type=point
+    # make the raster a vector points
+    r.to.vect --o input=micr_${ID} output=micr_vp_${ID} type=point
 
-#     # of how many pixels the raster consist?
-#     # 1 if stream reach with only one pixel
-#     # meaning the points already overlap
-#     NUMP=$(v.info micr_vp_${ID}  | awk '/points/{print $5}')
+    # of how many pixels the raster consist?
+    # 1 if stream reach with only one pixel
+    # meaning the points already overlap
+    NUMP=$(v.info micr_vp_${ID}  | awk '/points/{print $5}')
 
-#     if [ $NUMP -eq 1 ]
-#     then
-#         v.net --o -s input=streamReach_$MIB  points=point_${ID} \
-#         output=snap_${ID} operation=connect threshold=90 arc_layer=1 \
-#         node_layer=2
+    if [ $NUMP -eq 1 ]
+    then
+        v.net --o -s input=streamReach_$MIB  points=point_${ID} \
+        output=snap_${ID} operation=connect threshold=90 arc_layer=1 \
+        node_layer=2
 
-#         v.out.ascii input=snap_${ID} layer=2 separator=comma \
-#         > ${OUTDIR}/coords_${ID}_${RAND_STRING}
+        v.out.ascii input=snap_${ID} layer=2 separator=comma \
+        > ${OUTDIR}/coords_${ID}_${RAND_STRING}
 
-#     else
+    else
 
-#         v.distance -pas from=micr_vp_${ID} to=micr_vp_${ID}  upload=dist \
-#           > $DIR/dist_mat_p${ID}_${MAB}_${MIB}_${RAND_STRING}.txt
+        v.distance -pas from=micr_vp_${ID} to=micr_vp_${ID}  upload=dist \
+          > $DIR/dist_mat_p${ID}_${MAB}_${MIB}_${RAND_STRING}.txt
 
-#         # calculate maximum distance between all points in microbasin
-#         MAXDIST=0
-#         for i in \
-#         $( seq -s' ' 2 $(v.info micr_vp_${ID}  | awk '/points/{print $5}') )
-#         do
-#           newmax=$(awk -F'|' -v X="$i" '{print $X}' \
-#           $DIR/dist_mat_p${ID}_${MAB}_${MIB}_${RAND_STRING}.txt | sort -n | tail -n1)
-#           if (( $(echo "$newmax > $MAXDIST" | bc -l) ));then MAXDIST=$newmax;fi
-#         done
+        # calculate maximum distance between all points in microbasin
+        MAXDIST=0
+        for i in \
+        $( seq -s' ' 2 $(v.info micr_vp_${ID}  | awk '/points/{print $5}') )
+        do
+          newmax=$(awk -F'|' -v X="$i" '{print $X}' \
+          $DIR/dist_mat_p${ID}_${MAB}_${MIB}_${RAND_STRING}.txt | sort -n | tail -n1)
+          if (( $(echo "$newmax > $MAXDIST" | bc -l) ));then MAXDIST=$newmax;fi
+        done
 
-#         v.net --o -s input=streamReach_${MIB}  points=point_${ID} \
-#         output=snap_${ID} operation=connect threshold=$MAXDIST arc_layer=1 \
-#         node_layer=2
+        v.net --o -s input=streamReach_${MIB}  points=point_${ID} \
+        output=snap_${ID} operation=connect threshold=$MAXDIST arc_layer=1 \
+        node_layer=2
 
-#         v.out.ascii input=snap_${ID} layer=2 separator=comma \
-#         > ${OUTDIR}/coords_${ID}_${RAND_STRING}
+        v.out.ascii input=snap_${ID} layer=2 separator=comma \
+        > ${OUTDIR}/coords_${ID}_${RAND_STRING}
 
-#         rm $DIR/dist_mat_p${ID}_${MAB}_${MIB}_${RAND_STRING}.txt $DIR/point_${ID}_${RAND_STRING}.gpkg  \
-#         $DIR/Microb_${MIB}_${RAND_STRING}.gpkg
-#     fi
-# EOF
+        rm $DIR/dist_mat_p${ID}_${MAB}_${MIB}_${RAND_STRING}.txt $DIR/point_${ID}_${RAND_STRING}.gpkg  \
+        $DIR/Microb_${MIB}_${RAND_STRING}.gpkg
+    fi
+EOF
 }
 
 export -f SnapPoint
