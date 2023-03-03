@@ -19,7 +19,7 @@
 #' calculated. If "network", the shortest path along the network between all
 #' pairs of points is calculated. (see "Details" for more information).
 #' If method is set to "both", both distance measures are calculated.
-#' Default is "both".
+#' Distances are given in meters. Default is "both".
 #' @param n_cores numeric. Number of cores used for parallelization.
 #' Default is 1.
 #' @param quiet logical. If FALSE, the standard output will be printed.
@@ -36,14 +36,14 @@
 #' To calculate the euclidian distance between all pair of points the function
 #' uses the v.distance command of GRASS GIS, which has been set up to produce a
 #' square matrix of distances. The calculation of distances along the stream
-#' network has been implemented with the command v.net.allpairs of GRASS GIS. 
-#' The along the network distance calculation is done for all pair points 
+#' network has been implemented with the command v.net.allpairs of GRASS GIS.
+#' The along the network distance calculation is done for all pair points
 #' located within the same basin. If the points are located in
 #' different basins the function can be run in parallel (i.e., each core for
 #' the distance calculations of all points within one basin). The
 #' distance between points located in different
 #' basins is zero because they are not connected through the network.
-#' 
+#'
 #' @returns
 #' If distance='euclidean', a distance matrix, in meters, of the euclidean distances between
 #' all the pairs of points (object of class data.frame). If distance='network',
@@ -109,8 +109,7 @@
 #'                                basin_id = "basin_id",
 #'                                basin_layer = basin_rast,
 #'                                stream_layer = stream_vect,
-#'                                distance = "network",
-#'                                n_cores = 2)
+#'                                distance = "network")
 #' # Show table
 #' distance_table
 

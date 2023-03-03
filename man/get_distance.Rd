@@ -40,7 +40,7 @@ If "euclidean", the euclidean distances between all pairs of points are
 calculated. If "network", the shortest path along the network between all
 pairs of points is calculated. (see "Details" for more information).
 If method is set to "both", both distance measures are calculated.
-Default is "both".}
+Default is "both". Ditances are given in meters.}
 
 \item{n_cores}{numeric. Number of cores used for parallelization.
 Default is 1.}
@@ -49,10 +49,10 @@ Default is 1.}
 Default is TRUE.}
 }
 \value{
-If distance='euclidean', a distance matrix of the euclidean distances between
+If distance='euclidean', a distance matrix, in meters, of the euclidean distances between
 all the pairs of points (object of class data.frame). If distance='network',
 a data.frame with three columns: from_id, to_id, dist. The 'dist' column
-includes the distance of the shortest path along the network from the node
+includes the distance, in meters, of the shortest path along the network from the node
 from_id to the node to_id. If distance='both', a list containing both objects
 is returned.
 }
@@ -60,7 +60,16 @@ is returned.
 Calculate euclidean or along the network distance between points
 }
 \details{
-...
+To calculate the euclidian distance between all pair of points the function
+uses the v.distance command of GRASS GIS, which has been set up to produce a
+square matrix of distances. The calculation of distances along the stream
+network has been implemented with the command v.net.allpairs of GRASS GIS.
+The along the network distance calculation is done for all pair points
+located within the same basin. If the points are located in
+different basins the function can be run in parallel (i.e., each core for
+the distance calculations of all points within one basin). The
+distance between points located in different
+basins is zero because they are not connected through the network.
 }
 \examples{
 # Download test data into the temporary R folder
@@ -107,7 +116,7 @@ distance_table <- get_distance(data = snapped_coordinates,
                                basin_layer = basin_rast,
                                stream_layer = stream_vect,
                                distance = "network",
-                               n_cores = 2)
+                               n_cores = 1)
 # Show table
 distance_table
 }
