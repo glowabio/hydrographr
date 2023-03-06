@@ -1,9 +1,12 @@
 #' @title Calculate euclidean or along the network distance between points
 #'
 #' @description
-#' Calculate euclidean or along the network distance between points
+#' Calculate euclidean or along the network distance between points. To calculate
+#' the distance along the network, point coordinates need to be snapped to the
+#' stream network using the function \code{\link{snap_to_network}} or
+#' \code{\link{snap_to_subc_segment}}.
 #'
-
+#'
 #' @param data a data.frame or data.table with lat/lon coordinates in WGS84.
 #' @param lon character. The name of the column with the longitude coordinates.
 #' @param lat character. The name of the column with the latitude coordinates.
@@ -12,8 +15,10 @@
 #' @param basin_id character. The name of the column with the basin IDs.
 #' If NULL and distance is set to 'network' or 'both', the basin IDs will be
 #' extracted automatically. Default is NULL.
-#' @param basin_layer character. Full path to the basin ID .tif layer.
+#' @param basin_layer character. Full path to the basin ID .tif layer. Needs to
+#' be defined to calculate the distance along the network.
 #' @param stream_layer character. Full path of the stream network .gpkg file.
+#' Needs to be defined to calculate the distance along the network.
 #' @param distance character. One of "euclidean", "network", or "both".
 #' If "euclidean", the euclidean distances between all pairs of points are
 #' calculated. If "network", the shortest path along the network between all
@@ -62,6 +67,8 @@
 #' \code{\link{snap_to_network}} to snap the data points to the next stream
 #' segment within a given radius and/or a given flow accumulation threshold
 #' value.
+#' \code{\link{snap_to_subc_segment}} to snap the data points to the next stream
+#' segment of the sub-catchment the data point is located.
 #' \code{\link{extract_ids}} to extract basin and sub-catchment IDs.
 #'
 #'@examples
@@ -116,7 +123,7 @@
 
 get_distance <- function(data, lon, lat, id, basin_id = NULL,
                          basin_layer = NULL, stream_layer = NULL,
-                         distance = "all", n_cores = 1, quiet = TRUE) {
+                         distance = "both", n_cores = 1, quiet = TRUE) {
 
 
   # Check if any of the arguments is missing
@@ -161,6 +168,15 @@ get_distance <- function(data, lon, lat, id, basin_id = NULL,
   if (!(distance == "both" || distance == "euclidean" || distance == "network"))
     stop("distance: Has to be 'euclidean', 'network', or 'both'.")
 
+  # Check if needed layers are defined
+  if (!(distance == "both" || distance == "network")) {
+    if (!is.null(basin_layer))
+      stop("For distance = 'network' or 'both', basin_layer needs to be defined.")
+    if (!is.null(stream_layer))
+      stop("For distance = 'network' or 'both', stream_layer needs to be defined.")
+  }
+
+
    # Check if paths exists
   for (path in c(basin_layer, stream_layer)) {
    if (!file.exists(path))
@@ -191,9 +207,37 @@ get_distance <- function(data, lon, lat, id, basin_id = NULL,
   if (!is.logical(quiet))
     stop("quiet: Has to be TRUE or FALSE.")
 
+  # Check if the data points were correctly snapped with snap_to_network function
+  if (lon == "lon_snap_dist" & lat == "lat_snap_dist") {
+    if (!is.null(data[["subc_id_snap_dist"]])){
+    n_rows <- nrow(data)
+    data <- data %>%
+      filter(!is.na(subc_id_snap_dist)) %>%
+      mutate(lon_snap_dist = as.numeric(lon_snap_dist),
+             lat_snap_dist = as.numeric(lat_snap_dist))
+    removed_rows <- n_rows - nrow(data)
+    if(removed_rows > 0)
+    warning(paste0(removed_rows, " rows with NA in the column 'subc_id_snap_dist' were removed."))
+    }
+  }
+
+  if (lon == "lon_snap_accu" & lat == "lat_snap_accu") {
+    if (!is.null(data[["subc_id_snap_accu"]])){
+      n_rows <- nrow(data)
+      data <- data %>%
+        filter(!is.na(subc_id_snap_accu)) %>%
+        mutate(lon_snap_accu = as.numeric(lon_snap_accu),
+               lat_snap_accu = as.numeric(lat_snap_accu))
+      removed_rows <- n_rows - nrow(data)
+      if(removed_rows > 0)
+        warning(paste0(removed_rows, " rows with NA in the column 'subc_id_snap_accu' were removed."))
+    }
+  }
+
+
   # If basin_id is NULL
   # Extract ids first
-  if (is.null(basin_id)) {
+  if (is.null(basin_id) & distance != "euclidean") {
     # Extract basin ids
     basin_ids <- extract_ids(data = data, lon = lon, lat = lat,
                              subc_layer = NULL,basin_layer = basin_layer,
@@ -204,10 +248,15 @@ get_distance <- function(data, lon, lat, id, basin_id = NULL,
     ids <- left_join(data, basin_ids, by = c(lon, lat)) %>%
       select(matches(c(id, lon, lat)), basin_id)
 
-  } else {
-    # Select columns needed for the bash script
+  } else if (!is.null(basin_id) & distance != "euclidean"){
+    # Select columns needed for the bash script to calculate network distances
     ids <- data %>%
       select(matches(c(id, lon, lat, basin_id)))
+  } else {
+    # Select columns needed for the bash script to calculate euclidean distances
+    ids <- data %>%
+      select(matches(c(id, lon, lat)))
+
   }
 
   # Create random string to attach to the file name of the temporary
@@ -244,7 +293,7 @@ get_distance <- function(data, lon, lat, id, basin_id = NULL,
 
   # Convert NULL argument to "NA" so that the bash script can evaluate
   # the argument
-  basin_id <- ifelse(is.null(basin_id), "NA", basin_id)
+  basin_id <- ifelse(is.null(basin_id), "basin_id", basin_id)
   stream_layer <- ifelse(is.null(stream_layer), "NA", stream_layer)
   basin_layer <- ifelse(is.null(basin_layer), "NA", basin_layer)
   dist_eucl_tmp_path <- ifelse(is.null(dist_eucl_tmp_path), "NA",
@@ -294,6 +343,7 @@ get_distance <- function(data, lon, lat, id, basin_id = NULL,
   if(distance == "euclidean" || distance == "both") {
     dist_eucl_table <- fread(dist_eucl_tmp_path,
                              keepLeadingZeros = TRUE, header = TRUE, sep = ",")
+    names(dist_eucl_table)[1] <- id
 
   }
   if(distance == "network" || distance == "both") {

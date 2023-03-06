@@ -12,7 +12,7 @@ get_distance(
   basin_id = NULL,
   basin_layer = NULL,
   stream_layer = NULL,
-  distance = "all",
+  distance = "both",
   n_cores = 1,
   quiet = TRUE
 )
@@ -31,16 +31,18 @@ of "data" (e.g., occurrence or site IDs).}
 If NULL and distance is set to 'network' or 'both', the basin IDs will be
 extracted automatically. Default is NULL.}
 
-\item{basin_layer}{character. Full path to the basin ID .tif layer.}
+\item{basin_layer}{character. Full path to the basin ID .tif layer. Needs to
+be defined to calculate the distance along the network.}
 
-\item{stream_layer}{character. Full path of the stream network .gpkg file.}
+\item{stream_layer}{character. Full path of the stream network .gpkg file.
+Needs to be defined to calculate the distance along the network.}
 
 \item{distance}{character. One of "euclidean", "network", or "both".
 If "euclidean", the euclidean distances between all pairs of points are
 calculated. If "network", the shortest path along the network between all
 pairs of points is calculated. (see "Details" for more information).
 If method is set to "both", both distance measures are calculated.
-Default is "both". Ditances are given in meters.}
+Distances are given in meters. Default is "both".}
 
 \item{n_cores}{numeric. Number of cores used for parallelization.
 Default is 1.}
@@ -57,7 +59,10 @@ from_id to the node to_id. If distance='both', a list containing both objects
 is returned.
 }
 \description{
-Calculate euclidean or along the network distance between points
+Calculate euclidean or along the network distance between points. To calculate
+the distance along the network, point coordinates need to be snapped to the
+stream network using the function \code{\link{snap_to_network}} or
+\code{\link{snap_to_subc_segment}}.
 }
 \details{
 To calculate the euclidian distance between all pair of points the function
@@ -115,8 +120,7 @@ distance_table <- get_distance(data = snapped_coordinates,
                                basin_id = "basin_id",
                                basin_layer = basin_rast,
                                stream_layer = stream_vect,
-                               distance = "network",
-                               n_cores = 1)
+                               distance = "network")
 # Show table
 distance_table
 }
@@ -128,6 +132,8 @@ distance_table
 \code{\link{snap_to_network}} to snap the data points to the next stream
 segment within a given radius and/or a given flow accumulation threshold
 value.
+\code{\link{snap_to_subc_segment}} to snap the data points to the next stream
+segment of the sub-catchment the data point is located.
 \code{\link{extract_ids}} to extract basin and sub-catchment IDs.
 }
 \author{
