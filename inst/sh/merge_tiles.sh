@@ -12,6 +12,9 @@ export out=$3
 # output file name (including the tif or the gpkg extension)
 export outname=$4
 
+# Column name used for ST_Union
+export colname=$5
+
 # remove the output file if it exists
 [ -f $out/${outname}  ] && rm $out/${outname}
 
@@ -38,7 +41,7 @@ then
     export GEOM=$(ogrinfo -al -so $out/merge_${outname_base}.gpkg | \
         grep 'Geometry Column' | awk -F' ' '{print $4}')
     ogr2ogr  -nlt POLYGON -dialect sqlite \
-        -sql "SELECT ST_Union($GEOM),"ID" FROM merged GROUP BY "ID" "\
+        -sql "SELECT ST_Union($GEOM), $colname FROM merged GROUP BY $colname" \
         $out/${outname} $out/merge_${outname_base}.gpkg
     rm $out/merge_${outname_base}.gpkg
 fi

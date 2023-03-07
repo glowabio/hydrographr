@@ -16,6 +16,9 @@
 #' @param out_dir character. The directory where the output will be stored.
 #' @param file_name character. Name of the merged output file, including the
 #' file extension (.tif or .gpkg).
+#' @param name character. The attribute table column name of the stream segment
+#' ("stream"), sub-catchment ("ID"), basin ("ID") or outlet ("ID") column which
+#' is used for merging GeoPackages. Default is "stream".
 #' @param read logical. If TRUE, the merged layer gets read
 #' into R. If FALSE, the layer is only stored on disk. Default is FALSE.
 #' @param quiet logical. If FALSE, the standard output will be printed.
@@ -65,7 +68,7 @@
 #'                             read = TRUE)
 #'
 
-merge_tiles <- function(tile_dir, tile_names, out_dir, file_name,
+merge_tiles <- function(tile_dir, tile_names, out_dir, file_name, name = "stream",
                         read = FALSE, quiet = TRUE) {
   # Check if paths exist
   if (!dir.exists(tile_dir))
@@ -75,8 +78,8 @@ merge_tiles <- function(tile_dir, tile_names, out_dir, file_name,
     stop(paste0("Path: ", out_dir, " does not exist."))
 
   # Check if tile_names exist
-  for (name in tile_names){
-    file <- paste(tile_dir, name, sep ="/")
+  for (iname in tile_names){
+    file <- paste(tile_dir, iname, sep ="/")
     if (!file.exists(file))
       stop(paste0("File: ", file, " does not exist."))
   }
@@ -95,7 +98,7 @@ merge_tiles <- function(tile_dir, tile_names, out_dir, file_name,
       if (sys_os == "linux" || sys_os == "osx") {
         processx::run(system.file("sh", "merge_tiles.sh",
                                   package = "hydrographr"),
-                      args = c(tile_dir, tile_names_array, out_dir, file_name),
+                      args = c(tile_dir, tile_names_array, out_dir, file_name, name),
                       echo = !quiet)
 
        } else {
@@ -110,7 +113,7 @@ merge_tiles <- function(tile_dir, tile_names, out_dir, file_name,
 
        processx::run(system.file("bat", "merge_tiles.bat",
                                  package = "hydrographr"),
-        args = c(wsl_tile_dir, tile_names_array, wsl_out_dir, file_name,
+        args = c(wsl_tile_dir, tile_names_array, wsl_out_dir, file_name, name,
                  wsl_sh_file),
         echo = !quiet)
        }
