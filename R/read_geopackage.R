@@ -182,15 +182,14 @@ read_geopackage <- function(gpkg, import_as = "data.table", layer_name = NULL,
   } else if (import_as == "SpatVect") {
     cat("Importing as a terra SpatVect object...\n")
     if (missing(subc_id)) {
-    sf <- read_sf(gpkg)
+    vect <- vect(gpkg)
     } else {
     subc_id2 <- paste(subc_id, collapse = ", ")
-    sf <- read_sf(gpkg, query=paste0("SELECT * FROM '",
-                              layer_name, "' WHERE ", name,
-                              " in (", subc_id2, ")"))
-    }
-    vect <- vect(sf)
+    vect <- vect(gpkg, query=paste0("SELECT * FROM '",
+                                  layer_name, "' WHERE ", name,
+                                  " in (", subc_id2, ")"))
     return(vect)
     }
+  }
 
 }
