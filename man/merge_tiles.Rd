@@ -28,7 +28,7 @@ file extension (.tif or .gpkg).}
 
 \item{name}{character. The attribute table column name of the stream segment
 ("stream"), sub-catchment ("ID"), basin ("ID") or outlet ("ID") column which
-is used for merging the GeoPackage. Default is "stream".}
+is used for merging GeoPackages. Default is "stream".}
 
 \item{read}{logical. If TRUE, the merged layer gets read
 into R. If FALSE, the layer is only stored on disk. Default is FALSE.}
