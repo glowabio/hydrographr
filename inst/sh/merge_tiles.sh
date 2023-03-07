@@ -38,7 +38,7 @@ then
     export GEOM=$(ogrinfo -al -so $out/merge_${outname_base}.gpkg | \
         grep 'Geometry Column' | awk -F' ' '{print $4}')
     ogr2ogr  -nlt POLYGON -dialect sqlite \
-        -sql "SELECT ST_Union($GEOM),"ID" FROM merged GROUP BY "ID" " \
+        -sql "SELECT ST_Union($GEOM),"ID" FROM merged GROUP BY "ID" "\
         $out/${outname} $out/merge_${outname_base}.gpkg
     rm $out/merge_${outname_base}.gpkg
 fi
