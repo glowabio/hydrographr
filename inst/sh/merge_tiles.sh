@@ -35,15 +35,17 @@ then
 elif [ ${f: -4} == "gpkg" ]
 then
     export outname_base=$(basename $outname .gpkg)
-    ogrmerge.py -single -progress -skipfailures -overwrite_ds -f GPKG \
-        -o $out/merge_${outname_base}.gpkg ${farray[@]}
+    ogrmerge.py -single -progress -skipfailures -overwrite_ds -f VRT \
+        -o $out/merge_${outname_base}.vrt ${farray[@]}
+    ogr2ogr  -nlt PROMOTE_TO_MULTI -makeValid  \
+          $out/merge_${outname_base}.gpkg $out/merge_${outname_base}.vrt
         # Get the Geometry Column name in the merged fil
     export GEOM=$(ogrinfo -al -so $out/merge_${outname_base}.gpkg | \
         grep 'Geometry Column' | awk -F' ' '{print $4}')
-    ogr2ogr  -nlt POLYGON -dialect sqlite \
+    ogr2ogr  -nlt PROMOTE_TO_MULTI -dialect sqlite \
         -sql "SELECT ST_Union($GEOM), $colname FROM merged GROUP BY $colname" \
-        $out/${outname} $out/merge_${outname_base}.gpkg
-    rm $out/merge_${outname_base}.gpkg
+        -makeValid $out/${outname} $out/merge_${outname_base}.gpkg
+    rm $out/merge_${outname_base}.vrt $out/merge_${outname_base}.gpkg
 fi
 
 exit

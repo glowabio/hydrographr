@@ -25,7 +25,7 @@
 #' Default is TRUE.
 #'
 #' @importFrom processx run
-#' @importFrom terra rast vect makeValid
+#' @importFrom terra rast vect
 #' @importFrom tools file_ext
 #' @export
 #'
@@ -118,24 +118,15 @@ merge_tiles <- function(tile_dir, tile_names, out_dir, file_name, name = "stream
         echo = !quiet)
        }
 
-    # Identify if merged file is .tif or .gpkg
-    file_extension <- file_ext(paste0(out_dir, "/", file_name))
-
-   if(file_extension == "gpkg") {
-     # Make the geometry of the merged gpkg valid
-     merged_gpkg <- vect(paste0(out_dir, "/", file_name))
-     merged_gpkg <- merged_gpkg %>% makeValid()
-     writeVector(merged_gpkg, paste0(out_dir, "/", file_name),  overwrite=TRUE)
-   }
 
   # Print message
   cat("Merged file saved under: ", out_dir,"\n")
 
   if (read == TRUE) {
-
+    # Identify if merged file is .tif or .gpkg
+    file_extension <- file_ext(paste0(out_dir, "/", file_name))
     # Print message
     cat("Loading merged file\n")
-
 
     # Read merged layer
     if(file_extension == "tif") {
