@@ -149,5 +149,15 @@ will cite
 ```
 
 
+**GNU bc**
+
+GNU bc (Basic Calculator) is an arbitrary precision numeric processing language, which is used in the function `snap_to_subc_segment()`. For more information check the [GNU bc](https://www.gnu.org/software/bc/) website.
+
+```{bash, eval=FALSE}
+# Install bc
+sudo apt install bc
+
+```
 
 
+We recommend to reboot your computer after the installation.
