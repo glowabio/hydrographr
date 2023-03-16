@@ -32,7 +32,7 @@
 #'
 #' @importFrom parallel detectCores
 #' @importFrom stringi stri_rand_strings
-#' @importFrom dplyr select left_join
+#' @importFrom dplyr left_join
 #' @importFrom data.table fread
 #' @importFrom processx run
 #' @export
@@ -245,17 +245,20 @@ get_distance <- function(data, lon, lat, id, basin_id = NULL,
 
     # Join with data and select columns needed for the bash script
     # Note: "id" should be the first column
-    ids <- left_join(data, basin_ids, by = c(lon, lat)) %>%
-      select(matches(c(id, lon, lat)), basin_id)
+    columns <- c(id, lon, lat, "basin_id")
+    ids <- as.data.table(data) %>%
+      left_join(., basin_ids, by = c(lon, lat)) %>%
+      .[, ..columns]
 
   } else if (!is.null(basin_id) & distance != "euclidean"){
     # Select columns needed for the bash script to calculate network distances
-    ids <- data %>%
-      select(matches(c(id, lon, lat, basin_id)))
+    columns <- c(id, lon, lat, basin_id)
+    ids <- as.data.table(data)[, ..columns]
+
   } else {
     # Select columns needed for the bash script to calculate euclidean distances
-    ids <- data %>%
-      select(matches(c(id, lon, lat)))
+    columns <- c(id, lon, lat)
+    ids <- as.data.table(data)[, ..columns]
 
   }
 
