@@ -19,7 +19,6 @@
 #' @param quiet logical. If FALSE, the standard output will be printed.
 #' Default is TRUE.
 #' @importFrom stringi stri_rand_strings
-#' @importFrom dplyr select
 #' @importFrom data.table fread fwrite
 #' @importFrom processx run
 #' @importFrom parallel detectCores
@@ -158,8 +157,9 @@ get_upstream_catchment <- function(data, id, lon, lat, direction_layer = NULL,
   # points_dataset.txt and ids.txt file
   rand_string <- stri_rand_strings(n = 1, length = 8, pattern = "[A-Za-z0-9]")
   # Select columns with lon/lat coordinates and occurrence/site id
-  coord_id <- data %>%
-    select(matches(c(id, lon, lat)))
+  columns <- c(id, lon, lat)
+  coord_id <- as.data.table(data)[, ..columns]
+
   # Export occurrence points
   coord_tmp_path <- paste0(tempdir(), "/coordinates_id_", rand_string, ".txt")
   ## Note:Only export lon/lat and id columns
