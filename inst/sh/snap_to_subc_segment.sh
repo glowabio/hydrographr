@@ -164,7 +164,7 @@ cat ${OUTDIR}/coords_* >> ${OUTDIR}/snap_all.csv
 
 # Join original table with new coordinates
 paste -d","   \
-    $DATA \
+    <(sort -t, -k1,1n -n $DATA) \
     <(sort -t, -k3 -h ${OUTDIR}/snap_all.csv | awk -F, -v OFS=, '{print $1, $2}')  \
     > $SNAP
 
