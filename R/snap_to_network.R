@@ -7,7 +7,8 @@
 #' @param lon character. The name of the column with the longitude coordinates.
 #' @param lat character. The name of the column with the latitude coordinates.
 #' @param id  character. The name of a column containing unique IDs for
-#' each row of "data" (e.g., occurrence or site IDs).
+#' each row of "data" (e.g., occurrence or site IDs). The unique IDs need to be
+#' numeric.
 #' @param stream_layer character. Full path of the stream network .tif file
 #' @param accu_layer character. Full path of the flow accumulation .tif file.
 #' Needed if the point should be snapped to the next stream segment having

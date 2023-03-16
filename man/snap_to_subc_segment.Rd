@@ -26,7 +26,7 @@ snap_to_subc_segment(
 \item{lat}{character. The name of the column with the latitude coordinates.}
 
 \item{id}{character. The name of a column containing unique IDs for each row
-of "data" (e.g., occurrence or site IDs).}
+of "data" (e.g., occurrence or site IDs). The unique IDs need to be numeric.}
 
 \item{basin_id}{character. The name of the column with the basin IDs.
 If NULL, the basin IDs will be extracted automatically. Default is NULL}
