@@ -27,7 +27,7 @@
 #' @param quiet logical. If FALSE, the standard output will be printed.
 #' Default is TRUE.
 #' @importFrom stringi stri_rand_strings
-#' @importFrom dplyr select left_join
+#' @importFrom dplyr left_join
 #' @importFrom data.table fread
 #' @importFrom processx run
 #' @export
