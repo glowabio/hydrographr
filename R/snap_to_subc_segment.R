@@ -24,7 +24,7 @@
 #'
 #' @importFrom parallel detectCores
 #' @importFrom stringi stri_rand_strings
-#' @importFrom dplyr select left_join
+#' @importFrom dplyr left_join
 #' @importFrom data.table fread
 #' @importFrom processx run
 #' @export
@@ -198,9 +198,9 @@ snap_to_subc_segment <- function(data, lon, lat, id, basin_id = NULL,
                                   basin_layer = basin_layer, quiet = quiet)
     # Join with data and select columns needed for the bash script
     columns <- c(id, lon, lat, "basin_id", "subcatchment_id")
-    ids <- data %>%
+    ids <- as.data.table(data) %>%
       left_join(., subc_basin_ids, by = c(lon, lat)) %>%
-      .[, columns, with=FALSE]
+      .[, ..columns]
 
   } else if (is.null(basin_id) && !is.null(subc_id)) {
     # Extract basin ids
@@ -209,9 +209,9 @@ snap_to_subc_segment <- function(data, lon, lat, id, basin_id = NULL,
                              basin_layer = basin_layer, quiet = quiet)
     # Join with data and select columns needed for the bash script
     columns <- c(id, lon, lat, "basin_id", subc_id)
-    ids <- data %>%
+    ids <- as.data.table(data) %>%
       left_join(., basin_ids, by = c(lon, lat)) %>%
-      .[, columns, with=FALSE]
+      .[, ..columns]
 
 
   } else if (!is.null(basin_id) && is.null(subc_id)) {
@@ -221,14 +221,14 @@ snap_to_subc_segment <- function(data, lon, lat, id, basin_id = NULL,
                             basin_layer = NULL, quiet = quiet)
     # Join with data and select columns needed for the bash script
     columns <- c(id, lon, lat, basin_id, "subcatchment_id")
-    ids <- data %>%
+    ids <- as.data.table(data) %>%
       left_join(., subc_ids, by = c(lon, lat)) %>%
-      .[, columns, with=FALSE]
-#
+      .[, ..columns]
+
   } else {
     # Select columns needed for the bash script
     columns <- c(id, lon, lat, basin_id, subc_id)
-    ids <- data[, columns, with=FALSE]
+    ids <- as.data.table(data)[, ..columns]
   }
 
   # Create random string to attach to the file name of the temporary
