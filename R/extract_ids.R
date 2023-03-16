@@ -14,7 +14,6 @@
 #' Default is TRUE.
 #'
 #' @importFrom stringi stri_rand_strings
-#' @importFrom dplyr select
 #' @importFrom data.table fread fwrite
 #' @importFrom processx run
 #' @export
@@ -110,14 +109,14 @@ extract_ids <- function(data, lon, lat, id = NULL, basin_layer = NULL,
   rand_string <- stri_rand_strings(n = 1, length = 8, pattern = "[A-Za-z0-9]")
   # Select columns with lon/lat coordinates
   if (is.null(id)) {
-    coord <- data %>%
-      select(matches(c(lon, lat)))
+    columns <- c(lon, lat)
+    coord <- as.data.table(data)[, ..columns]
     # Remove duplicated rows across entire data frame
     coord <- coord[!duplicated(coord), ]
 
   } else {
-    coord <- data %>%
-      select(matches(c(lon, lat, id)))
+    columns <- c(lon, lat, id)
+    coord <- as.data.table(data)[, ..columns]
     # Remove duplicated rows across entire data frame
     coord <- coord[!duplicated(coord), ]
 
