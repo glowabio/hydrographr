@@ -27,7 +27,7 @@
 #' @param quiet logical. If FALSE, the standard output will be printed.
 #' Default is TRUE.
 #' @importFrom stringi stri_rand_strings
-#' @importFrom dplyr select left_join
+#' @importFrom dplyr left_join
 #' @importFrom data.table fread
 #' @importFrom processx run
 #' @export
@@ -179,10 +179,10 @@ snap_to_network <- function(data, lon, lat, id, stream_layer,
   rand_string <- stri_rand_strings(n = 1, length = 8, pattern = "[A-Za-z0-9]")
 
   # Select columns with lon/lat coordinates
-    coord <- data %>%
-      select(matches(c(id, lon, lat)))
-    # Remove duplicated rows across entire data frame
-    coord <- coord[!duplicated(coord), ]
+  columns <- c(id, lon, lat)
+  coord <- as.data.table(data)[, ..columns]
+  # Remove duplicated rows across entire data frame
+  coord <- coord[!duplicated(coord), ]
 
   # Export taxon occurrence points
   coord_tmp_path <- paste0(tempdir(), "/coordinates_", rand_string, ".csv")
