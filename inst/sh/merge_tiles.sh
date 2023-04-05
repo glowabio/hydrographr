@@ -42,8 +42,12 @@ then
         # Get the Geometry Column name in the merged fil
     export GEOM=$(ogrinfo -al -so $out/merge_${outname_base}.gpkg | \
         grep 'Geometry Column' | awk -F' ' '{print $4}')
+    export FID=$(ogrinfo -al -so $out/merge_${outname_base}.gpkg | \
+        grep 'FID Column' | awk -F' ' '{print $4}')
+    export ATTR=$(ogrinfo -al -so $out/merge_${outname_base}.gpkg | \
+        awk 'FNR >=38 {print $1}' | tr ":" ",")
     ogr2ogr  -nlt PROMOTE_TO_MULTI -dialect sqlite \
-        -sql "SELECT ST_Union($GEOM), $colname FROM merged GROUP BY $colname" \
+        -sql "SELECT $FID $ATTR ST_Union($GEOM) AS geom, $colname FROM merged GROUP BY $colname" \
         -makeValid $out/${outname} $out/merge_${outname_base}.gpkg
     rm $out/merge_${outname_base}.vrt $out/merge_${outname_base}.gpkg
 fi
@@ -51,23 +55,4 @@ fi
 exit
 
 
-#export BAS=$1
-#export OUT=$2
-### $1 is the raster tile or spatial vector path
-### $2 is the output path
-#
-# if (find "$BAS" -name "*tif") | grep -q $BAS; then
-#	# merge raster file by first creating a vrt and then do the merge
-#	 gdalbuildvrt -overwrite $BAS/basin.vrt $BAS/*.tif
-#	 rm -f $BAS/basin.tif
-#	 gdal_translate -co COMPRESS=DEFLATE -co ZLEVEL=9 $BAS/basin.vrt $OUT/basin.tif
-#	 rm -f $BAS/basin.vrt
-#
-# elif (find "$BAS" -name "*gpkg") | grep -q $BAS; then
-#	 # merge vector file
-#	 rm -f $BAS/basin.gpkg
-#	 ogrmerge.py -single -progress -skipfailures -overwrite_ds -f GPKG -o $BAS/basin.gpkg  $BAS/*.gpkg
-#	 rm -f $BAS/basin_dissolved.gpkg
-#	 ogr2ogr  -nlt POLYGON -dialect sqlite -sql "SELECT ST_Union(ST_MakeValid(geom)),"ID" FROM merged GROUP BY "ID" " $OUT/basin_dissolved.gpkg $BAS/basin.gpkg
-#	 rm -f $BAS/basin.gpkg
-# fi
+
