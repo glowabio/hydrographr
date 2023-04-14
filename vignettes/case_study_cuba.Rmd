@@ -279,7 +279,6 @@ We define the directory containing the layers to be cropped
 ```{r}
 dirs_chelsa <- list.dirs(paste0(wdir, "/data/chelsa_bioclim"),
                        recursive = TRUE, full.names = TRUE)
-dirs_chelsa
 ```
 
 ... and the final output directory
@@ -323,8 +322,6 @@ dirs_h90m <- list.dirs(paste0(wdir, "/data"),
                        recursive = TRUE, full.names = TRUE)
 
 dirs_h90m <- dirs_h90m[grep("tiles20d", dirs_h90m)]
-
-dirs_h90m
 ```
 
 ```{r, eval = FALSE}
@@ -800,7 +797,7 @@ prediction$pred_occur <- as.integer(round(prediction$pred_occur, 2) * 100)
 
 We can now reclassify the sub-catchment raster
 
-```{r}
+```{r, results = 'hide'}
 reclass_raster(
   data = prediction,
   rast_val = "subcatchment_id",
