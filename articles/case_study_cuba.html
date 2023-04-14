@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">hydrographr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.9</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.10</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -78,7 +78,7 @@
 data before and after a Species Distribution Model</h3>
                         <h4 data-toc-skip class="author"></h4>
             
-            <h4 data-toc-skip class="date">2023-03-14</h4>
+            <h4 data-toc-skip class="date">2023-04-14</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/glowabio/hydrographr/blob/HEAD/vignettes/case_study_cuba.Rmd" class="external-link"><code>vignettes/case_study_cuba.Rmd</code></a></small>
       <div class="d-none name"><code>case_study_cuba.Rmd</code></div>
@@ -127,7 +127,10 @@ vegetation of the riparian forest where they find shelter and prey.</p>
 <p>Define working directory</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">wdir</span> <span class="op">&lt;-</span> <span class="st">"my/working/directory"</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/getwd.html" class="external-link">setwd</a></span><span class="op">(</span><span class="va">wdir</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/getwd.html" class="external-link">setwd</a></span><span class="op">(</span><span class="va">wdir</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Create a new folder in the working directory to store all the data</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="st">"data"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="species-data">Species data<a class="anchor" aria-label="anchor" href="#species-data"></a>
@@ -970,7 +973,7 @@ and visualisations are available <a href="https://hydrography.org/hydrography90m
 <p>Then download the CHELSA present and future Bioclim variables</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Create download directory</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data/chelsa_bioclim"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data/chelsa_bioclim"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Extend timeout to 1000s to allow uninterrupted downloading</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>timeout <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></span>
@@ -1000,7 +1003,7 @@ global CHELSA layers:</p>
 <code class="sourceCode R"><span><span class="va">dirs_chelsa</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.dirs</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data/chelsa_bioclim"</span><span class="op">)</span>,</span>
 <span>                       recursive <span class="op">=</span> <span class="cn">TRUE</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">dirs_chelsa</span></span></code></pre></div>
-<pre><code><span><span class="co">## character(0)</span></span></code></pre>
+<pre><code><span><span class="co">## [1] "/home/afroditi/Documents/PhD/hydrographr_case_study/data/chelsa_bioclim"</span></span></code></pre>
 <p>… and the final output directory</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Define output directory for merged files</span></span>
@@ -1227,13 +1230,13 @@ NoData values:</p>
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/report_no_data.html">report_no_data</a></span><span class="op">(</span>data_dir <span class="op">=</span> <span class="va">layer_dir</span>, var_layer <span class="op">=</span> <span class="va">var_layers</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##                                    Raster   NoData</span></span>
-<span><span class="co">## 1 bio15_IPSL-CM6A-LR_ssp370_2041-2070.tif        0</span></span>
-<span><span class="co">## 2  bio1_IPSL-CM6A-LR_ssp370_2041-2070.tif        0</span></span>
-<span><span class="co">## 3                     bio12_1981-2010.tif        0</span></span>
+<span><span class="co">## 1                     bio12_1981-2010.tif        0</span></span>
+<span><span class="co">## 2               slope_curv_max_dw_cel.tif -9999999</span></span>
+<span><span class="co">## 3 bio12_IPSL-CM6A-LR_ssp370_2041-2070.tif        0</span></span>
 <span><span class="co">## 4                      bio1_1981-2010.tif        0</span></span>
-<span><span class="co">## 5 bio12_IPSL-CM6A-LR_ssp370_2041-2070.tif        0</span></span>
+<span><span class="co">## 5  bio1_IPSL-CM6A-LR_ssp370_2041-2070.tif        0</span></span>
 <span><span class="co">## 6                     bio15_1981-2010.tif        0</span></span>
-<span><span class="co">## 7               slope_curv_max_dw_cel.tif -9999999</span></span>
+<span><span class="co">## 7 bio15_IPSL-CM6A-LR_ssp370_2041-2070.tif        0</span></span>
 <span><span class="co">## 8                                 spi.tif -9999999</span></span></code></pre>
 <div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Run the function that returns the zonal statistics</span></span>
@@ -2207,8 +2210,8 @@ an indicator of the sub-catchment size</p>
 <span><span class="co"># Clear up memory</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">stats_gpkg_h08v06</span>, <span class="va">stats_gpkg_h10v06</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/base/gc.html" class="external-link">gc</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##            used  (Mb) gc trigger  (Mb) max used  (Mb)</span></span>
-<span><span class="co">## Ncells  4558491 243.5    7023742 375.2  7023742 375.2</span></span>
-<span><span class="co">## Vcells 25643684 195.7   55499074 423.5 48439128 369.6</span></span></code></pre>
+<span><span class="co">## Ncells  4553160 243.2    9051307 483.4  5510720 294.4</span></span>
+<span><span class="co">## Vcells 25632866 195.6   52341750 399.4 48428111 369.5</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="prepare-data-for-modelling">Prepare data for modelling<a class="anchor" aria-label="anchor" href="#prepare-data-for-modelling"></a>
@@ -3534,230 +3537,230 @@ length
 <tbody>
 <tr>
 <td style="text-align:right;">
-400280904
+422879430
 </td>
 <td style="text-align:right;">
-25.95000
+25.84778
 </td>
 <td style="text-align:right;">
-1362.800
+1222.002
 </td>
 <td style="text-align:right;">
-56.63333
+53.00000
 </td>
 <td style="text-align:right;">
--0.0001143
+-0.0683735
 </td>
 <td style="text-align:right;">
-7.166667
+8.7777778
 </td>
 <td style="text-align:right;">
-0.0000000
+0.2205940
 </td>
 <td style="text-align:right;">
-1.555635
-</td>
-<td style="text-align:right;">
-0.0471405
-</td>
-<td style="text-align:right;">
-0.0005227
-</td>
-<td style="text-align:right;">
-5.756639
-</td>
-<td style="text-align:right;">
-184.5403
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-422572460
-</td>
-<td style="text-align:right;">
-23.30254
-</td>
-<td style="text-align:right;">
-1990.707
-</td>
-<td style="text-align:right;">
-67.74746
-</td>
-<td style="text-align:right;">
--0.0780568
-</td>
-<td style="text-align:right;">
-5.406780
-</td>
-<td style="text-align:right;">
-0.1293477
-</td>
-<td style="text-align:right;">
-11.299525
-</td>
-<td style="text-align:right;">
-0.0499353
-</td>
-<td style="text-align:right;">
-0.1131071
-</td>
-<td style="text-align:right;">
-7.232503
-</td>
-<td style="text-align:right;">
-1073.6198
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-422798686
-</td>
-<td style="text-align:right;">
-26.03000
-</td>
-<td style="text-align:right;">
-1427.200
-</td>
-<td style="text-align:right;">
-54.98000
-</td>
-<td style="text-align:right;">
--0.0067754
-</td>
-<td style="text-align:right;">
-425.200000
-</td>
-<td style="text-align:right;">
-0.0400000
-</td>
-<td style="text-align:right;">
-1.400000
-</td>
-<td style="text-align:right;">
-0.0400000
-</td>
-<td style="text-align:right;">
-0.0146956
-</td>
-<td style="text-align:right;">
-525.110046
-</td>
-<td style="text-align:right;">
-184.5180
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-399742523
-</td>
-<td style="text-align:right;">
-23.82500
-</td>
-<td style="text-align:right;">
-1530.950
-</td>
-<td style="text-align:right;">
-51.90000
-</td>
-<td style="text-align:right;">
--0.0568990
-</td>
-<td style="text-align:right;">
-184.250000
-</td>
-<td style="text-align:right;">
-0.0433013
-</td>
-<td style="text-align:right;">
-3.031089
+16.869045
 </td>
 <td style="text-align:right;">
 0.0000000
 </td>
 <td style="text-align:right;">
-0.0758162
+0.0891477
 </td>
 <td style="text-align:right;">
-317.398310
+13.7224696
 </td>
 <td style="text-align:right;">
-125.8606
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-422494423
-</td>
-<td style="text-align:right;">
-24.43696
-</td>
-<td style="text-align:right;">
-1531.845
-</td>
-<td style="text-align:right;">
-55.88261
-</td>
-<td style="text-align:right;">
--0.0100358
-</td>
-<td style="text-align:right;">
-3.456522
-</td>
-<td style="text-align:right;">
-0.0336781
-</td>
-<td style="text-align:right;">
-4.435096
-</td>
-<td style="text-align:right;">
-0.0984761
-</td>
-<td style="text-align:right;">
-0.0272387
-</td>
-<td style="text-align:right;">
-5.663409
-</td>
-<td style="text-align:right;">
-1487.7009
+861.5021
 </td>
 </tr>
 <tr>
 <td style="text-align:right;">
-422570167
+399633264
 </td>
 <td style="text-align:right;">
-22.76250
+24.75000
 </td>
 <td style="text-align:right;">
-2202.137
+1398.500
 </td>
 <td style="text-align:right;">
-68.28750
+52.10000
 </td>
 <td style="text-align:right;">
--0.0266655
+-0.0195006
 </td>
 <td style="text-align:right;">
-717.375000
+0.6000000
 </td>
 <td style="text-align:right;">
-0.2420615
+0.0000000
 </td>
 <td style="text-align:right;">
-13.575800
+0.000000
 </td>
 <td style="text-align:right;">
-0.0330719
+0.0000000
 </td>
 <td style="text-align:right;">
-0.0368207
+0.0217459
 </td>
 <td style="text-align:right;">
-1326.548429
+0.8000000
 </td>
 <td style="text-align:right;">
-252.3430
+125.7514
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+399847579
+</td>
+<td style="text-align:right;">
+24.12959
+</td>
+<td style="text-align:right;">
+1480.141
+</td>
+<td style="text-align:right;">
+58.33265
+</td>
+<td style="text-align:right;">
+-0.0640673
+</td>
+<td style="text-align:right;">
+38.4081633
+</td>
+<td style="text-align:right;">
+0.0832493
+</td>
+<td style="text-align:right;">
+15.264938
+</td>
+<td style="text-align:right;">
+0.0711071
+</td>
+<td style="text-align:right;">
+0.0989512
+</td>
+<td style="text-align:right;">
+87.5258372
+</td>
+<td style="text-align:right;">
+852.0281
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+422684919
+</td>
+<td style="text-align:right;">
+25.64375
+</td>
+<td style="text-align:right;">
+1223.438
+</td>
+<td style="text-align:right;">
+58.30313
+</td>
+<td style="text-align:right;">
+-0.0709646
+</td>
+<td style="text-align:right;">
+5.3437500
+</td>
+<td style="text-align:right;">
+0.0347985
+</td>
+<td style="text-align:right;">
+1.322344
+</td>
+<td style="text-align:right;">
+0.0173993
+</td>
+<td style="text-align:right;">
+0.1377358
+</td>
+<td style="text-align:right;">
+3.5232210
+</td>
+<td style="text-align:right;">
+598.2645
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+422755725
+</td>
+<td style="text-align:right;">
+26.25000
+</td>
+<td style="text-align:right;">
+1071.121
+</td>
+<td style="text-align:right;">
+59.38947
+</td>
+<td style="text-align:right;">
+-0.0031438
+</td>
+<td style="text-align:right;">
+0.5263158
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+1.810664
+</td>
+<td style="text-align:right;">
+0.0306892
+</td>
+<td style="text-align:right;">
+0.0045071
+</td>
+<td style="text-align:right;">
+0.8806948
+</td>
+<td style="text-align:right;">
+397.9229
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+422487954
+</td>
+<td style="text-align:right;">
+24.85000
+</td>
+<td style="text-align:right;">
+1310.000
+</td>
+<td style="text-align:right;">
+58.20000
+</td>
+<td style="text-align:right;">
+-0.0065450
+</td>
+<td style="text-align:right;">
+3.7142857
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0182488
+</td>
+<td style="text-align:right;">
+3.4934341
+</td>
+<td style="text-align:right;">
+218.1596
 </td>
 </tr>
 </tbody>
@@ -4201,7 +4204,7 @@ presences.</p>
 <span><span class="co">## Target node size:                 10 </span></span>
 <span><span class="co">## Variable importance mode:         impurity </span></span>
 <span><span class="co">## Splitrule:                        gini </span></span>
-<span><span class="co">## OOB prediction error (Brier s.):  0.09399346</span></span></code></pre>
+<span><span class="co">## OOB prediction error (Brier s.):  0.09254441</span></span></code></pre>
 <p>The model can be evaluated based on the OOB prediction error. This
 metric lies on the fact that the data points that are not used in
 training a tree can be used to test the tree. The errors on the OOB
@@ -4228,12 +4231,12 @@ reclassification rules</p>
 <span>                         pred_occur <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">pred</span><span class="op">$</span><span class="va">predictions</span><span class="op">[</span>,<span class="fl">2</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">prediction</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##    subcatchment_id pred_occur</span></span>
-<span><span class="co">## 1:       399592461 0.01645238</span></span>
-<span><span class="co">## 2:       399592865 0.01608016</span></span>
-<span><span class="co">## 3:       399593700 0.02687421</span></span>
-<span><span class="co">## 4:       399593701 0.02123254</span></span>
-<span><span class="co">## 5:       399593817 0.01857857</span></span>
-<span><span class="co">## 6:       399593818 0.08921230</span></span></code></pre>
+<span><span class="co">## 1:       399592461 0.02866230</span></span>
+<span><span class="co">## 2:       399592865 0.02910913</span></span>
+<span><span class="co">## 3:       399593700 0.04133770</span></span>
+<span><span class="co">## 4:       399593701 0.03296468</span></span>
+<span><span class="co">## 5:       399593817 0.02662817</span></span>
+<span><span class="co">## 6:       399593818 0.08649127</span></span></code></pre>
 <p>and multiply the probability values by 100</p>
 <div class="sourceCode" id="cb66"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">prediction</span><span class="op">$</span><span class="va">pred_occur</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">prediction</span><span class="op">$</span><span class="va">pred_occur</span>, <span class="fl">2</span><span class="op">)</span> <span class="op">*</span> <span class="fl">100</span><span class="op">)</span></span></code></pre></div>
