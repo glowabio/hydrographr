@@ -382,7 +382,7 @@ spdata_ids <- extract_ids(data = spdata, lon = "longitude", lat = "latitude",
                                
 ```
 
-```{r}
+```{r, echo=F}
 knitr::kable(head(spdata_ids),
  caption = "The species data have now their corresponding sub-catchment ids")
 ```
