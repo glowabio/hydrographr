@@ -241,7 +241,7 @@ Then download the CHELSA present and future Bioclim variables
 
 ```{r}
 # Create download directory
-dir.create(paste(wdir, "/data/chelsa_bioclim"))
+dir.create(paste0(wdir, "/data/chelsa_bioclim"))
 ```
 
 ```{r, eval = FALSE}
