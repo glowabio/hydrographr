@@ -90,6 +90,7 @@ Define working directory
 ```{r, echo = FALSE}
 wdir <- "/home/afroditi/Documents/PhD/hydrographr_case_study"
 setwd(wdir)
+dir.create("data")
 ```
 
 ```{r, eval = FALSE}
@@ -853,4 +854,3 @@ more detailed view.
 ![](/home/afroditi/Documents/PhD/scripts/hydrographr/man/figures/prediction_zoom.png){width="800"}
 
 ### References
-
