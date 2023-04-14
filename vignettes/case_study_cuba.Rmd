@@ -95,6 +95,9 @@ setwd(wdir)
 ```{r, eval = FALSE}
 wdir <- "my/working/directory"
 setwd(wdir)
+
+# Create a new folder in the working directory to store all the data
+dir.create("data")
 ```
 
 ### Species data
@@ -850,3 +853,4 @@ more detailed view.
 ![](/home/afroditi/Documents/PhD/scripts/hydrographr/man/figures/prediction_zoom.png){width="800"}
 
 ### References
+
