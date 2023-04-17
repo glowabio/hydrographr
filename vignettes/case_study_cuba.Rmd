@@ -90,7 +90,7 @@ Define working directory
 ```{r, echo = FALSE}
 wdir <- "/home/afroditi/Documents/PhD/hydrographr_case_study"
 setwd(wdir)
-dir.create("data")
+dir.create("data_cuba")
 ```
 
 ```{r, eval = FALSE}
@@ -98,7 +98,7 @@ wdir <- "my/working/directory"
 setwd(wdir)
 
 # Create a new folder in the working directory to store all the data
-dir.create("data")
+dir.create("data_cuba")
 ```
 
 ### Species data
@@ -108,8 +108,8 @@ occurrence records in Cuba from
 <https://doi.org/10.18728/igb-fred-778.3> (Cambas & Salina, 2022).
 
 ```{r, eval = FALSE}
-download.file("https://fred.igb-berlin.de/data/file_download/1395", 
-              destfile = paste0(wdir, "/data/spdata_cuba.csv"))
+download.file("https://fred.igb-berlin.de/data_cuba/file_download/1395", 
+              destfile = paste0(wdir, "/data_cuba/spdata_cuba.csv"))
               
 ```
 
@@ -117,7 +117,7 @@ Import the dataset and select the occurrences of the species of
 interest, sampled after the year 1980 (to match with the climate data)
 
 ```{r}
-spdata <- fread(paste0(wdir, "/data/spdata_cuba.csv"), sep = "\t", fill = TRUE) %>% 
+spdata <- fread(paste0(wdir, "/data_cuba/spdata_cuba.csv"), sep = "\t", fill = TRUE) %>% 
           filter(species == "Hypolestes_trinitatis") %>% 
           filter(year > 1980)
               
@@ -234,18 +234,18 @@ vars_gpkg <- c("order_vect_point")
 ```{r, eval = FALSE}
 # Download the .tif tiles of the desired variables
 download_tiles(variable = vars_tif, tile_id = tile_id, file_format = "tif",
-              download_dir = "data")
+              download_dir = "data_cuba")
 
 # Download the .gpkg tiles of the desired variables
 download_tiles(variable = vars_gpkg, tile_id = tile_id, file_format = "gpkg",
-              download_dir = "data")
+              download_dir = "data_cuba")
 ```
 
 Then download the CHELSA present and future Bioclim variables
 
 ```{r}
 # Create download directory
-dir.create(paste0(wdir, "/data/chelsa_bioclim"))
+dir.create(paste0(wdir, "/data_cuba/chelsa_bioclim"))
 ```
 
 ```{r, eval = FALSE}
@@ -254,17 +254,17 @@ options(timeout = 1000)
 
 # Download
 download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio12_1981-2010_V.2.1.tif",
-destfile = "data/chelsa_bioclim/bio12_1981-2010.tif")
+destfile = "data_cuba/chelsa_bioclim/bio12_1981-2010.tif")
 download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio15_1981-2010_V.2.1.tif",
-destfile = "data/chelsa_bioclim/bio15_1981-2010.tif")
+destfile = "data_cuba/chelsa_bioclim/bio15_1981-2010.tif")
 download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio1_1981-2010_V.2.1.tif",
-destfile = "data/chelsa_bioclim/bio1_1981-2010.tif")
+destfile = "data_cuba/chelsa_bioclim/bio1_1981-2010.tif")
 download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/2041-2070/IPSL-CM6A-LR/ssp370/bio/CHELSA_bio12_2041-2070_ipsl-cm6a-lr_ssp370_V.2.1.tif",
-destfile = "data/chelsa_bioclim/bio12_IPSL-CM6A-LR_ssp370_2041-2070.tif")
+destfile = "data_cuba/chelsa_bioclim/bio12_IPSL-CM6A-LR_ssp370_2041-2070.tif")
 download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/2041-2070/IPSL-CM6A-LR/ssp370/bio/CHELSA_bio15_2041-2070_ipsl-cm6a-lr_ssp370_V.2.1.tif",
-destfile = "data/chelsa_bioclim/bio15_IPSL-CM6A-LR_ssp370_2041-2070.tif")
+destfile = "data_cuba/chelsa_bioclim/bio15_IPSL-CM6A-LR_ssp370_2041-2070.tif")
 download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/2041-2070/IPSL-CM6A-LR/ssp370/bio/CHELSA_bio1_2041-2070_ipsl-cm6a-lr_ssp370_V.2.1.tif",
-destfile = "data/chelsa_bioclim/bio1_IPSL-CM6A-LR_ssp370_2041-2070.tif")
+destfile = "data_cuba/chelsa_bioclim/bio1_IPSL-CM6A-LR_ssp370_2041-2070.tif")
 
 ```
 
@@ -277,7 +277,7 @@ global CHELSA layers:
 We define the directory containing the layers to be cropped
 
 ```{r}
-dirs_chelsa <- list.dirs(paste0(wdir, "/data/chelsa_bioclim"),
+dirs_chelsa <- list.dirs(paste0(wdir, "/data_cuba/chelsa_bioclim"),
                        recursive = TRUE, full.names = TRUE)
 ```
 
@@ -285,7 +285,7 @@ dirs_chelsa <- list.dirs(paste0(wdir, "/data/chelsa_bioclim"),
 
 ```{r}
 # Define output directory for merged files
-layer_dir <- paste0(wdir, "/data/final_layers")
+layer_dir <- paste0(wdir, "/data_cuba/final_layers")
 # Create the directory
 dir.create(layer_dir)
 ```
@@ -417,7 +417,7 @@ stats_table_zon <- extract_zonal_stat(
                     subc_layer = paste0(layer_dir, "/sub_catchment.tif"),
                     subc_id = "all",
                     var_layer = var_layers,
-                    file_name = paste0(wdir, "/data/zonal_stats.csv"),
+                    file_name = paste0(wdir, "/data_cuba/zonal_stats.csv"),
                     n_cores = 2)
 ```
 
@@ -426,7 +426,7 @@ calculation of the zonal statistics of each variable.
 
 ```{r, echo = FALSE}
 # Read the previously created file
-stats_table_zon <- fread(paste0(wdir, "/data/zonal_stats.csv"))
+stats_table_zon <- fread(paste0(wdir, "/data_cuba/zonal_stats.csv"))
 ```
 
 Let's inspect the resulting table
@@ -463,12 +463,12 @@ stats_table
 
 ```{r, eval = FALSE}
 stats_gpkg_h08v06 <- read_geopackage(
-  "data/r.stream.order/order_vect_tiles20d/order_vect_point_h08v06.gpkg",
+  "data_cuba/r.stream.order/order_vect_tiles20d/order_vect_point_h08v06.gpkg",
   subc_id = stats_table_zon$subcatchment_id) %>%
   rename('subcatchment_id' = 'stream')
 
 stats_gpkg_h10v06 <- read_geopackage(
-  "data/r.stream.order/order_vect_tiles20d/order_vect_point_h10v06.gpkg",
+  "data_cuba/r.stream.order/order_vect_tiles20d/order_vect_point_h10v06.gpkg",
   subc_id = stats_table_zon$subcatchment_id) %>%
   rename('subcatchment_id' = 'stream')
 ```
@@ -478,10 +478,10 @@ stats_gpkg_h10v06 <- read_geopackage(
 # so that the size of data in the repository is smaller
 fwrite(stats_gpkg_h08v06, sep = ",", row.names = FALSE, quote = FALSE,
   paste0(wdir, 
-  "/data/r.stream.order/order_vect_tiles20d/order_vect_point_h08v06.csv"))
+  "/data_cuba/r.stream.order/order_vect_tiles20d/order_vect_point_h08v06.csv"))
 fwrite(stats_gpkg_h10v06, sep = ",", row.names = FALSE, quote = FALSE,
   paste0(wdir, 
-  "/data/r.stream.order/order_vect_tiles20d/order_vect_point_h10v06.csv"))
+  "/data_cuba/r.stream.order/order_vect_tiles20d/order_vect_point_h10v06.csv"))
 
 ```
 
@@ -490,11 +490,11 @@ fwrite(stats_gpkg_h10v06, sep = ",", row.names = FALSE, quote = FALSE,
 # They read the pre-filtered gpkg which was exported as a csv in the previous 
 # step. The result is the same as if we ran "read_geopackage" in the .gpkg files
 stats_gpkg_h08v06 <- fread(paste0(wdir,
-  "/data/r.stream.order/order_vect_tiles20d/order_vect_point_h08v06.csv"), 
+  "/data_cuba/r.stream.order/order_vect_tiles20d/order_vect_point_h08v06.csv"), 
   sep = ",")
 
 stats_gpkg_h10v06 <- fread(paste0(wdir,
-  "/data/r.stream.order/order_vect_tiles20d/order_vect_point_h10v06.csv"), 
+  "/data_cuba/r.stream.order/order_vect_tiles20d/order_vect_point_h10v06.csv"), 
   sep = ",")
 ```
 
