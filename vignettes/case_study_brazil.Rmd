@@ -20,7 +20,7 @@ editor_options:
 
 ```{r, include = FALSE, eval = FALSE}
 # writes out the references for all packages
-#knitr::write_bib(file = 'packages.bib')
+# knitr::write_bib(file = 'packages.bib')
 ```
 
 ### Introduction
@@ -62,7 +62,7 @@ library(sf)
 library(purrr)
 library(ggplot2)
 library(forcats)
-
+library(here)
 #library(leafem)
 #library(leafletCN)
 #library(mapview)
@@ -79,19 +79,18 @@ library(rgbif)
 library(dplyr)
 library(data.table)
 library(leaflet)
+library(stringr)
 library(terra)
 library(sf)
-library(stringr)
 library(purrr)
 library(ggplot2)
 library(forcats)
-
 ```
 
 
-```{r eval=FALSE, include=FALSE}
-wdir <- paste0(getwd(), "/data_brazil")
-setwd(wdir)
+```{r, eval = FALSE, include=FALSE}
+wdir <- paste0(here(), "/data_brazil")
+
 ```
 
 ```{r, eval = FALSE}
@@ -161,7 +160,7 @@ spdata_plot
 ```
 
 
-![](../vignettes/data_brazil/data/figures/occurrence_locations.png)
+![](../man/figures/occurrence_locations.png)
 
 
 ### Download files
@@ -173,10 +172,12 @@ uses the auxiliary raster file that contains all the regional units globally,
 and thus requires an active internet connection.
 
 ```{r, eval = FALSE}
+# Get the tile IDs where the points are located
 tile_id <- get_tile_id(data = spdata, lon = "longitude", lat = "latitude")
 ```
 
 ```{r, echo = FALSE}
+# Get the tile IDs 
 tile_id <- c("h12v08", "h12v10", "h14v08")
 ```
 
@@ -473,7 +474,7 @@ define a certain flow accumulation threshold and to ensure that the fish
 occurrence and dam sites will not be snapped to a headwater stream (first order
 stream) also there is a higher order stream next to it. 
 
-![](../vignettes/data_brazil/data/figures/snapping.png)
+![](../man/figures/snapping.png)
 
 The function is implemented in a for-loop to start searching for streams with a 
 very high flow accumulation of 400,000 km² in a very short distance and than 
@@ -599,7 +600,6 @@ point_locations_snapped <- fread("./data/basin_481051/point_locations_snapped.cs
 
 
 ```{r echo=FALSE}
-
 kbl(point_locations_snapped) %>%                        
   kable_styling(bootstrap_options = "striped", full_width = F, position = "left") %>%     
   scroll_box(width = "700px", height = "200px")
@@ -648,7 +648,7 @@ locations_plot
 ```
 
 
-![](../vignettes/data_brazil/data/figures/point_location_snapped.png)
+![](../man/figures/point_location_snapped.png)
 
 ### Snap point locations to the stream segment within the sub-catchment with the same unique ID
 
@@ -747,15 +747,14 @@ upstream_segment <- read_geopackage(gpkg =  paste0(saofra_dir,
                                     name = "stream")
   
 write_sf(upstream_segment, paste0(upcatch_dir, "/order_vect_segment_2516.gpkg"))
-upstream_segment <- read_sf(paste0(upcatch_dir, "/order_vect_segment_2516.gpkg"))                                     
+                              
 
- 
 # Convert the data.frame into a simply feature
 point_locations_snapped_pts <- st_as_sf(point_locations_snapped,  
                                         coords = c("lon_snap_accu","lat_snap_accu"), 
                                         remove = FALSE, crs="WGS84")
 write_sf(point_locations_snapped_pts, paste0(upcatch_dir, "/point_locations_snapped_2516.gpkg"))
-point_locations_snapped_pts <- read_sf( paste0(upcatch_dir, "/point_locations_snapped_2516.gpkg"))
+
 # Use the polygon to filter the upstream point locations
 upstream_point_locations <- st_filter(point_locations_snapped_pts, 
                                       st_as_sf(upstream_basin_vect)) %>% 
@@ -763,9 +762,14 @@ upstream_point_locations <- st_filter(point_locations_snapped_pts,
 
 
 fwrite(upstream_point_locations, paste0(upcatch_dir, "/upstream_point_locations_2516.csv"))
-upstream_point_locations <- fread(paste0(upcatch_dir, "/upstream_point_locations_2516.csv"))
+
 ```
 
+```{r eval=FALSE, include=FALSE}
+upstream_segment <- read_sf(paste0(upcatch_dir, "/order_vect_segment_2516.gpkg"))       
+point_locations_snapped_pts <- read_sf( paste0(upcatch_dir, "/point_locations_snapped_2516.gpkg"))
+upstream_point_locations <- fread(paste0(upcatch_dir, "/upstream_point_locations_2516.csv"))
+```
 
 ```{r eval=FALSE}
 upstream_basin_vect <- vect(paste0(upcatch_dir , "/upstream_basin_2516.gpkg"))
@@ -787,7 +791,7 @@ upcatch_plot
 ```
 
 
-![](../vignettes/data_brazil/data/figures/upstream_catchment.png)
+![](../man/figures/upstream_catchment.png)
 
 ### Get distance along the stream network
 
@@ -805,7 +809,6 @@ stream_vect <- paste0(upcatch_dir, "/order_vect_segment_2516.gpkg")
 upstream_point_locations <- upstream_point_locations %>% 
   mutate(basin_id = 2516)
 
-start_time <- Sys.time()
 network_distance <- get_distance(data = upstream_point_locations,
                                  lon = "lon_snap_accu",
                                  lat = "lat_snap_accu",
@@ -815,8 +818,6 @@ network_distance <- get_distance(data = upstream_point_locations,
                                  stream_layer = stream_vect,
                                  distance = "network",
                                  n_cores = 1)
-end_time <- Sys.time()
-end_time - start_time
 
 ```
 
@@ -1062,3 +1063,6 @@ ggplot(plot_data, aes(x = as.factor(from_site_id), y = dist, fill = type)) +
 ```
 
 The distance to the next existing dam upstream ranges from 12.6km for the fish occurrence site 8 to 528.9km  for the fish occurrence site 9. For most sites the the distance to the next dam upstream will decrease in the future. Only for the fish occurrence sites 7 and 8 the next future dam upstream will farther away than the existing dam. The distance to the existing dam downstream ranges between 415.2km and 1672.0km. In the future the distance for the next dam downstream will decrease from about 1475km to about 114km for the fish occurrence sites 7 and 8. 
+
+
+### References
