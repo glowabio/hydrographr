@@ -5,7 +5,7 @@ author: ""
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Case study}
+  %\VignetteIndexEntry{Case study - Cuba}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 bibliography: bib/references_cuba.bib
@@ -99,7 +99,6 @@ setwd(wdir)
 dir.create("data_cuba")
 ```
 
-
 ```{r, eval = FALSE}
 wdir <- "my/working/directory"
 setwd(wdir)
@@ -116,7 +115,7 @@ occurrence records in Cuba from
 
 ```{r, eval = FALSE}
 download.file("https://fred.igb-berlin.de/data_cuba/file_download/1395",
-              destfile = paste0(wdir, "/data_cuba/spdata_cuba.csv"))
+              destfile = paste0(wdir, "/data/spdata_cuba.csv"))
 
 ```
 
@@ -134,7 +133,6 @@ spdata <- fread(paste0(wdir, "/data/spdata_cuba.csv"), sep = "\t", fill = TRUE) 
 knitr::opts_knit$set(root.dir = "./data_cuba")
 spdata<- fread("./data/spdata_cuba.csv")
 ```
-
 
 Subset columns
 
@@ -267,17 +265,17 @@ options(timeout = 1000)
 
 # Download
 download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio12_1981-2010_V.2.1.tif",
-destfile = "data_cuba/chelsa_bioclim/bio12_1981-2010.tif")
+destfile = "data/chelsa_bioclim/bio12_1981-2010.tif")
 download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio15_1981-2010_V.2.1.tif",
-destfile = "data_cuba/chelsa_bioclim/bio15_1981-2010.tif")
+destfile = "data/chelsa_bioclim/bio15_1981-2010.tif")
 download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio1_1981-2010_V.2.1.tif",
-destfile = "data_cuba/chelsa_bioclim/bio1_1981-2010.tif")
+destfile = "data/chelsa_bioclim/bio1_1981-2010.tif")
 download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/2041-2070/IPSL-CM6A-LR/ssp370/bio/CHELSA_bio12_2041-2070_ipsl-cm6a-lr_ssp370_V.2.1.tif",
-destfile = "data_cuba/chelsa_bioclim/bio12_IPSL-CM6A-LR_ssp370_2041-2070.tif")
+destfile = "data/chelsa_bioclim/bio12_IPSL-CM6A-LR_ssp370_2041-2070.tif")
 download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/2041-2070/IPSL-CM6A-LR/ssp370/bio/CHELSA_bio15_2041-2070_ipsl-cm6a-lr_ssp370_V.2.1.tif",
-destfile = "data_cuba/chelsa_bioclim/bio15_IPSL-CM6A-LR_ssp370_2041-2070.tif")
+destfile = "data/chelsa_bioclim/bio15_IPSL-CM6A-LR_ssp370_2041-2070.tif")
 download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/2041-2070/IPSL-CM6A-LR/ssp370/bio/CHELSA_bio1_2041-2070_ipsl-cm6a-lr_ssp370_V.2.1.tif",
-destfile = "data_cuba/chelsa_bioclim/bio1_IPSL-CM6A-LR_ssp370_2041-2070.tif")
+destfile = "data/chelsa_bioclim/bio1_IPSL-CM6A-LR_ssp370_2041-2070.tif")
 
 ```
 
@@ -298,7 +296,7 @@ dirs_chelsa <- list.dirs(paste0(wdir, "/data/chelsa_bioclim"),
 
 ```{r, eval = FALSE}
 # Define output directory for merged files
-layer_dir <- paste0(wdir, "/data_cuba/final_layers")
+layer_dir <- paste0(wdir, "/data/final_layers")
 # Create the directory
 dir.create(layer_dir)
 ```
@@ -353,7 +351,6 @@ for(idir in dirs_h90m) {
 }
 ```
 
-
 ### Merging
 
 The cropped tiles of the variable now need to be merged together.
@@ -406,7 +403,6 @@ knitr::kable(head(spdata_ids),
              caption = "The species data have now their corresponding sub-catchment ids")
 ```
 
-
 ### Aggregation of environmental layers
 
 We will calculate the zonal statistics of the Hydrography90m and the
@@ -453,7 +449,6 @@ report_no_data(data_dir = layer_dir, var_layer = var_layers)
 ## 8                                 spi.tif -9999999
 ```
 
-
 ```{r, eval = FALSE}
 # Run the function that returns the zonal statistics
 stats_table_zon <- extract_zonal_stat(
@@ -461,17 +456,16 @@ stats_table_zon <- extract_zonal_stat(
                     subc_layer = paste0(layer_dir, "/sub_catchment.tif"),
                     subc_id = "all",
                     var_layer = var_layers,
-                    file_name = paste0(wdir, "/data_cuba/zonal_stats.csv"),
+                    file_name = paste0(wdir, "/data/zonal_stats.csv"),
                     n_cores = 2)
 ```
-
 
 The function also reports the NoData values that are used in the
 calculation of the zonal statistics of each variable.
 
 ```{r, eval = FALSE}
 # Read the previously created file
-stats_table_zon <- fread(paste0(wdir, "/data_cuba/zonal_stats.csv"))
+stats_table_zon <- fread(paste0(wdir, "/data/zonal_stats.csv"))
 ```
 
 ```{r, include=FALSE}
@@ -514,12 +508,12 @@ stats_table
 
 ```{r, eval = FALSE}
 stats_gpkg_h08v06 <- read_geopackage(
-  "data_cuba/r.stream.order/order_vect_tiles20d/order_vect_point_h08v06.gpkg",
+  "data/r.stream.order/order_vect_tiles20d/order_vect_point_h08v06.gpkg",
   subc_id = stats_table_zon$subcatchment_id) %>%
   rename('subcatchment_id' = 'stream')
 
 stats_gpkg_h10v06 <- read_geopackage(
-  "data_cuba/r.stream.order/order_vect_tiles20d/order_vect_point_h10v06.gpkg",
+  "data/r.stream.order/order_vect_tiles20d/order_vect_point_h10v06.gpkg",
   subc_id = stats_table_zon$subcatchment_id) %>%
   rename('subcatchment_id' = 'stream')
 ```
@@ -529,24 +523,23 @@ stats_gpkg_h10v06 <- read_geopackage(
 # so that the size of data in the repository is smaller
 fwrite(stats_gpkg_h08v06, sep = ",", row.names = FALSE, quote = FALSE,
   paste0(wdir,
-  "/data_cuba/r.stream.order/order_vect_tiles20d/order_vect_point_h08v06.csv"))
+  "/data/r.stream.order/order_vect_tiles20d/order_vect_point_h08v06.csv"))
 fwrite(stats_gpkg_h10v06, sep = ",", row.names = FALSE, quote = FALSE,
   paste0(wdir,
-  "/data_cuba/r.stream.order/order_vect_tiles20d/order_vect_point_h10v06.csv"))
+  "/data/r.stream.order/order_vect_tiles20d/order_vect_point_h10v06.csv"))
 
 ```
-
 
 ```{r, eval = FALSE}
 # These are the lines that actually run.
 # They read the pre-filtered gpkg which was exported as a csv in the previous
 # step. The result is the same as if we ran "read_geopackage" in the .gpkg files
 stats_gpkg_h08v06 <- fread(paste0(wdir,
-  "/data_cuba/r.stream.order/order_vect_tiles20d/order_vect_point_h08v06.csv"),
+  "/data/r.stream.order/order_vect_tiles20d/order_vect_point_h08v06.csv"),
   sep = ",")
 
 stats_gpkg_h10v06 <- fread(paste0(wdir,
-  "/data_cuba/r.stream.order/order_vect_tiles20d/order_vect_point_h10v06.csv"),
+  "/data/r.stream.order/order_vect_tiles20d/order_vect_point_h10v06.csv"),
   sep = ",")
 ```
 
@@ -568,7 +561,6 @@ stats_gpkg <- rbind(stats_gpkg_h08v06, stats_gpkg_h10v06) %>%
 rm(stats_gpkg_h08v06, stats_gpkg_h10v06); gc()
 
 ```
-
 
 ### Prepare data for modelling
 
@@ -608,7 +600,6 @@ kbl(head(stats_table)) %>%
   scroll_box(width = "800px", height = "200px")
 ```
 
-
 <!-- Check if there are NAs in the rows of the table -->
 
 <!-- ```{r, eval = FALSE} -->
@@ -636,7 +627,6 @@ kbl(head(stats_table)) %>%
 <!-- stats_table$length[is.na(stats_table$length)] <- 0 -->
 
 <!-- ``` -->
-
 
 ```{r, eval = FALSE}
 head(stats_table[is.na(stats_table$slope_curv_max_dw_cel_mean),])
@@ -702,7 +692,6 @@ stats_table_future <- stats_table %>%
 
 ```
 
-
 The classification model needs at least two classes, in this case
 presences and absences. We will sample 10,000 random sub-catchments that
 will be used as pseudoabsences in the model. The filtering that takes
@@ -756,7 +745,6 @@ kbl(head(data_model)) %>%
   scroll_box(width = "800px", height = "200px")
 ```
 
-
 In this step, there are two alternatives: Either we split the data into
 train and test sets:
 
@@ -777,7 +765,6 @@ intrinsic evaluation in every tree
 ```{r}
 data_train <- data_model
 ```
-
 
 ### A simple SDM using Random Forest
 
@@ -827,17 +814,17 @@ metric lies on the fact that the data points that are not used in
 training a tree can be used to test the tree. The errors on the OOB
 samples are called the **out-of-bag errors**.
 
-
 ### Model prediction
 
-We will now predict to the table of all the sub-catchments across Cuba,
+We will predict to the table of all the sub-catchments across Cuba,
 including the future Bioclim variables.
 
-```{r}
+```{r eval=FALSE}
 pred <- predict(model, data = stats_table_future[,!1])
 ```
 
-We will now reclassify the sub-catchment raster based on the predicted
+
+We can now reclassify the sub-catchment raster based on the predicted
 probabilities of occurrence, to visualise the potential suitable
 habitats of the species. For this purpose we will use the
 'reclass_raster' function. The function requires a table with the
@@ -848,13 +835,29 @@ First, let's join the probabilities of presence in each sub-catchment
 with the corresponding sub-catchment IDs, to create a table with
 reclassification rules
 
-```{r}
+```{r, eval = TRUE, echo = FALSE}
+prediction <- fread("./data/prediction.csv", sep = ",", fill = TRUE)
+```
+
+
+```{r, eval = FALSE}
 prediction <- data.table(subcatchment_id = stats_table_future$subcatchment_id,
                          pred_occur = as.numeric(pred$predictions[,2]))
+```
+
+
+```{r, eval = TRUE, echo = FALSE}
+prediction <- data.table(subcatchment_id = stats_table_future$subcatchment_id,
+                         pred_occur = as.numeric(prediction$pred_occur))
+```
+
+
+```{r}
 head(prediction)
 ```
 
-and multiply the probability values by 100
+
+and multiply the probability values by 100, to convert them to integers
 
 ```{r}
 prediction$pred_occur <- as.integer(round(prediction$pred_occur, 2) * 100)
