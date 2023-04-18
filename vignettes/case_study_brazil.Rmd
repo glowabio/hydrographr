@@ -98,6 +98,8 @@ wdir <- paste0(here(), "/data_brazil")
 wdir <- "my/working/directory"
 # Set defined working directory
 setwd(wdir)
+# Create a directory to store all the data of the case study
+dir.create("data")
 ```
 
 
