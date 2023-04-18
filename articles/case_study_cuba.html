@@ -104,15 +104,16 @@ the random forest (RF) algorithm, we will build a simple SDM and predict
 where the species could potentially occur. Finally, we will reclassify
 the layer of all the sub-catchments in the study area, creating a
 habitat suitability map.</p>
-<p><em>Hypolestes trinitatis</em> is a damselfly species endemic to
-Cuba. The species inhabits rivers and streams located in forest areas at
-the main mountain ranges of eastern and central Cuba. The presence of
-riparian forests as well as clean and well oxygenated water seems to be
-important ecological conditions required by <em>H. trinitatis</em>.
-Larvae can be found clinging to boulders and cobbles in the river bed at
-fast-flowing water stream segments and pre-reproductive adults of both
-sexes and sexually mature females remain most of the time in the
-vegetation of the riparian forest where they find shelter and prey.</p>
+<p><a href="https://www.gbif.org/species/1424240" class="external-link"><em>Hypolestes
+trinitatis</em></a> is a damselfly species endemic to Cuba. The species
+inhabits rivers and streams located in forest areas at the main mountain
+ranges of eastern and central Cuba. The presence of riparian forests as
+well as clean and well oxygenated water seems to be important ecological
+conditions required by <em>H. trinitatis</em>. Larvae can be found
+clinging to boulders and cobbles in the river bed at fast-flowing water
+stream segments and pre-reproductive adults of both sexes and sexually
+mature females remain most of the time in the vegetation of the riparian
+forest where they find shelter and prey.</p>
 <p>Let’s get started!</p>
 <p>Load required libraries</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
@@ -57350,8 +57351,8 @@ an indicator of the sub-catchment size</p>
 <span><span class="co"># Clear up memory</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">stats_gpkg_h08v06</span>, <span class="va">stats_gpkg_h10v06</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/base/gc.html" class="external-link">gc</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##            used  (Mb) gc trigger  (Mb) max used  (Mb)</span></span>
-<span><span class="co">## Ncells  4516167 241.2    8915500 476.2  5545955 296.2</span></span>
-<span><span class="co">## Vcells 25677196 196.0   52383833 399.7 48491079 370.0</span></span></code></pre>
+<span><span class="co">## Ncells  4516169 241.2    8913354 476.1  5550267 296.5</span></span>
+<span><span class="co">## Vcells 25677213 196.0   52383851 399.7 48491096 370.0</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="prepare-data-for-modelling">Prepare data for modelling<a class="anchor" aria-label="anchor" href="#prepare-data-for-modelling"></a>
@@ -58677,230 +58678,230 @@ length
 <tbody>
 <tr>
 <td style="text-align:right;">
-422859089
+422606104
 </td>
 <td style="text-align:right;">
-23.36034
+25.85000
 </td>
 <td style="text-align:right;">
-2034.003
+1300.200
 </td>
 <td style="text-align:right;">
-49.74138
+44.40000
 </td>
 <td style="text-align:right;">
--0.0920581
+-0.0042988
 </td>
 <td style="text-align:right;">
-15.2068966
+0.5000000
 </td>
 <td style="text-align:right;">
-0.3447586
+0.0000000
 </td>
 <td style="text-align:right;">
-23.689842
+0.0000000
 </td>
 <td style="text-align:right;">
-0.0492512
+0.0000000
 </td>
 <td style="text-align:right;">
-0.1563166
+0.0097290
 </td>
 <td style="text-align:right;">
-22.6462744
+0.8488747
 </td>
 <td style="text-align:right;">
-467.78938
+424.9150
 </td>
 </tr>
 <tr>
 <td style="text-align:right;">
-422702413
+422656441
 </td>
 <td style="text-align:right;">
-26.15000
+25.15351
 </td>
 <td style="text-align:right;">
-1314.600
+1397.463
 </td>
 <td style="text-align:right;">
-64.80000
+62.89825
 </td>
 <td style="text-align:right;">
--0.0077768
+-0.0070624
 </td>
 <td style="text-align:right;">
-0.4500000
+19.2280702
 </td>
 <td style="text-align:right;">
-0.0000000
+0.0184002
 </td>
 <td style="text-align:right;">
-0.000000
+0.5421308
 </td>
 <td style="text-align:right;">
-0.0000000
+0.0131286
 </td>
 <td style="text-align:right;">
-0.0112143
+0.0116375
 </td>
 <td style="text-align:right;">
-0.9733961
+48.3960335
 </td>
 <td style="text-align:right;">
-339.66442
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-422760079
-</td>
-<td style="text-align:right;">
-26.35000
-</td>
-<td style="text-align:right;">
-1104.600
-</td>
-<td style="text-align:right;">
-60.60000
-</td>
-<td style="text-align:right;">
--0.0059930
-</td>
-<td style="text-align:right;">
-1.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-86.77047
+684.3625
 </td>
 </tr>
 <tr>
 <td style="text-align:right;">
-399749239
-</td>
-<td style="text-align:right;">
-24.85000
-</td>
-<td style="text-align:right;">
-1419.627
-</td>
-<td style="text-align:right;">
-63.31818
-</td>
-<td style="text-align:right;">
--0.0154495
-</td>
-<td style="text-align:right;">
-0.8181818
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-1.267848
-</td>
-<td style="text-align:right;">
-0.0385695
-</td>
-<td style="text-align:right;">
-0.0254166
-</td>
-<td style="text-align:right;">
-1.1922615
-</td>
-<td style="text-align:right;">
-211.45958
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-422619298
+422527748
 </td>
 <td style="text-align:right;">
 25.45000
 </td>
 <td style="text-align:right;">
-1444.064
+1433.328
 </td>
 <td style="text-align:right;">
-50.55909
+52.09310
 </td>
 <td style="text-align:right;">
--0.0053792
+-0.0035674
 </td>
 <td style="text-align:right;">
-0.5909091
+0.5172414
 </td>
 <td style="text-align:right;">
 0.0000000
 </td>
 <td style="text-align:right;">
-7.988318
+0.1013582
 </td>
 <td style="text-align:right;">
-0.2443155
+0.0253395
 </td>
 <td style="text-align:right;">
-0.0095638
+0.0048696
 </td>
 <td style="text-align:right;">
-0.8344345
+1.0706327
 </td>
 <td style="text-align:right;">
-643.63959
+470.4386
 </td>
 </tr>
 <tr>
 <td style="text-align:right;">
-399894099
+422751970
 </td>
 <td style="text-align:right;">
-25.25000
+26.45000
 </td>
 <td style="text-align:right;">
-1249.100
+1176.100
 </td>
 <td style="text-align:right;">
-57.30000
+61.10000
 </td>
 <td style="text-align:right;">
--0.0022152
+-0.0049248
 </td>
 <td style="text-align:right;">
-1.6250000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
+0.4347826
 </td>
 <td style="text-align:right;">
 0.0000000
 </td>
 <td style="text-align:right;">
-0.0031512
+0.0000000
 </td>
 <td style="text-align:right;">
-2.3418742
+0.0000000
 </td>
 <td style="text-align:right;">
-218.28094
+0.0079435
+</td>
+<td style="text-align:right;">
+0.7117698
+</td>
+<td style="text-align:right;">
+437.7952
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+422750064
+</td>
+<td style="text-align:right;">
+26.35000
+</td>
+<td style="text-align:right;">
+1213.700
+</td>
+<td style="text-align:right;">
+60.30000
+</td>
+<td style="text-align:right;">
+-0.0042255
+</td>
+<td style="text-align:right;">
+90.7500000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0055028
+</td>
+<td style="text-align:right;">
+157.1836108
+</td>
+<td style="text-align:right;">
+126.6296
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+399834684
+</td>
+<td style="text-align:right;">
+25.15263
+</td>
+<td style="text-align:right;">
+1357.021
+</td>
+<td style="text-align:right;">
+54.49211
+</td>
+<td style="text-align:right;">
+-0.0031579
+</td>
+<td style="text-align:right;">
+0.5000000
+</td>
+<td style="text-align:right;">
+0.0160073
+</td>
+<td style="text-align:right;">
+1.0884943
+</td>
+<td style="text-align:right;">
+0.0480218
+</td>
+<td style="text-align:right;">
+0.0056192
+</td>
+<td style="text-align:right;">
+0.9104655
+</td>
+<td style="text-align:right;">
+468.7908
 </td>
 </tr>
 </tbody>
@@ -59344,7 +59345,7 @@ presences.</p>
 <span><span class="co">## Target node size:                 10 </span></span>
 <span><span class="co">## Variable importance mode:         impurity </span></span>
 <span><span class="co">## Splitrule:                        gini </span></span>
-<span><span class="co">## OOB prediction error (Brier s.):  0.09139842</span></span></code></pre>
+<span><span class="co">## OOB prediction error (Brier s.):  0.08988707</span></span></code></pre>
 <p>The model can be evaluated based on the OOB prediction error. This
 metric lies on the fact that the data points that are not used in
 training a tree can be used to test the tree. The errors on the OOB
