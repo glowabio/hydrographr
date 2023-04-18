@@ -40,15 +40,16 @@ could potentially occur. Finally, we will reclassify the layer of all
 the sub-catchments in the study area, creating a habitat suitability
 map.
 
-[*Hypolestes trinitatis*](https://hydrography.org/hydrography90m/hydrography90m_layers/) is a damselfly species endemic to Cuba. The
-species inhabits rivers and streams located in forest areas at the main
-mountain ranges of eastern and central Cuba. The presence of riparian
-forests as well as clean and well oxygenated water seems to be important
-ecological conditions required by *H. trinitatis*. Larvae can be found
-clinging to boulders and cobbles in the river bed at fast-flowing water
-stream segments and pre-reproductive adults of both sexes and sexually
-mature females remain most of the time in the vegetation of the riparian
-forest where they find shelter and prey.
+[*Hypolestes trinitatis*](https://www.gbif.org/species/1424240) is a
+damselfly species endemic to Cuba. The species inhabits rivers and
+streams located in forest areas at the main mountain ranges of eastern
+and central Cuba. The presence of riparian forests as well as clean and
+well oxygenated water seems to be important ecological conditions
+required by *H. trinitatis*. Larvae can be found clinging to boulders
+and cobbles in the river bed at fast-flowing water stream segments and
+pre-reproductive adults of both sexes and sexually mature females remain
+most of the time in the vegetation of the riparian forest where they
+find shelter and prey.
 
 Let's get started!
 
@@ -254,8 +255,8 @@ download_tiles(variable = vars_gpkg, tile_id = tile_id, file_format = "gpkg",
 
 Then download the CHELSA present and future Bioclim variables
 
-For a quick outlook on the bioclimatic variables you can have a look [here](https://chelsa-climate.org/bioclim/).
-
+For a quick outlook on the bioclimatic variables you can have a look
+[here](https://chelsa-climate.org/bioclim/).
 
 ```{r, eval = FALSE}
 # Create download directory
@@ -826,7 +827,6 @@ including the future Bioclim variables.
 pred <- predict(model, data = stats_table_future[,!1])
 ```
 
-
 We can now reclassify the sub-catchment raster based on the predicted
 probabilities of occurrence, to visualise the potential suitable
 habitats of the species. For this purpose we will use the
@@ -842,23 +842,19 @@ reclassification rules
 prediction <- fread("./data/prediction.csv", sep = ",", fill = TRUE)
 ```
 
-
 ```{r, eval = FALSE}
 prediction <- data.table(subcatchment_id = stats_table_future$subcatchment_id,
                          pred_occur = as.numeric(pred$predictions[,2]))
 ```
-
 
 ```{r, eval = TRUE, echo = FALSE}
 prediction <- data.table(subcatchment_id = stats_table_future$subcatchment_id,
                          pred_occur = as.numeric(prediction$pred_occur))
 ```
 
-
 ```{r}
 head(prediction)
 ```
-
 
 and multiply the probability values by 100, to convert them to integers
 
