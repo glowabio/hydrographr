@@ -1,5 +1,5 @@
 ---
-title: "Case study"
+title: "Case study - Cuba"
 subtitle: "Processing of spatial data before and after a Species Distribution Model"
 author: ""
 date: "`r Sys.Date()`"
@@ -8,7 +8,7 @@ vignette: >
   %\VignetteIndexEntry{Case study}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
-bibliography: /home/afroditi/Documents/PhD/scripts/hydrographr/man/references.bib
+bibliography: bib/references_cuba.bib
 link-citations: yes
 linkcolor: blue
 # csl: copernicus.csl
@@ -55,7 +55,7 @@ Let's get started!
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE,  
                       out.width='50%', fig.align='center')
-knitr::opts_knit$set(root.dir = "/home/afroditi/Documents/PhD/hydrographr_case_study")
+knitr::opts_knit$set(root.dir = "./data_cuba")
 library(hydrographr)
 library(terra)
 library(tools)
@@ -83,15 +83,22 @@ library(stringr)
 library(ranger)
 library(leaflet)
 library(leafem)
+library(here)
 ```
 
 Define working directory
 
-```{r, echo = FALSE}
+```{r, eval=FALSE, include=FALSE}
+wdir <- paste0(here(), "/vignettes/data_cuba")
+if(!dir.exists(paste0(wdir, "/data"))) dir.create(paste0(wdir, "/data"))
+```
+
+```{r, eval=FALSE, include=FALSE}
 wdir <- "/home/afroditi/Documents/PhD/hydrographr_case_study"
 setwd(wdir)
 dir.create("data")
 ```
+
 
 ```{r, eval = FALSE}
 wdir <- "my/working/directory"
@@ -116,12 +123,18 @@ download.file("https://fred.igb-berlin.de/data/file_download/1395",
 Import the dataset and select the occurrences of the species of
 interest, sampled after the year 1980 (to match with the climate data)
 
-```{r}
+```{r, eval = FALSE}
 spdata <- fread(paste0(wdir, "/data/spdata_cuba.csv"), sep = "\t", fill = TRUE) %>% 
           filter(species == "Hypolestes_trinitatis") %>% 
           filter(year > 1980)
               
 ```
+
+```{r include=FALSE}
+knitr::opts_knit$set(root.dir = "./data_cuba")
+spdata<- fread("./data/spdata_cuba.csv")
+```
+
 
 Subset columns
 
@@ -173,7 +186,7 @@ m <- leaflet() %>%
 m
 ```
 
-![](/home/afroditi/Documents/PhD/scripts/hydrographr/man/figures/cuba_map.png)
+![](../man/figures/cuba_map.png)
 
 ### Download files
 
@@ -224,7 +237,7 @@ A list of all available Hydrography90m variables, as well as details and
 visualisations are available
 [here](https://hydrography.org/hydrography90m/hydrography90m_layers/).
 
-```{r}
+```{r, eval = FALSE}
 # Variables in raster format
 vars_tif <- c("sub_catchment", "slope_curv_max_dw_cel", "spi")
 # Variables in vector format
@@ -243,7 +256,7 @@ download_tiles(variable = vars_gpkg, tile_id = tile_id, file_format = "gpkg",
 
 Then download the CHELSA present and future Bioclim variables
 
-```{r}
+```{r, eval = FALSE}
 # Create download directory
 dir.create(paste0(wdir, "/data/chelsa_bioclim"))
 ```
@@ -276,14 +289,14 @@ global CHELSA layers:
 
 We define the directory containing the layers to be cropped
 
-```{r}
+```{r, eval = FALSE}
 dirs_chelsa <- list.dirs(paste0(wdir, "/data/chelsa_bioclim"),
                        recursive = TRUE, full.names = TRUE)
 ```
 
 ... and the final output directory
 
-```{r}
+```{r, eval = FALSE}
 # Define output directory for merged files
 layer_dir <- paste0(wdir, "/data/final_layers")
 # Create the directory
@@ -317,7 +330,7 @@ Again, we will first define the input directories, but this time we will
 store the cropped files in the same directory as the input files, as
 there is an extra step before reaching to the final output.
 
-```{r}
+```{r, eval = FALSE}
 dirs_h90m <- list.dirs(paste0(wdir, "/data"),
                        recursive = TRUE, full.names = TRUE)
 
@@ -339,6 +352,7 @@ for(idir in dirs_h90m) {
   }
 }
 ```
+
 
 ### Merging
 
@@ -374,18 +388,24 @@ a vector of sub-catchment IDs as input. Note that the function
 any raster file provided to the argument *subc_layer*. It can be safely
 used to query very large raster files, as these are not loaded into R.
 
-```{r}
+```{r, eval = FALSE}
 spdata_ids <- extract_ids(data = spdata, lon = "longitude", lat = "latitude",
-                               id = "occurrence_ID", quiet = FALSE,
-                               subc_layer = paste0(layer_dir, "/sub_catchment.tif"
-                               ))
+                          id = "occurrence_ID", quiet = FALSE,
+                          subc_layer = paste0(layer_dir, "/sub_catchment.tif"))
                                
 ```
 
-```{r, echo=F}
-knitr::kable(head(spdata_ids),
- caption = "The species data have now their corresponding sub-catchment ids")
+```{r include=FALSE}
+knitr::opts_knit$set(root.dir = "./data_cuba")
+spdata_ids <- fread("./data/spdata_ids.csv")
+
 ```
+
+```{r, echo = FALSE}
+knitr::kable(head(spdata_ids),
+             caption = "The species data have now their corresponding sub-catchment ids")
+```
+
 
 ### Aggregation of environmental layers
 
@@ -396,19 +416,43 @@ cause memory problems. However, this highly depends to the number of
 sub-catchments as well. We recommend to test the function with different
 parameters to find out what works best for your case.
 
-```{r}
+```{r, eval = FALSE}
 # Define input var_layers for the extract_zonal_stat() function
 var_layers <- list.files(layer_dir)[-9]
 # var_layers <- list.files(layer_dir)[c(3,5,7)]
 var_layers
 ```
 
+```{r}
+## [1] "bio1_1981-2010.tif"                     
+## [2] "bio1_IPSL-CM6A-LR_ssp370_2041-2070.tif" 
+## [3] "bio12_1981-2010.tif"                    
+## [4] "bio12_IPSL-CM6A-LR_ssp370_2041-2070.tif"
+## [5] "bio15_1981-2010.tif"                    
+## [6] "bio15_IPSL-CM6A-LR_ssp370_2041-2070.tif"
+## [7] "slope_curv_max_dw_cel.tif"              
+## [8] "spi.tif"
+```
+
 A good practice before aggregating the variables is to check their
 NoData values:
 
-```{r}
+```{r, eval = FALSE}
 report_no_data(data_dir = layer_dir, var_layer = var_layers)
 ```
+
+```{r}
+##                                    Raster   NoData
+## 1                     bio15_1981-2010.tif        0
+## 2                      bio1_1981-2010.tif        0
+## 3  bio1_IPSL-CM6A-LR_ssp370_2041-2070.tif        0
+## 4                     bio12_1981-2010.tif        0
+## 5 bio12_IPSL-CM6A-LR_ssp370_2041-2070.tif        0
+## 6 bio15_IPSL-CM6A-LR_ssp370_2041-2070.tif        0
+## 7               slope_curv_max_dw_cel.tif -9999999
+## 8                                 spi.tif -9999999
+```
+
 
 ```{r, eval = FALSE}
 # Run the function that returns the zonal statistics
@@ -421,17 +465,24 @@ stats_table_zon <- extract_zonal_stat(
                     n_cores = 2)
 ```
 
+
 The function also reports the NoData values that are used in the
 calculation of the zonal statistics of each variable.
 
-```{r, echo = FALSE}
+```{r, eval = FALSE}
 # Read the previously created file
 stats_table_zon <- fread(paste0(wdir, "/data/zonal_stats.csv"))
 ```
 
+```{r, include=FALSE}
+knitr::opts_knit$set(root.dir = "./data_cuba")
+stats_table_zon <- fread("./data/zonal_stats.csv")
+
+```
+
 Let's inspect the resulting table
 
-```{r, eval = FALSE}
+```{r, include=FALSE}
 head(stats_table_zon)
 ```
 
@@ -485,7 +536,8 @@ fwrite(stats_gpkg_h10v06, sep = ",", row.names = FALSE, quote = FALSE,
 
 ```
 
-```{r, echo = FALSE}
+
+```{r, eval = FALSE}
 # These are the lines that actually run. 
 # They read the pre-filtered gpkg which was exported as a csv in the previous 
 # step. The result is the same as if we ran "read_geopackage" in the .gpkg files
@@ -496,6 +548,12 @@ stats_gpkg_h08v06 <- fread(paste0(wdir,
 stats_gpkg_h10v06 <- fread(paste0(wdir,
   "/data/r.stream.order/order_vect_tiles20d/order_vect_point_h10v06.csv"), 
   sep = ",")
+```
+
+```{r include=FALSE}
+knitr::opts_knit$set(root.dir = "./data_cuba")
+stats_gpkg_h08v06  <- fread("./data/r.stream.order/order_vect_tiles20d/order_vect_point_h08v06.csv")
+stats_gpkg_h10v06 <- fread("./data/r.stream.order/order_vect_tiles20d/order_vect_point_h10v06.csv", sep = ",")
 ```
 
 Then we join the two .gpkg databases and select the columns
@@ -510,6 +568,7 @@ stats_gpkg <- rbind(stats_gpkg_h08v06, stats_gpkg_h10v06) %>%
 rm(stats_gpkg_h08v06, stats_gpkg_h10v06); gc()
 
 ```
+
 
 ### Prepare data for modelling
 
@@ -549,6 +608,7 @@ kbl(head(stats_table)) %>%
   scroll_box(width = "800px", height = "200px")
 ```
 
+
 <!-- Check if there are NAs in the rows of the table -->
 
 <!-- ```{r, eval = FALSE} -->
@@ -576,6 +636,7 @@ kbl(head(stats_table)) %>%
 <!-- stats_table$length[is.na(stats_table$length)] <- 0 -->
 
 <!-- ``` -->
+
 
 ```{r, eval = FALSE}
 head(stats_table[is.na(stats_table$slope_curv_max_dw_cel_mean),])
@@ -641,6 +702,7 @@ stats_table_future <- stats_table %>%
 
 ```
 
+
 The classification model needs at least two classes, in this case
 presences and absences. We will sample 10,000 random sub-catchments that
 will be used as pseudoabsences in the model. The filtering that takes
@@ -694,6 +756,7 @@ kbl(head(data_model)) %>%
   scroll_box(width = "800px", height = "200px")
 ```
 
+
 In this step, there are two alternatives: Either we split the data into
 train and test sets:
 
@@ -701,7 +764,7 @@ train and test sets:
 set.seed(17)
 ```
 
-```{r, eval = FALSE}
+```{r}
 #obtain stratified training sample
 train_idx <- sample(nrow(data_model), 2/3 * nrow(data_model))
 data_train <- data_model[train_idx, ]
@@ -714,6 +777,7 @@ intrinsic evaluation in every tree
 ```{r}
 data_train <- data_model
 ```
+
 
 ### A simple SDM using Random Forest
 
@@ -763,6 +827,7 @@ metric lies on the fact that the data points that are not used in
 training a tree can be used to test the tree. The errors on the OOB
 samples are called the **out-of-bag errors**.
 
+
 ### Model prediction
 
 We will now predict to the table of all the sub-catchments across Cuba,
@@ -797,7 +862,7 @@ prediction$pred_occur <- as.integer(round(prediction$pred_occur, 2) * 100)
 
 We can now reclassify the sub-catchment raster
 
-```{r, results = 'hide'}
+```{r, eval = FALSE}
 reclass_raster(
   data = prediction,
   rast_val = "subcatchment_id",
@@ -838,7 +903,7 @@ p <- leaflet() %>% addTiles() %>%
 p
 ```
 
-![](/home/afroditi/Documents/PhD/scripts/hydrographr/man/figures/prediction.png){width="800"}
+![](../man/figures/prediction.png){width="800"}
 
 ```{r, include = FALSE, eval = FALSE}
 saveWidget(p, paste0(wdir, "/prediction.html"))
@@ -848,6 +913,6 @@ If we zoom in to the habitat suitability map, we can observe the
 sub-catchments that could offer a suitable habitat to the species in a
 more detailed view.
 
-![](/home/afroditi/Documents/PhD/scripts/hydrographr/man/figures/prediction_zoom.png){width="800"}
+![](../man/figures/prediction_zoom.png){width="800"}
 
 ### References
