@@ -40,7 +40,7 @@ could potentially occur. Finally, we will reclassify the layer of all
 the sub-catchments in the study area, creating a habitat suitability
 map.
 
-*Hypolestes trinitatis* is a damselfly species endemic to Cuba. The
+[*Hypolestes trinitatis*](https://hydrography.org/hydrography90m/hydrography90m_layers/) is a damselfly species endemic to Cuba. The
 species inhabits rivers and streams located in forest areas at the main
 mountain ranges of eastern and central Cuba. The presence of riparian
 forests as well as clean and well oxygenated water seems to be important
