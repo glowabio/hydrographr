@@ -254,7 +254,7 @@ download_tiles(variable = vars_gpkg, tile_id = tile_id, file_format = "gpkg",
 
 Then download the CHELSA present and future Bioclim variables
 
-For a quick outlook on the bioclimatic variables you can have a look [here](https://chelsa-climate.org/bioclim/)
+For a quick outlook on the bioclimatic variables you can have a look [here](https://chelsa-climate.org/bioclim/).
 
 
 ```{r, eval = FALSE}
