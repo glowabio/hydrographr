@@ -20,7 +20,7 @@
 #' (see "Details" for more information). If method is set to "both" the output
 #' will contain the new coordinates for both calculations.
 #' Default is "distance".
-#' @param distance numeric. Maximum radius in meters. The points will be
+#' @param distance numeric. Maximum radius in pixels. The points will be
 #' snapped to the next stream within this radius. Default is 500.
 #' @param accumulation numeric. Minimum flow accumulation. Points will be
 #' snapped to the next stream with a flow accumulation equal or higher than the
