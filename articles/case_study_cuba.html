@@ -8,8 +8,8 @@
 <meta name="description" content="hydrographr">
 <title>Case study - Cuba • hydrographr</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.1.3/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.1.3/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<link href="../deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- bootstrap-toc --><script src="https://cdn.rawgit.com/afeld/bootstrap-toc/v1.0.1/dist/bootstrap-toc.min.js"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Case study - Cuba">
 <meta property="og:description" content="hydrographr">
@@ -57351,8 +57351,8 @@ an indicator of the sub-catchment size</p>
 <span><span class="co"># Clear up memory</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">stats_gpkg_h08v06</span>, <span class="va">stats_gpkg_h10v06</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/base/gc.html" class="external-link">gc</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##            used  (Mb) gc trigger  (Mb) max used  (Mb)</span></span>
-<span><span class="co">## Ncells  4485241 239.6    8398934 448.6  5882337 314.2</span></span>
-<span><span class="co">## Vcells 25626836 195.6   52317410 399.2 48440884 369.6</span></span></code></pre>
+<span><span class="co">## Ncells  4516169 241.2    8913605 476.1  5549795 296.4</span></span>
+<span><span class="co">## Vcells 25677209 196.0   52383851 399.7 48491086 370.0</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="prepare-data-for-modelling">Prepare data for modelling<a class="anchor" aria-label="anchor" href="#prepare-data-for-modelling"></a>
@@ -58678,101 +58678,25 @@ length
 <tbody>
 <tr>
 <td style="text-align:right;">
-399984866
+422581254
 </td>
 <td style="text-align:right;">
-25.5500
+21.85
 </td>
 <td style="text-align:right;">
-1232.500
+2444.900
 </td>
 <td style="text-align:right;">
-61.70000
+67.60000
 </td>
 <td style="text-align:right;">
--0.0060606
+-0.0983686
 </td>
 <td style="text-align:right;">
-0.360000
+6.125000
 </td>
 <td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0101957
-</td>
-<td style="text-align:right;">
-0.5571355
-</td>
-<td style="text-align:right;">
-310.6358
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-422821954
-</td>
-<td style="text-align:right;">
-26.2500
-</td>
-<td style="text-align:right;">
-1391.030
-</td>
-<td style="text-align:right;">
-55.47000
-</td>
-<td style="text-align:right;">
--0.0028718
-</td>
-<td style="text-align:right;">
-1.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-5.086659
-</td>
-<td style="text-align:right;">
-0.0458258
-</td>
-<td style="text-align:right;">
-0.0039600
-</td>
-<td style="text-align:right;">
-2.0493902
-</td>
-<td style="text-align:right;">
-253.6200
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-422843467
-</td>
-<td style="text-align:right;">
-25.8500
-</td>
-<td style="text-align:right;">
-1290.100
-</td>
-<td style="text-align:right;">
-50.40000
-</td>
-<td style="text-align:right;">
--0.0103022
-</td>
-<td style="text-align:right;">
-748.166667
-</td>
-<td style="text-align:right;">
-0.0000000
+0
 </td>
 <td style="text-align:right;">
 0.000000
@@ -58781,127 +58705,203 @@ length
 0.0000000
 </td>
 <td style="text-align:right;">
-0.0305327
+0.1078345
 </td>
 <td style="text-align:right;">
-780.9653037
+4.166458
 </td>
 <td style="text-align:right;">
-253.7136
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-422495487
-</td>
-<td style="text-align:right;">
-24.4625
-</td>
-<td style="text-align:right;">
-1514.562
-</td>
-<td style="text-align:right;">
-56.33750
-</td>
-<td style="text-align:right;">
--0.0049132
-</td>
-<td style="text-align:right;">
-2.625000
-</td>
-<td style="text-align:right;">
-0.0330719
-</td>
-<td style="text-align:right;">
-2.215817
-</td>
-<td style="text-align:right;">
-0.0992157
-</td>
-<td style="text-align:right;">
-0.0099213
-</td>
-<td style="text-align:right;">
-3.4255474
-</td>
-<td style="text-align:right;">
-344.1280
+424.59379
 </td>
 </tr>
 <tr>
 <td style="text-align:right;">
-422673732
+399732269
 </td>
 <td style="text-align:right;">
-25.1500
+24.55
 </td>
 <td style="text-align:right;">
-1370.143
+1398.200
 </td>
 <td style="text-align:right;">
-60.55714
+57.10000
 </td>
 <td style="text-align:right;">
--0.0091890
+-0.0004563
 </td>
 <td style="text-align:right;">
-1.178571
+7.333333
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000000
 </td>
 <td style="text-align:right;">
 0.0000000
 </td>
 <td style="text-align:right;">
-1.088718
+0.0020904
 </td>
 <td style="text-align:right;">
-0.0494872
+5.312459
 </td>
 <td style="text-align:right;">
-0.0151520
-</td>
-<td style="text-align:right;">
-2.3460236
-</td>
-<td style="text-align:right;">
-385.9641
+92.28416
 </td>
 </tr>
 <tr>
 <td style="text-align:right;">
-422557242
+422695438
 </td>
 <td style="text-align:right;">
-25.4500
+25.85
 </td>
 <td style="text-align:right;">
-1215.731
+1244.800
 </td>
 <td style="text-align:right;">
-63.39375
+55.30000
 </td>
 <td style="text-align:right;">
--0.0040087
+-0.0040079
 </td>
 <td style="text-align:right;">
-1.937500
+305.454545
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000000
 </td>
 <td style="text-align:right;">
 0.0000000
 </td>
 <td style="text-align:right;">
-1.040864
+0.0110302
 </td>
 <td style="text-align:right;">
-0.0242061
+335.648995
 </td>
 <td style="text-align:right;">
-0.0109747
+369.06187
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+422787422
 </td>
 <td style="text-align:right;">
-2.9040650
+25.55
 </td>
 <td style="text-align:right;">
-384.1391
+1887.060
+</td>
+<td style="text-align:right;">
+33.54000
+</td>
+<td style="text-align:right;">
+-0.0413088
+</td>
+<td style="text-align:right;">
+42.800000
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+7.280000
+</td>
+<td style="text-align:right;">
+0.1200000
+</td>
+<td style="text-align:right;">
+0.0969330
+</td>
+<td style="text-align:right;">
+83.100903
+</td>
+<td style="text-align:right;">
+126.72526
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+399693914
+</td>
+<td style="text-align:right;">
+24.65
+</td>
+<td style="text-align:right;">
+1383.780
+</td>
+<td style="text-align:right;">
+54.13000
+</td>
+<td style="text-align:right;">
+-0.0054491
+</td>
+<td style="text-align:right;">
+46.050000
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.621604
+</td>
+<td style="text-align:right;">
+0.1452584
+</td>
+<td style="text-align:right;">
+0.0077775
+</td>
+<td style="text-align:right;">
+91.725937
+</td>
+<td style="text-align:right;">
+422.66385
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+422674439
+</td>
+<td style="text-align:right;">
+26.15
+</td>
+<td style="text-align:right;">
+1098.071
+</td>
+<td style="text-align:right;">
+50.08571
+</td>
+<td style="text-align:right;">
+-0.0029787
+</td>
+<td style="text-align:right;">
+116.428571
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+2.258770
+</td>
+<td style="text-align:right;">
+0.1807016
+</td>
+<td style="text-align:right;">
+0.0035327
+</td>
+<td style="text-align:right;">
+179.215638
+</td>
+<td style="text-align:right;">
+252.94416
 </td>
 </tr>
 </tbody>
@@ -59345,7 +59345,7 @@ presences.</p>
 <span><span class="co">## Target node size:                 10 </span></span>
 <span><span class="co">## Variable importance mode:         impurity </span></span>
 <span><span class="co">## Splitrule:                        gini </span></span>
-<span><span class="co">## OOB prediction error (Brier s.):  0.09133589</span></span></code></pre>
+<span><span class="co">## OOB prediction error (Brier s.):  0.09298635</span></span></code></pre>
 <p>The model can be evaluated based on the OOB prediction error. This
 metric lies on the fact that the data points that are not used in
 training a tree can be used to test the tree. The errors on the OOB
