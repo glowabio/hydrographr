@@ -366,7 +366,35 @@ for(idir in dirs_h90m) {
 The cropped tiles of the variable now need to be merged together.
 
 ```{r, eval = FALSE}
-# Merge the files in a loop
+
+# This can be done sequentially:
+idir <- dirs_h90m[1]
+merge_tiles(tile_dir = idir,
+            tile_names = list.files(idir, full.names = FALSE,
+                                    pattern = "_crop.tif"),
+            out_dir = layer_dir,
+            file_name = "spi.tif",
+            read = FALSE)
+
+idir <- dirs_h90m[3]
+merge_tiles(tile_dir = idir,
+            tile_names = list.files(idir, full.names = FALSE,
+                                    pattern = "_crop.tif"),
+            out_dir = layer_dir,
+            file_name = "slope_curv_max_dw_cel.tif",
+            read = FALSE)
+
+idir <- dirs_h90m[4]
+merge_tiles(tile_dir = idir,
+            tile_names = list.files(idir, full.names = FALSE,
+                                    pattern = "_crop.tif"),
+            out_dir = layer_dir,
+            file_name = "sub_catchment.tif",
+            read = FALSE)
+
+
+
+# ...or in a loop
 for(idir in dirs_h90m) {
   # Get input file extension
   file_extension <- file_ext(list.files(idir, full.names = FALSE)[1])
