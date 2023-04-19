@@ -1008,8 +1008,7 @@ extent of our study area. This is straightforward in the case of the
 global CHELSA layers:</p>
 <p>We define the directory containing the layers to be cropped</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">dirs_chelsa</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.dirs</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data/chelsa_bioclim"</span><span class="op">)</span>,</span>
-<span>                       recursive <span class="op">=</span> <span class="cn">TRUE</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">dirs_chelsa</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data/chelsa_bioclim"</span><span class="op">)</span></span></code></pre></div>
 <p>… and the final output directory</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Define output directory for merged files</span></span>
@@ -2223,8 +2222,8 @@ an indicator of the sub-catchment size</p>
 <span><span class="co"># Clear up memory</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">stats_gpkg_h08v06</span>, <span class="va">stats_gpkg_h10v06</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/base/gc.html" class="external-link">gc</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##            used  (Mb) gc trigger  (Mb) max used  (Mb)</span></span>
-<span><span class="co">## Ncells  4531324 242.0    8958400 478.5  5546075 296.2</span></span>
-<span><span class="co">## Vcells 25584352 195.2   55379544 422.6 48398235 369.3</span></span></code></pre>
+<span><span class="co">## Ncells  4531361 242.1    8958418 478.5  5546048 296.2</span></span>
+<span><span class="co">## Vcells 25584636 195.2   55379526 422.6 48398519 369.3</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="prepare-data-for-modelling">Prepare data for modelling<a class="anchor" aria-label="anchor" href="#prepare-data-for-modelling"></a>
@@ -3550,230 +3549,230 @@ length
 <tbody>
 <tr>
 <td style="text-align:right;">
-422634514
+399694149
 </td>
 <td style="text-align:right;">
-25.95000
+23.65222
 </td>
 <td style="text-align:right;">
-1196.692
+1610.664
 </td>
 <td style="text-align:right;">
-67.21795
+52.39778
 </td>
 <td style="text-align:right;">
--0.0069317
+-0.1285802
 </td>
 <td style="text-align:right;">
-0.8205128
+7.00000
 </td>
 <td style="text-align:right;">
-0.0000000
+0.0147406
 </td>
 <td style="text-align:right;">
-1.726919
+2.8891487
 </td>
 <td style="text-align:right;">
-0.0383760
+0.0147406
 </td>
 <td style="text-align:right;">
-0.0116438
+0.1567186
 </td>
 <td style="text-align:right;">
-1.6151811
+10.5113695
 </td>
 <td style="text-align:right;">
-184.5410
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-422618647
-</td>
-<td style="text-align:right;">
-25.65000
-</td>
-<td style="text-align:right;">
-1407.000
-</td>
-<td style="text-align:right;">
-67.70000
-</td>
-<td style="text-align:right;">
--0.0041988
-</td>
-<td style="text-align:right;">
-0.2777778
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0062206
-</td>
-<td style="text-align:right;">
-0.5583264
-</td>
-<td style="text-align:right;">
-437.1373
+674.2996
 </td>
 </tr>
 <tr>
 <td style="text-align:right;">
-422543007
+422534382
 </td>
 <td style="text-align:right;">
-25.35513
+25.38871
 </td>
 <td style="text-align:right;">
-1269.338
+1412.281
 </td>
 <td style="text-align:right;">
-61.87179
+53.80000
 </td>
 <td style="text-align:right;">
--0.0150798
+-0.0042725
 </td>
 <td style="text-align:right;">
-63.9487179
+313.00000
 </td>
 <td style="text-align:right;">
-0.0220572
+0.0487086
 </td>
 <td style="text-align:right;">
-2.300682
+2.5083627
 </td>
 <td style="text-align:right;">
-0.0449998
+0.2676059
 </td>
 <td style="text-align:right;">
-0.0250692
+0.0129672
 </td>
 <td style="text-align:right;">
-128.7406355
+996.8447642
 </td>
 <td style="text-align:right;">
-802.3788
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-399755584
-</td>
-<td style="text-align:right;">
-22.72368
-</td>
-<td style="text-align:right;">
-1629.289
-</td>
-<td style="text-align:right;">
-52.10000
-</td>
-<td style="text-align:right;">
--0.0580845
-</td>
-<td style="text-align:right;">
-25.3157895
-</td>
-<td style="text-align:right;">
-0.0440347
-</td>
-<td style="text-align:right;">
-2.862258
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0987541
-</td>
-<td style="text-align:right;">
-32.0395358
-</td>
-<td style="text-align:right;">
-508.5529
+2355.2893
 </td>
 </tr>
 <tr>
 <td style="text-align:right;">
-399856194
+399709022
 </td>
 <td style="text-align:right;">
-25.05000
+24.95000
 </td>
 <td style="text-align:right;">
-1343.586
+1171.394
 </td>
 <td style="text-align:right;">
-64.38571
+56.61250
 </td>
 <td style="text-align:right;">
--0.0063247
+-0.0132790
 </td>
 <td style="text-align:right;">
-133.7142857
+1.18750
 </td>
 <td style="text-align:right;">
 0.0000000
 </td>
 <td style="text-align:right;">
-1.014789
+3.6042455
 </td>
 <td style="text-align:right;">
-0.0349927
+0.0780625
 </td>
 <td style="text-align:right;">
-0.0097688
+0.0247349
 </td>
 <td style="text-align:right;">
-212.7847432
+1.3792548
 </td>
 <td style="text-align:right;">
-211.7058
+422.7374
 </td>
 </tr>
 <tr>
 <td style="text-align:right;">
-422561180
+422683474
 </td>
 <td style="text-align:right;">
-24.65000
+26.15000
 </td>
 <td style="text-align:right;">
-1529.307
+1136.367
 </td>
 <td style="text-align:right;">
-66.90000
+51.16667
 </td>
 <td style="text-align:right;">
--0.0084019
+-0.0018663
 </td>
 <td style="text-align:right;">
-11.7333333
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-6.390771
+24.88095
 </td>
 <td style="text-align:right;">
 0.0000000
 </td>
 <td style="text-align:right;">
-0.0189603
+0.6128259
 </td>
 <td style="text-align:right;">
-27.8195774
+0.0471405
 </td>
 <td style="text-align:right;">
-344.5721
+0.0033281
+</td>
+<td style="text-align:right;">
+48.7125692
+</td>
+<td style="text-align:right;">
+771.3198
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+422643157
+</td>
+<td style="text-align:right;">
+25.45000
+</td>
+<td style="text-align:right;">
+1377.611
+</td>
+<td style="text-align:right;">
+65.30000
+</td>
+<td style="text-align:right;">
+-0.0039396
+</td>
+<td style="text-align:right;">
+172.77778
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+1.3827866
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0048061
+</td>
+<td style="text-align:right;">
+324.7541900
+</td>
+<td style="text-align:right;">
+252.7410
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+422714989
+</td>
+<td style="text-align:right;">
+25.55000
+</td>
+<td style="text-align:right;">
+1355.100
+</td>
+<td style="text-align:right;">
+58.00000
+</td>
+<td style="text-align:right;">
+-0.0108067
+</td>
+<td style="text-align:right;">
+0.50000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0129895
+</td>
+<td style="text-align:right;">
+0.7071068
+</td>
+<td style="text-align:right;">
+218.8230
 </td>
 </tr>
 </tbody>
@@ -4217,7 +4216,7 @@ presences.</p>
 <span><span class="co">## Target node size:                 10 </span></span>
 <span><span class="co">## Variable importance mode:         impurity </span></span>
 <span><span class="co">## Splitrule:                        gini </span></span>
-<span><span class="co">## OOB prediction error (Brier s.):  0.0920027</span></span></code></pre>
+<span><span class="co">## OOB prediction error (Brier s.):  0.09202748</span></span></code></pre>
 <p>The model can be evaluated based on the OOB prediction error. This
 metric lies on the fact that the data points that are not used in
 training a tree can be used to test the tree. The errors on the OOB
