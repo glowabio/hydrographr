@@ -797,7 +797,7 @@ upcatch_plot
 
 ### Get distance along the stream network
 
-Toe determine the distance to the closest dam up- and downstream of each
+To determine the distance to the closest dam up- and downstream of each
 fish occurrence site we will first calculate the distance between all point 
 locations using the function `get_distance`.
 
@@ -840,7 +840,7 @@ kbl(network_distance) %>%
 
 To evaluate which and how many dames are located up- and downstream of the 
 fish occurrence sites, we need to load the GeoPackage of the stream segments (
-order_vect_segment) as a graph. Further we will need the sub-catchment IDs of 
+order_vect_segment) as a graph. Further we will need the sub-catchment ids of 
 the fish occurrence sites to use the function `get_catchment_graph`. The
 function will return for each fish occurrence site all sub-catchment IDs 
 which are located up- or downstream.
@@ -1017,15 +1017,15 @@ dam_num_dist <- ed_upstream %>%
 
 
 ```{r include=FALSE}
-
 #fwrite(dam_num_dist, paste0(upcatch_dir, "/dam_num_dist.csv"))
-
-knitr::opts_knit$set(root.dir = "./data_brazil")
-dam_num_dist <- fread("./data/basin_481051/upstream_catchment/dam_num_dist.csv")
+#knitr::opts_knit$set(root.dir = "./data_brazil")
+#dam_num_dist <- fread("./data/basin_481051/upstream_catchment/dam_num_dist.csv")
 
 ```
 
-```{r fig.height=10, fig.width = 20, unit = "cm"} 
+
+
+```{r eval = FALSE} 
 
 # Prepare data.frame for the plot
 plot_data <- dam_num_dist %>% 
@@ -1045,11 +1045,12 @@ ggplot(plot_data, aes(x = as.factor(from_site_id), y = n_dams, fill = fct_rev(ty
   labs(x = "Fish occurrence site ID", y = "Number of dams")
 
 ```
+![](../man/figures/number_of_dams.png)
 
 With the exception of fish occurrence site 4 and 6 the number of upstream dams will dramatically increase. Especially for site 9 which has already 14 dams located upstream the number might increase in the future to 94 dams. Downstream of all fish occurrence sites there is currently only one existing dam. It is the dam with the ID 2516 at the outlet of our delineated upstream catchment. This leads to the assumption that all fish occurrence sites are currently connected. In the future the number of dams will increase for the fish occurrence sites 7 and 8 from one to two dames. The future dam might lead to a disconnection of these two sites from the others. 
 
 
-```{r fig.height=10, fig.width = 20, unit = "cm"} 
+```{r eval = FALSE} 
 
 # Create plot to show the distance to the closest dam
 ggplot(plot_data, aes(x = as.factor(from_site_id), y = dist, fill = type)) + 
@@ -1063,6 +1064,7 @@ ggplot(plot_data, aes(x = as.factor(from_site_id), y = dist, fill = type)) +
   labs(x = "Fish occurrence site ID", y = "Distance along the stream network (km)")
 
 ```
+![](../man/figures/distance_to_dams.png)
 
 The distance to the next existing dam upstream ranges from 12.6km for the fish occurrence site 8 to 528.9km  for the fish occurrence site 9. For most sites the the distance to the next dam upstream will decrease in the future. Only for the fish occurrence sites 7 and 8 the next future dam upstream will farther away than the existing dam. The distance to the existing dam downstream ranges between 415.2km and 1672.0km. In the future the distance for the next dam downstream will decrease from about 1475km to about 114km for the fish occurrence sites 7 and 8. 
 
