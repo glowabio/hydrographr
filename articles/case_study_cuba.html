@@ -985,12 +985,14 @@ and visualisations are available <a href="https://hydrography.org/hydrography90m
 <span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>timeout <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Download</span></span>
+<span><span class="co"># Present, 1981-2010</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/download.file.html" class="external-link">download.file</a></span><span class="op">(</span><span class="st">"https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio12_1981-2010_V.2.1.tif"</span>,</span>
 <span>destfile <span class="op">=</span> <span class="st">"data/chelsa_bioclim/bio12_1981-2010.tif"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/download.file.html" class="external-link">download.file</a></span><span class="op">(</span><span class="st">"https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio15_1981-2010_V.2.1.tif"</span>,</span>
 <span>destfile <span class="op">=</span> <span class="st">"data/chelsa_bioclim/bio15_1981-2010.tif"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/download.file.html" class="external-link">download.file</a></span><span class="op">(</span><span class="st">"https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio1_1981-2010_V.2.1.tif"</span>,</span>
 <span>destfile <span class="op">=</span> <span class="st">"data/chelsa_bioclim/bio1_1981-2010.tif"</span><span class="op">)</span></span>
+<span><span class="co"># Future, 2041-2070</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/download.file.html" class="external-link">download.file</a></span><span class="op">(</span><span class="st">"https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/2041-2070/IPSL-CM6A-LR/ssp370/bio/CHELSA_bio12_2041-2070_ipsl-cm6a-lr_ssp370_V.2.1.tif"</span>,</span>
 <span>destfile <span class="op">=</span> <span class="st">"data/chelsa_bioclim/bio12_IPSL-CM6A-LR_ssp370_2041-2070.tif"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/download.file.html" class="external-link">download.file</a></span><span class="op">(</span><span class="st">"https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/2041-2070/IPSL-CM6A-LR/ssp370/bio/CHELSA_bio15_2041-2070_ipsl-cm6a-lr_ssp370_V.2.1.tif"</span>,</span>
@@ -2221,8 +2223,8 @@ an indicator of the sub-catchment size</p>
 <span><span class="co"># Clear up memory</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">stats_gpkg_h08v06</span>, <span class="va">stats_gpkg_h10v06</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/base/gc.html" class="external-link">gc</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##            used  (Mb) gc trigger  (Mb) max used  (Mb)</span></span>
-<span><span class="co">## Ncells  4531322 242.0    8958420 478.5  5546108 296.2</span></span>
-<span><span class="co">## Vcells 25584333 195.2   55379523 422.6 48398216 369.3</span></span></code></pre>
+<span><span class="co">## Ncells  4531324 242.0    8958400 478.5  5546075 296.2</span></span>
+<span><span class="co">## Vcells 25584352 195.2   55379544 422.6 48398235 369.3</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="prepare-data-for-modelling">Prepare data for modelling<a class="anchor" aria-label="anchor" href="#prepare-data-for-modelling"></a>
@@ -3548,230 +3550,230 @@ length
 <tbody>
 <tr>
 <td style="text-align:right;">
-422857979
+422634514
 </td>
 <td style="text-align:right;">
-26.25000
+25.95000
 </td>
 <td style="text-align:right;">
-1461.450
+1196.692
 </td>
 <td style="text-align:right;">
-57.87500
+67.21795
 </td>
 <td style="text-align:right;">
--0.0144215
+-0.0069317
 </td>
 <td style="text-align:right;">
-291.500000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-6.148780
-</td>
-<td style="text-align:right;">
-0.0433013
-</td>
-<td style="text-align:right;">
-0.0161281
-</td>
-<td style="text-align:right;">
-504.892810
-</td>
-<td style="text-align:right;">
-126.8858
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-422620199
-</td>
-<td style="text-align:right;">
-25.55000
-</td>
-<td style="text-align:right;">
-1395.346
-</td>
-<td style="text-align:right;">
-49.42143
-</td>
-<td style="text-align:right;">
--0.0053272
-</td>
-<td style="text-align:right;">
-56.892857
+0.8205128
 </td>
 <td style="text-align:right;">
 0.0000000
 </td>
 <td style="text-align:right;">
-4.541985
+1.726919
 </td>
 <td style="text-align:right;">
-0.0976771
+0.0383760
 </td>
 <td style="text-align:right;">
-0.0103600
+0.0116438
 </td>
 <td style="text-align:right;">
-117.114821
+1.6151811
 </td>
 <td style="text-align:right;">
-425.0840
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-422611255
-</td>
-<td style="text-align:right;">
-25.70769
-</td>
-<td style="text-align:right;">
-1283.508
-</td>
-<td style="text-align:right;">
-66.11538
-</td>
-<td style="text-align:right;">
--0.0031258
-</td>
-<td style="text-align:right;">
-7.615385
-</td>
-<td style="text-align:right;">
-0.0494047
-</td>
-<td style="text-align:right;">
-3.922021
-</td>
-<td style="text-align:right;">
-0.0360801
-</td>
-<td style="text-align:right;">
-0.0063708
-</td>
-<td style="text-align:right;">
-12.143618
-</td>
-<td style="text-align:right;">
-643.5320
+184.5410
 </td>
 </tr>
 <tr>
 <td style="text-align:right;">
-399843847
+422618647
 </td>
 <td style="text-align:right;">
-24.95000
+25.65000
 </td>
 <td style="text-align:right;">
-1231.810
+1407.000
 </td>
 <td style="text-align:right;">
-55.39000
+67.70000
 </td>
 <td style="text-align:right;">
--0.0084558
+-0.0041988
 </td>
 <td style="text-align:right;">
-1416.200000
+0.2777778
 </td>
 <td style="text-align:right;">
 0.0000000
 </td>
 <td style="text-align:right;">
-1.470000
-</td>
-<td style="text-align:right;">
-0.0300000
-</td>
-<td style="text-align:right;">
-0.0123582
-</td>
-<td style="text-align:right;">
-2266.491024
-</td>
-<td style="text-align:right;">
-310.5166
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-399671443
-</td>
-<td style="text-align:right;">
-24.85000
-</td>
-<td style="text-align:right;">
-1332.217
-</td>
-<td style="text-align:right;">
-53.16667
-</td>
-<td style="text-align:right;">
--0.0073197
-</td>
-<td style="text-align:right;">
-2.083333
+0.000000
 </td>
 <td style="text-align:right;">
 0.0000000
 </td>
 <td style="text-align:right;">
-2.720549
+0.0062206
 </td>
 <td style="text-align:right;">
-0.1490712
+0.5583264
 </td>
 <td style="text-align:right;">
-0.0081413
-</td>
-<td style="text-align:right;">
-2.564447
-</td>
-<td style="text-align:right;">
-343.8736
+437.1373
 </td>
 </tr>
 <tr>
 <td style="text-align:right;">
-422772190
+422543007
 </td>
 <td style="text-align:right;">
-25.94333
+25.35513
 </td>
 <td style="text-align:right;">
-1361.220
+1269.338
 </td>
 <td style="text-align:right;">
-52.90000
+61.87179
 </td>
 <td style="text-align:right;">
--0.0220115
+-0.0150798
 </td>
 <td style="text-align:right;">
-2.133333
+63.9487179
 </td>
 <td style="text-align:right;">
-0.0997775
+0.0220572
 </td>
 <td style="text-align:right;">
-1.047664
+2.300682
+</td>
+<td style="text-align:right;">
+0.0449998
+</td>
+<td style="text-align:right;">
+0.0250692
+</td>
+<td style="text-align:right;">
+128.7406355
+</td>
+<td style="text-align:right;">
+802.3788
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+399755584
+</td>
+<td style="text-align:right;">
+22.72368
+</td>
+<td style="text-align:right;">
+1629.289
+</td>
+<td style="text-align:right;">
+52.10000
+</td>
+<td style="text-align:right;">
+-0.0580845
+</td>
+<td style="text-align:right;">
+25.3157895
+</td>
+<td style="text-align:right;">
+0.0440347
+</td>
+<td style="text-align:right;">
+2.862258
 </td>
 <td style="text-align:right;">
 0.0000000
 </td>
 <td style="text-align:right;">
-0.0256754
+0.0987541
 </td>
 <td style="text-align:right;">
-2.418448
+32.0395358
 </td>
 <td style="text-align:right;">
-347.2719
+508.5529
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+399856194
+</td>
+<td style="text-align:right;">
+25.05000
+</td>
+<td style="text-align:right;">
+1343.586
+</td>
+<td style="text-align:right;">
+64.38571
+</td>
+<td style="text-align:right;">
+-0.0063247
+</td>
+<td style="text-align:right;">
+133.7142857
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+1.014789
+</td>
+<td style="text-align:right;">
+0.0349927
+</td>
+<td style="text-align:right;">
+0.0097688
+</td>
+<td style="text-align:right;">
+212.7847432
+</td>
+<td style="text-align:right;">
+211.7058
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+422561180
+</td>
+<td style="text-align:right;">
+24.65000
+</td>
+<td style="text-align:right;">
+1529.307
+</td>
+<td style="text-align:right;">
+66.90000
+</td>
+<td style="text-align:right;">
+-0.0084019
+</td>
+<td style="text-align:right;">
+11.7333333
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+6.390771
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0189603
+</td>
+<td style="text-align:right;">
+27.8195774
+</td>
+<td style="text-align:right;">
+344.5721
 </td>
 </tr>
 </tbody>
@@ -4215,7 +4217,7 @@ presences.</p>
 <span><span class="co">## Target node size:                 10 </span></span>
 <span><span class="co">## Variable importance mode:         impurity </span></span>
 <span><span class="co">## Splitrule:                        gini </span></span>
-<span><span class="co">## OOB prediction error (Brier s.):  0.09278817</span></span></code></pre>
+<span><span class="co">## OOB prediction error (Brier s.):  0.0920027</span></span></code></pre>
 <p>The model can be evaluated based on the OOB prediction error. This
 metric lies on the fact that the data points that are not used in
 training a tree can be used to test the tree. The errors on the OOB
