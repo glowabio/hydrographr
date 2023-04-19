@@ -214,6 +214,7 @@ will cite
 
 #> It is really appreciated. The citation notice is now silenced.
 ```
+Now type ctrl+z to exit the GNU parallel environment.
 
 **GNU bc**
 
