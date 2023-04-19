@@ -132,7 +132,9 @@ spdata <- fread(paste0(wdir, "/data/spdata_cuba.csv"), sep = "\t", fill = TRUE) 
 
 ```{r include=FALSE}
 knitr::opts_knit$set(root.dir = "./data_cuba")
-spdata<- fread("./data/spdata_cuba.csv")
+spdata<- fread("./data/spdata_cuba.csv") %>%
+          filter(species == "Hypolestes_trinitatis") %>%
+          filter(year > 1980)
 ```
 
 Subset columns
