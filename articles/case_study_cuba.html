@@ -955,15 +955,16 @@ double check which tile IDs are relevant for your purpose using the
 download. We will use the variables <a href="https://hydrography.org/hydrography90m/hydrography90m_layers#stream-slope-layers" class="external-link">slope_curv_max_dw_cel</a>
 (maximum curvature between the highest upstream, focal and downstream
 cell) and <a href="https://geo.igb-berlin.de/maps/new?layer=geonode:hydrography90m_v1_spi_cog&amp;view=True" class="external-link">spi</a>
-(Stream Power Index) as predictors in our model. Additionally, we will
-download the <a href="https://geo.igb-berlin.de/maps/new?layer=geonode:hydrography90m_v1_sub_catchment_cog&amp;view=True" class="external-link">sub_catchment</a>
+(Stream Power Index) and <a href="https://hydrography.org/hydrography90m/hydrography90m_layers/#stream-order-layers" class="external-link">stream
+length</a> as predictors in our model.</p>
+<p>Additionally, we will download the <a href="https://geo.igb-berlin.de/maps/new?layer=geonode:hydrography90m_v1_sub_catchment_cog&amp;view=True" class="external-link">sub_catchment</a>
 layer, which is the necessary base-layer for the workflow.</p>
 <p>A list of all available Hydrography90m variables, as well as details
 and visualisations are available <a href="https://hydrography.org/hydrography90m/hydrography90m_layers/" class="external-link">here</a>.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Variables in raster format</span></span>
 <span><span class="va">vars_tif</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sub_catchment"</span>, <span class="st">"slope_curv_max_dw_cel"</span>, <span class="st">"spi"</span><span class="op">)</span></span>
-<span><span class="co"># Variables in vector format</span></span>
+<span><span class="co"># Variables in vector format. This layerholds the information on stream length</span></span>
 <span><span class="va">vars_gpkg</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"order_vect_point"</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Download the .tif tiles of the desired variables</span></span>
@@ -2220,8 +2221,8 @@ an indicator of the sub-catchment size</p>
 <span><span class="co"># Clear up memory</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">stats_gpkg_h08v06</span>, <span class="va">stats_gpkg_h10v06</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/base/gc.html" class="external-link">gc</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##            used  (Mb) gc trigger  (Mb) max used  (Mb)</span></span>
-<span><span class="co">## Ncells  4531320 242.0    8955897 478.3  5551015 296.5</span></span>
-<span><span class="co">## Vcells 25584288 195.2   55379451 422.6 48398171 369.3</span></span></code></pre>
+<span><span class="co">## Ncells  4531322 242.0    8958420 478.5  5546108 296.2</span></span>
+<span><span class="co">## Vcells 25584333 195.2   55379523 422.6 48398216 369.3</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="prepare-data-for-modelling">Prepare data for modelling<a class="anchor" aria-label="anchor" href="#prepare-data-for-modelling"></a>
@@ -3547,230 +3548,230 @@ length
 <tbody>
 <tr>
 <td style="text-align:right;">
-422676523
+422857979
 </td>
 <td style="text-align:right;">
-26.05000
+26.25000
 </td>
 <td style="text-align:right;">
-1054.500
+1461.450
 </td>
 <td style="text-align:right;">
-43.90000
+57.87500
 </td>
 <td style="text-align:right;">
--0.0011649
+-0.0144215
 </td>
 <td style="text-align:right;">
-7.3333333
-</td>
-<td style="text-align:right;">
-0.0000000
+291.500000
 </td>
 <td style="text-align:right;">
 0.0000000
 </td>
 <td style="text-align:right;">
-0.0000000
+6.148780
 </td>
 <td style="text-align:right;">
-0.0028609
+0.0433013
 </td>
 <td style="text-align:right;">
-10.338708
+0.0161281
 </td>
 <td style="text-align:right;">
-259.5221
+504.892810
+</td>
+<td style="text-align:right;">
+126.8858
 </td>
 </tr>
 <tr>
 <td style="text-align:right;">
-422727835
-</td>
-<td style="text-align:right;">
-25.64825
-</td>
-<td style="text-align:right;">
-1323.218
-</td>
-<td style="text-align:right;">
-50.17544
-</td>
-<td style="text-align:right;">
--0.0313970
-</td>
-<td style="text-align:right;">
-67.2280702
-</td>
-<td style="text-align:right;">
-0.0131286
-</td>
-<td style="text-align:right;">
-2.2059825
-</td>
-<td style="text-align:right;">
-0.1218004
-</td>
-<td style="text-align:right;">
-0.0489802
-</td>
-<td style="text-align:right;">
-175.068610
-</td>
-<td style="text-align:right;">
-858.5781
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-400139297
-</td>
-<td style="text-align:right;">
-25.87000
-</td>
-<td style="text-align:right;">
-1305.220
-</td>
-<td style="text-align:right;">
-57.40000
-</td>
-<td style="text-align:right;">
--0.0011770
-</td>
-<td style="text-align:right;">
-24.2666667
-</td>
-<td style="text-align:right;">
-0.0400000
-</td>
-<td style="text-align:right;">
-1.3600000
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0053993
-</td>
-<td style="text-align:right;">
-32.280989
-</td>
-<td style="text-align:right;">
-276.8207
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-422825530
-</td>
-<td style="text-align:right;">
-23.37609
-</td>
-<td style="text-align:right;">
-1695.974
-</td>
-<td style="text-align:right;">
-53.60000
-</td>
-<td style="text-align:right;">
--0.0536870
-</td>
-<td style="text-align:right;">
-16.2173913
-</td>
-<td style="text-align:right;">
-0.0439109
-</td>
-<td style="text-align:right;">
-12.1633168
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0677530
-</td>
-<td style="text-align:right;">
-44.023666
-</td>
-<td style="text-align:right;">
-438.1526
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-422572948
+422620199
 </td>
 <td style="text-align:right;">
 25.55000
 </td>
 <td style="text-align:right;">
-1385.680
+1395.346
 </td>
 <td style="text-align:right;">
-50.12571
+49.42143
 </td>
 <td style="text-align:right;">
--0.0030827
+-0.0053272
 </td>
 <td style="text-align:right;">
-0.4571429
+56.892857
 </td>
 <td style="text-align:right;">
 0.0000000
 </td>
 <td style="text-align:right;">
-0.5878775
+4.541985
 </td>
 <td style="text-align:right;">
-0.0839825
+0.0976771
 </td>
 <td style="text-align:right;">
-0.0048895
+0.0103600
 </td>
 <td style="text-align:right;">
-1.023798
+117.114821
 </td>
 <td style="text-align:right;">
-510.5369
+425.0840
 </td>
 </tr>
 <tr>
 <td style="text-align:right;">
-399902458
+422611255
 </td>
 <td style="text-align:right;">
-25.25000
+25.70769
 </td>
 <td style="text-align:right;">
-1434.740
+1283.508
 </td>
 <td style="text-align:right;">
-64.48000
+66.11538
 </td>
 <td style="text-align:right;">
--0.0006689
+-0.0031258
 </td>
 <td style="text-align:right;">
-1.1000000
+7.615385
+</td>
+<td style="text-align:right;">
+0.0494047
+</td>
+<td style="text-align:right;">
+3.922021
+</td>
+<td style="text-align:right;">
+0.0360801
+</td>
+<td style="text-align:right;">
+0.0063708
+</td>
+<td style="text-align:right;">
+12.143618
+</td>
+<td style="text-align:right;">
+643.5320
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+399843847
+</td>
+<td style="text-align:right;">
+24.95000
+</td>
+<td style="text-align:right;">
+1231.810
+</td>
+<td style="text-align:right;">
+55.39000
+</td>
+<td style="text-align:right;">
+-0.0084558
+</td>
+<td style="text-align:right;">
+1416.200000
 </td>
 <td style="text-align:right;">
 0.0000000
 </td>
 <td style="text-align:right;">
-0.3200000
+1.470000
 </td>
 <td style="text-align:right;">
-0.0400000
+0.0300000
 </td>
 <td style="text-align:right;">
-0.0007546
+0.0123582
 </td>
 <td style="text-align:right;">
-2.211334
+2266.491024
 </td>
 <td style="text-align:right;">
-252.0164
+310.5166
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+399671443
+</td>
+<td style="text-align:right;">
+24.85000
+</td>
+<td style="text-align:right;">
+1332.217
+</td>
+<td style="text-align:right;">
+53.16667
+</td>
+<td style="text-align:right;">
+-0.0073197
+</td>
+<td style="text-align:right;">
+2.083333
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+2.720549
+</td>
+<td style="text-align:right;">
+0.1490712
+</td>
+<td style="text-align:right;">
+0.0081413
+</td>
+<td style="text-align:right;">
+2.564447
+</td>
+<td style="text-align:right;">
+343.8736
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+422772190
+</td>
+<td style="text-align:right;">
+25.94333
+</td>
+<td style="text-align:right;">
+1361.220
+</td>
+<td style="text-align:right;">
+52.90000
+</td>
+<td style="text-align:right;">
+-0.0220115
+</td>
+<td style="text-align:right;">
+2.133333
+</td>
+<td style="text-align:right;">
+0.0997775
+</td>
+<td style="text-align:right;">
+1.047664
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0256754
+</td>
+<td style="text-align:right;">
+2.418448
+</td>
+<td style="text-align:right;">
+347.2719
 </td>
 </tr>
 </tbody>
@@ -4214,7 +4215,7 @@ presences.</p>
 <span><span class="co">## Target node size:                 10 </span></span>
 <span><span class="co">## Variable importance mode:         impurity </span></span>
 <span><span class="co">## Splitrule:                        gini </span></span>
-<span><span class="co">## OOB prediction error (Brier s.):  0.0914941</span></span></code></pre>
+<span><span class="co">## OOB prediction error (Brier s.):  0.09278817</span></span></code></pre>
 <p>The model can be evaluated based on the OOB prediction error. This
 metric lies on the fact that the data points that are not used in
 training a tree can be used to test the tree. The errors on the OOB
