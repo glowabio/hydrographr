@@ -97,7 +97,7 @@ if(!dir.exists(paste0(wdir, "/data"))) dir.create(paste0(wdir, "/data"))
 ```{r, eval=FALSE, include=FALSE}
 wdir <- "/home/afroditi/Documents/PhD/hydrographr_case_study"
 setwd(wdir)
-dir.create("data_cuba")
+dir.create("data")
 ```
 
 ```{r, eval = FALSE}
@@ -105,7 +105,7 @@ wdir <- "my/working/directory"
 setwd(wdir)
 
 # Create a new folder in the working directory to store all the data
-dir.create("data_cuba")
+dir.create("data")
 ```
 
 ### Species data
@@ -115,7 +115,7 @@ occurrence records in Cuba from
 <https://doi.org/10.18728/igb-fred-778.3> (Cambas & Salina, 2022).
 
 ```{r, eval = FALSE}
-download.file("https://fred.igb-berlin.de/data_cuba/file_download/1395",
+download.file("https://fred.igb-berlin.de/data/file_download/1395",
               destfile = paste0(wdir, "/data/spdata_cuba.csv"))
 
 ```
@@ -246,11 +246,11 @@ vars_gpkg <- c("order_vect_point")
 ```{r, eval = FALSE}
 # Download the .tif tiles of the desired variables
 download_tiles(variable = vars_tif, tile_id = tile_id, file_format = "tif",
-              download_dir = "data_cuba")
+              download_dir = "data")
 
 # Download the .gpkg tiles of the desired variables
 download_tiles(variable = vars_gpkg, tile_id = tile_id, file_format = "gpkg",
-              download_dir = "data_cuba")
+              download_dir = "data")
 ```
 
 Then download the CHELSA present and future Bioclim variables
@@ -260,7 +260,7 @@ For a quick outlook on the bioclimatic variables you can have a look
 
 ```{r, eval = FALSE}
 # Create download directory
-dir.create(paste0(wdir, "/data_cuba/chelsa_bioclim"))
+dir.create(paste0(wdir, "/data/chelsa_bioclim"))
 ```
 
 ```{r, eval = FALSE}
