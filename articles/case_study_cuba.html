@@ -1062,7 +1062,34 @@ as there is an extra step before reaching to the final output.</p>
 </h3>
 <p>The cropped tiles of the variable now need to be merged together.</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Merge the files in a loop</span></span>
+<code class="sourceCode R"><span><span class="co"># This can be done sequentially:</span></span>
+<span><span class="va">idir</span> <span class="op">&lt;-</span> <span class="va">dirs_h90m</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span>
+<span><span class="fu"><a href="../reference/merge_tiles.html">merge_tiles</a></span><span class="op">(</span>tile_dir <span class="op">=</span> <span class="va">idir</span>,</span>
+<span>            tile_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">idir</span>, full.names <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>                                    pattern <span class="op">=</span> <span class="st">"_crop.tif"</span><span class="op">)</span>,</span>
+<span>            out_dir <span class="op">=</span> <span class="va">layer_dir</span>,</span>
+<span>            file_name <span class="op">=</span> <span class="st">"spi.tif"</span>,</span>
+<span>            read <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">idir</span> <span class="op">&lt;-</span> <span class="va">dirs_h90m</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span></span>
+<span><span class="fu"><a href="../reference/merge_tiles.html">merge_tiles</a></span><span class="op">(</span>tile_dir <span class="op">=</span> <span class="va">idir</span>,</span>
+<span>            tile_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">idir</span>, full.names <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>                                    pattern <span class="op">=</span> <span class="st">"_crop.tif"</span><span class="op">)</span>,</span>
+<span>            out_dir <span class="op">=</span> <span class="va">layer_dir</span>,</span>
+<span>            file_name <span class="op">=</span> <span class="st">"slope_curv_max_dw_cel.tif"</span>,</span>
+<span>            read <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">idir</span> <span class="op">&lt;-</span> <span class="va">dirs_h90m</span><span class="op">[</span><span class="fl">4</span><span class="op">]</span></span>
+<span><span class="fu"><a href="../reference/merge_tiles.html">merge_tiles</a></span><span class="op">(</span>tile_dir <span class="op">=</span> <span class="va">idir</span>,</span>
+<span>            tile_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">idir</span>, full.names <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>                                    pattern <span class="op">=</span> <span class="st">"_crop.tif"</span><span class="op">)</span>,</span>
+<span>            out_dir <span class="op">=</span> <span class="va">layer_dir</span>,</span>
+<span>            file_name <span class="op">=</span> <span class="st">"sub_catchment.tif"</span>,</span>
+<span>            read <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span></span>
+<span></span>
+<span><span class="co"># ...or in a loop</span></span>
 <span><span class="kw">for</span><span class="op">(</span><span class="va">idir</span> <span class="kw">in</span> <span class="va">dirs_h90m</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="co"># Get input file extension</span></span>
 <span>  <span class="va">file_extension</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/tools/fileutils.html" class="external-link">file_ext</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">idir</span>, full.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
@@ -2222,8 +2249,8 @@ an indicator of the sub-catchment size</p>
 <span><span class="co"># Clear up memory</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">stats_gpkg_h08v06</span>, <span class="va">stats_gpkg_h10v06</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/base/gc.html" class="external-link">gc</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##            used  (Mb) gc trigger  (Mb) max used  (Mb)</span></span>
-<span><span class="co">## Ncells  4531361 242.1    8958418 478.5  5546048 296.2</span></span>
-<span><span class="co">## Vcells 25584636 195.2   55379526 422.6 48398519 369.3</span></span></code></pre>
+<span><span class="co">## Ncells  4531336 242.0    8959128 478.5  5545070 296.2</span></span>
+<span><span class="co">## Vcells 25584602 195.2   55379909 422.6 48398485 369.3</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="prepare-data-for-modelling">Prepare data for modelling<a class="anchor" aria-label="anchor" href="#prepare-data-for-modelling"></a>
@@ -3549,230 +3576,230 @@ length
 <tbody>
 <tr>
 <td style="text-align:right;">
-399694149
+422760134
 </td>
 <td style="text-align:right;">
-23.65222
+26.19286
 </td>
 <td style="text-align:right;">
-1610.664
+1122.407
 </td>
 <td style="text-align:right;">
-52.39778
+58.68571
 </td>
 <td style="text-align:right;">
--0.1285802
+-0.0378117
 </td>
 <td style="text-align:right;">
-7.00000
+2.0000000
 </td>
 <td style="text-align:right;">
-0.0147406
+0.0903508
 </td>
 <td style="text-align:right;">
-2.8891487
+4.2153570
 </td>
 <td style="text-align:right;">
-0.0147406
+0.0349927
 </td>
 <td style="text-align:right;">
-0.1567186
+0.0956210
 </td>
 <td style="text-align:right;">
-10.5113695
+1.4142136
 </td>
 <td style="text-align:right;">
-674.2996
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-422534382
-</td>
-<td style="text-align:right;">
-25.38871
-</td>
-<td style="text-align:right;">
-1412.281
-</td>
-<td style="text-align:right;">
-53.80000
-</td>
-<td style="text-align:right;">
--0.0042725
-</td>
-<td style="text-align:right;">
-313.00000
-</td>
-<td style="text-align:right;">
-0.0487086
-</td>
-<td style="text-align:right;">
-2.5083627
-</td>
-<td style="text-align:right;">
-0.2676059
-</td>
-<td style="text-align:right;">
-0.0129672
-</td>
-<td style="text-align:right;">
-996.8447642
-</td>
-<td style="text-align:right;">
-2355.2893
+253.3118
 </td>
 </tr>
 <tr>
 <td style="text-align:right;">
-399709022
+399785857
+</td>
+<td style="text-align:right;">
+24.75000
+</td>
+<td style="text-align:right;">
+1173.400
+</td>
+<td style="text-align:right;">
+54.20000
+</td>
+<td style="text-align:right;">
+-0.0080909
+</td>
+<td style="text-align:right;">
+0.2000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0120862
+</td>
+<td style="text-align:right;">
+0.4000000
+</td>
+<td style="text-align:right;">
+251.7996
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+422563325
+</td>
+<td style="text-align:right;">
+25.75000
+</td>
+<td style="text-align:right;">
+1276.814
+</td>
+<td style="text-align:right;">
+42.20000
+</td>
+<td style="text-align:right;">
+-0.0026909
+</td>
+<td style="text-align:right;">
+0.2857143
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.9760395
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0039778
+</td>
+<td style="text-align:right;">
+0.4517540
+</td>
+<td style="text-align:right;">
+218.4293
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+399702270
 </td>
 <td style="text-align:right;">
 24.95000
 </td>
 <td style="text-align:right;">
-1171.394
+1198.200
 </td>
 <td style="text-align:right;">
-56.61250
+56.70000
 </td>
 <td style="text-align:right;">
--0.0132790
+-0.0164051
 </td>
 <td style="text-align:right;">
-1.18750
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-3.6042455
-</td>
-<td style="text-align:right;">
-0.0780625
-</td>
-<td style="text-align:right;">
-0.0247349
-</td>
-<td style="text-align:right;">
-1.3792548
-</td>
-<td style="text-align:right;">
-422.7374
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-422683474
-</td>
-<td style="text-align:right;">
-26.15000
-</td>
-<td style="text-align:right;">
-1136.367
-</td>
-<td style="text-align:right;">
-51.16667
-</td>
-<td style="text-align:right;">
--0.0018663
-</td>
-<td style="text-align:right;">
-24.88095
+50.7777778
 </td>
 <td style="text-align:right;">
 0.0000000
 </td>
 <td style="text-align:right;">
-0.6128259
+0.0000000
 </td>
 <td style="text-align:right;">
-0.0471405
+0.0000000
 </td>
 <td style="text-align:right;">
-0.0033281
+0.0318858
 </td>
 <td style="text-align:right;">
-48.7125692
+140.4419831
 </td>
 <td style="text-align:right;">
-771.3198
+125.8242
 </td>
 </tr>
 <tr>
 <td style="text-align:right;">
-422643157
+422571881
 </td>
 <td style="text-align:right;">
 25.45000
 </td>
 <td style="text-align:right;">
-1377.611
+1399.733
 </td>
 <td style="text-align:right;">
-65.30000
+58.66667
 </td>
 <td style="text-align:right;">
--0.0039396
+-0.0040501
 </td>
 <td style="text-align:right;">
-172.77778
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-1.3827866
+0.2500000
 </td>
 <td style="text-align:right;">
 0.0000000
 </td>
 <td style="text-align:right;">
-0.0048061
+1.4613540
 </td>
 <td style="text-align:right;">
-324.7541900
+0.0471405
 </td>
 <td style="text-align:right;">
-252.7410
+0.0048214
+</td>
+<td style="text-align:right;">
+0.4330127
+</td>
+<td style="text-align:right;">
+218.4502
 </td>
 </tr>
 <tr>
 <td style="text-align:right;">
-422714989
+399854272
 </td>
 <td style="text-align:right;">
-25.55000
+25.05000
 </td>
 <td style="text-align:right;">
-1355.100
+1252.316
 </td>
 <td style="text-align:right;">
-58.00000
+56.47164
 </td>
 <td style="text-align:right;">
--0.0108067
+-0.0022335
 </td>
 <td style="text-align:right;">
-0.50000
-</td>
-<td style="text-align:right;">
-0.0000000
+2.4776119
 </td>
 <td style="text-align:right;">
 0.0000000
 </td>
 <td style="text-align:right;">
-0.0000000
+1.9661765
 </td>
 <td style="text-align:right;">
-0.0129895
+0.0567949
 </td>
 <td style="text-align:right;">
-0.7071068
+0.0037687
 </td>
 <td style="text-align:right;">
-218.8230
+4.9455489
+</td>
+<td style="text-align:right;">
+1415.8134
 </td>
 </tr>
 </tbody>
@@ -4216,7 +4243,7 @@ presences.</p>
 <span><span class="co">## Target node size:                 10 </span></span>
 <span><span class="co">## Variable importance mode:         impurity </span></span>
 <span><span class="co">## Splitrule:                        gini </span></span>
-<span><span class="co">## OOB prediction error (Brier s.):  0.09202748</span></span></code></pre>
+<span><span class="co">## OOB prediction error (Brier s.):  0.09432096</span></span></code></pre>
 <p>The model can be evaluated based on the OOB prediction error. This
 metric lies on the fact that the data points that are not used in
 training a tree can be used to test the tree. The errors on the OOB
