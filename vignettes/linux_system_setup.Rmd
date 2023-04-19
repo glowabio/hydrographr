@@ -23,6 +23,7 @@ knitr::opts_chunk$set(
 
 If you do not have installed any of the GIS tools, please, install before using `hydrographr`. If you use Ubuntu you can copy-paste the commands below. If you use another Linux distribution, please, see the linked software webpage below for installation instruction.
 
+Warning! Sometimes the installation does not work within a VPN connection. If you fail to fetch data from online repositories during the installation, please try deactivating your VPN connection. 
 
 **Add the Ubuntugis repository**
 
