@@ -229,7 +229,10 @@ download. We will use the variables
 (maximum curvature between the highest upstream, focal and downstream
 cell) and
 [spi](https://geo.igb-berlin.de/maps/new?layer=geonode:hydrography90m_v1_spi_cog&view=True)
-(Stream Power Index) as predictors in our model. Additionally, we will
+(Stream Power Index) and [stream length](https://hydrography.org/hydrography90m/hydrography90m_layers/#stream-order-layers) 
+as predictors in our model.
+
+Additionally, we will
 download the
 [sub_catchment](https://geo.igb-berlin.de/maps/new?layer=geonode:hydrography90m_v1_sub_catchment_cog&view=True)
 layer, which is the necessary base-layer for the workflow.
@@ -241,7 +244,7 @@ visualisations are available
 ```{r, eval = FALSE}
 # Variables in raster format
 vars_tif <- c("sub_catchment", "slope_curv_max_dw_cel", "spi")
-# Variables in vector format
+# Variables in vector format. This layerholds the information on stream length
 vars_gpkg <- c("order_vect_point")
 ```
 
