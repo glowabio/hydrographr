@@ -299,8 +299,7 @@ global CHELSA layers:
 We define the directory containing the layers to be cropped
 
 ```{r, eval = FALSE}
-dirs_chelsa <- list.dirs(paste0(wdir, "/data/chelsa_bioclim"),
-                       recursive = TRUE, full.names = TRUE)
+dirs_chelsa <- paste0(wdir, "/data/chelsa_bioclim")
 ```
 
 ... and the final output directory
