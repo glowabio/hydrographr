@@ -51,7 +51,7 @@ up- and downstream stream egments from each point locations as a graph. Afterwar
 we will query the tables and evaluate the shortest distance to the next dam as well
 as the number of dams. 
 
-![](../vignettes/data_brazil/data/figures/workflow.png)
+![](../man/figures/workflow.png)
 
 Let's get started!
 
