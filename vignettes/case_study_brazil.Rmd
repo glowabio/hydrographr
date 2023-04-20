@@ -89,13 +89,13 @@ library(forcats)
 
 
 ```{r, eval = FALSE, include=FALSE}
-wdir <- paste0(here(), "/data_brazil")
+wdir <- paste0(here(), "/vignettes/data_brazil")
 
 ```
 
 ```{r, eval = FALSE}
 # Define working directory
-wdir <- "my/working/directory"
+wdir <- "my/working/directory/data_brazil"
 # Set defined working directory
 setwd(wdir)
 # Create a directory to store all the data of the case study
@@ -265,16 +265,16 @@ stream segments with the same sub-catchment ID and merge them.
 ```{r, eval = FALSE}
 # Define a directory for the São Francisco drainage basin
 saofra_dir = paste0(wdir, "/data/basin_481051")
-if(!dir.exists(saofran_dir)) dir.create(saofran_dir)
+if(!dir.exists(saofra_dir)) dir.create(saofra_dir)
 
 
 # Get the full path of the basin  GeoPackage tiles
-saofra_dir <- list.files(wdir, pattern = "basin_h[v0-8]+.gpkg$",
+basin_dir <- list.files(wdir, pattern = "basin_h[v0-8]+.gpkg$",
                          full.names = TRUE, recursive = TRUE)
 
 # Filter basin ID from the GeoPackages of the basin tiles
 # Save the vector data of the São Francisco drainage basin
-for(itile in saofra_dir) {
+for(itile in basin_dir) {
   
   filtered_tile <- read_geopackage(itile,
                                    import_as = "sf",
@@ -291,7 +291,7 @@ for(itile in saofra_dir) {
 merge_tiles(tile_dir = saofra_dir,
             tile_names = list.files(saofra_dir, full.names = FALSE,
                                     pattern = "basin_.+_tmp.gpkg$"),
-            basin_dir = saofra_dir,
+            out_dir = saofra_dir,
             file_name = "basin_481051.gpkg",
             name = "ID",
             read = FALSE)
@@ -306,7 +306,7 @@ for(itile in raster_dir) {
   
   crop_to_extent(raster_layer = itile,
                  vector_layer = paste0(saofra_dir, "/basin_481051.gpkg"),
-                 basin_dir = saofra_dir,
+                 out_dir = saofra_dir,
                  file_name =  paste0(str_remove(basename(itile), ".tif"), 
                                      "_tmp.tif"))
   
@@ -316,26 +316,26 @@ for(itile in raster_dir) {
 merge_tiles(tile_dir = saofra_dir,
             tile_names = list.files(saofra_dir, full.names = FALSE,
                                     pattern = "basin_.+_tmp.tif$"),
-            basin_dir = saofra_dir,
+            out_dir = saofra_dir,
             file_name = "basin_481051.tif")
 
 merge_tiles(tile_dir = saofra_dir,
             tile_names = list.files(saofra_dir, full.names = FALSE,
                                     pattern = "segment_.+_tmp.tif$"),
-            basin_dir = saofra_dir,
+            out_dir = saofra_dir,
             file_name = "segment_481051.tif")
 
 merge_tiles(tile_dir = saofra_dir,
             tile_names = list.files(saofra_dir, full.names = FALSE,
                                     pattern = "accumulation_.+_tmp.tif$"),
-            basin_dir = saofra_dir,
+            out_dir = saofra_dir,
             file_name = "accumulation_481051.tif")
 
 
 merge_tiles(tile_dir = saofra_dir,
             tile_names = list.files(saofra_dir, full.names = FALSE,
                                     pattern = "direction_.+_tmp.tif$"),
-            basin_dir = saofra_dir,
+            out_dir = saofra_dir,
             file_name = "direction_481051.tif")
 
 
@@ -368,7 +368,7 @@ for(itile in order_dir) {
                                    subc_id = subc_ids$sub_catchment_481051,
                                    name = "stream")
   
-      
+   
   write_sf(filtered_tile, paste(saofra_dir,
                                 paste0(str_remove(basename(itile), ".gpkg"),
                                        "_tmp.gpkg"), sep="/"))
