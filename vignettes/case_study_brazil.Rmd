@@ -174,7 +174,6 @@ spdata_plot
 
 ![](../man/figures/occurrence_locations.png)
 
-
 ### Download files
 
 In order to download layers of the Hydrography90m, we need to know the
@@ -182,6 +181,9 @@ IDs of the 20°x20° tiles in which the occurrence sites are located. We can
 obtain these IDs using the function *get_tile_id()*. This function downloads and
 uses the auxiliary raster file that contains all the regional units globally,
 and thus requires an active internet connection.
+
+![](../man/figures/workflow1.png)
+
 
 ```{r, eval = FALSE}
 # Get the tile IDs where the points are located
@@ -270,6 +272,7 @@ Afterwards, we will extract the unique sub-catchment IDs from the raster layer
 to filter the stream network GeoPackage tiles (oder_vect_segment) for 
 stream segments with the same sub-catchment ID and merge them.
 
+![](../man/figures/workflow2.png)
 
 ```{r, eval = FALSE}
 # Define a directory for the São Francisco drainage basin
@@ -413,6 +416,8 @@ To filter the point locations of the fish occurrence and dams we will use the
 polygon of the drainage basin to only keep the locations which are located within 
 the drainage basin. For this step we will use the functions of the `sf` package.  
 
+![](../man/figures/workflow3.png)
+
 ```{r, eval = FALSE}
 # Load the GRanD data shape file
 grand_pts <- st_read(paste0(wdir, "/data/GRanD_Version_1_3/GRanD_dams_v1_3.shp"))
@@ -496,6 +501,7 @@ up to 30 cells.
 In addition to the new coordinates the function will also report the unique
 sub-catchment ID.
 
+![](../man/figures/workflow4.png)
 
 ```{r eval=FALSE}
 # Define full path to the stream network raster layer
@@ -706,6 +712,8 @@ package to polygonise the raster file of the upstream catchment and use the
 polygon of the upstream catchment to filter our point locations using the functions
 provided by the `sf` package.
 
+![](../man/figures/workflow5.png)
+
 ```{r eval=FALSE}
 # Define full path for the direction raster layer
 direction_rast <- paste0(saofra_dir, "/direction_481051.tif")
@@ -810,6 +818,8 @@ To determine the distance to the closest dam up- and downstream of each
 fish occurrence site we will first calculate the distance between all point 
 locations using the function `get_distance`.
 
+![](../man/figures/workflow6.png)
+
 ```{r eval=FALSE}
 # Load layers (if not already loaded)
 # upstream_basin_rast <- paste0(upcatch_dir, "/upstream_basin_2516.tif")
@@ -855,6 +865,8 @@ order_vect_segment) as a graph. Further we will need the sub-catchment IDs of
 the fish occurrence sites to use the function `get_catchment_graph`. The
 function will return for each fish occurrence site all sub-catchment IDs 
 which are located up- or downstream.
+
+![](../man/figures/workflow7.png)
 
 ```{r eval=FALSE}
 # Define full path to the GeoPackage of the stream segments
@@ -914,6 +926,8 @@ kbl(head(upstream_segments_168036446)) %>%
 After we have determined the distance between the point locations and now
 the sub-catchment IDs up- and downstream of each fish occurrence site we can 
 estimate the number of dams and evaluate the distance to the closest dam.
+
+![](../man/figures/workflow.png)
 
 ```{r eval=FALSE}
 
