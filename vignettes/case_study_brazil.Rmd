@@ -153,7 +153,7 @@ Let's visualise the species occurrences on a map.
 
 
 ```{r, eval = FALSE}
-# Define the extend
+# Define the extent
 bbox <- c(min(spdata$longitude), min(spdata$latitude),
           max(spdata$longitude), max(spdata$latitude))
 
@@ -214,8 +214,7 @@ raster and vector layer, which contains the drainage basin of the São Francisco
 river basin. The
 [sub_catchment](https://geo.igb-berlin.de/maps/new?layer=geonode:hydrography90m_v1_sub_catchment_cog&view=True)
 layer, which contains the sub-catchment for each single stream segment with an
-unique ID and is the necessary base-layer for the workflow. We will need these
-layers for cropping and filtering and to extract the unique IDs.
+unique ID. We will need these layers for cropping and filtering.
 
 We will need the raster layer of the stream 
 [segment](https://geo.igb-berlin.de/layers/geonode:hydrography90m_v1_segment_cog&view=True) 
@@ -223,7 +222,7 @@ and the flow
 [accumulation](https://geo.igb-berlin.de/layers/geonode:hydrography90m_v1_accumulation_cog&view=True) 
 to snap our fish occurrence and dam sites to the stream network.
 
-Further, we will download raster layer of the 
+Further, we will download the raster layer of the 
 [direction](https://geo.igb-berlin.de/layers/geonode:hydrography90m_v1_direction_cog&view=True)
 to calculate the upstream catchment from a defined point location.
 
@@ -265,7 +264,7 @@ files first and than merge them.
 
 First, we will filter the GeoPackage tiles containing the drainage basins for 
 the basin ID 481051 (São Francisco drainage basin) and merge them to get the 
-extent the drainage basin of São Francisco river. We will then use the polygon of 
+extent of the drainage basin of São Francisco river. We will then use the polygon of 
 the drainage basin to crop all downloaded raster tiles and then merge them. 
 Afterwards, we will extract the unique sub-catchment IDs from the raster layer 
 to filter the stream network GeoPackage tiles (oder_vect_segment) for 
@@ -469,15 +468,15 @@ point_locations <- existing_dams %>%
 
 ### Snap species occurrence and dam sites to a stream segment within a certain distance and with a certain flow accumulation
 
-Before we can calculate the upstream catchment of a defined point location or
+Before we can calculate the upstream catchment for a defined point location or
 the distance along the stream network between species occurrence and dam sites, 
 we need to snap the coordinates of the sites to the stream network. (Recorded
 coordinates of point locations usually do not exactly overlap with the digital
 stream network and therefore need to be corrected slightly.)
 
-The `hydrographr` package offers to different snapping function the 
+The `hydrographr` package offers two different snapping functions the 
 `snap_to_network` and the `snap_to_subc_segment`. The first function uses
-a defined distance radius and if also defined a flow accumulation threshold, 
+a defined distance radius and a flow accumulation threshold, 
 while the second function snaps the point location to the stream segment of the 
 sub-catchment the point was originally located.
 
@@ -563,17 +562,19 @@ for (idist in dist_radius) {
 ```
 
 In some cases the GRASS GIS function r.stream.snap does not snap some of the
-sites to the stream network, not matter how much you increase the distance radius.
+sites to the stream network, no matter how much you increase the distance radius.
 If this happens the coordinates need to be changed slightly within the same cell
 until the point gets snapped. I might happen that this needs to be done multiple
 times.
 
 ```{r eval=FALSE}
+# Run the snapping function until all points are snapped
 # Note the while conditions runs a few times and
 # takes about 5 minutes
 while(nrow(point_locations_tmp) > 0) {
-  
+  # Create random number smaller than the size if a cell
   rn <- runif(n=1, min=-0.000833333, max=+0.000833333)
+  # Add random number to the longitude and latitude 
   point_locations_tmp <- point_locations_tmp %>% 
     mutate(longitude = longitude + rn,
            latitude = latitude + rn)
@@ -621,10 +622,8 @@ kbl(point_locations_snapped) %>%
 ```{r, eval = FALSE}
 # Load the polygon of the drainage basin
 basin_poly <- read_sf(paste0(saofra_dir,"/basin_481051.gpkg"))
-#stream_vect <- read_sf(paste0(saofra_dir,"/order_vect_segment_481051.gpkg"))
 
-
-# Define the extend
+# Define the extent
 bbox <- c(min(spdata$longitude), min(spdata$latitude),
           max(spdata$longitude), max(spdata$latitude))
 
@@ -634,7 +633,7 @@ point_locations_snapped <- point_locations[ ,1:2] %>%
   mutate(type = factor(type, levels = c("FS", "ED", "UD", "PD")))
 
 
-# Define color palette for the different years of record
+# Define color palette for the different site types
 pal <- colorFactor(
   palette = c('blue', 'red', 'orange', 'yellow'),
   domain = point_locations_snapped$type
@@ -730,7 +729,7 @@ get_upstream_catchment(as.data.table(point_locations_snapped)[site_id == 2516,],
 upstream_basin_rast <- rast(paste0(upcatch_dir , "/upstream_basin_2516.tif"))
 # Polygonise the raster
 upstream_basin_vect <- as.polygons(upstream_basin_rast)
-# # Save the vector file of the upstream catchment
+# Save the vector file of the upstream catchment
 writeVector(upstream_basin_vect, paste0(upcatch_dir , "/upstream_basin_2516.gpkg"), 
             filetype = "gpkg", overwrite=TRUE )
 
@@ -743,48 +742,48 @@ upstream_subc_rast <- crop_to_extent(raster_layer = paste0(saofra_dir,
                                      read = TRUE)
 
 
-# Get all sub-catchment IDs of upstream basin
+# Get all sub-catchment IDs of the upstream basin
 subc_ids <- terra::unique(upstream_subc_rast)
 
 
 # Filter the sub-catchment IDs from the GeoPackages of the order_vector_segment
 # basin file (sub-catchment ID = stream ID)
-# Save the stream segments of the upstream drainage basin
-
-  
-upstream_segment <- read_geopackage(gpkg =  paste0(saofra_dir, 
+upstream_segment_vect <- read_geopackage(gpkg =  paste0(saofra_dir, 
                                                 "/order_vect_segment_481051.gpkg"),
-                                    import_as = "sf",
-                                    subc_id = subc_ids$sub_catchment_2516,
-                                    name = "stream")
-  
-write_sf(upstream_segment, paste0(upcatch_dir, "/order_vect_segment_2516.gpkg"))
+                                        import_as = "sf",
+                                        subc_id = subc_ids$sub_catchment_2516,
+                                        name = "stream")
+# Save the stream segments of the upstream drainage basin  
+write_sf(upstream_segment_vectt, paste0(upcatch_dir, "/order_vect_segment_2516.gpkg"))
                               
 
 # Convert the data.frame into a simply feature
 point_locations_snapped_pts <- st_as_sf(point_locations_snapped,  
                                         coords = c("lon_snap_accu","lat_snap_accu"), 
                                         remove = FALSE, crs="WGS84")
-write_sf(point_locations_snapped_pts, paste0(upcatch_dir, "/point_locations_snapped_2516.gpkg"))
+# Save point locations as a GeoPackage
+# write_sf(point_locations_snapped_pts, paste0(upcatch_dir, "/point_locations_snapped_2516.gpkg"))
 
 # Use the polygon to filter the upstream point locations
 upstream_point_locations <- st_filter(point_locations_snapped_pts, 
                                       st_as_sf(upstream_basin_vect)) %>% 
   sf::st_drop_geometry()
 
-
+# Save upstream point locations
 fwrite(upstream_point_locations, paste0(upcatch_dir, "/upstream_point_locations_2516.csv"))
 
 ```
 
 ```{r eval=FALSE, include=FALSE}
-upstream_segment <- read_sf(paste0(upcatch_dir, "/order_vect_segment_2516.gpkg"))       
+upstream_segment_vect <- read_sf(paste0(upcatch_dir, "/order_vect_segment_2516.gpkg"))       
 point_locations_snapped_pts <- read_sf( paste0(upcatch_dir, "/point_locations_snapped_2516.gpkg"))
 upstream_point_locations <- fread(paste0(upcatch_dir, "/upstream_point_locations_2516.csv"))
 ```
 
 ```{r eval=FALSE}
-upstream_basin_vect <- vect(paste0(upcatch_dir , "/upstream_basin_2516.gpkg"))
+# Load the gpkg of the upstream basin (if not already loaded)
+# upstream_basin_vect <- vect(paste0(upcatch_dir , "/upstream_basin_2516.gpkg"))
+
 # Create leaflet plot
 upcatch_plot <- leaflet() %>%
   addProviderTiles('Esri.WorldShadedRelief') %>%
@@ -812,8 +811,10 @@ fish occurrence site we will first calculate the distance between all point
 locations using the function `get_distance`.
 
 ```{r eval=FALSE}
-basin_rast <- paste0(upcatch_dir, "/upstream_basin_2516.tif")
-stream_vect <- paste0(upcatch_dir, "/order_vect_segment_2516.gpkg")
+# Load layers (if not already loaded)
+# upstream_basin_rast <- paste0(upcatch_dir, "/upstream_basin_2516.tif")
+# upstream_segment_vect <- paste0(upcatch_dir, "/order_vect_segment_2516.gpkg")
+
 # Get the distances along the stream network between each pair of point locations
 # The process takes about 1 hour 
 # Increasing the number of cores only makes sense if the calculation
@@ -826,8 +827,8 @@ network_distance <- get_distance(data = upstream_point_locations,
                                  lat = "lat_snap_accu",
                                  id = "site_id",
                                  basin_id = "basin_id",
-                                 basin_layer = basin_rast,
-                                 stream_layer = stream_vect,
+                                 basin_layer = upstream_basin_rast,
+                                 stream_layer = upstream_segment_vect,
                                  distance = "network",
                                  n_cores = 1)
 
@@ -850,16 +851,17 @@ kbl(network_distance) %>%
 
 To evaluate which and how many dames are located up- and downstream of the 
 fish occurrence sites, we need to load the GeoPackage of the stream segments (
-order_vect_segment) as a graph. Further we will need the sub-catchment ids of 
+order_vect_segment) as a graph. Further we will need the sub-catchment IDs of 
 the fish occurrence sites to use the function `get_catchment_graph`. The
 function will return for each fish occurrence site all sub-catchment IDs 
 which are located up- or downstream.
 
 ```{r eval=FALSE}
 # Define full path to the GeoPackage of the stream segments
-# stream_vect <- paste0(upcatch_dir, "/order_vect_segment_2516.gpkg")
+# upstream_segment_vect <- paste0(upcatch_dir, "/order_vect_segment_2516.gpkg")
+
 # Load the GeoPackage as graph
-stream_network_graph <- read_geopackage(gpkg = stream_vect, import_as = "graph")
+stream_network_graph <- read_geopackage(gpkg = upstream_segment_vect, import_as = "graph")
 
 # Get sub-catchment IDs of the fish occurrence sites
 fs_subc_ids <- upstream_point_locations %>% 
@@ -955,7 +957,7 @@ fd_site_id <- upstream_point_locations %>%
   mutate(stream = as.character(stream)) %>% 
   inner_join(.,point_locations, by = c("site_id", "longitude", "latitude"))
 
-# Get the number of existing dams upstream and the distance to the closest
+# Get the number of future dams upstream and the distance to the closest
 # dam upstream
 fd_upstream <- upstream_segments %>% 
   map(., ~ inner_join(fd_site_id, .x, by= "stream")) %>% 
@@ -1016,7 +1018,6 @@ fd_downstream <- downstream_segments %>%
   mutate(type = "FD",
          direction = "downstream")
 
-
 # Bind tables
 dam_num_dist <- ed_upstream %>% 
   bind_rows(fd_upstream) %>% 
@@ -1036,13 +1037,14 @@ dam_num_dist <- ed_upstream %>%
 
 
 ```{r eval = FALSE} 
-
 # Prepare data.frame for the plot
 plot_data <- dam_num_dist %>% 
   mutate(dist = dist/1000) %>% 
   mutate(direction = factor(direction, levels = c("upstream", "downstream")))
 
+# Define colors
 cols <- c(ED = "#E69F00", FD = "#56B4E9")
+
 # Create plot to show the number of dams
 ggplot(plot_data, aes(x = as.factor(from_site_id), y = n_dams, fill = fct_rev(type))) + 
   geom_bar(stat="identity", position= "stack", width = 0.5) + 
@@ -1057,11 +1059,10 @@ ggplot(plot_data, aes(x = as.factor(from_site_id), y = n_dams, fill = fct_rev(ty
 ```
 ![](../man/figures/number_of_dams.png)
 
-With the exception of fish occurrence site 4 and 6 the number of upstream dams will dramatically increase. Especially for site 9 which has already 14 dams located upstream the number might increase in the future to 94 dams. Downstream of all fish occurrence sites there is currently only one existing dam. It is the dam with the ID 2516 at the outlet of our delineated upstream catchment. This leads to the assumption that all fish occurrence sites are currently connected. In the future the number of dams will increase for the fish occurrence sites 7 and 8 from one to two dames. The future dam might lead to a disconnection of these two sites from the others. 
+With the exception of the fish occurrence sites 4 and 6 the number of upstream dams will dramatically increase. Especially for site 9, which has already 14 dams located upstream, the number might increase in the future to 94 dams. Downstream of all fish occurrence sites there is currently only one existing dam. It is the dam with the ID 2516 at the outlet of our delineated upstream catchment. This leads to the assumption that all fish occurrence sites are currently connected. In the future the number of dams will increase for the fish occurrence sites 7 and 8 from one to two dames. The future dam might lead to a disconnection of these two sites from the others. 
 
 
 ```{r eval = FALSE} 
-
 # Create plot to show the distance to the closest dam
 ggplot(plot_data, aes(x = as.factor(from_site_id), y = dist, fill = type)) + 
   geom_bar(stat="identity", position= "dodge", width = 0.5) + 
