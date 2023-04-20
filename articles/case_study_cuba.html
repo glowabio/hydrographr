@@ -147,7 +147,7 @@ occurrence records in Cuba from <a href="https://doi.org/10.18728/igb-fred-778.3
 Salina, 2022).</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/download.file.html" class="external-link">download.file</a></span><span class="op">(</span><span class="st">"https://fred.igb-berlin.de/data/file_download/1395"</span>,</span>
-<span>              destfile <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data/spdata_cuba.csv"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span>              destfile <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data/spdata_cuba.csv"</span><span class="op">)</span>, mode <span class="op">=</span> <span class="st">"wb"</span><span class="op">)</span></span></code></pre></div>
 <p>Import the dataset and select the occurrences of the species of
 interest, sampled after the year 1980 (to match with the climate
 data)</p>
@@ -993,18 +993,18 @@ and visualisations are available <a href="https://hydrography.org/hydrography90m
 <span><span class="co"># Download</span></span>
 <span><span class="co"># # Present, 1981-2010</span></span>
 <span><span class="co"># download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio12_1981-2010_V.2.1.tif",</span></span>
-<span><span class="co"># destfile = "data/chelsa_bioclim/bio12_1981-2010.tif")</span></span>
+<span><span class="co"># destfile = "data/chelsa_bioclim/bio12_1981-2010.tif", mode = "wb")</span></span>
 <span><span class="co"># download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio15_1981-2010_V.2.1.tif",</span></span>
-<span><span class="co"># destfile = "data/chelsa_bioclim/bio15_1981-2010.tif")</span></span>
+<span><span class="co"># destfile = "data/chelsa_bioclim/bio15_1981-2010.tif", mode = "wb")</span></span>
 <span><span class="co"># download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio1_1981-2010_V.2.1.tif",</span></span>
-<span><span class="co"># destfile = "data/chelsa_bioclim/bio1_1981-2010.tif")</span></span>
+<span><span class="co"># destfile = "data/chelsa_bioclim/bio1_1981-2010.tif", mode = "wb")</span></span>
 <span><span class="co"># # Future, 2041-2070</span></span>
 <span><span class="co"># download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/2041-2070/IPSL-CM6A-LR/ssp370/bio/CHELSA_bio12_2041-2070_ipsl-cm6a-lr_ssp370_V.2.1.tif",</span></span>
-<span><span class="co"># destfile = "data/chelsa_bioclim/bio12_IPSL-CM6A-LR_ssp370_2041-2070.tif")</span></span>
+<span><span class="co"># destfile = "data/chelsa_bioclim/bio12_IPSL-CM6A-LR_ssp370_2041-2070.tif", mode = "wb")</span></span>
 <span><span class="co"># download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/2041-2070/IPSL-CM6A-LR/ssp370/bio/CHELSA_bio15_2041-2070_ipsl-cm6a-lr_ssp370_V.2.1.tif",</span></span>
-<span><span class="co"># destfile = "data/chelsa_bioclim/bio15_IPSL-CM6A-LR_ssp370_2041-2070.tif")</span></span>
+<span><span class="co"># destfile = "data/chelsa_bioclim/bio15_IPSL-CM6A-LR_ssp370_2041-2070.tif", mode = "wb")</span></span>
 <span><span class="co"># download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/2041-2070/IPSL-CM6A-LR/ssp370/bio/CHELSA_bio1_2041-2070_ipsl-cm6a-lr_ssp370_V.2.1.tif",</span></span>
-<span><span class="co"># destfile = "data/chelsa_bioclim/bio1_IPSL-CM6A-LR_ssp370_2041-2070.tif")</span></span></code></pre></div>
+<span><span class="co"># destfile = "data/chelsa_bioclim/bio1_IPSL-CM6A-LR_ssp370_2041-2070.tif", mode = "wb")</span></span></code></pre></div>
 <p><img src="../reference/figures/folder_structure.png"></p>
 </div>
 <div class="section level3">
@@ -2260,8 +2260,8 @@ an indicator of the sub-catchment size</p>
 <span><span class="co"># Clear up memory</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">stats_gpkg_h08v06</span>, <span class="va">stats_gpkg_h10v06</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/base/gc.html" class="external-link">gc</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##            used  (Mb) gc trigger  (Mb) max used  (Mb)</span></span>
-<span><span class="co">## Ncells  4531350 242.1    8960112 478.6  5542862 296.1</span></span>
-<span><span class="co">## Vcells 25584790 195.2   55380180 422.6 48398671 369.3</span></span></code></pre>
+<span><span class="co">## Ncells  4531349 242.1    8960120 478.6  5542844 296.1</span></span>
+<span><span class="co">## Vcells 25584837 195.2   55380248 422.6 48398720 369.3</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="prepare-data-for-modelling">Prepare data for modelling<a class="anchor" aria-label="anchor" href="#prepare-data-for-modelling"></a>
@@ -3588,230 +3588,230 @@ length
 <tbody>
 <tr>
 <td style="text-align:right;">
-422708818
+422669649
 </td>
 <td style="text-align:right;">
-25.75000
+25.85
 </td>
 <td style="text-align:right;">
-1202.264
+1160.650
 </td>
 <td style="text-align:right;">
-59.30000
+56.45000
 </td>
 <td style="text-align:right;">
--0.0288211
+-0.0015955
 </td>
 <td style="text-align:right;">
-1.0714286
+0.3333333
 </td>
 <td style="text-align:right;">
-0.0000000
+0
 </td>
 <td style="text-align:right;">
-1.8464666
+0.450000
 </td>
 <td style="text-align:right;">
-0.0000000
+0.0500000
 </td>
 <td style="text-align:right;">
-0.0475392
+0.0034124
 </td>
 <td style="text-align:right;">
-0.7985957
+0.4714045
 </td>
 <td style="text-align:right;">
-253.0954
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-422861636
-</td>
-<td style="text-align:right;">
-22.55625
-</td>
-<td style="text-align:right;">
-2252.916
-</td>
-<td style="text-align:right;">
-51.64062
-</td>
-<td style="text-align:right;">
--0.1784097
-</td>
-<td style="text-align:right;">
-15.6875000
-</td>
-<td style="text-align:right;">
-0.0998045
-</td>
-<td style="text-align:right;">
-2.6448192
-</td>
-<td style="text-align:right;">
-0.1497067
-</td>
-<td style="text-align:right;">
-0.1887258
-</td>
-<td style="text-align:right;">
-15.7568190
-</td>
-<td style="text-align:right;">
-467.8114
+218.72614
 </td>
 </tr>
 <tr>
 <td style="text-align:right;">
-422530232
+422814305
 </td>
 <td style="text-align:right;">
-24.85000
+26.45
 </td>
 <td style="text-align:right;">
-1393.954
+1339.777
 </td>
 <td style="text-align:right;">
-65.48462
+57.33077
 </td>
 <td style="text-align:right;">
--0.0116414
+-0.0025108
 </td>
 <td style="text-align:right;">
-0.9487179
+0.1538462
 </td>
 <td style="text-align:right;">
-0.0000000
+0
 </td>
 <td style="text-align:right;">
-4.1653544
+4.040974
 </td>
 <td style="text-align:right;">
-0.0360801
+0.0721602
 </td>
 <td style="text-align:right;">
-0.0186172
+0.0029818
 </td>
 <td style="text-align:right;">
-1.3577643
+0.3608012
 </td>
 <td style="text-align:right;">
-436.6834
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-422889337
-</td>
-<td style="text-align:right;">
-25.95833
-</td>
-<td style="text-align:right;">
-1195.817
-</td>
-<td style="text-align:right;">
-52.90000
-</td>
-<td style="text-align:right;">
--0.0328354
-</td>
-<td style="text-align:right;">
-24.0000000
-</td>
-<td style="text-align:right;">
-0.0276385
-</td>
-<td style="text-align:right;">
-0.9397104
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0771895
-</td>
-<td style="text-align:right;">
-33.8649278
-</td>
-<td style="text-align:right;">
-301.3729
+219.04984
 </td>
 </tr>
 <tr>
 <td style="text-align:right;">
-422718758
+422802764
 </td>
 <td style="text-align:right;">
-25.85714
+26.35
 </td>
 <td style="text-align:right;">
-1189.350
+1205.200
 </td>
 <td style="text-align:right;">
-59.80000
+54.16667
 </td>
 <td style="text-align:right;">
--0.0063969
+-0.0103747
 </td>
 <td style="text-align:right;">
-1.2857143
+25.3333333
 </td>
 <td style="text-align:right;">
-0.0257539
+0
 </td>
 <td style="text-align:right;">
-3.0647186
+4.101219
 </td>
 <td style="text-align:right;">
-0.0000000
+0.0942809
 </td>
 <td style="text-align:right;">
-0.0086968
+0.0180632
 </td>
 <td style="text-align:right;">
-2.7627257
+46.4447103
 </td>
 <td style="text-align:right;">
-552.9756
+213.69780
 </td>
 </tr>
 <tr>
 <td style="text-align:right;">
-422851981
+399834444
 </td>
 <td style="text-align:right;">
-25.55000
+24.95
 </td>
 <td style="text-align:right;">
-1232.541
+1370.500
 </td>
 <td style="text-align:right;">
-52.30000
+64.25000
 </td>
 <td style="text-align:right;">
--0.0307214
+-0.0015400
 </td>
 <td style="text-align:right;">
-1.7407407
+20.0000000
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.700000
+</td>
+<td style="text-align:right;">
+0.0500000
+</td>
+<td style="text-align:right;">
+0.0056920
+</td>
+<td style="text-align:right;">
+19.0000000
+</td>
+<td style="text-align:right;">
+92.28159
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+399847984
+</td>
+<td style="text-align:right;">
+24.55
+</td>
+<td style="text-align:right;">
+1259.463
+</td>
+<td style="text-align:right;">
+55.90000
+</td>
+<td style="text-align:right;">
+-0.0262169
+</td>
+<td style="text-align:right;">
+0.7500000
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.210307
 </td>
 <td style="text-align:right;">
 0.0000000
 </td>
 <td style="text-align:right;">
-2.3744409
+0.0381685
+</td>
+<td style="text-align:right;">
+0.8291562
+</td>
+<td style="text-align:right;">
+92.28124
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+422663951
+</td>
+<td style="text-align:right;">
+25.85
+</td>
+<td style="text-align:right;">
+1165.000
+</td>
+<td style="text-align:right;">
+55.50000
+</td>
+<td style="text-align:right;">
+-0.0037040
+</td>
+<td style="text-align:right;">
+1620.0000000
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.000000
 </td>
 <td style="text-align:right;">
 0.0000000
 </td>
 <td style="text-align:right;">
-0.0299647
+0.0123620
 </td>
 <td style="text-align:right;">
-2.3348026
+1619.0000000
 </td>
 <td style="text-align:right;">
-467.7197
+86.45280
 </td>
 </tr>
 </tbody>
@@ -4255,7 +4255,7 @@ presences.</p>
 <span><span class="co">## Target node size:                 10 </span></span>
 <span><span class="co">## Variable importance mode:         impurity </span></span>
 <span><span class="co">## Splitrule:                        gini </span></span>
-<span><span class="co">## OOB prediction error (Brier s.):  0.0916423</span></span></code></pre>
+<span><span class="co">## OOB prediction error (Brier s.):  0.09188129</span></span></code></pre>
 <p>The model can be evaluated based on the OOB prediction error. This
 metric lies on the fact that the data points that are not used in
 training a tree can be used to test the tree. The errors on the OOB
