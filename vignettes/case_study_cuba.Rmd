@@ -122,7 +122,7 @@ occurrence records in Cuba from
 
 ```{r, eval = FALSE}
 download.file("https://fred.igb-berlin.de/data/file_download/1395",
-              destfile = paste0(wdir, "/data/spdata_cuba.csv"))
+              destfile = paste0(wdir, "/data/spdata_cuba.csv"), mode = "wb")
 
 ```
 
@@ -285,18 +285,18 @@ options(timeout = 1000)
 # Download
 # # Present, 1981-2010
 # download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio12_1981-2010_V.2.1.tif",
-# destfile = "data/chelsa_bioclim/bio12_1981-2010.tif")
+# destfile = "data/chelsa_bioclim/bio12_1981-2010.tif", mode = "wb")
 # download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio15_1981-2010_V.2.1.tif",
-# destfile = "data/chelsa_bioclim/bio15_1981-2010.tif")
+# destfile = "data/chelsa_bioclim/bio15_1981-2010.tif", mode = "wb")
 # download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio1_1981-2010_V.2.1.tif",
-# destfile = "data/chelsa_bioclim/bio1_1981-2010.tif")
+# destfile = "data/chelsa_bioclim/bio1_1981-2010.tif", mode = "wb")
 # # Future, 2041-2070
 # download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/2041-2070/IPSL-CM6A-LR/ssp370/bio/CHELSA_bio12_2041-2070_ipsl-cm6a-lr_ssp370_V.2.1.tif",
-# destfile = "data/chelsa_bioclim/bio12_IPSL-CM6A-LR_ssp370_2041-2070.tif")
+# destfile = "data/chelsa_bioclim/bio12_IPSL-CM6A-LR_ssp370_2041-2070.tif", mode = "wb")
 # download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/2041-2070/IPSL-CM6A-LR/ssp370/bio/CHELSA_bio15_2041-2070_ipsl-cm6a-lr_ssp370_V.2.1.tif",
-# destfile = "data/chelsa_bioclim/bio15_IPSL-CM6A-LR_ssp370_2041-2070.tif")
+# destfile = "data/chelsa_bioclim/bio15_IPSL-CM6A-LR_ssp370_2041-2070.tif", mode = "wb")
 # download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/2041-2070/IPSL-CM6A-LR/ssp370/bio/CHELSA_bio1_2041-2070_ipsl-cm6a-lr_ssp370_V.2.1.tif",
-# destfile = "data/chelsa_bioclim/bio1_IPSL-CM6A-LR_ssp370_2041-2070.tif")
+# destfile = "data/chelsa_bioclim/bio1_IPSL-CM6A-LR_ssp370_2041-2070.tif", mode = "wb")
 
 ```
 
