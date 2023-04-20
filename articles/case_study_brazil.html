@@ -94,33 +94,46 @@ sites</h3>
 </h3>
 <p>The following example showcases the functionality of the
 <code>hydrographr</code> package along a workflow to analyse the
-fragmentation of a stream network. We will evaluate the connectivity of
-the habitats for a catfish in Brazil, the current and future state.</p>
-<p>We will start by defining the regular tiles of the Hydrography90m
-(Amatulli et al., 2022) where the occurrence points of the species are
-located. Afterwards we will download the Hydrography90m layers, crop and
-merge them, if necessary.</p>
-<p><em>Conorhynchos conirostris</em> is a fish species endemic to the
-São Francisco river basin in Brazil. The catfish is listed as
+fragmentation of a stream network. We will evaluate how many dams are
+up- and downstream of each fish occurrence site and the distance along
+the stream network from each fish occurrence site to the next dam for
+the current and future state.</p>
+<p>In our example we will focus on the catfish species <em>Conorhynchos
+conirostris</em>, which is a catfish species endemic to the São
+Francisco drainage basin in Brazil. The catfish is listed as
 ‘endangered’ by the IUCN red list. Wetlands are the preferred habitat
-and it is migrating for spawning. As an migratory species, it is mostly
+and it is migrating for spawning.As an migratory species, it is mostly
 threatened by dams along the stream network. Further, it is threatened
 by fishing during the spawning season in the upstream part of the
 river.</p>
+<p>We will start by defining the regular tiles of the Hydrography90m
+(Amatulli et al., 2022) where the occurrence points of the species are
+located. Afterwards we will download the Hydrography90m layers,
+filter/crop and merge them. Then we will filter our fish occurrence and
+dam point locations using the polygon of the drainage basin and snap the
+point locations to the stream network. Afterwards, we will reduce our
+drainage basin using the dam upstream of all fish occurrence sites as
+our outlet location to calculate the upstream catchment from this point
+location. In a next step, we will calculate the distances along the
+stream network between each point location (fish and dams) and get the
+up- and downstream stream egments from each point locations as a graph.
+Afterwards, we will query the tables and evaluate the shortest distance
+to the next dam as well as the number of dams.</p>
+<p><img src="../articles/data_brazil/data/figures/workflow.png"></p>
 <p>Let’s get started!</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Load libraries</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://glowabio.github.io/hydrographr/" class="external-link">hydrographr</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://docs.ropensci.org/rgbif" class="external-link">rgbif</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-datatable.com" class="external-link">data.table</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rstudio.github.io/leaflet/" class="external-link">leaflet</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://stringr.tidyverse.org" class="external-link">stringr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rspatial.org/terra/" class="external-link">terra</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/" class="external-link">sf</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://docs.ropensci.org/rgbif" class="external-link">rgbif</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-datatable.com" class="external-link">data.table</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://stringr.tidyverse.org" class="external-link">stringr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://purrr.tidyverse.org/" class="external-link">purrr</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://forcats.tidyverse.org/" class="external-link">forcats</a></span><span class="op">)</span></span></code></pre></div>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://forcats.tidyverse.org/" class="external-link">forcats</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rstudio.github.io/leaflet/" class="external-link">leaflet</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Define working directory</span></span>
 <span><span class="va">wdir</span> <span class="op">&lt;-</span> <span class="st">"my/working/directory"</span></span>
@@ -590,25 +603,25 @@ them to the extent of our study area.</p>
 (raster) the files first and than merge them.</p>
 <p>First, we will filter the GeoPackage tiles containing the drainage
 basins for the basin ID 481051 (São Francisco drainage basin) and merge
-them to get the extent the drainage basin ofSão Francisco river. We will
-then use the polygon of the drainage basin to crop all downloaded raster
-tiles and then merge them. Afterwards, we will extract the unique
+them to get the extent the drainage basin of São Francisco river. We
+will then use the polygon of the drainage basin to crop all downloaded
+raster tiles and then merge them. Afterwards, we will extract the unique
 sub-catchment IDs from the raster layer to filter the stream network
 GeoPackage tiles (oder_vect_segment) for stream segments with the same
 sub-catchment ID and merge them.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Define a directory for the São Francisco drainage basin</span></span>
 <span><span class="va">saofra_dir</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data/basin_481051"</span><span class="op">)</span></span>
-<span><span class="kw">if</span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.exists</a></span><span class="op">(</span><span class="va">saofran_dir</span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="va">saofran_dir</span><span class="op">)</span></span>
+<span><span class="kw">if</span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.exists</a></span><span class="op">(</span><span class="va">saofra_dir</span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="va">saofra_dir</span><span class="op">)</span></span>
 <span></span>
 <span></span>
 <span><span class="co"># Get the full path of the basin  GeoPackage tiles</span></span>
-<span><span class="va">saofra_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">wdir</span>, pattern <span class="op">=</span> <span class="st">"basin_h[v0-8]+.gpkg$"</span>,</span>
+<span><span class="va">basin_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">wdir</span>, pattern <span class="op">=</span> <span class="st">"basin_h[v0-8]+.gpkg$"</span>,</span>
 <span>                         full.names <span class="op">=</span> <span class="cn">TRUE</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Filter basin ID from the GeoPackages of the basin tiles</span></span>
 <span><span class="co"># Save the vector data of the São Francisco drainage basin</span></span>
-<span><span class="kw">for</span><span class="op">(</span><span class="va">itile</span> <span class="kw">in</span> <span class="va">saofra_dir</span><span class="op">)</span> <span class="op">{</span></span>
+<span><span class="kw">for</span><span class="op">(</span><span class="va">itile</span> <span class="kw">in</span> <span class="va">basin_dir</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  </span>
 <span>  <span class="va">filtered_tile</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_geopackage.html">read_geopackage</a></span><span class="op">(</span><span class="va">itile</span>,</span>
 <span>                                   import_as <span class="op">=</span> <span class="st">"sf"</span>,</span>

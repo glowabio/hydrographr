@@ -105,6 +105,7 @@ where the species could potentially occur. Finally, we will reclassify
 the layer of all the sub-catchments in the study area, creating a
 habitat suitability map.</p>
 <p><img src="../reference/figures/wf_0.png"></p>
+<p><img src="../reference/figures/SDM.png"></p>
 <p><a href="https://www.gbif.org/species/1424240" class="external-link"><em>Hypolestes
 trinitatis</em></a> is a damselfly species endemic to Cuba. The species
 inhabits rivers and streams located in forest areas at the main mountain
@@ -130,7 +131,9 @@ forest where they find shelter and prey.</p>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://here.r-lib.org/" class="external-link">here</a></span><span class="op">)</span></span></code></pre></div>
 <p>Define working directory</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">wdir</span> <span class="op">&lt;-</span> <span class="st">"my/working/directory"</span></span>
+<code class="sourceCode R"><span><span class="co"># Define the "data_cuba" directory, where you have downloaded all the data,</span></span>
+<span><span class="co"># as the working directory</span></span>
+<span><span class="va">wdir</span> <span class="op">&lt;-</span> <span class="st">"my/working/directory/data_cuba"</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/getwd.html" class="external-link">setwd</a></span><span class="op">(</span><span class="va">wdir</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Create a new folder in the working directory to store all the data</span></span>
@@ -924,7 +927,7 @@ xmax, ymax)</p>
 <code class="sourceCode R"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/leaflet/man/leaflet.html" class="external-link">leaflet</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/pkg/leaflet/man/addProviderTiles.html" class="external-link">addProviderTiles</a></span><span class="op">(</span><span class="st">'Esri.WorldShadedRelief'</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/pkg/leaflet/man/map-methods.html" class="external-link">setMaxBounds</a></span><span class="op">(</span><span class="va">bbox</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, <span class="va">bbox</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>, <span class="va">bbox</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span>, <span class="va">bbox</span><span class="op">[</span><span class="fl">4</span><span class="op">]</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/leaflet/man/map-layers.html" class="external-link">addCircles</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">spdata_vect</span>, color <span class="op">=</span> <span class="st">"purple"</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/leaflet/man/map-layers.html" class="external-link">addCircles</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">spdata_vect</span>, color <span class="op">=</span> <span class="st">"purple"</span><span class="op">)</span> <span class="co"># data = spdata</span></span>
 <span></span>
 <span><span class="va">m</span></span></code></pre></div>
 <p><img src="../reference/figures/cuba_map.png"></p>
@@ -970,13 +973,13 @@ and visualisations are available <a href="https://hydrography.org/hydrography90m
 <span><span class="co"># Variables in vector format. This layerholds the information on stream length</span></span>
 <span><span class="va">vars_gpkg</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"order_vect_point"</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Download the .tif tiles of the desired variables</span></span>
-<span><span class="fu"><a href="../reference/download_tiles.html">download_tiles</a></span><span class="op">(</span>variable <span class="op">=</span> <span class="va">vars_tif</span>, tile_id <span class="op">=</span> <span class="va">tile_id</span>, file_format <span class="op">=</span> <span class="st">"tif"</span>,</span>
-<span>              download_dir <span class="op">=</span> <span class="st">"data"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Download the .gpkg tiles of the desired variables</span></span>
-<span><span class="fu"><a href="../reference/download_tiles.html">download_tiles</a></span><span class="op">(</span>variable <span class="op">=</span> <span class="va">vars_gpkg</span>, tile_id <span class="op">=</span> <span class="va">tile_id</span>, file_format <span class="op">=</span> <span class="st">"gpkg"</span>,</span>
-<span>              download_dir <span class="op">=</span> <span class="st">"data"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># # Download the .tif tiles of the desired variables</span></span>
+<span><span class="co"># download_tiles(variable = vars_tif, tile_id = tile_id, file_format = "tif",</span></span>
+<span><span class="co">#               download_dir = "data")</span></span>
+<span><span class="co"># </span></span>
+<span><span class="co"># # Download the .gpkg tiles of the desired variables</span></span>
+<span><span class="co"># download_tiles(variable = vars_gpkg, tile_id = tile_id, file_format = "gpkg",</span></span>
+<span><span class="co">#               download_dir = "data")</span></span></code></pre></div>
 <p>Then download the CHELSA present and future Bioclim variables</p>
 <p>For a quick outlook on the bioclimatic variables you can have a look
 <a href="https://chelsa-climate.org/bioclim/" class="external-link">here</a>.</p>
@@ -988,20 +991,20 @@ and visualisations are available <a href="https://hydrography.org/hydrography90m
 <span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>timeout <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Download</span></span>
-<span><span class="co"># Present, 1981-2010</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/download.file.html" class="external-link">download.file</a></span><span class="op">(</span><span class="st">"https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio12_1981-2010_V.2.1.tif"</span>,</span>
-<span>destfile <span class="op">=</span> <span class="st">"data/chelsa_bioclim/bio12_1981-2010.tif"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/download.file.html" class="external-link">download.file</a></span><span class="op">(</span><span class="st">"https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio15_1981-2010_V.2.1.tif"</span>,</span>
-<span>destfile <span class="op">=</span> <span class="st">"data/chelsa_bioclim/bio15_1981-2010.tif"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/download.file.html" class="external-link">download.file</a></span><span class="op">(</span><span class="st">"https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio1_1981-2010_V.2.1.tif"</span>,</span>
-<span>destfile <span class="op">=</span> <span class="st">"data/chelsa_bioclim/bio1_1981-2010.tif"</span><span class="op">)</span></span>
-<span><span class="co"># Future, 2041-2070</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/download.file.html" class="external-link">download.file</a></span><span class="op">(</span><span class="st">"https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/2041-2070/IPSL-CM6A-LR/ssp370/bio/CHELSA_bio12_2041-2070_ipsl-cm6a-lr_ssp370_V.2.1.tif"</span>,</span>
-<span>destfile <span class="op">=</span> <span class="st">"data/chelsa_bioclim/bio12_IPSL-CM6A-LR_ssp370_2041-2070.tif"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/download.file.html" class="external-link">download.file</a></span><span class="op">(</span><span class="st">"https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/2041-2070/IPSL-CM6A-LR/ssp370/bio/CHELSA_bio15_2041-2070_ipsl-cm6a-lr_ssp370_V.2.1.tif"</span>,</span>
-<span>destfile <span class="op">=</span> <span class="st">"data/chelsa_bioclim/bio15_IPSL-CM6A-LR_ssp370_2041-2070.tif"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/download.file.html" class="external-link">download.file</a></span><span class="op">(</span><span class="st">"https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/2041-2070/IPSL-CM6A-LR/ssp370/bio/CHELSA_bio1_2041-2070_ipsl-cm6a-lr_ssp370_V.2.1.tif"</span>,</span>
-<span>destfile <span class="op">=</span> <span class="st">"data/chelsa_bioclim/bio1_IPSL-CM6A-LR_ssp370_2041-2070.tif"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="co"># # Present, 1981-2010</span></span>
+<span><span class="co"># download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio12_1981-2010_V.2.1.tif",</span></span>
+<span><span class="co"># destfile = "data/chelsa_bioclim/bio12_1981-2010.tif")</span></span>
+<span><span class="co"># download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio15_1981-2010_V.2.1.tif",</span></span>
+<span><span class="co"># destfile = "data/chelsa_bioclim/bio15_1981-2010.tif")</span></span>
+<span><span class="co"># download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio1_1981-2010_V.2.1.tif",</span></span>
+<span><span class="co"># destfile = "data/chelsa_bioclim/bio1_1981-2010.tif")</span></span>
+<span><span class="co"># # Future, 2041-2070</span></span>
+<span><span class="co"># download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/2041-2070/IPSL-CM6A-LR/ssp370/bio/CHELSA_bio12_2041-2070_ipsl-cm6a-lr_ssp370_V.2.1.tif",</span></span>
+<span><span class="co"># destfile = "data/chelsa_bioclim/bio12_IPSL-CM6A-LR_ssp370_2041-2070.tif")</span></span>
+<span><span class="co"># download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/2041-2070/IPSL-CM6A-LR/ssp370/bio/CHELSA_bio15_2041-2070_ipsl-cm6a-lr_ssp370_V.2.1.tif",</span></span>
+<span><span class="co"># destfile = "data/chelsa_bioclim/bio15_IPSL-CM6A-LR_ssp370_2041-2070.tif")</span></span>
+<span><span class="co"># download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/2041-2070/IPSL-CM6A-LR/ssp370/bio/CHELSA_bio1_2041-2070_ipsl-cm6a-lr_ssp370_V.2.1.tif",</span></span>
+<span><span class="co"># destfile = "data/chelsa_bioclim/bio1_IPSL-CM6A-LR_ssp370_2041-2070.tif")</span></span></code></pre></div>
 <p><img src="../reference/figures/folder_structure.png"></p>
 </div>
 <div class="section level3">
@@ -2257,8 +2260,8 @@ an indicator of the sub-catchment size</p>
 <span><span class="co"># Clear up memory</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">stats_gpkg_h08v06</span>, <span class="va">stats_gpkg_h10v06</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/base/gc.html" class="external-link">gc</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##            used  (Mb) gc trigger  (Mb) max used  (Mb)</span></span>
-<span><span class="co">## Ncells  4531346 242.0    8958921 478.5  5545197 296.2</span></span>
-<span><span class="co">## Vcells 25584720 195.2   55380080 422.6 48398603 369.3</span></span></code></pre>
+<span><span class="co">## Ncells  4531350 242.1    8959450 478.5  5544122 296.1</span></span>
+<span><span class="co">## Vcells 25584794 195.2   55380186 422.6 48398677 369.3</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="prepare-data-for-modelling">Prepare data for modelling<a class="anchor" aria-label="anchor" href="#prepare-data-for-modelling"></a>
@@ -3585,63 +3588,22 @@ length
 <tbody>
 <tr>
 <td style="text-align:right;">
-422642654
-</td>
-<td style="text-align:right;">
-26.05000
-</td>
-<td style="text-align:right;">
-1172.818
-</td>
-<td style="text-align:right;">
-48.00588
-</td>
-<td style="text-align:right;">
--0.0054855
-</td>
-<td style="text-align:right;">
-0.5882353
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0705882
-</td>
-<td style="text-align:right;">
-0.0235294
-</td>
-<td style="text-align:right;">
-0.0113357
-</td>
-<td style="text-align:right;">
-1.0323488
-</td>
-<td style="text-align:right;">
-379.1073
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-422553572
+422695785
 </td>
 <td style="text-align:right;">
 25.75000
 </td>
 <td style="text-align:right;">
-1265.100
+1178.000
 </td>
 <td style="text-align:right;">
-42.60000
+45.20000
 </td>
 <td style="text-align:right;">
--0.0025491
+-0.0119866
 </td>
 <td style="text-align:right;">
-21.0000000
-</td>
-<td style="text-align:right;">
-0.0000000
+28.083333
 </td>
 <td style="text-align:right;">
 0.0000000
@@ -3650,165 +3612,206 @@ length
 0.0000000
 </td>
 <td style="text-align:right;">
-0.0105348
+0.0000000
 </td>
 <td style="text-align:right;">
-23.6907155
+0.0236811
 </td>
 <td style="text-align:right;">
-343.9380
+35.6615066
+</td>
+<td style="text-align:right;">
+339.62209
 </td>
 </tr>
 <tr>
 <td style="text-align:right;">
-422790895
+422499962
 </td>
 <td style="text-align:right;">
-26.35000
+24.78226
 </td>
 <td style="text-align:right;">
-1061.521
+1364.213
 </td>
 <td style="text-align:right;">
-54.46429
+61.93226
 </td>
 <td style="text-align:right;">
--0.0010700
+-0.0108258
 </td>
 <td style="text-align:right;">
-0.2857143
+4.419355
 </td>
 <td style="text-align:right;">
-0.0000000
+0.0467464
 </td>
 <td style="text-align:right;">
-0.2395787
+3.1466051
 </td>
 <td style="text-align:right;">
-0.0479157
+0.0467464
 </td>
 <td style="text-align:right;">
-0.0019670
+0.0197644
 </td>
 <td style="text-align:right;">
-0.4517540
+7.9748564
 </td>
 <td style="text-align:right;">
-253.4673
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-422781059
-</td>
-<td style="text-align:right;">
-25.60185
-</td>
-<td style="text-align:right;">
-1311.704
-</td>
-<td style="text-align:right;">
-54.24815
-</td>
-<td style="text-align:right;">
--0.0568766
-</td>
-<td style="text-align:right;">
-3.0000000
-</td>
-<td style="text-align:right;">
-0.0499657
-</td>
-<td style="text-align:right;">
-6.7097763
-</td>
-<td style="text-align:right;">
-0.0499657
-</td>
-<td style="text-align:right;">
-0.0985132
-</td>
-<td style="text-align:right;">
-1.9436506
-</td>
-<td style="text-align:right;">
-472.3925
+587.36099
 </td>
 </tr>
 <tr>
 <td style="text-align:right;">
-422617345
+399858370
 </td>
 <td style="text-align:right;">
-25.65000
+23.60000
 </td>
 <td style="text-align:right;">
-1423.100
+1618.050
 </td>
 <td style="text-align:right;">
-67.10000
+58.96000
 </td>
 <td style="text-align:right;">
--0.0069532
+-0.1064270
 </td>
 <td style="text-align:right;">
-0.2727273
+6.900000
 </td>
 <td style="text-align:right;">
-0.0000000
+0.2291288
 </td>
 <td style="text-align:right;">
-0.0000000
+3.8951893
 </td>
 <td style="text-align:right;">
-0.0000000
+0.0916515
 </td>
 <td style="text-align:right;">
-0.0095140
+0.1468700
 </td>
 <td style="text-align:right;">
-0.4453618
+5.1855569
 </td>
 <td style="text-align:right;">
-126.2919
+125.96802
 </td>
 </tr>
 <tr>
 <td style="text-align:right;">
-399678535
+399683010
 </td>
 <td style="text-align:right;">
-24.75000
+24.87222
 </td>
 <td style="text-align:right;">
-1423.300
+1307.444
 </td>
 <td style="text-align:right;">
-53.40000
+54.86667
 </td>
 <td style="text-align:right;">
--0.0090012
+-0.0180784
 </td>
 <td style="text-align:right;">
-0.6428571
+1.111111
+</td>
+<td style="text-align:right;">
+0.0415740
+</td>
+<td style="text-align:right;">
+1.3929275
+</td>
+<td style="text-align:right;">
+0.1598611
+</td>
+<td style="text-align:right;">
+0.0262020
+</td>
+<td style="text-align:right;">
+0.9362389
+</td>
+<td style="text-align:right;">
+251.60981
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+422655446
+</td>
+<td style="text-align:right;">
+26.15000
+</td>
+<td style="text-align:right;">
+1139.700
+</td>
+<td style="text-align:right;">
+49.90000
+</td>
+<td style="text-align:right;">
+-0.0016772
+</td>
+<td style="text-align:right;">
+45.555556
 </td>
 <td style="text-align:right;">
 0.0000000
 </td>
 <td style="text-align:right;">
-0.0000000
+0.9899495
+</td>
+<td style="text-align:right;">
+0.1414214
+</td>
+<td style="text-align:right;">
+0.0024145
+</td>
+<td style="text-align:right;">
+85.0778873
+</td>
+<td style="text-align:right;">
+252.82810
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+400089982
+</td>
+<td style="text-align:right;">
+25.95000
+</td>
+<td style="text-align:right;">
+1236.919
+</td>
+<td style="text-align:right;">
+59.45769
+</td>
+<td style="text-align:right;">
+-0.0111682
+</td>
+<td style="text-align:right;">
+0.600000
 </td>
 <td style="text-align:right;">
 0.0000000
 </td>
 <td style="text-align:right;">
-0.0091610
+0.4446427
 </td>
 <td style="text-align:right;">
-0.7178483
+0.0494047
 </td>
 <td style="text-align:right;">
-377.4037
+0.0162319
+</td>
+<td style="text-align:right;">
+1.3266499
+</td>
+<td style="text-align:right;">
+92.27482
 </td>
 </tr>
 </tbody>
@@ -4252,7 +4255,7 @@ presences.</p>
 <span><span class="co">## Target node size:                 10 </span></span>
 <span><span class="co">## Variable importance mode:         impurity </span></span>
 <span><span class="co">## Splitrule:                        gini </span></span>
-<span><span class="co">## OOB prediction error (Brier s.):  0.09135727</span></span></code></pre>
+<span><span class="co">## OOB prediction error (Brier s.):  0.09336473</span></span></code></pre>
 <p>The model can be evaluated based on the OOB prediction error. This
 metric lies on the fact that the data points that are not used in
 training a tree can be used to test the tree. The errors on the OOB
@@ -4318,7 +4321,7 @@ points</p>
 <span>                  na.color <span class="op">=</span> <span class="st">"transparent"</span></span>
 <span>                  <span class="op">)</span> <span class="co"># read external raster file without loading it to R</span></span>
 <span>  <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu">leaflet</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/leaflet/man/map-layers.html" class="external-link">addCircles</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">spdata_vect</span>, color <span class="op">=</span> <span class="st">"turquoise"</span>, stroke <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  <span class="fu">leaflet</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/leaflet/man/map-layers.html" class="external-link">addCircles</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">spdata_vect</span>, color <span class="op">=</span> <span class="st">"turquoise"</span>, stroke <span class="op">=</span> <span class="cn">TRUE</span>, <span class="co"># data = spdata</span></span>
 <span>                      weight <span class="op">=</span> <span class="fl">5</span>, opacity <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="co"># add points</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/pkg/leaflet/man/addLegend.html" class="external-link">addLegend</a></span><span class="op">(</span>pal <span class="op">=</span> <span class="va">num_pal</span>,</span>
 <span>           values <span class="op">=</span> <span class="va">prediction</span><span class="op">$</span><span class="va">pred_occur</span>,</span>
