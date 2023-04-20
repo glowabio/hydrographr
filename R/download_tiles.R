@@ -61,7 +61,7 @@ download_tiles <- function(variable, file_format = "tif",
   file_size_file <- paste0(tempdir(), "/hydrography90m_paths_file_sizes.txt")
   if (!file.exists(file_size_file)) {
     download.file("https://drive.google.com/uc?export=download&id=1SEkcgGPutP6ZQPvYtzICh_gcGnVgH_uR&confirm=t",
-                  destfile = file_size_file)
+                  destfile = file_size_file, mode = "wb")
 
   }
 
@@ -138,12 +138,14 @@ download_tiles <- function(variable, file_format = "tif",
   variable_size_sum
 
   # Print warning on file size and ask for input from the user
-  arg <- readline(prompt = paste0("Download size is ",
-                                  round(variable_size_sum / 1000000, 2),
-                                  " MB. Please type \"y\" if you are ready to smash it\n
-                                  or \"n\" if you'd rather not to, and then press Enter \n"))
-
-  if (arg == "y") {
+  # arg <- readline(prompt = paste0("Download size is ",
+  #                                 round(variable_size_sum / 1000000, 2),
+  #                                 " MB. Please type \"y\" if you are ready to smash it\n
+  #                                 or \"n\" if you'd rather not to, and then press Enter \n"))
+  print(paste0("Download size is ",
+         round(variable_size_sum / 1000000, 2),
+         " MB."))
+  # if (arg == "y") {
 
 
     # The argument 'server_url' of the download_tiles_base() function controls
@@ -158,7 +160,7 @@ download_tiles <- function(variable, file_format = "tif",
     server_url <- tryCatch(
       {
         download.file(paste0(nimbus_path, "README/README.txt"),
-                      destfile = paste0(download_dir, "/README.txt"))
+                      destfile = paste0(download_dir, "/README.txt"), mode = "wb")
         server_url <- nimbus_path
         server_url
       },
@@ -168,7 +170,7 @@ download_tiles <- function(variable, file_format = "tif",
           file_size_table_sep$varname_tile == "README.txt", ]$file_id
         # Download README.txt file
         download.file(paste0(gdrive_path, readme_id),
-                      destfile = paste0(download_dir, "/README.txt"))
+                      destfile = paste0(download_dir, "/README.txt"), mode = "wb")
         server_url <- gdrive_path
         server_url
       },
@@ -194,5 +196,5 @@ download_tiles <- function(variable, file_format = "tif",
         Üblacker, M. M., Shen, L. Q., and Domisch, S.: Hydrography90m: a new
         high-resolution global hydrographic dataset, Earth Syst. Sci. Data, 14,
         4525–4550, https://doi.org/10.5194/essd-14-4525-2022, 2022.")
-  }
+  # }
 }
