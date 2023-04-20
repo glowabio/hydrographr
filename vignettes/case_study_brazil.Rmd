@@ -27,21 +27,31 @@ editor_options:
 
 The following example showcases the functionality of the `hydrographr`
 package along a workflow to analyse the fragmentation of a stream network. 
-We will evaluate the connectivity of the habitats for a catfish 
-in Brazil, the current and future state.
+We will evaluate how many dams are up- and downstream of each fish occurrence 
+site and the distance along the stream network from each fish occurrence site 
+to the next dam for the current and future state.
+
+In our example we will focus on the catfish species *Conorhynchos conirostris*, 
+which is a catfish species endemic to the São Francisco drainage basin in Brazil.
+The catfish is listed as 'endangered' by the IUCN red list. Wetlands are the 
+preferred habitat and it is migrating for spawning.As an migratory species, it 
+is mostly threatened by dams along the stream network. Further, it is threatened 
+by fishing during the spawning season in the upstream part of the river. 
 
 We will start by defining the regular tiles of the Hydrography90m 
 (Amatulli et al., 2022) where the occurrence points of the species are located. 
-Afterwards we will download the Hydrography90m layers, crop and merge them, if 
-necessary. 
+Afterwards we will download the Hydrography90m layers, filter/crop and merge them.
+Then we will filter our fish occurrence and dam point locations using the polygon 
+of the drainage basin and snap the point locations to the stream network. 
+Afterwards, we will reduce our drainage basin using the dam upstream of all fish
+occurrence sites as our outlet location to calculate the upstream catchment from 
+this point location. In a next step, we will calculate the distances along the 
+stream network between each point location (fish and dams) and get the 
+up- and downstream stream egments from each point locations as a graph. Afterwards,
+we will query the tables and evaluate the shortest distance to the next dam as well
+as the number of dams. 
 
-
-*Conorhynchos conirostris* is a fish species endemic to the São Francisco river 
-basin in Brazil. The catfish is listed as 'endangered' by the IUCN 
-red list. Wetlands are the preferred habitat and it is migrating for spawning.
-As an migratory species, it is mostly threatened by dams along the stream network.
-Further, it is threatened by fishing during the spawning season in the upstream part
-of the river. 
+![](../vignettes/data_brazil/data/figures/workflow.png)
 
 Let's get started!
 
@@ -75,16 +85,16 @@ library(here)
 ```{r, eval=FALSE}
 # Load libraries
 library(hydrographr)
-library(rgbif)
-library(dplyr)
-library(data.table)
-library(leaflet)
-library(stringr)
 library(terra)
 library(sf)
+library(rgbif)
+library(data.table)
+library(dplyr)
+library(stringr)
 library(purrr)
-library(ggplot2)
 library(forcats)
+library(leaflet)
+library(ggplot2)
 ```
 
 
@@ -255,7 +265,7 @@ files first and than merge them.
 
 First, we will filter the GeoPackage tiles containing the drainage basins for 
 the basin ID 481051 (São Francisco drainage basin) and merge them to get the 
-extent the drainage basin ofSão Francisco river. We will then use the polygon of 
+extent the drainage basin of São Francisco river. We will then use the polygon of 
 the drainage basin to crop all downloaded raster tiles and then merge them. 
 Afterwards, we will extract the unique sub-catchment IDs from the raster layer 
 to filter the stream network GeoPackage tiles (oder_vect_segment) for 
@@ -265,16 +275,16 @@ stream segments with the same sub-catchment ID and merge them.
 ```{r, eval = FALSE}
 # Define a directory for the São Francisco drainage basin
 saofra_dir = paste0(wdir, "/data/basin_481051")
-if(!dir.exists(saofran_dir)) dir.create(saofran_dir)
+if(!dir.exists(saofra_dir)) dir.create(saofra_dir)
 
 
 # Get the full path of the basin  GeoPackage tiles
-saofra_dir <- list.files(wdir, pattern = "basin_h[v0-8]+.gpkg$",
+basin_dir <- list.files(wdir, pattern = "basin_h[v0-8]+.gpkg$",
                          full.names = TRUE, recursive = TRUE)
 
 # Filter basin ID from the GeoPackages of the basin tiles
 # Save the vector data of the São Francisco drainage basin
-for(itile in saofra_dir) {
+for(itile in basin_dir) {
   
   filtered_tile <- read_geopackage(itile,
                                    import_as = "sf",
