@@ -42,6 +42,7 @@ map.
 
 ![](../man/figures/wf_0.png)
 
+![](../man/figures/SDM.png)
 
 [*Hypolestes trinitatis*](https://www.gbif.org/species/1424240) is a
 damselfly species endemic to Cuba. The species inhabits rivers and
@@ -104,7 +105,9 @@ dir.create("data")
 ```
 
 ```{r, eval = FALSE}
-wdir <- "my/working/directory"
+# Define the "data_cuba" directory, where you have downloaded all the data,
+# as the working directory
+wdir <- "my/working/directory/data_cuba"
 setwd(wdir)
 
 # Create a new folder in the working directory to store all the data
@@ -176,7 +179,7 @@ bbox <- c(-84.9749110583, 19.8554808619, -74.1780248685, 23.1886107447)
 m <- leaflet() %>%
   addProviderTiles('Esri.WorldShadedRelief') %>%
   setMaxBounds(bbox[1], bbox[2], bbox[3], bbox[4]) %>%
-  addCircles(data = spdata_vect, color = "purple")
+  addCircles(data = spdata_vect, color = "purple") # data = spdata
 
 saveWidget(m, file=paste0(wdir, "/cuba_map.html"))
 ```
@@ -185,7 +188,7 @@ saveWidget(m, file=paste0(wdir, "/cuba_map.html"))
 m <- leaflet() %>%
   addProviderTiles('Esri.WorldShadedRelief') %>%
   setMaxBounds(bbox[1], bbox[2], bbox[3], bbox[4]) %>%
-  addCircles(data = spdata_vect, color = "purple")
+  addCircles(data = spdata_vect, color = "purple") # data = spdata
 
 m
 ```
@@ -256,13 +259,13 @@ vars_gpkg <- c("order_vect_point")
 ```
 
 ```{r, eval = FALSE}
-# Download the .tif tiles of the desired variables
-download_tiles(variable = vars_tif, tile_id = tile_id, file_format = "tif",
-              download_dir = "data")
-
-# Download the .gpkg tiles of the desired variables
-download_tiles(variable = vars_gpkg, tile_id = tile_id, file_format = "gpkg",
-              download_dir = "data")
+# # Download the .tif tiles of the desired variables
+# download_tiles(variable = vars_tif, tile_id = tile_id, file_format = "tif",
+#               download_dir = "data")
+# 
+# # Download the .gpkg tiles of the desired variables
+# download_tiles(variable = vars_gpkg, tile_id = tile_id, file_format = "gpkg",
+#               download_dir = "data")
 ```
 
 Then download the CHELSA present and future Bioclim variables
@@ -280,20 +283,20 @@ dir.create(paste0(wdir, "/data/chelsa_bioclim"))
 options(timeout = 1000)
 
 # Download
-# Present, 1981-2010
-download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio12_1981-2010_V.2.1.tif",
-destfile = "data/chelsa_bioclim/bio12_1981-2010.tif")
-download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio15_1981-2010_V.2.1.tif",
-destfile = "data/chelsa_bioclim/bio15_1981-2010.tif")
-download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio1_1981-2010_V.2.1.tif",
-destfile = "data/chelsa_bioclim/bio1_1981-2010.tif")
-# Future, 2041-2070
-download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/2041-2070/IPSL-CM6A-LR/ssp370/bio/CHELSA_bio12_2041-2070_ipsl-cm6a-lr_ssp370_V.2.1.tif",
-destfile = "data/chelsa_bioclim/bio12_IPSL-CM6A-LR_ssp370_2041-2070.tif")
-download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/2041-2070/IPSL-CM6A-LR/ssp370/bio/CHELSA_bio15_2041-2070_ipsl-cm6a-lr_ssp370_V.2.1.tif",
-destfile = "data/chelsa_bioclim/bio15_IPSL-CM6A-LR_ssp370_2041-2070.tif")
-download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/2041-2070/IPSL-CM6A-LR/ssp370/bio/CHELSA_bio1_2041-2070_ipsl-cm6a-lr_ssp370_V.2.1.tif",
-destfile = "data/chelsa_bioclim/bio1_IPSL-CM6A-LR_ssp370_2041-2070.tif")
+# # Present, 1981-2010
+# download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio12_1981-2010_V.2.1.tif",
+# destfile = "data/chelsa_bioclim/bio12_1981-2010.tif")
+# download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio15_1981-2010_V.2.1.tif",
+# destfile = "data/chelsa_bioclim/bio15_1981-2010.tif")
+# download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio1_1981-2010_V.2.1.tif",
+# destfile = "data/chelsa_bioclim/bio1_1981-2010.tif")
+# # Future, 2041-2070
+# download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/2041-2070/IPSL-CM6A-LR/ssp370/bio/CHELSA_bio12_2041-2070_ipsl-cm6a-lr_ssp370_V.2.1.tif",
+# destfile = "data/chelsa_bioclim/bio12_IPSL-CM6A-LR_ssp370_2041-2070.tif")
+# download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/2041-2070/IPSL-CM6A-LR/ssp370/bio/CHELSA_bio15_2041-2070_ipsl-cm6a-lr_ssp370_V.2.1.tif",
+# destfile = "data/chelsa_bioclim/bio15_IPSL-CM6A-LR_ssp370_2041-2070.tif")
+# download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/2041-2070/IPSL-CM6A-LR/ssp370/bio/CHELSA_bio1_2041-2070_ipsl-cm6a-lr_ssp370_V.2.1.tif",
+# destfile = "data/chelsa_bioclim/bio1_IPSL-CM6A-LR_ssp370_2041-2070.tif")
 
 ```
 
@@ -947,7 +950,7 @@ p <- leaflet() %>% addTiles() %>%
                   na.color = "transparent"
                   ) # read external raster file without loading it to R
   ) %>%
-  leaflet::addCircles(data = spdata_vect, color = "turquoise", stroke = TRUE,
+  leaflet::addCircles(data = spdata_vect, color = "turquoise", stroke = TRUE, # data = spdata
                       weight = 5, opacity = 1) %>% # add points
   addLegend(pal = num_pal,
            values = prediction$pred_occur,
