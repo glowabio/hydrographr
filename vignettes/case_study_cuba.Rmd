@@ -587,7 +587,7 @@ fwrite(stats_gpkg_h10v06, sep = ",", row.names = FALSE, quote = FALSE,
 
 ```
 
-```{r, eval = FALSE}
+```{r, eval = FALSE, include = FALSE}
 # These are the lines that actually run.
 # They read the pre-filtered gpkg which was exported as a csv in the previous
 # step. The result is the same as if we ran "read_geopackage" in the .gpkg files
