@@ -301,7 +301,7 @@ for(itile in basin_dir) {
 merge_tiles(tile_dir = saofra_dir,
             tile_names = list.files(saofra_dir, full.names = FALSE,
                                     pattern = "basin_.+_tmp.gpkg$"),
-            basin_dir = saofra_dir,
+            out_dir = saofra_dir,
             file_name = "basin_481051.gpkg",
             name = "ID",
             read = FALSE)
