@@ -273,7 +273,7 @@ stream segments with the same sub-catchment ID and merge them.
 
 ```{r, eval = FALSE}
 # Define a directory for the São Francisco drainage basin
-saofra_dir = paste0(wdir, "/data/basin_481051")
+saofra_dir <-  paste0(wdir, "/data/basin_481051")
 if(!dir.exists(saofra_dir)) dir.create(saofra_dir)
 
 
