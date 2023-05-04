@@ -42,7 +42,7 @@ Defines if the points are snapped using the distance or flow accumulation
 will contain the new coordinates for both calculations.
 Default is "distance".}
 
-\item{distance}{numeric. Maximum radius in meters. The points will be
+\item{distance}{numeric. Maximum radius in pixels. The points will be
 snapped to the next stream within this radius. Default is 500.}
 
 \item{accumulation}{numeric. Minimum flow accumulation. Points will be
