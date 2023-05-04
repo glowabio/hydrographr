@@ -33,6 +33,7 @@
 #' @importFrom processx run
 #' @importFrom parallel detectCores
 #' @importFrom stringr str_c str_split
+#' @importFrom stringi stri_rand_strings
 #' @import dplyr
 #' @export
 #'
@@ -209,8 +210,8 @@ extract_zonal_stat <- function(data_dir,  subc_id, subc_layer, var_layer,
 
   # Write out master table if requested
   # Compose full out_path by combining out_dir and file_name
-  out_path <- paste0(out_dir, "/", file_name)
-  if (!is.null(out_path)) {
+  if (!is.null(out_dir)) {
+    out_path <- paste0(out_dir, "/", file_name)
     fwrite(var_table, out_path, sep = ",",
            row.names = FALSE, quote = FALSE, col.names = TRUE)
   }
