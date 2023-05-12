@@ -10,6 +10,8 @@ merge_tiles(
   out_dir,
   file_name,
   name = "stream",
+  compression = "low",
+  bigtiff = TRUE,
   read = FALSE,
   quiet = TRUE
 )
@@ -29,6 +31,14 @@ file extension (.tif or .gpkg).}
 \item{name}{character. The attribute table column name of the stream segment
 ("stream"), sub-catchment ("ID"), basin ("ID") or outlet ("ID") column which
 is used for merging GeoPackages. Default is "stream".}
+
+\item{compression}{character. Compression of the written output file.
+Compression levels can be defined as "none", "low", or "high". Default is
+"low".}
+
+\item{bigtiff}{logical. Define whether the output file is expected to be a
+BIGTIFF (file size larger than 4 GB). If FALSE and size > 4GB no file will be
+written. Default is TRUE.}
 
 \item{read}{logical. If TRUE, the merged layer gets read
 into R. If FALSE, the layer is only stored on disk. Default is FALSE.}
@@ -69,7 +79,7 @@ if(!dir.exists(output_folder)) dir.create(output_folder)
 
 # Merge tiles
 merged_tiles <- merge_tiles(tile_dir = tiles_folder,
-                            tile_names = c("h22v08", "h22v10"),
+                            tile_names = c("basin_h22v08.tif", "basin_h22v10.tif"),
                             out_dir = output_folder,
                             file_name = "basin_merged.tif",
                             read = TRUE)
