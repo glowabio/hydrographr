@@ -19,6 +19,12 @@
 #' @param name character. The attribute table column name of the stream segment
 #' ("stream"), sub-catchment ("ID"), basin ("ID") or outlet ("ID") column which
 #' is used for merging GeoPackages. Default is "stream".
+#' @param compression character. Compression of the written output file.
+#' Compression levels can be defined as "none", "low", or "high". Default is
+#' "low".
+#' @param bigtiff logical. Define whether the output file is expected to be a
+#' BIGTIFF (file size larger than 4 GB). If FALSE and size > 4GB no file will be
+#' written. Default is TRUE.
 #' @param read logical. If TRUE, the merged layer gets read
 #' into R. If FALSE, the layer is only stored on disk. Default is FALSE.
 #' @param quiet logical. If FALSE, the standard output will be printed.
@@ -62,13 +68,14 @@
 #'
 #' # Merge tiles
 #' merged_tiles <- merge_tiles(tile_dir = tiles_folder,
-#'                             tile_names = c("h22v08", "h22v10"),
+#'                             tile_names = c("basin_h22v08.tif", "basin_h22v10.tif"),
 #'                             out_dir = output_folder,
 #'                             file_name = "basin_merged.tif",
 #'                             read = TRUE)
 #'
 
 merge_tiles <- function(tile_dir, tile_names, out_dir, file_name, name = "stream",
+                        compression = "low", bigtiff = TRUE,
                         read = FALSE, quiet = TRUE) {
   # Check if paths exist
   if (!dir.exists(tile_dir))
@@ -84,43 +91,72 @@ merge_tiles <- function(tile_dir, tile_names, out_dir, file_name, name = "stream
       stop(paste0("File: ", file, " does not exist."))
   }
 
-      # Check operating system
-      sys_os <- hydrographr:::get_os()
+  # Check and translate compression into the compression type and the
+  # compression level which is applied to the tiff file when writing it.
+  if(compression == "none") {
+    compression_type  <- "NONE"
+    compression_level <- 0
+  } else if (compression == "low") {
+    compression_type  <- "DEFLATE"
+    compression_level <- 2
+  } else if (compression == "high") {
+    compression_type  <- "DEFLATE"
+    compression_level <- 9
+  } else {
+    stop("'compression' must be one of 'none', 'low', or 'high'.")
+  }
 
-      # Make bash scripts executable
-      make_sh_exec()
+  # Define whether BIGTIFF is used or not. BIGTIFF is required for
+  # tiff output files > 4 GB.
+  if(bigtiff) {
+    bigtiff <- "YES"
+  } else {
+    bigtiff <- "NO"
+  }
 
-      # Format tile_names vector so that it can be read
-      # as an array in the bash script
-      tile_names_array <- paste(unique(tile_names), collapse = "/")
+  # Check operating system
+  sys_os <- hydrographr:::get_os()
 
+  # Make bash scripts executable
+  make_sh_exec()
 
-      if (sys_os == "linux" || sys_os == "osx") {
-        processx::run(system.file("sh", "merge_tiles.sh",
-                                  package = "hydrographr"),
-                      args = c(tile_dir, tile_names_array, out_dir, file_name, name),
-                      echo = !quiet)
-
-       } else {
-       # Check if WSL and Ubuntu are installed
-       check_wsl()
-       # Change path for WSL
-       wsl_tile_dir <- fix_path(tile_dir)
-       wsl_out_dir <- fix_path(out_dir)
-       wsl_sh_file <- fix_path(
-         system.file("sh", "merge_tiles.sh",
-                    package = "hydrographr"))
-
-       processx::run(system.file("bat", "merge_tiles.bat",
-                                 package = "hydrographr"),
-        args = c(wsl_tile_dir, tile_names_array, wsl_out_dir, file_name, name,
-                 wsl_sh_file),
-        echo = !quiet)
-       }
+  # Format tile_names vector so that it can be read
+  # as an array in the bash script
+  tile_names_array <- paste(unique(tile_names), collapse = "/")
 
 
-  # Print message
-  cat("Merged file saved under: ", out_dir,"\n")
+  if (sys_os == "linux" || sys_os == "osx") {
+    processx::run(system.file("sh", "merge_tiles.sh",
+                              package = "hydrographr"),
+                  args = c(tile_dir, tile_names_array, out_dir, file_name, name,
+                           compression_type, compression_level, bigtiff),
+                  echo = !quiet)
+
+   } else {
+   # Check if WSL and Ubuntu are installed
+   check_wsl()
+   # Change path for WSL
+   wsl_tile_dir <- fix_path(tile_dir)
+   wsl_out_dir <- fix_path(out_dir)
+   wsl_sh_file <- fix_path(
+     system.file("sh", "merge_tiles.sh",
+                package = "hydrographr"))
+
+   processx::run(system.file("bat", "merge_tiles.bat",
+                             package = "hydrographr"),
+    args = c(wsl_tile_dir, tile_names_array, wsl_out_dir, file_name, name,
+             compression_type, compression_level, bigtiff,
+             wsl_sh_file),
+    echo = !quiet)
+  }
+
+  if (file.exists(paste0(out_dir, "/", file_name))) {
+    # Print message
+    cat("Merged file saved under: ", out_dir,"\n")
+  } else {
+    stop("Output file was not written. File size may have been larger than 4GB",
+         "\nSet bigtiff = TRUE, for writing large output files.")
+  }
 
   if (read == TRUE) {
     # Identify if merged file is .tif or .gpkg
