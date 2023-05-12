@@ -20,7 +20,7 @@ export COMPRESSION=$8
 
 export LEVEL=$9
 
-export BTIFF=$10
+export BTIFF=${10}
 
 
 ###############################################################################
