@@ -16,6 +16,12 @@
 #' To identify the upstream catchment the output file name includes the site id.
 #' @param n_cores numeric. Number of cores used for parallelization.
 #' If NULL, available cores - 1 will be used.
+#' @param compression character. Compression of the written output file.
+#' Compression levels can be defined as "none", "low", or "high". Default is
+#' "low".
+#' @param bigtiff logical. Define whether the output file is expected to be a
+#' BIGTIFF (file size larger than 4 GB). If FALSE and size > 4GB no file will be
+#' written. Default is TRUE.
 #' @param quiet logical. If FALSE, the standard output will be printed.
 #' Default is TRUE.
 #' @importFrom stringi stri_rand_strings
@@ -93,6 +99,7 @@
 
 get_upstream_catchment <- function(data, id, lon, lat, direction_layer = NULL,
                                    out_dir = NULL, n_cores = NULL,
+                                   compression = "low", bigtiff = TRUE,
                                    quiet = TRUE) {
 
   # Check if data.frame is defined
@@ -145,13 +152,36 @@ get_upstream_catchment <- function(data, id, lon, lat, direction_layer = NULL,
   if (!endsWith(direction_layer, ".tif"))
     stop("direction_layer: Stream network raster is not a .tif file.")
 
-  # Check if quiet is logical
-  if (!is.logical(quiet))
-    stop("quiet: Has to be TRUE or FALSE.")
-
   # Check if value of cores numeric
   if (!is.numeric(n_cores))
     stop("n_cores: Value has to be numeric.")
+
+  # Check and translate compression into the compression type and the
+  # compression level which is applied to the tiff file when writing it.
+  if(compression == "none") {
+    compression_type  <- "NONE"
+    compression_level <- 0
+  } else if (compression == "low") {
+    compression_type  <- "DEFLATE"
+    compression_level <- 2
+  } else if (compression == "high") {
+    compression_type  <- "DEFLATE"
+    compression_level <- 9
+  } else {
+    stop("'compression' must be one of 'none', 'low', or 'high'.")
+  }
+
+  # Define whether BIGTIFF is used or not. BIGTIFF is required for
+  # tiff output files > 4 GB.
+  if(bigtiff) {
+    bigtiff <- "YES"
+  } else {
+    bigtiff <- "NO"
+  }
+
+  # Check if quiet is logical
+  if (!is.logical(quiet))
+    stop("quiet: Has to be TRUE or FALSE.")
 
   # Create random string to attach to the file name of the temporary
   # points_dataset.txt and ids.txt file
@@ -184,7 +214,8 @@ get_upstream_catchment <- function(data, id, lon, lat, direction_layer = NULL,
     processx::run(system.file("sh", "get_upstream_catchment.sh",
                               package = "hydrographr"),
                   args = c(coord_tmp_path, id, lon, lat, direction_layer,
-                           out_dir, n_cores),
+                           out_dir, n_cores,
+                           compression_type, compression_level, bigtiff),
                   echo = !quiet)
 
   } else {
@@ -202,7 +233,8 @@ get_upstream_catchment <- function(data, id, lon, lat, direction_layer = NULL,
     run(system.file("bat", "get_upstream_catchment.bat",
                                 package = "hydrographr"),
                     args = c(wsl_coord_tmp_path, id, lon, lat, wsl_dire_path,
-                             wsl_out_dir, n_cores, wsl_sh_file),
+                             wsl_out_dir, n_cores, compression_type, compression_level,
+                             bigtiff, wsl_sh_file),
                     echo = !quiet)
 
   }
@@ -211,6 +243,5 @@ get_upstream_catchment <- function(data, id, lon, lat, direction_layer = NULL,
   file.remove(coord_tmp_path)
 
   # Print output location
-  print(paste0("The output is in ", out_dir))
-
+  cat("Output file(s) saved under: ", out_dir,"\n")
 }
