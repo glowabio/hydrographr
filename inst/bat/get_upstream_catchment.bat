@@ -4,7 +4,7 @@ set a=%1 %2 %3 %4 %5 %6 %7 %8 %9
 SHIFT
 SHIFT
 set b=%8
-WSLENV= %a% %b%
+set WSLENV=%a% %b%
 set DATA=%1
 set SHDIR=%9
 
