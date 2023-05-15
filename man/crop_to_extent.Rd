@@ -10,6 +10,8 @@ crop_to_extent(
   bounding_box = NULL,
   out_dir,
   file_name,
+  compression = "low",
+  bigtiff = TRUE,
   read = TRUE,
   quiet = TRUE
 )
@@ -27,6 +29,14 @@ or other spatial object.}
 \item{out_dir}{character. The directory where the output will be stored.}
 
 \item{file_name}{character. Name of the cropped output raster .tif file.}
+
+\item{compression}{character. Compression of the written output file.
+Compression levels can be defined as "none", "low", or "high". Default is
+"low".}
+
+\item{bigtiff}{logical. Define whether the output file is expected to be a
+BIGTIFF (file size larger than 4 GB). If FALSE and size > 4GB no file will be
+written. Default is TRUE.}
 
 \item{read}{logical. If TRUE, the cropped raster .tif layer gets read into R.
 If FALSE, the layer is only stored on disk. Default is TRUE.}

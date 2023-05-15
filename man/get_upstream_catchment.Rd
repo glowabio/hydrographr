@@ -12,6 +12,8 @@ get_upstream_catchment(
   direction_layer = NULL,
   out_dir = NULL,
   n_cores = NULL,
+  compression = "low",
+  bigtiff = TRUE,
   quiet = TRUE
 )
 }
@@ -35,6 +37,14 @@ To identify the upstream catchment the output file name includes the site id.}
 
 \item{n_cores}{numeric. Number of cores used for parallelization.
 If NULL, available cores - 1 will be used.}
+
+\item{compression}{character. Compression of the written output file.
+Compression levels can be defined as "none", "low", or "high". Default is
+"low".}
+
+\item{bigtiff}{logical. Define whether the output file is expected to be a
+BIGTIFF (file size larger than 4 GB). If FALSE and size > 4GB no file will be
+written. Default is TRUE.}
 
 \item{quiet}{logical. If FALSE, the standard output will be printed.
 Default is TRUE.}

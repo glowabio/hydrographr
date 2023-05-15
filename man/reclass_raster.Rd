@@ -10,10 +10,11 @@ reclass_raster(
   new_val,
   raster_layer,
   recl_layer,
-  read = TRUE,
   no_data = -9999,
   type = "Int32",
-  compress = "DEFLATE",
+  compression = "low",
+  bigtiff = TRUE,
+  read = FALSE,
   quiet = TRUE
 )
 }
@@ -31,17 +32,26 @@ raster values.}
 \item{recl_layer}{character. Full path of the output .tif layer
 of the reclassified raster file.}
 
-\item{read}{logical. If TRUE, then the reclassified raster .tif layer
-gets read into R as a SpatRaster (terra object).
-If FALSE, the layer is only stored on disk. Default is TRUE.}
-
 \item{no_data}{numeric. The no_data value of the new .tif layer.
 Default is -9999.}
 
 \item{type}{character. Data type; Options are Byte, Int16, UInt16, Int32,
 UInt32,CInt16, CInt32. Default is Int32.}
 
-\item{compress}{Compression type: DEFLATE or LZW. Default is DEFLATE.}
+\item{compression}{character. Compression of the written output file.
+Compression levels can be defined as "none", "low", or "high". Default is
+"low".}
+
+\item{bigtiff}{logical. Define whether the output file is expected to be a
+BIGTIFF (file size larger than 4 GB). If FALSE and size > 4GB no file will be
+written. Default is TRUE.}
+
+\item{read}{logical. If TRUE, then the reclassified raster .tif layer
+gets read into R as a SpatRaster (terra object).
+If FALSE, the layer is only stored on disk. Default is FALSE.}
+
+\item{quiet}{logical. If FALSE, the standard output will be printed.
+Default is TRUE.}
 }
 \description{
 Reclassifies an integer raster .tif layer using the r.reclass
