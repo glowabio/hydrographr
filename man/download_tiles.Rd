@@ -14,9 +14,11 @@ download_tiles(
 )
 }
 \arguments{
-\item{variable}{character vector of variable names.}
+\item{variable}{character vector of variable names. See Details for all the
+variable names.}
 
-\item{file_format}{character. Format of the requested file ("tif" or "gpkg").}
+\item{file_format}{character. Format of the requested file ("tif" or "gpkg").
+See Details.}
 
 \item{tile_id}{character vector. The IDs of the requested tiles.}
 
@@ -30,11 +32,73 @@ downloaded. Default is the working directory.}
 }
 \description{
 The function downloads files of the Hydrography90m
-dataset, available at https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4?path=%2F .
+dataset, available at https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4?path=\%2F .
 The files will be stored in the folder architecture of the above domain.
 Multiple regular tile or regional unit files can be requested in a single
 call of the function. The tile or regional unit IDs can be obtained
 using the functions "get_tile_id" and "get_regional_unit_id" respectively.
+}
+\details{
+In the following table you can find all the variables included in the
+Hydrography90m dataset. The column "Abbreviation" includes the variable names
+that should be used as an input in the parameter "variable" of the function.
+Likewise, the column "File format" contains the input that should be given to
+the "file_format" parameter.
+For more details and visualisations of the spatial layers, please refer to
+\url{https://hydrography.org/hydrography90m/hydrography90m_layers/}.\tabular{llllll}{
+   \strong{Variable type} \tab \strong{Variable} \tab \strong{Abbreviation} \tab \strong{Description} \tab \strong{File format} \tab \strong{Unit} \cr
+   Flow \tab Flow accumulation \tab flow \tab Flow accumulation \tab tif \tab km² \cr
+   Stream slope \tab Cell maximum curvature \tab slope_curv_max_dw_cel \tab Cell maximum curvature (between highest upstream cell,focal cell and downstream cell) \tab tif \tab m⁻¹ \cr
+   Stream slope \tab Cell minimum curvature \tab slope_curv_min_dw_cel \tab Cell minimum curvature(between lowest upstream cell,focal cell and downstream cell) \tab tif \tab m⁻¹ \cr
+   Stream slope \tab Cell elevation difference \tab slope_elv_dw_cel \tab Cell elevation difference(between focal cell and downstream cell) \tab tif \tab m \cr
+   Stream slope \tab Cell gradient \tab slope_grad_dw_cel \tab Cell gradient \tab tif \tab  \cr
+   Stream distance \tab Shortest distance to drainage divide \tab stream_dist_up_near \tab Shortest upstream distance between focal grid cell and the nearest sub-catchment drainage divide \tab tif \tab m \cr
+   Stream distance \tab Longest distance to drainage divide \tab stream_dist_up_farth \tab Longest upstream distance between focal grid cell and the nearest sub-catchment drainage divide \tab tif \tab m \cr
+   Stream distance \tab Nearest down stream stream grid cell \tab stream_dist_dw_near \tab Distance between focal grid cell and its nearest down stream stream grid cell \tab tif \tab m \cr
+   Stream distance \tab Outlet grid cell in the network \tab outlet_dist_dw_basin \tab Distance between focal grid cell and the outlet grid cell in the network \tab tif \tab m \cr
+   Stream distance \tab Down stream stream node grid cell \tab outlet_dist_dw_scatch \tab Distance between focal grid cell and the down stream stream node grid cell \tab tif \tab m \cr
+   Stream distance \tab Euclidean distance \tab stream_dist_proximity \tab Euclidean distance between focal grid cell and the stream network (in meters) \tab tif \tab m \cr
+   Elevation difference \tab Shortest path \tab stream_diff_up_near \tab Elevation difference of the shortest path from focal grid cell to the sub-catchment drainage divide \tab tif \tab m \cr
+   Elevation difference \tab Longest path \tab stream_diff_up_farth \tab Elevation difference of the longest path from focal grid cell to the sub-catchment drainage divide \tab tif \tab m \cr
+   Elevation difference \tab Nearest downstream stream pixel \tab stream_diff_dw_near \tab Elevation difference between focal grid cell and its nearest downstream stream pixel \tab tif \tab m \cr
+   Elevation difference \tab Outlet grid cell in the network \tab outlet_diff_dw_basin \tab Elevation difference between focal grid cell and the outlet grid cell in the network \tab tif \tab m \cr
+   Elevation difference \tab Downstream stream node grid cell \tab outlet_diff_dw_scatch \tab Elevation difference between focal grid cell and the downstream stream node grid cell \tab tif \tab m \cr
+   Segment properties \tab Segment downstream mean gradient \tab channel_grad_dw_seg \tab Segment downstream mean gradient (between focal cell and the node/outlet) \tab tif \tab  \cr
+   Segment properties \tab Segment upstream mean gradient \tab channel_grad_up_seg \tab Segment upstream mean gradient (between focal cell and the init/node) \tab tif \tab  \cr
+   Segment properties \tab Cell upstream gradient \tab channel_grad_up_cel \tab Cell upstream gradient (between focal cell and next cell \tab tif \tab  \cr
+   Segment properties \tab Cell stream course curvature \tab channel curv_cel \tab Cell stream course curvature (focal cell) \tab tif \tab  \cr
+   Segment properties \tab Segment downstream elevation difference \tab channel_elv_dw_seg \tab Segment downstream elevation difference (between focal cell and the node/outlet) \tab tif \tab  \cr
+   Segment properties \tab Segment upstream elevation difference \tab channel_elv_up_seg \tab Segment upstream elevation difference (between focal cell and the init/node) \tab tif \tab  \cr
+   Segment properties \tab Cell upstream elevation difference \tab channel_elv_up_cel \tab Cell upstream elevation difference (between focal cell and next cell) \tab tif \tab  \cr
+   Segment properties \tab Cell downstream elevation difference \tab channel_elv_dw_cel \tab Cell downstream elevation difference (between focal cell and next cell) \tab tif \tab  \cr
+   Segment properties \tab Segment downstream distance \tab channel_dist_dw_seg \tab Segment downstream distance (between focal cell and the node/outlet \tab tif \tab  \cr
+   Segment properties \tab Segment upstream distance \tab channel_dist_up_seg \tab Segment upstream distance (between focal cell and the init/node) \tab tif \tab  \cr
+   Segment properties \tab Cell upstream distance \tab channel_dist_up_cel \tab Cell upstream distance (between focal cell and next cell) \tab tif \tab  \cr
+   Stream order \tab Strahler’s stream order \tab order_strahler \tab Strahler’s stream order \tab tif \tab  \cr
+   Stream order \tab Shreve’s stream magnitude \tab order_shreve \tab Shreve’s stream magnitude \tab tif \tab  \cr
+   Stream order \tab Horton’s stream order \tab order_horton \tab Horton’s stream order \tab tif \tab  \cr
+   Stream order \tab Hack’s stream order \tab order_hack \tab Hack’s stream order \tab tif \tab  \cr
+   Stream order \tab Topological dimension of streams \tab order_topo \tab Topological dimension of streams \tab tif \tab  \cr
+   Stream order \tab Strahler’s stream order \tab order_vect_point/order_vect_segment \tab Strahler’s stream order \tab gpkg \tab  \cr
+   Stream order \tab Shreve’s stream magnitude \tab order_vect_point/order_vect_segment \tab Shreve’s stream magnitude \tab gpkg \tab  \cr
+   Stream order \tab Horton’s stream order \tab order_vect_point/order_vect_segment \tab Horton’s stream order \tab gpkg \tab  \cr
+   Stream order \tab Hack’s stream order \tab order_vect_point/order_vect_segment \tab Hack’s stream order \tab gpkg \tab  \cr
+   Stream order \tab Topological dimension of streams \tab order_vect_point/order_vect_segment \tab Topological dimension of streams \tab gpkg \tab  \cr
+   Stream reach \tab Length of the stream reach \tab order_vect_point/order_vect_segment \tab Length of the stream reach \tab gpkg \tab  \cr
+   Stream reach \tab Straight length \tab order_vect_point/order_vect_segment \tab Length of stream as straight line \tab gpkg \tab  \cr
+   Stream reach \tab Sinusoid of the stream reach \tab order_vect_point/order_vect_segment \tab Fractal dimension: stream length/straight stream length \tab gpkg \tab  \cr
+   Stream reach \tab Accumulated length \tab order_vect_point/order_vect_segment \tab Length of stream from source \tab gpkg \tab  \cr
+   Stream reach \tab Flow accumulation \tab order_vect_point/order_vect_segment \tab Flow accumulation \tab gpkg \tab  \cr
+   Stream reach \tab Distance to outlet \tab order_vect_point/order_vect_segment \tab Distance of current stream init from outlet \tab gpkg \tab  \cr
+   Stream reach \tab Source elevation \tab order_vect_point/order_vect_segment \tab Elevation of stream init \tab gpkg \tab  \cr
+   Stream reach \tab Outlet elevation \tab order_vect_point/order_vect_segment \tab Elevation of stream outlet \tab gpkg \tab  \cr
+   Stream reach \tab Elevation drop \tab order_vect_point/order_vect_segment \tab Difference between source_elev and outlet_elev + drop outlet \tab gpkg \tab  \cr
+   Stream reach \tab Outlet drop \tab order_vect_point/order_vect_segment \tab Drop at the outlet of the stream \tab gpkg \tab  \cr
+   Stream reach \tab Gradient \tab order_vect_point/order_vect_segment \tab Mean gradient of the sub-catchment (downstream elevation difference divided by distance) \tab gpkg \tab  \cr
+   Flow index \tab Stream power index \tab spi \tab A measure of the erosive power of flowing water (Moore et al., 1991) \tab tif \tab  \cr
+   Flow index \tab Sediment transportation index \tab sti \tab A metric for describing the erosion and deposition of sediments (Mojaddadi et al., 2017) \tab tif \tab  \cr
+   Flow index \tab Compound topographic index \tab cti \tab A steady state wetness index, also known as topographic wetness index (TWI) (Beven & Kirkby, 1979) \tab tif \tab  \cr
+}
 }
 \examples{
 # Download data for two variables in three regular tiles
