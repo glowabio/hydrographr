@@ -8,6 +8,8 @@
 #' @param data a data.frame or data.table with lat/lon coordinates in WGS84.
 #' @param lon character. The name of the column with the longitude coordinates.
 #' @param lat character. The name of the column with the latitude coordinates.
+#' @param quiet logical. If FALSE, the standard output will be printed.
+#' Default is TRUE.
 #' @importFrom stringi stri_rand_strings
 #' @importFrom dplyr select
 #' @importFrom data.table fread

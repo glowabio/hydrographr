@@ -12,6 +12,9 @@ get_regional_unit_id(data, lon, lat, quiet = TRUE)
 \item{lon}{character. The name of the column with the longitude coordinates.}
 
 \item{lat}{character. The name of the column with the latitude coordinates.}
+
+\item{quiet}{logical. If FALSE, the standard output will be printed.
+Default is TRUE.}
 }
 \description{
 Identifies the IDs of the regional units within the Hydrography90m data
