@@ -84,7 +84,7 @@ https://hydrography.org/hydrography90m/hydrography90m_layers/ .\tabular{llllll}{
    Stream reach \tab Straight length \tab order_vect_point/order_vect_segment \tab Length of stream as straight line \tab gpkg \tab  \cr
    Stream reach \tab Sinusoid of the stream reach \tab order_vect_point/order_vect_segment \tab Fractal dimension: stream length/straight stream length \tab gpkg \tab  \cr
    Stream reach \tab Accumulated length \tab order_vect_point/order_vect_segment \tab Length of stream from source \tab gpkg \tab  \cr
-   Stream reach \tab Flow accumulation (?) \tab order_vect_point/order_vect_segment \tab Flow accumulation \tab gpkg \tab  \cr
+   Stream reach \tab Flow accumulation \tab order_vect_point/order_vect_segment \tab Flow accumulation \tab gpkg \tab  \cr
    Stream reach \tab Distance to outlet \tab order_vect_point/order_vect_segment \tab Distance of current stream init from outlet \tab gpkg \tab  \cr
    Stream reach \tab Source elevation \tab order_vect_point/order_vect_segment \tab Elevation of stream init \tab gpkg \tab  \cr
    Stream reach \tab Outlet elevation \tab order_vect_point/order_vect_segment \tab Elevation of stream outlet \tab gpkg \tab  \cr

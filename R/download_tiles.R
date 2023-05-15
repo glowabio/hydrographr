@@ -78,7 +78,7 @@
 #'| Stream reach         | Straight length                          | order_vect_point/order_vect_segment | Length of stream as straight line                                                                   | gpkg        |      |
 #'| Stream reach         | Sinusoid of the stream reach             | order_vect_point/order_vect_segment | Fractal dimension: stream length/straight stream length                                             | gpkg        |      |
 #'| Stream reach         | Accumulated length                       | order_vect_point/order_vect_segment | Length of stream from source                                                                        | gpkg        |      |
-#'| Stream reach         | Flow accumulation (?)                    | order_vect_point/order_vect_segment | Flow accumulation                                       | gpkg        |      |
+#'| Stream reach         | Flow accumulation                        | order_vect_point/order_vect_segment | Flow accumulation                                       | gpkg        |      |
 #'| Stream reach         | Distance to outlet                       | order_vect_point/order_vect_segment | Distance of current stream init from outlet                                                         | gpkg        |      |
 #'| Stream reach         | Source elevation                         | order_vect_point/order_vect_segment | Elevation of stream init                                                                            | gpkg        |      |
 #'| Stream reach         | Outlet elevation                         | order_vect_point/order_vect_segment | Elevation of stream outlet                                                                          | gpkg        |      |
