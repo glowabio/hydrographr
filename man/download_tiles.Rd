@@ -38,7 +38,7 @@ using the functions "get_tile_id" and "get_regional_unit_id" respectively.
 }
 \details{
 \tabular{llllll}{
-   Variable type \tab Variable \tab Abbreviation \tab Description \tab File_format \tab Unit \cr
+   \strong{Variable type} \tab \strong{Variable} \tab \strong{Abbreviation} \tab \strong{Description} \tab \strong{File_format} \tab \strong{Unit} \cr
    Flow \tab Flow accumulation \tab flow \tab Flow accumulation \tab tif \tab km² \cr
    Flow \tab Flow accumulation (positive values) \tab flowpos \tab Flow accumulation with positive values \tab tif \tab km² \cr
    Stream slope \tab Cell maximum curvature \tab slope_curv_max_dw_cel \tab Cell maximum curvature (between highest upstream cell,focal cell and downstream cell) \tab tif \tab m⁻¹ \cr
@@ -93,7 +93,7 @@ using the functions "get_tile_id" and "get_regional_unit_id" respectively.
                                                                                                                                                                                                                                                                            | Stream reach         | Gradient                                 | order_vect_point/order_vect_segment | Mean gradient of the sub-catchment (downstream elevation difference divided by distance)            | gpkg        |      |
                                                                                                                                                                                                                                                                            | Flow index           | Stream power index                       | spi                                 | A measure of the erosive power of flowing water (Moore et al., 1991)                                | tif         |      |
                                                                                                                                                                                                                                                                            | Flow index           | Sediment transportation index            | sti                                 | A metric for describing the erosion and deposition of sediments (Mojaddadi et al., 2017)            | tif         |      |
-                                                                                                                                                                                                                                                                           | Flow index           | Compound topographic index               | cti                                 | "A steady state wetness index, also known as topographic wetness index (TWI) (Beven & Kirkby,       |             |      |
+                                                                                                                                                                                                                                                                           | Flow index           | Compound topographic index               | cti                                 | "A steady state wetness index, also known as topographic wetness index (TWI) (Beven & Kirkby, 1979)"      |             |      |
 }\if{html}{\out{</div>}}
 }
 \examples{
