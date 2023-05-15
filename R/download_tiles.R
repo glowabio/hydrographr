@@ -7,8 +7,10 @@
 #' call of the function. The tile or regional unit IDs can be obtained
 #' using the functions "get_tile_id" and "get_regional_unit_id" respectively.
 #'
-#' @param variable character vector of variable names.
+#' @param variable character vector of variable names. See Details for all the
+#' variable names.
 #' @param file_format character. Format of the requested file ("tif" or "gpkg").
+#' See Details.
 #' @param tile_id character vector. The IDs of the requested tiles.
 #' @param reg_unit_id character vector. The IDs of the requested regional units.
 #' @param global logical. If TRUE, the global extent file is downloaded.
@@ -31,11 +33,13 @@
 #' In the following table you can find all the variables included in the
 #' Hydrography90m dataset. The column "Abbreviation" includes the variable names
 #' that should be used as an input in the parameter "variable" of the function.
+#' Likewise, the column "File format" contains the input that should be given to
+#' the "file_format" parameter.
 #' For more details and visualisations of the spatial layers, please refer to
-#' https://hydrography.org/hydrography90m/hydrography90m_layers/ .
+#' \url{https://hydrography.org/hydrography90m/hydrography90m_layers/}.
 #'
 #'
-#' | **Variable type**        | **Variable**                                 | **Abbreviation**                        | **Description**                                                                                         | **File_format** | **Unit** |
+#' | **Variable type**        | **Variable**                                 | **Abbreviation**                        | **Description**                                                                                         | **File format** | **Unit** |
 #'   |----------------------|------------------------------------------|-------------------------------------|-----------------------------------------------------------------------------------------------------|-------------|------|
 #'   | Flow                 | Flow accumulation                        | flow                                | Flow accumulation                                                                                   | tif         | km²  |
 #'   | Stream slope         | Cell maximum curvature                   | slope_curv_max_dw_cel               | Cell maximum curvature (between highest upstream cell,focal cell and downstream cell)               | tif         | m⁻¹  |

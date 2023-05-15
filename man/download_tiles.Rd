@@ -14,9 +14,11 @@ download_tiles(
 )
 }
 \arguments{
-\item{variable}{character vector of variable names.}
+\item{variable}{character vector of variable names. See Details for all the
+variable names.}
 
-\item{file_format}{character. Format of the requested file ("tif" or "gpkg").}
+\item{file_format}{character. Format of the requested file ("tif" or "gpkg").
+See Details.}
 
 \item{tile_id}{character vector. The IDs of the requested tiles.}
 
@@ -40,9 +42,11 @@ using the functions "get_tile_id" and "get_regional_unit_id" respectively.
 In the following table you can find all the variables included in the
 Hydrography90m dataset. The column "Abbreviation" includes the variable names
 that should be used as an input in the parameter "variable" of the function.
+Likewise, the column "File format" contains the input that should be given to
+the "file_format" parameter.
 For more details and visualisations of the spatial layers, please refer to
-https://hydrography.org/hydrography90m/hydrography90m_layers/ .\tabular{llllll}{
-   \strong{Variable type} \tab \strong{Variable} \tab \strong{Abbreviation} \tab \strong{Description} \tab \strong{File_format} \tab \strong{Unit} \cr
+\url{https://hydrography.org/hydrography90m/hydrography90m_layers/}.\tabular{llllll}{
+   \strong{Variable type} \tab \strong{Variable} \tab \strong{Abbreviation} \tab \strong{Description} \tab \strong{File format} \tab \strong{Unit} \cr
    Flow \tab Flow accumulation \tab flow \tab Flow accumulation \tab tif \tab km² \cr
    Stream slope \tab Cell maximum curvature \tab slope_curv_max_dw_cel \tab Cell maximum curvature (between highest upstream cell,focal cell and downstream cell) \tab tif \tab m⁻¹ \cr
    Stream slope \tab Cell minimum curvature \tab slope_curv_min_dw_cel \tab Cell minimum curvature(between lowest upstream cell,focal cell and downstream cell) \tab tif \tab m⁻¹ \cr
