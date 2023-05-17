@@ -46,6 +46,13 @@
 #' @references
 #' \url{https://grass.osgeo.org/grass82/manuals/r.univar.html}
 #'
+#' @return Returns a table with the sub-catchment ID (subc_id), number of cells
+#' with a value (data_cells), number of cells with a NoData value (nodata_cells),
+#' the minimum value (min), the maximum value (max), the value range (range),
+#' the arithmetic mean (mean), the arithmetic mean of the absolute values (mean_abs),
+#' the standard deviation (sd), the variance (var), the coefficient of variance
+#' (cv), the sum (sum), and the sum of the absolute values (sum_abs).
+#'
 #' @examples
 #' # Download test data into the temporary R folder
 #' # or define a different directory
