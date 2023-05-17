@@ -32,13 +32,12 @@
 #'
 #' @importFrom data.table setDT rbindlist setorder setnames as.data.table setkey
 #' @importFrom foreach foreach
-#' @importFrom parallel detectCores
+#' @importFrom parallel detectCores stopCluster
 #' @importFrom dplyr mutate
 #' @importFrom igraph graph.data.frame subcomponent V degree all_simple_paths
 #' as_ids delete_edges adjacent_vertices
 #' @importFrom future.apply future_lapply  future_mapply future_sapply
 #' @importFrom tidyr fill
-#' @importFrom parallel stopCluster
 #' @importFrom doFuture registerDoFuture
 #' @importFrom future plan multisession multicore sequential
 #' @importFrom terra rast expanse
@@ -63,7 +62,7 @@
 #'                       import_as ="graph")
 #'
 #' # Subset the graph such that it contains only one one basin. You can use
-#' a random ID, i.e. it does not need to be the real outlet of the basin.
+#' # a random ID, i.e. it does not need to be the real outlet of the basin.
 #' g <- get_catchment_graph(g,
 #'                          stream=513867228,
 #'                          outlet=FALSE,
@@ -73,11 +72,11 @@
 #' # Specify the sub-catchment raster file
 #' subc_raster <- paste0(DIR, "/sub_catchment_h34v10.tif")
 #'
-#' Specify the output directory
+#' # Specify the output directory
 #' out_dir <- my_directory
 #'
-#' Calculate the Pfafstetter sub-basins and write the raster layer to disk (
-#' and import into R)
+#' # Calculate the Pfafstetter sub-basins and write the raster layer to disk (
+#' # and import into R)
 #' pfafstetter <- get_pfafstetter_basins(g=my_graph,
 #'                                       subc_raster=subc_raster,
 #'                                       out_dir=out_dir,
