@@ -39,10 +39,10 @@ grass -f --gtext --tmp-location $SUBC_LAYER   <<'EOF'
     r.external  input=$DATADIR/$VAR  output=$VARNAME --overwrite  --qq
 
     # Add header to the output .csv file
-    echo "subc_id,${VARNAME}_min,${VARNAME}_max,${VARNAME}_range,${VARNAME}_mean,${VARNAME}_sd" \
+    echo "subc_id,${VARNAME}_data_cells,${VARNAME}_nodata_cells,${VARNAME}_min,${VARNAME}_max,${VARNAME}_range,${VARNAME}_mean,${VARNAME}_mean_abs,${VARNAME}_sd,${VARNAME}_var,${VARNAME}_cv,${VARNAME}_sum,${VARNAME}_sum_abs"\
         > $OUTDIR/stats_${VARNAME}_tmp.csv
     # Calculate zonal statistics and append to the output .csv
-    r.univar --qq -t --o map=$VARNAME zones=subc  separator=comma |  awk -F, 'BEGIN{OFS=",";} NR>1 {print $1, $5, $6, $7, $8, $10}'  \
+    r.univar --qq -t --o map=$VARNAME zones=subc  separator=comma |  awk -F, 'BEGIN{OFS=",";} NR>1 {print $1, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14}'  \
         >> $OUTDIR/stats_${VARNAME}_tmp.csv
 
 EOF
