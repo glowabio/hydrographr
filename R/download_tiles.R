@@ -128,8 +128,8 @@ download_tiles <- function(variable, file_format = "tif",
 
   # Introductory steps
 
-  # Set timeout option for download to 1 hour (3600 seconds)
-  options(timeout=3600)
+  # Set timeout option for download to 4 hours (14400 seconds)
+  options(timeout=14400)
 
   # Download lookup table with the size of each file
   # if it doesn't exist in the tempdir()
