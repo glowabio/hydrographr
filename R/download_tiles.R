@@ -103,7 +103,8 @@
 #'
 #' @md
 #' @note
-#' If there is an error during the download of a file, you can try to manually
+#' If there is an error during the download of a file
+#' (more likely in case of files bigger than 3-4GB), you can try to manually
 #' download this file by pasting the link that is returned by the error
 #' message in your browser.
 #'
