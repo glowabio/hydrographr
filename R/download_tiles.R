@@ -102,6 +102,11 @@
 #'   | Flow index           | Compound topographic index               | cti                       |          | tif              |
 #'
 #' @md
+#' @note
+#' If there is an error during the download of a file, you can try to manually
+#' download this file by pasting the link that is returned by the error
+#' message in your browser.
+#'
 #' @examples
 #' # Download data for two variables in three regular tiles
 #' # to the current working directory
