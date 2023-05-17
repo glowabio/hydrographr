@@ -39,59 +39,67 @@
 #' \url{https://hydrography.org/hydrography90m/hydrography90m_layers/}.
 #'
 #'
-#' | **Variable type**        | **Variable**                                 | **Abbreviation**                        | **Description**                                                                                         | **File format** | **Unit** |
-#'   |----------------------|------------------------------------------|-------------------------------------|-----------------------------------------------------------------------------------------------------|-------------|------|
-#'   | Flow                 | Flow accumulation                        | flow                                | Flow accumulation                                                                                   | tif         | km^2  |
-#'   | Stream slope         | Cell maximum curvature                   | slope_curv_max_dw_cel               | Cell maximum curvature (between highest upstream cell,focal cell and downstream cell)               | tif         | 1/m  |
-#'   | Stream slope         | Cell minimum curvature                   | slope_curv_min_dw_cel               | Cell minimum curvature(between lowest upstream cell,focal cell and downstream cell)                 | tif         | 1/m  |
-#'   | Stream slope         | Cell elevation difference                | slope_elv_dw_cel                    | Cell elevation difference(between focal cell and downstream cell)                                   | tif         | m    |
-#'   | Stream slope         | Cell gradient                            | slope_grad_dw_cel                   | Cell gradient                                                                                       | tif         |      |
-#'   | Stream distance      | Shortest distance to drainage divide     | stream_dist_up_near                 | Shortest upstream distance between focal grid cell and the nearest sub-catchment drainage divide    | tif         | m    |
-#'   | Stream distance      | Longest distance to drainage divide      | stream_dist_up_farth                | Longest upstream distance between focal grid cell and the nearest sub-catchment drainage divide     | tif         | m    |
-#'   | Stream distance      | Nearest down stream stream grid cell     | stream_dist_dw_near                 | Distance between focal grid cell and its nearest down stream stream grid cell                       | tif         | m    |
-#'   | Stream distance      | Outlet grid cell in the network          | outlet_dist_dw_basin                | Distance between focal grid cell and the outlet grid cell in the network                            | tif         | m    |
-#'   | Stream distance      | Down stream stream node grid cell        | outlet_dist_dw_scatch               | Distance between focal grid cell and the down stream stream node grid cell                          | tif         | m    |
-#'   | Stream distance      | Euclidean distance                       | stream_dist_proximity               | Euclidean distance between focal grid cell and the stream network (in meters)                       | tif         | m    |
-#'   | Elevation difference | Shortest path                            | stream_diff_up_near                 | Elevation difference of the shortest path from focal grid cell to the sub-catchment drainage divide | tif         | m    |
-#'   | Elevation difference | Longest path                             | stream_diff_up_farth                | Elevation difference of the longest path from focal grid cell to the sub-catchment drainage divide  | tif         | m    |
-#'   | Elevation difference | Nearest downstream stream pixel          | stream_diff_dw_near                 | Elevation difference between focal grid cell and its nearest downstream stream pixel                | tif         | m    |
-#'   | Elevation difference | Outlet grid cell in the network          | outlet_diff_dw_basin                | Elevation difference between focal grid cell and the outlet grid cell in the network                | tif         | m    |
-#'   | Elevation difference | Downstream stream node grid cell         | outlet_diff_dw_scatch               | Elevation difference between focal grid cell and the downstream stream node grid cell               | tif         | m    |
-#'   | Segment properties   | Segment downstream mean gradient         | channel_grad_dw_seg                 | Segment downstream mean gradient (between focal cell and the node/outlet)                           | tif         |      |
-#'   | Segment properties   | Segment upstream mean gradient           | channel_grad_up_seg                 | Segment upstream mean gradient (between focal cell and the init/node)                               | tif         |      |
-#'   | Segment properties   | Cell upstream gradient                   | channel_grad_up_cel                 | Cell upstream gradient (between focal cell and next cell                                            | tif         |      |
-#'| Segment properties   | Cell stream course curvature             | channel curv_cel                    | Cell stream course curvature (focal cell)                                                           | tif         |      |
-#'| Segment properties   | Segment downstream elevation difference  | channel_elv_dw_seg                  | Segment downstream elevation difference (between focal cell and the node/outlet)                    | tif         |      |
-#'| Segment properties   | Segment upstream elevation difference    | channel_elv_up_seg                  | Segment upstream elevation difference (between focal cell and the init/node)                        | tif         |      |
-#'| Segment properties   | Cell upstream elevation difference       | channel_elv_up_cel                  | Cell upstream elevation difference (between focal cell and next cell)                               | tif         |      |
-#'| Segment properties   | Cell downstream elevation difference     | channel_elv_dw_cel                  | Cell downstream elevation difference (between focal cell and next cell)                             | tif         |      |
-#'| Segment properties   | Segment downstream distance              | channel_dist_dw_seg                 | Segment downstream distance (between focal cell and the node/outlet                                 | tif         |      |
-#'| Segment properties   | Segment upstream distance                | channel_dist_up_seg                 | Segment upstream distance (between focal cell and the init/node)                                    | tif         |      |
-#'| Segment properties   | Cell upstream distance                   | channel_dist_up_cel                 | Cell upstream distance (between focal cell and next cell)                                           | tif         |      |
-#'| Stream order         | Strahler’s stream order                  | order_strahler                      | Strahler’s stream order                                                                             | tif         |      |
-#'| Stream order         | Shreve’s stream magnitude                | order_shreve                        | Shreve’s stream magnitude                                                                           | tif         |      |
-#'| Stream order         | Horton’s stream order                    | order_horton                        | Horton’s stream order                                                                               | tif         |      |
-#'| Stream order         | Hack’s stream order                      | order_hack                          | Hack’s stream order                                                                                 | tif         |      |
-#'| Stream order         | Topological dimension of streams         | order_topo                          | Topological dimension of streams                                                                    | tif         |      |
-#'| Stream order         | Strahler’s stream order                  | order_vect_point/order_vect_segment | Strahler’s stream order                                                                             | gpkg        |      |
-#'| Stream order         | Shreve’s stream magnitude                | order_vect_point/order_vect_segment | Shreve’s stream magnitude                                                                           | gpkg        |      |
-#'| Stream order         | Horton’s stream order                    | order_vect_point/order_vect_segment | Horton’s stream order                                                                               | gpkg        |      |
-#'| Stream order         | Hack’s stream order                      | order_vect_point/order_vect_segment | Hack’s stream order                                                                                 | gpkg        |      |
-#'| Stream order         | Topological dimension of streams         | order_vect_point/order_vect_segment | Topological dimension of streams                                                                    | gpkg        |      |
-#'| Stream reach         | Length of the stream reach               | order_vect_point/order_vect_segment | Length of the stream reach                                                                          | gpkg        |      |
-#'| Stream reach         | Straight length                          | order_vect_point/order_vect_segment | Length of stream as straight line                                                                   | gpkg        |      |
-#'| Stream reach         | Sinusoid of the stream reach             | order_vect_point/order_vect_segment | Fractal dimension: stream length/straight stream length                                             | gpkg        |      |
-#'| Stream reach         | Accumulated length                       | order_vect_point/order_vect_segment | Length of stream from source                                                                        | gpkg        |      |
-#'| Stream reach         | Flow accumulation                        | order_vect_point/order_vect_segment | Flow accumulation                                       | gpkg        |      |
-#'| Stream reach         | Distance to outlet                       | order_vect_point/order_vect_segment | Distance of current stream init from outlet                                                         | gpkg        |      |
-#'| Stream reach         | Source elevation                         | order_vect_point/order_vect_segment | Elevation of stream init                                                                            | gpkg        |      |
-#'| Stream reach         | Outlet elevation                         | order_vect_point/order_vect_segment | Elevation of stream outlet                                                                          | gpkg        |      |
-#'| Stream reach         | Elevation drop                           | order_vect_point/order_vect_segment | Difference between source_elev and outlet_elev + drop outlet                                        | gpkg        |      |
-#'| Stream reach         | Outlet drop                              | order_vect_point/order_vect_segment | Drop at the outlet of the stream                                                                    | gpkg        |      |
-#'| Stream reach         | Gradient                                 | order_vect_point/order_vect_segment | Mean gradient of the sub-catchment (downstream elevation difference divided by distance)            | gpkg        |      |
-#'| Flow index           | Stream power index                       | spi                                 | A measure of the erosive power of flowing water (Moore et al., 1991)                                | tif         |      |
-#'| Flow index           | Sediment transportation index            | sti                                 | A metric for describing the erosion and deposition of sediments (Mojaddadi et al., 2017)            | tif         |      |
-#'| Flow index           | Compound topographic index               | cti                                 | A steady state wetness index, also known as topographic wetness index (TWI) (Beven & Kirkby, 1979)  |tif          |      |
+#'| **Variable type**    | **Variable**                             | **Abbreviation**          | **Unit** | **File_format** |
+#' |----------------------|------------------------------------------|---------------------------|----------|------------------|
+#'   | Network              | Drainage basin                           | basin                     |          | tif              |
+#'   | Network              | Drainage basin                           | basin                     |          | gpkg             |
+#'   | Network              | Sub-catchment                           | sub_catchment            |          | tif              |
+#'   | Network              | Sub-catchment                           | sub_catchment            |          | gpkg             |
+#'   | Network              | Stream segment                           | segment                   |          | tif              |
+#'   | Network              | Outlet                                   | outlet                    |          | tif              |
+#'   | Network              | Outlet                                   | outlet                    |          | gpkg             |
+#'   | Network              | Regional unit                            | regional_unit            |          | tif              |
+#'   | Flow                 | Flow accumulation                        | flow                      | km^2     | tif              |
+#'   | Stream slope         | Cell maximum curvature                   | slope_curv_max_dw_cel | 1/m      | tif              |
+#'   | Stream slope         | Cell minimum curvature                   | slope_curv_min_dw_cel | 1/m      | tif              |
+#'   | Stream slope         | Cell elevation difference                | slope_elv_dw_cel       | m        | tif              |
+#'   | Stream slope         | Cell gradient                            | slope_grad_dw_cel      |          | tif              |
+#'   | Stream distance      | Shortest distance to drainage divide     | stream_dist_up_near    | m        | tif              |
+#'   | Stream distance      | Longest distance to drainage divide      | stream_dist_up_farth   | m        | tif              |
+#'   | Stream distance      | Nearest down stream stream grid cell     | stream_dist_dw_near    | m        | tif              |
+#'   | Stream distance      | Outlet grid cell in the network          | outlet_dist_dw_basin   | m        | tif              |
+#'   | Stream distance      | Down stream stream node grid cell        | outlet_dist_dw_scatch  | m        | tif              |
+#'   | Stream distance      | Euclidean distance                       | stream_dist_proximity   | m        | tif              |
+#'   | Elevation difference | Shortest path                            | stream_diff_up_near    | m        | tif              |
+#'   | Elevation difference | Longest path                             | stream_diff_up_farth   | m        | tif              |
+#'   | Elevation difference | Nearest downstream stream pixel          | stream_diff_dw_near    | m        | tif              |
+#'   | Elevation difference | Outlet grid cell in the network          | outlet_diff_dw_basin   | m        | tif              |
+#'   | Elevation difference | Downstream stream node grid cell         | outlet_diff_dw_scatch  | m        | tif              |
+#'   | Segment properties   | Segment downstream mean gradient         | channel_grad_dw_seg    |          | tif              |
+#'   | Segment properties   | Segment upstream mean gradient           | channel_grad_up_seg    |          | tif              |
+#'   | Segment properties   | Cell upstream gradient                   | channel_grad_up_cel    |          | tif              |
+#'   | Segment properties   | Cell stream course curvature             | channel curv_cel         |          | tif              |
+#'   | Segment properties   | Segment downstream elevation difference  | channel_elv_dw_seg     |          | tif              |
+#'   | Segment properties   | Segment upstream elevation difference    | channel_elv_up_seg     |          | tif              |
+#'   | Segment properties   | Cell upstream elevation difference       | channel_elv_up_cel     |          | tif              |
+#'   | Segment properties   | Cell downstream elevation difference     | channel_elv_dw_cel     |          | tif              |
+#'   | Segment properties   | Segment downstream distance              | channel_dist_dw_seg    |          | tif              |
+#'   | Segment properties   | Segment upstream distance                | channel_dist_up_seg    |          | tif              |
+#'   | Segment properties   | Cell upstream distance                   | channel_dist_up_cel    |          | tif              |
+#'   | Stream order         | Strahler’s stream order                  | order_strahler           |          | tif              |
+#'   | Stream order         | Shreve’s stream magnitude                | order_shreve             |          | tif              |
+#'   | Stream order         | Horton’s stream order                    | order_horton             |          | tif              |
+#'   | Stream order         | Hack’s stream order                      | order_hack               |          | tif              |
+#'   | Stream order         | Topological dimension of streams         | order_topo               |          | tif              |
+#'   | Stream order         | Strahler’s stream order                  | order_vect_segment      |          | gpkg             |
+#'   | Stream order         | Shreve’s stream magnitude                | order_vect_segment      |          | gpkg             |
+#'   | Stream order         | Horton’s stream order                    | order_vect_segment      |          | gpkg             |
+#'   | Stream order         | Hack’s stream order                      | order_vect_segment      |          | gpkg             |
+#'   | Stream order         | Topological dimension of streams         | order_vect_segment      |          | gpkg             |
+#'   | Stream reach         | Length of the stream reach               | order_vect_segment      | m        | gpkg             |
+#'   | Stream reach         | Straight length                          | order_vect_segment      | m        | gpkg             |
+#'   | Stream reach         | Sinusoid of the stream reach             | order_vect_segment      |          | gpkg             |
+#'   | Stream reach         | Accumulated length                       | order_vect_segment      | m        | gpkg             |
+#'   | Stream reach         | Flow accumulation                        | order_vect_segment      | km^2     | gpkg             |
+#'   | Stream reach         | Distance to outlet                       | order_vect_segment      | m        | gpkg             |
+#'   | Stream reach         | Source elevation                         | order_vect_segment      | m        | gpkg             |
+#'   | Stream reach         | Outlet elevation                         | order_vect_segment      | m        | gpkg             |
+#'   | Stream reach         | Elevation drop                           | order_vect_segment      |          | gpkg             |
+#'   | Stream reach         | Outlet drop                              | order_vect_segment      |          | gpkg             |
+#'   | Stream reach         | Gradient                                 | order_vect_segment      |          | gpkg             |
+#'   | Flow index           | Stream power index                       | spi                       |          | tif              |
+#'   | Flow index           | Sediment transportation index            | sti                       |          | tif              |
+#'   | Flow index           | Compound topographic index               | cti                       |          | tif              |
 #'
 #' @md
 #' @examples
