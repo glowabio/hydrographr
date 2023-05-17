@@ -47,9 +47,9 @@ the "file_format" parameter.
 For more details and visualisations of the spatial layers, please refer to
 \url{https://hydrography.org/hydrography90m/hydrography90m_layers/}.\tabular{llllll}{
    \strong{Variable type} \tab \strong{Variable} \tab \strong{Abbreviation} \tab \strong{Description} \tab \strong{File format} \tab \strong{Unit} \cr
-   Flow \tab Flow accumulation \tab flow \tab Flow accumulation \tab tif \tab km² \cr
-   Stream slope \tab Cell maximum curvature \tab slope_curv_max_dw_cel \tab Cell maximum curvature (between highest upstream cell,focal cell and downstream cell) \tab tif \tab m⁻¹ \cr
-   Stream slope \tab Cell minimum curvature \tab slope_curv_min_dw_cel \tab Cell minimum curvature(between lowest upstream cell,focal cell and downstream cell) \tab tif \tab m⁻¹ \cr
+   Flow \tab Flow accumulation \tab flow \tab Flow accumulation \tab tif \tab km^2 \cr
+   Stream slope \tab Cell maximum curvature \tab slope_curv_max_dw_cel \tab Cell maximum curvature (between highest upstream cell,focal cell and downstream cell) \tab tif \tab 1/m \cr
+   Stream slope \tab Cell minimum curvature \tab slope_curv_min_dw_cel \tab Cell minimum curvature(between lowest upstream cell,focal cell and downstream cell) \tab tif \tab 1/m \cr
    Stream slope \tab Cell elevation difference \tab slope_elv_dw_cel \tab Cell elevation difference(between focal cell and downstream cell) \tab tif \tab m \cr
    Stream slope \tab Cell gradient \tab slope_grad_dw_cel \tab Cell gradient \tab tif \tab  \cr
    Stream distance \tab Shortest distance to drainage divide \tab stream_dist_up_near \tab Shortest upstream distance between focal grid cell and the nearest sub-catchment drainage divide \tab tif \tab m \cr
