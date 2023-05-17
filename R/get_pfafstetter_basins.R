@@ -32,7 +32,7 @@
 #'
 #' @importFrom data.table setDT rbindlist setorder setnames as.data.table setkey
 #' @importFrom foreach foreach
-#' @importFrom doParallel detectCores
+#' @importFrom parallel detectCores
 #' @importFrom dplyr mutate
 #' @importFrom igraph graph.data.frame subcomponent V degree all_simple_paths
 #' as_ids delete_edges adjacent_vertices
