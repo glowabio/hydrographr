@@ -18,7 +18,7 @@ The output is a data.table which is loaded into R."><!-- mathjax --><script src=
     
     <a class="navbar-brand me-2" href="../index.html">hydrographr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.13</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.14</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -124,7 +124,8 @@ will be stored. out_dir should also be specified for this purpose.</p></dd>
 
 <dt>n_cores</dt>
 <dd><p>numeric. Number of cores used for parallelization, in case
-multiple .tif files are provided to var_layer.</p></dd>
+multiple .tif files are provided to var_layer. Default is NULL
+(= detectCores(logical=FALSE)-1).</p></dd>
 
 
 <dt>quiet</dt>
@@ -132,6 +133,17 @@ multiple .tif files are provided to var_layer.</p></dd>
 Default is TRUE.</p></dd>
 
 </dl></div>
+    <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    
+
+<p>Returns a table with the sub-catchment ID (subc_id), number of cells
+with a value (data_cells), number of cells with a NoData value (nodata_cells),
+the minimum value (min), the maximum value (max), the value range (range),
+the arithmetic mean (mean), the arithmetic mean of the absolute values (mean_abs),
+the standard deviation (sd), the variance (var), the coefficient of variance
+(cv), the sum (sum), and the sum of the absolute values (sum_abs).</p>
+    </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
     <p><a href="https://grass.osgeo.org/grass82/manuals/r.univar.html" class="external-link">https://grass.osgeo.org/grass82/manuals/r.univar.html</a></p>
