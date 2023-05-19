@@ -46,6 +46,7 @@
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/case_study_brazil.html">Case study - São Francisco drainage basin</a>
     <a class="dropdown-item" href="../articles/case_study_cuba.html">Case study - Cuba</a>
+    <a class="dropdown-item" href="../articles/case_study_cuba_for_pdf.html">Case study - Cuba</a>
     <a class="dropdown-item" href="../articles/linux_system_setup.html">Setting up the package requirements on Linux</a>
     <a class="dropdown-item" href="../articles/windows_system_setup.html">Setting up the package requirements on Windows</a>
   </div>
@@ -3452,7 +3453,7 @@ stats_table, to use them as predictors in the species distribution
 model</p>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">stats_table_zon</span> <span class="op">&lt;-</span> <span class="va">stats_table_zon</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">contains</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"subc"</span>, <span class="st">"_mean"</span>, <span class="st">"_sd"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">contains</a></span><span class="op">(</span><span class="st">"subc"</span><span class="op">)</span> <span class="op">|</span>  <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">ends_with</a></span><span class="op">(</span><span class="st">"_mean"</span><span class="op">)</span> <span class="op">|</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">ends_with</a></span><span class="op">(</span><span class="st">"_sd"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span><span class="st">'subcatchment_id'</span> <span class="op">=</span> <span class="st">'subc_id'</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
@@ -3481,8 +3482,8 @@ an indicator of the sub-catchment size</p>
 <span><span class="co"># Clear up memory</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">stats_gpkg_h08v06</span>, <span class="va">stats_gpkg_h10v06</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/base/gc.html" class="external-link">gc</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##            used  (Mb) gc trigger  (Mb)  max used  (Mb)</span></span>
-<span><span class="co">## Ncells  4612220 246.4    8663244 462.7   6490775 346.7</span></span>
-<span><span class="co">## Vcells 36394927 277.7  104867320 800.1 104345376 796.1</span></span></code></pre>
+<span><span class="co">## Ncells  4613378 246.4    8663238 462.7   6491353 346.7</span></span>
+<span><span class="co">## Vcells 27068050 206.6   83893892 640.1 104348114 796.2</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="prepare-data-for-modelling">Prepare data for modelling<a class="anchor" aria-label="anchor" href="#prepare-data-for-modelling"></a>
@@ -3516,49 +3517,25 @@ subcatchment_id
 bio1_1981.2010_mean
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
-bio1_1981.2010_mean_abs
-</th>
-<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 bio1_IPSL.CM6A.LR_ssp370_2041.2070_mean
-</th>
-<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
-bio1_IPSL.CM6A.LR_ssp370_2041.2070_mean_abs
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 bio12_1981.2010_mean
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
-bio12_1981.2010_mean_abs
-</th>
-<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 bio12_IPSL.CM6A.LR_ssp370_2041.2070_mean
-</th>
-<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
-bio12_IPSL.CM6A.LR_ssp370_2041.2070_mean_abs
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 bio15_1981.2010_mean
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
-bio15_1981.2010_mean_abs
-</th>
-<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 bio15_IPSL.CM6A.LR_ssp370_2041.2070_mean
-</th>
-<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
-bio15_IPSL.CM6A.LR_ssp370_2041.2070_mean_abs
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 slope_curv_max_dw_cel_mean
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
-slope_curv_max_dw_cel_mean_abs
-</th>
-<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 spi_mean
-</th>
-<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
-spi_mean_abs
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 bio1_1981.2010_sd
@@ -3597,16 +3574,7 @@ length
 25.45
 </td>
 <td style="text-align:right;">
-25.45
-</td>
-<td style="text-align:right;">
 27.35
-</td>
-<td style="text-align:right;">
-27.35
-</td>
-<td style="text-align:right;">
-1105.004
 </td>
 <td style="text-align:right;">
 1105.004
@@ -3615,28 +3583,13 @@ length
 1054.623
 </td>
 <td style="text-align:right;">
-1054.623
-</td>
-<td style="text-align:right;">
 41.47380
-</td>
-<td style="text-align:right;">
-41.47380
-</td>
-<td style="text-align:right;">
-37.40225
 </td>
 <td style="text-align:right;">
 37.40225
 </td>
 <td style="text-align:right;">
 -0.0024720
-</td>
-<td style="text-align:right;">
-0.0057521
-</td>
-<td style="text-align:right;">
-6.655367
 </td>
 <td style="text-align:right;">
 6.655367
@@ -3677,16 +3630,7 @@ length
 25.45
 </td>
 <td style="text-align:right;">
-25.45
-</td>
-<td style="text-align:right;">
 27.35
-</td>
-<td style="text-align:right;">
-27.35
-</td>
-<td style="text-align:right;">
-1104.917
 </td>
 <td style="text-align:right;">
 1104.917
@@ -3695,28 +3639,13 @@ length
 1054.572
 </td>
 <td style="text-align:right;">
-1054.572
-</td>
-<td style="text-align:right;">
 41.41220
-</td>
-<td style="text-align:right;">
-41.41220
-</td>
-<td style="text-align:right;">
-37.30610
 </td>
 <td style="text-align:right;">
 37.30610
 </td>
 <td style="text-align:right;">
 -0.0039076
-</td>
-<td style="text-align:right;">
-0.0075273
-</td>
-<td style="text-align:right;">
-8.925926
 </td>
 <td style="text-align:right;">
 8.925926
@@ -3757,16 +3686,7 @@ length
 25.45
 </td>
 <td style="text-align:right;">
-25.45
-</td>
-<td style="text-align:right;">
 27.35
-</td>
-<td style="text-align:right;">
-27.35
-</td>
-<td style="text-align:right;">
-1101.970
 </td>
 <td style="text-align:right;">
 1101.970
@@ -3775,28 +3695,13 @@ length
 1052.042
 </td>
 <td style="text-align:right;">
-1052.042
-</td>
-<td style="text-align:right;">
 41.45811
-</td>
-<td style="text-align:right;">
-41.45811
-</td>
-<td style="text-align:right;">
-37.51757
 </td>
 <td style="text-align:right;">
 37.51757
 </td>
 <td style="text-align:right;">
 -0.0011602
-</td>
-<td style="text-align:right;">
-0.0030823
-</td>
-<td style="text-align:right;">
-2.439189
 </td>
 <td style="text-align:right;">
 2.439189
@@ -3837,16 +3742,7 @@ length
 25.45
 </td>
 <td style="text-align:right;">
-25.45
-</td>
-<td style="text-align:right;">
 27.35
-</td>
-<td style="text-align:right;">
-27.35
-</td>
-<td style="text-align:right;">
-1098.700
 </td>
 <td style="text-align:right;">
 1098.700
@@ -3855,28 +3751,13 @@ length
 1049.000
 </td>
 <td style="text-align:right;">
-1049.000
-</td>
-<td style="text-align:right;">
 41.50000
-</td>
-<td style="text-align:right;">
-41.50000
-</td>
-<td style="text-align:right;">
-37.60000
 </td>
 <td style="text-align:right;">
 37.60000
 </td>
 <td style="text-align:right;">
 -0.0020463
-</td>
-<td style="text-align:right;">
-0.0038746
-</td>
-<td style="text-align:right;">
-2.142857
 </td>
 <td style="text-align:right;">
 2.142857
@@ -3917,16 +3798,7 @@ length
 25.45
 </td>
 <td style="text-align:right;">
-25.45
-</td>
-<td style="text-align:right;">
 27.35
-</td>
-<td style="text-align:right;">
-27.35
-</td>
-<td style="text-align:right;">
-1100.902
 </td>
 <td style="text-align:right;">
 1100.902
@@ -3935,28 +3807,13 @@ length
 1050.990
 </td>
 <td style="text-align:right;">
-1050.990
-</td>
-<td style="text-align:right;">
 41.47654
-</td>
-<td style="text-align:right;">
-41.47654
-</td>
-<td style="text-align:right;">
-37.52160
 </td>
 <td style="text-align:right;">
 37.52160
 </td>
 <td style="text-align:right;">
 -0.0022349
-</td>
-<td style="text-align:right;">
-0.0051348
-</td>
-<td style="text-align:right;">
-2.660494
 </td>
 <td style="text-align:right;">
 2.660494
@@ -3997,16 +3854,7 @@ length
 25.45
 </td>
 <td style="text-align:right;">
-25.45
-</td>
-<td style="text-align:right;">
 27.35
-</td>
-<td style="text-align:right;">
-27.35
-</td>
-<td style="text-align:right;">
-1097.740
 </td>
 <td style="text-align:right;">
 1097.740
@@ -4015,28 +3863,13 @@ length
 1048.120
 </td>
 <td style="text-align:right;">
-1048.120
-</td>
-<td style="text-align:right;">
-41.50000
-</td>
-<td style="text-align:right;">
 41.50000
 </td>
 <td style="text-align:right;">
 37.68000
 </td>
 <td style="text-align:right;">
-37.68000
-</td>
-<td style="text-align:right;">
 0.0021164
-</td>
-<td style="text-align:right;">
-0.0021164
-</td>
-<td style="text-align:right;">
-1.200000
 </td>
 <td style="text-align:right;">
 1.200000
@@ -4098,49 +3931,25 @@ subcatchment_id
 bio1_1981.2010_mean
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
-bio1_1981.2010_mean_abs
-</th>
-<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 bio1_IPSL.CM6A.LR_ssp370_2041.2070_mean
-</th>
-<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
-bio1_IPSL.CM6A.LR_ssp370_2041.2070_mean_abs
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 bio12_1981.2010_mean
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
-bio12_1981.2010_mean_abs
-</th>
-<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 bio12_IPSL.CM6A.LR_ssp370_2041.2070_mean
-</th>
-<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
-bio12_IPSL.CM6A.LR_ssp370_2041.2070_mean_abs
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 bio15_1981.2010_mean
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
-bio15_1981.2010_mean_abs
-</th>
-<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 bio15_IPSL.CM6A.LR_ssp370_2041.2070_mean
-</th>
-<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
-bio15_IPSL.CM6A.LR_ssp370_2041.2070_mean_abs
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 slope_curv_max_dw_cel_mean
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
-slope_curv_max_dw_cel_mean_abs
-</th>
-<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 spi_mean
-</th>
-<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
-spi_mean_abs
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 bio1_1981.2010_sd
@@ -4179,16 +3988,7 @@ length
 25.45
 </td>
 <td style="text-align:right;">
-25.45
-</td>
-<td style="text-align:right;">
 27.35
-</td>
-<td style="text-align:right;">
-27.35
-</td>
-<td style="text-align:right;">
-1110.4
 </td>
 <td style="text-align:right;">
 1110.4
@@ -4197,25 +3997,10 @@ length
 1054.3
 </td>
 <td style="text-align:right;">
-1054.3
-</td>
-<td style="text-align:right;">
-41.8
-</td>
-<td style="text-align:right;">
 41.8
 </td>
 <td style="text-align:right;">
 36.6
-</td>
-<td style="text-align:right;">
-36.6
-</td>
-<td style="text-align:right;">
-NA
-</td>
-<td style="text-align:right;">
-NA
 </td>
 <td style="text-align:right;">
 NA
@@ -4259,16 +4044,7 @@ NA
 25.55
 </td>
 <td style="text-align:right;">
-25.55
-</td>
-<td style="text-align:right;">
 27.55
-</td>
-<td style="text-align:right;">
-27.55
-</td>
-<td style="text-align:right;">
-1362.3
 </td>
 <td style="text-align:right;">
 1362.3
@@ -4277,25 +4053,10 @@ NA
 1261.1
 </td>
 <td style="text-align:right;">
-1261.1
-</td>
-<td style="text-align:right;">
-49.3
-</td>
-<td style="text-align:right;">
 49.3
 </td>
 <td style="text-align:right;">
 42.9
-</td>
-<td style="text-align:right;">
-42.9
-</td>
-<td style="text-align:right;">
-NA
-</td>
-<td style="text-align:right;">
-NA
 </td>
 <td style="text-align:right;">
 NA
@@ -4339,16 +4100,7 @@ NA
 25.35
 </td>
 <td style="text-align:right;">
-25.35
-</td>
-<td style="text-align:right;">
 27.35
-</td>
-<td style="text-align:right;">
-27.35
-</td>
-<td style="text-align:right;">
-1117.2
 </td>
 <td style="text-align:right;">
 1117.2
@@ -4357,25 +4109,10 @@ NA
 1059.8
 </td>
 <td style="text-align:right;">
-1059.8
-</td>
-<td style="text-align:right;">
-42.9
-</td>
-<td style="text-align:right;">
 42.9
 </td>
 <td style="text-align:right;">
 38.9
-</td>
-<td style="text-align:right;">
-38.9
-</td>
-<td style="text-align:right;">
-NA
-</td>
-<td style="text-align:right;">
-NA
 </td>
 <td style="text-align:right;">
 NA
@@ -4419,16 +4156,7 @@ NA
 25.35
 </td>
 <td style="text-align:right;">
-25.35
-</td>
-<td style="text-align:right;">
 27.25
-</td>
-<td style="text-align:right;">
-27.25
-</td>
-<td style="text-align:right;">
-1130.5
 </td>
 <td style="text-align:right;">
 1130.5
@@ -4437,25 +4165,10 @@ NA
 1074.5
 </td>
 <td style="text-align:right;">
-1074.5
-</td>
-<td style="text-align:right;">
-43.2
-</td>
-<td style="text-align:right;">
 43.2
 </td>
 <td style="text-align:right;">
 38.6
-</td>
-<td style="text-align:right;">
-38.6
-</td>
-<td style="text-align:right;">
-NA
-</td>
-<td style="text-align:right;">
-NA
 </td>
 <td style="text-align:right;">
 NA
@@ -4499,16 +4212,7 @@ NA
 25.35
 </td>
 <td style="text-align:right;">
-25.35
-</td>
-<td style="text-align:right;">
 27.25
-</td>
-<td style="text-align:right;">
-27.25
-</td>
-<td style="text-align:right;">
-1149.3
 </td>
 <td style="text-align:right;">
 1149.3
@@ -4517,25 +4221,10 @@ NA
 1086.0
 </td>
 <td style="text-align:right;">
-1086.0
-</td>
-<td style="text-align:right;">
-44.5
-</td>
-<td style="text-align:right;">
 44.5
 </td>
 <td style="text-align:right;">
 39.0
-</td>
-<td style="text-align:right;">
-39.0
-</td>
-<td style="text-align:right;">
-NA
-</td>
-<td style="text-align:right;">
-NA
 </td>
 <td style="text-align:right;">
 NA
@@ -4579,16 +4268,7 @@ NA
 25.45
 </td>
 <td style="text-align:right;">
-25.45
-</td>
-<td style="text-align:right;">
 27.45
-</td>
-<td style="text-align:right;">
-27.45
-</td>
-<td style="text-align:right;">
-1305.2
 </td>
 <td style="text-align:right;">
 1305.2
@@ -4597,25 +4277,10 @@ NA
 1207.6
 </td>
 <td style="text-align:right;">
-1207.6
-</td>
-<td style="text-align:right;">
-50.2
-</td>
-<td style="text-align:right;">
 50.2
 </td>
 <td style="text-align:right;">
 43.9
-</td>
-<td style="text-align:right;">
-43.9
-</td>
-<td style="text-align:right;">
-NA
-</td>
-<td style="text-align:right;">
-NA
 </td>
 <td style="text-align:right;">
 NA
@@ -4666,49 +4331,25 @@ subcatchment_id
 bio1_1981.2010_mean
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
-bio1_1981.2010_mean_abs
-</th>
-<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 bio1_IPSL.CM6A.LR_ssp370_2041.2070_mean
-</th>
-<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
-bio1_IPSL.CM6A.LR_ssp370_2041.2070_mean_abs
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 bio12_1981.2010_mean
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
-bio12_1981.2010_mean_abs
-</th>
-<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 bio12_IPSL.CM6A.LR_ssp370_2041.2070_mean
-</th>
-<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
-bio12_IPSL.CM6A.LR_ssp370_2041.2070_mean_abs
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 bio15_1981.2010_mean
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
-bio15_1981.2010_mean_abs
-</th>
-<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 bio15_IPSL.CM6A.LR_ssp370_2041.2070_mean
-</th>
-<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
-bio15_IPSL.CM6A.LR_ssp370_2041.2070_mean_abs
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 slope_curv_max_dw_cel_mean
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
-slope_curv_max_dw_cel_mean_abs
-</th>
-<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 spi_mean
-</th>
-<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
-spi_mean_abs
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 bio1_1981.2010_sd
@@ -4747,16 +4388,7 @@ length
 25.45
 </td>
 <td style="text-align:right;">
-25.45
-</td>
-<td style="text-align:right;">
 27.35
-</td>
-<td style="text-align:right;">
-27.35
-</td>
-<td style="text-align:right;">
-1110.4
 </td>
 <td style="text-align:right;">
 1110.4
@@ -4765,25 +4397,10 @@ length
 1054.3
 </td>
 <td style="text-align:right;">
-1054.3
-</td>
-<td style="text-align:right;">
-41.8
-</td>
-<td style="text-align:right;">
 41.8
 </td>
 <td style="text-align:right;">
 36.6
-</td>
-<td style="text-align:right;">
-36.6
-</td>
-<td style="text-align:right;">
-NA
-</td>
-<td style="text-align:right;">
-NA
 </td>
 <td style="text-align:right;">
 NA
@@ -4827,16 +4444,7 @@ NA
 25.55
 </td>
 <td style="text-align:right;">
-25.55
-</td>
-<td style="text-align:right;">
 27.55
-</td>
-<td style="text-align:right;">
-27.55
-</td>
-<td style="text-align:right;">
-1362.3
 </td>
 <td style="text-align:right;">
 1362.3
@@ -4845,25 +4453,10 @@ NA
 1261.1
 </td>
 <td style="text-align:right;">
-1261.1
-</td>
-<td style="text-align:right;">
-49.3
-</td>
-<td style="text-align:right;">
 49.3
 </td>
 <td style="text-align:right;">
 42.9
-</td>
-<td style="text-align:right;">
-42.9
-</td>
-<td style="text-align:right;">
-NA
-</td>
-<td style="text-align:right;">
-NA
 </td>
 <td style="text-align:right;">
 NA
@@ -4907,16 +4500,7 @@ NA
 25.35
 </td>
 <td style="text-align:right;">
-25.35
-</td>
-<td style="text-align:right;">
 27.35
-</td>
-<td style="text-align:right;">
-27.35
-</td>
-<td style="text-align:right;">
-1117.2
 </td>
 <td style="text-align:right;">
 1117.2
@@ -4925,25 +4509,10 @@ NA
 1059.8
 </td>
 <td style="text-align:right;">
-1059.8
-</td>
-<td style="text-align:right;">
-42.9
-</td>
-<td style="text-align:right;">
 42.9
 </td>
 <td style="text-align:right;">
 38.9
-</td>
-<td style="text-align:right;">
-38.9
-</td>
-<td style="text-align:right;">
-NA
-</td>
-<td style="text-align:right;">
-NA
 </td>
 <td style="text-align:right;">
 NA
@@ -4987,16 +4556,7 @@ NA
 25.35
 </td>
 <td style="text-align:right;">
-25.35
-</td>
-<td style="text-align:right;">
 27.25
-</td>
-<td style="text-align:right;">
-27.25
-</td>
-<td style="text-align:right;">
-1130.5
 </td>
 <td style="text-align:right;">
 1130.5
@@ -5005,25 +4565,10 @@ NA
 1074.5
 </td>
 <td style="text-align:right;">
-1074.5
-</td>
-<td style="text-align:right;">
-43.2
-</td>
-<td style="text-align:right;">
 43.2
 </td>
 <td style="text-align:right;">
 38.6
-</td>
-<td style="text-align:right;">
-38.6
-</td>
-<td style="text-align:right;">
-NA
-</td>
-<td style="text-align:right;">
-NA
 </td>
 <td style="text-align:right;">
 NA
@@ -5067,16 +4612,7 @@ NA
 25.35
 </td>
 <td style="text-align:right;">
-25.35
-</td>
-<td style="text-align:right;">
 27.25
-</td>
-<td style="text-align:right;">
-27.25
-</td>
-<td style="text-align:right;">
-1149.3
 </td>
 <td style="text-align:right;">
 1149.3
@@ -5085,25 +4621,10 @@ NA
 1086.0
 </td>
 <td style="text-align:right;">
-1086.0
-</td>
-<td style="text-align:right;">
-44.5
-</td>
-<td style="text-align:right;">
 44.5
 </td>
 <td style="text-align:right;">
 39.0
-</td>
-<td style="text-align:right;">
-39.0
-</td>
-<td style="text-align:right;">
-NA
-</td>
-<td style="text-align:right;">
-NA
 </td>
 <td style="text-align:right;">
 NA
@@ -5147,16 +4668,7 @@ NA
 25.45
 </td>
 <td style="text-align:right;">
-25.45
-</td>
-<td style="text-align:right;">
 27.45
-</td>
-<td style="text-align:right;">
-27.45
-</td>
-<td style="text-align:right;">
-1305.2
 </td>
 <td style="text-align:right;">
 1305.2
@@ -5165,25 +4677,10 @@ NA
 1207.6
 </td>
 <td style="text-align:right;">
-1207.6
-</td>
-<td style="text-align:right;">
-50.2
-</td>
-<td style="text-align:right;">
 50.2
 </td>
 <td style="text-align:right;">
 43.9
-</td>
-<td style="text-align:right;">
-43.9
-</td>
-<td style="text-align:right;">
-NA
-</td>
-<td style="text-align:right;">
-NA
 </td>
 <td style="text-align:right;">
 NA
@@ -5280,31 +4777,16 @@ subcatchment_id
 bio1_mean
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
-bio1_1981.2010_mean_abs
-</th>
-<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 bio12_mean
-</th>
-<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
-bio12_1981.2010_mean_abs
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 bio15_mean
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
-bio15_1981.2010_mean_abs
-</th>
-<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 slope_curv_max_dw_cel_mean
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
-slope_curv_max_dw_cel_mean_abs
-</th>
-<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 spi_mean
-</th>
-<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
-spi_mean_abs
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 bio1_sd
@@ -5328,146 +4810,63 @@ length
 <tbody>
 <tr>
 <td style="text-align:right;">
-399679605
+422792269
 </td>
 <td style="text-align:right;">
-24.85000
+26.74048
 </td>
 <td style="text-align:right;">
-24.85000
+1066.900
 </td>
 <td style="text-align:right;">
-1339.911
+60.69524
 </td>
 <td style="text-align:right;">
-1339.911
+-0.0067354
 </td>
 <td style="text-align:right;">
-48.93684
+0.8095238
 </td>
 <td style="text-align:right;">
-48.93684
+0.0293544
 </td>
 <td style="text-align:right;">
--0.0115942
+1.197617
 </td>
 <td style="text-align:right;">
-0.0181115
+0.0212959
 </td>
 <td style="text-align:right;">
-1.1578947
+0.0145047
 </td>
 <td style="text-align:right;">
-1.1578947
+1.562021
 </td>
 <td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-2.516032
-</td>
-<td style="text-align:right;">
-0.1458569
-</td>
-<td style="text-align:right;">
-0.0189496
-</td>
-<td style="text-align:right;">
-2.2539593
-</td>
-<td style="text-align:right;">
-296.79467
+380.2119
 </td>
 </tr>
 <tr>
 <td style="text-align:right;">
-399889196
+422836859
 </td>
 <td style="text-align:right;">
-24.75000
+26.45000
 </td>
 <td style="text-align:right;">
-24.75000
+1404.700
 </td>
 <td style="text-align:right;">
-1318.237
+59.50000
 </td>
 <td style="text-align:right;">
-1318.237
+-0.0022415
 </td>
 <td style="text-align:right;">
-58.28305
+19.2500000
 </td>
 <td style="text-align:right;">
-58.28305
-</td>
-<td style="text-align:right;">
--0.0068933
-</td>
-<td style="text-align:right;">
-0.0119985
-</td>
-<td style="text-align:right;">
-0.8813559
-</td>
-<td style="text-align:right;">
-0.8813559
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-2.377286
-</td>
-<td style="text-align:right;">
-0.0739962
-</td>
-<td style="text-align:right;">
-0.0142241
-</td>
-<td style="text-align:right;">
-1.4032015
-</td>
-<td style="text-align:right;">
-1152.33265
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-422891045
-</td>
-<td style="text-align:right;">
-24.45000
-</td>
-<td style="text-align:right;">
-24.45000
-</td>
-<td style="text-align:right;">
-1527.400
-</td>
-<td style="text-align:right;">
-1527.400
-</td>
-<td style="text-align:right;">
-53.30000
-</td>
-<td style="text-align:right;">
-53.30000
-</td>
-<td style="text-align:right;">
--0.0139393
-</td>
-<td style="text-align:right;">
-0.0139393
-</td>
-<td style="text-align:right;">
-99.6666667
-</td>
-<td style="text-align:right;">
-99.6666667
-</td>
-<td style="text-align:right;">
-0.000000
+0.0000000
 </td>
 <td style="text-align:right;">
 0.000000
@@ -5476,172 +4875,165 @@ length
 0.0000000
 </td>
 <td style="text-align:right;">
-0.0006690
+0.0036746
 </td>
 <td style="text-align:right;">
-138.1239379
+33.226809
 </td>
 <td style="text-align:right;">
-126.95492
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-422494862
-</td>
-<td style="text-align:right;">
-24.75000
-</td>
-<td style="text-align:right;">
-24.75000
-</td>
-<td style="text-align:right;">
-1397.569
-</td>
-<td style="text-align:right;">
-1397.569
-</td>
-<td style="text-align:right;">
-60.92500
-</td>
-<td style="text-align:right;">
-60.92500
-</td>
-<td style="text-align:right;">
--0.0067157
-</td>
-<td style="text-align:right;">
-0.0089384
-</td>
-<td style="text-align:right;">
-0.5625000
-</td>
-<td style="text-align:right;">
-0.5625000
-</td>
-<td style="text-align:right;">
-0.000000
-</td>
-<td style="text-align:right;">
-2.301825
-</td>
-<td style="text-align:right;">
-0.0433013
-</td>
-<td style="text-align:right;">
-0.0085637
-</td>
-<td style="text-align:right;">
-0.7043392
-</td>
-<td style="text-align:right;">
-218.20055
+311.3563
 </td>
 </tr>
 <tr>
 <td style="text-align:right;">
-422519310
+422527524
 </td>
 <td style="text-align:right;">
-25.25000
+24.66778
 </td>
 <td style="text-align:right;">
-25.25000
+1806.070
 </td>
 <td style="text-align:right;">
-1308.800
+63.01333
 </td>
 <td style="text-align:right;">
-1308.800
+-0.0393951
 </td>
 <td style="text-align:right;">
-63.50000
+8.0666667
 </td>
 <td style="text-align:right;">
-63.50000
+0.1121287
 </td>
 <td style="text-align:right;">
--0.0076725
+19.904832
 </td>
 <td style="text-align:right;">
-0.0284195
+0.1156623
 </td>
 <td style="text-align:right;">
-675.0000000
+0.0602131
 </td>
 <td style="text-align:right;">
-675.0000000
+10.259738
 </td>
 <td style="text-align:right;">
-0.000000
+1106.2109
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+422685957
 </td>
 <td style="text-align:right;">
-0.000000
+25.95000
+</td>
+<td style="text-align:right;">
+1121.622
+</td>
+<td style="text-align:right;">
+42.96757
+</td>
+<td style="text-align:right;">
+-0.0055708
+</td>
+<td style="text-align:right;">
+34.0810811
 </td>
 <td style="text-align:right;">
 0.0000000
 </td>
 <td style="text-align:right;">
-0.0284195
+4.438111
 </td>
 <td style="text-align:right;">
-674.0000000
+0.0737199
 </td>
 <td style="text-align:right;">
-92.27927
+0.0079595
+</td>
+<td style="text-align:right;">
+64.544298
+</td>
+<td style="text-align:right;">
+845.5559
 </td>
 </tr>
 <tr>
 <td style="text-align:right;">
-399719823
+422526217
 </td>
 <td style="text-align:right;">
-25.13033
+25.00862
 </td>
 <td style="text-align:right;">
-25.13033
+1664.679
 </td>
 <td style="text-align:right;">
-1322.252
+62.06552
 </td>
 <td style="text-align:right;">
-1322.252
+-0.0025835
 </td>
 <td style="text-align:right;">
-54.06721
+1.2068966
 </td>
 <td style="text-align:right;">
-54.06721
+0.0492512
 </td>
 <td style="text-align:right;">
--0.0129520
+20.685517
 </td>
 <td style="text-align:right;">
-0.0224049
+0.1970049
 </td>
 <td style="text-align:right;">
-1.6721311
+0.0043141
 </td>
 <td style="text-align:right;">
-1.6721311
+1.647973
 </td>
 <td style="text-align:right;">
-0.039752
+833.1241
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+400179946
 </td>
 <td style="text-align:right;">
-8.986102
+26.05000
 </td>
 <td style="text-align:right;">
-0.0863111
+1326.767
 </td>
 <td style="text-align:right;">
-0.0280747
+58.31667
 </td>
 <td style="text-align:right;">
-2.1016879
+0.0000000
 </td>
 <td style="text-align:right;">
-971.41119
+5.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+3.652244
+</td>
+<td style="text-align:right;">
+0.0372678
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+3.785939
+</td>
+<td style="text-align:right;">
+344.8082
 </td>
 </tr>
 </tbody>
@@ -5681,31 +5073,16 @@ subcatchment_id
 bio1_mean
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
-bio1_1981.2010_mean_abs
-</th>
-<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 bio12_mean
-</th>
-<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
-bio12_1981.2010_mean_abs
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 bio15_mean
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
-bio15_1981.2010_mean_abs
-</th>
-<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 slope_curv_max_dw_cel_mean
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
-slope_curv_max_dw_cel_mean_abs
-</th>
-<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 spi_mean
-</th>
-<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
-spi_mean_abs
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 bio1_sd
@@ -5747,28 +5124,13 @@ occurrence
 25.73519
 </td>
 <td style="text-align:right;">
-25.73519
-</td>
-<td style="text-align:right;">
 1250.785
-</td>
-<td style="text-align:right;">
-1250.785
-</td>
-<td style="text-align:right;">
-52.50000
 </td>
 <td style="text-align:right;">
 52.50000
 </td>
 <td style="text-align:right;">
 -0.0324294
-</td>
-<td style="text-align:right;">
-0.0560391
-</td>
-<td style="text-align:right;">
-59.8148148
 </td>
 <td style="text-align:right;">
 59.8148148
@@ -5812,28 +5174,13 @@ occurrence
 24.53667
 </td>
 <td style="text-align:right;">
-24.53667
-</td>
-<td style="text-align:right;">
 1866.747
-</td>
-<td style="text-align:right;">
-1866.747
-</td>
-<td style="text-align:right;">
-47.82667
 </td>
 <td style="text-align:right;">
 47.82667
 </td>
 <td style="text-align:right;">
 -0.0349241
-</td>
-<td style="text-align:right;">
-0.0578543
-</td>
-<td style="text-align:right;">
-7.2666667
 </td>
 <td style="text-align:right;">
 7.2666667
@@ -5877,28 +5224,13 @@ occurrence
 22.37000
 </td>
 <td style="text-align:right;">
-22.37000
-</td>
-<td style="text-align:right;">
 1819.280
-</td>
-<td style="text-align:right;">
-1819.280
-</td>
-<td style="text-align:right;">
-52.28000
 </td>
 <td style="text-align:right;">
 52.28000
 </td>
 <td style="text-align:right;">
 -0.0280889
-</td>
-<td style="text-align:right;">
-0.0370487
-</td>
-<td style="text-align:right;">
-1.8666667
 </td>
 <td style="text-align:right;">
 1.8666667
@@ -5942,28 +5274,13 @@ occurrence
 26.35000
 </td>
 <td style="text-align:right;">
-26.35000
-</td>
-<td style="text-align:right;">
 1401.500
-</td>
-<td style="text-align:right;">
-1401.500
-</td>
-<td style="text-align:right;">
-58.50000
 </td>
 <td style="text-align:right;">
 58.50000
 </td>
 <td style="text-align:right;">
 -0.0020064
-</td>
-<td style="text-align:right;">
-0.0027001
-</td>
-<td style="text-align:right;">
-0.3571429
 </td>
 <td style="text-align:right;">
 0.3571429
@@ -6007,28 +5324,13 @@ occurrence
 24.39706
 </td>
 <td style="text-align:right;">
-24.39706
-</td>
-<td style="text-align:right;">
 2527.112
-</td>
-<td style="text-align:right;">
-2527.112
-</td>
-<td style="text-align:right;">
-27.59706
 </td>
 <td style="text-align:right;">
 27.59706
 </td>
 <td style="text-align:right;">
 -0.0927082
-</td>
-<td style="text-align:right;">
-0.1656461
-</td>
-<td style="text-align:right;">
-132.1470588
 </td>
 <td style="text-align:right;">
 132.1470588
@@ -6072,28 +5374,13 @@ occurrence
 24.95000
 </td>
 <td style="text-align:right;">
-24.95000
-</td>
-<td style="text-align:right;">
 1441.100
-</td>
-<td style="text-align:right;">
-1441.100
-</td>
-<td style="text-align:right;">
-53.60000
 </td>
 <td style="text-align:right;">
 53.60000
 </td>
 <td style="text-align:right;">
 -0.1552392
-</td>
-<td style="text-align:right;">
-0.2212828
-</td>
-<td style="text-align:right;">
-53.7500000
 </td>
 <td style="text-align:right;">
 53.7500000
@@ -6190,7 +5477,7 @@ presences.</p>
 <span><span class="co">## Target node size:                 10 </span></span>
 <span><span class="co">## Variable importance mode:         impurity </span></span>
 <span><span class="co">## Splitrule:                        gini </span></span>
-<span><span class="co">## OOB prediction error (Brier s.):  0.09148845</span></span></code></pre>
+<span><span class="co">## OOB prediction error (Brier s.):  0.09281725</span></span></code></pre>
 <p>The model can be evaluated based on the OOB prediction error. This
 metric lies on the fact that the data points that are not used in
 training a tree can be used to test the tree. The errors on the OOB
