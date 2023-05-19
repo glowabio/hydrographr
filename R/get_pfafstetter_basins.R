@@ -29,11 +29,11 @@
 #' case the result is a raster, then a .tif file is written to disk.
 #'
 #' @importFrom data.table setDT rbindlist setorder setnames as.data.table setkey
-#' @importFrom foreach foreach
+#' @importFrom foreach getDoParWorkers
 #' @importFrom parallel detectCores stopCluster makePSOCKcluster
 #' @importFrom dplyr mutate
-#' @importFrom igraph graph.data.frame is_directed subcomponent V degree all_simple_paths
-#' as_ids delete_edges adjacent_vertices is_directed
+#' @importFrom igraph graph.data.frame is_directed subcomponent V degree
+#' all_simple_paths as_ids delete_edges delete_vertices adjacent_vertices gsize
 #' @importFrom future.apply future_lapply  future_mapply future_sapply
 #' @importFrom tidyr fill
 #' @importFrom doParallel registerDoParallel
@@ -66,7 +66,7 @@
 #' # Subset the graph such that it contains only one basin. You can use
 #' # a random ID, i.e. it does not need to be the real outlet of the basin.
 #' g_subset <- get_catchment_graph(g = my_graph,
-#'                          subc_id = "513877427",
+#'                          subc_id = "513867227",
 #'                          outlet = FALSE,
 #'                          mode = "in",
 #'                          as_graph = TRUE)
@@ -144,7 +144,7 @@ cat("Setting up parallel backend...\n")
 # Foreach
 cl <- makePSOCKcluster(n_cores)
 registerDoParallel(cl)
-
+cat("Using", foreach::getDoParWorkers(), "CPUs...", "\n")
 
 # Avoid exponential numbers in the reclassification
 options(scipen=999)
@@ -168,12 +168,19 @@ g <- graph.data.frame(g_dt_tmp[,c("from", "to")], directed = T)
 outlet = which(degree(g, v = V(g), mode = "out")==0, useNames = T)
 headwater = which(degree(g, v = V(g), mode = "in")==0, useNames = T)
 
+
+# Stop if too few stream segments (currently three, need to go lower?)
+if (gsize(g_subset)<3) {
+  stop("The input basin has too few stream segments / sub-catchments. Please
+       select another outlet segment with get_catchment_graph()")
+}
+
+
 # Stop if too many outlets
 if (length(outlet)!=1) {
   stop("Only one outlet possible. You may want to run get_catchment_graph()
        to get a single drainage basin.")
 }
-
 
 
 
@@ -197,7 +204,7 @@ cat("Finding the most contributing stream...", "\n")
 ### Run only with foreach (future / lapply results in strange results
 # for very small basins)
 
-l <- foreach (i=names(headwater), .inorder=FALSE,
+l <- foreach::foreach (i=names(headwater), .inorder=FALSE,
               .packages = "igraph")  %dopar% {
               out <-subcomponent(g, i, mode = c("out"))
               }
@@ -380,7 +387,7 @@ delete_these <- append(as.character(main_trib_all_id$stream),
                        as.character(trib_order$stream) )
 delete_these <- unique(delete_these)
 
-g_del_for_interbas <- delete_vertices(g, V(g)[paste(delete_these)])
+g_del_for_interbas <- igraph::delete_vertices(g, V(g)[paste(delete_these)])
 
 # Get the most downstream interbasin stream reach for which to search
 first_interbas_id <- main_dt[match(unique(main_dt$code), main_dt$code),]
