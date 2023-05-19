@@ -3,7 +3,7 @@ title: "Case study - São Francisco drainage basin"
 subtitle: "Processing of spatial data and calculating the number of dams and the distance along the stream network to the clostest dam up- and downstream of fish occurence sites"
 author: ""
 date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
+output: rmarkdown::pdf_document
 vignette: >
   %\VignetteIndexEntry{Case study - São Francisco drainage basin}
   %\VignetteEncoding{UTF-8}
@@ -619,7 +619,7 @@ point_locations_snapped <- fread("./data/basin_481051/point_locations_snapped.cs
 
 
 ```{r echo=FALSE}
-kbl(point_locations_snapped) %>%                        
+kbl(head(point_locations_snapped)) %>%                        
   kable_styling(bootstrap_options = "striped", full_width = F, position = "left") %>%     
   scroll_box(width = "700px", height = "200px")
 ```
@@ -852,7 +852,7 @@ network_distance <- fread("./data/basin_481051/upstream_catchment/network_distan
 
 ```{r echo=FALSE}
 
-kbl(network_distance) %>%                        
+kbl(head(network_distance)) %>%                        
   kable_styling(bootstrap_options = "striped", full_width = F, position = "left") %>%     
   scroll_box(width = "700px", height = "200px")
 ```
@@ -916,7 +916,7 @@ upstream_segments_168036446 <- fread("./data/basin_481051/upstream_catchment/ups
 
 ```{r echo=FALSE}
 
-kbl(head(upstream_segments_168036446)) %>%                        
+kbl(head(upstream_segments_168036446[,1:8])) %>%                        
   kable_styling(bootstrap_options = "striped", full_width = F, position = "left") %>%     
   scroll_box(width = "700px", height = "200px")
 ```

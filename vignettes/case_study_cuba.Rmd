@@ -23,6 +23,8 @@ editor_options:
 knitr::write_bib(file = 'packages.bib')
 ```
 
+
+
 ### Introduction
 
 The following example showcases the functionality of the hydrographr
@@ -259,13 +261,13 @@ vars_gpkg <- c("order_vect_point")
 ```
 
 ```{r, eval = FALSE}
-# # Download the .tif tiles of the desired variables
-# download_tiles(variable = vars_tif, tile_id = tile_id, file_format = "tif",
-#               download_dir = "data")
-# 
-# # Download the .gpkg tiles of the desired variables
-# download_tiles(variable = vars_gpkg, tile_id = tile_id, file_format = "gpkg",
-#               download_dir = "data")
+# Download the .tif tiles of the desired variables
+download_tiles(variable = vars_tif, tile_id = tile_id, file_format = "tif",
+              download_dir = "data")
+
+# Download the .gpkg tiles of the desired variables
+download_tiles(variable = vars_gpkg, tile_id = tile_id, file_format = "gpkg",
+              download_dir = "data")
 ```
 
 Then download the CHELSA present and future Bioclim variables
@@ -283,20 +285,20 @@ dir.create(paste0(wdir, "/data/chelsa_bioclim"))
 options(timeout = 1000)
 
 # Download
-# # Present, 1981-2010
-# download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio12_1981-2010_V.2.1.tif",
-# destfile = "data/chelsa_bioclim/bio12_1981-2010.tif", mode = "wb")
-# download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio15_1981-2010_V.2.1.tif",
-# destfile = "data/chelsa_bioclim/bio15_1981-2010.tif", mode = "wb")
-# download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio1_1981-2010_V.2.1.tif",
-# destfile = "data/chelsa_bioclim/bio1_1981-2010.tif", mode = "wb")
-# # Future, 2041-2070
-# download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/2041-2070/IPSL-CM6A-LR/ssp370/bio/CHELSA_bio12_2041-2070_ipsl-cm6a-lr_ssp370_V.2.1.tif",
-# destfile = "data/chelsa_bioclim/bio12_IPSL-CM6A-LR_ssp370_2041-2070.tif", mode = "wb")
-# download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/2041-2070/IPSL-CM6A-LR/ssp370/bio/CHELSA_bio15_2041-2070_ipsl-cm6a-lr_ssp370_V.2.1.tif",
-# destfile = "data/chelsa_bioclim/bio15_IPSL-CM6A-LR_ssp370_2041-2070.tif", mode = "wb")
-# download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/2041-2070/IPSL-CM6A-LR/ssp370/bio/CHELSA_bio1_2041-2070_ipsl-cm6a-lr_ssp370_V.2.1.tif",
-# destfile = "data/chelsa_bioclim/bio1_IPSL-CM6A-LR_ssp370_2041-2070.tif", mode = "wb")
+# Present, 1981-2010
+download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio12_1981-2010_V.2.1.tif",
+destfile = "data/chelsa_bioclim/bio12_1981-2010.tif", mode = "wb")
+download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio15_1981-2010_V.2.1.tif",
+destfile = "data/chelsa_bioclim/bio15_1981-2010.tif", mode = "wb")
+download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio1_1981-2010_V.2.1.tif",
+destfile = "data/chelsa_bioclim/bio1_1981-2010.tif", mode = "wb")
+# Future, 2041-2070
+download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/2041-2070/IPSL-CM6A-LR/ssp370/bio/CHELSA_bio12_2041-2070_ipsl-cm6a-lr_ssp370_V.2.1.tif",
+destfile = "data/chelsa_bioclim/bio12_IPSL-CM6A-LR_ssp370_2041-2070.tif", mode = "wb")
+download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/2041-2070/IPSL-CM6A-LR/ssp370/bio/CHELSA_bio15_2041-2070_ipsl-cm6a-lr_ssp370_V.2.1.tif",
+destfile = "data/chelsa_bioclim/bio15_IPSL-CM6A-LR_ssp370_2041-2070.tif", mode = "wb")
+download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/2041-2070/IPSL-CM6A-LR/ssp370/bio/CHELSA_bio1_2041-2070_ipsl-cm6a-lr_ssp370_V.2.1.tif",
+destfile = "data/chelsa_bioclim/bio1_IPSL-CM6A-LR_ssp370_2041-2070.tif", mode = "wb")
 
 ```
 
@@ -513,7 +515,8 @@ stats_table_zon <- extract_zonal_stat(
                     subc_layer = paste0(layer_dir, "/sub_catchment.tif"),
                     subc_id = "all",
                     var_layer = var_layers,
-                    file_name = paste0(wdir, "/data/zonal_stats.csv"),
+                    out_dir = paste0(wdir, "/data"),
+                    file_name = "zonal_stats.csv",
                     n_cores = 2)
 ```
 
@@ -552,7 +555,7 @@ to use them as predictors in the species distribution model
 
 ```{r}
 stats_table_zon <- stats_table_zon %>%
-  dplyr::select(contains(c("subc", "_mean", "_sd"))) %>%
+  dplyr::select(contains("subc") |  ends_with("_mean") | ends_with("_sd")) %>%
   rename('subcatchment_id' = 'subc_id')
 
 ```
