@@ -29,7 +29,7 @@
 #' case the result is a raster, then a .tif file is written to disk.
 #'
 #' @importFrom data.table setDT rbindlist setorder setnames as.data.table setkey
-#' @importFrom foreach getDoParWorkers
+#' @importFrom foreach getDoParWorkers %dopar%
 #' @importFrom parallel detectCores stopCluster makePSOCKcluster
 #' @importFrom dplyr mutate
 #' @importFrom igraph graph.data.frame is_directed subcomponent V degree

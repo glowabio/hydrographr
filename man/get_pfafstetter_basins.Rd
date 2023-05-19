@@ -71,7 +71,7 @@ my_graph <- read_geopackage(gpkg = paste0(my_directory,
 # Subset the graph such that it contains only one basin. You can use
 # a random ID, i.e. it does not need to be the real outlet of the basin.
 g_subset <- get_catchment_graph(g = my_graph,
-                         subc_id = "513877427",
+                         subc_id = "513867227",
                          outlet = FALSE,
                          mode = "in",
                          as_graph = TRUE)
