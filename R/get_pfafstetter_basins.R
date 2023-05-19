@@ -7,23 +7,27 @@
 #' hierarchical topological coding scheme (see Verdin & Verdin (1999) for
 #' details). This function splits a given basin into up to nine sub-basins
 #' using the flow accumulation as the basis. The user has to define the
-#' sub-catchment (stream segment) ID
+#' sub-catchment (stream segment) ID that serves as the outlet of the basin.
+#' Note that this can be any stream segment with a sufficient number of upstream
+#' segments (sub-catchments).
 #'
 #' @param g igraph object. A directed graph of a basin with one outlet.
 #' The outlet can be any stream / sub-catchment for which the upstream basin
 #' should be split into smaller ones.
-#' @param subc_raster Full path to the sub-catchment raster file of the basin.
-#' Does not need to be cropped / masked to the basin.
+#' @param subc_raster character. Full path to the sub-catchment raster file of
+#' the basin. Does not need to be cropped / masked to the basin, but the IDs
+#' of the sub-catchments need to match with the input graph.
 #' @param data_table Logical. If TRUE, then the result will be loaded into R
 #' as a 2-column data.table (sub-catchment ID and Pfafstetter code). If FALSE,
-#' the result is provided as a raster (terra object) and written to disk.
+#' the result is loaded as a raster (terra object) in R and written to disk.
 #' Default is FALSE.
-#' @param out_dir The path of the output directory where the Pfafstetter
-#' raster layer will be written.
+#' @param out_dir character. The path of the output directory where the
+#' Pfafstetter raster layer will be written. Only needed when data.table=FALSE.
 #' @param file_name character. The filename and extension of the Pfafstetter
-#' raster layer (e.g. 'pfafstetter_raster.tif")
+#' raster layer (e.g. 'pfafstetter_raster.tif"). Only needed when
+#' data.table=FALSE.
 #' @param n_cores numeric. Number of cores used for parallelization. Default is
-#' NULL (= detectCores(logical=FALSE)-1).
+#' NULL (= detectCores(logical=FALSE)-1). Optional.
 #'
 #' @return Either a data.table, or a raster (terra object) loaded into R. In
 #' case the result is a raster, then a .tif file is written to disk.
