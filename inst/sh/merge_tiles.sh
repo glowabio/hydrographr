@@ -38,8 +38,8 @@ if [ ${f: -4} == ".tif" ]
 then
     export outname_base=$(basename $outname .tif)
     gdalbuildvrt -overwrite $out/merge_${outname_base}.vrt ${farray[@]}
-    gdal_translate  -co COMPRESS=$compression -co ZLEVEL=$level -co BIGTIFF=$bigtiff \
-    $out/merge_${outname_base}.vrt $out/${outname}
+    gdal_translate  -co COMPRESS=$compression -co ZLEVEL=$level \
+    -co BIGTIFF=$bigtiff  $out/merge_${outname_base}.vrt $out/${outname}
     rm $out/merge_${outname_base}.vrt
 elif [ ${f: -4} == "gpkg" ]
 then
@@ -56,7 +56,8 @@ then
     export ATTR=$(ogrinfo -al -so $out/merge_${outname_base}.gpkg | \
         awk 'FNR >=38 {print $1}' | tr ":" ",")
     ogr2ogr  -nlt PROMOTE_TO_MULTI -dialect sqlite \
-        -sql "SELECT $FID $ATTR ST_Union($GEOM) AS geom, $colname FROM merged GROUP BY $colname" \
+        -sql "SELECT $FID $ATTR ST_Union($GEOM) AS geom, \
+        $colname FROM merged GROUP BY $colname" \
         -makeValid $out/${outname} $out/merge_${outname_base}.gpkg
     rm $out/merge_${outname_base}.vrt $out/merge_${outname_base}.gpkg
 fi
