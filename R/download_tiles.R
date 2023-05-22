@@ -31,7 +31,7 @@
 #'
 #' @details
 #' In the following table you can find all the variables included in the
-#' Hydrography90m dataset. The column "Abbreviation" includes the variable names
+#' Hydrography90m dataset. The column "Variable" includes the variable names
 #' that should be used as an input in the parameter "variable" of the function.
 #' Likewise, the column "File format" contains the input that should be given to
 #' the "file_format" parameter.
@@ -39,7 +39,7 @@
 #' \url{https://hydrography.org/hydrography90m/hydrography90m_layers/}.
 #'
 #'
-#'| **Variable type**    | **Variable**                             | **Abbreviation**          | **Unit** | **File_format** |
+#'| **Variable type**    | **Variable name**                             | **Variable**          | **Unit** | **File format** |
 #' |----------------------|------------------------------------------|---------------------------|----------|------------------|
 #'   | Network              | Drainage basin                           | basin                     |          | tif              |
 #'   | Network              | Drainage basin                           | basin                     |          | gpkg             |

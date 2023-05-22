@@ -40,13 +40,13 @@ using the functions "get_tile_id" and "get_regional_unit_id" respectively.
 }
 \details{
 In the following table you can find all the variables included in the
-Hydrography90m dataset. The column "Abbreviation" includes the variable names
+Hydrography90m dataset. The column "Variable" includes the variable names
 that should be used as an input in the parameter "variable" of the function.
 Likewise, the column "File format" contains the input that should be given to
 the "file_format" parameter.
 For more details and visualisations of the spatial layers, please refer to
 \url{https://hydrography.org/hydrography90m/hydrography90m_layers/}.\tabular{lllll}{
-   \strong{Variable type} \tab \strong{Variable} \tab \strong{Abbreviation} \tab \strong{Unit} \tab \strong{File_format} \cr
+   \strong{Variable type} \tab \strong{Variable name} \tab \strong{Variable} \tab \strong{Unit} \tab \strong{File format} \cr
    Network \tab Drainage basin \tab basin \tab  \tab tif \cr
    Network \tab Drainage basin \tab basin \tab  \tab gpkg \cr
    Network \tab Sub-catchment \tab sub_catchment \tab  \tab tif \cr
