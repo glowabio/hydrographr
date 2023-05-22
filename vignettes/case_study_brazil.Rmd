@@ -570,7 +570,7 @@ for (idist in dist_radius) {
 In some cases the GRASS GIS function r.stream.snap does not snap some of the
 sites to the stream network, no matter how much you increase the distance radius.
 If this happens the coordinates need to be changed slightly within the same cell
-until the point gets snapped. I might happen that this needs to be done multiple
+until the point gets snapped. It might happen that this needs to be done multiple
 times.
 
 ```{r eval=FALSE}
