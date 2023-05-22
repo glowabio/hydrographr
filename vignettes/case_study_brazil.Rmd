@@ -3,7 +3,7 @@ title: "Case study - São Francisco drainage basin"
 subtitle: "Processing of spatial data and calculating the number of dams and the distance along the stream network to the clostest dam up- and downstream of fish occurence sites"
 author: ""
 date: "`r Sys.Date()`"
-output: rmarkdown::pdf_document
+output: rmarkdown::html_document
 vignette: >
   %\VignetteIndexEntry{Case study - São Francisco drainage basin}
   %\VignetteEncoding{UTF-8}
@@ -29,27 +29,28 @@ The following example showcases the functionality of the `hydrographr`
 package along a workflow to analyse the fragmentation of a stream network. 
 We will evaluate how many dams are up- and downstream of each fish occurrence 
 site and the distance along the stream network from each fish occurrence site 
-to the next dam for the current and future state.
+to the closest existing and future dam.
 
 In our example we will focus on the catfish species *Conorhynchos conirostris*, 
 which is a catfish species endemic to the São Francisco drainage basin in Brazil.
-The catfish is listed as 'endangered' by the IUCN red list. Wetlands are the 
-preferred habitat and it is migrating for spawning.As an migratory species, it 
-is mostly threatened by dams along the stream network. Further, it is threatened 
-by fishing during the spawning season in the upstream part of the river. 
+The catfish is listed as 'endangered' by the IUCN red list (IUCN, 2022). Wetlands
+are the preferred habitat of the species and it is migrating for spawning. As an 
+migratory species, it is mostly threatened by dams along the stream network. 
+Further, it is threatened by fishing during the spawning season in the upstream 
+part of the river. 
 
 We will start by defining the regular tiles of the Hydrography90m 
 (Amatulli et al., 2022) where the occurrence points of the species are located. 
 Afterwards we will download the Hydrography90m layers, filter/crop and merge them.
-Then we will filter our fish occurrence and dam point locations using the polygon 
+Then we will select our fish occurrence and dam point locations using the polygon 
 of the drainage basin and snap the point locations to the stream network. 
-Afterwards, we will reduce our drainage basin using the dam upstream of all fish
-occurrence sites as our outlet location to calculate the upstream catchment from 
-this point location. In a next step, we will calculate the distances along the 
-stream network between each point location (fish and dams) and get the 
-up- and downstream stream egments from each point locations as a graph. Afterwards,
-we will query the tables and evaluate the shortest distance to the next dam as well
-as the number of dams. 
+Afterwards, we will reduce our drainage basin using the dam downstream of all fish
+occurrence sites, the Sobradinho dam, as our outlet location to calculate the 
+upstream catchment from this point location. In a next step, we will calculate 
+the distances along the stream network between each point location (fish and dams) 
+and get the up- and downstream stream segments from each point locations as a graph. 
+Afterwards, we will query the tables and evaluate the shortest distance to the 
+next dam as well as the number of dams. 
 
 ![](../man/figures/workflow.png)
 
@@ -105,7 +106,7 @@ wdir <- paste0(here(), "/vignettes/data_brazil")
 
 ```{r, eval = FALSE}
 # Define working directory
-wdir <- "my/working/directory/data_brazil"
+wdir <- "my/working/directory"
 # Set defined working directory
 setwd(wdir)
 # Create a directory to store all the data of the case study
@@ -182,7 +183,7 @@ obtain these IDs using the function *get_tile_id()*. This function downloads and
 uses the auxiliary raster file that contains all the regional units globally,
 and thus requires an active internet connection.
 
-![](../man/figures/workflow1.png)
+<!-- ![](../man/figures/workflow1.png)-->
 
 
 ```{r, eval = FALSE}
@@ -232,7 +233,7 @@ We will need the Geopackage
 [order_vect_segment](https://geo.igb-berlin.de/maps/new?layer=geonode:hydrography90m_v1_stream_order_strahler_cog&view=True),
 containing the stream network, with the stream (sub-catchment) IDs, the ID of 
 the next stream and some additional attributes. We will need the GeoPackage to 
-to calculate the distance between point locations and to create a graph to find
+calculate the distance between point locations and to create a graph to find
 out which stream segments are up- and downstream of the fish occurrence sites. 
 
 A list of all available Hydrography90m variables, as well as details and
@@ -240,18 +241,18 @@ visualisations are available
 [here](https://hydrography.org/hydrography90m/hydrography90m_layers/).
 
 ```{r, eval = FALSE}
-# Variables in raster format
+# Define the raster layers
 vars_tif <- c("basin", "sub_catchment", "segment", "accumulation", "direction")
-# Variables in vector format
+# Define the vector layers
 vars_gpkg <- c("basin", "order_vect_segment")
 ```
 
 ```{r, eval = FALSE}
-# Download the .tif tiles of the desired variables
+# Download the .tif tiles of the defined raster layer
 download_tiles(variable = vars_tif, tile_id = tile_id, file_format = "tif",
                download_dir = paste0(wdir, "/data"))
 
-# Download the .gpkg tiles of the desired variables
+# Download the .gpkg tiles of the defined vector layers
 download_tiles(variable = vars_gpkg, tile_id = tile_id, file_format = "gpkg",
                download_dir =   paste0(wdir, "/data"))
 ```
@@ -262,17 +263,17 @@ After having downloaded all the layers, we need to filter and crop them to the
 extent of our study area. 
 
 For a faster processing, we recommend to filter (vector) or crop (raster) the 
-files first and than merge them.
+files first and then merge them.
 
 First, we will filter the GeoPackage tiles containing the drainage basins for 
 the basin ID 481051 (São Francisco drainage basin) and merge them to get the 
-extent of the drainage basin of São Francisco river. We will then use the polygon of 
-the drainage basin to crop all downloaded raster tiles and then merge them. 
+extent of the drainage basin of São Francisco river. We will then use the polygon 
+of the drainage basin to crop all downloaded raster tiles and then merge them. 
 Afterwards, we will extract the unique sub-catchment IDs from the raster layer 
 to filter the stream network GeoPackage tiles (oder_vect_segment) for 
-stream segments with the same sub-catchment ID and merge them.
+stream segments with the same sub-catchment ID and merge them as well.
 
-![](../man/figures/workflow2.png)
+<!-- ![](../man/figures/workflow2.png)-->
 
 ```{r, eval = FALSE}
 # Define a directory for the São Francisco drainage basin
@@ -280,12 +281,12 @@ saofra_dir <-  paste0(wdir, "/data/basin_481051")
 if(!dir.exists(saofra_dir)) dir.create(saofra_dir)
 
 
-# Get the full path of the basin  GeoPackage tiles
+# Get the full paths of the basin  GeoPackage tiles
 basin_dir <- list.files(wdir, pattern = "basin_h[v0-8]+.gpkg$",
                          full.names = TRUE, recursive = TRUE)
 
 # Filter basin ID from the GeoPackages of the basin tiles
-# Save the vector data of the São Francisco drainage basin
+# Save the filtered tiles
 for(itile in basin_dir) {
   
   filtered_tile <- read_geopackage(itile,
@@ -309,7 +310,7 @@ merge_tiles(tile_dir = saofra_dir,
             read = FALSE)
 
 
-# Get the full path of the raster tiles
+# Get the full paths of the raster tiles
 raster_dir <- list.files(paste0(wdir, "/data/r.watershed"), pattern = ".tif",
                        full.names = TRUE, recursive = TRUE)
 
@@ -351,26 +352,24 @@ merge_tiles(tile_dir = saofra_dir,
             file_name = "direction_481051.tif")
 
 
-# Merge the cropped sub-catchment raster layers and load the file after merging
+# Merge the cropped sub-catchment raster layers
 subc_layer <- merge_tiles(tile_dir = saofra_dir,
                           tile_names = list.files(saofra_dir, full.names = FALSE,
                                                   pattern = "sub_.+_tmp.tif$"),
                           out_dir = saofra_dir,
                           file_name = "sub_catchment_481051.tif",
                           read = TRUE)
-
+# Load the merged sub-catchment raster layer of the São Francisco drainage basin
 subc_layer <- rast(paste0(saofra_dir, "/sub_catchment_481051.tif"))
 # Get all sub-catchment IDs of the São Francisco drainage basin
 subc_ids <- terra::unique(subc_layer)
 
 
-
-
-# Get the full path of the stream order segment GeoPackages tile
+# Get the full paths of the stream order segment GeoPackage tiles
 order_dir <- list.files(wdir, pattern = "order_.+_h[v0-8]+.gpkg$",
                         full.names = TRUE, recursive = TRUE)
 
-# Filter the sub-catchment IDs from the GeoPackages of the order_vector_segment
+# Filter the sub-catchment IDs from the GeoPackage of the order_vector_segment
 # tiles (sub-catchment ID = stream ID)
 # Save the stream segments of the São Francisco drainage basin
 for(itile in order_dir) {
@@ -406,37 +405,38 @@ file.remove(tmp_files)
 ```
 
 
-### Filtering of the species occurrence and dam locations
+### Filtering of the species occurrences and dams
 
-The information of present and future dam locations is provided by the GRanD and
-the FHRed database, respectively. Both datasets can be downloaded from
+The information of the existing and future dams is provided by the GRanD 
+(Lehner et al., 2011) and the FHReD (Zarfl et al., 2015) database, respectively. 
+Both datasets can be downloaded from
 [globaldamwatch.org](https://www.globaldamwatch.org/directory).
 
-To filter the point locations of the fish occurrence and dams we will use the
-polygon of the drainage basin to only keep the locations which are located within 
-the drainage basin. For this step we will use the functions of the `sf` package.  
+To select those point locations of the fish occurrences and dams, which are located
+within the the São Francisco drainage we will use the polygon of the drainage 
+basin. For this step we will use the functions of the  R package `sf`.  
 
-![](../man/figures/workflow3.png)
+<!-- ![](../man/figures/workflow3.png)-->
 
 ```{r, eval = FALSE}
 # Load the GRanD data shape file
 grand_pts <- st_read(paste0(wdir, "/data/GRanD_Version_1_3/GRanD_dams_v1_3.shp"))
-# Load FHRed dataset
+# Load the FHReD dataset
 fhred_corr <- fread(paste0(wdir, "/data/FHReD_2015/FHReD_2015_future_dams_Zarfl_et_al_beta_version.csv"))
 # Load the polygon of the drainage basin
 basin_poly <- read_sf(paste0(saofra_dir,"/basin_481051.gpkg"))
 
-# Create a simply feature for the function st_filter
+# Create simply features from the data tables 
 spdata_pts <- st_as_sf(spdata,  coords = c("longitude","latitude"), remove = FALSE, crs="WGS84")
 fhred_pts <- st_as_sf(fhred_corr, coords = c("Lon_Cleaned","LAT_cleaned"), crs="WGS84")
 
-# Only keep species occurrence and dam sites within the drainage basin
+# Only keep species occurrences and dams within the drainage basin
 spdata_pts_481051 <- st_filter(spdata_pts, basin_poly)
 grand_pts_481051 <- st_filter(grand_pts, basin_poly)
 fhred_pts_481051 <- st_filter(fhred_pts, basin_poly)
 
 
-# Transfer the simply feature back to a data.frame and harmonize column names
+# Transfer the simply featurs back to a data table  and harmonise the column names
 # Existing dams (ED)
 existing_dams <- grand_pts_481051 %>% 
   mutate(longitude = st_coordinates(.)[,1],
@@ -462,8 +462,8 @@ species_occurrence <- spdata_pts_481051 %>%
   rename(site_id = occurence_id) %>%
   select(site_id, type, longitude, latitude)
 
-# Bind the data.frames of the dame locations and the fish occurrence
-# Remove sites of the same type with duplicated coordinates
+# Bind the data.frames of the dam  and the fish occurrence locations
+# Remove locations of the same type with duplicated coordinates
 point_locations <- existing_dams %>% 
   bind_rows(future_dams) %>% 
   bind_rows(species_occurrence) %>% 
@@ -471,37 +471,37 @@ point_locations <- existing_dams %>%
 ```
 
 
-### Snap species occurrence and dam sites to a stream segment within a certain distance and with a certain flow accumulation
+### Snap species occurrences and dams to a stream segment within a certain distance and with a certain flow accumulation
 
 Before we can calculate the upstream catchment for a defined point location or
-the distance along the stream network between species occurrence and dam sites, 
+the distance along the stream network between species occurrences and dams, 
 we need to snap the coordinates of the sites to the stream network. (Recorded
 coordinates of point locations usually do not exactly overlap with the digital
-stream network and therefore need to be corrected slightly.)
+stream network and therefore, need to be corrected slightly.)
 
 The `hydrographr` package offers two different snapping functions the 
 `snap_to_network` and the `snap_to_subc_segment`. The first function uses
 a defined distance radius and a flow accumulation threshold, 
-while the second function snaps the point location to the stream segment of the 
+while the second function snaps the point to the stream segment of the 
 sub-catchment the point was originally located.
 
 For this case study we will use the function `snap_to_network` to be able to
 define a certain flow accumulation threshold and to ensure that the fish 
-occurrence and dam sites will not be snapped to a headwater stream (first order
+occurrences and dams will not be snapped to a headwater stream (first order
 stream) also there is a higher order stream next to it. 
 
 ![](../man/figures/snapping.png)
 
 The function is implemented in a for-loop to start searching for streams with a 
-very high flow accumulation of 400,000 km² in a very short distance and than 
-slowly decrease the flow accumulation to 100 km². If there are still sites left
-which were not snapped to stream segment yet. The distance will increase from 10 
+very high flow accumulation of 400,000 km² in a very short distance and then 
+slowly decreases the flow accumulation to 100 km². If there are still sites left
+which were not snapped to a stream segment yet. The distance will increase from 10 
 up to 30 cells.
 
 In addition to the new coordinates the function will also report the unique
-sub-catchment ID.
+sub-catchment IDs.
 
-![](../man/figures/workflow4.png)
+<!-- ![](../man/figures/workflow4.png)-->
 
 ```{r eval=FALSE}
 # Define full path to the stream network raster layer
@@ -519,7 +519,7 @@ dist_radius <- c(10, 20, 30)
 # Create a temporary data.table
 point_locations_tmp <- point_locations
 
-# Note: For loop takes about 9 minutes
+# Note: The for loop takes about 9 minutes
 first <- TRUE
 for (idist in dist_radius) {
     
@@ -568,14 +568,14 @@ for (idist in dist_radius) {
 ```
 
 In some cases the GRASS GIS function r.stream.snap does not snap some of the
-sites to the stream network, no matter how much you increase the distance radius.
-If this happens the coordinates need to be changed slightly within the same cell
-until the point gets snapped. It might happen that this needs to be done multiple
-times.
+point locations to the stream network, no matter how much you increase the 
+distance radius. If this happens the coordinates need to be changed slightly 
+within the same cell until the point gets snapped. It might happen that this 
+needs to be done multiple times.
 
 ```{r eval=FALSE}
 # Run the snapping function until all points are snapped
-# Note the while conditions runs a few times and
+# Note: The while condition runs a few times and
 # takes about 5 minutes
 while(nrow(point_locations_tmp) > 0) {
   # Create random number smaller than the size if a cell
@@ -703,16 +703,16 @@ function will extract the IDs as well.
 
 On the website of the [IUCN red list](https://www.iucnredlist.org/species/187028/1822039)
 we can see that the habitat range of *Conorhynchos conirostris* is  
-restricted to the areas upstream of the Sobradinho dam (site ID 2516) and all
-our fish occurrence sites are located upstream of the dam as well. Therefore,
+restricted to the area upstream of the Sobradinho dam (site ID 2516) and all
+our fish occurrences are located upstream of the dam as well. Therefore,
 we are only interested in dams upstream of the Sobradinho dam. To get the 
 upstream catchment from the point location of the Sobradinho dam we will use
 the function `get_upstream_catchment`. Afterwards we will use the `terra` 
 package to polygonise the raster file of the upstream catchment and use the 
-polygon of the upstream catchment to filter our point locations using the functions
+polygon of the upstream catchment to select our point locations using the functions
 provided by the `sf` package.
 
-![](../man/figures/workflow5.png)
+<!-- ![](../man/figures/workflow5.png)-->
 
 ```{r eval=FALSE}
 # Define full path for the direction raster layer
@@ -762,7 +762,7 @@ upstream_segment_vect <- read_geopackage(gpkg =  paste0(saofra_dir,
                                         subc_id = subc_ids$sub_catchment_2516,
                                         name = "stream")
 # Save the stream segments of the upstream drainage basin  
-write_sf(upstream_segment_vectt, paste0(upcatch_dir, "/order_vect_segment_2516.gpkg"))
+write_sf(upstream_segment_vect, paste0(upcatch_dir, "/order_vect_segment_2516.gpkg"))
                               
 
 # Convert the data.frame into a simply feature
@@ -789,7 +789,7 @@ upstream_point_locations <- fread(paste0(upcatch_dir, "/upstream_point_locations
 ```
 
 ```{r eval=FALSE}
-# Load the gpkg of the upstream basin (if not already loaded)
+# Load the GeoPackage of the upstream basin (if not already loaded)
 # upstream_basin_vect <- vect(paste0(upcatch_dir , "/upstream_basin_2516.gpkg"))
 
 # Create leaflet plot
@@ -815,20 +815,21 @@ upcatch_plot
 ### Get distance along the stream network
 
 To determine the distance to the closest dam up- and downstream of each
-fish occurrence site we will first calculate the distance between all point 
-locations using the function `get_distance`.
+fish occurrence we will first calculate the distance between all point 
+locations (fish occurrences and dams) using the function `get_distance`.
 
-![](../man/figures/workflow6.png)
+<!-- ![](../man/figures/workflow6.png)-->
 
 ```{r eval=FALSE}
-# Load layers (if not already loaded)
-# upstream_basin_rast <- paste0(upcatch_dir, "/upstream_basin_2516.tif")
-# upstream_segment_vect <- paste0(upcatch_dir, "/order_vect_segment_2516.gpkg")
+# Define the full path to the upstream basin raster layer and the GeoPackage
+# of the upstream stream segments 
+upstream_basin_rast <- paste0(upcatch_dir, "/upstream_basin_2516.tif")
+upstream_segment_vect <- paste0(upcatch_dir, "/order_vect_segment_2516.gpkg")
 
 # Get the distances along the stream network between each pair of point locations
 # The process takes about 1 hour 
 # Increasing the number of cores only makes sense if the calculation
-# is done for points in multiple drainage basins
+# is done for point locations in multiple drainage basins
 upstream_point_locations <- upstream_point_locations %>% 
   mutate(basin_id = 2516)
 
@@ -860,13 +861,13 @@ kbl(head(network_distance)) %>%
 ### Get catchment graph
 
 To evaluate which and how many dames are located up- and downstream of the 
-fish occurrence sites, we need to load the GeoPackage of the stream segments (
-order_vect_segment) as a graph. Further we will need the sub-catchment IDs of 
-the fish occurrence sites to use the function `get_catchment_graph`. The
-function will return for each fish occurrence site all sub-catchment IDs 
+fish occurrences, we need to load the GeoPackage of the stream segments (
+order_vect_segment) as a graph. Further, we will need the sub-catchment IDs of 
+the fish occurrences to use the function `get_catchment_graph`. The
+function will return for each fish occurrence all sub-catchment IDs 
 which are located up- or downstream.
 
-![](../man/figures/workflow7.png)
+<!-- ![](../man/figures/workflow7.png)-->
 
 ```{r eval=FALSE}
 # Define full path to the GeoPackage of the stream segments
@@ -875,7 +876,7 @@ which are located up- or downstream.
 # Load the GeoPackage as graph
 stream_network_graph <- read_geopackage(gpkg = upstream_segment_vect, import_as = "graph")
 
-# Get sub-catchment IDs of the fish occurrence sites
+# Get sub-catchment IDs of the fish occurrences
 fs_subc_ids <- upstream_point_locations %>% 
   rename(subcatchment_id = subc_id_snap_accu) %>% 
   filter(site_id %in% c(1:2, 4:14)) %>% 
@@ -883,16 +884,16 @@ fs_subc_ids <- upstream_point_locations %>%
   unique() %>% 
   as.character()
 
-# Get all stream segment IDs (=sub-catchments IDs)  upstream for each
-# fish occurrence site
-# Note: There will be no output for fish occurrence sites which are located
+# Get all stream segment IDs (=sub-catchments IDs) upstream of each
+# fish occurrence
+# Note: There will be no output for fish occurrences which are located
 # in headwaters (Strahler order 1)
 upstream_segments <- get_catchment_graph(g = stream_network_graph,
                                          subc_id = fs_subc_ids, mode = "in")
 
 # Get all stream segment IDs downstream for each
-# fish occurrence site
-# Note: There will be no output for fish occurrence sites which are located
+# fish occurrence
+# Note: There will be no output for fish occurrences which are located
 # in the last segments before the outlet
 downstream_segments <- get_catchment_graph(g = stream_network_graph,
                                            subc_id = fs_subc_ids, mode = "out")
@@ -921,21 +922,20 @@ kbl(head(upstream_segments_168036446[,1:8])) %>%
   scroll_box(width = "700px", height = "200px")
 ```
 
-### Determine the number of dams and the distance alonge the network to the closest dam
+### Determine the number of dams and the distance along the network to the closest dam
 
 After we have determined the distance between the point locations and now
-the sub-catchment IDs up- and downstream of each fish occurrence site we can 
+the sub-catchment IDs up- and downstream of each fish occurrence we can 
 estimate the number of dams and evaluate the distance to the closest dam.
 
-![](../man/figures/workflow.png)
+<!-- ![](../man/figures/workflow.png) -->
 
 ```{r eval=FALSE}
 
-# Get all sub-catchment IDs of fish occurrence sites with stream 
-# segments upstream
+# Get all sub-catchment IDs of fish occurrences with stream segments upstream
 fs_subc_ids_up <- names(upstream_segments)
 
-# Get site IDs of the fish occurrence sites 
+# Get unique site IDs of the fish occurrences
 fs_site_id <- upstream_point_locations %>% 
   filter(subc_id_snap_accu %in% fs_subc_ids_up) %>% 
   arrange(match(subc_id_snap_accu, fs_subc_ids_up)) %>% 
@@ -991,7 +991,7 @@ fd_upstream <- upstream_segments %>%
 # segments downstream
 fs_subc_ids_down <- names(downstream_segments)
 
-# Get unique site IDs of the fish occurrence sites 
+# Get unique site IDs of the fish occurrences 
 fs_site_id <- upstream_point_locations %>% 
   filter(subc_id_snap_accu %in% fs_subc_ids_down) %>% 
   arrange(match(subc_id_snap_accu, fs_subc_ids_down)) %>% 
