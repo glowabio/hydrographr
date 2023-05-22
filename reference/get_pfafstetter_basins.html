@@ -82,30 +82,32 @@ should be split into smaller ones.</p></dd>
 
 
 <dt>subc_raster</dt>
-<dd><p>Full path to the sub-catchment raster file of the basin.
-Does not need to be cropped / masked to the basin.</p></dd>
+<dd><p>character. Full path to the sub-catchment raster file of
+the basin. Does not need to be cropped / masked to the basin, but the IDs
+of the sub-catchments need to match with the input graph.</p></dd>
 
 
 <dt>out_dir</dt>
-<dd><p>The path of the output directory where the Pfafstetter
-raster layer will be written.</p></dd>
+<dd><p>character. The path of the output directory where the
+Pfafstetter raster layer will be written. Only needed when data.table=FALSE.</p></dd>
 
 
 <dt>file_name</dt>
 <dd><p>character. The filename and extension of the Pfafstetter
-raster layer (e.g. 'pfafstetter_raster.tif")</p></dd>
+raster layer (e.g. 'pfafstetter_raster.tif"). Only needed when
+data.table=FALSE.</p></dd>
 
 
 <dt>data_table</dt>
 <dd><p>Logical. If TRUE, then the result will be loaded into R
 as a 2-column data.table (sub-catchment ID and Pfafstetter code). If FALSE,
-the result is provided as a raster (terra object) and written to disk.
+the result is loaded as a raster (terra object) in R and written to disk.
 Default is FALSE.</p></dd>
 
 
 <dt>n_cores</dt>
 <dd><p>numeric. Number of cores used for parallelization. Default is
-NULL (= detectCores(logical=FALSE)-1).</p></dd>
+NULL (= detectCores(logical=FALSE)-1). Optional.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -121,7 +123,9 @@ case the result is a raster, then a .tif file is written to disk.</p>
 hierarchical topological coding scheme (see Verdin &amp; Verdin (1999) for
 details). This function splits a given basin into up to nine sub-basins
 using the flow accumulation as the basis. The user has to define the
-sub-catchment (stream segment) ID</p>
+sub-catchment (stream segment) ID that serves as the outlet of the basin.
+Note that this can be any stream segment with a sufficient number of upstream
+segments (sub-catchments).</p>
     </div>
     <div class="section level2">
     <h2 id="note">Note<a class="anchor" aria-label="anchor" href="#note"></a></h2>
