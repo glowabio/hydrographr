@@ -99,12 +99,13 @@ of "data" (e.g., occurrence or site IDs). The unique IDs need to be numeric.</p>
 
 <dt>basin_id</dt>
 <dd><p>character. The name of the column with the basin IDs.
-If NULL, the basin IDs will be extracted automatically. Default is NULL</p></dd>
+If NULL, the basin IDs will be extracted automatically. Optional.
+Default is NULL</p></dd>
 
 
 <dt>subc_id</dt>
 <dd><p>character. The name of the column with the sub-catchment IDs.
-If NULL, the sub-catchment IDs will be extracted automatically.
+If NULL, the sub-catchment IDs will be extracted automatically. Optional.
 Default is NULL.</p></dd>
 
 
@@ -197,7 +198,7 @@ value.
 <span>                                            stream_layer <span class="op">=</span> <span class="va">stream_vect</span>,</span>
 <span>                                            n_cores <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="co"># Show head of output table</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">snapped_coordinates</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">snapped_coordinates</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># OR</span></span>
 <span><span class="co"># Automatically extract the basin and sub-catchment IDs and</span></span>
@@ -211,7 +212,7 @@ value.
 <span>                                            stream_layer <span class="op">=</span> <span class="va">stream_vect</span>,</span>
 <span>                                            n_cores <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="co"># Show head of output table</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">snapped_coordinates</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">snapped_coordinates</span><span class="op">)</span></span>
 <span></span></code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
