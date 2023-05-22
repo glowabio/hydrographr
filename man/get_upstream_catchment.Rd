@@ -36,7 +36,7 @@ direction variable.}
 To identify the upstream catchment the output file name includes the site id.}
 
 \item{n_cores}{numeric. Number of cores used for parallelization.
-If NULL, available cores - 1 will be used.}
+If NULL, available cores - 1 will be used. Default is NULL.}
 
 \item{compression}{character. Compression of the written output file.
 Compression levels can be defined as "none", "low", or "high". Default is

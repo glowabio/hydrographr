@@ -24,7 +24,7 @@
 #' and "all" returns both.
 #' @param var_layer character vector. One or more attributes (variable layers)
 #' of the input graph that should be reported for each output segment_id
-#' ("to_stream"). Optional.
+#' ("to_stream"). Optional. Default is NULL.
 #' @param attach_only logical. If TRUE, the selected variables will be only
 #' attached to each segment without any further aggregation. Default is FALSE.
 #' @param stat one of the functions mean, median, min, max, sd (without quotes).
@@ -100,7 +100,7 @@
 
 
 
-get_segment_neighbours <- function(g, subc_id = NULL,var_layer = NULL,
+get_segment_neighbours <- function(g, subc_id = NULL, var_layer = NULL,
                                    stat = NULL, attach_only = FALSE, order = 5,
                                    mode = "in", n_cores = 1, max_size = 1500) {
 

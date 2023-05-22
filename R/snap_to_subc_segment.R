@@ -10,9 +10,10 @@
 #' @param id character. The name of a column containing unique IDs for each row
 #' of "data" (e.g., occurrence or site IDs). The unique IDs need to be numeric.
 #' @param basin_id character. The name of the column with the basin IDs.
-#' If NULL, the basin IDs will be extracted automatically. Default is NULL
+#' If NULL, the basin IDs will be extracted automatically. Optional.
+#' Default is NULL
 #' @param subc_id character. The name of the column with the sub-catchment IDs.
-#' If NULL, the sub-catchment IDs will be extracted automatically.
+#' If NULL, the sub-catchment IDs will be extracted automatically. Optional.
 #' Default is NULL.
 #' @param basin_layer character. Full path to the basin ID .tif layer.
 #' @param subc_layer character. Full path to the sub-catchment ID .tif layer.

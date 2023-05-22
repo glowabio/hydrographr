@@ -24,7 +24,7 @@ get_segment_neighbours(
 
 \item{var_layer}{character vector. One or more attributes (variable layers)
 of the input graph that should be reported for each output segment_id
-("to_stream"). Optional.}
+("to_stream"). Optional. Default is NULL.}
 
 \item{stat}{one of the functions mean, median, min, max, sd (without quotes).
 Aggregates (or summarizes) the variables for the neighbourhood of each input

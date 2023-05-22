@@ -14,7 +14,7 @@
 #' Needed if the point should be snapped to the next stream segment having
 #' an accumulation value higher than the flow accumulation threshold
 #' (set by 'accumulation'). This prevents points from being snapped to small
-#' stream tributaries.
+#' stream tributaries. Optional. Default is NULL.
 #' @param method character. One of "distance", "accumulation", or "both".
 #' Defines if the points are snapped using the distance or flow accumulation
 #' (see "Details" for more information). If method is set to "both" the output

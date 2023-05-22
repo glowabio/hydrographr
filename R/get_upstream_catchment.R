@@ -15,7 +15,7 @@
 #' @param out_dir Full path to the directory where the output(s) will be stored.
 #' To identify the upstream catchment the output file name includes the site id.
 #' @param n_cores numeric. Number of cores used for parallelization.
-#' If NULL, available cores - 1 will be used.
+#' If NULL, available cores - 1 will be used. Default is NULL.
 #' @param compression character. Compression of the written output file.
 #' Compression levels can be defined as "none", "low", or "high". Default is
 #' "low".
