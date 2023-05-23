@@ -1,6 +1,6 @@
 #' @title Read a GeoPackage file
 #'
-#' @description Reads an entire, or only a subset of a GeoPackage vector file
+#' @description Reads an entire, or a subset of a GeoPackage vector file
 #' from disk either as a table (data.table), as a directed graph object
 #' (igraph), a spatial dataframe (sf) or a SpatVect object (terra).
 #'
@@ -8,8 +8,8 @@
 #' @param import_as character. "data.table", "graph", "sf", or "SpatVect".
 #' "data.table" imports data as a data.table. "graph" imports the layer as a
 #' directed graph (igraph object). This option is only possible for a network
-#' layer (e.g. the stream network) and it needs to contain the attributes stream
-#' and next stream. "sf" imports the layer as a  spatial data
+#' layer (e.g. the stream network) and it needs to contain the attributes "stream"
+#' and "next_stream". "sf" imports the layer as a  spatial data
 #' frame (sf object). "SpatVect" imports the layer as a SpatVector (terra
 #' object). Default is "data.table".
 #' @param layer_name character. Name of the specific data layer to import from
