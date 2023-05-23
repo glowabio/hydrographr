@@ -37,6 +37,7 @@ the output is loaded into R."><!-- mathjax --><script src="https://cdnjs.cloudfl
     <a class="dropdown-item" href="../articles/case_study_brazil.html">Case study - São Francisco drainage basin</a>
     <a class="dropdown-item" href="../articles/case_study_cuba.html">Case study - Cuba</a>
     <a class="dropdown-item" href="../articles/linux_system_setup.html">Setting up the package requirements on Linux</a>
+    <a class="dropdown-item" href="../articles/macos_system_setup.html">Setting up the package requirements on MacOS</a>
     <a class="dropdown-item" href="../articles/windows_system_setup.html">Setting up the package requirements on Windows</a>
   </div>
 </li>
@@ -130,8 +131,36 @@ Default is TRUE.</p></dd>
 
 </dl></div>
     <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>The following attributes are stored in the stream network .gpkg files:</p>
+<p>* cat - category
+* stream - sub-catchment / stream segment ID (equal to cat)
+* next_stream - downstream sub-catchment / stream segment ID
+* prev_streams; two or more uptstream sub-catchment / stream segment IDs
+* strahler - Strahler's stream order
+* horton - Hortons's stream order
+* shreve - Shreve's stream magnitude
+* hack - Hack's main streams or Gravelius order
+* topo_dim - Topological dimension streams order
+* scheidegger - Scheidegger's Consisted Associated Integers
+* drwal - Drwal's stream hierarchy
+* length - length of the stream segment
+* stright - length of the stream segment as a stright line
+* sinusoid - fractal dimension: stream segment length / stright stream
+* segment length;
+* cum_length - length of the stream from the source
+* flow_accum - flow accumulation within the sub-catchment of a stream segment
+* out_dist - distance of current stream initialisation from outlet
+* source_elev - elevation at stream segment initialisation
+* outlet_elev - elevation at stream segment outlet
+* elev_drop difference between source_elev and outlet_elev + drop outlet
+* out_drop - drop at the outlet of the stream segment
+* gradient - drop/length;</p>
+    </div>
+    <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
-    <p><a href="https://grass.osgeo.org/grass82/manuals/v.in.ogr.html" class="external-link">https://grass.osgeo.org/grass82/manuals/v.in.ogr.html</a></p>
+    <p><a href="https://grass.osgeo.org/grass82/manuals/v.in.ogr.html" class="external-link">https://grass.osgeo.org/grass82/manuals/v.in.ogr.html</a>
+<a href="https://grass.osgeo.org/grass82/manuals/addons/r.stream.order.html" class="external-link">https://grass.osgeo.org/grass82/manuals/addons/r.stream.order.html</a></p>
     </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>

@@ -48,6 +48,7 @@
     <a class="dropdown-item" href="../articles/case_study_brazil.html">Case study - São Francisco drainage basin</a>
     <a class="dropdown-item" href="../articles/case_study_cuba.html">Case study - Cuba</a>
     <a class="dropdown-item" href="../articles/linux_system_setup.html">Setting up the package requirements on Linux</a>
+    <a class="dropdown-item" href="../articles/macos_system_setup.html">Setting up the package requirements on MacOS</a>
     <a class="dropdown-item" href="../articles/windows_system_setup.html">Setting up the package requirements on Windows</a>
   </div>
 </li>
@@ -106,7 +107,7 @@ where the species could potentially occur. Finally, we will reclassify
 the layer of all the sub-catchments in the study area, creating a
 habitat suitability map.</p>
 <p><img src="../reference/figures/wf_0.png"></p>
-<!--![](../man/figures/SDM.png)-->
+<p><img src="../reference/figures/SDM.png"></p>
 <p><a href="https://www.gbif.org/species/1424240" class="external-link"><em>Hypolestes
 trinitatis</em></a> is a damselfly species endemic to Cuba. The species
 inhabits rivers and streams located in forest areas at the main mountain
@@ -941,7 +942,7 @@ these IDs using the function <em>get_tile_id()</em>. This function
 downloads and uses the auxiliary raster file that contains all the
 regional units globally, and thus requires an active internet
 connection.</p>
-<!--![](../man/figures/wf_1.png)-->
+<p><img src="../reference/figures/wf_1.png"></p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">tile_id</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_tile_id.html">get_tile_id</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">spdata</span>, lon <span class="op">=</span> <span class="st">"longitude"</span>, lat <span class="op">=</span> <span class="st">"latitude"</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
@@ -956,7 +957,7 @@ double check which tile IDs are relevant for your purpose using the
 “h08v06” and “h10v06”, so we will keep only these two.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">tile_id</span> <span class="op">&lt;-</span> <span class="va">tile_id</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">3</span><span class="op">)</span><span class="op">]</span></span></code></pre></div>
-<!--![](../man/figures/wf_2.png)-->
+<p><img src="../reference/figures/wf_2.png"></p>
 <p>Let’s define the Hydrography90m variables that we would like to
 download. We will use the variables <a href="https://hydrography.org/hydrography90m/hydrography90m_layers#stream-slope-layers" class="external-link">slope_curv_max_dw_cel</a>
 (maximum curvature between the highest upstream, focal and downstream
@@ -1010,7 +1011,7 @@ and visualisations are available <a href="https://hydrography.org/hydrography90m
 <div class="section level3">
 <h3 id="cropping">Cropping<a class="anchor" aria-label="anchor" href="#cropping"></a>
 </h3>
-<!--![](../man/figures/wf_3.png)-->
+<p><img src="../reference/figures/wf_3.png"></p>
 <p>After having downloaded all the layers, we need to crop them to the
 extent of our study area. This is straightforward in the case of the
 global CHELSA layers:</p>
@@ -1068,8 +1069,8 @@ as there is an extra step before reaching to the final output.</p>
 <div class="section level3">
 <h3 id="merging">Merging<a class="anchor" aria-label="anchor" href="#merging"></a>
 </h3>
-<!--![](../man/figures/wf_4.png)-->
-<p>The cropped tiles of the variable now need to be merged together.</p>
+<p><img src="../reference/figures/wf_4.png"> The cropped tiles of the
+variable now need to be merged together.</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># This can be done sequentially:</span></span>
 <span><span class="va">idir</span> <span class="op">&lt;-</span> <span class="va">dirs_h90m</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span>
@@ -1099,7 +1100,7 @@ as there is an extra step before reaching to the final output.</p>
 <span></span>
 <span></span>
 <span><span class="co"># ...or in a loop</span></span>
-<span><span class="kw">for</span><span class="op">(</span><span class="va">idir</span> <span class="kw">in</span> <span class="va">dirs_h90m</span><span class="op">)</span> <span class="op">{</span></span>
+<span><span class="kw">for</span><span class="op">(</span><span class="va">idir</span> <span class="kw">in</span> <span class="va">dirs_h90m</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">3</span>,<span class="fl">4</span><span class="op">)</span><span class="op">]</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="co"># Get input file extension</span></span>
 <span>  <span class="va">file_extension</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/tools/fileutils.html" class="external-link">file_ext</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">idir</span>, full.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
 <span></span>
@@ -1114,7 +1115,8 @@ as there is an extra step before reaching to the final output.</p>
 <span>                                      pattern <span class="op">=</span> <span class="st">"_crop.tif"</span><span class="op">)</span>,</span>
 <span>              out_dir <span class="op">=</span> <span class="va">layer_dir</span>,</span>
 <span>              file_name <span class="op">=</span> <span class="va">ivar_name</span>,</span>
-<span>              read <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span>              read <span class="op">=</span> <span class="cn">FALSE</span>, </span>
+<span>              bigtiff <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 </div>
 <div class="section level3">
@@ -1127,7 +1129,7 @@ require a vector of sub-catchment IDs as input. Note that the function
 points of any raster file provided to the argument <em>subc_layer</em>.
 It can be safely used to query very large raster files, as these are not
 loaded into R.</p>
-<!--![](../man/figures/wf_5.png)-->
+<p><img src="../reference/figures/wf_5.png"></p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">spdata_ids</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_ids.html">extract_ids</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">spdata</span>, lon <span class="op">=</span> <span class="st">"longitude"</span>, lat <span class="op">=</span> <span class="st">"latitude"</span>,</span>
 <span>                          id <span class="op">=</span> <span class="st">"occurrence_ID"</span>, quiet <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -1247,7 +1249,7 @@ Caution, don’t increase the number of cores to more than 3 as this can
 cause memory problems. However, this highly depends to the number of
 sub-catchments as well. We recommend to test the function with different
 parameters to find out what works best for your case.</p>
-<!--![](../man/figures/wf_6.png)-->
+<p><img src="../reference/figures/wf_6.png"></p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Define input var_layers for the extract_zonal_stat() function</span></span>
 <span><span class="va">var_layers</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">layer_dir</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="fl">9</span><span class="op">]</span></span>
@@ -1299,6 +1301,12 @@ calculation of the zonal statistics of each variable.</p>
 subc_id
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+bio1_1981.2010_data_cells
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+bio1_1981.2010_nodata_cells
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 bio1_1981.2010_min
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
@@ -1311,7 +1319,28 @@ bio1_1981.2010_range
 bio1_1981.2010_mean
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+bio1_1981.2010_mean_abs
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 bio1_1981.2010_sd
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+bio1_1981.2010_var
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+bio1_1981.2010_cv
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+bio1_1981.2010_sum
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+bio1_1981.2010_sum_abs
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+bio1_IPSL.CM6A.LR_ssp370_2041.2070_data_cells
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+bio1_IPSL.CM6A.LR_ssp370_2041.2070_nodata_cells
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 bio1_IPSL.CM6A.LR_ssp370_2041.2070_min
@@ -1326,7 +1355,28 @@ bio1_IPSL.CM6A.LR_ssp370_2041.2070_range
 bio1_IPSL.CM6A.LR_ssp370_2041.2070_mean
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+bio1_IPSL.CM6A.LR_ssp370_2041.2070_mean_abs
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 bio1_IPSL.CM6A.LR_ssp370_2041.2070_sd
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+bio1_IPSL.CM6A.LR_ssp370_2041.2070_var
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+bio1_IPSL.CM6A.LR_ssp370_2041.2070_cv
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+bio1_IPSL.CM6A.LR_ssp370_2041.2070_sum
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+bio1_IPSL.CM6A.LR_ssp370_2041.2070_sum_abs
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+bio12_1981.2010_data_cells
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+bio12_1981.2010_nodata_cells
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 bio12_1981.2010_min
@@ -1341,7 +1391,28 @@ bio12_1981.2010_range
 bio12_1981.2010_mean
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+bio12_1981.2010_mean_abs
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 bio12_1981.2010_sd
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+bio12_1981.2010_var
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+bio12_1981.2010_cv
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+bio12_1981.2010_sum
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+bio12_1981.2010_sum_abs
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+bio12_IPSL.CM6A.LR_ssp370_2041.2070_data_cells
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+bio12_IPSL.CM6A.LR_ssp370_2041.2070_nodata_cells
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 bio12_IPSL.CM6A.LR_ssp370_2041.2070_min
@@ -1356,7 +1427,28 @@ bio12_IPSL.CM6A.LR_ssp370_2041.2070_range
 bio12_IPSL.CM6A.LR_ssp370_2041.2070_mean
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+bio12_IPSL.CM6A.LR_ssp370_2041.2070_mean_abs
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 bio12_IPSL.CM6A.LR_ssp370_2041.2070_sd
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+bio12_IPSL.CM6A.LR_ssp370_2041.2070_var
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+bio12_IPSL.CM6A.LR_ssp370_2041.2070_cv
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+bio12_IPSL.CM6A.LR_ssp370_2041.2070_sum
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+bio12_IPSL.CM6A.LR_ssp370_2041.2070_sum_abs
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+bio15_1981.2010_data_cells
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+bio15_1981.2010_nodata_cells
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 bio15_1981.2010_min
@@ -1371,7 +1463,28 @@ bio15_1981.2010_range
 bio15_1981.2010_mean
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+bio15_1981.2010_mean_abs
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 bio15_1981.2010_sd
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+bio15_1981.2010_var
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+bio15_1981.2010_cv
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+bio15_1981.2010_sum
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+bio15_1981.2010_sum_abs
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+bio15_IPSL.CM6A.LR_ssp370_2041.2070_data_cells
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+bio15_IPSL.CM6A.LR_ssp370_2041.2070_nodata_cells
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 bio15_IPSL.CM6A.LR_ssp370_2041.2070_min
@@ -1386,7 +1499,28 @@ bio15_IPSL.CM6A.LR_ssp370_2041.2070_range
 bio15_IPSL.CM6A.LR_ssp370_2041.2070_mean
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+bio15_IPSL.CM6A.LR_ssp370_2041.2070_mean_abs
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 bio15_IPSL.CM6A.LR_ssp370_2041.2070_sd
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+bio15_IPSL.CM6A.LR_ssp370_2041.2070_var
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+bio15_IPSL.CM6A.LR_ssp370_2041.2070_cv
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+bio15_IPSL.CM6A.LR_ssp370_2041.2070_sum
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+bio15_IPSL.CM6A.LR_ssp370_2041.2070_sum_abs
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+slope_curv_max_dw_cel_data_cells
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+slope_curv_max_dw_cel_nodata_cells
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 slope_curv_max_dw_cel_min
@@ -1401,7 +1535,28 @@ slope_curv_max_dw_cel_range
 slope_curv_max_dw_cel_mean
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+slope_curv_max_dw_cel_mean_abs
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 slope_curv_max_dw_cel_sd
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+slope_curv_max_dw_cel_var
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+slope_curv_max_dw_cel_cv
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+slope_curv_max_dw_cel_sum
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+slope_curv_max_dw_cel_sum_abs
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+spi_data_cells
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+spi_nodata_cells
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 spi_min
@@ -1416,7 +1571,22 @@ spi_range
 spi_mean
 </th>
 <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+spi_mean_abs
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
 spi_sd
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+spi_var
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+spi_cv
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+spi_sum
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+spi_sum_abs
 </th>
 </tr></thead>
 <tbody>
@@ -1425,6 +1595,12 @@ spi_sd
 399592461
 </td>
 <td style="text-align:right;">
+355
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
 2986
 </td>
 <td style="text-align:right;">
@@ -1435,6 +1611,27 @@ spi_sd
 </td>
 <td style="text-align:right;">
 2986
+</td>
+<td style="text-align:right;">
+2986
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1060030
+</td>
+<td style="text-align:right;">
+1060030
+</td>
+<td style="text-align:right;">
+355
 </td>
 <td style="text-align:right;">
 0
@@ -1450,6 +1647,27 @@ spi_sd
 </td>
 <td style="text-align:right;">
 3005
+</td>
+<td style="text-align:right;">
+3005
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1066775
+</td>
+<td style="text-align:right;">
+1066775
+</td>
+<td style="text-align:right;">
+355
 </td>
 <td style="text-align:right;">
 0
@@ -1467,7 +1685,28 @@ spi_sd
 11050.04
 </td>
 <td style="text-align:right;">
+11050.04
+</td>
+<td style="text-align:right;">
 17.799709
+</td>
+<td style="text-align:right;">
+316.82964
+</td>
+<td style="text-align:right;">
+0.1610828
+</td>
+<td style="text-align:right;">
+3922763
+</td>
+<td style="text-align:right;">
+3922763
+</td>
+<td style="text-align:right;">
+355
+</td>
+<td style="text-align:right;">
+0
 </td>
 <td style="text-align:right;">
 10532
@@ -1482,7 +1721,28 @@ spi_sd
 10546.23
 </td>
 <td style="text-align:right;">
+10546.23
+</td>
+<td style="text-align:right;">
 13.81320
+</td>
+<td style="text-align:right;">
+190.80449
+</td>
+<td style="text-align:right;">
+0.1309776
+</td>
+<td style="text-align:right;">
+3743913
+</td>
+<td style="text-align:right;">
+3743913
+</td>
+<td style="text-align:right;">
+355
+</td>
+<td style="text-align:right;">
+0
 </td>
 <td style="text-align:right;">
 414
@@ -1497,7 +1757,28 @@ spi_sd
 414.7380
 </td>
 <td style="text-align:right;">
+414.7380
+</td>
+<td style="text-align:right;">
 0.9650755
+</td>
+<td style="text-align:right;">
+0.9313708
+</td>
+<td style="text-align:right;">
+0.2326952
+</td>
+<td style="text-align:right;">
+147232
+</td>
+<td style="text-align:right;">
+147232
+</td>
+<td style="text-align:right;">
+355
+</td>
+<td style="text-align:right;">
+0
 </td>
 <td style="text-align:right;">
 373
@@ -1512,7 +1793,28 @@ spi_sd
 374.0225
 </td>
 <td style="text-align:right;">
+374.0225
+</td>
+<td style="text-align:right;">
 0.6230767
+</td>
+<td style="text-align:right;">
+0.3882246
+</td>
+<td style="text-align:right;">
+0.1665880
+</td>
+<td style="text-align:right;">
+132778
+</td>
+<td style="text-align:right;">
+132778
+</td>
+<td style="text-align:right;">
+354
+</td>
+<td style="text-align:right;">
+1
 </td>
 <td style="text-align:right;">
 -54884
@@ -1527,7 +1829,28 @@ spi_sd
 -2472.034
 </td>
 <td style="text-align:right;">
+5752.051
+</td>
+<td style="text-align:right;">
 12038.554
+</td>
+<td style="text-align:right;">
+144926775
+</td>
+<td style="text-align:right;">
+-486.9898
+</td>
+<td style="text-align:right;">
+-875100
+</td>
+<td style="text-align:right;">
+2036226
+</td>
+<td style="text-align:right;">
+354
+</td>
+<td style="text-align:right;">
+1
 </td>
 <td style="text-align:right;">
 0
@@ -1542,7 +1865,22 @@ spi_sd
 6.655367
 </td>
 <td style="text-align:right;">
+6.655367
+</td>
+<td style="text-align:right;">
 9.411190
+</td>
+<td style="text-align:right;">
+88.570494
+</td>
+<td style="text-align:right;">
+141.40752
+</td>
+<td style="text-align:right;">
+2356
+</td>
+<td style="text-align:right;">
+2356
 </td>
 </tr>
 <tr>
@@ -1550,6 +1888,12 @@ spi_sd
 399592865
 </td>
 <td style="text-align:right;">
+82
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
 2986
 </td>
 <td style="text-align:right;">
@@ -1560,6 +1904,27 @@ spi_sd
 </td>
 <td style="text-align:right;">
 2986
+</td>
+<td style="text-align:right;">
+2986
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+244852
+</td>
+<td style="text-align:right;">
+244852
+</td>
+<td style="text-align:right;">
+82
 </td>
 <td style="text-align:right;">
 0
@@ -1575,6 +1940,27 @@ spi_sd
 </td>
 <td style="text-align:right;">
 3005
+</td>
+<td style="text-align:right;">
+3005
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+246410
+</td>
+<td style="text-align:right;">
+246410
+</td>
+<td style="text-align:right;">
+82
 </td>
 <td style="text-align:right;">
 0
@@ -1592,7 +1978,28 @@ spi_sd
 11049.17
 </td>
 <td style="text-align:right;">
+11049.17
+</td>
+<td style="text-align:right;">
 9.880758
+</td>
+<td style="text-align:right;">
+97.62939
+</td>
+<td style="text-align:right;">
+0.0894253
+</td>
+<td style="text-align:right;">
+906032
+</td>
+<td style="text-align:right;">
+906032
+</td>
+<td style="text-align:right;">
+82
+</td>
+<td style="text-align:right;">
+0
 </td>
 <td style="text-align:right;">
 10540
@@ -1607,7 +2014,28 @@ spi_sd
 10545.72
 </td>
 <td style="text-align:right;">
+10545.72
+</td>
+<td style="text-align:right;">
 8.19023
+</td>
+<td style="text-align:right;">
+67.07986
+</td>
+<td style="text-align:right;">
+0.0776640
+</td>
+<td style="text-align:right;">
+864749
+</td>
+<td style="text-align:right;">
+864749
+</td>
+<td style="text-align:right;">
+82
+</td>
+<td style="text-align:right;">
+0
 </td>
 <td style="text-align:right;">
 414
@@ -1622,7 +2050,28 @@ spi_sd
 414.1220
 </td>
 <td style="text-align:right;">
+414.1220
+</td>
+<td style="text-align:right;">
 0.4785711
+</td>
+<td style="text-align:right;">
+0.2290303
+</td>
+<td style="text-align:right;">
+0.1155629
+</td>
+<td style="text-align:right;">
+33958
+</td>
+<td style="text-align:right;">
+33958
+</td>
+<td style="text-align:right;">
+82
+</td>
+<td style="text-align:right;">
+0
 </td>
 <td style="text-align:right;">
 373
@@ -1637,7 +2086,28 @@ spi_sd
 373.0610
 </td>
 <td style="text-align:right;">
+373.0610
+</td>
+<td style="text-align:right;">
 0.2392856
+</td>
+<td style="text-align:right;">
+0.0572576
+</td>
+<td style="text-align:right;">
+0.0641411
+</td>
+<td style="text-align:right;">
+30591
+</td>
+<td style="text-align:right;">
+30591
+</td>
+<td style="text-align:right;">
+81
+</td>
+<td style="text-align:right;">
+1
 </td>
 <td style="text-align:right;">
 -40084
@@ -1652,7 +2122,28 @@ spi_sd
 -3907.630
 </td>
 <td style="text-align:right;">
+7527.259
+</td>
+<td style="text-align:right;">
 12947.641
+</td>
+<td style="text-align:right;">
+167641415
+</td>
+<td style="text-align:right;">
+-331.3426
+</td>
+<td style="text-align:right;">
+-316518
+</td>
+<td style="text-align:right;">
+609708
+</td>
+<td style="text-align:right;">
+81
+</td>
+<td style="text-align:right;">
+1
 </td>
 <td style="text-align:right;">
 0
@@ -1667,7 +2158,22 @@ spi_sd
 8.925926
 </td>
 <td style="text-align:right;">
+8.925926
+</td>
+<td style="text-align:right;">
 13.105251
+</td>
+<td style="text-align:right;">
+171.747600
+</td>
+<td style="text-align:right;">
+146.82231
+</td>
+<td style="text-align:right;">
+723
+</td>
+<td style="text-align:right;">
+723
 </td>
 </tr>
 <tr>
@@ -1675,6 +2181,12 @@ spi_sd
 399593700
 </td>
 <td style="text-align:right;">
+148
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
 2986
 </td>
 <td style="text-align:right;">
@@ -1685,6 +2197,27 @@ spi_sd
 </td>
 <td style="text-align:right;">
 2986
+</td>
+<td style="text-align:right;">
+2986
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+441928
+</td>
+<td style="text-align:right;">
+441928
+</td>
+<td style="text-align:right;">
+148
 </td>
 <td style="text-align:right;">
 0
@@ -1700,6 +2233,27 @@ spi_sd
 </td>
 <td style="text-align:right;">
 3005
+</td>
+<td style="text-align:right;">
+3005
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+444740
+</td>
+<td style="text-align:right;">
+444740
+</td>
+<td style="text-align:right;">
+148
 </td>
 <td style="text-align:right;">
 0
@@ -1717,7 +2271,28 @@ spi_sd
 11019.70
 </td>
 <td style="text-align:right;">
+11019.70
+</td>
+<td style="text-align:right;">
 14.048015
+</td>
+<td style="text-align:right;">
+197.34674
+</td>
+<td style="text-align:right;">
+0.1274810
+</td>
+<td style="text-align:right;">
+1630915
+</td>
+<td style="text-align:right;">
+1630915
+</td>
+<td style="text-align:right;">
+148
+</td>
+<td style="text-align:right;">
+0
 </td>
 <td style="text-align:right;">
 10510
@@ -1732,7 +2307,28 @@ spi_sd
 10520.42
 </td>
 <td style="text-align:right;">
+10520.42
+</td>
+<td style="text-align:right;">
 11.55306
+</td>
+<td style="text-align:right;">
+133.47316
+</td>
+<td style="text-align:right;">
+0.1098156
+</td>
+<td style="text-align:right;">
+1557022
+</td>
+<td style="text-align:right;">
+1557022
+</td>
+<td style="text-align:right;">
+148
+</td>
+<td style="text-align:right;">
+0
 </td>
 <td style="text-align:right;">
 414
@@ -1747,7 +2343,28 @@ spi_sd
 414.5811
 </td>
 <td style="text-align:right;">
+414.5811
+</td>
+<td style="text-align:right;">
 0.8055006
+</td>
+<td style="text-align:right;">
+0.6488313
+</td>
+<td style="text-align:right;">
+0.1942927
+</td>
+<td style="text-align:right;">
+61358
+</td>
+<td style="text-align:right;">
+61358
+</td>
+<td style="text-align:right;">
+148
+</td>
+<td style="text-align:right;">
+0
 </td>
 <td style="text-align:right;">
 375
@@ -1762,7 +2379,28 @@ spi_sd
 375.1757
 </td>
 <td style="text-align:right;">
+375.1757
+</td>
+<td style="text-align:right;">
 0.3805440
+</td>
+<td style="text-align:right;">
+0.1448137
+</td>
+<td style="text-align:right;">
+0.1014309
+</td>
+<td style="text-align:right;">
+55526
+</td>
+<td style="text-align:right;">
+55526
+</td>
+<td style="text-align:right;">
+148
+</td>
+<td style="text-align:right;">
+0
 </td>
 <td style="text-align:right;">
 -28093
@@ -1777,7 +2415,28 @@ spi_sd
 -1160.236
 </td>
 <td style="text-align:right;">
+3082.331
+</td>
+<td style="text-align:right;">
 7115.013
+</td>
+<td style="text-align:right;">
+50623405
+</td>
+<td style="text-align:right;">
+-613.2381
+</td>
+<td style="text-align:right;">
+-171715
+</td>
+<td style="text-align:right;">
+456185
+</td>
+<td style="text-align:right;">
+148
+</td>
+<td style="text-align:right;">
+0
 </td>
 <td style="text-align:right;">
 0
@@ -1792,7 +2451,22 @@ spi_sd
 2.439189
 </td>
 <td style="text-align:right;">
+2.439189
+</td>
+<td style="text-align:right;">
 2.916000
+</td>
+<td style="text-align:right;">
+8.503059
+</td>
+<td style="text-align:right;">
+119.54794
+</td>
+<td style="text-align:right;">
+361
+</td>
+<td style="text-align:right;">
+361
 </td>
 </tr>
 <tr>
@@ -1800,6 +2474,12 @@ spi_sd
 399593701
 </td>
 <td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
 2986
 </td>
 <td style="text-align:right;">
@@ -1810,6 +2490,27 @@ spi_sd
 </td>
 <td style="text-align:right;">
 2986
+</td>
+<td style="text-align:right;">
+2986
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+20902
+</td>
+<td style="text-align:right;">
+20902
+</td>
+<td style="text-align:right;">
+7
 </td>
 <td style="text-align:right;">
 0
@@ -1825,6 +2526,27 @@ spi_sd
 </td>
 <td style="text-align:right;">
 3005
+</td>
+<td style="text-align:right;">
+3005
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+21035
+</td>
+<td style="text-align:right;">
+21035
+</td>
+<td style="text-align:right;">
+7
 </td>
 <td style="text-align:right;">
 0
@@ -1842,7 +2564,28 @@ spi_sd
 10987.00
 </td>
 <td style="text-align:right;">
+10987.00
+</td>
+<td style="text-align:right;">
 0.000000
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+76909
+</td>
+<td style="text-align:right;">
+76909
+</td>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+0
 </td>
 <td style="text-align:right;">
 10490
@@ -1857,7 +2600,28 @@ spi_sd
 10490.00
 </td>
 <td style="text-align:right;">
+10490.00
+</td>
+<td style="text-align:right;">
 0.00000
+</td>
+<td style="text-align:right;">
+0.00000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+73430
+</td>
+<td style="text-align:right;">
+73430
+</td>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+0
 </td>
 <td style="text-align:right;">
 415
@@ -1872,7 +2636,28 @@ spi_sd
 415.0000
 </td>
 <td style="text-align:right;">
+415.0000
+</td>
+<td style="text-align:right;">
 0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+2905
+</td>
+<td style="text-align:right;">
+2905
+</td>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+0
 </td>
 <td style="text-align:right;">
 376
@@ -1887,7 +2672,28 @@ spi_sd
 376.0000
 </td>
 <td style="text-align:right;">
+376.0000
+</td>
+<td style="text-align:right;">
 0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+2632
+</td>
+<td style="text-align:right;">
+2632
+</td>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+0
 </td>
 <td style="text-align:right;">
 -8035
@@ -1902,7 +2708,28 @@ spi_sd
 -2046.286
 </td>
 <td style="text-align:right;">
+3874.571
+</td>
+<td style="text-align:right;">
 4235.546
+</td>
+<td style="text-align:right;">
+17939850
+</td>
+<td style="text-align:right;">
+-206.9870
+</td>
+<td style="text-align:right;">
+-14324
+</td>
+<td style="text-align:right;">
+27122
+</td>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+0
 </td>
 <td style="text-align:right;">
 0
@@ -1917,7 +2744,22 @@ spi_sd
 2.142857
 </td>
 <td style="text-align:right;">
+2.142857
+</td>
+<td style="text-align:right;">
 3.481731
+</td>
+<td style="text-align:right;">
+12.122449
+</td>
+<td style="text-align:right;">
+162.48077
+</td>
+<td style="text-align:right;">
+15
+</td>
+<td style="text-align:right;">
+15
 </td>
 </tr>
 <tr>
@@ -1925,6 +2767,12 @@ spi_sd
 399593817
 </td>
 <td style="text-align:right;">
+162
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
 2986
 </td>
 <td style="text-align:right;">
@@ -1935,6 +2783,27 @@ spi_sd
 </td>
 <td style="text-align:right;">
 2986
+</td>
+<td style="text-align:right;">
+2986
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+483732
+</td>
+<td style="text-align:right;">
+483732
+</td>
+<td style="text-align:right;">
+162
 </td>
 <td style="text-align:right;">
 0
@@ -1950,6 +2819,27 @@ spi_sd
 </td>
 <td style="text-align:right;">
 3005
+</td>
+<td style="text-align:right;">
+3005
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+486810
+</td>
+<td style="text-align:right;">
+486810
+</td>
+<td style="text-align:right;">
+162
 </td>
 <td style="text-align:right;">
 0
@@ -1967,7 +2857,28 @@ spi_sd
 11009.02
 </td>
 <td style="text-align:right;">
+11009.02
+</td>
+<td style="text-align:right;">
 14.746614
+</td>
+<td style="text-align:right;">
+217.46262
+</td>
+<td style="text-align:right;">
+0.1339503
+</td>
+<td style="text-align:right;">
+1783461
+</td>
+<td style="text-align:right;">
+1783461
+</td>
+<td style="text-align:right;">
+162
+</td>
+<td style="text-align:right;">
+0
 </td>
 <td style="text-align:right;">
 10496
@@ -1982,7 +2893,28 @@ spi_sd
 10509.90
 </td>
 <td style="text-align:right;">
+10509.90
+</td>
+<td style="text-align:right;">
 12.24907
+</td>
+<td style="text-align:right;">
+150.03963
+</td>
+<td style="text-align:right;">
+0.1165479
+</td>
+<td style="text-align:right;">
+1702604
+</td>
+<td style="text-align:right;">
+1702604
+</td>
+<td style="text-align:right;">
+162
+</td>
+<td style="text-align:right;">
+0
 </td>
 <td style="text-align:right;">
 414
@@ -1997,7 +2929,28 @@ spi_sd
 414.7654
 </td>
 <td style="text-align:right;">
+414.7654
+</td>
+<td style="text-align:right;">
 0.7161558
+</td>
+<td style="text-align:right;">
+0.5128791
+</td>
+<td style="text-align:right;">
+0.1726653
+</td>
+<td style="text-align:right;">
+67192
+</td>
+<td style="text-align:right;">
+67192
+</td>
+<td style="text-align:right;">
+162
+</td>
+<td style="text-align:right;">
+0
 </td>
 <td style="text-align:right;">
 375
@@ -2012,7 +2965,28 @@ spi_sd
 375.2160
 </td>
 <td style="text-align:right;">
+375.2160
+</td>
+<td style="text-align:right;">
 0.4115484
+</td>
+<td style="text-align:right;">
+0.1693720
+</td>
+<td style="text-align:right;">
+0.1096830
+</td>
+<td style="text-align:right;">
+60785
+</td>
+<td style="text-align:right;">
+60785
+</td>
+<td style="text-align:right;">
+162
+</td>
+<td style="text-align:right;">
+0
 </td>
 <td style="text-align:right;">
 -38488
@@ -2027,7 +3001,28 @@ spi_sd
 -2234.920
 </td>
 <td style="text-align:right;">
+5134.846
+</td>
+<td style="text-align:right;">
 9093.644
+</td>
+<td style="text-align:right;">
+82694353
+</td>
+<td style="text-align:right;">
+-406.8890
+</td>
+<td style="text-align:right;">
+-362057
+</td>
+<td style="text-align:right;">
+831845
+</td>
+<td style="text-align:right;">
+162
+</td>
+<td style="text-align:right;">
+0
 </td>
 <td style="text-align:right;">
 0
@@ -2042,7 +3037,22 @@ spi_sd
 2.660494
 </td>
 <td style="text-align:right;">
+2.660494
+</td>
+<td style="text-align:right;">
 3.961487
+</td>
+<td style="text-align:right;">
+15.693378
+</td>
+<td style="text-align:right;">
+148.90043
+</td>
+<td style="text-align:right;">
+431
+</td>
+<td style="text-align:right;">
+431
 </td>
 </tr>
 <tr>
@@ -2050,6 +3060,12 @@ spi_sd
 399593818
 </td>
 <td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
 2986
 </td>
 <td style="text-align:right;">
@@ -2060,6 +3076,27 @@ spi_sd
 </td>
 <td style="text-align:right;">
 2986
+</td>
+<td style="text-align:right;">
+2986
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+14930
+</td>
+<td style="text-align:right;">
+14930
+</td>
+<td style="text-align:right;">
+5
 </td>
 <td style="text-align:right;">
 0
@@ -2075,6 +3112,27 @@ spi_sd
 </td>
 <td style="text-align:right;">
 3005
+</td>
+<td style="text-align:right;">
+3005
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+15025
+</td>
+<td style="text-align:right;">
+15025
+</td>
+<td style="text-align:right;">
+5
 </td>
 <td style="text-align:right;">
 0
@@ -2092,7 +3150,28 @@ spi_sd
 10977.40
 </td>
 <td style="text-align:right;">
+10977.40
+</td>
+<td style="text-align:right;">
 4.800000
+</td>
+<td style="text-align:right;">
+23.04000
+</td>
+<td style="text-align:right;">
+0.0437262
+</td>
+<td style="text-align:right;">
+54887
+</td>
+<td style="text-align:right;">
+54887
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+0
 </td>
 <td style="text-align:right;">
 10479
@@ -2107,7 +3186,28 @@ spi_sd
 10481.20
 </td>
 <td style="text-align:right;">
+10481.20
+</td>
+<td style="text-align:right;">
 4.40000
+</td>
+<td style="text-align:right;">
+19.36000
+</td>
+<td style="text-align:right;">
+0.0419799
+</td>
+<td style="text-align:right;">
+52406
+</td>
+<td style="text-align:right;">
+52406
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+0
 </td>
 <td style="text-align:right;">
 415
@@ -2122,7 +3222,28 @@ spi_sd
 415.0000
 </td>
 <td style="text-align:right;">
+415.0000
+</td>
+<td style="text-align:right;">
 0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+2075
+</td>
+<td style="text-align:right;">
+2075
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+0
 </td>
 <td style="text-align:right;">
 376
@@ -2137,7 +3258,28 @@ spi_sd
 376.8000
 </td>
 <td style="text-align:right;">
+376.8000
+</td>
+<td style="text-align:right;">
 0.4000000
+</td>
+<td style="text-align:right;">
+0.1600000
+</td>
+<td style="text-align:right;">
+0.1061571
+</td>
+<td style="text-align:right;">
+1884
+</td>
+<td style="text-align:right;">
+1884
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+0
 </td>
 <td style="text-align:right;">
 0
@@ -2152,7 +3294,28 @@ spi_sd
 2116.400
 </td>
 <td style="text-align:right;">
+2116.400
+</td>
+<td style="text-align:right;">
 4232.800
+</td>
+<td style="text-align:right;">
+17916596
+</td>
+<td style="text-align:right;">
+200.0000
+</td>
+<td style="text-align:right;">
+10582
+</td>
+<td style="text-align:right;">
+10582
+</td>
+<td style="text-align:right;">
+5
+</td>
+<td style="text-align:right;">
+0
 </td>
 <td style="text-align:right;">
 1
@@ -2167,7 +3330,22 @@ spi_sd
 1.200000
 </td>
 <td style="text-align:right;">
+1.200000
+</td>
+<td style="text-align:right;">
 0.400000
+</td>
+<td style="text-align:right;">
+0.160000
+</td>
+<td style="text-align:right;">
+33.33333
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+6
 </td>
 </tr>
 </tbody>
@@ -2175,47 +3353,103 @@ spi_sd
 </div>
 <div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">stats_table_zon</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##  [1] "subc_id"                                  </span></span>
-<span><span class="co">##  [2] "bio1_1981.2010_min"                       </span></span>
-<span><span class="co">##  [3] "bio1_1981.2010_max"                       </span></span>
-<span><span class="co">##  [4] "bio1_1981.2010_range"                     </span></span>
-<span><span class="co">##  [5] "bio1_1981.2010_mean"                      </span></span>
-<span><span class="co">##  [6] "bio1_1981.2010_sd"                        </span></span>
-<span><span class="co">##  [7] "bio1_IPSL.CM6A.LR_ssp370_2041.2070_min"   </span></span>
-<span><span class="co">##  [8] "bio1_IPSL.CM6A.LR_ssp370_2041.2070_max"   </span></span>
-<span><span class="co">##  [9] "bio1_IPSL.CM6A.LR_ssp370_2041.2070_range" </span></span>
-<span><span class="co">## [10] "bio1_IPSL.CM6A.LR_ssp370_2041.2070_mean"  </span></span>
-<span><span class="co">## [11] "bio1_IPSL.CM6A.LR_ssp370_2041.2070_sd"    </span></span>
-<span><span class="co">## [12] "bio12_1981.2010_min"                      </span></span>
-<span><span class="co">## [13] "bio12_1981.2010_max"                      </span></span>
-<span><span class="co">## [14] "bio12_1981.2010_range"                    </span></span>
-<span><span class="co">## [15] "bio12_1981.2010_mean"                     </span></span>
-<span><span class="co">## [16] "bio12_1981.2010_sd"                       </span></span>
-<span><span class="co">## [17] "bio12_IPSL.CM6A.LR_ssp370_2041.2070_min"  </span></span>
-<span><span class="co">## [18] "bio12_IPSL.CM6A.LR_ssp370_2041.2070_max"  </span></span>
-<span><span class="co">## [19] "bio12_IPSL.CM6A.LR_ssp370_2041.2070_range"</span></span>
-<span><span class="co">## [20] "bio12_IPSL.CM6A.LR_ssp370_2041.2070_mean" </span></span>
-<span><span class="co">## [21] "bio12_IPSL.CM6A.LR_ssp370_2041.2070_sd"   </span></span>
-<span><span class="co">## [22] "bio15_1981.2010_min"                      </span></span>
-<span><span class="co">## [23] "bio15_1981.2010_max"                      </span></span>
-<span><span class="co">## [24] "bio15_1981.2010_range"                    </span></span>
-<span><span class="co">## [25] "bio15_1981.2010_mean"                     </span></span>
-<span><span class="co">## [26] "bio15_1981.2010_sd"                       </span></span>
-<span><span class="co">## [27] "bio15_IPSL.CM6A.LR_ssp370_2041.2070_min"  </span></span>
-<span><span class="co">## [28] "bio15_IPSL.CM6A.LR_ssp370_2041.2070_max"  </span></span>
-<span><span class="co">## [29] "bio15_IPSL.CM6A.LR_ssp370_2041.2070_range"</span></span>
-<span><span class="co">## [30] "bio15_IPSL.CM6A.LR_ssp370_2041.2070_mean" </span></span>
-<span><span class="co">## [31] "bio15_IPSL.CM6A.LR_ssp370_2041.2070_sd"   </span></span>
-<span><span class="co">## [32] "slope_curv_max_dw_cel_min"                </span></span>
-<span><span class="co">## [33] "slope_curv_max_dw_cel_max"                </span></span>
-<span><span class="co">## [34] "slope_curv_max_dw_cel_range"              </span></span>
-<span><span class="co">## [35] "slope_curv_max_dw_cel_mean"               </span></span>
-<span><span class="co">## [36] "slope_curv_max_dw_cel_sd"                 </span></span>
-<span><span class="co">## [37] "spi_min"                                  </span></span>
-<span><span class="co">## [38] "spi_max"                                  </span></span>
-<span><span class="co">## [39] "spi_range"                                </span></span>
-<span><span class="co">## [40] "spi_mean"                                 </span></span>
-<span><span class="co">## [41] "spi_sd"</span></span></code></pre>
+<pre><code><span><span class="co">##  [1] "subc_id"                                         </span></span>
+<span><span class="co">##  [2] "bio1_1981.2010_data_cells"                       </span></span>
+<span><span class="co">##  [3] "bio1_1981.2010_nodata_cells"                     </span></span>
+<span><span class="co">##  [4] "bio1_1981.2010_min"                              </span></span>
+<span><span class="co">##  [5] "bio1_1981.2010_max"                              </span></span>
+<span><span class="co">##  [6] "bio1_1981.2010_range"                            </span></span>
+<span><span class="co">##  [7] "bio1_1981.2010_mean"                             </span></span>
+<span><span class="co">##  [8] "bio1_1981.2010_mean_abs"                         </span></span>
+<span><span class="co">##  [9] "bio1_1981.2010_sd"                               </span></span>
+<span><span class="co">## [10] "bio1_1981.2010_var"                              </span></span>
+<span><span class="co">## [11] "bio1_1981.2010_cv"                               </span></span>
+<span><span class="co">## [12] "bio1_1981.2010_sum"                              </span></span>
+<span><span class="co">## [13] "bio1_1981.2010_sum_abs"                          </span></span>
+<span><span class="co">## [14] "bio1_IPSL.CM6A.LR_ssp370_2041.2070_data_cells"   </span></span>
+<span><span class="co">## [15] "bio1_IPSL.CM6A.LR_ssp370_2041.2070_nodata_cells" </span></span>
+<span><span class="co">## [16] "bio1_IPSL.CM6A.LR_ssp370_2041.2070_min"          </span></span>
+<span><span class="co">## [17] "bio1_IPSL.CM6A.LR_ssp370_2041.2070_max"          </span></span>
+<span><span class="co">## [18] "bio1_IPSL.CM6A.LR_ssp370_2041.2070_range"        </span></span>
+<span><span class="co">## [19] "bio1_IPSL.CM6A.LR_ssp370_2041.2070_mean"         </span></span>
+<span><span class="co">## [20] "bio1_IPSL.CM6A.LR_ssp370_2041.2070_mean_abs"     </span></span>
+<span><span class="co">## [21] "bio1_IPSL.CM6A.LR_ssp370_2041.2070_sd"           </span></span>
+<span><span class="co">## [22] "bio1_IPSL.CM6A.LR_ssp370_2041.2070_var"          </span></span>
+<span><span class="co">## [23] "bio1_IPSL.CM6A.LR_ssp370_2041.2070_cv"           </span></span>
+<span><span class="co">## [24] "bio1_IPSL.CM6A.LR_ssp370_2041.2070_sum"          </span></span>
+<span><span class="co">## [25] "bio1_IPSL.CM6A.LR_ssp370_2041.2070_sum_abs"      </span></span>
+<span><span class="co">## [26] "bio12_1981.2010_data_cells"                      </span></span>
+<span><span class="co">## [27] "bio12_1981.2010_nodata_cells"                    </span></span>
+<span><span class="co">## [28] "bio12_1981.2010_min"                             </span></span>
+<span><span class="co">## [29] "bio12_1981.2010_max"                             </span></span>
+<span><span class="co">## [30] "bio12_1981.2010_range"                           </span></span>
+<span><span class="co">## [31] "bio12_1981.2010_mean"                            </span></span>
+<span><span class="co">## [32] "bio12_1981.2010_mean_abs"                        </span></span>
+<span><span class="co">## [33] "bio12_1981.2010_sd"                              </span></span>
+<span><span class="co">## [34] "bio12_1981.2010_var"                             </span></span>
+<span><span class="co">## [35] "bio12_1981.2010_cv"                              </span></span>
+<span><span class="co">## [36] "bio12_1981.2010_sum"                             </span></span>
+<span><span class="co">## [37] "bio12_1981.2010_sum_abs"                         </span></span>
+<span><span class="co">## [38] "bio12_IPSL.CM6A.LR_ssp370_2041.2070_data_cells"  </span></span>
+<span><span class="co">## [39] "bio12_IPSL.CM6A.LR_ssp370_2041.2070_nodata_cells"</span></span>
+<span><span class="co">## [40] "bio12_IPSL.CM6A.LR_ssp370_2041.2070_min"         </span></span>
+<span><span class="co">## [41] "bio12_IPSL.CM6A.LR_ssp370_2041.2070_max"         </span></span>
+<span><span class="co">## [42] "bio12_IPSL.CM6A.LR_ssp370_2041.2070_range"       </span></span>
+<span><span class="co">## [43] "bio12_IPSL.CM6A.LR_ssp370_2041.2070_mean"        </span></span>
+<span><span class="co">## [44] "bio12_IPSL.CM6A.LR_ssp370_2041.2070_mean_abs"    </span></span>
+<span><span class="co">## [45] "bio12_IPSL.CM6A.LR_ssp370_2041.2070_sd"          </span></span>
+<span><span class="co">## [46] "bio12_IPSL.CM6A.LR_ssp370_2041.2070_var"         </span></span>
+<span><span class="co">## [47] "bio12_IPSL.CM6A.LR_ssp370_2041.2070_cv"          </span></span>
+<span><span class="co">## [48] "bio12_IPSL.CM6A.LR_ssp370_2041.2070_sum"         </span></span>
+<span><span class="co">## [49] "bio12_IPSL.CM6A.LR_ssp370_2041.2070_sum_abs"     </span></span>
+<span><span class="co">## [50] "bio15_1981.2010_data_cells"                      </span></span>
+<span><span class="co">## [51] "bio15_1981.2010_nodata_cells"                    </span></span>
+<span><span class="co">## [52] "bio15_1981.2010_min"                             </span></span>
+<span><span class="co">## [53] "bio15_1981.2010_max"                             </span></span>
+<span><span class="co">## [54] "bio15_1981.2010_range"                           </span></span>
+<span><span class="co">## [55] "bio15_1981.2010_mean"                            </span></span>
+<span><span class="co">## [56] "bio15_1981.2010_mean_abs"                        </span></span>
+<span><span class="co">## [57] "bio15_1981.2010_sd"                              </span></span>
+<span><span class="co">## [58] "bio15_1981.2010_var"                             </span></span>
+<span><span class="co">## [59] "bio15_1981.2010_cv"                              </span></span>
+<span><span class="co">## [60] "bio15_1981.2010_sum"                             </span></span>
+<span><span class="co">## [61] "bio15_1981.2010_sum_abs"                         </span></span>
+<span><span class="co">## [62] "bio15_IPSL.CM6A.LR_ssp370_2041.2070_data_cells"  </span></span>
+<span><span class="co">## [63] "bio15_IPSL.CM6A.LR_ssp370_2041.2070_nodata_cells"</span></span>
+<span><span class="co">## [64] "bio15_IPSL.CM6A.LR_ssp370_2041.2070_min"         </span></span>
+<span><span class="co">## [65] "bio15_IPSL.CM6A.LR_ssp370_2041.2070_max"         </span></span>
+<span><span class="co">## [66] "bio15_IPSL.CM6A.LR_ssp370_2041.2070_range"       </span></span>
+<span><span class="co">## [67] "bio15_IPSL.CM6A.LR_ssp370_2041.2070_mean"        </span></span>
+<span><span class="co">## [68] "bio15_IPSL.CM6A.LR_ssp370_2041.2070_mean_abs"    </span></span>
+<span><span class="co">## [69] "bio15_IPSL.CM6A.LR_ssp370_2041.2070_sd"          </span></span>
+<span><span class="co">## [70] "bio15_IPSL.CM6A.LR_ssp370_2041.2070_var"         </span></span>
+<span><span class="co">## [71] "bio15_IPSL.CM6A.LR_ssp370_2041.2070_cv"          </span></span>
+<span><span class="co">## [72] "bio15_IPSL.CM6A.LR_ssp370_2041.2070_sum"         </span></span>
+<span><span class="co">## [73] "bio15_IPSL.CM6A.LR_ssp370_2041.2070_sum_abs"     </span></span>
+<span><span class="co">## [74] "slope_curv_max_dw_cel_data_cells"                </span></span>
+<span><span class="co">## [75] "slope_curv_max_dw_cel_nodata_cells"              </span></span>
+<span><span class="co">## [76] "slope_curv_max_dw_cel_min"                       </span></span>
+<span><span class="co">## [77] "slope_curv_max_dw_cel_max"                       </span></span>
+<span><span class="co">## [78] "slope_curv_max_dw_cel_range"                     </span></span>
+<span><span class="co">## [79] "slope_curv_max_dw_cel_mean"                      </span></span>
+<span><span class="co">## [80] "slope_curv_max_dw_cel_mean_abs"                  </span></span>
+<span><span class="co">## [81] "slope_curv_max_dw_cel_sd"                        </span></span>
+<span><span class="co">## [82] "slope_curv_max_dw_cel_var"                       </span></span>
+<span><span class="co">## [83] "slope_curv_max_dw_cel_cv"                        </span></span>
+<span><span class="co">## [84] "slope_curv_max_dw_cel_sum"                       </span></span>
+<span><span class="co">## [85] "slope_curv_max_dw_cel_sum_abs"                   </span></span>
+<span><span class="co">## [86] "spi_data_cells"                                  </span></span>
+<span><span class="co">## [87] "spi_nodata_cells"                                </span></span>
+<span><span class="co">## [88] "spi_min"                                         </span></span>
+<span><span class="co">## [89] "spi_max"                                         </span></span>
+<span><span class="co">## [90] "spi_range"                                       </span></span>
+<span><span class="co">## [91] "spi_mean"                                        </span></span>
+<span><span class="co">## [92] "spi_mean_abs"                                    </span></span>
+<span><span class="co">## [93] "spi_sd"                                          </span></span>
+<span><span class="co">## [94] "spi_var"                                         </span></span>
+<span><span class="co">## [95] "spi_cv"                                          </span></span>
+<span><span class="co">## [96] "spi_sum"                                         </span></span>
+<span><span class="co">## [97] "spi_sum_abs"</span></span></code></pre>
 <p>We will keep only the mean and sd of each variable of the
 stats_table, to use them as predictors in the species distribution
 model</p>
@@ -2249,14 +3483,14 @@ an indicator of the sub-catchment size</p>
 <span></span>
 <span><span class="co"># Clear up memory</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">stats_gpkg_h08v06</span>, <span class="va">stats_gpkg_h10v06</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/base/gc.html" class="external-link">gc</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##            used  (Mb) gc trigger  (Mb) max used  (Mb)</span></span>
-<span><span class="co">## Ncells  4581027 244.7    8583750 458.5  6155032 328.8</span></span>
-<span><span class="co">## Vcells 25723334 196.3   52452676 400.2 48537324 370.4</span></span></code></pre>
+<pre><code><span><span class="co">##            used  (Mb) gc trigger  (Mb)  max used  (Mb)</span></span>
+<span><span class="co">## Ncells  4614236 246.5    8664621 462.8   6490620 346.7</span></span>
+<span><span class="co">## Vcells 27069658 206.6   83895440 640.1 104349737 796.2</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="prepare-data-for-modelling">Prepare data for modelling<a class="anchor" aria-label="anchor" href="#prepare-data-for-modelling"></a>
 </h3>
-<!--![](../man/figures/wf_7.png)-->
+<p><img src="../reference/figures/wf_7.png"></p>
 <p>Join the stats_table with the .gpkg database</p>
 <div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">stats_table</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">stats_table_zon</span>, <span class="va">stats_gpkg</span>, by <span class="op">=</span> <span class="st">"subcatchment_id"</span><span class="op">)</span></span></code></pre></div>
@@ -3578,174 +4812,212 @@ length
 <tbody>
 <tr>
 <td style="text-align:right;">
-422764017
+422861198
 </td>
 <td style="text-align:right;">
-26.47857
+24.71400
 </td>
 <td style="text-align:right;">
-1072.800
+1541.036
 </td>
 <td style="text-align:right;">
-55.80000
+51.20800
 </td>
 <td style="text-align:right;">
--0.0029436
+-0.0896538
 </td>
 <td style="text-align:right;">
-4.7142857
+23.2800000
 </td>
 <td style="text-align:right;">
-0.0451754
+0.1438888
 </td>
 <td style="text-align:right;">
-1.5811388
+10.7485024
 </td>
 <td style="text-align:right;">
-0.0000000
+0.0271293
 </td>
 <td style="text-align:right;">
-0.0042586
+0.1894050
 </td>
 <td style="text-align:right;">
-9.0508766
+30.1177954
 </td>
 <td style="text-align:right;">
-340.1172
+340.9096
 </td>
 </tr>
 <tr>
 <td style="text-align:right;">
-422807314
+422516538
 </td>
 <td style="text-align:right;">
-25.05000
+24.05000
 </td>
 <td style="text-align:right;">
-2126.044
+1661.196
 </td>
 <td style="text-align:right;">
-24.04444
+63.73571
 </td>
 <td style="text-align:right;">
--0.1102770
+-0.0312058
 </td>
 <td style="text-align:right;">
-24.0277778
+15.8214286
 </td>
 <td style="text-align:right;">
 0.0000000
 </td>
 <td style="text-align:right;">
-18.8326614
+0.4212924
+</td>
+<td style="text-align:right;">
+0.0765986
+</td>
+<td style="text-align:right;">
+0.0541250
+</td>
+<td style="text-align:right;">
+35.1141542
+</td>
+<td style="text-align:right;">
+894.0340
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+399708333
+</td>
+<td style="text-align:right;">
+24.59762
+</td>
+<td style="text-align:right;">
+1395.957
+</td>
+<td style="text-align:right;">
+55.55714
+</td>
+<td style="text-align:right;">
+-0.0128723
+</td>
+<td style="text-align:right;">
+0.8095238
+</td>
+<td style="text-align:right;">
+0.0499433
+</td>
+<td style="text-align:right;">
+1.2373441
+</td>
+<td style="text-align:right;">
+0.1498298
+</td>
+<td style="text-align:right;">
+0.0169159
+</td>
+<td style="text-align:right;">
+1.0519391
+</td>
+<td style="text-align:right;">
+436.2267
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+422795191
+</td>
+<td style="text-align:right;">
+26.55000
+</td>
+<td style="text-align:right;">
+1120.811
+</td>
+<td style="text-align:right;">
+55.14444
+</td>
+<td style="text-align:right;">
+-0.0025008
+</td>
+<td style="text-align:right;">
+0.1111111
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+5.0315548
 </td>
 <td style="text-align:right;">
 0.0496904
 </td>
 <td style="text-align:right;">
-0.1787904
+0.0041078
 </td>
 <td style="text-align:right;">
-62.8744278
+0.3142697
 </td>
 <td style="text-align:right;">
-467.2785
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-422574697
-</td>
-<td style="text-align:right;">
-24.27381
-</td>
-<td style="text-align:right;">
-1656.781
-</td>
-<td style="text-align:right;">
-65.02381
-</td>
-<td style="text-align:right;">
--0.0251843
-</td>
-<td style="text-align:right;">
-1.3809524
-</td>
-<td style="text-align:right;">
-0.0425918
-</td>
-<td style="text-align:right;">
-0.2129589
-</td>
-<td style="text-align:right;">
-0.0425918
-</td>
-<td style="text-align:right;">
-0.0481576
-</td>
-<td style="text-align:right;">
-1.4301578
-</td>
-<td style="text-align:right;">
-556.8937
+126.7443
 </td>
 </tr>
 <tr>
 <td style="text-align:right;">
-399875670
+422694641
 </td>
 <td style="text-align:right;">
-25.15000
+25.85000
 </td>
 <td style="text-align:right;">
-1450.900
+1226.603
 </td>
 <td style="text-align:right;">
-65.18000
+52.15313
 </td>
 <td style="text-align:right;">
--0.0004887
+-0.0075014
 </td>
 <td style="text-align:right;">
-0.4333333
+2.3437500
 </td>
 <td style="text-align:right;">
 0.0000000
 </td>
 <td style="text-align:right;">
-0.5440588
+6.0950023
 </td>
 <td style="text-align:right;">
-0.0400000
+0.1249609
 </td>
 <td style="text-align:right;">
-0.0010631
+0.0119988
 </td>
 <td style="text-align:right;">
-0.6155395
+4.4833677
 </td>
 <td style="text-align:right;">
-509.2747
+592.6560
 </td>
 </tr>
 <tr>
 <td style="text-align:right;">
-422589148
+422758447
 </td>
 <td style="text-align:right;">
-24.95000
+26.65000
 </td>
 <td style="text-align:right;">
-1604.800
+1121.400
 </td>
 <td style="text-align:right;">
-68.60000
+61.30000
 </td>
 <td style="text-align:right;">
--0.0069364
+-0.0026806
 </td>
 <td style="text-align:right;">
-23.0000000
+2.8947368
 </td>
 <td style="text-align:right;">
 0.0000000
@@ -3757,51 +5029,13 @@ length
 0.0000000
 </td>
 <td style="text-align:right;">
-0.0043339
+0.0034050
 </td>
 <td style="text-align:right;">
-27.0702789
+5.0251445
 </td>
 <td style="text-align:right;">
-184.5476
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-422714791
-</td>
-<td style="text-align:right;">
-25.90000
-</td>
-<td style="text-align:right;">
-1166.150
-</td>
-<td style="text-align:right;">
-59.35000
-</td>
-<td style="text-align:right;">
--0.0119354
-</td>
-<td style="text-align:right;">
-9.1000000
-</td>
-<td style="text-align:right;">
-0.0500000
-</td>
-<td style="text-align:right;">
-0.5500000
-</td>
-<td style="text-align:right;">
-0.0500000
-</td>
-<td style="text-align:right;">
-0.0214709
-</td>
-<td style="text-align:right;">
-16.5978914
-</td>
-<td style="text-align:right;">
-471.9404
+564.4781
 </td>
 </tr>
 </tbody>
@@ -4245,7 +5479,7 @@ presences.</p>
 <span><span class="co">## Target node size:                 10 </span></span>
 <span><span class="co">## Variable importance mode:         impurity </span></span>
 <span><span class="co">## Splitrule:                        gini </span></span>
-<span><span class="co">## OOB prediction error (Brier s.):  0.09351581</span></span></code></pre>
+<span><span class="co">## OOB prediction error (Brier s.):  0.09328806</span></span></code></pre>
 <p>The model can be evaluated based on the OOB prediction error. This
 metric lies on the fact that the data points that are not used in
 training a tree can be used to test the tree. The errors on the OOB
@@ -4258,13 +5492,12 @@ samples are called the <strong>out-of-bag errors</strong>.</p>
 including the future Bioclim variables.</p>
 <div class="sourceCode" id="cb60"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">model</span>, data <span class="op">=</span> <span class="va">stats_table_future</span><span class="op">[</span>,<span class="op">!</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
-<!--![](../man/figures/wf_8.png)-->
-<p>We can now reclassify the sub-catchment raster based on the predicted
-probabilities of occurrence, to visualise the potential suitable
-habitats of the species. For this purpose we will use the
-‘reclass_raster’ function. The function requires a table with the
-reclassification rules (i.e., subc_id = predicted_occurrence), the
-values of which need to be integers.</p>
+<p><img src="../reference/figures/wf_8.png"> We can now reclassify the
+sub-catchment raster based on the predicted probabilities of occurrence,
+to visualise the potential suitable habitats of the species. For this
+purpose we will use the ‘reclass_raster’ function. The function requires
+a table with the reclassification rules (i.e., subc_id =
+predicted_occurrence), the values of which need to be integers.</p>
 <p>First, let’s join the probabilities of presence in each sub-catchment
 with the corresponding sub-catchment IDs, to create a table with
 reclassification rules</p>
