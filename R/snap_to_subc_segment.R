@@ -1,10 +1,11 @@
 #' @title Snap points to stream segment within the sub-catchment
 #'
 #' @description
-#' Snaps data points to the stream segment of the
-#' sub-catchment the data point is located.
+#' Move points to the stream segment within the sub-catchment where the point
+#' is located.
 
-#' @param data a data.frame or data.table with lat/lon coordinates in WGS84.
+#' @param data a data.frame or data.table that contains the columns regarding
+#' the longitude / latitude coordinates in WGS84.
 #' @param lon character. The name of the column with the longitude coordinates.
 #' @param lat character. The name of the column with the latitude coordinates.
 #' @param id character. The name of a column containing unique IDs for each row
@@ -18,7 +19,7 @@
 #' @param basin_layer character. Full path to the basin ID .tif layer.
 #' @param subc_layer character. Full path to the sub-catchment ID .tif layer.
 #' @param stream_layer character. Full path of the stream network .gpkg file.
-#' @param n_cores numeric. Number of cores used for parallelization.
+#' @param n_cores numeric. Number of cores used for parallelisation.
 #' Default is 1.
 #' @param quiet logical. If FALSE, the standard output will be printed.
 #' Default is TRUE.
@@ -31,15 +32,14 @@
 #' @export
 #'
 #' @details
-#' The function uses the network preparation and maintenance module of
-#' GRASS GIS (v.net), to connect a vector lines map (stream network) with a
-#' points map (occurrence/sampling points). After masking the stream segment and
+#' The function uses the network module of
+#' GRASS GIS (v.net), to connect a vector line map (stream network) with a
+#' point map (occurrence/sampling points). After masking the stream segment and
 #' the sub-catchment where the target point is located, the connect operation
 #' snaps the point to the stream segment using a distance threshold. This
 #' threshold is automatically calculated as the longest distance between two
 #' points within the sub-catchment. In this way the snapping will always take
-#' place.This operation creates a new node on the vector line (i.e. stream
-#' segment) from which the new snapped coordinates can be extracted.
+#' place. From the new location, the function extracts the new snapped coordinates.
 #'
 #' @author Jaime Garcia Marquez, Maria M. Üblacker
 #'
