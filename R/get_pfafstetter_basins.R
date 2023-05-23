@@ -1,22 +1,20 @@
-#' Get Pfafstetter basins
+#' Get Pfafstetter sub-basins
 #'
-#' Subset a basin or catchment into up to nine smaller units following the
-#' Pfafstetter basin delineation scheme.
-#'
-#' Each drainage basin can be split into smaller sub-basins following a
+#' Subset a basin or catchment into up to nine smaller sub-basins following the
+#' Pfafstetter basin delineation scheme. The functions takes a network graph as
+#' the input and splits it into smaller sub-basins following a
 #' hierarchical topological coding scheme (see Verdin & Verdin (1999) for
-#' details). This function splits a given basin into up to nine sub-basins
-#' using the flow accumulation as the basis. The user has to define the
+#' details), using the flow accumulation as the basis. The user has to define the
 #' sub-catchment (stream segment) ID that serves as the outlet of the basin.
-#' Note that this can be any stream segment with a sufficient number of upstream
-#' segments (sub-catchments).
+#' Note that this can be any stream segment that has an upstream catchment.
+#' The input graph can be created with \code{\link{read_geopackage()}} and \code{\link{get_catchment_graph.()}}
 #'
 #' @param g igraph object. A directed graph of a basin with one outlet.
 #' The outlet can be any stream / sub-catchment for which the upstream basin
-#' should be split into smaller ones.
+#' should be split into smaller sub-basins. The input graph can be created with \code{\link{read_geopackage()}} and \code{\link{get_catchment_graph.()}}
 #' @param subc_raster character. Full path to the sub-catchment raster file of
 #' the basin. Does not need to be cropped / masked to the basin, but the IDs
-#' of the sub-catchments need to match with the input graph.
+#' of the sub-catchments need to match with those in the input graph.
 #' @param data_table Logical. If TRUE, then the result will be loaded into R
 #' as a 2-column data.table (sub-catchment ID and Pfafstetter code). If FALSE,
 #' the result is loaded as a raster (terra object) in R and written to disk.
