@@ -28,8 +28,7 @@
 #' @param file_name character. Name of the .csv file where the output table
 #' will be stored. out_dir should also be specified for this purpose.
 #' @param n_cores numeric. Number of cores used for parallelization, in case
-#' multiple .tif files are provided to var_layer. Default is NULL
-#' (= detectCores(logical=FALSE)-1).
+#' multiple .tif files are provided to var_layer. Default is 1.
 #' @param quiet logical. If FALSE, the standard output will be printed.
 #' Default is TRUE.
 #'
@@ -154,7 +153,8 @@ extract_zonal_stat <- function(data_dir,  subc_id, subc_layer, var_layer,
   if (is.null(n_cores)) {
 
     #  Detect number of available cores
-    n_cores <- detectCores(logical = FALSE) - 1
+    # n_cores <- detectCores(logical = FALSE) - 1
+    n_cores <- 1
 
   }
 
