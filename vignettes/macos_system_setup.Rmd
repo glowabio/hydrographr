@@ -18,17 +18,18 @@ knitr::opts_chunk$set(
 )
 ```
 
+The package does not yet fully support the GRASS GIS functionality.
 
 ## Installation of the required GIS tools
 
-If you do not have installed any of the GIS tools, please, install before using `hydrographr`. If you use Ubuntu you can copy-paste the commands below. If you use another Linux distribution, please, see the linked software webpage below for installation instruction.
+If you do not have installed any of the GIS tools, please, install before using `hydrographr`. 
 
 Warning! Sometimes the installation does not work within a VPN connection. If you fail to fetch data from online repositories during the installation, please try deactivating your VPN connection. 
 
-**Add the Ubuntugis repository**
+<!-- **Add the Ubuntugis repository** -->
 
 
-Now you are ready to install`GDAL`, `GRASS GIS` and GNU `parallel`. 
+<!-- Now you are ready to install`GDAL`, `GRASS GIS` and GNU `parallel`.  -->
 <!-- Copy and paste the commands below into your console and follow the instructions to install the tools. -->
 
 **GDAL**
@@ -59,20 +60,20 @@ IMPORTANT: INSTALLATION LOCATION
 These new fully bundled binaries MUST be installed and run from the /Applications folder. They will not run from another folder or even a subfolder of /Applications. This has to do with the build environment. 
 
 
-**GRASS GIS addons**
+<!-- **GRASS GIS addons** -->
 
-Copy-paste the commands below to install the required addons for GRASS GIS.
+<!-- Copy-paste the commands below to install the required addons for GRASS GIS. -->
 
-```{bash, eval=FALSE}
-sudo apt install make
+<!-- ```{bash, eval=FALSE} -->
+<!-- sudo apt install make -->
 
-# Install GRASS GIS addons
-export GRASSEXEC="grass --exec"
-$GRASSEXEC  g.extension  extension=r.stream.distance
-$GRASSEXEC  g.extension  extension=r.stream.order
-$GRASSEXEC  g.extension  extension=r.stream.snap
-$GRASSEXEC  g.extension  extension=r.stream.basins
-```
+<!-- # Install GRASS GIS addons -->
+<!-- export GRASSEXEC="grass --exec" -->
+<!-- $GRASSEXEC  g.extension  extension=r.stream.distance -->
+<!-- $GRASSEXEC  g.extension  extension=r.stream.order -->
+<!-- $GRASSEXEC  g.extension  extension=r.stream.snap -->
+<!-- $GRASSEXEC  g.extension  extension=r.stream.basins -->
+<!-- ``` -->
 
 
 **GNU parallel**

@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_upstream_catchment.R
 \name{get_upstream_catchment}
 \alias{get_upstream_catchment}
-\title{Calculate upstream basin}
+\title{Delineate the upstream catchment}
 \usage{
 get_upstream_catchment(
   data,
@@ -18,9 +18,10 @@ get_upstream_catchment(
 )
 }
 \arguments{
-\item{data}{a data.frame or data.table with lat/lon coordinates in WGS84,
-which have been snapped to the stream network.
-The snapping can be done using the function 'snap_to_network'.}
+\item{data}{a data.frame or data.table that contains the columns regarding
+the longitude / latitude coordinates in WGS84. Note that the points need to
+be snapped to the stream network with \code{\link{snap_to_network()}} or
+\code{\link{snap_to_subc_segment()}}.}
 
 \item{id}{character. The name of a column containing unique IDs for each row
 of "data" (e.g., occurrence or site IDs).}
@@ -29,18 +30,19 @@ of "data" (e.g., occurrence or site IDs).}
 
 \item{lat}{character. The name of the column with the latitude coordinates.}
 
-\item{direction_layer}{character. Full path to raster file with the
-direction variable.}
+\item{direction_layer}{character. Full path to the flow direction raster file.}
 
 \item{out_dir}{Full path to the directory where the output(s) will be stored.
-To identify the upstream catchment the output file name includes the site id.}
+The output file name includes the "id" which helps identifying  the upstream
+corresponding catchment.}
 
-\item{n_cores}{numeric. Number of cores used for parallelization.
+\item{n_cores}{numeric. Number of cores used for parallelisation.
 If NULL, available cores - 1 will be used. Default is NULL.}
 
 \item{compression}{character. Compression of the written output file.
 Compression levels can be defined as "none", "low", or "high". Default is
-"low".}
+"low", referring to compression type "DEFLATE" and compression level 2.
+"high" refers to compression level 9.}
 
 \item{bigtiff}{logical. Define whether the output file is expected to be a
 BIGTIFF (file size larger than 4 GB). If FALSE and size > 4GB no file will be
@@ -50,8 +52,8 @@ written. Default is TRUE.}
 Default is TRUE.}
 }
 \description{
-Calculates the upstream basin of a given point, considering the
-point as the outlet.
+Delineates the upstream catchment of a given point, where the
+point is considered as the outlet.
 }
 \examples{
 # Download test data into temporary R folder

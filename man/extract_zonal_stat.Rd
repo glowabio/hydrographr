@@ -41,8 +41,7 @@ loaded in R and not stored on disk.}
 will be stored. out_dir should also be specified for this purpose.}
 
 \item{n_cores}{numeric. Number of cores used for parallelization, in case
-multiple .tif files are provided to var_layer. Default is NULL
-(= detectCores(logical=FALSE)-1).}
+multiple .tif files are provided to var_layer. Default is 1.}
 
 \item{quiet}{logical. If FALSE, the standard output will be printed.
 Default is TRUE.}
