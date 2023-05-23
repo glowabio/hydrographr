@@ -50,7 +50,9 @@
 #' for delineation and codification of the Earth’s river basins. Journal
 #' of Hydrology, 218(1-2), 1-12. doi:10.1016/s0022-1694(99)00011-6
 #'
-#'
+#' @seealso
+#' \code{\link{read_geopackage()}} and \code{\link{get_catchment_graph.()}} to
+#' create the input graph.
 #'
 #' @examples
 #' # Download test data into the temporary R folder
