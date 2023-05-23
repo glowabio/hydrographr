@@ -8,7 +8,7 @@ vignette: >
   %\VignetteIndexEntry{Function benchmarks}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
-#bibliography: bib/references_bench.bib
+bibliography: bib/references_bench.bib
 link-citations: yes
 linkcolor: blue
 # csl: copernicus.csl
@@ -25,7 +25,7 @@ knitr::write_bib(file = "packages.bib")
 
 ### Introduction and scope
 
-The main focus of `hydrographr` is to process Hydrography90m data and include them in workflows in `R`. Nevertheless, `hydrographr` provides geospatial functions which can be useful when working with geospatial data in general, with the goal to be computationally and RAM usage efficient. Benchmark tests for selected `hydrographr` functions should demonstrate the capabilities of the `R` package. We compared the tested functions to corresponding workflows which employ the `terra` package to put the performance into perspective without claiming any superiority of either one of the `R` packages over the other.
+The main focus of `hydrographr` is to process Hydrography90m [@amatulli2022hydrography90m] data and include them in workflows in `R`. Nevertheless, `hydrographr` provides geospatial functions which can be useful when working with geospatial data in general, with the goal to be computationally and RAM usage efficient. Benchmark tests for selected `hydrographr` functions should demonstrate the capabilities of the `R` package. We compared the tested functions to corresponding workflows which employ the `terra` package to put the performance into perspective without claiming any superiority of either one of the `R` packages over the other.
 
 We focused on five common geospatial tasks that can be easily implemented with both `hydrographr` and `terra`:
 
