@@ -65,6 +65,7 @@
 #' * coefficient of variance (cv)
 #' * sum (sum)
 #' * sum of the absolute values (sum_abs).
+#' @md
 #'
 #' @examples
 #' # Download test data into the temporary R folder

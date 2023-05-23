@@ -67,7 +67,8 @@
 #' * outlet_elev - elevation at stream segment outlet
 #' * elev_drop difference between source_elev and outlet_elev + drop outlet
 #' * out_drop - drop at the outlet of the stream segment
-#' * gradient - drop/length;
+#' * gradient - drop/length
+#' @md
 #'
 #' @examples
 #' # Download test data into temporary R folder
