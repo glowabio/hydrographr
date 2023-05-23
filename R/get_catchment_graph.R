@@ -8,7 +8,7 @@
 #'
 #' By switching the mode to either "in", "out" or "all", only the upstream,
 #' downstream or all connected segments will be returned, respectively. The
-#' function read_geopackage() can be used to create the input network graph.
+#' function \code{\link{read_geopackage()}} can be used to create the input network graph.
 #'
 #' @param g igraph object. A directed graph.
 #' @param subc_id numeric vector of a single or multiple IDs,

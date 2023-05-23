@@ -20,7 +20,7 @@
 #' e.g. "slope_grad_dw_cel_h00v00.tif". Note that the variable name appears in
 #' the output table columns (e.g. slope_grad_dw_cel_mean). To speed up the
 #' processing, the selected variable raster layers can be cropped to the extent
-#' of the sub-catchment layer, e.g. with crop_to_extent().
+#' of the sub-catchment layer, e.g. with \code{\link{crop_to_extent()}}.
 #' @param out_dir character. The directory where the output will be stored.
 #' If the out_dir and file_name are specified, the output table will be stored
 #' as a .csv file in this location. If they are NULL, the output is only
