@@ -2,7 +2,7 @@
 % Please edit documentation in R/reclass_raster.R
 \name{reclass_raster}
 \alias{reclass_raster}
-\title{Reclassify an integer raster layer}
+\title{Reclassify a raster layer}
 \usage{
 reclass_raster(
   data,
@@ -19,28 +19,32 @@ reclass_raster(
 )
 }
 \arguments{
-\item{data}{a data.frame or data.table with the present and new raster
+\item{data}{a data.frame or data.table with the original and new values to be
+written to the raster.}
+
+\item{rast_val}{character. The name of the column with the original raster
 values.}
 
-\item{rast_val}{character. The name of the column with the present
-raster values.}
-
-\item{new_val}{character. The name of the column with the new raster values.}
+\item{new_val}{character. The name of the column with the new raster values,
+which need to be integer values. In case of floating point values, consider
+multiplying the values e.g. by 1000 to keep three decimals.}
 
 \item{raster_layer}{Full path to the input raster .tif layer.}
 
-\item{recl_layer}{character. Full path of the output .tif layer
-of the reclassified raster file.}
+\item{recl_layer}{character. Full path of the output .tif layer, i.e., the
+reclassified raster file.}
 
 \item{no_data}{numeric. The no_data value of the new .tif layer.
 Default is -9999.}
 
 \item{type}{character. Data type; Options are Byte, Int16, UInt16, Int32,
-UInt32,CInt16, CInt32. Default is Int32.}
+UInt32,CInt16, CInt32. Default is Int32. Note that only integer values are
+allowed.}
 
 \item{compression}{character. Compression of the written output file.
 Compression levels can be defined as "none", "low", or "high". Default is
-"low".}
+"low", referring to compression type "DEFLATE" and compression level 2.
+"high" refers to compression level 9.}
 
 \item{bigtiff}{logical. Define whether the output file is expected to be a
 BIGTIFF (file size larger than 4 GB). If FALSE and size > 4GB no file will be
@@ -54,14 +58,14 @@ If FALSE, the layer is only stored on disk. Default is FALSE.}
 Default is TRUE.}
 }
 \description{
-Reclassifies an integer raster .tif layer using the r.reclass
-function of GRASS GIS. To reclassify the raster layer the present raster
-values and the new raster values have to be defined.
+Reclassifies a raster .tif layer based on a look-up table, such
+that the output raster contains the new values. The function uses the r.reclass
+function of GRASS GIS.
 
-If the input raster layer has floating point values, you should multiply
-the input data by some factor (e.g. 1000) to achieve integer values,
-otherwise the GRASS GIS r.reclass will round the raster values down to
-the next integer which is not always desired.
+Note that the input raster needs to be of type integer. If the input raster
+layer has floating point values, you can multiply it by some factor
+(e.g. 1000) to achieve integer values, otherwise the GRASS GIS r.reclass will
+round the raster values down to the next integer which is not always desired.
 }
 \examples{
 # Download test data into the temporary R folder

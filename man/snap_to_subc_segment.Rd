@@ -19,7 +19,8 @@ snap_to_subc_segment(
 )
 }
 \arguments{
-\item{data}{a data.frame or data.table with lat/lon coordinates in WGS84.}
+\item{data}{a data.frame or data.table that contains the columns regarding
+the longitude / latitude coordinates in WGS84.}
 
 \item{lon}{character. The name of the column with the longitude coordinates.}
 
@@ -42,26 +43,25 @@ Default is NULL.}
 
 \item{stream_layer}{character. Full path of the stream network .gpkg file.}
 
-\item{n_cores}{numeric. Number of cores used for parallelization.
+\item{n_cores}{numeric. Number of cores used for parallelisation.
 Default is 1.}
 
 \item{quiet}{logical. If FALSE, the standard output will be printed.
 Default is TRUE.}
 }
 \description{
-Snaps data points to the stream segment of the
-sub-catchment the data point is located.
+Move points to the stream segment within the sub-catchment where the point
+is located.
 }
 \details{
-The function uses the network preparation and maintenance module of
-GRASS GIS (v.net), to connect a vector lines map (stream network) with a
-points map (occurrence/sampling points). After masking the stream segment and
+The function uses the network module of
+GRASS GIS (v.net), to connect a vector line map (stream network) with a
+point map (occurrence/sampling points). After masking the stream segment and
 the sub-catchment where the target point is located, the connect operation
 snaps the point to the stream segment using a distance threshold. This
 threshold is automatically calculated as the longest distance between two
 points within the sub-catchment. In this way the snapping will always take
-place.This operation creates a new node on the vector line (i.e. stream
-segment) from which the new snapped coordinates can be extracted.
+place. From the new location, the function extracts the new snapped coordinates.
 }
 \examples{
 # Download test data into the temporary R folder
