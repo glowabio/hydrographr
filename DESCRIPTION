@@ -35,7 +35,7 @@ Authors@R:
              email = "sami.domisch@igb-berlin.de",
              role = c("aut")))
 Maintainer: Maria Üblacker <maria.ueblacker@igb-berlin.d>
-Description: A collection of R function wrappers for GDAL and GRASS-GIS functions to efficiently work with Hydrography90m spatial data.
+Description: Scalable hydrographic geospatial data processing tools using open-source command-line utilities.
 License: GPL-3
 URL: https://glowabio.github.io/hydrographr/
 BugReports: https://github.com/glowabio/hydrographr/issues
