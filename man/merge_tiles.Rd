@@ -34,7 +34,8 @@ is used for merging GeoPackages. Default is "stream".}
 
 \item{compression}{character. Compression of the written output file.
 Compression levels can be defined as "none", "low", or "high". Default is
-"low".}
+"low", referring to compression type "DEFLATE" and compression level 2.
+"high" refers to compression level 9.}
 
 \item{bigtiff}{logical. Define whether the output file is expected to be a
 BIGTIFF (file size larger than 4 GB). If FALSE and size > 4GB no file will be
