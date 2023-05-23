@@ -44,6 +44,7 @@
 <li class="active nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+    <a class="dropdown-item" href="../articles/benchmark.html">Function benchmarks</a>
     <a class="dropdown-item" href="../articles/case_study_brazil.html">Case study - São Francisco drainage basin</a>
     <a class="dropdown-item" href="../articles/case_study_cuba.html">Case study - Cuba</a>
     <a class="dropdown-item" href="../articles/linux_system_setup.html">Setting up the package requirements on Linux</a>
@@ -81,7 +82,7 @@ stream network to the clostest dam up- and downstream of fish occurence
 sites</h3>
                         <h4 data-toc-skip class="author"></h4>
             
-            <h4 data-toc-skip class="date">2023-05-22</h4>
+            <h4 data-toc-skip class="date">2023-05-23</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/glowabio/hydrographr/blob/HEAD/vignettes/case_study_brazil.Rmd" class="external-link"><code>vignettes/case_study_brazil.Rmd</code></a></small>
       <div class="d-none name"><code>case_study_brazil.Rmd</code></div>
@@ -94,29 +95,31 @@ sites</h3>
 </h3>
 <p>The following example showcases the functionality of the
 <code>hydrographr</code> package along a workflow to analyse the
-fragmentation of a stream network. We will evaluate how many dams are
-up- and downstream of each fish occurrence site and the distance along
-the stream network from each fish occurrence site to the next dam for
-the current and future state.</p>
+fragmentation of a stream network. We will evaluate the number of dams
+up- and downstream of each fish occurrence site and calculate the
+distance along the stream network from each fish occurrence site to the
+closest existing and future dam.</p>
 <p>In our example we will focus on the catfish species <em>Conorhynchos
 conirostris</em>, which is a catfish species endemic to the São
 Francisco drainage basin in Brazil. The catfish is listed as
-‘endangered’ by the IUCN red list. Wetlands are the preferred habitat
-and it is migrating for spawning.As an migratory species, it is mostly
-threatened by dams along the stream network. Further, it is threatened
-by fishing during the spawning season in the upstream part of the
-river.</p>
+‘endangered’ by the IUCN red list <span class="citation">(<a href="#ref-IUCNRedList2022" role="doc-biblioref">IUCN 2022</a>)</span>.
+Wetlands are the preferred habitats of the species. <em>Conorhynchos
+conirostris</em> is a migratory species, which migrates for spawning. As
+a migratory species, it is mostly threatened by dams along the stream
+network. Further, it is threatened by fishing during the spawning season
+in the upstream part of the river.</p>
 <p>We will start by defining the regular tiles of the Hydrography90m
-(Amatulli et al., 2022) where the occurrence points of the species are
-located. Afterwards we will download the Hydrography90m layers,
-filter/crop and merge them. Then we will filter our fish occurrence and
-dam point locations using the polygon of the drainage basin and snap the
-point locations to the stream network. Afterwards, we will reduce our
-drainage basin using the dam upstream of all fish occurrence sites as
-our outlet location to calculate the upstream catchment from this point
+<span class="citation">(<a href="#ref-amatulli2022hydrography90m" role="doc-biblioref">Amatulli et al. 2022</a>)</span> in which the
+occurrence points of the species are located. Afterwards we will
+download the Hydrography90m layers, filter/crop and merge them. Then we
+will select our fish occurrence and dam point locations using the
+polygon of the drainage basin and snap the point locations to the stream
+network. Afterwards, we will reduce our drainage basin using the dam
+downstream of all fish occurrence sites, the Sobradinho dam, as our
+outlet location to calculate the upstream catchment from this point
 location. In a next step, we will calculate the distances along the
 stream network between each point location (fish and dams) and get the
-up- and downstream stream egments from each point locations as a graph.
+up- and downstream stream segments from each point locations as a graph.
 Afterwards, we will query the tables and evaluate the shortest distance
 to the next dam as well as the number of dams.</p>
 <p><img src="../reference/figures/workflow.png"></p>
@@ -165,7 +168,9 @@ conirostris</em> from GBIF.org using the R package
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>occurence_id <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span><span class="st">"longitude"</span> <span class="op">=</span> <span class="st">"decimalLongitude"</span>,</span>
 <span>         <span class="st">"latitude"</span> <span class="op">=</span> <span class="st">"decimalLatitude"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fl">7</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fl">7</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">spdata</span></span></code></pre></div>
 <div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:200px; overflow-x: scroll; width:700px; ">
 <table class="table table table-striped" style="width: auto !important; ">
 <thead><tr>
@@ -542,11 +547,11 @@ Brazil
 </h3>
 <p>In order to download layers of the Hydrography90m, we need to know
 the IDs of the 20°x20° tiles in which the occurrence sites are located.
-We can obtain these IDs using the function <em>get_tile_id()</em>. This
-function downloads and uses the auxiliary raster file that contains all
-the regional units globally, and thus requires an active internet
+We can obtain these IDs using the function <code>get_tile_id</code>.
+This function downloads and uses the auxiliary raster file that contains
+all the regional units globally, and thus requires an active internet
 connection.</p>
-<p><img src="../reference/figures/workflow1.png"></p>
+<!-- ![](../man/figures/workflow1.png)-->
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Get the tile IDs where the points are located</span></span>
 <span><span class="va">tile_id</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_tile_id.html">get_tile_id</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">spdata</span>, lon <span class="op">=</span> <span class="st">"longitude"</span>, lat <span class="op">=</span> <span class="st">"latitude"</span><span class="op">)</span></span></code></pre></div>
@@ -554,18 +559,18 @@ connection.</p>
 <code class="sourceCode R"><span><span class="va">tile_id</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "h12v08" "h12v10" "h14v08"</span></span></code></pre>
 <p>Currently the function returns all the tiles of the regional unit
-where the input points are located. However, some of them may be far
-from the study area and hence not always needed in further steps. Please
-double check which tile IDs are relevant for your purpose using the
-<strong>Tile map</strong> found <a href="https://hydrography.org/hydrography90m/hydrography90m_layers/" class="external-link">here</a>.</p>
+where the input points are located in. However, some of the tiles may be
+far from the study area and hence are not always needed in further
+steps. Please double check which tile IDs are relevant for your purpose
+using the <strong>Tile map</strong> found <a href="https://hydrography.org/hydrography90m/hydrography90m_layers/" class="external-link">here</a>.</p>
 <p>In our case, the São Francisco river basin spreads across all three
-tiles, so we will keep all.</p>
+tiles, so we will keep all tiles.</p>
 <p>Let’s define the Hydrography90m raster layers and GeoPackages that we
 would like to download. We will use the <a href="https://geo.igb-berlin.de/maps/new?layer=geonode:hydrography90m_v1_basin_cog&amp;view=True" class="external-link">basin</a>
 raster and vector layer, which contains the drainage basin of the São
 Francisco river basin. The <a href="https://geo.igb-berlin.de/maps/new?layer=geonode:hydrography90m_v1_sub_catchment_cog&amp;view=True" class="external-link">sub_catchment</a>
 layer, which contains the sub-catchment for each single stream segment
-with an unique ID. We will need these layers for cropping and
+with a unique ID. We will need these layers for cropping and
 filtering.</p>
 <p>We will need the raster layer of the stream <a href="https://geo.igb-berlin.de/layers/geonode:hydrography90m_v1_segment_cog&amp;view=True" class="external-link">segment</a>
 and the flow <a href="https://geo.igb-berlin.de/layers/geonode:hydrography90m_v1_accumulation_cog&amp;view=True" class="external-link">accumulation</a>
@@ -574,23 +579,23 @@ to snap our fish occurrence and dam sites to the stream network.</p>
 to calculate the upstream catchment from a defined point location.</p>
 <p>We will need the Geopackage <a href="https://geo.igb-berlin.de/maps/new?layer=geonode:hydrography90m_v1_stream_order_strahler_cog&amp;view=True" class="external-link">order_vect_segment</a>,
 containing the stream network, with the stream (sub-catchment) IDs, the
-ID of the next stream and some additional attributes. We will need the
-GeoPackage to to calculate the distance between point locations and to
+ID of the next stream and additional attributes. We will need the
+GeoPackage to calculate the distance between point locations and to
 create a graph to find out which stream segments are up- and downstream
 of the fish occurrence sites.</p>
 <p>A list of all available Hydrography90m variables, as well as details
 and visualisations are available <a href="https://hydrography.org/hydrography90m/hydrography90m_layers/" class="external-link">here</a>.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Variables in raster format</span></span>
+<code class="sourceCode R"><span><span class="co"># Define the raster layers</span></span>
 <span><span class="va">vars_tif</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"basin"</span>, <span class="st">"sub_catchment"</span>, <span class="st">"segment"</span>, <span class="st">"accumulation"</span>, <span class="st">"direction"</span><span class="op">)</span></span>
-<span><span class="co"># Variables in vector format</span></span>
+<span><span class="co"># Define the vector layers</span></span>
 <span><span class="va">vars_gpkg</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"basin"</span>, <span class="st">"order_vect_segment"</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Download the .tif tiles of the desired variables</span></span>
+<code class="sourceCode R"><span><span class="co"># Download the .tif tiles of the defined raster layer</span></span>
 <span><span class="fu"><a href="../reference/download_tiles.html">download_tiles</a></span><span class="op">(</span>variable <span class="op">=</span> <span class="va">vars_tif</span>, tile_id <span class="op">=</span> <span class="va">tile_id</span>, file_format <span class="op">=</span> <span class="st">"tif"</span>,</span>
 <span>               download_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Download the .gpkg tiles of the desired variables</span></span>
+<span><span class="co"># Download the .gpkg tiles of the defined vector layers</span></span>
 <span><span class="fu"><a href="../reference/download_tiles.html">download_tiles</a></span><span class="op">(</span>variable <span class="op">=</span> <span class="va">vars_gpkg</span>, tile_id <span class="op">=</span> <span class="va">tile_id</span>, file_format <span class="op">=</span> <span class="st">"gpkg"</span>,</span>
 <span>               download_dir <span class="op">=</span>   <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -600,28 +605,28 @@ and visualisations are available <a href="https://hydrography.org/hydrography90m
 <p>After having downloaded all the layers, we need to filter and crop
 them to the extent of our study area.</p>
 <p>For a faster processing, we recommend to filter (vector) or crop
-(raster) the files first and than merge them.</p>
+(raster) the files first and then merge them.</p>
 <p>First, we will filter the GeoPackage tiles containing the drainage
 basins for the basin ID 481051 (São Francisco drainage basin) and merge
 them to get the extent of the drainage basin of São Francisco river. We
 will then use the polygon of the drainage basin to crop all downloaded
 raster tiles and then merge them. Afterwards, we will extract the unique
 sub-catchment IDs from the raster layer to filter the stream network
-GeoPackage tiles (oder_vect_segment) for stream segments with the same
-sub-catchment ID and merge them.</p>
-<p><img src="../reference/figures/workflow2.png"></p>
+GeoPackage tiles (order_vect_segment) for stream segments with the same
+sub-catchment ID and merge them as well.</p>
+<!-- ![](../man/figures/workflow2.png)-->
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Define a directory for the São Francisco drainage basin</span></span>
 <span><span class="va">saofra_dir</span> <span class="op">&lt;-</span>  <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data/basin_481051"</span><span class="op">)</span></span>
 <span><span class="kw">if</span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.exists</a></span><span class="op">(</span><span class="va">saofra_dir</span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="va">saofra_dir</span><span class="op">)</span></span>
 <span></span>
 <span></span>
-<span><span class="co"># Get the full path of the basin  GeoPackage tiles</span></span>
+<span><span class="co"># Get the full paths of the basin  GeoPackage tiles</span></span>
 <span><span class="va">basin_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">wdir</span>, pattern <span class="op">=</span> <span class="st">"basin_h[v0-8]+.gpkg$"</span>,</span>
 <span>                         full.names <span class="op">=</span> <span class="cn">TRUE</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Filter basin ID from the GeoPackages of the basin tiles</span></span>
-<span><span class="co"># Save the vector data of the São Francisco drainage basin</span></span>
+<span><span class="co"># Save the filtered tiles</span></span>
 <span><span class="kw">for</span><span class="op">(</span><span class="va">itile</span> <span class="kw">in</span> <span class="va">basin_dir</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  </span>
 <span>  <span class="va">filtered_tile</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_geopackage.html">read_geopackage</a></span><span class="op">(</span><span class="va">itile</span>,</span>
@@ -645,7 +650,7 @@ sub-catchment ID and merge them.</p>
 <span>            read <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
 <span></span>
-<span><span class="co"># Get the full path of the raster tiles</span></span>
+<span><span class="co"># Get the full paths of the raster tiles</span></span>
 <span><span class="va">raster_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data/r.watershed"</span><span class="op">)</span>, pattern <span class="op">=</span> <span class="st">".tif"</span>,</span>
 <span>                       full.names <span class="op">=</span> <span class="cn">TRUE</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
@@ -687,26 +692,25 @@ sub-catchment ID and merge them.</p>
 <span>            file_name <span class="op">=</span> <span class="st">"direction_481051.tif"</span><span class="op">)</span></span>
 <span></span>
 <span></span>
-<span><span class="co"># Merge the cropped sub-catchment raster layers and load the file after merging</span></span>
+<span><span class="co"># Merge the cropped sub-catchment raster layers</span></span>
 <span><span class="va">subc_layer</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/merge_tiles.html">merge_tiles</a></span><span class="op">(</span>tile_dir <span class="op">=</span> <span class="va">saofra_dir</span>,</span>
-<span>                          tile_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">saofra_dir</span>, full.names <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>                          tile_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">saofra_dir</span>, </span>
+<span>                                                  full.names <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>                                                  pattern <span class="op">=</span> <span class="st">"sub_.+_tmp.tif$"</span><span class="op">)</span>,</span>
 <span>                          out_dir <span class="op">=</span> <span class="va">saofra_dir</span>,</span>
 <span>                          file_name <span class="op">=</span> <span class="st">"sub_catchment_481051.tif"</span>,</span>
 <span>                          read <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span></span>
+<span><span class="co"># Load the merged sub-catchment raster layer of the São Francisco drainage basin</span></span>
 <span><span class="va">subc_layer</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/rast.html" class="external-link">rast</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">saofra_dir</span>, <span class="st">"/sub_catchment_481051.tif"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co"># Get all sub-catchment IDs of the São Francisco drainage basin</span></span>
 <span><span class="va">subc_ids</span> <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">subc_layer</span><span class="op">)</span></span>
 <span></span>
 <span></span>
-<span></span>
-<span></span>
-<span><span class="co"># Get the full path of the stream order segment GeoPackages tile</span></span>
+<span><span class="co"># Get the full paths of the stream order segment GeoPackage tiles</span></span>
 <span><span class="va">order_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">wdir</span>, pattern <span class="op">=</span> <span class="st">"order_.+_h[v0-8]+.gpkg$"</span>,</span>
 <span>                        full.names <span class="op">=</span> <span class="cn">TRUE</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Filter the sub-catchment IDs from the GeoPackages of the order_vector_segment</span></span>
+<span><span class="co"># Filter the sub-catchment IDs from the GeoPackage of the order_vector_segment</span></span>
 <span><span class="co"># tiles (sub-catchment ID = stream ID)</span></span>
 <span><span class="co"># Save the stream segments of the São Francisco drainage basin</span></span>
 <span><span class="kw">for</span><span class="op">(</span><span class="va">itile</span> <span class="kw">in</span> <span class="va">order_dir</span><span class="op">)</span> <span class="op">{</span></span>
@@ -740,35 +744,42 @@ sub-catchment ID and merge them.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.remove</a></span><span class="op">(</span><span class="va">tmp_files</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="filtering-of-the-species-occurrence-and-dam-locations">Filtering of the species occurrence and dam locations<a class="anchor" aria-label="anchor" href="#filtering-of-the-species-occurrence-and-dam-locations"></a>
+<h3 id="filtering-of-the-species-occurrences-and-dams">Filtering of the species occurrences and dams<a class="anchor" aria-label="anchor" href="#filtering-of-the-species-occurrences-and-dams"></a>
 </h3>
-<p>The information of present and future dam locations is provided by
-the GRanD and the FHRed database, respectively. Both datasets can be
+<p>The information of the existing and future dams is provided by the
+GRanD <span class="citation">(<a href="#ref-Lehner2011" role="doc-biblioref">Lehner et al. 2011</a>)</span> and the FHReD <span class="citation">(<a href="#ref-Zarfl2015" role="doc-biblioref">Zarfl et
+al. 2015</a>)</span> database, respectively. Both datasets can be
 downloaded from <a href="https://www.globaldamwatch.org/directory" class="external-link">globaldamwatch.org</a>.</p>
-<p>To filter the point locations of the fish occurrence and dams we will
-use the polygon of the drainage basin to only keep the locations which
-are located within the drainage basin. For this step we will use the
-functions of the <code>sf</code> package.</p>
-<p><img src="../reference/figures/workflow3.png"></p>
+<p>To select those point locations of the fish occurrences and dams,
+which are located within the the São Francisco drainage we will use the
+polygon of the drainage basin. For this step we will use the functions
+of the R package <code>sf</code>.</p>
+<!-- ![](../man/figures/workflow3.png)-->
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Load the GRanD data shape file</span></span>
-<span><span class="va">grand_pts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_read.html" class="external-link">st_read</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data/GRanD_Version_1_3/GRanD_dams_v1_3.shp"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co"># Load FHRed dataset</span></span>
-<span><span class="va">fhred_corr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/fread.html" class="external-link">fread</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data/FHReD_2015/FHReD_2015_future_dams_Zarfl_et_al_beta_version.csv"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">grand_pts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_read.html" class="external-link">st_read</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, </span>
+<span>                            <span class="st">"/data/GRanD_Version_1_3/GRanD_dams_v1_3.shp"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co"># Load the FHReD dataset</span></span>
+<span><span class="va">fhred_corr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/fread.html" class="external-link">fread</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, </span>
+<span>  <span class="st">"/data/FHReD_2015/FHReD_2015_future_dams_Zarfl_et_al_beta_version.csv"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co"># Load the polygon of the drainage basin</span></span>
 <span><span class="va">basin_poly</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_read.html" class="external-link">read_sf</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">saofra_dir</span>,<span class="st">"/basin_481051.gpkg"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Create a simply feature for the function st_filter</span></span>
-<span><span class="va">spdata_pts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sf.html" class="external-link">st_as_sf</a></span><span class="op">(</span><span class="va">spdata</span>,  coords <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"longitude"</span>,<span class="st">"latitude"</span><span class="op">)</span>, remove <span class="op">=</span> <span class="cn">FALSE</span>, crs<span class="op">=</span><span class="st">"WGS84"</span><span class="op">)</span></span>
-<span><span class="va">fhred_pts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sf.html" class="external-link">st_as_sf</a></span><span class="op">(</span><span class="va">fhred_corr</span>, coords <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Lon_Cleaned"</span>,<span class="st">"LAT_cleaned"</span><span class="op">)</span>, crs<span class="op">=</span><span class="st">"WGS84"</span><span class="op">)</span></span>
+<span><span class="co"># Create simply features from the data tables </span></span>
+<span><span class="va">spdata_pts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sf.html" class="external-link">st_as_sf</a></span><span class="op">(</span><span class="va">spdata</span>,  </span>
+<span>                       coords <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"longitude"</span>,<span class="st">"latitude"</span><span class="op">)</span>, </span>
+<span>                       remove <span class="op">=</span> <span class="cn">FALSE</span>, crs<span class="op">=</span><span class="st">"WGS84"</span><span class="op">)</span></span>
+<span><span class="va">fhred_pts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sf.html" class="external-link">st_as_sf</a></span><span class="op">(</span><span class="va">fhred_corr</span>, </span>
+<span>                      coords <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Lon_Cleaned"</span>,<span class="st">"LAT_cleaned"</span><span class="op">)</span>, </span>
+<span>                      crs<span class="op">=</span><span class="st">"WGS84"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Only keep species occurrence and dam sites within the drainage basin</span></span>
+<span><span class="co"># Only keep species occurrences and dams within the drainage basin</span></span>
 <span><span class="va">spdata_pts_481051</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_join.html" class="external-link">st_filter</a></span><span class="op">(</span><span class="va">spdata_pts</span>, <span class="va">basin_poly</span><span class="op">)</span></span>
 <span><span class="va">grand_pts_481051</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_join.html" class="external-link">st_filter</a></span><span class="op">(</span><span class="va">grand_pts</span>, <span class="va">basin_poly</span><span class="op">)</span></span>
 <span><span class="va">fhred_pts_481051</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_join.html" class="external-link">st_filter</a></span><span class="op">(</span><span class="va">fhred_pts</span>, <span class="va">basin_poly</span><span class="op">)</span></span>
 <span></span>
 <span></span>
-<span><span class="co"># Transfer the simply feature back to a data.frame and harmonize column names</span></span>
+<span><span class="co"># Transfer the simply featurs back to a data table  and harmonise the column names</span></span>
 <span><span class="co"># Existing dams (ED)</span></span>
 <span><span class="va">existing_dams</span> <span class="op">&lt;-</span> <span class="va">grand_pts_481051</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>longitude <span class="op">=</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_coordinates.html" class="external-link">st_coordinates</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span><span class="op">[</span>,<span class="fl">1</span><span class="op">]</span>,</span>
@@ -794,43 +805,43 @@ functions of the <code>sf</code> package.</p>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span>site_id <span class="op">=</span> <span class="va">occurence_id</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">site_id</span>, <span class="va">type</span>, <span class="va">longitude</span>, <span class="va">latitude</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Bind the data.frames of the dame locations and the fish occurrence</span></span>
-<span><span class="co"># Remove sites of the same type with duplicated coordinates</span></span>
+<span><span class="co"># Bind the data.frames of the dam  and the fish occurrence locations</span></span>
+<span><span class="co"># Remove locations of the same type with duplicated coordinates</span></span>
 <span><span class="va">point_locations</span> <span class="op">&lt;-</span> <span class="va">existing_dams</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="va">future_dams</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="va">species_occurrence</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/distinct.html" class="external-link">distinct</a></span><span class="op">(</span><span class="va">type</span>, <span class="va">longitude</span>, <span class="va">latitude</span>, .keep_all <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="snap-species-occurrence-and-dam-sites-to-a-stream-segment-within-a-certain-distance-and-with-a-certain-flow-accumulation">Snap species occurrence and dam sites to a stream segment within a
-certain distance and with a certain flow accumulation<a class="anchor" aria-label="anchor" href="#snap-species-occurrence-and-dam-sites-to-a-stream-segment-within-a-certain-distance-and-with-a-certain-flow-accumulation"></a>
+<h3 id="snap-species-occurrences-and-dams-to-a-stream-segment-within-a-certain-distance-and-with-a-certain-flow-accumulation">Snap species occurrences and dams to a stream segment within a
+certain distance and with a certain flow accumulation<a class="anchor" aria-label="anchor" href="#snap-species-occurrences-and-dams-to-a-stream-segment-within-a-certain-distance-and-with-a-certain-flow-accumulation"></a>
 </h3>
 <p>Before we can calculate the upstream catchment for a defined point
 location or the distance along the stream network between species
-occurrence and dam sites, we need to snap the coordinates of the sites
-to the stream network. (Recorded coordinates of point locations usually
-do not exactly overlap with the digital stream network and therefore
-need to be corrected slightly.)</p>
+occurrences and dams, we need to snap the coordinates of the sites to
+the stream network. (Recorded coordinates of point locations usually do
+not exactly overlap with the digital stream network and therefore, need
+to be corrected slightly.)</p>
 <p>The <code>hydrographr</code> package offers two different snapping
 functions the <code>snap_to_network</code> and the
 <code>snap_to_subc_segment</code>. The first function uses a defined
 distance radius and a flow accumulation threshold, while the second
-function snaps the point location to the stream segment of the
-sub-catchment the point was originally located.</p>
+function snaps the point to the stream segment of the sub-catchment the
+point was originally located in.</p>
 <p>For this case study we will use the function
 <code>snap_to_network</code> to be able to define a certain flow
-accumulation threshold and to ensure that the fish occurrence and dam
-sites will not be snapped to a headwater stream (first order stream)
-also there is a higher order stream next to it.</p>
+accumulation threshold and to ensure that the fish occurrences and dams
+will not be snapped to a headwater stream (first order stream) if there
+is also a higher order stream next to it.</p>
 <p><img src="../reference/figures/snapping.png"></p>
 <p>The function is implemented in a for-loop to start searching for
 streams with a very high flow accumulation of 400,000 km² in a very
-short distance and than slowly decrease the flow accumulation to 100
-km². If there are still sites left which were not snapped to stream
+short distance and then slowly decreases the flow accumulation to 100
+km². If there are still sites left which were not snapped to a stream
 segment yet. The distance will increase from 10 up to 30 cells.</p>
 <p>In addition to the new coordinates the function will also report the
-unique sub-catchment ID.</p>
-<p><img src="../reference/figures/workflow4.png"></p>
+unique sub-catchment IDs.</p>
+<!-- ![](../man/figures/workflow4.png)-->
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Define full path to the stream network raster layer</span></span>
 <span><span class="va">stream_rast</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">saofra_dir</span>, <span class="st">"/segment_481051.tif"</span><span class="op">)</span></span>
@@ -847,7 +858,7 @@ unique sub-catchment ID.</p>
 <span><span class="co"># Create a temporary data.table</span></span>
 <span><span class="va">point_locations_tmp</span> <span class="op">&lt;-</span> <span class="va">point_locations</span></span>
 <span></span>
-<span><span class="co"># Note: For loop takes about 9 minutes</span></span>
+<span><span class="co"># Note: The for loop takes about 9 minutes</span></span>
 <span><span class="va">first</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">idist</span> <span class="kw">in</span> <span class="va">dist_radius</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    </span>
@@ -894,13 +905,13 @@ unique sub-catchment ID.</p>
 <span>    </span>
 <span><span class="op">}</span></span></code></pre></div>
 <p>In some cases the GRASS GIS function r.stream.snap does not snap some
-of the sites to the stream network, no matter how much you increase the
-distance radius. If this happens the coordinates need to be changed
-slightly within the same cell until the point gets snapped. It might
-happen that this needs to be done multiple times.</p>
+of the point locations to the stream network, no matter how much you
+increase the distance radius. If this happens the coordinates need to be
+changed slightly within the same cell until the point gets snapped. It
+might happen that this needs to be done multiple times.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Run the snapping function until all points are snapped</span></span>
-<span><span class="co"># Note the while conditions runs a few times and</span></span>
+<span><span class="co"># Note: The while condition runs a few times and</span></span>
 <span><span class="co"># takes about 5 minutes</span></span>
 <span><span class="kw">while</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/dimensions.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">point_locations_tmp</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="co"># Create random number smaller than the size if a cell</span></span>
@@ -930,7 +941,9 @@ happen that this needs to be done multiple times.</p>
 <span>  <span class="va">point_locations_snapped</span> <span class="op">&lt;-</span> <span class="va">point_locations_snapped</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="va">point_locations_snapped_tmp</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">subc_id_snap_accu</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="op">}</span></span></code></pre></div>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="va">point_locations_snapped</span></span></code></pre></div>
 <div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:200px; overflow-x: scroll; width:700px; ">
 <table class="table table table-striped" style="width: auto !important; ">
 <thead><tr>
@@ -1097,14 +1110,16 @@ subc_id_snap_accu
 <span>  domain <span class="op">=</span> <span class="va">point_locations_snapped</span><span class="op">$</span><span class="va">type</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">labels</span> <span class="op">&lt;-</span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Fish occurrence"</span>, <span class="st">"Existing dam"</span>, <span class="st">"Dam under construction "</span>, <span class="st">"Planned dam"</span><span class="op">)</span></span>
+<span><span class="va">labels</span> <span class="op">&lt;-</span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Fish occurrence"</span>, <span class="st">"Existing dam"</span>, </span>
+<span>             <span class="st">"Dam under construction "</span>, <span class="st">"Planned dam"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Create leaflet plot</span></span>
 <span><span class="va">locations_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/leaflet/man/leaflet.html" class="external-link">leaflet</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/pkg/leaflet/man/addProviderTiles.html" class="external-link">addProviderTiles</a></span><span class="op">(</span><span class="st">'Esri.WorldShadedRelief'</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/pkg/leaflet/man/map-methods.html" class="external-link">setMaxBounds</a></span><span class="op">(</span><span class="va">bbox</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, <span class="va">bbox</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>, <span class="va">bbox</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span>, <span class="va">bbox</span><span class="op">[</span><span class="fl">4</span><span class="op">]</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/leaflet/man/map-layers.html" class="external-link">addPolygons</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">basin_poly</span> ,color <span class="op">=</span> <span class="st">"#444444"</span>, weight <span class="op">=</span> <span class="fl">1</span>, smoothFactor <span class="op">=</span> <span class="fl">0.5</span>,</span>
-<span>    opacity <span class="op">=</span> <span class="fl">1.0</span>, fillOpacity <span class="op">=</span> <span class="fl">0.5</span> <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/leaflet/man/map-layers.html" class="external-link">addPolygons</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">basin_poly</span> ,color <span class="op">=</span> <span class="st">"#444444"</span>, </span>
+<span>              weight <span class="op">=</span> <span class="fl">1</span>, smoothFactor <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>              opacity <span class="op">=</span> <span class="fl">1.0</span>, fillOpacity <span class="op">=</span> <span class="fl">0.5</span> <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="co">#addPolylines(data = stream_vect) %&gt;% </span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/pkg/leaflet/man/map-layers.html" class="external-link">addCircles</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">point_locations_snapped</span>, lng <span class="op">=</span> <span class="op">~</span><span class="va">lon_snap_accu</span>, </span>
 <span>             lat <span class="op">=</span> <span class="op">~</span><span class="va">lat_snap_accu</span>, radius <span class="op">=</span> <span class="fl">0.2</span>, color <span class="op">=</span> <span class="op">~</span><span class="fu">pal</span><span class="op">(</span><span class="va">type</span><span class="op">)</span>,</span>
@@ -1154,17 +1169,17 @@ well.</p>
 <p>On the website of the <a href="https://www.iucnredlist.org/species/187028/1822039" class="external-link">IUCN red
 list</a> we can see that the habitat range of <em>Conorhynchos
 conirostris</em> is<br>
-restricted to the areas upstream of the Sobradinho dam (site ID 2516)
-and all our fish occurrence sites are located upstream of the dam as
-well. Therefore, we are only interested in dams upstream of the
-Sobradinho dam. To get the upstream catchment from the point location of
-the Sobradinho dam we will use the function
+restricted to the area upstream of the Sobradinho dam (site ID 2516) and
+all our fish occurrences are located upstream of the dam as well.
+Therefore, we are only interested in dams upstream of the Sobradinho
+dam. To get the upstream catchment from the point location of the
+Sobradinho dam we will use the function
 <code>get_upstream_catchment</code>. Afterwards we will use the
 <code>terra</code> package to polygonise the raster file of the upstream
-catchment and use the polygon of the upstream catchment to filter our
+catchment and use the polygon of the upstream catchment to select our
 point locations using the functions provided by the <code>sf</code>
 package.</p>
-<p><img src="../reference/figures/workflow5.png"></p>
+<!-- ![](../man/figures/workflow5.png)-->
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Define full path for the direction raster layer</span></span>
 <span><span class="va">direction_rast</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">saofra_dir</span>, <span class="st">"/direction_481051.tif"</span><span class="op">)</span></span>
@@ -1189,13 +1204,16 @@ package.</p>
 <span><span class="co"># Polygonise the raster</span></span>
 <span><span class="va">upstream_basin_vect</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/as.spatvector.html" class="external-link">as.polygons</a></span><span class="op">(</span><span class="va">upstream_basin_rast</span><span class="op">)</span></span>
 <span><span class="co"># Save the vector file of the upstream catchment</span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/writeVector.html" class="external-link">writeVector</a></span><span class="op">(</span><span class="va">upstream_basin_vect</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">upcatch_dir</span> , <span class="st">"/upstream_basin_2516.gpkg"</span><span class="op">)</span>, </span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/writeVector.html" class="external-link">writeVector</a></span><span class="op">(</span><span class="va">upstream_basin_vect</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">upcatch_dir</span> , </span>
+<span>                                        <span class="st">"/upstream_basin_2516.gpkg"</span><span class="op">)</span>, </span>
 <span>            filetype <span class="op">=</span> <span class="st">"gpkg"</span>, overwrite<span class="op">=</span><span class="cn">TRUE</span> <span class="op">)</span></span>
 <span></span>
-<span><span class="va">upstream_subc_rast</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/crop_to_extent.html">crop_to_extent</a></span><span class="op">(</span>raster_layer <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">saofra_dir</span>,</span>
-<span>                                                           <span class="st">"/sub_catchment_481051.tif"</span><span class="op">)</span>,</span>
-<span>                                     vector_layer <span class="op">=</span>  <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">upcatch_dir</span> ,</span>
-<span>                                                            <span class="st">"/upstream_basin_2516.gpkg"</span><span class="op">)</span>,</span>
+<span><span class="va">upstream_subc_rast</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/crop_to_extent.html">crop_to_extent</a></span><span class="op">(</span>raster_layer <span class="op">=</span> </span>
+<span>                                       <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">saofra_dir</span>,</span>
+<span>                                              <span class="st">"/sub_catchment_481051.tif"</span><span class="op">)</span>,</span>
+<span>                                     vector_layer <span class="op">=</span>  </span>
+<span>                                       <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">upcatch_dir</span> ,</span>
+<span>                                              <span class="st">"/upstream_basin_2516.gpkg"</span><span class="op">)</span>,</span>
 <span>                                     out_dir <span class="op">=</span> <span class="va">upcatch_dir</span>,</span>
 <span>                                     file_name <span class="op">=</span>  <span class="st">"sub_catchment_2516.tif"</span>,</span>
 <span>                                     read <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
@@ -1207,21 +1225,26 @@ package.</p>
 <span></span>
 <span><span class="co"># Filter the sub-catchment IDs from the GeoPackages of the order_vector_segment</span></span>
 <span><span class="co"># basin file (sub-catchment ID = stream ID)</span></span>
-<span><span class="va">upstream_segment_vect</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_geopackage.html">read_geopackage</a></span><span class="op">(</span>gpkg <span class="op">=</span>  <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">saofra_dir</span>, </span>
-<span>                                                <span class="st">"/order_vect_segment_481051.gpkg"</span><span class="op">)</span>,</span>
+<span><span class="va">upstream_segment_vect</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_geopackage.html">read_geopackage</a></span><span class="op">(</span>gpkg <span class="op">=</span>  </span>
+<span>                                           <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">saofra_dir</span>, </span>
+<span>                                             <span class="st">"/order_vect_segment_481051.gpkg"</span><span class="op">)</span>,</span>
 <span>                                        import_as <span class="op">=</span> <span class="st">"sf"</span>,</span>
 <span>                                        subc_id <span class="op">=</span> <span class="va">subc_ids</span><span class="op">$</span><span class="va">sub_catchment_2516</span>,</span>
 <span>                                        name <span class="op">=</span> <span class="st">"stream"</span><span class="op">)</span></span>
 <span><span class="co"># Save the stream segments of the upstream drainage basin  </span></span>
-<span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_write.html" class="external-link">write_sf</a></span><span class="op">(</span><span class="va">upstream_segment_vectt</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">upcatch_dir</span>, <span class="st">"/order_vect_segment_2516.gpkg"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_write.html" class="external-link">write_sf</a></span><span class="op">(</span><span class="va">upstream_segment_vect</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">upcatch_dir</span>, </span>
+<span>                                       <span class="st">"/order_vect_segment_2516.gpkg"</span><span class="op">)</span><span class="op">)</span></span>
 <span>                              </span>
 <span></span>
 <span><span class="co"># Convert the data.frame into a simply feature</span></span>
 <span><span class="va">point_locations_snapped_pts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sf.html" class="external-link">st_as_sf</a></span><span class="op">(</span><span class="va">point_locations_snapped</span>,  </span>
-<span>                                        coords <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"lon_snap_accu"</span>,<span class="st">"lat_snap_accu"</span><span class="op">)</span>, </span>
+<span>                                        coords <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"lon_snap_accu"</span>,</span>
+<span>                                                   <span class="st">"lat_snap_accu"</span><span class="op">)</span>, </span>
 <span>                                        remove <span class="op">=</span> <span class="cn">FALSE</span>, crs<span class="op">=</span><span class="st">"WGS84"</span><span class="op">)</span></span>
+<span></span>
 <span><span class="co"># Save point locations as a GeoPackage</span></span>
-<span><span class="co"># write_sf(point_locations_snapped_pts, paste0(upcatch_dir, "/point_locations_snapped_2516.gpkg"))</span></span>
+<span><span class="co"># write_sf(point_locations_snapped_pts, </span></span>
+<span><span class="co">#   paste0(upcatch_dir, "/point_locations_snapped_2516.gpkg"))</span></span>
 <span></span>
 <span><span class="co"># Use the polygon to filter the upstream point locations</span></span>
 <span><span class="va">upstream_point_locations</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_join.html" class="external-link">st_filter</a></span><span class="op">(</span><span class="va">point_locations_snapped_pts</span>, </span>
@@ -1229,22 +1252,27 @@ package.</p>
 <span>  <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_drop_geometry</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Save upstream point locations</span></span>
-<span><span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/fwrite.html" class="external-link">fwrite</a></span><span class="op">(</span><span class="va">upstream_point_locations</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">upcatch_dir</span>, <span class="st">"/upstream_point_locations_2516.csv"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/fwrite.html" class="external-link">fwrite</a></span><span class="op">(</span><span class="va">upstream_point_locations</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">upcatch_dir</span>, </span>
+<span>                                        <span class="st">"/upstream_point_locations_2516.csv"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Load the gpkg of the upstream basin (if not already loaded)</span></span>
+<code class="sourceCode R"><span><span class="co"># Load the GeoPackage of the upstream basin (if not already loaded)</span></span>
 <span><span class="co"># upstream_basin_vect &lt;- vect(paste0(upcatch_dir , "/upstream_basin_2516.gpkg"))</span></span>
 <span></span>
 <span><span class="co"># Create leaflet plot</span></span>
 <span><span class="va">upcatch_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/leaflet/man/leaflet.html" class="external-link">leaflet</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/pkg/leaflet/man/addProviderTiles.html" class="external-link">addProviderTiles</a></span><span class="op">(</span><span class="st">'Esri.WorldShadedRelief'</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/pkg/leaflet/man/map-methods.html" class="external-link">setMaxBounds</a></span><span class="op">(</span><span class="va">bbox</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, <span class="va">bbox</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>, <span class="va">bbox</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span>, <span class="va">bbox</span><span class="op">[</span><span class="fl">4</span><span class="op">]</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/leaflet/man/map-layers.html" class="external-link">addPolygons</a></span><span class="op">(</span>data <span class="op">=</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sf.html" class="external-link">st_as_sf</a></span><span class="op">(</span><span class="va">upstream_basin_vect</span><span class="op">)</span> ,color <span class="op">=</span> <span class="st">"#444444"</span>, weight <span class="op">=</span> <span class="fl">1</span>, smoothFactor <span class="op">=</span> <span class="fl">0.5</span>,</span>
-<span>    opacity <span class="op">=</span> <span class="fl">1.0</span>, fillOpacity <span class="op">=</span> <span class="fl">0.5</span> <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/leaflet/man/map-layers.html" class="external-link">addPolygons</a></span><span class="op">(</span>data <span class="op">=</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sf.html" class="external-link">st_as_sf</a></span><span class="op">(</span><span class="va">upstream_basin_vect</span><span class="op">)</span>,</span>
+<span>              color <span class="op">=</span> <span class="st">"#444444"</span>, weight <span class="op">=</span> <span class="fl">1</span>, </span>
+<span>              smoothFactor <span class="op">=</span> <span class="fl">0.5</span>, opacity <span class="op">=</span> <span class="fl">1.0</span>, </span>
+<span>              fillOpacity <span class="op">=</span> <span class="fl">0.5</span> <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="co">#addPolylines(data = stream_vect) %&gt;% </span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/leaflet/man/map-layers.html" class="external-link">addCircles</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">upstream_point_locations</span>, lng <span class="op">=</span> <span class="op">~</span><span class="va">lon_snap_accu</span>, </span>
-<span>             lat <span class="op">=</span> <span class="op">~</span><span class="va">lat_snap_accu</span>, radius <span class="op">=</span> <span class="fl">0.2</span>, color <span class="op">=</span> <span class="op">~</span><span class="fu">pal</span><span class="op">(</span><span class="va">type</span><span class="op">)</span>,</span>
-<span>              opacity <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/leaflet/man/addLegend.html" class="external-link">addLegend</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">upstream_point_locations</span>, pal <span class="op">=</span> <span class="va">pal</span>, values <span class="op">=</span> <span class="op">~</span><span class="va">type</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/leaflet/man/map-layers.html" class="external-link">addCircles</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">upstream_point_locations</span>, </span>
+<span>             lng <span class="op">=</span> <span class="op">~</span><span class="va">lon_snap_accu</span>, lat <span class="op">=</span> <span class="op">~</span><span class="va">lat_snap_accu</span>, </span>
+<span>             radius <span class="op">=</span> <span class="fl">0.2</span>, color <span class="op">=</span> <span class="op">~</span><span class="fu">pal</span><span class="op">(</span><span class="va">type</span><span class="op">)</span>,</span>
+<span>             opacity <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/leaflet/man/addLegend.html" class="external-link">addLegend</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">upstream_point_locations</span>, </span>
+<span>            pal <span class="op">=</span> <span class="va">pal</span>, values <span class="op">=</span> <span class="op">~</span><span class="va">type</span>,</span>
 <span>            labFormat <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">type</span>, <span class="va">cuts</span>, <span class="va">p</span><span class="op">)</span> <span class="op">{</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">labels</span><span class="op">)</span><span class="op">}</span>,</span>
 <span>            title <span class="op">=</span> <span class="st">"Site type"</span><span class="op">)</span></span>
 <span></span>
@@ -1255,18 +1283,21 @@ package.</p>
 <h3 id="get-distance-along-the-stream-network">Get distance along the stream network<a class="anchor" aria-label="anchor" href="#get-distance-along-the-stream-network"></a>
 </h3>
 <p>To determine the distance to the closest dam up- and downstream of
-each fish occurrence site we will first calculate the distance between
-all point locations using the function <code>get_distance</code>.</p>
-<p><img src="../reference/figures/workflow6.png"></p>
+each fish occurrence we will first calculate the distance between all
+point locations (fish occurrences and dams) using the function
+<code>get_distance</code>.</p>
+<!-- ![](../man/figures/workflow6.png)-->
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Load layers (if not already loaded)</span></span>
-<span><span class="co"># upstream_basin_rast &lt;- paste0(upcatch_dir, "/upstream_basin_2516.tif")</span></span>
-<span><span class="co"># upstream_segment_vect &lt;- paste0(upcatch_dir, "/order_vect_segment_2516.gpkg")</span></span>
+<code class="sourceCode R"><span><span class="co"># Define the full path to the upstream basin raster layer and the GeoPackage</span></span>
+<span><span class="co"># of the upstream stream segments </span></span>
+<span><span class="va">upstream_basin_rast</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">upcatch_dir</span>, <span class="st">"/upstream_basin_2516.tif"</span><span class="op">)</span></span>
+<span><span class="va">upstream_segment_vect</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">upcatch_dir</span>, <span class="st">"/order_vect_segment_2516.gpkg"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Get the distances along the stream network between each pair of point locations</span></span>
+<span><span class="co"># Get the distances along the stream network between each pair of </span></span>
+<span><span class="co"># point locations</span></span>
 <span><span class="co"># The process takes about 1 hour </span></span>
 <span><span class="co"># Increasing the number of cores only makes sense if the calculation</span></span>
-<span><span class="co"># is done for points in multiple drainage basins</span></span>
+<span><span class="co"># is done for point locations in multiple drainage basins</span></span>
 <span><span class="va">upstream_point_locations</span> <span class="op">&lt;-</span> <span class="va">upstream_point_locations</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>basin_id <span class="op">=</span> <span class="fl">2516</span><span class="op">)</span></span>
 <span></span>
@@ -1367,21 +1398,22 @@ dist
 <h3 id="get-catchment-graph">Get catchment graph<a class="anchor" aria-label="anchor" href="#get-catchment-graph"></a>
 </h3>
 <p>To evaluate which and how many dames are located up- and downstream
-of the fish occurrence sites, we need to load the GeoPackage of the
-stream segments ( order_vect_segment) as a graph. Further we will need
-the sub-catchment IDs of the fish occurrence sites to use the function
+of the fish occurrences, we need to load the GeoPackage of the stream
+segments ( order_vect_segment) as a graph. Further, we will need the
+sub-catchment IDs of the fish occurrences to use the function
 <code>get_catchment_graph</code>. The function will return for each fish
-occurrence site all sub-catchment IDs which are located up- or
+occurrence all sub-catchment IDs which are located up- or
 downstream.</p>
-<p><img src="../reference/figures/workflow7.png"></p>
+<!-- ![](../man/figures/workflow7.png)-->
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Define full path to the GeoPackage of the stream segments</span></span>
 <span><span class="co"># upstream_segment_vect &lt;- paste0(upcatch_dir, "/order_vect_segment_2516.gpkg")</span></span>
 <span></span>
 <span><span class="co"># Load the GeoPackage as graph</span></span>
-<span><span class="va">stream_network_graph</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_geopackage.html">read_geopackage</a></span><span class="op">(</span>gpkg <span class="op">=</span> <span class="va">upstream_segment_vect</span>, import_as <span class="op">=</span> <span class="st">"graph"</span><span class="op">)</span></span>
+<span><span class="va">stream_network_graph</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_geopackage.html">read_geopackage</a></span><span class="op">(</span>gpkg <span class="op">=</span> <span class="va">upstream_segment_vect</span>, </span>
+<span>                                        import_as <span class="op">=</span> <span class="st">"graph"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Get sub-catchment IDs of the fish occurrence sites</span></span>
+<span><span class="co"># Get sub-catchment IDs of the fish occurrences</span></span>
 <span><span class="va">fs_subc_ids</span> <span class="op">&lt;-</span> <span class="va">upstream_point_locations</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span>subcatchment_id <span class="op">=</span> <span class="va">subc_id_snap_accu</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">site_id</span> <span class="op"><a href="https://rdrr.io/pkg/terra/man/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, <span class="fl">4</span><span class="op">:</span><span class="fl">14</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
@@ -1389,16 +1421,16 @@ downstream.</p>
 <span>  <span class="fu"><a href="https://rdrr.io/pkg/terra/man/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Get all stream segment IDs (=sub-catchments IDs)  upstream for each</span></span>
-<span><span class="co"># fish occurrence site</span></span>
-<span><span class="co"># Note: There will be no output for fish occurrence sites which are located</span></span>
+<span><span class="co"># Get all stream segment IDs (=sub-catchments IDs) upstream of each</span></span>
+<span><span class="co"># fish occurrence</span></span>
+<span><span class="co"># Note: There will be no output for fish occurrences which are located</span></span>
 <span><span class="co"># in headwaters (Strahler order 1)</span></span>
 <span><span class="va">upstream_segments</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_catchment_graph.html">get_catchment_graph</a></span><span class="op">(</span>g <span class="op">=</span> <span class="va">stream_network_graph</span>,</span>
 <span>                                         subc_id <span class="op">=</span> <span class="va">fs_subc_ids</span>, mode <span class="op">=</span> <span class="st">"in"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Get all stream segment IDs downstream for each</span></span>
-<span><span class="co"># fish occurrence site</span></span>
-<span><span class="co"># Note: There will be no output for fish occurrence sites which are located</span></span>
+<span><span class="co"># fish occurrence</span></span>
+<span><span class="co"># Note: There will be no output for fish occurrences which are located</span></span>
 <span><span class="co"># in the last segments before the outlet</span></span>
 <span><span class="va">downstream_segments</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_catchment_graph.html">get_catchment_graph</a></span><span class="op">(</span>g <span class="op">=</span> <span class="va">stream_network_graph</span>,</span>
 <span>                                           subc_id <span class="op">=</span> <span class="va">fs_subc_ids</span>, mode <span class="op">=</span> <span class="st">"out"</span><span class="op">)</span></span></code></pre></div>
@@ -1594,20 +1626,19 @@ horton
 </div>
 </div>
 <div class="section level3">
-<h3 id="determine-the-number-of-dams-and-the-distance-alonge-the-network-to-the-closest-dam">Determine the number of dams and the distance alonge the network to
-the closest dam<a class="anchor" aria-label="anchor" href="#determine-the-number-of-dams-and-the-distance-alonge-the-network-to-the-closest-dam"></a>
+<h3 id="determine-the-number-of-dams-and-the-distance-along-the-network-to-the-closest-dam">Determine the number of dams and the distance along the network to
+the closest dam<a class="anchor" aria-label="anchor" href="#determine-the-number-of-dams-and-the-distance-along-the-network-to-the-closest-dam"></a>
 </h3>
-<p>After we have determined the distance between the point locations and
-now the sub-catchment IDs up- and downstream of each fish occurrence
-site we can estimate the number of dams and evaluate the distance to the
-closest dam.</p>
-<p><img src="../reference/figures/workflow.png"></p>
+<p>After we determined the distance between the point locations and the
+sub-catchment IDs up- and downstream of each fish occurrence, we can
+estimate the number of dams and evaluate the distance to the closest
+dam.</p>
+<!-- ![](../man/figures/workflow.png) -->
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Get all sub-catchment IDs of fish occurrence sites with stream </span></span>
-<span><span class="co"># segments upstream</span></span>
+<code class="sourceCode R"><span><span class="co"># Get all sub-catchment IDs of fish occurrences with stream segments upstream</span></span>
 <span><span class="va">fs_subc_ids_up</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">upstream_segments</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Get site IDs of the fish occurrence sites </span></span>
+<span><span class="co"># Get unique site IDs of the fish occurrences</span></span>
 <span><span class="va">fs_site_id</span> <span class="op">&lt;-</span> <span class="va">upstream_point_locations</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">subc_id_snap_accu</span> <span class="op"><a href="https://rdrr.io/pkg/terra/man/match.html" class="external-link">%in%</a></span> <span class="va">fs_subc_ids_up</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/match.html" class="external-link">match</a></span><span class="op">(</span><span class="va">subc_id_snap_accu</span>, <span class="va">fs_subc_ids_up</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
@@ -1663,7 +1694,7 @@ closest dam.</p>
 <span><span class="co"># segments downstream</span></span>
 <span><span class="va">fs_subc_ids_down</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">downstream_segments</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Get unique site IDs of the fish occurrence sites </span></span>
+<span><span class="co"># Get unique site IDs of the fish occurrences </span></span>
 <span><span class="va">fs_site_id</span> <span class="op">&lt;-</span> <span class="va">upstream_point_locations</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">subc_id_snap_accu</span> <span class="op"><a href="https://rdrr.io/pkg/terra/man/match.html" class="external-link">%in%</a></span> <span class="va">fs_subc_ids_down</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/match.html" class="external-link">match</a></span><span class="op">(</span><span class="va">subc_id_snap_accu</span>, <span class="va">fs_subc_ids_down</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
@@ -1716,10 +1747,11 @@ closest dam.</p>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>direction <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">direction</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"upstream"</span>, <span class="st">"downstream"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Define colors</span></span>
-<span><span class="va">cols</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>ED <span class="op">=</span> <span class="st">"#E69F00"</span>, FD <span class="op">=</span> <span class="st">"#56B4E9"</span><span class="op">)</span></span>
+<span><span class="va">cols</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>ED <span class="op">=</span> <span class="st">"red3"</span>, FD <span class="op">=</span> <span class="st">"orange"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Create plot to show the number of dams</span></span>
-<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">plot_data</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/is.bool.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">from_site_id</span><span class="op">)</span>, y <span class="op">=</span> <span class="va">n_dams</span>, fill <span class="op">=</span> <span class="fu"><a href="https://forcats.tidyverse.org/reference/fct_rev.html" class="external-link">fct_rev</a></span><span class="op">(</span><span class="va">type</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">plot_data</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/is.bool.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">from_site_id</span><span class="op">)</span>, y <span class="op">=</span> <span class="va">n_dams</span>, </span>
+<span>                      fill <span class="op">=</span> <span class="fu"><a href="https://forcats.tidyverse.org/reference/fct_rev.html" class="external-link">fct_rev</a></span><span class="op">(</span><span class="va">type</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_bar</a></span><span class="op">(</span>stat<span class="op">=</span><span class="st">"identity"</span>, position<span class="op">=</span> <span class="st">"stack"</span>, width <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html" class="external-link">facet_grid</a></span><span class="op">(</span><span class="op">~</span> <span class="va">direction</span>, scales <span class="op">=</span> <span class="st">"free"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
@@ -1731,8 +1763,8 @@ closest dam.</p>
 <p><img src="../reference/figures/number_of_dams.png"></p>
 <p>With the exception of the fish occurrence sites 4 and 6 the number of
 upstream dams will dramatically increase. Especially for site 9, which
-has already 14 dams located upstream, the number might increase in the
-future to 94 dams. Downstream of all fish occurrence sites there is
+has already 14 dams located upstream, the number might increase to 94
+dams in the future. Downstream of all fish occurrence sites there is
 currently only one existing dam. It is the dam with the ID 2516 at the
 outlet of our delineated upstream catchment. This leads to the
 assumption that all fish occurrence sites are currently connected. In
@@ -1802,6 +1834,17 @@ Dowle, Matt, and Arun Srinivasan. 2022. <em>Data.table: Extension of
 <div id="ref-R-terra" class="csl-entry">
 Hijmans, Robert J. 2023. <em>Terra: Spatial Data Analysis</em>. <a href="https://rspatial.org/terra/" class="external-link">https://rspatial.org/terra/</a>.
 </div>
+<div id="ref-IUCNRedList2022" class="csl-entry">
+IUCN. 2022. <span>“<span class="nocase">The IUCN Red List of Threatened
+Species</span>.”</span> https://www.iucnredlist.org.
+</div>
+<div id="ref-Lehner2011" class="csl-entry">
+Lehner, Bernhard, Catherine Reidy Liermann, Carmen Revenga, Charles
+Vörösmarty, Balazs Fekete, Philippe Crouzet, Petra Döll, et al. 2011.
+<span>“High-Resolution Mapping of the World’s Reservoirs and Dams for
+Sustainable River-Flow Management.”</span> <em>Frontiers in Ecology and
+the Environment</em> 9 (9): 494–502. <a href="https://doi.org/10.1890/100125" class="external-link">https://doi.org/10.1890/100125</a>.
+</div>
 <div id="ref-R-sf" class="csl-entry">
 Pebesma, Edzer. 2018. <span>“<span class="nocase">Simple Features for R:
 Standardized Support for Spatial Vector Data</span>.”</span>
@@ -1855,6 +1898,11 @@ ed. Boca Raton, Florida: Chapman; Hall/CRC. <a href="https://yihui.org/knitr/" c
 <div id="ref-R-knitr" class="csl-entry">
 ———. 2023. <em>Knitr: A General-Purpose Package for Dynamic Report
 Generation in r</em>. <a href="https://yihui.org/knitr/" class="external-link">https://yihui.org/knitr/</a>.
+</div>
+<div id="ref-Zarfl2015" class="csl-entry">
+Zarfl, Christiane, Alexander E. Lumsdon, Jürgen Berlekamp, Laura
+Tydecks, and Klement Tockner. 2015. <span>“A Global Boom in Hydropower
+Dam Construction.”</span> <em>Aquatic Sciences</em> 77 (1): 161–70. <a href="https://doi.org/10.1007/s00027-014-0377-0" class="external-link">https://doi.org/10.1007/s00027-014-0377-0</a>.
 </div>
 <div id="ref-R-kableExtra" class="csl-entry">
 Zhu, Hao. 2021. <em>kableExtra: Construct Complex Table with Kable and
