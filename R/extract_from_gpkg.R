@@ -40,6 +40,34 @@
 #'
 #' @references
 #' \url{https://grass.osgeo.org/grass82/manuals/v.in.ogr.html}
+#' \url{https://grass.osgeo.org/grass82/manuals/addons/r.stream.order.html}
+#'
+#' @details
+#' The following attributes are stored in the stream network .gpkg files:
+#'
+#' * cat - category
+#' * stream - sub-catchment / stream segment ID (equal to cat)
+#' * next_stream - downstream sub-catchment / stream segment ID
+#' * prev_streams; two or more uptstream sub-catchment / stream segment IDs
+#' * strahler - Strahler's stream order
+#' * horton - Hortons's stream order
+#' * shreve - Shreve's stream magnitude
+#' * hack - Hack's main streams or Gravelius order
+#' * topo_dim - Topological dimension streams order
+#' * scheidegger - Scheidegger's Consisted Associated Integers
+#' * drwal - Drwal's stream hierarchy
+#' * length - length of the stream segment
+#' * stright - length of the stream segment as a stright line
+#' * sinusoid - fractal dimension: stream segment length / stright stream
+#' * segment length;
+#' * cum_length - length of the stream from the source
+#' * flow_accum - flow accumulation within the sub-catchment of a stream segment
+#' * out_dist - distance of current stream initialisation from outlet
+#' * source_elev - elevation at stream segment initialisation
+#' * outlet_elev - elevation at stream segment outlet
+#' * elev_drop difference between source_elev and outlet_elev + drop outlet
+#' * out_drop - drop at the outlet of the stream segment
+#' * gradient - drop/length;
 #'
 #' @examples
 #' # Download test data into temporary R folder
