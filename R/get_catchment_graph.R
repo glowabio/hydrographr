@@ -1,13 +1,14 @@
-#' @title Get catchment from graph
+#' @title Get catchment from stream network graph
 #'
-#' @description Subset the network graph by extracting the upstream, downstream
-#' or entire catchment, for one or multiple stream segments. The function will
-#' return either one or more data.tables or graph objects for each input stream
-#' segment. Note that the stream segment and sub-catchment IDs are identical,
-#' and for consistency, we use the term "subc_id".
+#' @description Subset the stream network graph by extracting the upstream,
+#' downstream or entire catchment, for one or multiple stream segments. The
+#' function will return either one or more data.tables or graph objects for
+#' each input stream segment. Note that the stream segment and sub-catchment
+#' IDs are identical, and for consistency, we use the term "subc_id".
 #'
 #' By switching the mode to either "in", "out" or "all", only the upstream,
-#' downstream or all connected segments will be returned.
+#' downstream or all connected segments will be returned, respectively. The
+#' function read_geopackage() can be used to create the input network graph.
 #'
 #' @param g igraph object. A directed graph.
 #' @param subc_id numeric vector of a single or multiple IDs,
@@ -58,6 +59,9 @@
 #' @references
 #' Csardi G, Nepusz T: The igraph software package for complex network research,
 #' InterJournal, Complex Systems 1695. 2006. \url{https://igraph.org}
+#'
+#' #' @seealso
+#' \code{\link{read_geopackage}} to create a network graph.
 #'
 #' @examples
 #' # Download test data into the temporary R folder
