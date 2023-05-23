@@ -53,30 +53,31 @@ the output is loaded into R.
 }
 \details{
 The following attributes are stored in the stream network .gpkg files:
-
-* cat - category
-* stream - sub-catchment / stream segment ID (equal to cat)
-* next_stream - downstream sub-catchment / stream segment ID
-* prev_streams; two or more uptstream sub-catchment / stream segment IDs
-* strahler - Strahler's stream order
-* horton - Hortons's stream order
-* shreve - Shreve's stream magnitude
-* hack - Hack's main streams or Gravelius order
-* topo_dim - Topological dimension streams order
-* scheidegger - Scheidegger's Consisted Associated Integers
-* drwal - Drwal's stream hierarchy
-* length - length of the stream segment
-* stright - length of the stream segment as a stright line
-* sinusoid - fractal dimension: stream segment length / stright stream
-* segment length;
-* cum_length - length of the stream from the source
-* flow_accum - flow accumulation within the sub-catchment of a stream segment
-* out_dist - distance of current stream initialisation from outlet
-* source_elev - elevation at stream segment initialisation
-* outlet_elev - elevation at stream segment outlet
-* elev_drop difference between source_elev and outlet_elev + drop outlet
-* out_drop - drop at the outlet of the stream segment
-* gradient - drop/length;
+\itemize{
+\item cat - category
+\item stream - sub-catchment / stream segment ID (equal to cat)
+\item next_stream - downstream sub-catchment / stream segment ID
+\item prev_streams; two or more uptstream sub-catchment / stream segment IDs
+\item strahler - Strahler's stream order
+\item horton - Hortons's stream order
+\item shreve - Shreve's stream magnitude
+\item hack - Hack's main streams or Gravelius order
+\item topo_dim - Topological dimension streams order
+\item scheidegger - Scheidegger's Consisted Associated Integers
+\item drwal - Drwal's stream hierarchy
+\item length - length of the stream segment
+\item stright - length of the stream segment as a stright line
+\item sinusoid - fractal dimension: stream segment length / stright stream
+\item segment length;
+\item cum_length - length of the stream from the source
+\item flow_accum - flow accumulation within the sub-catchment of a stream segment
+\item out_dist - distance of current stream initialisation from outlet
+\item source_elev - elevation at stream segment initialisation
+\item outlet_elev - elevation at stream segment outlet
+\item elev_drop difference between source_elev and outlet_elev + drop outlet
+\item out_drop - drop at the outlet of the stream segment
+\item gradient - drop/length
+}
 }
 \examples{
 # Download test data into temporary R folder

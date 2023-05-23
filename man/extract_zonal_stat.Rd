@@ -48,19 +48,21 @@ Default is TRUE.}
 }
 \value{
 Returns a table with
-* sub-catchment ID (subc_id)
-* number of cells with a value (data_cells)
-* number of cells with a NoData value (nodata_cells)
-* minimum value (min)
-* maximum value (max)
-* value range (range)
-* arithmetic mean (mean)
-* arithmetic mean of the absolute values (mean_abs)
-* standard deviation (sd)
-* variance (var)
-* coefficient of variance (cv)
-* sum (sum)
-* sum of the absolute values (sum_abs).
+\itemize{
+\item sub-catchment ID (subc_id)
+\item number of cells with a value (data_cells)
+\item number of cells with a NoData value (nodata_cells)
+\item minimum value (min)
+\item maximum value (max)
+\item value range (range)
+\item arithmetic mean (mean)
+\item arithmetic mean of the absolute values (mean_abs)
+\item standard deviation (sd)
+\item variance (var)
+\item coefficient of variance (cv)
+\item sum (sum)
+\item sum of the absolute values (sum_abs).
+}
 }
 \description{
 Calculate zonal statistics based on one or more environmental
