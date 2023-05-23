@@ -15,11 +15,10 @@ Download the test data of the package, which includes all
 Hydrography90m and species point observation data
 for a small geographic extent, to test the functions.
 
-The test data is available at
+The test data will be automatically downloaded and unzipped
+with this function to a desired path, or can be alternatively downloaded at
 
-https://drive.google.com/file/d/1kYNWXmtVm6X7MZLISOePGpvxB1pk1scD/view?usp=share_link
-and can be automatically downloaded and unzipped
-with this function to a desired path.
+https://drive.google.com/file/d/1kYNWXmtVm6X7MZLISOePGpvxB1pk1scD/view?usp=share_link.
 }
 \details{
 Downloads the test data for the Hydrography90m dataset

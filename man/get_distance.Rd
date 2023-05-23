@@ -18,7 +18,8 @@ get_distance(
 )
 }
 \arguments{
-\item{data}{a data.frame or data.table with lat/lon coordinates in WGS84.}
+\item{data}{a data.frame or data.table that contains the columns regarding
+the longitude / latitude coordinates in WGS84.}
 
 \item{lon}{character. The name of the column with the longitude coordinates.}
 
@@ -51,30 +52,30 @@ Default is 1.}
 Default is TRUE.}
 }
 \value{
-If distance='euclidean', a distance matrix, in meters, of the euclidean distances between
-all the pairs of points (object of class data.frame). If distance='network',
-a data.frame with three columns: from_id, to_id, dist. The 'dist' column
-includes the distance, in meters, of the shortest path along the network from the node
-from_id to the node to_id. If distance='both', a list containing both objects
-is returned.
+If distance='euclidean', a distance matrix, in meters, of the euclidean
+distances between all the pairs of points (object of class data.frame)
+is returned. If distance='network', a data.frame with three columns: from_id,
+to_id, dist is returned. The 'dist' column includes the distance, in meters,
+of the shortest path along the network from the point "from_id" to the point
+"to_id". If distance='both', a list containing both objects is returned.
 }
 \description{
-Calculate euclidean or along the network distance between points. To calculate
-the distance along the network, point coordinates need to be snapped to the
-stream network using the function \code{\link{snap_to_network}} or
-\code{\link{snap_to_subc_segment}}.
+Calculate euclidean or along-the-network distance (in meters) between points.
+To calculate the distance along the network, point coordinates need to be
+snapped to the stream network using the function \code{\link{snap_to_network}}
+or \code{\link{snap_to_subc_segment}}.
 }
 \details{
-To calculate the euclidian distance between all pair of points the function
+To calculate the euclidian distance between all pairs of points the function
 uses the v.distance command of GRASS GIS, which has been set up to produce a
 square matrix of distances. The calculation of distances along the stream
 network has been implemented with the command v.net.allpairs of GRASS GIS.
-The along the network distance calculation is done for all pair points
+The along-the-network distance calculation is done for all pairs of points
 located within the same basin. If the points are located in
-different basins the function can be run in parallel (i.e., each core for
+different basins, the function can be run in parallel (i.e., each core for
 the distance calculations of all points within one basin). The
-distance between points located in different
-basins is zero because they are not connected through the network.
+distance between points located in different basins is zero because they are
+not connected through the network.
 }
 \examples{
 # Download test data into the temporary R folder
