@@ -85,21 +85,19 @@
 
     
     
+<p>The package does not yet fully support the GRASS GIS
+functionality.</p>
 <div class="section level2">
 <h2 id="installation-of-the-required-gis-tools">Installation of the required GIS tools<a class="anchor" aria-label="anchor" href="#installation-of-the-required-gis-tools"></a>
 </h2>
 <p>If you do not have installed any of the GIS tools, please, install
-before using <code>hydrographr</code>. If you use Ubuntu you can
-copy-paste the commands below. If you use another Linux distribution,
-please, see the linked software webpage below for installation
-instruction.</p>
+before using <code>hydrographr</code>.</p>
 <p>Warning! Sometimes the installation does not work within a VPN
 connection. If you fail to fetch data from online repositories during
 the installation, please try deactivating your VPN connection.</p>
-<p><strong>Add the Ubuntugis repository</strong></p>
-<p>Now you are ready to install<code>GDAL</code>, <code>GRASS GIS</code>
-and GNU <code>parallel</code>.
-<!-- Copy and paste the commands below into your console and follow the instructions to install the tools. --></p>
+<!-- **Add the Ubuntugis repository** -->
+<!-- Now you are ready to install`GDAL`, `GRASS GIS` and GNU `parallel`.  -->
+<!-- Copy and paste the commands below into your console and follow the instructions to install the tools. -->
 <p><strong>GDAL</strong></p>
 <p>GDAL is a translator library for raster and vector geospatial data
 formats and comes with a variety of useful command line utilities for
@@ -127,17 +125,17 @@ work properly in any other folder)</p>
 MUST be installed and run from the /Applications folder. They will not
 run from another folder or even a subfolder of /Applications. This has
 to do with the build environment.</p>
-<p><strong>GRASS GIS addons</strong></p>
-<p>Copy-paste the commands below to install the required addons for
-GRASS GIS.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install make</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Install GRASS GIS addons</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">GRASSEXEC</span><span class="op">=</span><span class="st">"grass --exec"</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="va">$GRASSEXEC</span>  g.extension  extension=r.stream.distance</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="va">$GRASSEXEC</span>  g.extension  extension=r.stream.order</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="va">$GRASSEXEC</span>  g.extension  extension=r.stream.snap</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="va">$GRASSEXEC</span>  g.extension  extension=r.stream.basins</span></code></pre></div>
+<!-- **GRASS GIS addons** -->
+<!-- Copy-paste the commands below to install the required addons for GRASS GIS. -->
+<!-- ```{bash, eval=FALSE} -->
+<!-- sudo apt install make -->
+<!-- # Install GRASS GIS addons -->
+<!-- export GRASSEXEC="grass --exec" -->
+<!-- $GRASSEXEC  g.extension  extension=r.stream.distance -->
+<!-- $GRASSEXEC  g.extension  extension=r.stream.order -->
+<!-- $GRASSEXEC  g.extension  extension=r.stream.snap -->
+<!-- $GRASSEXEC  g.extension  extension=r.stream.basins -->
+<!-- ``` -->
 <p><strong>GNU parallel</strong></p>
 <p>GNU parallel is a shell tool for executing jobs in parallel on
 multiple cores. For a faster processing, some of the
@@ -147,58 +145,58 @@ multiple cores. For a faster processing, some of the
 more information check the <a href="https://www.gnu.org/software/parallel/" class="external-link">GNU parallel</a>
 website.</p>
 <p>Copy and paste the commands below into your console:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">brew</span> install parallel</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">parallel</span> <span class="at">--citation</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Academic tradition requires you to cite works you base your article on.</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; If you use programs that use GNU Parallel to process data for an article in a</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; scientific publication, please cite:</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; @software{tange_2022_7347980,</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       author       = {Tange, Ole},</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       title        = {GNU Parallel 20221122 ('Херсо́н')},</span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       month        = Nov,</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       year         = 2022,</span></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       note         = {{GNU Parallel is a general parallelizer to run</span></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                        multiple serial command line programs in parallel</span></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                        without changing them.}},</span></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       publisher    = {Zenodo},</span></span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       doi          = {10.5281/zenodo.7347980},</span></span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       url          = {https://doi.org/10.5281/zenodo.7347980}</span></span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; }</span></span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (Feel free to use \nocite{tange_2022_7347980})</span></span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; This helps funding further development; AND IT WON'T COST YOU A CENT.</span></span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; If you pay 10000 EUR you should feel free to use GNU Parallel without citing.</span></span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; More about funding GNU Parallel and the citation notice:</span></span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; https://lists.gnu.org/archive/html/parallel/2013-11/msg00006.html</span></span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; https://www.gnu.org/software/parallel/parallel_design.html#citation-notice</span></span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; https://git.savannah.gnu.org/cgit/parallel.git/tree/doc/citation-notice-faq.txt</span></span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; If you send a copy of your published article to tange@gnu.org, it will be</span></span>
-<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; mentioned in the release notes of next version of GNU Parallel.</span></span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Type: 'will cite' and press enter.</span></span>
-<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a><span class="ex">will</span> cite</span>
-<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Thank you for your support: You are the reason why there is funding to</span></span>
-<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; continue maintaining GNU Parallel. On behalf of future versions of</span></span>
-<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; GNU Parallel, which would not exist without your support:</span></span>
-<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  THANK YOU SO MUCH</span></span>
-<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; It is really appreciated. The citation notice is now silenced.</span></span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">brew</span> install parallel</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">parallel</span> <span class="at">--citation</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Academic tradition requires you to cite works you base your article on.</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; If you use programs that use GNU Parallel to process data for an article in a</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; scientific publication, please cite:</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; @software{tange_2022_7347980,</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       author       = {Tange, Ole},</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       title        = {GNU Parallel 20221122 ('Херсо́н')},</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       month        = Nov,</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       year         = 2022,</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       note         = {{GNU Parallel is a general parallelizer to run</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                        multiple serial command line programs in parallel</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;                        without changing them.}},</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       publisher    = {Zenodo},</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       doi          = {10.5281/zenodo.7347980},</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       url          = {https://doi.org/10.5281/zenodo.7347980}</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; }</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; (Feel free to use \nocite{tange_2022_7347980})</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; This helps funding further development; AND IT WON'T COST YOU A CENT.</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; If you pay 10000 EUR you should feel free to use GNU Parallel without citing.</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; More about funding GNU Parallel and the citation notice:</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; https://lists.gnu.org/archive/html/parallel/2013-11/msg00006.html</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; https://www.gnu.org/software/parallel/parallel_design.html#citation-notice</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; https://git.savannah.gnu.org/cgit/parallel.git/tree/doc/citation-notice-faq.txt</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; If you send a copy of your published article to tange@gnu.org, it will be</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; mentioned in the release notes of next version of GNU Parallel.</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Type: 'will cite' and press enter.</span></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="ex">will</span> cite</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Thank you for your support: You are the reason why there is funding to</span></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; continue maintaining GNU Parallel. On behalf of future versions of</span></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; GNU Parallel, which would not exist without your support:</span></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  THANK YOU SO MUCH</span></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; It is really appreciated. The citation notice is now silenced.</span></span></code></pre></div>
 <p>Now type ctrl+z to exit the GNU parallel environment.</p>
 <p><strong>GNU bc</strong></p>
 <p>GNU bc (Basic Calculator) is an arbitrary precision numeric
 processing language, which is used in the function
 <code><a href="../reference/snap_to_subc_segment.html">snap_to_subc_segment()</a></code>. For more information check the <a href="https://www.gnu.org/software/bc/" class="external-link">GNU bc</a> website.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Install bc</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">brew</span> install bc</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Install bc</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">brew</span> install bc</span></code></pre></div>
 <p>We recommend to reboot your computer after the installation.</p>
 </div>
   </main>
