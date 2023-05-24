@@ -49,7 +49,7 @@
 #' @importFrom parallel detectCores
 #' @importFrom data.table as.data.table setDT setnames
 #' rbindlist setcolorder setkey
-#' @importFrom igraph ego as_ids is_directed as_long_data_frame
+#' @importFrom igraph ego as_ids is_directed as_data_frame
 #' @importFrom future.apply future_lapply future_sapply future_mapply
 #' @importFrom dplyr mutate
 #' @importFrom memuse Sys.meminfo
@@ -228,7 +228,7 @@ get_segment_neighbours <- function(g, subc_id = NULL, var_layer = NULL,
 
     # Get the attributes for all edges of the full graph
     lookup_dt <- as.data.table(
-      as_data_frame(g)[c("from", var_layer)])
+      igraph::as_data_frame(g)[c("from", var_layer)])
     names(lookup_dt)[1] <- "stream"
 
     # Merge the network attributes and sort:
