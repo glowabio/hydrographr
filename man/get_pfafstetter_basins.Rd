@@ -16,7 +16,8 @@ get_pfafstetter_basins(
 \arguments{
 \item{g}{igraph object. A directed graph of a basin with one outlet.
 The outlet can be any stream / sub-catchment for which the upstream basin
-should be split into smaller sub-basins. The input graph can be created with \code{\link{read_geopackage()}} and \code{\link{get_catchment_graph.()}}}
+should be split into smaller sub-basins. The input graph can be created with
+\code{\link{read_geopackage()}} and \code{\link{get_catchment_graph()}}.}
 
 \item{subc_raster}{character. Full path to the sub-catchment raster file of
 the basin. Does not need to be cropped / masked to the basin, but the IDs
@@ -34,7 +35,7 @@ as a 2-column data.table (sub-catchment ID and Pfafstetter code). If FALSE,
 the result is loaded as a raster (terra object) in R and written to disk.
 Default is FALSE.}
 
-\item{n_cores}{numeric. Number of cores used for parallelization. Default is
+\item{n_cores}{numeric. Number of cores used for parallelisation. Default is
 NULL (= detectCores(logical=FALSE)-1). Optional.}
 }
 \value{
@@ -49,7 +50,8 @@ hierarchical topological coding scheme (see Verdin & Verdin (1999) for
 details), using the flow accumulation as the basis. The user has to define the
 sub-catchment (stream segment) ID that serves as the outlet of the basin.
 Note that this can be any stream segment that has an upstream catchment.
-The input graph can be created with \code{\link{read_geopackage()}} and \code{\link{get_catchment_graph.()}}
+The input graph can be created with \code{\link{read_geopackage()}} and
+\code{\link{get_catchment_graph()}}.
 }
 \note{
 You can use the online map at https://geo.igb-berlin.de/maps/351/view

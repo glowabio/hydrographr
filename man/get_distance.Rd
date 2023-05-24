@@ -45,7 +45,7 @@ pairs of points is calculated. (see "Details" for more information).
 If method is set to "both", both distance measures are calculated.
 Distances are given in meters. Default is "both".}
 
-\item{n_cores}{numeric. Number of cores used for parallelization.
+\item{n_cores}{numeric. Number of cores used for parallelisation.
 Default is 1.}
 
 \item{quiet}{logical. If FALSE, the standard output will be printed.

@@ -53,7 +53,7 @@ Default is TRUE.}
 }
 \description{
 Delineates the upstream catchment of a given point, where the
-point is considered as the outlet.
+point is considered as the outlet of the catchment.
 }
 \examples{
 # Download test data into temporary R folder

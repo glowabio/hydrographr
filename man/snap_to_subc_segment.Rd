@@ -49,6 +49,10 @@ Default is 1.}
 \item{quiet}{logical. If FALSE, the standard output will be printed.
 Default is TRUE.}
 }
+\value{
+A data.table of the original and new coordinates, along with the
+sub-catchment ID.
+}
 \description{
 Move points to the stream segment within the sub-catchment where the point
 is located.
@@ -122,10 +126,12 @@ head(snapped_coordinates)
 \url{https://grass.osgeo.org/grass82/manuals/v.net.html}
 }
 \seealso{
-\code{\link{snap_to_network}} to snap the data points to the next stream
+\itemize{
+\item \code{\link{snap_to_network()}} to snap the data points to the next stream
 segment within a given radius and/or a given flow accumulation threshold
 value.
-\code{\link{extract_ids}} to extract basin and sub-catchment IDs.
+\item \code{\link{extract_ids()}} to extract basin and sub-catchment IDs.
+}
 }
 \author{
 Jaime Garcia Marquez, Maria M. Üblacker

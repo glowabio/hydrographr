@@ -52,7 +52,8 @@ sub-catchment (i.e. stream segment) IDs. The output is a data.table, and only
 the output is loaded into R.
 }
 \details{
-The following attributes are stored in the stream network .gpkg files:
+The following attributes are stored in the stream network .gpkg files (as
+produced by the GRASS GIS function r.stream.order:
 \itemize{
 \item cat - category
 \item stream - sub-catchment / stream segment ID (equal to cat)
