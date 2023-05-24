@@ -1,6 +1,6 @@
 #' @title Get stream segment neighbours
 #'
-#' @description For each input stream segment, zhe function reports those
+#' @description For each input stream segment, the function reports those
 #' upstream, downstream, or up-and downstream segments that are connected to the
 #' input segment(s) within a specified neighbour order, with the option to
 #' summarize attributes across these segments. Note that the stream
