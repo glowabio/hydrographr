@@ -43,7 +43,7 @@ obtained using the functions "get_tile_id" and "get_regional_unit_id",
 respectively.
 The files will be stored locally in a folder architecture, similar as in the
 data repository, available at
-https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4?path=\%2F.
+\url{https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4?path=\%2F}.
 }
 \details{
 In the following table you can find all the variables included in the

@@ -109,10 +109,12 @@ stat
 \url{https://grass.osgeo.org/grass82/manuals/r.univar.html}
 }
 \seealso{
-\code{\link{report_no_data}} to check the defined NoData value.
-\code{\link{set_no_data}} to define a NoData value.
-\code{\link{crop_to_extent}} to crop the data to the same extent as the
+\itemize{
+\item \code{\link{report_no_data()}} to check the defined NoData value.
+\item \code{\link{set_no_data()}} to define a NoData value.
+\item \code{\link{crop_to_extent()}} to crop the data to the same extent as the
 sub-catchments (subc_layer).
+}
 }
 \author{
 Afroditi Grigoropoulou, Jaime Garcia Marquez, Maria M. Üblacker

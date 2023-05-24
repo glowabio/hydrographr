@@ -1,7 +1,7 @@
 #' @title Delineate the upstream catchment
 
 #' @description Delineates the upstream catchment of a given point, where the
-#' point is considered as the outlet.
+#' point is considered as the outlet of the catchment.
 #'
 #' @param data a data.frame or data.table that contains the columns regarding
 #' the longitude / latitude coordinates in WGS84. Note that the points need to

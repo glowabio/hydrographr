@@ -7,11 +7,14 @@
 #' details), using the flow accumulation as the basis. The user has to define the
 #' sub-catchment (stream segment) ID that serves as the outlet of the basin.
 #' Note that this can be any stream segment that has an upstream catchment.
-#' The input graph can be created with \code{\link{read_geopackage()}} and \code{\link{get_catchment_graph.()}}
+#' The input graph can be created with \code{\link{read_geopackage()}} and
+#' \code{\link{get_catchment_graph()}}.
 #'
 #' @param g igraph object. A directed graph of a basin with one outlet.
 #' The outlet can be any stream / sub-catchment for which the upstream basin
-#' should be split into smaller sub-basins. The input graph can be created with \code{\link{read_geopackage()}} and \code{\link{get_catchment_graph.()}}
+#' should be split into smaller sub-basins. The input graph can be created with
+#' \code{\link{read_geopackage()}} and \code{\link{get_catchment_graph()}}.
+#'
 #' @param subc_raster character. Full path to the sub-catchment raster file of
 #' the basin. Does not need to be cropped / masked to the basin, but the IDs
 #' of the sub-catchments need to match with those in the input graph.
@@ -24,10 +27,10 @@
 #' @param file_name character. The filename and extension of the Pfafstetter
 #' raster layer (e.g. 'pfafstetter_raster.tif"). Only needed when
 #' data.table=FALSE.
-#' @param n_cores numeric. Number of cores used for parallelization. Default is
+#' @param n_cores numeric. Number of cores used for parallelisation. Default is
 #' NULL (= detectCores(logical=FALSE)-1). Optional.
 #'
-#' @return Either a data.table, or a raster (terra object) loaded into R. In
+#' @returns Either a data.table, or a raster (terra object) loaded into R. In
 #' case the result is a raster, then a .tif file is written to disk.
 #'
 #' @importFrom data.table setDT rbindlist setorder setnames as.data.table setkey

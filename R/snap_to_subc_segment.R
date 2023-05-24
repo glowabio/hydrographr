@@ -43,14 +43,19 @@
 #'
 #' @author Jaime Garcia Marquez, Maria M. Üblacker
 #'
+#' @returns
+#' A data.table of the original and new coordinates, along with the
+#' sub-catchment ID.
+#'
 #' @references
 #' \url{https://grass.osgeo.org/grass82/manuals/v.net.html}
 #'
 #' @seealso
-#' \code{\link{snap_to_network}} to snap the data points to the next stream
+#' * \code{\link{snap_to_network()}} to snap the data points to the next stream
 #' segment within a given radius and/or a given flow accumulation threshold
 #' value.
-#' \code{\link{extract_ids}} to extract basin and sub-catchment IDs.
+#' * \code{\link{extract_ids()}} to extract basin and sub-catchment IDs.
+#' @md
 #'
 #'@examples
 #' # Download test data into the temporary R folder

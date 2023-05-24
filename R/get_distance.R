@@ -3,8 +3,8 @@
 #' @description
 #' Calculate euclidean or along-the-network distance (in meters) between points.
 #' To calculate the distance along the network, point coordinates need to be
-#' snapped to the stream network using the function \code{\link{snap_to_network}}
-#' or \code{\link{snap_to_subc_segment}}.
+#' snapped to the stream network using the function \code{\link{snap_to_network()}}
+#' or \code{\link{snap_to_subc_segment()}}.
 #'
 #'
 #' @param data a data.frame or data.table that contains the columns regarding
@@ -26,7 +26,7 @@
 #' pairs of points is calculated. (see "Details" for more information).
 #' If method is set to "both", both distance measures are calculated.
 #' Distances are given in meters. Default is "both".
-#' @param n_cores numeric. Number of cores used for parallelization.
+#' @param n_cores numeric. Number of cores used for parallelisation.
 #' Default is 1.
 #' @param quiet logical. If FALSE, the standard output will be printed.
 #' Default is TRUE.
@@ -65,12 +65,13 @@
 #' \url{https://grass.osgeo.org/grass82/manuals/v.distance.html}
 #'
 #' @seealso
-#' \code{\link{snap_to_network}} to snap the data points to the next stream
+#' * \code{\link{snap_to_network()}} to snap the data points to the next stream
 #' segment within a given radius and/or a given flow accumulation threshold
 #' value.
-#' \code{\link{snap_to_subc_segment}} to snap the data points to the next stream
+#' * \code{\link{snap_to_subc_segment()}} to snap the data points to the next stream
 #' segment of the sub-catchment the data point is located.
-#' \code{\link{extract_ids}} to extract basin and sub-catchment IDs.
+#' * \code{\link{extract_ids()}} to extract basin and sub-catchment IDs.
+#' @md
 #'
 #'@examples
 #' # Download test data into the temporary R folder

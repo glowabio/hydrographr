@@ -97,9 +97,9 @@ g_all <- get_catchment_graph(g = my_graph, mode = "in", outlet = TRUE,
 \references{
 Csardi G, Nepusz T: The igraph software package for complex network research,
 InterJournal, Complex Systems 1695. 2006. \url{https://igraph.org}
-
-#' @seealso
-\code{\link{read_geopackage}} to create a network graph.
+}
+\seealso{
+\code{\link{read_geopackage()}} to create a network graph.
 }
 \author{
 Sami Domisch

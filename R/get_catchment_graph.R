@@ -16,7 +16,7 @@
 #' IDs for which to delineate the upstream drainage area.
 #' If empty, then outlets will be used as sub-catchment IDs
 #' (with outlet = TRUE). Note that you can browse the entire network online at
-#' https://geo.igb-berlin.de/maps/351/view and to left hand side, select the
+#' \url{https://geo.igb-berlin.de/maps/351/view} and to left hand side, select the
 #' "Stream segment ID"  layer and click on the map to get the ID. Optional.
 #' @param outlet logical. If TRUE, the outlets of the given network graph will
 #' be used as additional input subc_ids. Outlets will be identified internally
@@ -29,9 +29,9 @@
 #' @param mode character. One of "in", "out" or "all". "in" returns the
 #' upstream catchment, "out" returns the downstream catchment (all catchments
 #' that are reachable from the given input segment), and "all" returns both.
-#' @param n_cores numeric. Number of cores used for parallelization
+#' @param n_cores numeric. Number of cores used for parallelisation
 #' in the case of multiple stream segments / outlets. Default is 1.
-#' Currently, the parallelization process requires copying the data to each
+#' Currently, the parallelisation process requires copying the data to each
 #' core. In case the graph is very large, and many segments are
 #' used as an input, setting n_cores to a higher value can speed up the
 #' computation. This comes however at the cost of possible RAM limitations
@@ -41,7 +41,7 @@
 #' parallel back-end in MB. Default is 1500 (1.5 GB). Consider a higher value
 #' for large study areas (more than one 20°x20° tile). Optional.
 #'
-#' @return A graph or data.table that reports all subc_ids.
+#' @returns A graph or data.table that reports all subc_ids.
 #' In case of multiple input segments, the results are stored in a list.
 #'
 #' @importFrom future plan multisession multicore sequential
@@ -60,8 +60,13 @@
 #' Csardi G, Nepusz T: The igraph software package for complex network research,
 #' InterJournal, Complex Systems 1695. 2006. \url{https://igraph.org}
 #'
-#' #' @seealso
-#' \code{\link{read_geopackage}} to create a network graph.
+#' @seealso
+#' \code{\link{read_geopackage()}} to create a network graph.
+#'
+#' @note
+#' Currently the attributes are not provided for the outlet (the selected
+#' subc_id segment). If the attributes are also needed for the outlet subc_id,
+#' then the next downstream sub_id can be selected (enlarge the study area)
 #'
 #' @examples
 #' # Download test data into the temporary R folder
@@ -149,7 +154,7 @@ get_catchment_graph <- function(g, subc_id = NULL, outlet = FALSE, mode = NULL,
     }
   }
 
-  #  Remove any duplicate segmenrIDs
+  #  Remove any duplicate segmentIDs
   subc_id <- subc_id[!duplicated(subc_id)]
 
   # Set up parallel backend if multiple segments

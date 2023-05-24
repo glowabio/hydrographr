@@ -62,8 +62,8 @@ of the shortest path along the network from the point "from_id" to the point
 \description{
 Calculate euclidean or along-the-network distance (in meters) between points.
 To calculate the distance along the network, point coordinates need to be
-snapped to the stream network using the function \code{\link{snap_to_network}}
-or \code{\link{snap_to_subc_segment}}.
+snapped to the stream network using the function \code{\link{snap_to_network()}}
+or \code{\link{snap_to_subc_segment()}}.
 }
 \details{
 To calculate the euclidian distance between all pairs of points the function
@@ -130,12 +130,14 @@ distance_table
 \url{https://grass.osgeo.org/grass82/manuals/v.distance.html}
 }
 \seealso{
-\code{\link{snap_to_network}} to snap the data points to the next stream
+\itemize{
+\item \code{\link{snap_to_network()}} to snap the data points to the next stream
 segment within a given radius and/or a given flow accumulation threshold
 value.
-\code{\link{snap_to_subc_segment}} to snap the data points to the next stream
+\item \code{\link{snap_to_subc_segment()}} to snap the data points to the next stream
 segment of the sub-catchment the data point is located.
-\code{\link{extract_ids}} to extract basin and sub-catchment IDs.
+\item \code{\link{extract_ids()}} to extract basin and sub-catchment IDs.
+}
 }
 \author{
 Afroditi Grigoropoulou, Maria M. Üblacker, Jaime Garcia Marquez

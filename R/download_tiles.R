@@ -12,7 +12,7 @@
 #' respectively.
 #' The files will be stored locally in a folder architecture, similar as in the
 #' data repository, available at
-#' https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4?path=%2F.
+#' \url{https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4?path=%2F}.
 #'
 #' @param variable character vector of variable names. See Details for all the
 #' variable names.
@@ -34,7 +34,7 @@
 #' Grigoropoulou A., Üblacker M., Shen L. & Domisch S. (2022-08-09 )
 #' Hydrography90m: A new high-resolution global hydrographic dataset.
 #' IGB Leibniz-Institute of Freshwater Ecology and Inland Fisheries.
-#' dataset. https://doi.org/10.18728/igb-fred-762.1
+#' dataset. \url{https://doi.org/10.18728/igb-fred-762.1}
 #'
 #' @details
 #' In the following table you can find all the variables included in the

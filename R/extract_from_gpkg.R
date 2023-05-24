@@ -43,7 +43,8 @@
 #' \url{https://grass.osgeo.org/grass82/manuals/addons/r.stream.order.html}
 #'
 #' @details
-#' The following attributes are stored in the stream network .gpkg files:
+#' The following attributes are stored in the stream network .gpkg files (as
+#' produced by the GRASS GIS function r.stream.order:
 #'
 #' * cat - category
 #' * stream - sub-catchment / stream segment ID (equal to cat)
