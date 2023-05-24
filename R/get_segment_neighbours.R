@@ -1,16 +1,17 @@
 #' @title Get stream segment neighbours
 #'
-#' @description For each input stream segment, reports those upstream, downstream,
-#' or up-and downstream segments that are connected to the input
-#' segment(s) within a specified neighbour order, with the option to
+#' @description For each input stream segment, zhe function reports those
+#' upstream, downstream, or up-and downstream segments that are connected to the
+#' input segment(s) within a specified neighbour order, with the option to
 #' summarize attributes across these segments. Note that the stream
 #' segment and sub-catchment IDs are identical, and for consistency,
 #' we use the term "subc_id". The input graph can be created with
-#' \code{\link{read_geopackage()}} and \code{\link{get_catchment_graph.()}}
+#' \code{\link{read_geopackage()}} and \code{\link{get_catchment_graph()}}.
 #'
 #' This function can be used to obtain the neighbour stream segments /
 #' sub-catchments for spatially explicit models or for spatial prioritization
-#' analyses (e.g. Marxan/Gurobi).
+#' analyses (e.g. Marxan/Gurobi). By selecting a wider radius, the spatial
+#' dependency of the neighbouring segments / sub-catchments can be increased.
 #'
 #' @param g igraph object. A directed graph.
 #' @param subc_id numeric vector of the input sub-catchment IDs
@@ -48,11 +49,23 @@
 #' @importFrom parallel detectCores
 #' @importFrom data.table as.data.table setDT setnames
 #' rbindlist setcolorder setkey
-#' @importFrom igraph ego as_ids is_directed
+#' @importFrom igraph ego as_ids is_directed as_long_data_frame
 #' @importFrom future.apply future_lapply future_sapply future_mapply
 #' @importFrom dplyr mutate
 #' @importFrom memuse Sys.meminfo
 #' @export
+#'
+#'
+#' @returns
+#' A data.table indicating the connected segments (stream  | to_stream), or a
+#' data.table that summarizes the attributes of those neighbours contributing
+#' to each segment.
+#'
+#' #' @note
+#' Currently the attributes are not provided for the outlet (the selected
+#' subc_id segment). If the attributes are also needed for the outlet subc_id,
+#' then the next downstream sub_id can be selected (enlarge the study area)
+#' using e.g. \code{\link{get_catchment_graph()}}.
 #'
 #' @author Sami Domisch
 #'
@@ -75,6 +88,19 @@
 #'                                          "/hydrography90m_test_data",
 #'                                          "/order_vect_59.gpkg"),
 #'                             import_as = "graph")
+#'
+#' # Subset the graph and get a smaller catchment
+#' my_graph <- get_catchment_graph(g = my_graph, subc_id = 513866048, mode = "in",
+#'                                 outlet = FALSE, as_graph = TRUE, n_cores = 1)
+#'
+#'
+#' Get a vector of all segment IDs
+#' library(igraph)
+#' subc_id <- as_ids(V(my_graph))
+#'
+#'
+#' # Get all directly adjacent neighbours of each segment
+#'
 #'
 #' # Get the upstream segment neighbours in the 5th order
 #' # and report the length and source elevation
@@ -189,22 +215,27 @@ get_segment_neighbours <- function(g, subc_id = NULL, var_layer = NULL,
   names(dt)[1] <- "to_stream"
   setkey(dt, stream)
   dt <- unique(dt) # remove any duplicates, if any
+  setcolorder(dt, c("stream", "to_stream"))
+  # Remove the from-stream, self-reference
+  dt <- dt[dt$stream != dt$to_stream, ]
+
 
   # If aggregation was defined:
   if (!missing(var_layer)) {
 
-
     cat("Attaching the attribute(s)", var_layer, "\n")
+    # igraph::as_data_frame seems to omit the attributes of the outlet
+
     # Get the attributes for all edges of the full graph
     lookup_dt <- as.data.table(
-      as_long_data_frame(g)[c("ver[el[, 1], ]", var_layer)])
-    names(lookup_dt)[1] <- "to_stream"
+      as_data_frame(g)[c("from", var_layer)])
+    names(lookup_dt)[1] <- "stream"
 
     # Merge the network attributes and sort:
     # dt_join <- merge(dt, lookup_dt, by="to_stream", all.x=TRUE)
     # lookup_dt[dt, on="stream"]  gives NAs
     # dt_join <- dt[lookup_dt, on="to_stream"]
-    dt_join <- lookup_dt[dt, on = "to_stream"]
+    dt_join <- lookup_dt[dt, on = "stream"]
     dt_join <- dt_join[order(-rank(stream))]
     # Remove the from-stream, self-reference
     dt_join <- dt_join[dt_join$stream != dt_join$to_stream, ]
