@@ -15,7 +15,8 @@ extract_ids(
 )
 }
 \arguments{
-\item{data}{a data.frame or data.table with lat/lon coordinates in WGS84.}
+\item{data}{a data.frame or data.table that contains the columns regarding
+the longitude / latitude coordinates in WGS84.}
 
 \item{lon}{character. The name of the column with the longitude coordinates.}
 
@@ -24,24 +25,26 @@ extract_ids(
 \item{id}{character. The name of a column containing unique IDs for each row
 of "data" (e.g., occurrence or site IDs).}
 
-\item{basin_layer}{character. Full path to the basin ID .tif layer.}
+\item{basin_layer}{character. Full path to the .tif layer with the basin ID.}
 
-\item{subc_layer}{character. Full path to the sub-catchment ID .tif layer.}
+\item{subc_layer}{character. Full path to the .tif layer with the
+sub-catchment ID.}
 
 \item{quiet}{logical. If FALSE, the standard output will be printed.
 Default is TRUE.}
 }
 \description{
-Extracts the ID value of the basin and/or sub-catchment raster layer at a
-given point location.
+Extracts the ID value of the basin and/or sub-catchment raster
+layer at given point locations. Can also be used for point-based extraction
+of any .tif layer by specifying the layer in the "basin" parameter.
 }
 \details{
 For the extraction of a value at a given point location from the basin
 and/or sub-catchment raster layer of the Hydrography90m dataset, the GDAL
 function 'gdallocationinfo' is used. The point locations have to be defined
-by coordinates of the WGS84 reference system. The function can also be used
-to extract any value from a given raster layer with a WGS84 projection, such
-as e.g. environmental information that is stored in the input raster file.
+by coordinates in the WGS84 reference system. The function can also be used
+to extract any value from a given raster layer in a WGS84 projection, such
+as environmental information that is stored in the input raster file.
 }
 \note{
 Duplicated rows will be removed.

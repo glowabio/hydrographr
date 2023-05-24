@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_catchment_graph.R
 \name{get_catchment_graph}
 \alias{get_catchment_graph}
-\title{Get catchment from graph}
+\title{Get catchment from stream network graph}
 \usage{
 get_catchment_graph(
   g,
@@ -57,14 +57,15 @@ A graph or data.table that reports all subc_ids.
 In case of multiple input segments, the results are stored in a list.
 }
 \description{
-Subset the network graph by extracting the upstream, downstream
-or entire catchment, for one or multiple stream segments. The function will
-return either one or more data.tables or graph objects for each input stream
-segment. Note that the stream segment and sub-catchment IDs are identical,
-and for consistency, we use the term "subc_id".
+Subset the stream network graph by extracting the upstream,
+downstream or entire catchment, for one or multiple stream segments. The
+function will return either one or more data.tables or graph objects for
+each input stream segment. Note that the stream segment and sub-catchment
+IDs are identical, and for consistency, we use the term "subc_id".
 
 By switching the mode to either "in", "out" or "all", only the upstream,
-downstream or all connected segments will be returned.
+downstream or all connected segments will be returned, respectively. The
+function \code{\link{read_geopackage()}} can be used to create the input network graph.
 }
 \examples{
 # Download test data into the temporary R folder
@@ -96,6 +97,9 @@ g_all <- get_catchment_graph(g = my_graph, mode = "in", outlet = TRUE,
 \references{
 Csardi G, Nepusz T: The igraph software package for complex network research,
 InterJournal, Complex Systems 1695. 2006. \url{https://igraph.org}
+}
+\seealso{
+\code{\link{read_geopackage()}} to create a network graph.
 }
 \author{
 Sami Domisch

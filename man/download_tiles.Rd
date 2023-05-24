@@ -31,12 +31,19 @@ Default is FALSE.}
 downloaded. Default is the working directory.}
 }
 \description{
-The function downloads files of the Hydrography90m
-dataset, available at https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4?path=\%2F .
-The files will be stored in the folder architecture of the above domain.
-Multiple regular tile or regional unit files can be requested in a single
-call of the function. The tile or regional unit IDs can be obtained
-using the functions "get_tile_id" and "get_regional_unit_id" respectively.
+The function downloads data of the Hydrography90m
+dataset, which is split into 20°x20° tiles. If a tile ID is specified, then
+the selected layers (variable) will be downloaded. In addition,
+the Hydrography90m is organized in non-interrupted drainage basins called
+regional units. If a regional unit ID (reg_unit_id) is specified, then only
+the raster mask of the drainage basin is downloaded (useful for later
+processing). Multiple regular tiles, e.g. belonging to regional units, can be
+downloaded in a single request. The tile or regional unit IDs can be
+obtained using the functions "get_tile_id" and "get_regional_unit_id",
+respectively.
+The files will be stored locally in a folder architecture, similar as in the
+data repository, available at
+\url{https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4?path=\%2F}.
 }
 \details{
 In the following table you can find all the variables included in the

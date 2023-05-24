@@ -28,7 +28,7 @@ of the input graph that should be reported for each output segment_id
 
 \item{stat}{one of the functions mean, median, min, max, sd (without quotes).
 Aggregates (or summarizes) the variables for the neighbourhood of each input
-segment ("stream", e.g., the average land cover in the next five upstream
+segment (e.g., the average land cover in the next five upstream
 segments or sub-catchments). Default is NULL.}
 
 \item{attach_only}{logical. If TRUE, the selected variables will be only
@@ -43,31 +43,31 @@ those sub-catchment IDs in order 1, and so on.}
 upstream neighbouring segments, "out" returns only the downstream segments,
 and "all" returns both.}
 
-\item{n_cores}{numeric. Number of cores used for parallelization
+\item{n_cores}{numeric. Number of cores used for parallelisation
 in the case of multiple stream segments / outlets. Default is 1.
-Currently, the parallelization process requires copying the data to each
+Note that the parallelisation process requires copying the data to each
 core. In case the graph is very large, and many segments are
 used as an input, setting n_cores to a higher value can speed up the
 computation. This comes however at the cost of possible RAM limitations
 and even slower processing since the large data will be copied to each core.
-Hence consider testing with n_cores = 1 first. Optional.}
+Hence consider testing first with n_cores = 1. Optional.}
 
 \item{max_size}{numeric. Specifies the maximum size of the data passed to the
 parallel back-end in MB. Default is 1500 (1.5 GB). Consider a higher value
 for large study areas (more than one 20°x20° tile). Optional.}
 }
 \description{
-For each segment, reports those upstream, downstream, or up-and
-downstream segments that are connected to one or multiple input
-segments within a specified neighbour order, with the option to
+For each input stream segment, reports those upstream, downstream,
+or up-and downstream segments that are connected to the input
+segment(s) within a specified neighbour order, with the option to
 summarize attributes across these segments. Note that the stream
 segment and sub-catchment IDs are identical, and for consistency,
-we use the term "subc_id".
+we use the term "subc_id". The input graph can be created with
+\code{\link{read_geopackage()}} and \code{\link{get_catchment_graph.()}}
 
-This function can also be used to create the connectivity table
-for Marxan by using var_layer="length" and attach_only=TRUE.
-The resulting table reports the connectivity from each segment,
-along with the stream length for all connected segments.
+This function can be used to obtain the neighbour stream segments /
+sub-catchments for spatially explicit models or for spatial prioritization
+analyses (e.g. Marxan/Gurobi).
 }
 \examples{
 # Download test data into the temporary R folder
@@ -109,6 +109,10 @@ get_segment_neighbours(g = my_graph, subc_id = subc_id, order = 2,
 \references{
 Csardi G, Nepusz T: The igraph software package for complex network research,
 InterJournal, Complex Systems 1695. 2006. \url{https://igraph.org}
+}
+\seealso{
+\code{\link{read_geopackage()}} and \code{\link{get_catchment_graph.()}} to
+create the input graph.
 }
 \author{
 Sami Domisch

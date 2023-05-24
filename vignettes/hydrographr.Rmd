@@ -34,7 +34,8 @@ Here you can find the installation guideline for your operating systems:
 
 [Windows](https://glowabio.github.io/hydrographr/articles/windows_system_setup.html)
 
-macOS
+[macOS](https://glowabio.github.io/hydrographr/articles/macos_system_setup.html)
+
 
 ## Loading `hydrographr`
 

@@ -1,13 +1,14 @@
 #' @title Calculate euclidean or along the network distance between points
 #'
 #' @description
-#' Calculate euclidean or along the network distance between points. To calculate
-#' the distance along the network, point coordinates need to be snapped to the
-#' stream network using the function \code{\link{snap_to_network}} or
-#' \code{\link{snap_to_subc_segment}}.
+#' Calculate euclidean or along-the-network distance (in meters) between points.
+#' To calculate the distance along the network, point coordinates need to be
+#' snapped to the stream network using the function \code{\link{snap_to_network()}}
+#' or \code{\link{snap_to_subc_segment()}}.
 #'
 #'
-#' @param data a data.frame or data.table with lat/lon coordinates in WGS84.
+#' @param data a data.frame or data.table that contains the columns regarding
+#' the longitude / latitude coordinates in WGS84.
 #' @param lon character. The name of the column with the longitude coordinates.
 #' @param lat character. The name of the column with the latitude coordinates.
 #' @param id character. The name of a column containing unique IDs for each row
@@ -25,7 +26,7 @@
 #' pairs of points is calculated. (see "Details" for more information).
 #' If method is set to "both", both distance measures are calculated.
 #' Distances are given in meters. Default is "both".
-#' @param n_cores numeric. Number of cores used for parallelization.
+#' @param n_cores numeric. Number of cores used for parallelisation.
 #' Default is 1.
 #' @param quiet logical. If FALSE, the standard output will be printed.
 #' Default is TRUE.
@@ -38,24 +39,24 @@
 #' @export
 #'
 #' @details
-#' To calculate the euclidian distance between all pair of points the function
+#' To calculate the euclidian distance between all pairs of points the function
 #' uses the v.distance command of GRASS GIS, which has been set up to produce a
 #' square matrix of distances. The calculation of distances along the stream
 #' network has been implemented with the command v.net.allpairs of GRASS GIS.
-#' The along the network distance calculation is done for all pair points
+#' The along-the-network distance calculation is done for all pairs of points
 #' located within the same basin. If the points are located in
-#' different basins the function can be run in parallel (i.e., each core for
+#' different basins, the function can be run in parallel (i.e., each core for
 #' the distance calculations of all points within one basin). The
-#' distance between points located in different
-#' basins is zero because they are not connected through the network.
+#' distance between points located in different basins is zero because they are
+#' not connected through the network.
 #'
 #' @returns
-#' If distance='euclidean', a distance matrix, in meters, of the euclidean distances between
-#' all the pairs of points (object of class data.frame). If distance='network',
-#' a data.frame with three columns: from_id, to_id, dist. The 'dist' column
-#' includes the distance, in meters, of the shortest path along the network from the node
-#' from_id to the node to_id. If distance='both', a list containing both objects
-#' is returned.
+#' If distance='euclidean', a distance matrix, in meters, of the euclidean
+#' distances between all the pairs of points (object of class data.frame)
+#' is returned. If distance='network', a data.frame with three columns: from_id,
+#' to_id, dist is returned. The 'dist' column includes the distance, in meters,
+#' of the shortest path along the network from the point "from_id" to the point
+#' "to_id". If distance='both', a list containing both objects is returned.
 #'
 #' @author Afroditi Grigoropoulou, Maria M. Üblacker, Jaime Garcia Marquez
 #'
@@ -64,12 +65,13 @@
 #' \url{https://grass.osgeo.org/grass82/manuals/v.distance.html}
 #'
 #' @seealso
-#' \code{\link{snap_to_network}} to snap the data points to the next stream
+#' * \code{\link{snap_to_network()}} to snap the data points to the next stream
 #' segment within a given radius and/or a given flow accumulation threshold
 #' value.
-#' \code{\link{snap_to_subc_segment}} to snap the data points to the next stream
+#' * \code{\link{snap_to_subc_segment()}} to snap the data points to the next stream
 #' segment of the sub-catchment the data point is located.
-#' \code{\link{extract_ids}} to extract basin and sub-catchment IDs.
+#' * \code{\link{extract_ids()}} to extract basin and sub-catchment IDs.
+#' @md
 #'
 #'@examples
 #' # Download test data into the temporary R folder

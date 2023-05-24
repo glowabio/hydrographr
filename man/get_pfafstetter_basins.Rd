@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_pfafstetter_basins.R
 \name{get_pfafstetter_basins}
 \alias{get_pfafstetter_basins}
-\title{Get Pfafstetter basins}
+\title{Get Pfafstetter sub-basins}
 \usage{
 get_pfafstetter_basins(
   g,
@@ -16,11 +16,11 @@ get_pfafstetter_basins(
 \arguments{
 \item{g}{igraph object. A directed graph of a basin with one outlet.
 The outlet can be any stream / sub-catchment for which the upstream basin
-should be split into smaller ones.}
+should be split into smaller sub-basins. The input graph can be created with \code{\link{read_geopackage()}} and \code{\link{get_catchment_graph.()}}}
 
 \item{subc_raster}{character. Full path to the sub-catchment raster file of
 the basin. Does not need to be cropped / masked to the basin, but the IDs
-of the sub-catchments need to match with the input graph.}
+of the sub-catchments need to match with those in the input graph.}
 
 \item{out_dir}{character. The path of the output directory where the
 Pfafstetter raster layer will be written. Only needed when data.table=FALSE.}
@@ -42,17 +42,14 @@ Either a data.table, or a raster (terra object) loaded into R. In
 case the result is a raster, then a .tif file is written to disk.
 }
 \description{
-Subset a basin or catchment into up to nine smaller units following the
-Pfafstetter basin delineation scheme.
-}
-\details{
-Each drainage basin can be split into smaller sub-basins following a
+Subset a basin or catchment into up to nine smaller sub-basins following the
+Pfafstetter basin delineation scheme. The functions takes a network graph as
+the input and splits it into smaller sub-basins following a
 hierarchical topological coding scheme (see Verdin & Verdin (1999) for
-details). This function splits a given basin into up to nine sub-basins
-using the flow accumulation as the basis. The user has to define the
+details), using the flow accumulation as the basis. The user has to define the
 sub-catchment (stream segment) ID that serves as the outlet of the basin.
-Note that this can be any stream segment with a sufficient number of upstream
-segments (sub-catchments).
+Note that this can be any stream segment that has an upstream catchment.
+The input graph can be created with \code{\link{read_geopackage()}} and \code{\link{get_catchment_graph.()}}
 }
 \note{
 You can use the online map at https://geo.igb-berlin.de/maps/351/view
@@ -102,6 +99,10 @@ pfafstetter <- get_pfafstetter_basins(g = g_subset ,
 Verdin, K.L. & Verdin, J.P. (1999). A topological system
 for delineation and codification of the Earth’s river basins. Journal
 of Hydrology, 218(1-2), 1-12. doi:10.1016/s0022-1694(99)00011-6
+}
+\seealso{
+\code{\link{read_geopackage()}} and \code{\link{get_catchment_graph.()}} to
+create the input graph.
 }
 \author{
 Sami Domisch

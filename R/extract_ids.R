@@ -1,15 +1,18 @@
 #' @title Extract sub-catchment and/or basin IDs
 #'
-#' @description Extracts the ID value of the basin and/or sub-catchment raster layer at a
-#' given point location.
+#' @description Extracts the ID value of the basin and/or sub-catchment raster
+#' layer at given point locations. Can also be used for point-based extraction
+#' of any .tif layer by specifying the layer in the "basin" parameter.
 #'
-#' @param data a data.frame or data.table with lat/lon coordinates in WGS84.
+#' @param data a data.frame or data.table that contains the columns regarding
+#' the longitude / latitude coordinates in WGS84.
 #' @param lon character. The name of the column with the longitude coordinates.
 #' @param lat character. The name of the column with the latitude coordinates.
 #' @param id character. The name of a column containing unique IDs for each row
 #' of "data" (e.g., occurrence or site IDs).
-#' @param basin_layer character. Full path to the basin ID .tif layer.
-#' @param subc_layer character. Full path to the sub-catchment ID .tif layer.
+#' @param basin_layer character. Full path to the .tif layer with the basin ID.
+#' @param subc_layer character. Full path to the .tif layer with the
+#' sub-catchment ID.
 #' @param quiet logical. If FALSE, the standard output will be printed.
 #' Default is TRUE.
 #'
@@ -22,9 +25,9 @@
 #' For the extraction of a value at a given point location from the basin
 #' and/or sub-catchment raster layer of the Hydrography90m dataset, the GDAL
 #' function 'gdallocationinfo' is used. The point locations have to be defined
-#' by coordinates of the WGS84 reference system. The function can also be used
-#' to extract any value from a given raster layer with a WGS84 projection, such
-#' as e.g. environmental information that is stored in the input raster file.
+#' by coordinates in the WGS84 reference system. The function can also be used
+#' to extract any value from a given raster layer in a WGS84 projection, such
+#' as environmental information that is stored in the input raster file.
 #'
 #' @note
 #' Duplicated rows will be removed.

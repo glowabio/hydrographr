@@ -19,7 +19,7 @@ export level=$8
 export bigtiff=$9
 
 
-# R_INPUT is the path to a raster to crop, XMIN, YMIN, LRX and YMAX are
+# R_INPUT is the path to a raster to crop, XMIN, YMIN, XMAX and YMAX are
 # the coordinates of the corner of a bounding box
 # and R_OUTPUT the path to the cropped raster
 

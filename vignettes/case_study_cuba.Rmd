@@ -411,7 +411,7 @@ merge_tiles(tile_dir = idir,
 
 
 # ...or in a loop
-for(idir in dirs_h90m) {
+for(idir in dirs_h90m[c(1,3,4)]) {
   # Get input file extension
   file_extension <- file_ext(list.files(idir, full.names = FALSE)[1])
 
@@ -426,7 +426,8 @@ for(idir in dirs_h90m) {
                                       pattern = "_crop.tif"),
               out_dir = layer_dir,
               file_name = ivar_name,
-              read = FALSE)
+              read = FALSE, 
+              bigtiff = TRUE)
 }
 ```
 

@@ -51,6 +51,34 @@ The function reads the attribute table of the stream network GeoPackage file
 sub-catchment (i.e. stream segment) IDs. The output is a data.table, and only
 the output is loaded into R.
 }
+\details{
+The following attributes are stored in the stream network .gpkg files:
+\itemize{
+\item cat - category
+\item stream - sub-catchment / stream segment ID (equal to cat)
+\item next_stream - downstream sub-catchment / stream segment ID
+\item prev_streams; two or more uptstream sub-catchment / stream segment IDs
+\item strahler - Strahler's stream order
+\item horton - Hortons's stream order
+\item shreve - Shreve's stream magnitude
+\item hack - Hack's main streams or Gravelius order
+\item topo_dim - Topological dimension streams order
+\item scheidegger - Scheidegger's Consisted Associated Integers
+\item drwal - Drwal's stream hierarchy
+\item length - length of the stream segment
+\item stright - length of the stream segment as a stright line
+\item sinusoid - fractal dimension: stream segment length / stright stream
+\item segment length;
+\item cum_length - length of the stream from the source
+\item flow_accum - flow accumulation within the sub-catchment of a stream segment
+\item out_dist - distance of current stream initialisation from outlet
+\item source_elev - elevation at stream segment initialisation
+\item outlet_elev - elevation at stream segment outlet
+\item elev_drop difference between source_elev and outlet_elev + drop outlet
+\item out_drop - drop at the outlet of the stream segment
+\item gradient - drop/length
+}
+}
 \examples{
 # Download test data into temporary R folder
 # or define a different directory
@@ -77,6 +105,7 @@ attribute_table
 }
 \references{
 \url{https://grass.osgeo.org/grass82/manuals/v.in.ogr.html}
+\url{https://grass.osgeo.org/grass82/manuals/addons/r.stream.order.html}
 }
 \author{
 Afroditi Grigoropoulou, Jaime Garcia Marquez, Maria M. Üblacker
