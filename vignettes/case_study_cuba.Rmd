@@ -44,7 +44,7 @@ map.
 
 ![](../man/figures/wf_0.png)
 
-![](../man/figures/SDM.png)
+<!--![](../man/figures/SDM.png)-->
 
 [*Hypolestes trinitatis*](https://www.gbif.org/species/1424240) is a
 damselfly species endemic to Cuba. The species inhabits rivers and
@@ -205,7 +205,7 @@ IDs using the function *get_tile_id()*. This function downloads and uses
 the auxiliary raster file that contains all the regional units globally,
 and thus requires an active internet connection.
 
-![](../man/figures/wf_1.png)
+<!--![](../man/figures/wf_1.png)-->
 
 ```{r, eval = FALSE}
 tile_id <- get_tile_id(data = spdata, lon = "longitude", lat = "latitude")
@@ -233,7 +233,7 @@ and "h10v06", so we will keep only these two.
 tile_id <- tile_id[c(1,3)]
 ```
 
-![](../man/figures/wf_2.png)
+<!--![](../man/figures/wf_2.png)-->
 
 Let's define the Hydrography90m variables that we would like to
 download. We will use the variables
@@ -306,7 +306,7 @@ destfile = "data/chelsa_bioclim/bio1_IPSL-CM6A-LR_ssp370_2041-2070.tif", mode = 
 
 
 ### Cropping
-![](../man/figures/wf_3.png)
+<!--![](../man/figures/wf_3.png)-->
 
 After having downloaded all the layers, we need to crop them to the
 extent of our study area. This is straightforward in the case of the
@@ -378,7 +378,7 @@ for(idir in dirs_h90m) {
 ```
 
 ### Merging
-![](../man/figures/wf_4.png)
+<!--![](../man/figures/wf_4.png)-->
 The cropped tiles of the variable now need to be merged together.
 
 ```{r, eval = FALSE}
@@ -439,7 +439,7 @@ a vector of sub-catchment IDs as input. Note that the function
 any raster file provided to the argument *subc_layer*. It can be safely
 used to query very large raster files, as these are not loaded into R.
 
-![](../man/figures/wf_5.png)
+<!--![](../man/figures/wf_5.png)-->
 
 ```{r, eval = FALSE}
 spdata_ids <- extract_ids(data = spdata, lon = "longitude", lat = "latitude",
@@ -468,7 +468,7 @@ cause memory problems. However, this highly depends to the number of
 sub-catchments as well. We recommend to test the function with different
 parameters to find out what works best for your case.
 
-![](../man/figures/wf_6.png)
+<!--![](../man/figures/wf_6.png)-->
 
 
 ```{r, eval = FALSE}
@@ -624,7 +624,7 @@ rm(stats_gpkg_h08v06, stats_gpkg_h10v06); gc()
 
 ### Prepare data for modelling
 
-![](../man/figures/wf_7.png)
+<!--![](../man/figures/wf_7.png)-->
 
 Join the stats_table with the .gpkg database
 
@@ -885,7 +885,7 @@ including the future Bioclim variables.
 pred <- predict(model, data = stats_table_future[,!1])
 ```
 
-![](../man/figures/wf_8.png)
+<!--![](../man/figures/wf_8.png)-->
 We can now reclassify the sub-catchment raster based on the predicted
 probabilities of occurrence, to visualise the potential suitable
 habitats of the species. For this purpose we will use the
