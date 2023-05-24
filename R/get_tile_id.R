@@ -3,7 +3,8 @@
 #' @description Identifies the 20°x20° tile IDs of the Hydrography90m
 #' data in which the input points are located. The IDs can then be used to
 #' download the data using \code{\link{download_tiles()}}. The input is a data
-#' frame with point coordinates.
+#' frame with point coordinates. For orientation, please also see the tiles at
+#' the \url{https://hydrography.org/hydrography90m/hydrography90m_layers}
 #'
 #' @param data a data.frame or data.table that contains the columns regarding
 #' the longitude / latitude coordinates in WGS84.

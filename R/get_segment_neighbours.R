@@ -94,7 +94,7 @@
 #'                                 outlet = FALSE, as_graph = TRUE, n_cores = 1)
 #'
 #'
-#' Get a vector of all segment IDs
+#' # Get a vector of all segment IDs
 #' library(igraph)
 #' subc_id <- as_ids(V(my_graph))
 #'

@@ -34,8 +34,24 @@ Authors@R:
       person("Sami", "Domisch",
              email = "sami.domisch@igb-berlin.de",
              role = c("aut")))
-Maintainer: Maria Üblacker <maria.ueblacker@igb-berlin.de> and Afroditi Grigoropoulou <afroditi.grigoropoulou@igb-berlin.de>
-Description: Scalable hydrographic geospatial data processing tools using open-source command-line utilities. The package provides functions to download the Hydrography90m data (<https://essd.copernicus.org/articles/14/4525/2022/>), processing, reading and extracting information, as well as assessing network distances and network connectivity. While the functions are, by default, tailored towards the Hydrography90m data, they can also be generalized towards other data and purposes, such as efficient cropping and merging of raster and vector data, point-raster extraction, raster reclassification, and data aggregation. The package depends on the open-source software GDAL/OGR, GRASS-GIS and the AWK programming language in the Linux environment, allowing a seamless language integration. Since the data is processed outside R, hydrographr allows creating scalable geo-processing workflows. Please see the installation guide of the additional software at <https://glowabio.github.io/hydrographr/articles/hydrographr.html>. Windows users need to to first activate the Windows Subsystem for Linux (WSL) feature.
+Maintainer: Maria Üblacker <maria.ueblacker@igb-berlin.de> and 
+    Afroditi Grigoropoulou <afroditi.grigoropoulou@igb-berlin.de>
+Description: Scalable hydrographic geospatial data processing tools using 
+    open-source command-line utilities. The package provides functions to 
+    download the Hydrography90m data https://essd.copernicus.org/articles/14/4525/2022/, 
+    processing, reading and extracting information, as well as assessing network
+    distances and network connectivity. While the functions are, by default, 
+    tailored towards the Hydrography90m data, they can also be generalized 
+    towards other data and purposes, such as efficient cropping and merging 
+    of raster and vector data, point-raster extraction, raster reclassification, 
+    and data aggregation. The package depends on the open-source software 
+    GDAL/OGR, GRASS-GIS and the AWK programming language in the Linux 
+    environment, allowing a seamless language integration. Since the data is 
+    processed outside R, hydrographr allows creating scalable geo-processing 
+    workflows. Please see the installation guide of the additional software 
+    at https://glowabio.github.io/hydrographr/articles/hydrographr.html. 
+    Windows users need to to first activate the Windows Subsystem for Linux 
+    (WSL) feature.
 License: GPL-3
 URL: https://glowabio.github.io/hydrographr/
 BugReports: https://github.com/glowabio/hydrographr/issues
