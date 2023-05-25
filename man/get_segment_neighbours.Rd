@@ -68,7 +68,7 @@ then the next downstream sub_id can be selected (enlarge the study area)
 using e.g. \code{\link{get_catchment_graph()}}.
 }
 \description{
-For each input stream segment, zhe function reports those
+For each input stream segment, the function reports those
 upstream, downstream, or up-and downstream segments that are connected to the
 input segment(s) within a specified neighbour order, with the option to
 summarize attributes across these segments. Note that the stream
@@ -98,13 +98,14 @@ my_graph <- get_catchment_graph(g = my_graph, subc_id = 513866048, mode = "in",
                                 outlet = FALSE, as_graph = TRUE, n_cores = 1)
 
 
-Get a vector of all segment IDs
+# Get a vector of all segment IDs
 library(igraph)
 subc_id <- as_ids(V(my_graph))
 
 
-# Get all directly adjacent neighbours of each segment
-
+# Get all (up-and downstream) directly adjacent neighbours of each segment
+get_segment_neighbours(g = my_graph, subc_id = subc_id,
+                       order = 1, mode = "all")
 
 # Get the upstream segment neighbours in the 5th order
 # and report the length and source elevation

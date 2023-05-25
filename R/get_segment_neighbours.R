@@ -99,8 +99,9 @@
 #' subc_id <- as_ids(V(my_graph))
 #'
 #'
-#' # Get all directly adjacent neighbours of each segment
-#'
+#' # Get all (up-and downstream) directly adjacent neighbours of each segment
+#' get_segment_neighbours(g = my_graph, subc_id = subc_id,
+#'                        order = 1, mode = "all")
 #'
 #' # Get the upstream segment neighbours in the 5th order
 #' # and report the length and source elevation

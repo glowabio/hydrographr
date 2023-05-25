@@ -26,7 +26,7 @@ Authors@R:
              email = "thomas.tomiczek@igb-berlin.de",
              role = c("aut")),
       person("Vanessa", "Bremerich",
-             email = "bremerich@igb-berlin.de",
+             email = "vanessa.bremerich@igb-berlin.de",
              role = c("aut")),
       person("Giuseppe", "Amatulli",
              email = "giuseppe.amatulli@gmail.com",
@@ -38,7 +38,7 @@ Maintainer: Maria Üblacker <maria.ueblacker@igb-berlin.de> and
     Afroditi Grigoropoulou <afroditi.grigoropoulou@igb-berlin.de>
 Description: Scalable hydrographic geospatial data processing tools using 
     open-source command-line utilities. The package provides functions to 
-    download the Hydrography90m data https://essd.copernicus.org/articles/14/4525/2022/, 
+    download the Hydrography90m data (https://essd.copernicus.org/articles/14/4525/2022/), 
     processing, reading and extracting information, as well as assessing network
     distances and network connectivity. While the functions are, by default, 
     tailored towards the Hydrography90m data, they can also be generalized 

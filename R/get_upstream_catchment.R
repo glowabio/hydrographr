@@ -35,16 +35,18 @@
 #' @author Jaime Garcia Marquez, Afroditi Grigoropoulou, Maria M. Üblacker
 #'
 #' @references
-#' \url{https://grass.osgeo.org/grass82/manuals/r.water.outlet.html}
-#' \url{https://grass.osgeo.org/grass82/manuals/r.region.html}
+#' * \url{https://grass.osgeo.org/grass82/manuals/r.water.outlet.html}
+#' * \url{https://grass.osgeo.org/grass82/manuals/r.region.html}
+#' @md
 #'
 #' @seealso
-#' \code{\link{snap_to_network}} to snap the data points to the next stream
+#' * \code{\link{snap_to_network}} to snap the data points to the next stream
 #' segment within a given radius and/or a given flow accumulation threshold
 #' value.
-#' \code{\link{snap_to_subc_segment}} to snap the data points to the next stream
+#' * \code{\link{snap_to_subc_segment}} to snap the data points to the next stream
 #' segment within the sub-catchment the point is located.
-#' \code{\link{extract_ids}} to extract basin and sub-catchment IDs.
+#' * \code{\link{extract_ids}} to extract basin and sub-catchment IDs.
+#' @md
 #'
 #' @examples
 #' # Download test data into temporary R folder

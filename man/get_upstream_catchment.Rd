@@ -108,16 +108,20 @@ get_upstream_catchment(snapped_coordinates,
                        n_cores = 2)
 }
 \references{
-\url{https://grass.osgeo.org/grass82/manuals/r.water.outlet.html}
-\url{https://grass.osgeo.org/grass82/manuals/r.region.html}
+\itemize{
+\item \url{https://grass.osgeo.org/grass82/manuals/r.water.outlet.html}
+\item \url{https://grass.osgeo.org/grass82/manuals/r.region.html}
+}
 }
 \seealso{
-\code{\link{snap_to_network}} to snap the data points to the next stream
+\itemize{
+\item \code{\link{snap_to_network}} to snap the data points to the next stream
 segment within a given radius and/or a given flow accumulation threshold
 value.
-\code{\link{snap_to_subc_segment}} to snap the data points to the next stream
+\item \code{\link{snap_to_subc_segment}} to snap the data points to the next stream
 segment within the sub-catchment the point is located.
-\code{\link{extract_ids}} to extract basin and sub-catchment IDs.
+\item \code{\link{extract_ids}} to extract basin and sub-catchment IDs.
+}
 }
 \author{
 Jaime Garcia Marquez, Afroditi Grigoropoulou, Maria M. Üblacker
