@@ -47,6 +47,7 @@
     <a class="dropdown-item" href="../articles/benchmark.html">Function benchmarks</a>
     <a class="dropdown-item" href="../articles/case_study_brazil.html">Case study - São Francisco drainage basin</a>
     <a class="dropdown-item" href="../articles/case_study_cuba.html">Case study - Cuba</a>
+    <a class="dropdown-item" href="../articles/case_study_cuba_for_pdf.html">Case study - Cuba</a>
     <a class="dropdown-item" href="../articles/linux_system_setup.html">Setting up the package requirements on Linux</a>
     <a class="dropdown-item" href="../articles/macos_system_setup.html">Setting up the package requirements on MacOS</a>
     <a class="dropdown-item" href="../articles/windows_system_setup.html">Setting up the package requirements on Windows</a>
@@ -83,7 +84,7 @@ stream network to the clostest dam up- and downstream of fish occurence
 sites</h3>
                         <h4 data-toc-skip class="author"></h4>
             
-            <h4 data-toc-skip class="date">2023-05-23</h4>
+            <h4 data-toc-skip class="date">2023-06-01</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/glowabio/hydrographr/blob/HEAD/vignettes/case_study_brazil.Rmd" class="external-link"><code>vignettes/case_study_brazil.Rmd</code></a></small>
       <div class="d-none name"><code>case_study_brazil.Rmd</code></div>
@@ -103,7 +104,7 @@ closest existing and future dam.</p>
 <p>In our example we will focus on the catfish species <em>Conorhynchos
 conirostris</em>, which is a catfish species endemic to the São
 Francisco drainage basin in Brazil. The catfish is listed as
-‘endangered’ by the IUCN red list <span class="citation">(<a href="#ref-IUCNRedList2022" role="doc-biblioref"><strong>IUCNRedList2022?</strong></a>)</span>.
+‘endangered’ by the IUCN red list <span class="citation">(<a href="#ref-IUCNRedList2022" role="doc-biblioref">IUCN 2022</a>)</span>.
 Wetlands are the preferred habitats of the species. <em>Conorhynchos
 conirostris</em> is a migratory species, which migrates for spawning. As
 a migratory species, it is mostly threatened by dams along the stream
@@ -748,9 +749,9 @@ sub-catchment ID and merge them as well.</p>
 <h3 id="filtering-of-the-species-occurrences-and-dams">Filtering of the species occurrences and dams<a class="anchor" aria-label="anchor" href="#filtering-of-the-species-occurrences-and-dams"></a>
 </h3>
 <p>The information of the existing and future dams is provided by the
-GRanD <span class="citation">(<a href="#ref-Lehner2011" role="doc-biblioref"><strong>Lehner2011?</strong></a>)</span> and the
-FHReD <span class="citation">(<a href="#ref-Zarfl2015" role="doc-biblioref"><strong>Zarfl2015?</strong></a>)</span> database,
-respectively. Both datasets can be downloaded from <a href="https://www.globaldamwatch.org/directory" class="external-link">globaldamwatch.org</a>.</p>
+GRanD <span class="citation">(<a href="#ref-Lehner2011" role="doc-biblioref">Lehner et al. 2011</a>)</span> and the FHReD <span class="citation">(<a href="#ref-Zarfl2015" role="doc-biblioref">Zarfl et
+al. 2015</a>)</span> database, respectively. Both datasets can be
+downloaded from <a href="https://www.globaldamwatch.org/directory" class="external-link">globaldamwatch.org</a>.</p>
 <p>To select those point locations of the fish occurrences and dams,
 which are located within the the São Francisco drainage we will use the
 polygon of the drainage basin. For this step we will use the functions
@@ -1835,6 +1836,17 @@ Dowle, Matt, and Arun Srinivasan. 2022. <em>Data.table: Extension of
 <div id="ref-R-terra" class="csl-entry">
 Hijmans, Robert J. 2023. <em>Terra: Spatial Data Analysis</em>. <a href="https://rspatial.org/terra/" class="external-link">https://rspatial.org/terra/</a>.
 </div>
+<div id="ref-IUCNRedList2022" class="csl-entry">
+IUCN. 2022. <span>“<span class="nocase">The IUCN Red List of Threatened
+Species</span>.”</span> https://www.iucnredlist.org.
+</div>
+<div id="ref-Lehner2011" class="csl-entry">
+Lehner, Bernhard, Catherine Reidy Liermann, Carmen Revenga, Charles
+Vörösmarty, Balazs Fekete, Philippe Crouzet, Petra Döll, et al. 2011.
+<span>“High-Resolution Mapping of the World’s Reservoirs and Dams for
+Sustainable River-Flow Management.”</span> <em>Frontiers in Ecology and
+the Environment</em> 9 (9): 494–502. <a href="https://doi.org/10.1890/100125" class="external-link">https://doi.org/10.1890/100125</a>.
+</div>
 <div id="ref-R-sf" class="csl-entry">
 Pebesma, Edzer. 2018. <span>“<span class="nocase">Simple Features for R:
 Standardized Support for Spatial Vector Data</span>.”</span>
@@ -1888,6 +1900,11 @@ ed. Boca Raton, Florida: Chapman; Hall/CRC. <a href="https://yihui.org/knitr/" c
 <div id="ref-R-knitr" class="csl-entry">
 ———. 2023. <em>Knitr: A General-Purpose Package for Dynamic Report
 Generation in r</em>. <a href="https://yihui.org/knitr/" class="external-link">https://yihui.org/knitr/</a>.
+</div>
+<div id="ref-Zarfl2015" class="csl-entry">
+Zarfl, Christiane, Alexander E. Lumsdon, Jürgen Berlekamp, Laura
+Tydecks, and Klement Tockner. 2015. <span>“A Global Boom in Hydropower
+Dam Construction.”</span> <em>Aquatic Sciences</em> 77 (1): 161–70. <a href="https://doi.org/10.1007/s00027-014-0377-0" class="external-link">https://doi.org/10.1007/s00027-014-0377-0</a>.
 </div>
 <div id="ref-R-kableExtra" class="csl-entry">
 Zhu, Hao. 2021. <em>kableExtra: Construct Complex Table with Kable and

@@ -32,6 +32,7 @@ is located."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs
     <a class="dropdown-item" href="../articles/benchmark.html">Function benchmarks</a>
     <a class="dropdown-item" href="../articles/case_study_brazil.html">Case study - São Francisco drainage basin</a>
     <a class="dropdown-item" href="../articles/case_study_cuba.html">Case study - Cuba</a>
+    <a class="dropdown-item" href="../articles/case_study_cuba_for_pdf.html">Case study - Cuba</a>
     <a class="dropdown-item" href="../articles/linux_system_setup.html">Setting up the package requirements on Linux</a>
     <a class="dropdown-item" href="../articles/macos_system_setup.html">Setting up the package requirements on MacOS</a>
     <a class="dropdown-item" href="../articles/windows_system_setup.html">Setting up the package requirements on Windows</a>
@@ -135,6 +136,13 @@ Default is TRUE.</p></dd>
 
 </dl></div>
     <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    
+
+<p>A data.table of the original and new coordinates, along with the
+sub-catchment ID.</p>
+    </div>
+    <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>The function uses the network module of
 GRASS GIS (v.net), to connect a vector line map (stream network) with a
@@ -151,10 +159,12 @@ place. From the new location, the function extracts the new snapped coordinates.
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code><a href="snap_to_network.html">snap_to_network</a></code> to snap the data points to the next stream
+    <div class="dont-index">
+<ul><li><p><code><a href="snap_to_network.html">snap_to_network()</a></code> to snap the data points to the next stream
 segment within a given radius and/or a given flow accumulation threshold
-value.
-<code><a href="extract_ids.html">extract_ids</a></code> to extract basin and sub-catchment IDs.</p></div>
+value.</p></li>
+<li><p><code><a href="extract_ids.html">extract_ids()</a></code> to extract basin and sub-catchment IDs.</p></li>
+</ul></div>
     </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
@@ -200,7 +210,7 @@ value.
 <span>                                            stream_layer <span class="op">=</span> <span class="va">stream_vect</span>,</span>
 <span>                                            n_cores <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="co"># Show head of output table</span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">snapped_coordinates</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">snapped_coordinates</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># OR</span></span>
 <span><span class="co"># Automatically extract the basin and sub-catchment IDs and</span></span>
@@ -214,7 +224,7 @@ value.
 <span>                                            stream_layer <span class="op">=</span> <span class="va">stream_vect</span>,</span>
 <span>                                            n_cores <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="co"># Show head of output table</span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">snapped_coordinates</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">snapped_coordinates</span><span class="op">)</span></span>
 <span></span></code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
