@@ -1,5 +1,6 @@
 # hydrographr <img src="man/figures/hydrographr.svg" align="right" />
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7998072.svg)](https://doi.org/10.5281/zenodo.7998072)
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 
 `hydrographr` provides a collection of `R` function wrappers for GDAL and GRASS-GIS functions to efficiently work with [Hydrography90m](https://essd.copernicus.org/articles/14/4525/2022/essd-14-4525-2022.html) and spatial biodiversity data. The easy-to-use functions process large raster and vector data directly on disk in parallel, such that the memory of R does not get overloaded. This allows creating scalable data processing and analysis workflows in R, even though the data is not processed directly in R.
