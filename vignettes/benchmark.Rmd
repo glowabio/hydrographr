@@ -23,7 +23,7 @@ editor_options:
 knitr::write_bib(file = "packages.bib")
 ```
 
-### Introduction and scope
+## Introduction and scope
 
 The main focus of `hydrographr` is to process Hydrography90m [@amatulli2022hydrography90m] data and include them in workflows in `R`. Nevertheless, `hydrographr` provides geospatial functions which can be useful when working with geospatial data in general, with the goal to be computationally and RAM usage efficient. Benchmark tests for selected `hydrographr` functions should demonstrate the capabilities of the `R` package. We compared the tested functions to corresponding workflows which employ the `terra` package to put the performance into perspective without claiming any superiority of either one of the `R` packages over the other.
 
@@ -35,7 +35,7 @@ We focused on five common geospatial tasks that can be easily implemented with b
 - Reclassifying the values of a raster layer.
 - Zonal statistics of a raster layer.
 
-All benchmark experiment tasks consisted of reading the input data, processing the data, and writing the results back to disk (if the output is a raster layer). For each experiment, we recorded the total run-time of the entire task using the function `microbenchmark::microbenchmark`. The peak RAM usage was estimated by observing the task manager (in Windows) and top (on Linux). To ensure reliable estimates of the total run-time, we repeated each experiment three times. `hydrographr` requires a different implementations on Windows and Linux systems. Therefore we performed the experiments on two systems, a Windows laptop computer (Windows 11 Pro 10.0.22621/Intel i5-8350U/16 GB RAM) and a Laptop running Ubuntu Linux (Ubuntu 20.04.6 LTS/Intel i5-10310U/16 GB RAM) to identify any major performance differences between operating systems. The code for the individual geospatial tasks which was executed on both platforms is documented below for reproducability. We implemented all `hydrographr` and `terra` functions with default settings and we acknowledge that specific input arguments may improve the performance. Nevertheless the benchmark experiments provide a first general performance overview.
+All benchmark experiment tasks consisted of reading the input data, processing the data, and writing the results back to disk (if the output is a raster layer). For each experiment we recorded the total run-time of the entire task using the function `microbenchmark::microbenchmark`. The peak RAM usage was estimated by observing the task manager (in Windows) and top (on Linux). To ensure reliable estimates of the total run-time, we repeated each experiment three times. `hydrographr` requires a different implementations on Windows and Linux systems. Therefore we performed the experiments on two systems, a Windows laptop computer (Windows 11 Pro 10.0.22621/Intel i5-8350U/16 GB RAM) and a Laptop running Ubuntu Linux (Ubuntu 20.04.6 LTS/Intel i5-10310U/16 GB RAM) to identify any major performance differences between operating systems. The following chapter summarizes the results of the benchmark experiments which where performed on the two different systems. After the results summary we documented the code for the individual geospatial tasks for reproducability. We implemented all `hydrographr` and `terra` functions with default settings and we acknowledge that specific input arguments may improve the performance. Nevertheless the benchmark experiments provide a first general performance overview.
 
 
 ```{r setup, eval=FALSE, include=FALSE}
@@ -49,6 +49,20 @@ library(knitr)
 library(kableExtra)
 library(here)
 ```
+
+## Results of benchmark experiments
+
+The benchmark shows that `hydrographr::merge_tiles` overall merged the six tiles faster and using less RAM compared to `terra` where the tiles are loaded in R merged with `terra::merge` and written to the hard drive. On average, the performance of `hydrographr::merge_tiles` surpassed that of `terra` on both Windows and Ubuntu, completing the task 3 times faster (165 compared to 525 seconds) and 4.5 times faster (162 compared to 733 seconds), respectively. Additionally, `terra` required on Windows twice the amount of RAM to perform the merge operation compared to `hydrographr` (1.3 compared to 2.8 GB).
+
+For both tasks, cropping a raster to the extent of a bounding box and to the boundary of a vector polygon, `terra::crop` outperforms `hydrographr::crop_to_extent` in the experiments on the Windows system, performing the tasks 1.6 times (261 compared to 430 seconds) and 2.1 times  (258 compared to 549 seconds) faster. The differences on the Ubuntu system were less significant. Particularly, on the Windows system, `terra` used 2.5 times (3.1 compared to 1.3 GB) and 2.3 times (3.1 compared to 1.4 GB) more RAM to perform the cropping task. 
+
+The reclassification task was performed for the sub-catchments of the entire Amazon basin, reassigning random integer values to the over 31 million sub-catchment IDs, thus requiring a rather large reclassification table. While `hydrographr::reclass_raster` was able to perform the task in 178 (Windows) and 119 seconds (Ubuntu), respectively, while we aborted the `terra::classify` after 12 hours of run-time with a progress of approximately 10\%. 
+
+To assess the performance of computing zonal statistics using `hydrographr::extract_zonal_stat`, we implemented `terra::zonal` to calculate the mean and the standard deviation of a flow accumulation raster layer, where the ca. 31 million sub-catchments of the Amazon basin were used as the zones. `hydrographr::extract_zonal_stat` returns the following nine statistical measures by default in a single run: the number of cells within each zone, minimum and maximum cell values, range, arithmetic mean, population variance, standard deviation, coefficient of variation, and sum (as provided by the underlying r.univar function in GRASS GIS). Hence, if several statistical measures are of interest, the run-times of individual `terra::zonal` executions must be added up for comparison. The calculation of the means is 2.4 and 2.2 times faster when performed with `terra::zonal` on Windows (247 compared to 586 seconds) and Ubuntu (194 compared to 420 seconds), respectively. Similar to the other tasks, the RAM usage is twice as high with `terra` compared to `hydrographr` running on Windows (2.7 compared to 1.3 GB). While the standard deviation is included in the `hydrographr` output table, `terra::zonal` could not complete the task and ran out of memory.
+
+![](../man/figures/benchmark.png)
+
+## Benchmark experiments
 
 ### R packages and paths
 
