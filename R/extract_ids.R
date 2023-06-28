@@ -173,7 +173,8 @@ extract_ids <- function(data, lon, lat, id = NULL, basin_layer = NULL,
   }
   # Read in the file containing the ids
   data_ids <- fread(paste0(tempdir(),  "/ids_", rand_string, ".txt"),
-                    keepLeadingZeros = TRUE, header = TRUE, sep = " ")
+                    keepLeadingZeros = TRUE, header = TRUE, sep = " ",
+                    fill = TRUE)
 
   # Remove all files in the tmp folder
   file.remove(coord_tmp_path, ids_tmp_path)

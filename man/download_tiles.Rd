@@ -62,7 +62,8 @@ For more details and visualisations of the spatial layers, please refer to
    Network \tab Outlet \tab outlet \tab  \tab tif \cr
    Network \tab Outlet \tab outlet \tab  \tab gpkg \cr
    Network \tab Regional unit \tab regional_unit \tab  \tab tif \cr
-   Flow \tab Flow accumulation \tab flow \tab km^2 \tab tif \cr
+   Network \tab Flow direction \tab direction \tab  \tab tif \cr
+   Flow \tab Flow accumulation \tab accumulation \tab km^2 \tab tif \cr
    Stream slope \tab Cell maximum curvature \tab slope_curv_max_dw_cel \tab 1/m \tab tif \cr
    Stream slope \tab Cell minimum curvature \tab slope_curv_min_dw_cel \tab 1/m \tab tif \cr
    Stream slope \tab Cell elevation difference \tab slope_elv_dw_cel \tab m \tab tif \cr

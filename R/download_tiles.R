@@ -56,7 +56,8 @@
 #'   | Network              | Outlet                                   | outlet                    |          | tif              |
 #'   | Network              | Outlet                                   | outlet                    |          | gpkg             |
 #'   | Network              | Regional unit                            | regional_unit            |          | tif              |
-#'   | Flow                 | Flow accumulation                        | flow                      | km^2     | tif              |
+#'   | Network              | Flow direction                            | direction            |          | tif              |
+#'   | Flow                 | Flow accumulation                        | accumulation                      | km^2     | tif              |
 #'   | Stream slope         | Cell maximum curvature                   | slope_curv_max_dw_cel | 1/m      | tif              |
 #'   | Stream slope         | Cell minimum curvature                   | slope_curv_min_dw_cel | 1/m      | tif              |
 #'   | Stream slope         | Cell elevation difference                | slope_elv_dw_cel       | m        | tif              |
