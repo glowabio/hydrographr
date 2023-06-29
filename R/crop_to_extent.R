@@ -157,7 +157,7 @@ crop_to_extent <- function(raster_layer, vector_layer = NULL,
 
         # Call external gdalwarp command from GDAL library.
         # Cut through a polygon extent
-        cat("Cropping...\n")
+        cat("\nCropping...\n")
         processx::run(system.file("sh", "crop_to_extent_bb.sh",
                         package = "hydrographr"),
             args = c(raster_layer, xmin, ymin,
@@ -180,7 +180,7 @@ crop_to_extent <- function(raster_layer, vector_layer = NULL,
                     package = "hydrographr"))
       if (!is.null(vector_layer)) {
         # Call external gdalwarp command from GDAL library
-        cat("Cropping...\n")
+        cat("\nCropping...\n")
         processx::run(system.file("bat", "crop_to_extent_cl.bat",
                         package = "hydrographr"),
             args = c(wsl_raster_layer, wsl_vector_layer, wsl_output_path,
