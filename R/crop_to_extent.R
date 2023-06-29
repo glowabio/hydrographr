@@ -217,7 +217,7 @@ crop_to_extent <- function(raster_layer, vector_layer = NULL,
 
   if (file.exists(output_path)) {
     # Print message
-    cat("Cropped raster saved under: ", output_path)
+    cat("Cropped raster saved under: ", output_path, "\n")
   } else {
     stop("Output file was not written. File size may have been larger than 4GB",
          "\nSet bigtiff = TRUE, for writing large output files.")
