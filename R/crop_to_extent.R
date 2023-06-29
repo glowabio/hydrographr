@@ -133,7 +133,7 @@ crop_to_extent <- function(raster_layer, vector_layer = NULL,
     if (!is.null(vector_layer)) {
         # Call external gdalwarp command from GDAL library. Cut through
         # the border line option
-        cat("Cropping...\n")
+        cat("\nCropping...\n")
         processx::run(system.file("sh", "crop_to_extent_cl.sh",
                         package = "hydrographr"),
             args = c(raster_layer, vector_layer, output_path,
