@@ -59,7 +59,7 @@ Returns a table with
 \item arithmetic mean of the absolute values (mean_abs)
 \item standard deviation (sd)
 \item variance (var)
-\item coefficient of variance (cv)
+\item coefficient of variation (cv)
 \item sum (sum)
 \item sum of the absolute values (sum_abs).
 }

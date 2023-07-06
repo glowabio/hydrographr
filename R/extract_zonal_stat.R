@@ -63,7 +63,7 @@
 #' * arithmetic mean of the absolute values (mean_abs)
 #' * standard deviation (sd)
 #' * variance (var)
-#' * coefficient of variance (cv)
+#' * coefficient of variation (cv)
 #' * sum (sum)
 #' * sum of the absolute values (sum_abs).
 #' @md
