@@ -139,6 +139,17 @@ download_tiles(variable = "direction",
                global = TRUE,
                download_dir = my_directory)
 
+# Download the raster mask of two regional units
+# to the current working directory.
+download_tiles(variable = "regional_unit",
+               file_format = "tif",
+               reg_unit_id = c("33","34"))
+
+# Download the raster mask of all regional units
+# to the current working directory.
+download_tiles(variable = "regional_unit",
+               file_format = "tif",
+               global = TRUE)
 }
 \references{
 Amatulli G., Garcia Marquez J., Sethi T., Kiesel J.,
