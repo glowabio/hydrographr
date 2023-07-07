@@ -1,14 +1,13 @@
-pandoc: 2.19.2
+pandoc: 3.1.1
 pkgdown: 2.0.7
 pkgdown_sha: ~
 articles:
   benchmark: benchmark.html
   case_study_brazil: case_study_brazil.html
   case_study_cuba: case_study_cuba.html
-  case_study_cuba_for_pdf: case_study_cuba_for_pdf.html
   hydrographr: hydrographr.html
   linux_system_setup: linux_system_setup.html
   macos_system_setup: macos_system_setup.html
   windows_system_setup: windows_system_setup.html
-last_built: 2023-06-02T13:09Z
+last_built: 2023-07-07T09:14Z
 
