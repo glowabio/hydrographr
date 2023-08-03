@@ -136,9 +136,9 @@ spdata
 ### Visualise species data
 
 ```{r, eval = FALSE}
-m <- leaflet() %>%
-  addProviderTiles('Esri.WorldShadedRelief') %>%
-  addCircles(data = spdata, color = "purple") # data = spdata
+m <- leaflet::leaflet() %>%
+  leaflet::addProviderTiles('Esri.WorldShadedRelief') %>%
+  leaflet::addCircles(data = spdata, color = "purple") # data = spdata
 
 m
 ```
@@ -181,7 +181,7 @@ spdata <- spdata %>%
 
 ```
 
-### Crop data
+### Crop and merge raster data
 
 ```{r, eval = FALSE}
 # The coordinates of the bounding box should also be in the NAD_1983_UTM_Zone_4N projection system
@@ -192,17 +192,20 @@ crop_to_extent(raster_layer = paste0(rast_dir, "/NHDPLUS_H_2006_HU4_RASTER/HRNHD
                file_name = "cat_crop.tif",
                compression = "high"
               )
-```
 
-### Merge data
-
-!We need to download another area to merge, or just to crop two areas
-and then merge them back
-
-```{r, eval = FALSE}
-merge_tiles(tile_dir = rast_dir, 
-            tile_names = , 
+# We can crop to another bounding box, and then try to merge the two cropped layers
+bbox2 <- c(595603, 2371564, 604373, 2380255)
+crop_to_extent(raster_layer = paste0(rast_dir, "/NHDPLUS_H_2006_HU4_RASTER/HRNHDPlusRasters2006/cat.tif"), 
+               bounding_box = bbox2,
+               out_dir = out_dir,
+               file_name = "cat_crop2.tif",
+               compression = "high"
+              )
+# Merge the two cropped layers
+merge_tiles(tile_dir = out_dir, 
+            tile_names = c("cat_crop.tif", "cat_crop2.tif"),
             out_dir = out_dir,
+            file_name = "cat_merged.tif",
             compression = "high")
 ```
 
@@ -236,4 +239,54 @@ spdata_ids
 set_no_data(data_dir = paste0(rast_dir, "/NHDPLUS_H_2006_HU4_RASTER/HRNHDPlusRasters2006"), var_layer = "cat.tif", no_data = -99999)
 
 # Remember to set it back to the original value!
+```
+
+### Extract zonal statistics
+
+To extract zonal statistics of a raster layer using the NHDPlus basins
+as zones, we first need to download and crop to our extent an example
+raster layer. We will use the CHELSA Bioclim 12 (BIO12) layer of
+1981-2010 for this example.
+
+For this operation, we also need to convert the projection system of the
+cat.tif raster to EPSG:4326 using the 'terra' package, so that it is
+compatible with the coordinate system of CHELSA Bioclim files.
+
+```{r}
+
+# Download bio12 in the rast_dir
+download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio12_1981-2010_V.2.1.tif",
+destfile = paste0(rast_dir, "/bio12_1981-2010.tif"), mode = "wb")
+
+
+# Crop bio12 to bounding box
+# We first need to convert the bounding box coordinates to WGS84, that is the coordinate system of the CHELSA Bioclim layers.
+bbox_wgs84 <- project(ext(bbox), from = "EPSG:26904", to = "EPSG:4326")
+# Now crop
+crop_to_extent(raster_layer = paste0(rast_dir, "/bio12_1981-2010.tif"), 
+               bounding_box = bbox_wgs84,
+               out_dir = out_dir,
+               file_name = "bio12_crop.tif",
+               compression = "high"
+              )
+
+# Load the cat.tif layer
+cat_rast <- rast(paste0(rast_dir, "/NHDPLUS_H_2006_HU4_RASTER/HRNHDPlusRasters2006/cat.tif"))
+
+# Reproject to WGS84 and write out the file with a new name
+cat_rast <- project(cat_rast, 
+                    y = "epsg:4326", 
+                    filename = paste0(rast_dir, "/NHDPLUS_H_2006_HU4_RASTER/HRNHDPlusRasters2006/cat_wgs84.tif"))
+
+# Extract the zonal statistics of bio12 based on the NHDPlus basins
+zonal_stats <- extract_zonal_stat(data_dir = out_dir,
+                  subc_id = "all", 
+                  subc_layer =  paste0(rast_dir, "/NHDPLUS_H_2006_HU4_RASTER/HRNHDPlusRasters2006/cat_wgs84.tif"),
+                  var_layer = "bio12_crop.tif",
+                  quiet = F)
+
+# Same as before, we need to filter out the no data values to get a better grasp of the resulting table
+zonal_stats <- zonal_stats %>% 
+  filter(bio12_crop_data_cells !=0 )
+zonal_stats
 ```
