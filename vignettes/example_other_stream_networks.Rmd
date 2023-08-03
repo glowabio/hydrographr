@@ -31,6 +31,7 @@ library(nhdplusTools)
 library(rgbif)
 library(dplyr)
 library(archive)
+library(terra)
 ```
 
 Define working directory:
@@ -94,6 +95,13 @@ archive_extract(archive = paste0(vect_dir, "/NHDPLUS_H_2006_HU4_GDB.zip"),
 )
 ```
 
+Check directory structure
+
+```{r, eval = F}
+list.files(paste0(rast_dir, "/NHDPLUS_H_2006_HU4_RASTER"), recursive = T, pattern = ".tif$")
+# list.files(paste0(vect_dir, "/NHDPLUS_H_2006_HU4_GDB"), recursive = T)
+```
+
 ### Species data
 
 Download occurrence records of *Stenogobius hawaiiensis* from GBIF.org
@@ -114,7 +122,7 @@ spdata <- gbif_data$data %>%
   filter(!is.na(year),
          stateProvince == "Hawaii") %>% 
   distinct() %>% 
-  mutate(occurence_id = 1:nrow(.)) %>% 
+  mutate(occurrence_id = 1:nrow(.)) %>% 
   rename("longitude" = "decimalLongitude",
          "latitude" = "decimalLatitude") %>% 
   select(8, 1:7)
@@ -123,4 +131,109 @@ spdata <- gbif_data$data %>%
 write.csv(spdata, paste0(sp_dir, "/stenogobius_hawaiiensis.csv") )
 
 spdata
+```
+
+### Visualise species data
+
+```{r, eval = FALSE}
+m <- leaflet() %>%
+  addProviderTiles('Esri.WorldShadedRelief') %>%
+  addCircles(data = spdata, color = "purple") # data = spdata
+
+m
+```
+
+By inspecting the NHDPlus data, we observe that the coordinate reference
+system is not WGS84, but the EPSG:26904.
+
+```{r}
+rast(paste0(rast_dir, "/NHDPLUS_H_2006_HU4_RASTER/HRNHDPlusRasters2006/cat.tif"))
+```
+
+Therefore we will need to convert the species points' coordinates to
+EPSG:26904, so that they match with the spatial layers.
+
+```{r}
+
+# Convert the coordinate columns to a matrix
+spdata_coord <- spdata %>% 
+  select(longitude, latitude) %>% 
+  as.matrix()
+
+# Project to the coordinate reference system of the NHDPlus dataset
+spdata_coord <- project(spdata_coord, 
+                        from = "+proj=longlat +datum=WGS84", 
+                        to = "EPSG:26904")
+
+# Replace the WGS84 coordinates with the EPSG:26904 coordinates in the species points' data frame
+spdata <- spdata %>% 
+  mutate(longitude = spdata_coord[,1],
+         latitude = spdata_coord[,2])
+
+## Probably not needed
+# # Convert species data frame to spatial vector, defining the initial coordinate reference system as WGS84
+# spdata_vect <- vect(spdata, geom=c("longitude", "latitude"),
+#                     crs=
+#                       )
+# 
+# # Project to the coordinate reference system of the NHDPlus dataset
+# spdata_vect <- project(spdata_vect, "EPSG:26904")
+
+```
+
+### Crop data
+
+```{r, eval = FALSE}
+# The coordinates of the bounding box should also be in the NAD_1983_UTM_Zone_4N projection system
+bbox <- c(582638, 2361564, 594373, 2370255)
+crop_to_extent(raster_layer = paste0(rast_dir, "/NHDPLUS_H_2006_HU4_RASTER/HRNHDPlusRasters2006/cat.tif"), 
+               bounding_box = bbox,
+               out_dir = out_dir,
+               file_name = "cat_crop.tif",
+               compression = "high"
+              )
+```
+
+### Merge data
+
+!We need to download another area to merge, or just to crop two areas
+and then merge them back
+
+```{r, eval = FALSE}
+merge_tiles(tile_dir = rast_dir, 
+            tile_names = , 
+            out_dir = out_dir,
+            compression = "high")
+```
+
+### Extract IDs, Report no data value, Set no data value
+
+```{r}
+spdata_ids <- extract_ids(data = spdata, 
+            lon = "longitude", lat = "latitude",
+            id = "occurrence_id",
+            basin_layer  = paste0(rast_dir, "/NHDPLUS_H_2006_HU4_RASTER/HRNHDPlusRasters2006/cat.tif")) 
+
+spdata_ids
+
+# We observe that some points obtain basin_id=NA, because they fall out of the extent of the downloaded raster layer. We will filter these points out, keeping only those which overlap with the raster.
+
+spdata_ids <- spdata_ids %>% 
+   filter(!is.na(basin_id))
+
+spdata_ids
+
+# On the other hand, some other points obtain basin_id=-32768. This should be the no data value of the raster layer, meaning a value attributed to the sea cells. We can double-check this using the report_no_data function:
+no_data_val <- report_no_data(data_dir = paste0(rast_dir, "/NHDPLUS_H_2006_HU4_RASTER/HRNHDPlusRasters2006"), var_layer = "cat.tif")
+
+no_data_val
+# We can filter out these points, too, so that we only keep the points sampled in rivers. 
+spdata_ids <- spdata_ids %>% 
+   filter(basin_id != no_data_val$NoData)
+spdata_ids
+
+# If we wanted to change the no data value of a layer, we could do it using the function:
+set_no_data(data_dir = paste0(rast_dir, "/NHDPLUS_H_2006_HU4_RASTER/HRNHDPlusRasters2006"), var_layer = "cat.tif", no_data = -99999)
+
+# Remember to set it back to the original value!
 ```
