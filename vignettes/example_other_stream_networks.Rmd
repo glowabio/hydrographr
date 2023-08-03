@@ -235,10 +235,16 @@ spdata_ids <- spdata_ids %>%
    filter(basin_id != no_data_val$NoData)
 spdata_ids
 
+```
+
+```{r, eval = FALSE}
+# Don't run:
 # If we wanted to change the no data value of a layer, we could do it using the function:
-set_no_data(data_dir = paste0(rast_dir, "/NHDPLUS_H_2006_HU4_RASTER/HRNHDPlusRasters2006"), var_layer = "cat.tif", no_data = -99999)
+set_no_data(data_dir = paste0(rast_dir, "/NHDPLUS_H_2006_HU4_RASTER/HRNHDPlusRasters2006"), var_layer = "cat.tif", no_data = -32768)
 
 # Remember to set it back to the original value!
+
+
 ```
 
 ### Extract zonal statistics
@@ -289,4 +295,24 @@ zonal_stats <- extract_zonal_stat(data_dir = out_dir,
 zonal_stats <- zonal_stats %>% 
   filter(bio12_crop_data_cells !=0 )
 zonal_stats
+```
+
+### Reclassify raster
+
+```{r}
+
+# Create example dataframe with reclassification rules to reclassify the value of all basins containing species data to 1, and all the rest to -99999.
+
+reclass_rules <- data.frame(cat = as.integer(spdata_ids$basin_id), 
+                            new_val = as.integer(1))
+
+# Apply reclassification
+reclass_raster(
+  data = reclass_rules,
+  rast_val = "cat",
+  new_val = "new_val",
+  raster_layer = paste0(rast_dir, "/NHDPLUS_H_2006_HU4_RASTER/HRNHDPlusRasters2006/cat.tif"),
+  recl_layer = paste0(rast_dir, "/NHDPLUS_H_2006_HU4_RASTER/HRNHDPlusRasters2006/cat_reclass.tif"),
+  read = FALSE, 
+  no_data = no_data_val$NoData)
 ```
