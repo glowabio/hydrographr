@@ -31,7 +31,6 @@ library(hydrographr)
 library(nhdplusTools)
 library(rgbif)
 library(dplyr)
-library(sf)
 ```
 
 Define working directory:
@@ -59,7 +58,13 @@ dir.create(sp_dir)
 dir.create(out_dir)
 ```
 
+### Download NHDPlus data
+
+Data of the NHDPlus data can be downloaded using the R package `nhdplusTools` or 
+from this USGS website: 
+[https://apps.nationalmap.gov/downloader/](https://apps.nationalmap.gov/downloader/)
 ```{r, eval=F}
+# Download NHDPlus raster data for Hawaii 
 download_nhdplusv2(outdir = rast_dir,
                    url = paste0("https://prd-tnm.s3.amazonaws.com/StagedProducts/",
                                 "Hydrography/NHDPlusHR/Beta/GDB/",
@@ -68,13 +73,19 @@ download_nhdplusv2(outdir = rast_dir,
 ```
 
 ```{r, eval=F}
-  download_nhdplusv2(outdir = vect_dir,
-                     url = paste0("https://prd-tnm.s3.amazonaws.com/StagedProducts/",
-                                  "Hydrography/NHDPlusHR/Beta/GDB/",
-                                  "NHDPLUS_H_2006_HU4_GDB.zip"),
-                     progress = TRUE)
+
+# Download NHDPlus vector data for Hawaii 
+download_nhdplusv2(outdir = vect_dir,
+                   url = paste0("https://prd-tnm.s3.amazonaws.com/StagedProducts/",
+                                "Hydrography/NHDPlusHR/Beta/GDB/",
+                                "NHDPLUS_H_2006_HU4_GDB.zip"),
+                   progress = TRUE)
 ```
 
+### Species data
+
+Download occurrence records of *Stenogobius hawaiiensis* 
+from GBIF.org using the R package `rgbif`.
 
 ```{r, eval = FALSE}
 # Download occurrence data with coordinates from GBIF
@@ -96,8 +107,8 @@ spdata <- gbif_data$data %>%
          "latitude" = "decimalLatitude") %>% 
   select(8, 1:7)
 
+# Save the data
 write.csv(spdata, paste0(sp_dir, "/stenogobius_hawaiiensis.csv") )
 
 spdata
-
 ```
