@@ -23,7 +23,6 @@ editor_options:
 knitr::write_bib(file = "packages.bib")
 ```
 
-
 Load required libraries:
 
 ```{r, eval=F}
@@ -31,6 +30,7 @@ library(hydrographr)
 library(nhdplusTools)
 library(rgbif)
 library(dplyr)
+library(archive)
 ```
 
 Define working directory:
@@ -43,7 +43,7 @@ wdir <- paste0("/home/mueblacker/Documents/Glowabio/Code/hydrographr/vignettes/d
 
 # Define the working directory for the region Hawaii
 wdir <- "my/working/directory/data_hawaii"
-
+wdir <- "/home/afroditi/Documents/PhD/hydrographr_case_study/nhdplus"
 data_dir <- paste0(wdir, "/data")
 rast_dir <- paste0(data_dir, "/raster")
 vect_dir <- paste0(data_dir, "/vector")
@@ -60,9 +60,10 @@ dir.create(out_dir)
 
 ### Download NHDPlus data
 
-Data of the NHDPlus data can be downloaded using the R package `nhdplusTools` or 
-from this USGS website: 
-[https://apps.nationalmap.gov/downloader/](https://apps.nationalmap.gov/downloader/)
+Data of the NHDPlus data can be downloaded using the R package
+`nhdplusTools` or from this USGS website:
+<https://apps.nationalmap.gov/downloader/>
+
 ```{r, eval=F}
 # Download NHDPlus raster data for Hawaii 
 download_nhdplusv2(outdir = rast_dir,
@@ -70,6 +71,12 @@ download_nhdplusv2(outdir = rast_dir,
                                 "Hydrography/NHDPlusHR/Beta/GDB/",
                                 "NHDPLUS_H_2006_HU4_RASTER.7z"),
                    progress = TRUE)
+
+# Unzip -- can also be done manually
+# When called with default arguments extracts all files in the archive.
+archive_extract(archive = paste0(rast_dir, "/NHDPLUS_H_2006_HU4_RASTER.7z"),
+                dir = paste0(rast_dir, "/NHDPLUS_H_2006_HU4_RASTER")
+)
 ```
 
 ```{r, eval=F}
@@ -80,12 +87,17 @@ download_nhdplusv2(outdir = vect_dir,
                                 "Hydrography/NHDPlusHR/Beta/GDB/",
                                 "NHDPLUS_H_2006_HU4_GDB.zip"),
                    progress = TRUE)
+
+# Unzip -- can also be done manually
+archive_extract(archive = paste0(vect_dir, "/NHDPLUS_H_2006_HU4_GDB.zip"),
+                dir = paste0(vect_dir, "/NHDPLUS_H_2006_HU4_GDB")
+)
 ```
 
 ### Species data
 
-Download occurrence records of *Stenogobius hawaiiensis* 
-from GBIF.org using the R package `rgbif`.
+Download occurrence records of *Stenogobius hawaiiensis* from GBIF.org
+using the R package `rgbif`.
 
 ```{r, eval = FALSE}
 # Download occurrence data with coordinates from GBIF
