@@ -1,0 +1,103 @@
+---
+title: "Usage of hydrographr with other stream networks"
+subtitle: "Examples showing how to use the hydrographr package with the NHDPlus dataset "
+author: ""
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Other stream networks}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+bibliography: bib/references_nhdp.bib
+link-citations: yes
+linkcolor: blue
+# csl: copernicus.csl
+nocite: "@*"
+editor_options:
+  markdown:
+    wrap: 72
+---
+
+```{r, include = FALSE, eval = FALSE}
+# writes out the references for all packages
+knitr::write_bib(file = "packages.bib")
+```
+
+
+Load required libraries:
+
+```{r, eval=F}
+library(hydrographr)
+library(nhdplusTools)
+library(rgbif)
+library(dplyr)
+library(sf)
+```
+
+Define working directory:
+
+```{r, eval = FALSE, include=FALSE}
+wdir <- paste0("/home/mueblacker/Documents/Glowabio/Code/hydrographr/vignettes/data_hawaii")
+```
+
+```{r, eval=F}
+
+# Define the working directory for the region Hawaii
+wdir <- "my/working/directory/data_hawaii"
+
+data_dir <- paste0(wdir, "/data")
+rast_dir <- paste0(data_dir, "/raster")
+vect_dir <- paste0(data_dir, "/vector")
+sp_dir <- paste0(data_dir, "/species")
+out_dir  <- paste0(wdir, "/output")
+
+# Create a new folder in the working directories to store all the data
+dir.create(data_dir)
+dir.create(rast_dir)
+dir.create(vect_dir)
+dir.create(sp_dir)
+dir.create(out_dir)
+```
+
+```{r, eval=F}
+download_nhdplusv2(outdir = rast_dir,
+                   url = paste0("https://prd-tnm.s3.amazonaws.com/StagedProducts/",
+                                "Hydrography/NHDPlusHR/Beta/GDB/",
+                                "NHDPLUS_H_2006_HU4_RASTER.7z"),
+                   progress = TRUE)
+```
+
+```{r, eval=F}
+  download_nhdplusv2(outdir = vect_dir,
+                     url = paste0("https://prd-tnm.s3.amazonaws.com/StagedProducts/",
+                                  "Hydrography/NHDPlusHR/Beta/GDB/",
+                                  "NHDPLUS_H_2006_HU4_GDB.zip"),
+                     progress = TRUE)
+```
+
+
+```{r, eval = FALSE}
+# Download occurrence data with coordinates from GBIF
+gbif_data <- occ_data(scientificName = "Stenogobius hawaiiensis", 
+                      hasCoordinate = TRUE)
+
+# To cite the data use:
+# gbif_citation(gbif_data)        
+
+# Clean the data
+spdata <- gbif_data$data %>% 
+  select(decimalLongitude, decimalLatitude, species, occurrenceStatus, 
+         country, stateProvince, year) %>% 
+  filter(!is.na(year),
+         stateProvince == "Hawaii") %>% 
+  distinct() %>% 
+  mutate(occurence_id = 1:nrow(.)) %>% 
+  rename("longitude" = "decimalLongitude",
+         "latitude" = "decimalLatitude") %>% 
+  select(8, 1:7)
+
+write.csv(spdata, paste0(sp_dir, "/stenogobius_hawaiiensis.csv") )
+
+spdata
+
+```
