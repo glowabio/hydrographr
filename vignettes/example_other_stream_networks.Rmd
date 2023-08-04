@@ -40,6 +40,8 @@ Define working directory:
 wdir <- paste0("/home/mueblacker/Documents/Glowabio/Code/hydrographr/vignettes/data_hawaii")
 ```
 
+### Download NHDPlus data
+
 ```{r, eval=F}
 
 # Define the working directory for the region Hawaii
@@ -59,13 +61,11 @@ dir.create(sp_dir)
 dir.create(out_dir)
 ```
 
-### Download NHDPlus data
-
 Data of the NHDPlus data can be downloaded using the R package
 `nhdplusTools` or from this USGS website:
 <https://apps.nationalmap.gov/downloader/>
 
-```{r, eval=F}
+```{r download, eval=F}
 # Download NHDPlus raster data for Hawaii 
 download_nhdplusv2(outdir = rast_dir,
                    url = paste0("https://prd-tnm.s3.amazonaws.com/StagedProducts/",
@@ -315,4 +315,46 @@ reclass_raster(
   recl_layer = paste0(rast_dir, "/NHDPLUS_H_2006_HU4_RASTER/HRNHDPlusRasters2006/cat_reclass.tif"),
   read = FALSE, 
   no_data = no_data_val$NoData)
+```
+
+### Extract from .GPKG
+
+See [Download NHDPlus data] to download NHDPlus vector data for Hawaii.
+
+```{r, eval=F}
+gdb_dir <- paste0(vect_dir, "/NHDPLUS_H_2006_HU4_GDB")
+
+# Write out a .gpkg file based on the .gdb files
+get_nhdplushr(gdb_dir, file.path(gdb_dir, "nhdplus_2006-HU4.gpkg"))
+
+extract_from_gpkg(data_dir = gdb_dir,subc_id = "all", var_layer = "nhdplus_2006-HU4.gpkg",quiet = F)
+
+# I think that stream IDs don’t correspond to catchment ids, so it’s not possible to filter the .gpkg using the ids of the catchment raster
+```
+
+### Read a .GPKG
+
+See [Download NHDPlus data] to download NHDPlus vector data for Hawaii.
+
+```{r, eval=F}
+gdb_dir <- paste0(vect_dir, "/NHDPLUS_H_2006_HU4_GDB")
+
+# Write out a .gpkg file based on the .gdb files
+get_nhdplushr(gdb_dir, file.path(gdb_dir, "nhdplus_2006-HU4.gpkg"))
+
+# Import flow line attribute table as a data.table
+flow_line <- read_geopackage(gpkg = paste0(gdb_dir, "/nhdplus_2006-HU4.gpkg"), 
+                layer_name = "NHDFlowline")
+
+# Import flow line as a graph
+flow_line_graph <- read_geopackage(gpkg = paste0(gdb_dir, "/nhdplus_2006-HU4.gpkg"), 
+                layer_name = "NHDFlowline",
+                import_as = "graph")
+
+# Import the catchment layer as a spatial vector
+catchment_sp <- read_geopackage(gpkg = paste0(gdb_dir, "/nhdplus_2006-HU4.gpkg"), 
+                layer_name = "NHDPlusCatchment",
+                name = "REACHCODE",
+                import_as = "SpatVect")
+
 ```
