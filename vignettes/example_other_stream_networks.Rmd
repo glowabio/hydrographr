@@ -349,7 +349,7 @@ flow_line <- read_geopackage(gpkg = paste0(gdb_dir, "/nhdplus_2006-HU4.gpkg"),
 # Import flow line as a graph
 flow_line_graph <- read_geopackage(gpkg = paste0(gdb_dir, "/nhdplus_2006-HU4.gpkg"), 
                 layer_name = "NHDFlowline",
-                import_as = "graph")
+                import_as = "graph", name = "Permanent_Identifier")
 
 # Import the catchment layer as a spatial vector
 catchment_sp <- read_geopackage(gpkg = paste0(gdb_dir, "/nhdplus_2006-HU4.gpkg"), 
