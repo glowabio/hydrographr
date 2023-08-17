@@ -47,14 +47,15 @@
 #' Csardi G, Nepusz T: The igraph software package for complex network research,
 #' InterJournal, Complex Systems 1695. 2006. \url{https://igraph.org}
 #'
-#'#' @seealso
+#'
+#' @seealso
 #' * \code{\link{read_geopackage()}} to create a network graph.
 #' * \code{\link{get_catchment_graph()}} to subset a network graph.
 #' @md
 #'
 #'
 #'
-#'#' @note
+#' @note
 #' # For getting the actual IDs of the path between two subcatchments,
 #' # you can use the igraph function "all_shortest_paths":
 #'

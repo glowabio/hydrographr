@@ -54,6 +54,19 @@ function \code{\link{read_geopackage()}} can be used to create the input
 network graph, and the function \code{\link{get_catchment_graph()}} can be
 used to subset a network graph.
 }
+\note{
+For getting the actual IDs of the path between two subcatchments,you can use the igraph function "all_shortest_paths":Specify the subc_ids
+
+from_subc_id = 513866854
+to_subc_id = 513867238
+
+subc_path <- all_shortest_paths(graph = my_graph,
+from = as.character(from_subc_id),
+to = as.character(to_subc_id),
+mode = "all")Extract only the subc_ids from the output:
+
+subc_path <- as.numeric(as_ids(subc_path$res[\link{1}]))
+}
 \examples{
 # Download test data into the temporary R folder
 # or define a different directory
@@ -112,8 +125,8 @@ number_segments
 \references{
 Csardi G, Nepusz T: The igraph software package for complex network research,
 InterJournal, Complex Systems 1695. 2006. \url{https://igraph.org}
-
-#' @seealso
+}
+\seealso{
 \itemize{
 \item \code{\link{read_geopackage()}} to create a network graph.
 \item \code{\link{get_catchment_graph()}} to subset a network graph.
