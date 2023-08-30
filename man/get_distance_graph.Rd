@@ -6,7 +6,7 @@
 \usage{
 get_distance_graph(
   g,
-  subc_id = subc_id,
+  subc_id = NULL,
   variable = "length",
   distance_m = TRUE,
   max_size = 1500
@@ -93,17 +93,17 @@ subc_id <- c("513863746", "513866851", "513867238")
 my_points <- data.frame(longitude = c(8.885996642821286,
                                       8.873352770456831,
                                       8.898060225276105),
-                       latitude = c(42.26533822791161,
+                        latitude = c(42.26533822791161,
                             	       42.26307509726402,
                             	       42.25513157316764),
-                       occurrence_id = c(1, 2, 3))
+                        occurrence_id = c(1, 2, 3))
 
-# Define the path of the subcatchment raster
+# Define the path of the sub-catchment raster
 subc_raster <- paste0(my_directory,
                       "/hydrography90m_test_data/subcatchment_1264942.tif")
 
 
-# Extract the subcatchment IDs for the points:
+# Extract the sub-catchment IDs for the points:
 my_points_subc_id <- extract_ids(data = my_points,
                                  lon = "longitude",
                                  lat = "latitude",
@@ -111,7 +111,7 @@ my_points_subc_id <- extract_ids(data = my_points,
                                  subc_layer = subc_raster)
 
 
-# Get a vector of the subcatchment IDs:
+# Get a vector of the sub-catchment IDs:
 subc_id <- my_points_subc_id$subcatchment_id
 
 # Get the network distance (in meters) between all input pairs:
@@ -123,9 +123,9 @@ subc_distances
 
 # Get the number of stream segments that are along the network path:
 number_segments <- get_distance_graph(my_graph,
-                                     subc_id = subc_id,
-                                     variable = "length",
-                                     distance_m = FALSE)
+                                      subc_id = subc_id,
+                                      variable = "length",
+                                      distance_m = FALSE)
 number_segments
 }
 \references{
