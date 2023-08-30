@@ -12,8 +12,8 @@
 #' network graph, and the function \code{\link{get_catchment_graph()}} can be
 #' used to subset a network graph.
 #'
-#' @param g igraph object.
-#' @param subc_id numeric vector of a single or multiple IDs,
+#' @param g igraph object. A directed graph.
+#' @param subc_id numeric. Vector of a single or multiple IDs,
 #' e.g (c(ID1, ID2, ID3, ...). The sub-catchment (equivalent to stream segment)
 #' IDs for which to delineate the upstream drainage area. Note that you can
 #' browse the entire network online at
@@ -25,7 +25,7 @@
 #' using "distance_m = FALSE".
 #' @param distance_m logical. If TRUE, the length (in meters) of each network
 #' segment along the path will be cumulated and the total length between all
-#' pairs will be reported in a matrix. If false, only the number of segments
+#' pairs will be reported in a matrix. If FALSE, only the number of segments
 #' that are traversed through will be reported in the output matrix. Default
 #' is TRUE.
 #' @param max_size numeric. Specifies the maximum size of the data passed to the
@@ -56,11 +56,13 @@
 #'
 #'
 #' @note
-#' # For getting the actual IDs of the path between two subcatchments,
-#' # you can use the igraph function "all_shortest_paths":
+#' For getting the actual IDs of the path between two sub-catchments,
+#' you can use the igraph function "all_shortest_paths":
 #'
-#' # Specify the subc_ids
+#' Specify the subc_ids:
+#'
 #' from_subc_id = 513866854
+#'
 #' to_subc_id = 513867238
 #'
 #' subc_path <- all_shortest_paths(graph = my_graph,
@@ -68,7 +70,8 @@
 #'                                 to = as.character(to_subc_id),
 #'                                 mode = "all")
 #'
-#' # Extract only the subc_ids from the output:
+#' Extract only the subc_ids from the output:
+#'
 #' subc_path <- as.numeric(as_ids(subc_path$res[[1]]))
 #'
 #'
