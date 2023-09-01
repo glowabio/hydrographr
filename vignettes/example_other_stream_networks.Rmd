@@ -18,23 +18,57 @@ editor_options:
     wrap: 72
 ---
 
-```{r, include = FALSE, eval = FALSE}
+
+```{r, include = FALSE, eval = F}
 # writes out the references for all packages
-knitr::write_bib(file = "packages.bib")
+knitr::write_bib(file = "bib/references_nhdp.bib")
+```
+
+```{r setup, include=F}
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE,  
+                      out.width='50%', fig.align='center')
+knitr::opts_knit$set(root.dir = "./data_cuba")
+library(hydrographr)
+library(nhdplusTools)
+library(rgbif)
+library(terra)
+library(archive)
+library(tools)
+library(dplyr)
+library(knitr)
+library(kableExtra)
+library(leaflet)
+library(leafem)
+library(htmlwidgets)
+library(mapview)
+library(here)
 ```
 
 Load required libraries:
 
-```{r, eval=F}
+```{r, eval=T}
 library(hydrographr)
 library(nhdplusTools)
 library(rgbif)
 library(dplyr)
 library(archive)
 library(terra)
+library(leaflet)
 ```
 
 Define working directory:
+
+```{r, eval=FALSE}
+wdir <- paste0(here(), "/vignettes/data_other_networks")
+if(!dir.exists(paste0(wdir, "/data"))) dir.create(paste0(wdir, "/data"))
+```
+
+```{r, eval=FALSE, include=FALSE}
+wdir <- "/home/afroditi/Documents/PhD/hydrographr_case_study/nhdplus"
+setwd(wdir)
+dir.create("data")
+```
+
 
 ```{r, eval = FALSE, include=FALSE}
 wdir <- paste0("/home/mueblacker/Documents/Glowabio/Code/hydrographr/vignettes/data_hawaii")
@@ -61,7 +95,7 @@ dir.create(sp_dir)
 dir.create(out_dir)
 ```
 
-Data of the NHDPlus data can be downloaded using the R package
+Data of the NHDPlus dataset can be downloaded using the R package
 `nhdplusTools` or from this USGS website:
 <https://apps.nationalmap.gov/downloader/>
 
@@ -99,7 +133,6 @@ Check directory structure
 
 ```{r, eval = F}
 list.files(paste0(rast_dir, "/NHDPLUS_H_2006_HU4_RASTER"), recursive = T, pattern = ".tif$")
-# list.files(paste0(vect_dir, "/NHDPLUS_H_2006_HU4_GDB"), recursive = T)
 ```
 
 ### Species data
@@ -113,7 +146,7 @@ gbif_data <- occ_data(scientificName = "Stenogobius hawaiiensis",
                       hasCoordinate = TRUE)
 
 # To cite the data use:
-# gbif_citation(gbif_data)        
+# gbif_citation(gbif_data)
 
 # Clean the data
 spdata <- gbif_data$data %>% 
@@ -135,25 +168,35 @@ spdata
 
 ### Visualise species data
 
+```{r, include = FALSE, eval = FALSE}
+m <- leaflet() %>%
+  addProviderTiles('Esri.WorldShadedRelief') %>%
+  addCircles(data = spdata, color = "purple") 
+
+saveWidget(m, file=paste0(wdir, "../../man/figures/hawaii_map.html"))
+```
+
 ```{r, eval = FALSE}
-m <- leaflet::leaflet() %>%
-  leaflet::addProviderTiles('Esri.WorldShadedRelief') %>%
-  leaflet::addCircles(data = spdata, color = "purple") # data = spdata
+m <- leaflet() %>%
+  addProviderTiles('Esri.WorldShadedRelief') %>%
+  addCircles(data = spdata, color = "purple") 
 
 m
 ```
 
+![](../man/figures/hawaii_map.png)
+
 By inspecting the NHDPlus data, we observe that the coordinate reference
 system is not WGS84, but the EPSG:26904.
 
-```{r}
+```{r, eval=F}
 rast(paste0(rast_dir, "/NHDPLUS_H_2006_HU4_RASTER/HRNHDPlusRasters2006/cat.tif"))
 ```
 
 Therefore we will need to convert the species points' coordinates to
 EPSG:26904, so that they match with the spatial layers.
 
-```{r}
+```{r, eval=F}
 
 # Convert the coordinate columns to a matrix
 spdata_coord <- spdata %>% 
@@ -169,15 +212,6 @@ spdata_coord <- project(spdata_coord,
 spdata <- spdata %>% 
   mutate(longitude = spdata_coord[,1],
          latitude = spdata_coord[,2])
-
-## Probably not needed
-# # Convert species data frame to spatial vector, defining the initial coordinate reference system as WGS84
-# spdata_vect <- vect(spdata, geom=c("longitude", "latitude"),
-#                     crs=
-#                       )
-# 
-# # Project to the coordinate reference system of the NHDPlus dataset
-# spdata_vect <- project(spdata_vect, "EPSG:26904")
 
 ```
 
@@ -211,7 +245,7 @@ merge_tiles(tile_dir = out_dir,
 
 ### Extract IDs, Report no data value, Set no data value
 
-```{r}
+```{r, eval=F}
 spdata_ids <- extract_ids(data = spdata, 
             lon = "longitude", lat = "latitude",
             id = "occurrence_id",
@@ -258,7 +292,7 @@ For this operation, we also need to convert the projection system of the
 cat.tif raster to EPSG:4326 using the 'terra' package, so that it is
 compatible with the coordinate system of CHELSA Bioclim files.
 
-```{r}
+```{r, eval=F}
 
 # Download bio12 in the rast_dir
 download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio12_1981-2010_V.2.1.tif",
@@ -299,10 +333,9 @@ zonal_stats
 
 ### Reclassify raster
 
-```{r}
+```{r, eval=F}
 
 # Create example dataframe with reclassification rules to reclassify the value of all basins containing species data to 1, and all the rest to -99999.
-
 reclass_rules <- data.frame(cat = as.integer(spdata_ids$basin_id), 
                             new_val = as.integer(1))
 
@@ -317,17 +350,17 @@ reclass_raster(
   no_data = no_data_val$NoData)
 ```
 
-### Extract from .GPKG
+###  <!--# Extract from .GPKG -->
 
-See [Download NHDPlus data] to download NHDPlus vector data for Hawaii.
+<!--# See Download NHDPlus data to download NHDPlus vector data for Hawaii. -->
 
-```{r, eval=F}
+```{r, eval=F, include = F}
 gdb_dir <- paste0(vect_dir, "/NHDPLUS_H_2006_HU4_GDB")
 
 # Write out a .gpkg file based on the .gdb files
 get_nhdplushr(gdb_dir, file.path(gdb_dir, "nhdplus_2006-HU4.gpkg"))
 
-extract_from_gpkg(data_dir = gdb_dir,subc_id = "all", var_layer = "nhdplus_2006-HU4.gpkg",quiet = F)
+extract_from_gpkg(data_dir = gdb_dir, subc_id = "all", var_layer = "nhdplus_2006-HU4.gpkg", quiet = F)
 
 # I think that stream IDs don’t correspond to catchment ids, so it’s not possible to filter the .gpkg using the ids of the catchment raster
 ```
@@ -358,3 +391,5 @@ catchment_sp <- read_geopackage(gpkg = paste0(gdb_dir, "/nhdplus_2006-HU4.gpkg")
                 import_as = "SpatVect")
 
 ```
+
+### References
