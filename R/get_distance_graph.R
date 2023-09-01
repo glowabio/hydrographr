@@ -1,13 +1,13 @@
 #' @title Get the distance in meters between stream segments along a network graph
 #'
-#' @description Given a set of input sub-cacthments IDs, the function will
+#' @description Given a set of input sub-catchment IDs, the function will
 #' calculate the network distance in meters between all input pairs.
-#' Alternatively, only the number of stream segments (sub-cacthments) along the
+#' Alternatively, only the number of stream segments (sub-catchment) along the
 #' paths are reported. Note that the stream segment and sub-catchment
 #' IDs are identical, and for consistency, we use the term "subc_id".
 #'
-#' See the code under "Note" that explains how to use standard igraph functions
-#' to obtain the actual stream segment IDs along the path. The
+#' See the example code under "Note" that explains how to use standard igraph
+#' functions to obtain the actual stream segment IDs along the path. The
 #' function \code{\link{read_geopackage()}} can be used to create the input
 #' network graph, and the function \code{\link{get_catchment_graph()}} can be
 #' used to subset a network graph.
@@ -15,13 +15,13 @@
 #' @param g igraph object. A directed graph.
 #' @param subc_id numeric. Vector of a single or multiple IDs,
 #' e.g (c(ID1, ID2, ID3, ...). The sub-catchment (equivalent to stream segment)
-#' IDs for which to delineate the upstream drainage area. Note that you can
-#' browse the entire network online at
-#' \url{https://geo.igb-berlin.de/maps/351/view} and to the left hand side,
-#' select the "Stream segment ID" layer and click on the map to get the ID. Optional.
+#' IDs for calculating the distances. Note that you can browse the entire
+#' network online at \url{https://geo.igb-berlin.de/maps/351/view} and to the
+#' left hand side, select the "Stream segment ID" layer and click on the map
+#' to get the ID.
 #' @param variable character. Specify the attribute / column name in the graph
 #' object that should be cumulated along the network path. Default is "length"
-#' to be used with the Hydrography90m dataset.  Not needed when
+#' to be used with the Hydrography90m dataset. Not needed when
 #' using "distance_m = FALSE".
 #' @param distance_m logical. If TRUE, the length (in meters) of each network
 #' segment along the path will be cumulated and the total length between all
@@ -32,10 +32,9 @@
 #' parallel back-end in MB. Default is 1500 (1.5 GB). Consider a higher value
 #' for large study areas (more than one 20°x20° tile). Optional.
 #'
-#' @returns A graph or data.table that reports all subc_ids.
-#' In case of multiple input segments, the results are stored in a list.
+#' @returns A data.table that reports either the distance or the number of
+#' segments between sub_ids.
 #'
-
 #' @importFrom igraph all_shortest_paths edge_attr distances
 #' @importFrom data.table setDT
 #' @importFrom memuse Sys.meminfo
@@ -79,6 +78,7 @@
 #' @examples
 #' # Download test data into the temporary R folder
 #' # or define a different directory
+#'
 #' my_directory <- tempdir()
 #' download_test_data(my_directory)
 #'
@@ -136,6 +136,7 @@
 get_distance_graph <- function(g, subc_id = NULL, variable = "length",
                                distance_m = TRUE, max_size = 1500) {
 
+
   # Check input arguments
   if (class(g) != "igraph")
     stop("Input must be an igraph object.")
@@ -143,8 +144,8 @@ get_distance_graph <- function(g, subc_id = NULL, variable = "length",
   # if (!is_directed(g))
   #   stop("The input graph must be a directed graph.")
 
-  if (missing(subc_id) && outlet == FALSE)
-    stop("Please provide at least one segment ID of the input graph.
+  if (missing(subc_id) | length(subc_id) <2)
+    stop("Please provide at least two unique segment IDs of the input graph.
          The subc_id must be a numeric vector.")
 
   if (is.data.frame(subc_id) == TRUE)
@@ -161,8 +162,12 @@ get_distance_graph <- function(g, subc_id = NULL, variable = "length",
   # only set this only within the function
   options(scipen = 999)
 
-  # Remove any duplicates rom the input subc_ids
+  # Remove any duplicates from the input subc_ids
   subc_id <- subc_id[!duplicated(subc_id)]
+
+  if (length(subc_id) <2)
+    stop("Please provide at least two unique segment IDs of the input graph.
+         The subc_id must be a numeric vector.")
 
   if(distance_m == TRUE) { # default
     # get the actual distance in meters along the paths
@@ -171,28 +176,40 @@ get_distance_graph <- function(g, subc_id = NULL, variable = "length",
     names(edge_attr(g))[which(names(edge_attr(g)) == variable)] <- "weight"
 
     # Get a matrix of the distances [m] between the input IDs
-    network_length <- distances(g,
-                                v = as.character(subc_id),
-                                to = as.character(subc_id),
-                                mode = c("all"),
-                                weights = NULL,
-                                algorithm = c("automatic"))
-    # Return as data.table
-    network_length <- setDT(as.data.frame(network_length))
-    return(network_length)
+    dist_out <- distances(g,
+                          v = as.character(subc_id),
+                          to = as.character(subc_id),
+                          mode = c("all"),
+                          weights = NULL,
+                          algorithm = c("automatic"))
 
+
+    # get only the number of segments along the paths
     } else if(distance_m == FALSE) {
-  # get only the number of segments along the paths
-  number_subc_ids <- distances(g,
-                               v = as.character(subc_id),
-                               to = as.character(subc_id),
-                               mode = c("all"),
-                               weights = NA)
 
-  # Return as data.table
-  number_subc_ids <- setDT(as.data.frame(number_subc_ids))
-  return(number_subc_ids)
+    dist_out <- distances(g,
+                          v = as.character(subc_id),
+                          to = as.character(subc_id),
+                          mode = c("all"),
+                          weights = NA)
     }
+
+    # Convert the upper triangle to a 3-column long table
+    dist_out_ind <- which(upper.tri(dist_out, diag = TRUE), arr.ind = TRUE)
+    dist_out_ind_name <- dimnames(dist_out)
+    dist_out_table <- data.frame(from = dist_out_ind_name[[1]][dist_out_ind[, 1]],
+                                 to = dist_out_ind_name[[2]][dist_out_ind[, 2]],
+                                 distance = dist_out[dist_out_ind])
+
+    # Remove the zero self-distances
+    dist_out_table <- dist_out_table[-which(dist_out_table["from"] == dist_out_table["to"]),]
+
+    # Return as data.table
+    dist_out_table <- setDT(dist_out_table)
+    return(dist_out_table)
+
 }
+
+
 
 
