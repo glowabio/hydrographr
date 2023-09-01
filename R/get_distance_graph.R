@@ -10,7 +10,11 @@
 #' functions to obtain the actual stream segment IDs along the path. The
 #' function \code{\link{read_geopackage()}} can be used to create the input
 #' network graph, and the function \code{\link{get_catchment_graph()}} can be
-#' used to subset a network graph.
+#' used to subset a network graph. Note that graph-based function includes also
+#' the entire length of the "from" and "to" stream segment, opposed to the
+#' \code{\link{get_distance()}} which, depending on the snapping method,
+#' includes only the part of the "from" and "to" segement where the points are
+#' located, resulting in minor differences.
 #'
 #' @param g igraph object. A directed graph.
 #' @param subc_id numeric. Vector of a single or multiple IDs,
@@ -23,11 +27,12 @@
 #' object that should be cumulated along the network path. Default is "length"
 #' to be used with the Hydrography90m dataset. Not needed when
 #' using "distance_m = FALSE".
-#' @param distance_m logical. If TRUE, the length (in meters) of each network
-#' segment along the path will be cumulated and the total length between all
-#' pairs will be reported in a matrix. If FALSE, only the number of segments
-#' that are traversed through will be reported in the output matrix. Default
-#' is TRUE.
+#' @param distance_m logical. If TRUE, and in case of the Hydrography90m dataset,
+#' the length (in meters) of each network segment along the path will be
+#' cumulated and the total length between all pairs will be reported in
+#' data.table. If FALSE, only the number of segments that are traversed
+#' through will be reported in the output matrix. If the subc_ids of the actual
+#'  path is needed, please see the example code under "Note". Default is TRUE.
 #' @param max_size numeric. Specifies the maximum size of the data passed to the
 #' parallel back-end in MB. Default is 1500 (1.5 GB). Consider a higher value
 #' for large study areas (more than one 20°x20° tile). Optional.
