@@ -1,13 +1,13 @@
 ---
-title: "Function benchmarks"
+  title: "Function benchmarks"
 subtitle: "Performance of selected `hydrographr` functions and their comparison to corresponding `terra` workflows"
 author: ""
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Function benchmarks}
-  %\VignetteEncoding{UTF-8}
-  %\VignetteEngine{knitr::rmarkdown}
+%\VignetteEncoding{UTF-8}
+%\VignetteEngine{knitr::rmarkdown}
 bibliography: bib/references_bench.bib
 link-citations: yes
 linkcolor: blue
@@ -15,10 +15,10 @@ linkcolor: blue
 nocite: "@*"
 editor_options:
   markdown:
-    wrap: 72
+  wrap: 72
 ---
-
-```{r, include = FALSE, eval = FALSE}
+  
+  ```{r, include = FALSE, eval = FALSE}
 # writes out the references for all packages
 knitr::write_bib(file = "packages.bib")
 ```
@@ -28,8 +28,8 @@ knitr::write_bib(file = "packages.bib")
 The main focus of `hydrographr` is to process Hydrography90m [@amatulli2022hydrography90m] data and include them in workflows in `R`. Nevertheless, `hydrographr` provides geospatial functions which can be useful when working with geospatial data in general, with the goal to be computationally and RAM usage efficient. Benchmark tests for selected `hydrographr` functions should demonstrate the capabilities of the `R` package. We compared the tested functions to corresponding workflows which employ the `terra` package to put the performance into perspective without claiming any superiority of either one of the `R` packages over the other.
 
 We focused on five common geospatial tasks that can be easily implemented with both `hydrographr` and `terra`:
-
-- Merging multiple raster layers to one file.
+  
+  - Merging multiple raster layers to one file.
 - Cropping a raster layer to a bounding box extent.
 - Cropping a raster layer to an irregular boundary of a vector polygon.
 - Reclassifying the values of a raster layer.
@@ -52,13 +52,13 @@ library(here)
 
 ## Results of benchmark experiments
 
-The benchmark shows that `hydrographr::merge_tiles` overall merged the six tiles faster and using less RAM compared to `terra` where the tiles are loaded in R merged with `terra::merge` and written to the hard drive. On average, the performance of `hydrographr::merge_tiles` surpassed that of `terra` on both Windows and Ubuntu, completing the task 3 times faster (165 compared to 525 seconds) and 4.5 times faster (162 compared to 733 seconds), respectively. Additionally, `terra` required on Windows twice the amount of RAM to perform the merge operation compared to `hydrographr` (1.3 compared to 2.8 GB).
+The benchmark shows that `hydrographr::merge_tiles` overall merged the six tiles faster and using less RAM compared to `terra` where the tiles are loaded in R merged with `terra::merge` and written to the hard drive. On average, the performance of `hydrographr::merge_tiles` surpassed that of `terra` on both Windows and Ubuntu, completing the task 2.5 times faster (179 compared to 457 seconds) and 4 times faster (158 compared to 623 seconds), respectively. Additionally, `terra` required on Windows five times the amount of RAM to perform the merge operation compared to `hydrographr` (0.84 compared to 4.24 GB).
 
-For both tasks, cropping a raster to the extent of a bounding box and to the boundary of a vector polygon, `terra::crop` outperforms `hydrographr::crop_to_extent` in the experiments on the Windows system, performing the tasks 1.6 times (261 compared to 430 seconds) and 2.1 times  (258 compared to 549 seconds) faster. The differences on the Ubuntu system were less significant. Particularly, on the Windows system, `terra` used 2.5 times (3.1 compared to 1.3 GB) and 2.3 times (3.1 compared to 1.4 GB) more RAM to perform the cropping task. 
+For both tasks, cropping a raster to the extent of a bounding box and to the boundary of a vector polygon, `terra::crop` outperforms `hydrographr::crop_to_extent` in the experiments on the Windows system, performing the tasks 3.5 times (130 compared to 454 seconds) and 2.5 times  (225 compared to 571 seconds) faster. The differences on the Ubuntu system were less significant. Particularly, on the Windows system, `terra` used 4.5 times (4.43 compared to 0.97 GB) and 3.4 times (3.53 compared to 1.05 GB) more RAM to perform the cropping task. 
 
-The reclassification task was performed for the sub-catchments of the entire Amazon basin, reassigning random integer values to the over 31 million sub-catchment IDs, thus requiring a rather large reclassification table. While `hydrographr::reclass_raster` was able to perform the task in 178 (Windows) and 119 seconds (Ubuntu), respectively, while we aborted the `terra::classify` after 12 hours of run-time with a progress of approximately 10\%. 
+The reclassification task was performed for the sub-catchments of the entire Amazon basin, reassigning random integer values to the over 31 million sub-catchment IDs, thus requiring a rather large reclassification table. While `hydrographr::reclass_raster` was able to perform the task in 179 (Windows) and 116 seconds (Ubuntu), respectively, while we aborted the `terra::classify` after 12 hours of run-time with a progress of approximately 10\%. 
 
-To assess the performance of computing zonal statistics using `hydrographr::extract_zonal_stat`, we implemented `terra::zonal` to calculate the mean and the standard deviation of a flow accumulation raster layer, where the ca. 31 million sub-catchments of the Amazon basin were used as the zones. `hydrographr::extract_zonal_stat` returns the following nine statistical measures by default in a single run: the number of cells within each zone, minimum and maximum cell values, range, arithmetic mean, population variance, standard deviation, coefficient of variation, and sum (as provided by the underlying r.univar function in GRASS GIS). Hence, if several statistical measures are of interest, the run-times of individual `terra::zonal` executions must be added up for comparison. The calculation of the means is 2.4 and 2.2 times faster when performed with `terra::zonal` on Windows (247 compared to 586 seconds) and Ubuntu (194 compared to 420 seconds), respectively. Similar to the other tasks, the RAM usage is twice as high with `terra` compared to `hydrographr` running on Windows (2.7 compared to 1.3 GB). While the standard deviation is included in the `hydrographr` output table, `terra::zonal` could not complete the task and ran out of memory.
+To assess the performance of computing zonal statistics using `hydrographr::extract_zonal_stat`, we implemented `terra::zonal` to calculate the mean and the standard deviation of a flow accumulation raster layer, where the ca. 31 million sub-catchments of the Amazon basin were used as the zones. `hydrographr::extract_zonal_stat` returns the following nine statistical measures by default in a single run: the number of cells within each zone, minimum and maximum cell values, range, arithmetic mean, population variance, standard deviation, coefficient of variation, and sum (as provided by the underlying r.univar function in GRASS GIS). Hence, if several statistical measures are of interest, the run-times of individual `terra::zonal` executions must be added up for comparison. The calculation of the means is 2.6 times faster when performed with `terra::zonal` on Windows 247 compared to 645 seconds) and Ubuntu (197 compared to 520 seconds). The RAM usage is fairly large when calculating all zonal statistics with `hydrographr`, with 9.38 GB on Windows and 6.96 GB on Linux, while the mean calculation with `terra` only used 2.68 and 5.39 GB, respectively. While the standard deviation is included in the `hydrographr` output table, `terra::zonal` could not complete the task of calculating the standard deviation and ran out of memory.
 
 ![](../man/figures/benchmark.png)
 
@@ -67,8 +67,8 @@ To assess the performance of computing zonal statistics using `hydrographr::extr
 ### R packages and paths
 
 Load required libraries:
-
-```{r, eval=F}
+  
+  ```{r, eval=F}
 library(hydrographr)
 library(terra)
 library(microbenchmark)
@@ -76,8 +76,8 @@ library(readr)
 ```
 
 Function definitions:
-
-```{r, eval=FALSE}
+  
+  ```{r, eval=FALSE}
 # Small helper function to print benchmark experiments
 print_experiment <- function(micro) {
   cat("Run times in seconds:\n")
@@ -89,8 +89,8 @@ print_experiment <- function(micro) {
 
 
 Define working directory:
-
-```{r, eval=FALSE, include=FALSE}
+  
+  ```{r, eval=FALSE, include=FALSE}
 wdir <- "/home/mueblacker/Documents/Glowabio/Code/hydrographr/vignettes/benchmark"
 data_dir <- paste0(wdir, "/data")
 out_dir  <- paste0(wdir, "/output")
@@ -161,9 +161,6 @@ crop_to_extent(raster_layer = paste0(acc_dir, "acc_merge.tif"),
                file_name =  "acc_merge_crop.tif")
 ```
 
-
-
-
 ### Experiment 1: Merging tiles
 
 The first benchmark experiment is to merge the 6 tiles which cover the Amazon basin to on ".tif" file. The run time of the entire workflow is evaluated, which includes loading and merging the input tiles and writing the outputs back to the hard drive. 
@@ -194,7 +191,7 @@ print_experiment(t_merge_hydr)
 ```
 
 ```{r, echo=FALSE}
-cat("Run times in seconds:\n   min median    max \n 160.8  164.7  197.7")
+cat("Run times in seconds:\n   min median    max \n 160.5  179.4  190.3")
 ```
 
 The tested `terra` workflow involves reading the 6 sub-catchment tiles with the function `rast`, merging them with `merge` and writing the result layer with `writeRaster`.
@@ -217,7 +214,7 @@ print_experiment(t_merge_terra)
 ```
 
 ```{r, echo=FALSE}
-cat("Run times in seconds:\n   min median    max \n 524.7  524.7  525.2")
+cat("Run times in seconds:\n   min median    max \n 454.9  457.4  457.4")
 ```
 
 ### Experiment 2: Cropping to bounding box
@@ -238,7 +235,7 @@ print_experiment(t_crop_bbox_hydr)
 ```
 
 ```{r, echo=FALSE}
-cat("Run times in seconds:\n   min median    max \n 428.9  430.0  430.3")
+cat("Run times in seconds:\n   min median    max \n 449.8  453.7  478.4")
 ```
 
 The corresponding `terra` workflow includes loading the merged layer with `rast`, cropping the layer to the defined bounding box with `crop` and writing the cropped layer to the hard drive with `writeRaster`.
@@ -259,7 +256,7 @@ print_experiment(t_crop_bbox_terra)
 ```
 
 ```{r, echo=FALSE}
-cat("Run times in seconds:\n   min median    max \n 261.3  261.3  265.9")
+cat("Run times in seconds:\n   min median    max \n 130.1  130.6  143.6")
 ```
 
 ### Experiment 3: Cropping to basin boundary
@@ -286,7 +283,7 @@ print_experiment(t_crop_vect_hydr)
 ```
 
 ```{r, echo=FALSE}
-cat("Run times in seconds:\n   min median    max \n 539.4  549.4  555.9")
+cat("Run times in seconds:\n   min median    max \n 568.0  571.0  592.3")
 ```
 
 The corresponding `terra` workflow includes loading the merged layer with `rast`, loading the basin boundary with `vect`, cropping the layer to the basin boundary with `crop` and writing the cropped layer to the hard drive with `writeRaster`. For `crop` the input argument `mask = TRUE` is set, to crop and mask the layer with the basin boundary polygon.
@@ -305,7 +302,7 @@ print_experiment(t_crop_vect_terra)
 ```
 
 ```{r, echo=FALSE}
-cat("Run times in seconds:\n   min median    max \n 257.6  257.6  258.5")
+cat("Run times in seconds:\n   min median    max \n 224.3  225.0  225.5")
 ```
 
 ### Experiment 4: Reclassifying raster values
@@ -338,7 +335,7 @@ print_experiment(t_recl_hydr)
 ```
 
 ```{r, echo=FALSE}
-cat("Run times in seconds:\n   min median    max \n 171.0  178.0  184.3")
+cat("Run times in seconds:\n   min median    max \n 162.4  179.5  188.0")
 ```
 
 The corresponding `terra` workflow includes loading the cropped sub-catchment layer with `rast`, the reclassification with `classify` and writing the cropped layer to the hard drive with `writeRaster`. `classify` requires a matrix which defines the from/to values. The reclass workflow with `terra` was aborted after 12 hours and a progress of approximately 10% and cannot be compared to the performance of `hydrographr`.
@@ -375,7 +372,7 @@ print_experiment(t_zonal_hydr)
 ```
 
 ```{r, echo=FALSE}
-cat("Run times in seconds:\n   min median    max \n 584.7  585.7  592.4")
+cat("Run times in seconds:\n   min median    max \n 631.6  644.7  657.0")
 ```
 
 
