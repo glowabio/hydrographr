@@ -34,7 +34,7 @@ Authors@R:
       person("Sami", "Domisch",
              email = "sami.domisch@igb-berlin.de",
              role = c("aut")))
-Maintainer: Maria Üblacker <maria.ueblacker@igb-berlin.de> and 
+Maintainer: Marlene Schürz <marlene.schuerz@igb-berlin.de> and 
     Afroditi Grigoropoulou <afroditi.grigoropoulou@igb-berlin.de>
 Description: Scalable hydrographic geospatial data processing tools using 
     open-source command-line utilities. The package provides functions to 
