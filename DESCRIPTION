@@ -4,8 +4,8 @@ Title: Scalable Hydrographic Data Processing in R
 Date: 2023
 Version: 1.0.15
 Authors@R:
-    c(person("Maria", "Üblacker",
-             email = "maria.ueblacker@igb-berlin.de",
+    c(person("Marlene", "Schürz",
+             email = "marlene.schuerz@igb-berlin.de",
              role = c("aut", "cre")),
       person("Afroditi", "Grigoropoulou",
              email = "afroditi.grigoropoulou@igb-berlin.de",
