@@ -17,42 +17,47 @@ get_distance_graph(
 
 \item{subc_id}{numeric. Vector of a single or multiple IDs,
 e.g (c(ID1, ID2, ID3, ...). The sub-catchment (equivalent to stream segment)
-IDs for which to delineate the upstream drainage area. Note that you can
-browse the entire network online at
-\url{https://geo.igb-berlin.de/maps/351/view} and to the left hand side,
-select the "Stream segment ID" layer and click on the map to get the ID. Optional.}
+IDs for calculating the distances. Note that you can browse the entire
+network online at \url{https://geo.igb-berlin.de/maps/351/view} and to the
+left hand side, select the "Stream segment ID" layer and click on the map
+to get the ID.}
 
 \item{variable}{character. Specify the attribute / column name in the graph
 object that should be cumulated along the network path. Default is "length"
-to be used with the Hydrography90m dataset.  Not needed when
+to be used with the Hydrography90m dataset. Not needed when
 using "distance_m = FALSE".}
 
-\item{distance_m}{logical. If TRUE, the length (in meters) of each network
-segment along the path will be cumulated and the total length between all
-pairs will be reported in a matrix. If FALSE, only the number of segments
-that are traversed through will be reported in the output matrix. Default
-is TRUE.}
+\item{distance_m}{logical. If TRUE, and in case of the Hydrography90m dataset,
+the length (in meters) of each network segment along the path will be
+cumulated and the total length between all pairs will be reported in
+data.table. If FALSE, only the number of segments that are traversed
+through will be reported in the output matrix. If the subc_ids of the actual
+path is needed, please see the example code under "Note". Default is TRUE.}
 
 \item{max_size}{numeric. Specifies the maximum size of the data passed to the
 parallel back-end in MB. Default is 1500 (1.5 GB). Consider a higher value
 for large study areas (more than one 20°x20° tile). Optional.}
 }
 \value{
-A graph or data.table that reports all subc_ids.
-In case of multiple input segments, the results are stored in a list.
+A data.table that reports either the distance or the number of
+segments between sub_ids.
 }
 \description{
-Given a set of input sub-cacthments IDs, the function will
+Given a set of input sub-catchment IDs, the function will
 calculate the network distance in meters between all input pairs.
-Alternatively, only the number of stream segments (sub-cacthments) along the
+Alternatively, only the number of stream segments (sub-catchment) along the
 paths are reported. Note that the stream segment and sub-catchment
 IDs are identical, and for consistency, we use the term "subc_id".
 
-See the code under "Note" that explains how to use standard igraph functions
-to obtain the actual stream segment IDs along the path. The
+See the example code under "Note" that explains how to use standard igraph
+functions to obtain the actual stream segment IDs along the path. The
 function \code{\link{read_geopackage()}} can be used to create the input
 network graph, and the function \code{\link{get_catchment_graph()}} can be
-used to subset a network graph.
+used to subset a network graph. Note that graph-based function includes also
+the entire length of the "from" and "to" stream segment, opposed to the
+\code{\link{get_distance()}} which, depending on the snapping method,
+includes only the part of the "from" and "to" segement where the points are
+located, resulting in minor differences.
 }
 \note{
 For getting the actual IDs of the path between two sub-catchments,
@@ -76,6 +81,7 @@ subc_path <- as.numeric(as_ids(subc_path$res[\link{1}]))
 \examples{
 # Download test data into the temporary R folder
 # or define a different directory
+
 my_directory <- tempdir()
 download_test_data(my_directory)
 
