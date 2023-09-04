@@ -1,5 +1,5 @@
 ---
-  title: "Function benchmarks"
+title: "Function benchmarks"
 subtitle: "Performance of selected `hydrographr` functions and their comparison to corresponding `terra` workflows"
 author: ""
 date: "`r Sys.Date()`"
