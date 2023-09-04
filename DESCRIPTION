@@ -2,10 +2,10 @@ Package: hydrographr
 Type: Package
 Title: Scalable Hydrographic Data Processing in R
 Date: 2023
-Version: 0.1.9009
+Version: 1.0.15
 Authors@R:
-    c(person("Maria", "Üblacker",
-             email = "maria.ueblacker@igb-berlin.de",
+    c(person("Marlene", "Schürz",
+             email = "marlene.schuerz@igb-berlin.de",
              role = c("aut", "cre")),
       person("Afroditi", "Grigoropoulou",
              email = "afroditi.grigoropoulou@igb-berlin.de",
@@ -26,7 +26,7 @@ Authors@R:
              email = "thomas.tomiczek@igb-berlin.de",
              role = c("aut")),
       person("Vanessa", "Bremerich",
-             email = "bremerich@igb-berlin.de",
+             email = "vanessa.bremerich@igb-berlin.de",
              role = c("aut")),
       person("Giuseppe", "Amatulli",
              email = "giuseppe.amatulli@gmail.com",
@@ -34,20 +34,40 @@ Authors@R:
       person("Sami", "Domisch",
              email = "sami.domisch@igb-berlin.de",
              role = c("aut")))
-Maintainer: Maria Üblacker <maria.ueblacker@igb-berlin.d>
-Description: A collection of R function wrappers for GDAL and GRASS-GIS functions to efficiently work with Hydrography90m spatial data.
+Maintainer: Marlene Schürz <marlene.schuerz@igb-berlin.de> and 
+    Afroditi Grigoropoulou <afroditi.grigoropoulou@igb-berlin.de>
+Description: Scalable hydrographic geospatial data processing tools using 
+    open-source command-line utilities. The package provides functions to 
+    download the Hydrography90m data (https://essd.copernicus.org/articles/14/4525/2022/), 
+    processing, reading and extracting information, as well as assessing network
+    distances and network connectivity. While the functions are, by default, 
+    tailored towards the Hydrography90m data, they can also be generalized 
+    towards other data and purposes, such as efficient cropping and merging 
+    of raster and vector data, point-raster extraction, raster reclassification, 
+    and data aggregation. The package depends on the open-source software 
+    GDAL/OGR, GRASS-GIS and the AWK programming language in the Linux 
+    environment, allowing a seamless language integration. Since the data is 
+    processed outside R, hydrographr allows creating scalable geo-processing 
+    workflows. Please see the installation guide of the additional software 
+    at https://glowabio.github.io/hydrographr/articles/hydrographr.html. 
+    Windows users need to to first activate the Windows Subsystem for Linux 
+    (WSL) feature.
 License: GPL-3
 URL: https://glowabio.github.io/hydrographr/
 BugReports: https://github.com/glowabio/hydrographr/issues
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.2.2
+RoxygenNote: 7.2.3
 Imports:
     processx (>= 3.7.0),
     data.table (>= 1.14.2),
     tidyr (>= 1.2.1),
     dplyr (>= 1.0.10),
     stringi (>= 1.7.8),
+    stringr (>= 1.4.1),
+    rlang (>= 1.0.6),
+    DBI (>= 1.1.3),
+    RSQLite (>= 2.2.19),
     terra (>= 1.6-41),
     sf (>= 1.0-9),
     parallel (>= 4.2.2),
@@ -56,7 +76,32 @@ Imports:
     future (>= 1.29.0),
     doFuture (>= 0.12.2),
     future.apply (>= 1.10.0),
-    DBI (>= 1.1.3),
-    RSQLite (>= 2.2.19),
     memuse (>= 4.2-2),
-    igraph (>= 1.3.5)
+    igraph (>= 1.3.5),
+    magrittr (>= 2.0.3),
+    methods (>= 4.3.0)
+Collate:
+    'check_tiles_filesize.R'
+    'crop_to_extent.R'
+    'download_test_data.R'
+    'download_tiles.R'
+    'download_tiles_base.R'
+    'extract_from_gpkg.R'
+    'extract_ids.R'
+    'extract_zonal_stat.R'
+    'get_catchment_graph.R'
+    'get_distance.R'
+    'get_distance_graph.R'
+    'get_pfafstetter_basins.R'
+    'get_regional_unit_id.R'
+    'get_segment_neighbours.R'
+    'get_tile_id.R'
+    'get_upstream_catchment.R'
+    'utils.R'
+    'merge_tile.R'
+    'read_geopackage.R'
+    'reclass_raster.R'
+    'report_no_data.R'
+    'set_no_data.R'
+    'snap_to_network.R'
+    'snap_to_subc_segment.R'
