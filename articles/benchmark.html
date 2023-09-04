@@ -47,6 +47,7 @@
     <a class="dropdown-item" href="../articles/benchmark.html">Function benchmarks</a>
     <a class="dropdown-item" href="../articles/case_study_brazil.html">Case study - São Francisco drainage basin</a>
     <a class="dropdown-item" href="../articles/case_study_cuba.html">Case study - Cuba</a>
+    <a class="dropdown-item" href="../articles/example_other_stream_networks.html">Usage of hydrographr with other stream networks</a>
     <a class="dropdown-item" href="../articles/linux_system_setup.html">Setting up the package requirements on Linux</a>
     <a class="dropdown-item" href="../articles/macos_system_setup.html">Setting up the package requirements on MacOS</a>
     <a class="dropdown-item" href="../articles/windows_system_setup.html">Setting up the package requirements on Windows</a>
@@ -82,7 +83,7 @@
 <code>terra</code> workflows</h3>
                         <h4 data-toc-skip class="author"></h4>
             
-            <h4 data-toc-skip class="date">2023-08-30</h4>
+            <h4 data-toc-skip class="date">2023-09-04</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/glowabio/hydrographr/blob/HEAD/vignettes/benchmark.Rmd" class="external-link"><code>vignettes/benchmark.Rmd</code></a></small>
       <div class="d-none name"><code>benchmark.Rmd</code></div>
@@ -145,26 +146,26 @@ overall merged the six tiles faster and using less RAM compared to
 <code>terra</code> where the tiles are loaded in R merged with
 <code><a href="https://rdrr.io/pkg/terra/man/merge.html" class="external-link">terra::merge</a></code> and written to the hard drive. On average, the
 performance of <code><a href="../reference/merge_tiles.html">hydrographr::merge_tiles</a></code> surpassed that of
-<code>terra</code> on both Windows and Ubuntu, completing the task 3
-times faster (165 compared to 525 seconds) and 4.5 times faster (162
-compared to 733 seconds), respectively. Additionally, <code>terra</code>
-required on Windows twice the amount of RAM to perform the merge
-operation compared to <code>hydrographr</code> (1.3 compared to 2.8
+<code>terra</code> on both Windows and Ubuntu, completing the task 2.5
+times faster (179 compared to 457 seconds) and 4 times faster (158
+compared to 623 seconds), respectively. Additionally, <code>terra</code>
+required on Windows five times the amount of RAM to perform the merge
+operation compared to <code>hydrographr</code> (0.84 compared to 4.24
 GB).</p>
 <p>For both tasks, cropping a raster to the extent of a bounding box and
 to the boundary of a vector polygon, <code><a href="https://rdrr.io/pkg/terra/man/crop.html" class="external-link">terra::crop</a></code>
 outperforms <code><a href="../reference/crop_to_extent.html">hydrographr::crop_to_extent</a></code> in the experiments
-on the Windows system, performing the tasks 1.6 times (261 compared to
-430 seconds) and 2.1 times (258 compared to 549 seconds) faster. The
+on the Windows system, performing the tasks 3.5 times (130 compared to
+454 seconds) and 2.5 times (225 compared to 571 seconds) faster. The
 differences on the Ubuntu system were less significant. Particularly, on
-the Windows system, <code>terra</code> used 2.5 times (3.1 compared to
-1.3 GB) and 2.3 times (3.1 compared to 1.4 GB) more RAM to perform the
-cropping task.</p>
+the Windows system, <code>terra</code> used 4.5 times (4.43 compared to
+0.97 GB) and 3.4 times (3.53 compared to 1.05 GB) more RAM to perform
+the cropping task.</p>
 <p>The reclassification task was performed for the sub-catchments of the
 entire Amazon basin, reassigning random integer values to the over 31
 million sub-catchment IDs, thus requiring a rather large
 reclassification table. While <code><a href="../reference/reclass_raster.html">hydrographr::reclass_raster</a></code>
-was able to perform the task in 178 (Windows) and 119 seconds (Ubuntu),
+was able to perform the task in 179 (Windows) and 116 seconds (Ubuntu),
 respectively, while we aborted the <code><a href="https://rdrr.io/pkg/terra/man/classify.html" class="external-link">terra::classify</a></code> after 12
 hours of run-time with a progress of approximately 10%.</p>
 <p>To assess the performance of computing zonal statistics using
@@ -179,15 +180,16 @@ mean, population variance, standard deviation, coefficient of variation,
 and sum (as provided by the underlying r.univar function in GRASS GIS).
 Hence, if several statistical measures are of interest, the run-times of
 individual <code><a href="https://rdrr.io/pkg/terra/man/zonal.html" class="external-link">terra::zonal</a></code> executions must be added up for
-comparison. The calculation of the means is 2.4 and 2.2 times faster
-when performed with <code><a href="https://rdrr.io/pkg/terra/man/zonal.html" class="external-link">terra::zonal</a></code> on Windows (247 compared
-to 586 seconds) and Ubuntu (194 compared to 420 seconds), respectively.
-Similar to the other tasks, the RAM usage is twice as high with
-<code>terra</code> compared to <code>hydrographr</code> running on
-Windows (2.7 compared to 1.3 GB). While the standard deviation is
-included in the <code>hydrographr</code> output table,
-<code><a href="https://rdrr.io/pkg/terra/man/zonal.html" class="external-link">terra::zonal</a></code> could not complete the task and ran out of
-memory.</p>
+comparison. The calculation of the means is 2.6 times faster when
+performed with <code><a href="https://rdrr.io/pkg/terra/man/zonal.html" class="external-link">terra::zonal</a></code> on Windows 247 compared to 645
+seconds) and Ubuntu (197 compared to 520 seconds). The RAM usage is
+fairly large when calculating all zonal statistics with
+<code>hydrographr</code>, with 9.38 GB on Windows and 6.96 GB on Linux,
+while the mean calculation with <code>terra</code> only used 2.68 and
+5.39 GB, respectively. While the standard deviation is included in the
+<code>hydrographr</code> output table, <code><a href="https://rdrr.io/pkg/terra/man/zonal.html" class="external-link">terra::zonal</a></code> could
+not complete the task of calculating the standard deviation and ran out
+of memory.</p>
 <p><img src="../reference/figures/benchmark.png"></p>
 </div>
 <div class="section level2">
@@ -206,10 +208,10 @@ memory.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Small helper function to print benchmark experiments</span></span>
 <span><span class="va">print_experiment</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">micro</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Run times in seconds:\n"</span><span class="op">)</span></span>
-<span>  <span class="va">t</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="va">micro</span><span class="op">$</span><span class="va">time</span><span class="op">*</span><span class="fl">1e-9</span><span class="op">)</span>, digits <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">t</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"min"</span>, <span class="st">"median"</span>, <span class="st">"max"</span><span class="op">)</span></span>
-<span>  <span class="va">t</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Run times in seconds:\n"</span><span class="op">)</span></span>
+<span><span class="va">t</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="va">micro</span><span class="op">$</span><span class="va">time</span><span class="op">*</span><span class="fl">1e-9</span><span class="op">)</span>, digits <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">t</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"min"</span>, <span class="st">"median"</span>, <span class="st">"max"</span><span class="op">)</span></span>
+<span><span class="va">t</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p>Define working directory:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
@@ -311,7 +313,7 @@ much.</p>
 <span><span class="fu">print_experiment</span><span class="op">(</span><span class="va">t_merge_hydr</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Run times in seconds:</span></span>
 <span><span class="co">##    min median    max </span></span>
-<span><span class="co">##  160.8  164.7  197.7</span></span></code></pre>
+<span><span class="co">##  160.5  179.4  190.3</span></span></code></pre>
 <p>The tested <code>terra</code> workflow involves reading the 6
 sub-catchment tiles with the function <code>rast</code>, merging them
 with <code>merge</code> and writing the result layer with
@@ -333,7 +335,7 @@ with <code>merge</code> and writing the result layer with
 <span><span class="fu">print_experiment</span><span class="op">(</span><span class="va">t_merge_terra</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Run times in seconds:</span></span>
 <span><span class="co">##    min median    max </span></span>
-<span><span class="co">##  524.7  524.7  525.2</span></span></code></pre>
+<span><span class="co">##  454.9  457.4  457.4</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="experiment-2-cropping-to-bounding-box">Experiment 2: Cropping to bounding box<a class="anchor" aria-label="anchor" href="#experiment-2-cropping-to-bounding-box"></a>
@@ -355,7 +357,7 @@ cropped to the defined bounding box of the Amazon basin. Cropping with
 <span><span class="fu">print_experiment</span><span class="op">(</span><span class="va">t_crop_bbox_hydr</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Run times in seconds:</span></span>
 <span><span class="co">##    min median    max </span></span>
-<span><span class="co">##  428.9  430.0  430.3</span></span></code></pre>
+<span><span class="co">##  449.8  453.7  478.4</span></span></code></pre>
 <p>The corresponding <code>terra</code> workflow includes loading the
 merged layer with <code>rast</code>, cropping the layer to the defined
 bounding box with <code>crop</code> and writing the cropped layer to the
@@ -375,7 +377,7 @@ hard drive with <code>writeRaster</code>.</p>
 <span><span class="fu">print_experiment</span><span class="op">(</span><span class="va">t_crop_bbox_terra</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Run times in seconds:</span></span>
 <span><span class="co">##    min median    max </span></span>
-<span><span class="co">##  261.3  261.3  265.9</span></span></code></pre>
+<span><span class="co">##  130.1  130.6  143.6</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="experiment-3-cropping-to-basin-boundary">Experiment 3: Cropping to basin boundary<a class="anchor" aria-label="anchor" href="#experiment-3-cropping-to-basin-boundary"></a>
@@ -403,7 +405,7 @@ boundary is passed to the function with <code>vector_layer</code>.</p>
 <span><span class="fu">print_experiment</span><span class="op">(</span><span class="va">t_crop_vect_hydr</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Run times in seconds:</span></span>
 <span><span class="co">##    min median    max </span></span>
-<span><span class="co">##  539.4  549.4  555.9</span></span></code></pre>
+<span><span class="co">##  568.0  571.0  592.3</span></span></code></pre>
 <p>The corresponding <code>terra</code> workflow includes loading the
 merged layer with <code>rast</code>, loading the basin boundary with
 <code>vect</code>, cropping the layer to the basin boundary with
@@ -424,7 +426,7 @@ basin boundary polygon.</p>
 <span><span class="fu">print_experiment</span><span class="op">(</span><span class="va">t_crop_vect_terra</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Run times in seconds:</span></span>
 <span><span class="co">##    min median    max </span></span>
-<span><span class="co">##  257.6  257.6  258.5</span></span></code></pre>
+<span><span class="co">##  224.3  225.0  225.5</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="experiment-4-reclassifying-raster-values">Experiment 4: Reclassifying raster values<a class="anchor" aria-label="anchor" href="#experiment-4-reclassifying-raster-values"></a>
@@ -463,7 +465,7 @@ task.</p>
 <span><span class="fu">print_experiment</span><span class="op">(</span><span class="va">t_recl_hydr</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Run times in seconds:</span></span>
 <span><span class="co">##    min median    max </span></span>
-<span><span class="co">##  171.0  178.0  184.3</span></span></code></pre>
+<span><span class="co">##  162.4  179.5  188.0</span></span></code></pre>
 <p>The corresponding <code>terra</code> workflow includes loading the
 cropped sub-catchment layer with <code>rast</code>, the reclassification
 with <code>classify</code> and writing the cropped layer to the hard
@@ -512,7 +514,7 @@ arithmetic mean and the standard deviation with <code>terra</code>.</p>
 <span><span class="fu">print_experiment</span><span class="op">(</span><span class="va">t_zonal_hydr</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Run times in seconds:</span></span>
 <span><span class="co">##    min median    max </span></span>
-<span><span class="co">##  584.7  585.7  592.4</span></span></code></pre>
+<span><span class="co">##  631.6  644.7  657.0</span></span></code></pre>
 <p>In a first test workflow with <code>terra</code> the mean value of
 flow accumulation for the sub-catchments is calculated. The
 corresponding <code>terra</code> workflow includes loading the cropped
@@ -582,7 +584,7 @@ Vanessa Bremerich, Giuseppe Amatulli, and Sami Domisch. 2023.
 
     <footer><div class="pkgdown-footer-left">
   <p></p>
-<p>Developed by Maria Üblacker, Afroditi Grigoropoulou, Jaime Garcia Marquez, Yusdiel Torres Cambas, Christoph Schürz, Mathieu Floury, Thomas Tomiczek, Vanessa Bremerich, Giuseppe Amatulli, Sami Domisch.</p>
+<p>Developed by Marlene Schürz, Afroditi Grigoropoulou, Jaime Garcia Marquez, Yusdiel Torres Cambas, Christoph Schürz, Mathieu Floury, Thomas Tomiczek, Vanessa Bremerich, Giuseppe Amatulli, Sami Domisch.</p>
 </div>
 
 <div class="pkgdown-footer-right">

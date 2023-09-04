@@ -47,6 +47,7 @@
     <a class="dropdown-item" href="../articles/benchmark.html">Function benchmarks</a>
     <a class="dropdown-item" href="../articles/case_study_brazil.html">Case study - São Francisco drainage basin</a>
     <a class="dropdown-item" href="../articles/case_study_cuba.html">Case study - Cuba</a>
+    <a class="dropdown-item" href="../articles/example_other_stream_networks.html">Usage of hydrographr with other stream networks</a>
     <a class="dropdown-item" href="../articles/linux_system_setup.html">Setting up the package requirements on Linux</a>
     <a class="dropdown-item" href="../articles/macos_system_setup.html">Setting up the package requirements on MacOS</a>
     <a class="dropdown-item" href="../articles/windows_system_setup.html">Setting up the package requirements on Windows</a>
@@ -81,7 +82,7 @@
 data before and after a Species Distribution Model</h3>
                         <h4 data-toc-skip class="author"></h4>
             
-            <h4 data-toc-skip class="date">2023-08-30</h4>
+            <h4 data-toc-skip class="date">2023-09-04</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/glowabio/hydrographr/blob/HEAD/vignettes/case_study_cuba.Rmd" class="external-link"><code>vignettes/case_study_cuba.Rmd</code></a></small>
       <div class="d-none name"><code>case_study_cuba.Rmd</code></div>
@@ -3484,8 +3485,8 @@ an indicator of the sub-catchment size</p>
 <span><span class="co"># Clear up memory</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">stats_gpkg_h08v06</span>, <span class="va">stats_gpkg_h10v06</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/base/gc.html" class="external-link">gc</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##            used  (Mb) gc trigger  (Mb)  max used  (Mb)</span></span>
-<span><span class="co">## Ncells  4621707 246.9    8745732 467.1   6606392 352.9</span></span>
-<span><span class="co">## Vcells 27080870 206.7   83906213 640.2 104360946 796.3</span></span></code></pre>
+<span><span class="co">## Ncells  4614505 246.5    8680458 463.6   6516595 348.1</span></span>
+<span><span class="co">## Vcells 27069385 206.6   83895188 640.1 104349501 796.2</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="prepare-data-for-modelling">Prepare data for modelling<a class="anchor" aria-label="anchor" href="#prepare-data-for-modelling"></a>
@@ -4812,230 +4813,230 @@ length
 <tbody>
 <tr>
 <td style="text-align:right;">
-399719443
+399643040
 </td>
 <td style="text-align:right;">
-24.5500
+24.55
 </td>
 <td style="text-align:right;">
-1397.508
+1512.870
 </td>
 <td style="text-align:right;">
-56.26923
+56.05500
 </td>
 <td style="text-align:right;">
--0.0028614
+-0.0215570
 </td>
 <td style="text-align:right;">
-2.1538462
+4.6500000
 </td>
 <td style="text-align:right;">
-0.0000000
+0
 </td>
 <td style="text-align:right;">
-0.1685300
+4.9275856
 </td>
 <td style="text-align:right;">
-0.1263975
+0.1071214
 </td>
 <td style="text-align:right;">
-0.0037622
+0.0398244
 </td>
 <td style="text-align:right;">
-6.8930975
+7.8439467
 </td>
 <td style="text-align:right;">
-211.3903
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-422551282
-</td>
-<td style="text-align:right;">
-25.4500
-</td>
-<td style="text-align:right;">
-1398.226
-</td>
-<td style="text-align:right;">
-54.07353
-</td>
-<td style="text-align:right;">
--0.0023065
-</td>
-<td style="text-align:right;">
-0.6617647
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.4909827
-</td>
-<td style="text-align:right;">
-0.1481431
-</td>
-<td style="text-align:right;">
-0.0036652
-</td>
-<td style="text-align:right;">
-1.4411014
-</td>
-<td style="text-align:right;">
-1100.6440
+462.7297
 </td>
 </tr>
 <tr>
 <td style="text-align:right;">
-400294886
+422554207
 </td>
 <td style="text-align:right;">
-25.9500
+23.85
 </td>
 <td style="text-align:right;">
-1368.189
+1644.050
 </td>
 <td style="text-align:right;">
-56.60357
+64.10714
 </td>
 <td style="text-align:right;">
--0.0019859
+-0.0154781
 </td>
 <td style="text-align:right;">
-0.4642857
+29.2857143
 </td>
 <td style="text-align:right;">
-0.0000000
+0
 </td>
 <td style="text-align:right;">
-0.5752883
+0.9013878
 </td>
 <td style="text-align:right;">
-0.0185577
+0.0257539
 </td>
 <td style="text-align:right;">
-0.0036908
+0.0274216
 </td>
 <td style="text-align:right;">
-0.8229799
+48.7096772
 </td>
 <td style="text-align:right;">
-558.0662
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-422497815
-</td>
-<td style="text-align:right;">
-24.8500
-</td>
-<td style="text-align:right;">
-1486.551
-</td>
-<td style="text-align:right;">
-55.72326
-</td>
-<td style="text-align:right;">
--0.0162070
-</td>
-<td style="text-align:right;">
-1.3720930
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.4167271
-</td>
-<td style="text-align:right;">
-0.0641119
-</td>
-<td style="text-align:right;">
-0.0256316
-</td>
-<td style="text-align:right;">
-1.9171594
-</td>
-<td style="text-align:right;">
-839.2273
+402.9591
 </td>
 </tr>
 <tr>
 <td style="text-align:right;">
-422552086
+400149433
 </td>
 <td style="text-align:right;">
-23.3475
+25.85
 </td>
 <td style="text-align:right;">
-1783.527
+1338.506
 </td>
 <td style="text-align:right;">
-66.30000
+59.89216
 </td>
 <td style="text-align:right;">
--0.0903526
+-0.0136785
 </td>
 <td style="text-align:right;">
-7.8500000
+1.1764706
 </td>
 <td style="text-align:right;">
-0.0156125
+0
 </td>
 <td style="text-align:right;">
-5.7922356
+1.7122868
 </td>
 <td style="text-align:right;">
-0.0000000
+0.0435806
 </td>
 <td style="text-align:right;">
-0.1443772
+0.0187404
 </td>
 <td style="text-align:right;">
-11.2662105
+2.4868744
 </td>
 <td style="text-align:right;">
-808.2733
+806.1269
 </td>
 </tr>
 <tr>
 <td style="text-align:right;">
-399808252
+422693256
 </td>
 <td style="text-align:right;">
-24.9500
+25.55
 </td>
 <td style="text-align:right;">
-1449.704
+1296.545
 </td>
 <td style="text-align:right;">
-65.61915
+59.99091
 </td>
 <td style="text-align:right;">
--0.0021339
+-0.0055990
 </td>
 <td style="text-align:right;">
-0.6382979
+0.5454545
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0.5314879
+</td>
+<td style="text-align:right;">
+0.0287480
+</td>
+<td style="text-align:right;">
+0.0101103
+</td>
+<td style="text-align:right;">
+0.6555548
+</td>
+<td style="text-align:right;">
+426.1692
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+422522274
+</td>
+<td style="text-align:right;">
+24.25
+</td>
+<td style="text-align:right;">
+1691.000
+</td>
+<td style="text-align:right;">
+64.85000
+</td>
+<td style="text-align:right;">
+-0.0111164
+</td>
+<td style="text-align:right;">
+0.5714286
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.5000000
+</td>
+<td style="text-align:right;">
+0.0500000
+</td>
+<td style="text-align:right;">
+0.0175944
+</td>
+<td style="text-align:right;">
+0.6226998
+</td>
+<td style="text-align:right;">
+126.0374
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+422691125
+</td>
+<td style="text-align:right;">
+25.95
+</td>
+<td style="text-align:right;">
+1206.500
+</td>
+<td style="text-align:right;">
+54.40000
+</td>
+<td style="text-align:right;">
+-0.0050319
+</td>
+<td style="text-align:right;">
+4.4545455
+</td>
+<td style="text-align:right;">
+0
 </td>
 <td style="text-align:right;">
 0.0000000
 </td>
 <td style="text-align:right;">
-0.3803456
+0.0000000
 </td>
 <td style="text-align:right;">
-0.0393473
+0.0065201
 </td>
 <td style="text-align:right;">
-0.0035653
+9.0087194
 </td>
 <td style="text-align:right;">
-1.1189952
-</td>
-<td style="text-align:right;">
-562.3332
+213.0746
 </td>
 </tr>
 </tbody>
@@ -5479,7 +5480,7 @@ presences.</p>
 <span><span class="co">## Target node size:                 10 </span></span>
 <span><span class="co">## Variable importance mode:         impurity </span></span>
 <span><span class="co">## Splitrule:                        gini </span></span>
-<span><span class="co">## OOB prediction error (Brier s.):  0.09192846</span></span></code></pre>
+<span><span class="co">## OOB prediction error (Brier s.):  0.09182538</span></span></code></pre>
 <p>The model can be evaluated based on the OOB prediction error. This
 metric lies on the fact that the data points that are not used in
 training a tree can be used to test the tree. The errors on the OOB
@@ -5675,7 +5676,7 @@ Pipe Syntax</em>. <a href="https://CRAN.R-project.org/package=kableExtra" class=
 
     <footer><div class="pkgdown-footer-left">
   <p></p>
-<p>Developed by Maria Üblacker, Afroditi Grigoropoulou, Jaime Garcia Marquez, Yusdiel Torres Cambas, Christoph Schürz, Mathieu Floury, Thomas Tomiczek, Vanessa Bremerich, Giuseppe Amatulli, Sami Domisch.</p>
+<p>Developed by Marlene Schürz, Afroditi Grigoropoulou, Jaime Garcia Marquez, Yusdiel Torres Cambas, Christoph Schürz, Mathieu Floury, Thomas Tomiczek, Vanessa Bremerich, Giuseppe Amatulli, Sami Domisch.</p>
 </div>
 
 <div class="pkgdown-footer-right">
