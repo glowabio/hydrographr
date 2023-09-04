@@ -18,7 +18,6 @@ editor_options:
     wrap: 72
 ---
 
-
 ```{r, include = FALSE, eval = F}
 # writes out the references for all packages
 knitr::write_bib(file = "bib/references_nhdp.bib")
@@ -68,7 +67,6 @@ wdir <- "/home/afroditi/Documents/PhD/hydrographr_case_study/nhdplus"
 setwd(wdir)
 dir.create("data")
 ```
-
 
 ```{r, eval = FALSE, include=FALSE}
 wdir <- paste0("/home/mueblacker/Documents/Glowabio/Code/hydrographr/vignettes/data_hawaii")
@@ -132,7 +130,8 @@ archive_extract(archive = paste0(vect_dir, "/NHDPLUS_H_2006_HU4_GDB.zip"),
 Check directory structure
 
 ```{r, eval = F}
-list.files(paste0(rast_dir, "/NHDPLUS_H_2006_HU4_RASTER"), recursive = T, pattern = ".tif$")
+list.files(paste0(rast_dir, "/NHDPLUS_H_2006_HU4_RASTER"), recursive = T, 
+           pattern = ".tif$")
 ```
 
 ### Species data
@@ -161,7 +160,8 @@ spdata <- gbif_data$data %>%
   select(8, 1:7)
 
 # Save the data
-write.csv(spdata, paste0(sp_dir, "/stenogobius_hawaiiensis.csv") )
+write.csv(spdata, paste0(sp_dir, "/stenogobius_hawaiiensis.csv"), row.names = F,
+          quote = F)
 
 spdata
 ```
@@ -208,7 +208,8 @@ spdata_coord <- project(spdata_coord,
                         from = "+proj=longlat +datum=WGS84", 
                         to = "EPSG:26904")
 
-# Replace the WGS84 coordinates with the EPSG:26904 coordinates in the species points' data frame
+# Replace the WGS84 coordinates with the EPSG:26904 coordinates in the species 
+# points' data frame
 spdata <- spdata %>% 
   mutate(longitude = spdata_coord[,1],
          latitude = spdata_coord[,2])
@@ -227,7 +228,8 @@ crop_to_extent(raster_layer = paste0(rast_dir, "/NHDPLUS_H_2006_HU4_RASTER/HRNHD
                compression = "high"
               )
 
-# We can crop to another bounding box, and then try to merge the two cropped layers
+# We can crop to another bounding box, and then try to merge the two cropped 
+# layers
 bbox2 <- c(595603, 2371564, 604373, 2380255)
 crop_to_extent(raster_layer = paste0(rast_dir, "/NHDPLUS_H_2006_HU4_RASTER/HRNHDPlusRasters2006/cat.tif"), 
                bounding_box = bbox2,
@@ -253,18 +255,23 @@ spdata_ids <- extract_ids(data = spdata,
 
 spdata_ids
 
-# We observe that some points obtain basin_id=NA, because they fall out of the extent of the downloaded raster layer. We will filter these points out, keeping only those which overlap with the raster.
+# We observe that some points obtain basin_id=NA, because they fall out of the 
+# extent of the downloaded raster layer. We will filter these points out, 
+# keeping only those which overlap with the raster.
 
 spdata_ids <- spdata_ids %>% 
    filter(!is.na(basin_id))
 
 spdata_ids
 
-# On the other hand, some other points obtain basin_id=-32768. This should be the no data value of the raster layer, meaning a value attributed to the sea cells. We can double-check this using the report_no_data function:
+# On the other hand, some other points obtain basin_id=-32768. This should be 
+# the no data value of the raster layer, meaning a value attributed to the sea 
+# cells. We can double-check this using the report_no_data function:
 no_data_val <- report_no_data(data_dir = paste0(rast_dir, "/NHDPLUS_H_2006_HU4_RASTER/HRNHDPlusRasters2006"), var_layer = "cat.tif")
 
 no_data_val
-# We can filter out these points, too, so that we only keep the points sampled in rivers. 
+# We can filter out these points, too, so that we only keep the points sampled 
+# in rivers. 
 spdata_ids <- spdata_ids %>% 
    filter(basin_id != no_data_val$NoData)
 spdata_ids
@@ -274,7 +281,8 @@ spdata_ids
 ```{r, eval = FALSE}
 # Don't run:
 # If we wanted to change the no data value of a layer, we could do it using the function:
-set_no_data(data_dir = paste0(rast_dir, "/NHDPLUS_H_2006_HU4_RASTER/HRNHDPlusRasters2006"), var_layer = "cat.tif", no_data = -32768)
+set_no_data(data_dir = paste0(rast_dir, "/NHDPLUS_H_2006_HU4_RASTER/HRNHDPlusRasters2006"), var_layer = "cat.tif", 
+            no_data = -32768)
 
 # Remember to set it back to the original value!
 
@@ -325,7 +333,8 @@ zonal_stats <- extract_zonal_stat(data_dir = out_dir,
                   var_layer = "bio12_crop.tif",
                   quiet = F)
 
-# Same as before, we need to filter out the no data values to get a better grasp of the resulting table
+# Same as before, we need to filter out the no data values to get a better 
+# grasp of the resulting table
 zonal_stats <- zonal_stats %>% 
   filter(bio12_crop_data_cells !=0 )
 zonal_stats
@@ -335,7 +344,8 @@ zonal_stats
 
 ```{r, eval=F}
 
-# Create example dataframe with reclassification rules to reclassify the value of all basins containing species data to 1, and all the rest to -99999.
+# Create example dataframe with reclassification rules to reclassify the value 
+# of all basins containing species data to 1, and all the rest to -99999.
 reclass_rules <- data.frame(cat = as.integer(spdata_ids$basin_id), 
                             new_val = as.integer(1))
 
@@ -350,7 +360,7 @@ reclass_raster(
   no_data = no_data_val$NoData)
 ```
 
-###  <!--# Extract from .GPKG -->
+### <!--# Extract from .GPKG -->
 
 <!--# See Download NHDPlus data to download NHDPlus vector data for Hawaii. -->
 
@@ -362,7 +372,8 @@ get_nhdplushr(gdb_dir, file.path(gdb_dir, "nhdplus_2006-HU4.gpkg"))
 
 extract_from_gpkg(data_dir = gdb_dir, subc_id = "all", var_layer = "nhdplus_2006-HU4.gpkg", quiet = F)
 
-# I think that stream IDs don’t correspond to catchment ids, so it’s not possible to filter the .gpkg using the ids of the catchment raster
+# I think that stream IDs don’t correspond to catchment ids, so it’s not 
+# possible to filter the .gpkg using the ids of the catchment raster
 ```
 
 ### Read a .GPKG
@@ -391,5 +402,74 @@ catchment_sp <- read_geopackage(gpkg = paste0(gdb_dir, "/nhdplus_2006-HU4.gpkg")
                 import_as = "SpatVect")
 
 ```
+
+```{r}
+# Define full path to the stream network raster layer
+flow_rast <- paste0(rast_dir, "/NHDPLUS_H_2006_HU4_RASTER/HRNHDPlusRasters2006/swnet.tif")
+
+# Define full path to the flow accumulation raster layer
+stream_rast <- paste0(rast_dir, "/NHDPLUS_H_2006_HU4_RASTER/HRNHDPlusRasters2006/fac.tif")
+
+
+# Define thresholds for the flow accumulation of the stream segment, where
+# the point location should be snapped to
+accu_threshold <- c(400000, 300000, 100000, 50000, 10000, 5000, 1000, 500, 100) 
+# Define the distance radius
+dist_radius <- c(10, 20, 30)
+
+# Create a temporary data.table
+point_locations_tmp <- spdata
+
+# Note: The for loop takes about 9 minutes
+first <- TRUE
+for (idist in dist_radius) {
+    
+   # If the distance increases to 20 cells only a flow accumulation of 100 km²
+   # will be used
+   if (idist == 20) {
+    # Set accu_threshold to 100
+    accu_threshold <- c(100)
+   }
+  
+
+  for (iaccu in accu_threshold) {
+    # Snap point locations to the stream network
+    point_locations_snapped_tmp <- snap_to_network(data = point_locations_tmp,
+                                                   lon = "longitude",
+                                                   lat = "latitude",
+                                                   id = "occurrence_id",
+                                                   stream_layer = stream_rast,
+                                                   accu_layer = flow_rast,
+                                                   method = "accumulation",
+                                                   distance = idist,
+                                                   accumulation = iaccu,
+                                                   quiet = FALSE)
+    
+    # Keep point location with NAs for the next loop
+    point_locations_tmp <- point_locations_snapped_tmp %>% 
+      filter(is.na(subc_id_snap_accu))
+  
+  if (first == TRUE) {
+    # Keep the point locations with the new coordinates and remove rows with NA
+    point_locations_snapped <- point_locations_snapped_tmp %>% 
+    filter(!is.na(subc_id_snap_accu))
+    first <- FALSE
+  } else {
+    # Bind the new data.frame to the data.frame of the loop before
+    # and remove the NA
+    point_locations_snapped <- point_locations_snapped %>% 
+      bind_rows(point_locations_snapped_tmp) %>% 
+      filter(!is.na(subc_id_snap_accu))
+    
+  }
+  
+  }
+    
+}
+
+```
+
+
+
 
 ### References
