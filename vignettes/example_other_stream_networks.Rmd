@@ -404,7 +404,7 @@ catchment_sp <- read_geopackage(gpkg = paste0(gdb_dir, "/nhdplus_2006-HU4.gpkg")
 
 ### Snap points to the network
 
-```{r}
+```{r, eval = F}
 # Define full path to the stream network raster layer
 stream_rast <- paste0(rast_dir, "/NHDPLUS_H_2006_HU4_RASTER/HRNHDPlusRasters2006/swnet.tif")
 
