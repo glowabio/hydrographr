@@ -19,20 +19,22 @@ snap_to_subc_segment(
 )
 }
 \arguments{
-\item{data}{a data.frame or data.table with lat/lon coordinates in WGS84.}
+\item{data}{a data.frame or data.table that contains the columns regarding
+the longitude / latitude coordinates in WGS84.}
 
 \item{lon}{character. The name of the column with the longitude coordinates.}
 
 \item{lat}{character. The name of the column with the latitude coordinates.}
 
 \item{id}{character. The name of a column containing unique IDs for each row
-of "data" (e.g., occurrence or site IDs).}
+of "data" (e.g., occurrence or site IDs). The unique IDs need to be numeric.}
 
 \item{basin_id}{character. The name of the column with the basin IDs.
-If NULL, the basin IDs will be extracted automatically. Default is NULL}
+If NULL, the basin IDs will be extracted automatically. Optional.
+Default is NULL}
 
 \item{subc_id}{character. The name of the column with the sub-catchment IDs.
-If NULL, the sub-catchment IDs will be extracted automatically.
+If NULL, the sub-catchment IDs will be extracted automatically. Optional.
 Default is NULL.}
 
 \item{basin_layer}{character. Full path to the basin ID .tif layer.}
@@ -41,26 +43,29 @@ Default is NULL.}
 
 \item{stream_layer}{character. Full path of the stream network .gpkg file.}
 
-\item{n_cores}{numeric. Number of cores used for parallelization.
+\item{n_cores}{numeric. Number of cores used for parallelisation.
 Default is 1.}
 
 \item{quiet}{logical. If FALSE, the standard output will be printed.
 Default is TRUE.}
 }
+\value{
+A data.table of the original and new coordinates, along with the
+sub-catchment ID.
+}
 \description{
-Snaps data points to the stream segment of the
-sub-catchment the data point is located.
+Move points to the stream segment within the sub-catchment where the point
+is located.
 }
 \details{
-The function uses the network preparation and maintenance module of
-GRASS GIS (v.net), to connect a vector lines map (stream network) with a
-points map (occurrence/sampling points). After masking the stream segment and
+The function uses the network module of
+GRASS GIS (v.net), to connect a vector line map (stream network) with a
+point map (occurrence/sampling points). After masking the stream segment and
 the sub-catchment where the target point is located, the connect operation
 snaps the point to the stream segment using a distance threshold. This
 threshold is automatically calculated as the longest distance between two
 points within the sub-catchment. In this way the snapping will always take
-place.This operation creates a new node on the vector line (i.e. stream
-segment) from which the new snapped coordinates can be extracted.
+place. From the new location, the function extracts the new snapped coordinates.
 }
 \examples{
 # Download test data into the temporary R folder
@@ -121,10 +126,12 @@ head(snapped_coordinates)
 \url{https://grass.osgeo.org/grass82/manuals/v.net.html}
 }
 \seealso{
-\code{\link{snap_to_network}} to snap the data points to the next stream
+\itemize{
+\item \code{\link{snap_to_network()}} to snap the data points to the next stream
 segment within a given radius and/or a given flow accumulation threshold
 value.
-\code{\link{extract_ids}} to extract basin and sub-catchment IDs.
+\item \code{\link{extract_ids()}} to extract basin and sub-catchment IDs.
+}
 }
 \author{
 Jaime Garcia Marquez, Maria M. Üblacker

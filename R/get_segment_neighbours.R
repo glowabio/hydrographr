@@ -1,16 +1,17 @@
 #' @title Get stream segment neighbours
 #'
-#' @description For each segment, reports those upstream, downstream, or up-and
-#' downstream segments that are connected to one or multiple input
-#' segments within a specified neighbour order, with the option to
+#' @description For each input stream segment, the function reports those
+#' upstream, downstream, or up-and downstream segments that are connected to the
+#' input segment(s) within a specified neighbour order, with the option to
 #' summarize attributes across these segments. Note that the stream
 #' segment and sub-catchment IDs are identical, and for consistency,
-#' we use the term "subc_id".
+#' we use the term "subc_id". The input graph can be created with
+#' \code{\link{read_geopackage()}} and \code{\link{get_catchment_graph()}}.
 #'
-#' This function can also be used to create the connectivity table
-#' for Marxan by using var_layer="length" and attach_only=TRUE.
-#' The resulting table reports the connectivity from each segment,
-#' along with the stream length for all connected segments.
+#' This function can be used to obtain the neighbour stream segments /
+#' sub-catchments for spatially explicit models or for spatial prioritization
+#' analyses (e.g. Marxan/Gurobi). By selecting a wider radius, the spatial
+#' dependency of the neighbouring segments / sub-catchments can be increased.
 #'
 #' @param g igraph object. A directed graph.
 #' @param subc_id numeric vector of the input sub-catchment IDs
@@ -24,21 +25,21 @@
 #' and "all" returns both.
 #' @param var_layer character vector. One or more attributes (variable layers)
 #' of the input graph that should be reported for each output segment_id
-#' ("to_stream"). Optional.
+#' ("to_stream"). Optional. Default is NULL.
 #' @param attach_only logical. If TRUE, the selected variables will be only
 #' attached to each segment without any further aggregation. Default is FALSE.
 #' @param stat one of the functions mean, median, min, max, sd (without quotes).
 #' Aggregates (or summarizes) the variables for the neighbourhood of each input
-#' segment ("stream", e.g., the average land cover in the next five upstream
+#' segment (e.g., the average land cover in the next five upstream
 #' segments or sub-catchments). Default is NULL.
-#' @param n_cores numeric. Number of cores used for parallelization
+#' @param n_cores numeric. Number of cores used for parallelisation
 #' in the case of multiple stream segments / outlets. Default is 1.
-#' Currently, the parallelization process requires copying the data to each
+#' Note that the parallelisation process requires copying the data to each
 #' core. In case the graph is very large, and many segments are
 #' used as an input, setting n_cores to a higher value can speed up the
 #' computation. This comes however at the cost of possible RAM limitations
 #' and even slower processing since the large data will be copied to each core.
-#' Hence consider testing with n_cores = 1 first. Optional.
+#' Hence consider testing first with n_cores = 1. Optional.
 #' @param max_size numeric. Specifies the maximum size of the data passed to the
 #' parallel back-end in MB. Default is 1500 (1.5 GB). Consider a higher value
 #' for large study areas (more than one 20°x20° tile). Optional.
@@ -48,17 +49,33 @@
 #' @importFrom parallel detectCores
 #' @importFrom data.table as.data.table setDT setnames
 #' rbindlist setcolorder setkey
-#' @importFrom igraph ego as_ids is_directed
+#' @importFrom igraph ego as_ids is_directed as_data_frame
 #' @importFrom future.apply future_lapply future_sapply future_mapply
 #' @importFrom dplyr mutate
 #' @importFrom memuse Sys.meminfo
 #' @export
+#'
+#'
+#' @returns
+#' A data.table indicating the connected segments (stream  | to_stream), or a
+#' data.table that summarizes the attributes of those neighbours contributing
+#' to each segment.
+#'
+#' #' @note
+#' Currently the attributes are not provided for the outlet (the selected
+#' subc_id segment). If the attributes are also needed for the outlet subc_id,
+#' then the next downstream sub_id can be selected (enlarge the study area)
+#' using e.g. \code{\link{get_catchment_graph()}}.
 #'
 #' @author Sami Domisch
 #'
 #' @references
 #' Csardi G, Nepusz T: The igraph software package for complex network research,
 #' InterJournal, Complex Systems 1695. 2006. \url{https://igraph.org}
+#'
+#' @seealso
+#' \code{\link{read_geopackage()}} and \code{\link{get_catchment_graph.()}} to
+#' create the input graph.
 #'
 #' @examples
 #' # Download test data into the temporary R folder
@@ -71,6 +88,20 @@
 #'                                          "/hydrography90m_test_data",
 #'                                          "/order_vect_59.gpkg"),
 #'                             import_as = "graph")
+#'
+#' # Subset the graph and get a smaller catchment
+#' my_graph <- get_catchment_graph(g = my_graph, subc_id = 513866048, mode = "in",
+#'                                 outlet = FALSE, as_graph = TRUE, n_cores = 1)
+#'
+#'
+#' # Get a vector of all segment IDs
+#' library(igraph)
+#' subc_id <- as_ids(V(my_graph))
+#'
+#'
+#' # Get all (up-and downstream) directly adjacent neighbours of each segment
+#' get_segment_neighbours(g = my_graph, subc_id = subc_id,
+#'                        order = 1, mode = "all")
 #'
 #' # Get the upstream segment neighbours in the 5th order
 #' # and report the length and source elevation
@@ -100,7 +131,7 @@
 
 
 
-get_segment_neighbours <- function(g, subc_id = NULL,var_layer = NULL,
+get_segment_neighbours <- function(g, subc_id = NULL, var_layer = NULL,
                                    stat = NULL, attach_only = FALSE, order = 5,
                                    mode = "in", n_cores = 1, max_size = 1500) {
 
@@ -185,22 +216,27 @@ get_segment_neighbours <- function(g, subc_id = NULL,var_layer = NULL,
   names(dt)[1] <- "to_stream"
   setkey(dt, stream)
   dt <- unique(dt) # remove any duplicates, if any
+  setcolorder(dt, c("stream", "to_stream"))
+  # Remove the from-stream, self-reference
+  dt <- dt[dt$stream != dt$to_stream, ]
+
 
   # If aggregation was defined:
   if (!missing(var_layer)) {
 
-
     cat("Attaching the attribute(s)", var_layer, "\n")
+    # igraph::as_data_frame seems to omit the attributes of the outlet
+
     # Get the attributes for all edges of the full graph
     lookup_dt <- as.data.table(
-      as_long_data_frame(g)[c("ver[el[, 1], ]", var_layer)])
-    names(lookup_dt)[1] <- "to_stream"
+      igraph::as_data_frame(g)[c("from", var_layer)])
+    names(lookup_dt)[1] <- "stream"
 
     # Merge the network attributes and sort:
     # dt_join <- merge(dt, lookup_dt, by="to_stream", all.x=TRUE)
     # lookup_dt[dt, on="stream"]  gives NAs
     # dt_join <- dt[lookup_dt, on="to_stream"]
-    dt_join <- lookup_dt[dt, on = "to_stream"]
+    dt_join <- lookup_dt[dt, on = "stream"]
     dt_join <- dt_join[order(-rank(stream))]
     # Remove the from-stream, self-reference
     dt_join <- dt_join[dt_join$stream != dt_join$to_stream, ]

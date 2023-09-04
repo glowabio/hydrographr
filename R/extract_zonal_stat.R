@@ -1,10 +1,13 @@
 #' @title Calculate zonal statistics
 #'
-#' @description Calculate zonal statistics based on one or more environmental variable
-#' raster .tif layers.
-#' This function can be used to aggregate data across a set (or all)
-#' sub-catchments. The sub-catchment raster (.tif) input file is stored on disk.
-#' The output is a data.table which is loaded into R.
+#' @description Calculate zonal statistics based on one or more environmental
+#' variable raster .tif layers. This function aggregates data to
+#' 12 summary statistics (mean, min, max, range, ...) for selected or all
+#' sub-catchments of the input file. The sub-catchment raster (.tif) input
+#' file is read directly from disk. The output is a data.table which is loaded
+#' into R. This function can also be used for any zonal statistic calculation
+#' by specifying the raster layer zones in the subc_layer parameter and
+#' optionally, also the target zone IDs in the subc_id parameter.
 #'
 #' @param data_dir character. Path to the directory containing all input data.
 #' @param subc_id Vector of sub-catchment IDs or "all".
@@ -14,10 +17,10 @@
 #' the resulting data.frame.
 #' @param subc_layer character. Full path to the sub-catchment ID .tif layer.
 #' @param var_layer character vector of variable raster layers on disk,
-#' e.g. "slope_grad_dw_cel_h00v00.tif". Variable names should remain intact in
-#' file names, even after file processing, i.e., slope_grad_dw_cel should appear
-#' in the file name. The files should be cropped to the extent of the
-#' sub-catchment layer to speed up the computation.
+#' e.g. "slope_grad_dw_cel_h00v00.tif". Note that the variable name appears in
+#' the output table columns (e.g. slope_grad_dw_cel_mean). To speed up the
+#' processing, the selected variable raster layers can be cropped to the extent
+#' of the sub-catchment layer, e.g. with \code{\link{crop_to_extent()}}.
 #' @param out_dir character. The directory where the output will be stored.
 #' If the out_dir and file_name are specified, the output table will be stored
 #' as a .csv file in this location. If they are NULL, the output is only
@@ -25,7 +28,7 @@
 #' @param file_name character. Name of the .csv file where the output table
 #' will be stored. out_dir should also be specified for this purpose.
 #' @param n_cores numeric. Number of cores used for parallelization, in case
-#' multiple .tif files are provided to var_layer.
+#' multiple .tif files are provided to var_layer. Default is 1.
 #' @param quiet logical. If FALSE, the standard output will be printed.
 #' Default is TRUE.
 #'
@@ -33,17 +36,37 @@
 #' @importFrom processx run
 #' @importFrom parallel detectCores
 #' @importFrom stringr str_c str_split
+#' @importFrom stringi stri_rand_strings
 #' @import dplyr
 #' @export
 #'
 #' @author Afroditi Grigoropoulou, Jaime Garcia Marquez, Maria M. Üblacker
 #'
 #' @seealso
-#' \code{\link{report_no_data}} to check the defined NoData value.
-#' \code{\link{set_no_data}} to define a NoData value.
+#' * \code{\link{report_no_data()}} to check the defined NoData value.
+#' * \code{\link{set_no_data()}} to define a NoData value.
+#' * \code{\link{crop_to_extent()}} to crop the data to the same extent as the
+#' sub-catchments (subc_layer).
+#' @md
 #'
 #' @references
 #' \url{https://grass.osgeo.org/grass82/manuals/r.univar.html}
+#'
+#' @return Returns a table with
+#' * sub-catchment ID (subc_id)
+#' * number of cells with a value (data_cells)
+#' * number of cells with a NoData value (nodata_cells)
+#' * minimum value (min)
+#' * maximum value (max)
+#' * value range (range)
+#' * arithmetic mean (mean)
+#' * arithmetic mean of the absolute values (mean_abs)
+#' * standard deviation (sd)
+#' * variance (var)
+#' * coefficient of variation (cv)
+#' * sum (sum)
+#' * sum of the absolute values (sum_abs).
+#' @md
 #'
 #' @examples
 #' # Download test data into the temporary R folder
@@ -132,7 +155,8 @@ extract_zonal_stat <- function(data_dir,  subc_id, subc_layer, var_layer,
   if (is.null(n_cores)) {
 
     #  Detect number of available cores
-    n_cores <- detectCores(logical = FALSE) - 1
+    # n_cores <- detectCores(logical = FALSE) - 1
+    n_cores <- 1
 
   }
 
@@ -209,14 +233,14 @@ extract_zonal_stat <- function(data_dir,  subc_id, subc_layer, var_layer,
 
   # Write out master table if requested
   # Compose full out_path by combining out_dir and file_name
-  out_path <- paste0(out_dir, "/", file_name)
-  if (!is.null(out_path)) {
+  if (!is.null(out_dir)) {
+    out_path <- paste0(out_dir, "/", file_name)
     fwrite(var_table, out_path, sep = ",",
            row.names = FALSE, quote = FALSE, col.names = TRUE)
   }
 
   # Delete temporary output directory
-  # unlink(paste0(data_dir, tmp, "/"), recursive = TRUE)
+  unlink(paste0(data_dir, tmp, "/"), recursive = TRUE)
 
   # Return table
   return(var_table)

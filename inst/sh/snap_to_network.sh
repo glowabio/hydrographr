@@ -11,7 +11,7 @@ export ID=$2
 export LON=$3
 export LAT=$4
 
-## stream raster file (e.g. .tif file)
+# stream raster file (e.g. .tif file)
 export STR=$5
 
 ## accumulation raster files

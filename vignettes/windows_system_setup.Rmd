@@ -90,6 +90,8 @@ For more details about setting a username and password see [here](https://learn.
 
 Next, you need to install the required GIS tools on your WSL Ubuntu system. You can use the Ubuntu terminal, PowerShell or Windows Command Prompt to start the installation. If you use the PowerShell or Windows Command Prompt use the command `wsl` to enter the WSL first, and `exit` to go back to your Windows OS after the installation of the GIS tools. 
 
+Warning! Sometimes the installation does not work within a VPN connection. If you fail to fetch data from online repositories during the installation, please try deactivating your VPN connection. 
+
 **Add the Ubuntugis repository**
 
 First, you have to add the "Ubuntugis" Personal Package Archive (PPA) to your system's software sources to be able to install the GIS tools available from there.
@@ -212,6 +214,17 @@ will cite
 
 #> It is really appreciated. The citation notice is now silenced.
 ```
+Now type ctrl+z to exit the GNU parallel environment.
+
+**GNU bc**
+
+GNU bc (Basic Calculator) is an arbitrary precision numeric processing language, which is used in the function `snap_to_subc_segment()`. For more information check the [GNU bc](https://www.gnu.org/software/bc/) website.
+
+```{bash, eval=FALSE}
+# Install bc
+sudo apt install bc
+
+```
 
 **dos2unix**
 
@@ -222,3 +235,5 @@ The Windows systems uses different text file line endings than the Linux systems
 sudo apt install -y dos2unix
 ```
 
+
+We recommend to reboot your computer after the installation.

@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_catchment_graph.R
 \name{get_catchment_graph}
 \alias{get_catchment_graph}
-\title{Get catchment from graph}
+\title{Get catchment from stream network graph}
 \usage{
 get_catchment_graph(
   g,
@@ -22,7 +22,7 @@ e.g (c(ID1, ID2, ID3, ...). The sub-catchment (equivalent to stream segment)
 IDs for which to delineate the upstream drainage area.
 If empty, then outlets will be used as sub-catchment IDs
 (with outlet = TRUE). Note that you can browse the entire network online at
-https://geo.igb-berlin.de/maps/351/view and to left hand side, select the
+\url{https://geo.igb-berlin.de/maps/351/view} and to left hand side, select the
 "Stream segment ID"  layer and click on the map to get the ID. Optional.}
 
 \item{outlet}{logical. If TRUE, the outlets of the given network graph will
@@ -39,9 +39,9 @@ of new graphs with the original attributes. If FALSE, the output  will be a
 new data.table or a list of data.tables. List objects are named after the
 subc_ids. Default is FALSE.}
 
-\item{n_cores}{numeric. Number of cores used for parallelization
+\item{n_cores}{numeric. Number of cores used for parallelisation
 in the case of multiple stream segments / outlets. Default is 1.
-Currently, the parallelization process requires copying the data to each
+Currently, the parallelisation process requires copying the data to each
 core. In case the graph is very large, and many segments are
 used as an input, setting n_cores to a higher value can speed up the
 computation. This comes however at the cost of possible RAM limitations
@@ -57,14 +57,20 @@ A graph or data.table that reports all subc_ids.
 In case of multiple input segments, the results are stored in a list.
 }
 \description{
-Subset the network graph by extracting the upstream, downstream
-or entire catchment, for one or multiple stream segments. The function will
-return either one or more data.tables or graph objects for each input stream
-segment. Note that the stream segment and sub-catchment IDs are identical,
-and for consistency, we use the term "subc_id".
+Subset the stream network graph by extracting the upstream,
+downstream or entire catchment, for one or multiple stream segments. The
+function will return either one or more data.tables or graph objects for
+each input stream segment. Note that the stream segment and sub-catchment
+IDs are identical, and for consistency, we use the term "subc_id".
 
 By switching the mode to either "in", "out" or "all", only the upstream,
-downstream or all connected segments will be returned.
+downstream or all connected segments will be returned, respectively. The
+function \code{\link{read_geopackage()}} can be used to create the input network graph.
+}
+\note{
+Currently the attributes are not provided for the outlet (the selected
+subc_id segment). If the attributes are also needed for the outlet subc_id,
+then the next downstream sub_id can be selected (enlarge the study area)
 }
 \examples{
 # Download test data into the temporary R folder
@@ -96,6 +102,9 @@ g_all <- get_catchment_graph(g = my_graph, mode = "in", outlet = TRUE,
 \references{
 Csardi G, Nepusz T: The igraph software package for complex network research,
 InterJournal, Complex Systems 1695. 2006. \url{https://igraph.org}
+}
+\seealso{
+\code{\link{read_geopackage()}} to create a network graph.
 }
 \author{
 Sami Domisch

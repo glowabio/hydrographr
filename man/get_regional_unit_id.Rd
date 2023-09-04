@@ -7,17 +7,23 @@
 get_regional_unit_id(data, lon, lat, quiet = TRUE)
 }
 \arguments{
-\item{data}{a data.frame or data.table with lat/lon coordinates in WGS84.}
+\item{data}{a data.frame or data.table that contains the columns regarding
+the longitude / latitude coordinates in WGS84.}
 
 \item{lon}{character. The name of the column with the longitude coordinates.}
 
 \item{lat}{character. The name of the column with the latitude coordinates.}
+
+\item{quiet}{logical. If FALSE, the standard output will be printed.
+Default is TRUE.}
 }
 \description{
-Identifies the IDs of the regional units within the Hydrography90m data
-in which the input points are located. The IDs are required to then download
-the data using download_tiles().
-Input is a point data frame.
+Given the coordinates of input points (in WGS84), the function
+identifies the IDs of the regional units of the Hydrography90m in which the
+points are located. Input is a point data frame. The regional units refer to
+non-interrupted basins (as opposed to the 20°x20° tiles).
+These IDs can then be used to download the Hydrography90m regional unit
+raster mask(s) using \code{\link{download_tiles()}}.
 }
 \examples{
 # Download test data into the temporary R folder

@@ -1,20 +1,22 @@
 #' @title Extract sub-catchment and/or basin IDs
 #'
-#' @description Extracts the ID value of the basin and/or sub-catchment raster layer at a
-#' given point location.
+#' @description Extracts the ID value of the basin and/or sub-catchment raster
+#' layer at given point locations. Can also be used for point-based extraction
+#' of any .tif layer by specifying the layer in the "basin" parameter.
 #'
-#' @param data a data.frame or data.table with lat/lon coordinates in WGS84.
+#' @param data a data.frame or data.table that contains the columns regarding
+#' the longitude / latitude coordinates in WGS84.
 #' @param lon character. The name of the column with the longitude coordinates.
 #' @param lat character. The name of the column with the latitude coordinates.
 #' @param id character. The name of a column containing unique IDs for each row
 #' of "data" (e.g., occurrence or site IDs).
-#' @param basin_layer character. Full path to the basin ID .tif layer.
-#' @param subc_layer character. Full path to the sub-catchment ID .tif layer.
+#' @param basin_layer character. Full path to the .tif layer with the basin ID.
+#' @param subc_layer character. Full path to the .tif layer with the
+#' sub-catchment ID.
 #' @param quiet logical. If FALSE, the standard output will be printed.
 #' Default is TRUE.
 #'
 #' @importFrom stringi stri_rand_strings
-#' @importFrom dplyr select
 #' @importFrom data.table fread fwrite
 #' @importFrom processx run
 #' @export
@@ -23,9 +25,9 @@
 #' For the extraction of a value at a given point location from the basin
 #' and/or sub-catchment raster layer of the Hydrography90m dataset, the GDAL
 #' function 'gdallocationinfo' is used. The point locations have to be defined
-#' by coordinates of the WGS84 reference system. The function can also be used
-#' to extract any value from a given raster layer with a WGS84 projection, such
-#' as e.g. environmental information that is stored in the input raster file.
+#' by coordinates in the WGS84 reference system. The function can also be used
+#' to extract any value from a given raster layer in a WGS84 projection, such
+#' as environmental information that is stored in the input raster file.
 #'
 #' @note
 #' Duplicated rows will be removed.
@@ -110,14 +112,14 @@ extract_ids <- function(data, lon, lat, id = NULL, basin_layer = NULL,
   rand_string <- stri_rand_strings(n = 1, length = 8, pattern = "[A-Za-z0-9]")
   # Select columns with lon/lat coordinates
   if (is.null(id)) {
-    coord <- data %>%
-      select(matches(c(lon, lat)))
+    columns <- c(lon, lat)
+    coord <- as.data.table(data)[, ..columns]
     # Remove duplicated rows across entire data frame
     coord <- coord[!duplicated(coord), ]
 
   } else {
-    coord <- data %>%
-      select(matches(c(lon, lat, id)))
+    columns <- c(lon, lat, id)
+    coord <- as.data.table(data)[, ..columns]
     # Remove duplicated rows across entire data frame
     coord <- coord[!duplicated(coord), ]
 
@@ -169,9 +171,11 @@ extract_ids <- function(data, lon, lat, id = NULL, basin_layer = NULL,
                            wsl_sh_file, echo = !quiet))
 
   }
-  # Read in the file containing the ids
+  # Read in the file containing the ids setting fill=TRUE, for the case that
+  # some coordinates were in null cells so they did not get an ID
   data_ids <- fread(paste0(tempdir(),  "/ids_", rand_string, ".txt"),
-                    keepLeadingZeros = TRUE, header = TRUE, sep = " ")
+                    keepLeadingZeros = TRUE, header = TRUE, sep = " ",
+                    fill = TRUE)
 
   # Remove all files in the tmp folder
   file.remove(coord_tmp_path, ids_tmp_path)

@@ -1,4 +1,4 @@
-#' Downloads the test data for the Hydrography90m dataset
+#' Downloads the test data of the Hydrography90m dataset
 #'
 #' @title Download test data
 #'
@@ -6,13 +6,14 @@
 #' Hydrography90m and species point observation data
 #' for a small geographic extent, to test the functions.
 #'
-#' The test data is available at
-#' https://drive.google.com/file/d/1kYNWXmtVm6X7MZLISOePGpvxB1pk1scD/view?usp=share_link
-#' and can be automatically downloaded and unzipped
-#' with this function to a desired path.
+#' The test data will be automatically downloaded and unzipped
+#' with this function to a desired path, or can be alternatively downloaded at
+#'
+#' \url{https://drive.google.com/file/d/1kYNWXmtVm6X7MZLISOePGpvxB1pk1scD/view?usp=share_link}.
 #'
 #' @param download_dir character. The directory where the files will be
 #' downloaded. Default location is the working directory.
+#'
 #' @author Afroditi Grigoropoulou
 #' @export
 #'
@@ -24,17 +25,16 @@
 #' download_test_data("path/to/your/directory")
 #'
 #' @references
-#'
 #' Amatulli, G., Garcia Marquez, J., Sethi, T., Kiesel, J., Grigoropoulou, A.,
 #' Üblacker, M. M., Shen, L. Q., and Domisch, S.: Hydrography90m: a new
 #' high-resolution global hydrographic dataset, Earth Syst. Sci. Data, 14,
-#' 4525–4550, https://doi.org/10.5194/essd-14-4525-2022, 2022.")
+#' 4525–4550, \url{https://doi.org/10.5194/essd-14-4525-2022, 2022.}
 #'
 #' Amatulli G., Garcia Marquez J., Sethi T., Kiesel J., Grigoropoulou A.,
 #' Üblacker M., Shen L. & Domisch S. (2022-08-09 ). Hydrography90m: A new
 #' high-resolution global hydrographic dataset. IGB Leibniz-Institute of
 #' Freshwater Ecology and Inland Fisheries. dataset.
-#' https://doi.org/10.18728/igb-fred-762.1
+#' \url{https://doi.org/10.18728/igb-fred-762.1}
 
 download_test_data <- function(download_dir = ".") {
 

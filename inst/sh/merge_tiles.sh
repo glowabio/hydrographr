@@ -12,6 +12,18 @@ export out=$3
 # output file name (including the tif or the gpkg extension)
 export outname=$4
 
+# Column name used for ST_Union
+export colname=$5
+
+# Defines the compression type
+export compression=$6
+
+# Defines the corresponding compression level
+export level=$7
+
+# BIGTIFF=YES/NO required if output tiffs >4GiB
+export bigtiff=$8
+
 # remove the output file if it exists
 [ -f $out/${outname}  ] && rm $out/${outname}
 
@@ -26,40 +38,28 @@ if [ ${f: -4} == ".tif" ]
 then
     export outname_base=$(basename $outname .tif)
     gdalbuildvrt -overwrite $out/merge_${outname_base}.vrt ${farray[@]}
-    gdal_translate  -co COMPRESS=DEFLATE -co ZLEVEL=9 \
-    $out/merge_${outname_base}.vrt $out/${outname}
+    gdal_translate  -co COMPRESS=$compression -co ZLEVEL=$level \
+    -co BIGTIFF=$bigtiff  $out/merge_${outname_base}.vrt $out/${outname}
     rm $out/merge_${outname_base}.vrt
 elif [ ${f: -4} == "gpkg" ]
 then
     export outname_base=$(basename $outname .gpkg)
-    ogrmerge.py -single -progress -skipfailures -overwrite_ds -f GPKG \
-        -o $out/merge_${outname_base}.gpkg ${farray[@]}
-    ogr2ogr  -nlt POLYGON -dialect sqlite \
-        -sql "SELECT ST_Union(ST_MakeValid(geom)),"ID" FROM merged GROUP BY "ID" " \
-        $out/${outname} $out/merge_${outname_base}.gpkg
-    rm $out/merge_${outname_base}.gpkg
+    ogrmerge.py -single -progress -skipfailures -overwrite_ds -f VRT \
+        -o $out/merge_${outname_base}.vrt ${farray[@]}
+    ogr2ogr  -nlt PROMOTE_TO_MULTI -makeValid  \
+          $out/merge_${outname_base}.gpkg $out/merge_${outname_base}.vrt
+        # Get the Geometry Column name in the merged fil
+    export GEOM=$(ogrinfo -al -so $out/merge_${outname_base}.gpkg | \
+        grep 'Geometry Column' | awk -F' ' '{print $4}')
+    export FID=$(ogrinfo -al -so $out/merge_${outname_base}.gpkg | \
+        grep 'FID Column' | awk -F' ' '{print $4}')
+    export ATTR=$(ogrinfo -al -so $out/merge_${outname_base}.gpkg | \
+        awk 'FNR >=38 {print $1}' | tr ":" ",")
+    ogr2ogr  -nlt PROMOTE_TO_MULTI -dialect sqlite \
+        -sql "SELECT $FID $ATTR ST_Union($GEOM) AS geom, \
+        $colname FROM merged GROUP BY $colname" \
+        -makeValid $out/${outname} $out/merge_${outname_base}.gpkg
+    rm $out/merge_${outname_base}.vrt $out/merge_${outname_base}.gpkg
 fi
 
 exit
-
-
-#export BAS=$1
-#export OUT=$2
-### $1 is the raster tile or spatial vector path
-### $2 is the output path
-#
-# if (find "$BAS" -name "*tif") | grep -q $BAS; then
-#	# merge raster file by first creating a vrt and then do the merge
-#	 gdalbuildvrt -overwrite $BAS/basin.vrt $BAS/*.tif
-#	 rm -f $BAS/basin.tif
-#	 gdal_translate -co COMPRESS=DEFLATE -co ZLEVEL=9 $BAS/basin.vrt $OUT/basin.tif
-#	 rm -f $BAS/basin.vrt
-#
-# elif (find "$BAS" -name "*gpkg") | grep -q $BAS; then
-#	 # merge vector file
-#	 rm -f $BAS/basin.gpkg
-#	 ogrmerge.py -single -progress -skipfailures -overwrite_ds -f GPKG -o $BAS/basin.gpkg  $BAS/*.gpkg
-#	 rm -f $BAS/basin_dissolved.gpkg
-#	 ogr2ogr  -nlt POLYGON -dialect sqlite -sql "SELECT ST_Union(ST_MakeValid(geom)),"ID" FROM merged GROUP BY "ID" " $OUT/basin_dissolved.gpkg $BAS/basin.gpkg
-#	 rm -f $BAS/basin.gpkg
-# fi

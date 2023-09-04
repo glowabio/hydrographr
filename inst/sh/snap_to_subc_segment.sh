@@ -91,7 +91,7 @@ ogr2ogr -nln orderV_bid${MAB} -nlt LINESTRING -where "stream = ${MIB}" \
     -f GPKG $DIR/Microb_${MIB}_${RAND_STRING}.gpkg $VECT
 
 # open grass session based on microbasin raster
-grass -f --text --tmp-location $SUBCATCH <<'EOF'
+grass -f --gtext --tmp-location $SUBCATCH <<'EOF'
 
     # read in point of interest
     v.in.ogr input=$DIR/point_${ID}_${RAND_STRING}.gpkg layer=ref_points output=point_$ID \
@@ -164,7 +164,7 @@ cat ${OUTDIR}/coords_* >> ${OUTDIR}/snap_all.csv
 
 # Join original table with new coordinates
 paste -d","   \
-    $DATA \
+    <(sort -t, -k1,1n -n $DATA) \
     <(sort -t, -k3 -h ${OUTDIR}/snap_all.csv | awk -F, -v OFS=, '{print $1, $2}')  \
     > $SNAP
 

@@ -74,7 +74,7 @@ download_tiles_base <- function(variable, file_format = "tif",
     # The addition of &confirm=t in the download link
     # skips the virus scan of the gdrive
     download.file(paste0(gdrive_path, file_id, "&confirm=t"),
-                  destfile = paste0(download_dir, "/", file_path))
+                  destfile = paste0(download_dir, "/", file_path), mode = "wb")
 
   }
 

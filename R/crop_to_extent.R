@@ -1,15 +1,12 @@
 #' @title Crop raster to extent
 #'
-#' @description This function crops an input raster layer directly on disk,
-#' i.e. the input layer does not need to be loaded into R. The raster .tif is
-#' cropped to a polygon border line if a vector layer (cutline source) is
-#' provided, otherwise if a bounding box is provided
-#' (xmin, ymin, xmax, ymax coordinates or a spatial object from which to extract
-#' a bounding box), the raster is cropped to the extent of the bounding box. At
-#' least a cutline source (vector_layer) or a bounding box (bounding_box)
-#' should be provided. The output is always written to disk, and can be
-#' optionally loaded into R as a SpatRaster (terra package) object
-#' (using read = TRUE).
+#' @description This function crops an input raster layer (.tif) given a
+#' bounding box (xmin, ymin, xmax, ymax coordinates, or a spatial object from
+#' which to extract a bounding box) or to the boundary of a polygon vector
+#' layer (cutline source). The cropping is performed directly on disk, i.e.
+#' the input layer does not need to be loaded into R. The output is always
+#' written to disk, and can be optionally loaded into R as a SpatRaster
+#' (terra package) object (using read = TRUE).
 #'
 #' @param raster_layer character. Full path to the input raster .tif layer.
 #' @param vector_layer character. Full path to a vector layer that is used as a
@@ -19,6 +16,12 @@
 #' or other spatial object.
 #' @param out_dir character. The directory where the output will be stored.
 #' @param file_name character. Name of the cropped output raster .tif file.
+#' @param compression character. Compression of the written output file.
+#' Compression levels can be defined as "none", "low", or "high". Default is
+#' "low".
+#' @param bigtiff logical. Define whether the output file is expected to be a
+#' BIGTIFF (file size larger than 4 GB). If FALSE and size > 4GB no file will be
+#' written. Default is TRUE.
 #' @param read logical. If TRUE, the cropped raster .tif layer gets read into R.
 #' If FALSE, the layer is only stored on disk. Default is TRUE.
 #' @param quiet logical. If FALSE, the standard output will be printed.
@@ -55,6 +58,7 @@
 
 crop_to_extent <- function(raster_layer, vector_layer = NULL,
                            bounding_box = NULL, out_dir, file_name,
+                           compression = "low", bigtiff = TRUE,
                            read = TRUE, quiet = TRUE) {
 
   # Check that an input path and an output path were provided
@@ -86,6 +90,30 @@ crop_to_extent <- function(raster_layer, vector_layer = NULL,
   if (!endsWith(raster_layer, ".tif"))
     stop("raster_layer: Input raster is not a .tif file.")
 
+
+  # Check and translate compression into the compression type and the
+  # compression level which is applied to the tiff file when writing it.
+  if(compression == "none") {
+    compression_type  <- "NONE"
+    compression_level <- 0
+  } else if (compression == "low") {
+    compression_type  <- "DEFLATE"
+    compression_level <- 2
+  } else if (compression == "high") {
+    compression_type  <- "DEFLATE"
+    compression_level <- 9
+  } else {
+    stop("'compression' must be one of 'none', 'low', or 'high'.")
+  }
+
+  # Define whether BIGTIFF is used or not. BIGTIFF is required for
+  # tiff output files > 4 GB.
+  if(bigtiff) {
+    bigtiff <- "YES"
+  } else {
+    bigtiff <- "NO"
+  }
+
   # Check if quiet is logical
   if (!is.logical(quiet))
     stop("quiet: Has to be TRUE or FALSE.")
@@ -105,10 +133,11 @@ crop_to_extent <- function(raster_layer, vector_layer = NULL,
     if (!is.null(vector_layer)) {
         # Call external gdalwarp command from GDAL library. Cut through
         # the border line option
-        cat("Cropping...\n")
+        cat("\nCropping...\n")
         processx::run(system.file("sh", "crop_to_extent_cl.sh",
                         package = "hydrographr"),
-            args = c(raster_layer, vector_layer, output_path),
+            args = c(raster_layer, vector_layer, output_path,
+                     compression_type, compression_level, bigtiff),
             echo = FALSE)
         } else if (!is.null(bounding_box)) {
       # Check if bounding_box is a vector with corner coordinate values,
@@ -128,11 +157,12 @@ crop_to_extent <- function(raster_layer, vector_layer = NULL,
 
         # Call external gdalwarp command from GDAL library.
         # Cut through a polygon extent
-        cat("Cropping...\n")
+        cat("\nCropping...\n")
         processx::run(system.file("sh", "crop_to_extent_bb.sh",
                         package = "hydrographr"),
             args = c(raster_layer, xmin, ymin,
-                     xmax, ymax, output_path),
+                     xmax, ymax, output_path,
+                     compression_type, compression_level, bigtiff),
             echo = !quiet)
         }
     } else {
@@ -150,10 +180,11 @@ crop_to_extent <- function(raster_layer, vector_layer = NULL,
                     package = "hydrographr"))
       if (!is.null(vector_layer)) {
         # Call external gdalwarp command from GDAL library
-        cat("Cropping...\n")
+        cat("\nCropping...\n")
         processx::run(system.file("bat", "crop_to_extent_cl.bat",
                         package = "hydrographr"),
             args = c(wsl_raster_layer, wsl_vector_layer, wsl_output_path,
+                     compression_type, compression_level, bigtiff,
                      wsl_sh_cl_file),
             echo = !quiet)
       } else if (!is.null(bounding_box)) {
@@ -177,20 +208,25 @@ crop_to_extent <- function(raster_layer, vector_layer = NULL,
         processx::run(system.file("bat", "crop_to_extent_bb.bat",
                         package = "hydrographr"),
             args = c(wsl_raster_layer, xmin, ymin,
-                     xmax, ymax, wsl_output_path, wsl_sh_bb_file),
+                     xmax, ymax, wsl_output_path,
+                     compression_type, compression_level, bigtiff,
+                     wsl_sh_bb_file),
             echo = !quiet)
       }
-      }
-
-    if (read == TRUE) {
-      # Read cropped .tif layer
-      cat("Cropped raster saved under: ", output_path)
-      crop_rast <- rast(output_path)
-      return(crop_rast)
-
-    } else {
-      # Print message
-      cat("Cropped raster saved under: ", output_path)
     }
+
+  if (file.exists(output_path)) {
+    # Print message
+    cat("Cropped raster saved under: ", output_path, "\n")
+  } else {
+    stop("Output file was not written. File size may have been larger than 4GB",
+         "\nSet bigtiff = TRUE, for writing large output files.")
+  }
+
+  if (read == TRUE) {
+    # Read cropped .tif layer
+    crop_rast <- rast(output_path)
+    return(crop_rast)
+  }
 }
 

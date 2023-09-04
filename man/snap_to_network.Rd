@@ -18,14 +18,16 @@ snap_to_network(
 )
 }
 \arguments{
-\item{data}{a data.frame or data.table with lat/lon coordinates in WGS84.}
+\item{data}{a data.frame or data.table that contains the columns regarding
+the longitude / latitude coordinates in WGS84.}
 
 \item{lon}{character. The name of the column with the longitude coordinates.}
 
 \item{lat}{character. The name of the column with the latitude coordinates.}
 
 \item{id}{character. The name of a column containing unique IDs for
-each row of "data" (e.g., occurrence or site IDs).}
+each row of "data" (e.g., occurrence or site IDs). The unique IDs need to be
+numeric.}
 
 \item{stream_layer}{character. Full path of the stream network .tif file}
 
@@ -33,15 +35,15 @@ each row of "data" (e.g., occurrence or site IDs).}
 Needed if the point should be snapped to the next stream segment having
 an accumulation value higher than the flow accumulation threshold
 (set by 'accumulation'). This prevents points from being snapped to small
-stream tributaries.}
+stream tributaries. Optional. Default is NULL.}
 
 \item{method}{character. One of "distance", "accumulation", or "both".
 Defines if the points are snapped using the distance or flow accumulation
 (see "Details" for more information). If method is set to "both" the output
 will contain the new coordinates for both calculations.
-Default is "distance".}
+Default is "distance" (in map pixels).}
 
-\item{distance}{numeric. Maximum radius in meters. The points will be
+\item{distance}{numeric. Maximum radius in map pixels. The points will be
 snapped to the next stream within this radius. Default is 500.}
 
 \item{accumulation}{numeric. Minimum flow accumulation. Points will be
@@ -56,17 +58,19 @@ Returns a data.frame with the snapped coordinates and the sub-catchment ID
 of the snapped stream segment. If the sub-catchment ID is NA, no stream segment
 was found within the given distance (method = "distance") or no stream segment
 wad found within the given distance and a flow accumulation equal or higher
-than the given threshold (method = "accumulation").
+than the given threshold (method = "accumulation"). "out-bbox" means that the
+provided coordinates are not within the extend (bounding box) of the
+provided stream network layer.
 }
 \description{
 Snap points to the next stream segment within a defined radius
-or a minimum flow accumulation.
+(in map pixels) or a minimum flow accumulation.
 }
 \details{
-The function makes use of the r.stream.snap command available in GRASS GIS to
-simultaneously a number of points to a stream network. A distance threshold
+The function makes use of the r.stream.snap function available in GRASS GIS to
+simultaneously snap a number of points to the stream network. A distance threshold
 can be specified and points will be snapped to any stream segment within this
-distance radius. However, to avoid snapping to small tributaries, an
+distance radius (in map pixels). However, to avoid snapping to small tributaries, an
 accumulation threshold can be used and the snapping occurs on stream segment
 with equal or higher accumulation threshold and within the given distance
 radius.
