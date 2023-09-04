@@ -78,7 +78,6 @@ wdir <- paste0("/home/mueblacker/Documents/Glowabio/Code/hydrographr/vignettes/d
 
 # Define the working directory for the region Hawaii
 wdir <- "my/working/directory/data_hawaii"
-wdir <- "/home/afroditi/Documents/PhD/hydrographr_case_study/nhdplus"
 data_dir <- paste0(wdir, "/data")
 rast_dir <- paste0(data_dir, "/raster")
 vect_dir <- paste0(data_dir, "/vector")
@@ -405,7 +404,7 @@ catchment_sp <- read_geopackage(gpkg = paste0(gdb_dir, "/nhdplus_2006-HU4.gpkg")
 
 ### Snap points to the network
 
-```{r, eval = F}
+```{r}
 # Define full path to the stream network raster layer
 stream_rast <- paste0(rast_dir, "/NHDPLUS_H_2006_HU4_RASTER/HRNHDPlusRasters2006/swnet.tif")
 
