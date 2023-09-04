@@ -1,6 +1,6 @@
 ---
 title: "Usage of hydrographr with other stream networks"
-subtitle: "Examples showing how to use the hydrographr package with the NHDPlus dataset "
+subtitle: "Examples showing how to use the hydrographr package with the NHDPlus dataset"
 author: ""
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
