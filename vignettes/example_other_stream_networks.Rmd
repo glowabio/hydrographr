@@ -405,71 +405,34 @@ catchment_sp <- read_geopackage(gpkg = paste0(gdb_dir, "/nhdplus_2006-HU4.gpkg")
 
 ```{r}
 # Define full path to the stream network raster layer
-flow_rast <- paste0(rast_dir, "/NHDPLUS_H_2006_HU4_RASTER/HRNHDPlusRasters2006/swnet.tif")
+stream_rast <- paste0(rast_dir, "/NHDPLUS_H_2006_HU4_RASTER/HRNHDPlusRasters2006/swnet.tif")
 
 # Define full path to the flow accumulation raster layer
-stream_rast <- paste0(rast_dir, "/NHDPLUS_H_2006_HU4_RASTER/HRNHDPlusRasters2006/fac.tif")
-
+flow_rast <- paste0(rast_dir, "/NHDPLUS_H_2006_HU4_RASTER/HRNHDPlusRasters2006/fac.tif")
 
 # Define thresholds for the flow accumulation of the stream segment, where
 # the point location should be snapped to
-accu_threshold <- c(400000, 300000, 100000, 50000, 10000, 5000, 1000, 500, 100) 
+accu_threshold <- 700
 # Define the distance radius
-dist_radius <- c(10, 20, 30)
+dist_radius <- 20
 
-# Create a temporary data.table
-point_locations_tmp <- spdata
-
-# Note: The for loop takes about 9 minutes
-first <- TRUE
-for (idist in dist_radius) {
-    
-   # If the distance increases to 20 cells only a flow accumulation of 100 km²
-   # will be used
-   if (idist == 20) {
-    # Set accu_threshold to 100
-    accu_threshold <- c(100)
-   }
-  
-
-  for (iaccu in accu_threshold) {
-    # Snap point locations to the stream network
-    point_locations_snapped_tmp <- snap_to_network(data = point_locations_tmp,
-                                                   lon = "longitude",
-                                                   lat = "latitude",
-                                                   id = "occurrence_id",
-                                                   stream_layer = stream_rast,
-                                                   accu_layer = flow_rast,
-                                                   method = "accumulation",
-                                                   distance = idist,
-                                                   accumulation = iaccu,
-                                                   quiet = FALSE)
-    
-    # Keep point location with NAs for the next loop
-    point_locations_tmp <- point_locations_snapped_tmp %>% 
-      filter(is.na(subc_id_snap_accu))
-  
-  if (first == TRUE) {
-    # Keep the point locations with the new coordinates and remove rows with NA
-    point_locations_snapped <- point_locations_snapped_tmp %>% 
-    filter(!is.na(subc_id_snap_accu))
-    first <- FALSE
-  } else {
-    # Bind the new data.frame to the data.frame of the loop before
-    # and remove the NA
-    point_locations_snapped <- point_locations_snapped %>% 
-      bind_rows(point_locations_snapped_tmp) %>% 
-      filter(!is.na(subc_id_snap_accu))
-    
-  }
-  
-  }
-    
-}
+# Snap point locations to the stream network
+point_locations_snapped <- snap_to_network(data = spdata_ids,
+                                             lon = "longitude",
+                                             lat = "latitude",
+                                             id = "occurrence_id",
+                                             stream_layer = stream_rast,
+                                             accu_layer = flow_rast,
+                                             method = "both",
+                                             distance = dist_radius,
+                                             accumulation = accu_threshold,
+                                             quiet = FALSE)
 
 ```
 
-
-
+Note: The columns "subc_id_snap_dist" and "subc_id_snap_accu" of the
+table "point_locations_snapped" are only meaningful in case that the
+stream and flow accumulation raster layers were derived from the
+Hydrography90m.
 
 ### References
