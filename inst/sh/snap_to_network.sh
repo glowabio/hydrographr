@@ -11,7 +11,7 @@ export ID=$2
 export LON=$3
 export LAT=$4
 
-# stream raster file (e.g. .tif file)
+## stream raster file (e.g. .tif file)
 export STR=$5
 
 ## accumulation raster files
@@ -48,7 +48,7 @@ export RAND_STRING=$(xxd -l 8 -c 32 -p < /dev/random)
 #    export DATC=$(echo ${b}.csv)
 #fi
 
-##  make the file a gpkg
+##  make the file a gpkg -- works only if EPSG is 4326 (WGS 84)
 # ogr2ogr -f "GPKG" -overwrite -nln ref_points -nlt POINT -a_srs EPSG:4326 \
 #     $DIR/ref_points_${RAND_STRING}.gpkg $DATA -oo X_POSSIBLE_NAMES=$LON \
 #     -oo Y_POSSIBLE_NAMES=$LAT -oo AUTODETECT_TYPE=YES
@@ -57,6 +57,7 @@ export RAND_STRING=$(xxd -l 8 -c 32 -p < /dev/random)
 # export op=$(ogrinfo -so -al $DIR/ref_points_${RAND_STRING}.gpkg \
 #     | awk '/Feature/ {print $3}')
 
+# how many points originally (save as reference)
 export op=$(tail -n +2 $DATA | wc -l)
 
 ##  do the snapping in GRASS
@@ -70,7 +71,7 @@ r.in.gdal input=$STR output=stream
 #     type=point key=$ID
 
 v.in.ascii -z in=$DATA out=ref_points separator=comma \
-  cat=1 x=2 y=3 z=1 skip=1
+  cat=1 x=2 y=3 z=3 skip=1
 
 # if not then identify id of those left out
 
