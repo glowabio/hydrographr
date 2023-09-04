@@ -49,13 +49,15 @@ export RAND_STRING=$(xxd -l 8 -c 32 -p < /dev/random)
 #fi
 
 ##  make the file a gpkg
-ogr2ogr -f "GPKG" -overwrite -nln ref_points -nlt POINT -a_srs EPSG:4326 \
-    $DIR/ref_points_${RAND_STRING}.gpkg $DATA -oo X_POSSIBLE_NAMES=$LON \
-    -oo Y_POSSIBLE_NAMES=$LAT -oo AUTODETECT_TYPE=YES
+# ogr2ogr -f "GPKG" -overwrite -nln ref_points -nlt POINT -a_srs EPSG:4326 \
+#     $DIR/ref_points_${RAND_STRING}.gpkg $DATA -oo X_POSSIBLE_NAMES=$LON \
+#     -oo Y_POSSIBLE_NAMES=$LAT -oo AUTODETECT_TYPE=YES
 
 # how many points originally (save as reference)
-export op=$(ogrinfo -so -al $DIR/ref_points_${RAND_STRING}.gpkg \
-    | awk '/Feature/ {print $3}')
+# export op=$(ogrinfo -so -al $DIR/ref_points_${RAND_STRING}.gpkg \
+#     | awk '/Feature/ {print $3}')
+
+export op=$(tail -n +2 $DATA | wc -l)
 
 ##  do the snapping in GRASS
 grass -f --gtext --tmp-location $STR  <<'EOF'
@@ -64,9 +66,11 @@ grass -f --gtext --tmp-location $STR  <<'EOF'
 r.in.gdal input=$STR output=stream
 
 # read reference points
-v.in.ogr --o input=$DIR/ref_points_${RAND_STRING}.gpkg layer=ref_points output=ref_points \
-    type=point key=$ID
+# v.in.ogr --o input=$DIR/ref_points_${RAND_STRING}.gpkg layer=ref_points output=ref_points \
+#     type=point key=$ID
 
+v.in.ascii -z in=$DATA out=ref_points separator=comma \
+  cat=1 x=2 y=3 z=1 skip=1
 
 # if not then identify id of those left out
 
@@ -260,4 +264,4 @@ fi
 
 EOF
 
-rm $DIR/ref_points_${RAND_STRING}.gpkg
+# rm $DIR/ref_points_${RAND_STRING}.gpkg
