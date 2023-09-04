@@ -2,10 +2,10 @@ Package: hydrographr
 Type: Package
 Title: Scalable Hydrographic Data Processing in R
 Date: 2023
-Version: 1.0.14
+Version: 1.0.15
 Authors@R:
-    c(person("Maria", "Üblacker",
-             email = "maria.ueblacker@igb-berlin.de",
+    c(person("Marlene", "Schürz",
+             email = "marlene.schuerz@igb-berlin.de",
              role = c("aut", "cre")),
       person("Afroditi", "Grigoropoulou",
              email = "afroditi.grigoropoulou@igb-berlin.de",
@@ -34,7 +34,7 @@ Authors@R:
       person("Sami", "Domisch",
              email = "sami.domisch@igb-berlin.de",
              role = c("aut")))
-Maintainer: Maria Üblacker <maria.ueblacker@igb-berlin.de> and 
+Maintainer: Marlene Schürz <marlene.schuerz@igb-berlin.de> and 
     Afroditi Grigoropoulou <afroditi.grigoropoulou@igb-berlin.de>
 Description: Scalable hydrographic geospatial data processing tools using 
     open-source command-line utilities. The package provides functions to 
@@ -91,6 +91,7 @@ Collate:
     'extract_zonal_stat.R'
     'get_catchment_graph.R'
     'get_distance.R'
+    'get_distance_graph.R'
     'get_pfafstetter_basins.R'
     'get_regional_unit_id.R'
     'get_segment_neighbours.R'

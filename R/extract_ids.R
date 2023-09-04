@@ -171,7 +171,8 @@ extract_ids <- function(data, lon, lat, id = NULL, basin_layer = NULL,
                            wsl_sh_file, echo = !quiet))
 
   }
-  # Read in the file containing the ids
+  # Read in the file containing the ids setting fill=TRUE, for the case that
+  # some coordinates were in null cells so they did not get an ID
   data_ids <- fread(paste0(tempdir(),  "/ids_", rand_string, ".txt"),
                     keepLeadingZeros = TRUE, header = TRUE, sep = " ",
                     fill = TRUE)
