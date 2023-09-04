@@ -6,8 +6,8 @@ date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Function benchmarks}
-%\VignetteEncoding{UTF-8}
-%\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
 bibliography: bib/references_bench.bib
 link-citations: yes
 linkcolor: blue
