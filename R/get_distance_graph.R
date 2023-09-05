@@ -178,8 +178,10 @@ get_distance_graph <- function(g, subc_id = NULL, variable = "length",
     # get the actual distance in meters along the paths
 
     # Rename the length column for igraph::distances
-    names_edg_attr <- names(edge_attr(g))
-    names_edg_attr[which(names_edg_attr == variable)] <- "weight"
+    # names_edg_attr <- names(edge_attr(g))
+    # names_edg_attr[which(names_edg_attr == variable)] <- "weight"
+
+    names(edge_attr(g))[which(names(edge_attr(g)) == variable)] <- "weight"
 
     # Get a matrix of the distances [m] between the input IDs
     dist_out <- distances(g,
@@ -189,6 +191,12 @@ get_distance_graph <- function(g, subc_id = NULL, variable = "length",
                           weights = NULL,
                           algorithm = c("automatic"))
 
+    # Convert the upper triangle to a 3-column long table
+    dist_out_ind <- which(upper.tri(dist_out, diag = TRUE), arr.ind = TRUE)
+    dist_out_ind_name <- dimnames(dist_out)
+    dist_out_table <- data.frame(from = dist_out_ind_name[[1]][dist_out_ind[, 1]],
+                                 to = dist_out_ind_name[[2]][dist_out_ind[, 2]],
+                                 distance = dist_out[dist_out_ind])
 
     # get only the number of segments along the paths
     } else if(distance_m == FALSE) {
@@ -198,14 +206,16 @@ get_distance_graph <- function(g, subc_id = NULL, variable = "length",
                           to = as.character(subc_id),
                           mode = c("all"),
                           weights = NA)
-    }
 
     # Convert the upper triangle to a 3-column long table
     dist_out_ind <- which(upper.tri(dist_out, diag = TRUE), arr.ind = TRUE)
     dist_out_ind_name <- dimnames(dist_out)
     dist_out_table <- data.frame(from = dist_out_ind_name[[1]][dist_out_ind[, 1]],
                                  to = dist_out_ind_name[[2]][dist_out_ind[, 2]],
-                                 distance = dist_out[dist_out_ind])
+                                 segments = dist_out[dist_out_ind])
+
+    }
+
 
     # Remove the zero self-distances
     dist_out_table <- dist_out_table[-which(dist_out_table["from"] == dist_out_table["to"]),]
