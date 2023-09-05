@@ -51,7 +51,9 @@ Description: Scalable hydrographic geospatial data processing tools using
     workflows. Please see the installation guide of the additional software 
     at https://glowabio.github.io/hydrographr/articles/hydrographr.html. 
     Windows users need to to first activate the Windows Subsystem for Linux 
-    (WSL) feature.
+    (WSL) feature. Instructions on how to use hydrographr with other, finer 
+    resolution stream networks, can be found at 
+    https://glowabio.github.io/hydrographr/articles/example_other_stream_networks.html 
 License: GPL-3
 URL: https://glowabio.github.io/hydrographr/
 BugReports: https://github.com/glowabio/hydrographr/issues
