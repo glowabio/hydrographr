@@ -400,20 +400,13 @@ get_nhdplushr(gdb_dir, file.path(gdb_dir, "nhdplus_2006-HU4.gpkg"))
 flow_line <- read_geopackage(gpkg = paste0(gdb_dir, "/nhdplus_2006-HU4.gpkg"), 
                 layer_name = "NHDFlowline")
 
-<<<<<<< HEAD
-# Import flow line as a graph
-flow_line_graph <- read_geopackage(
-                gpkg = paste0(gdb_dir, "/nhdplus_2006-HU4.gpkg"), 
-                layer_name = "NHDFlowline",
-                import_as = "graph", name = "Permanent_Identifier")
-=======
-# Transform to a graph. Note that the first two columns need to be the "from" 
-# and "to" columns
+# To import flow line as a graph, first import the attribute table as a 
+# data.table and then transform to a graph. Note that the first two columns 
+# need to be the "from" and "to" columns
 setcolorder(flow_line, c("FromNode", "ToNode"))
 
 # Create the graph
 flow_line_graph  <- graph_from_data_frame(flow_line, directed = TRUE)
->>>>>>> dev_vignette_nhdp
 
 # Import the catchment layer as a spatial vector
 catchment_sp <- read_geopackage(
