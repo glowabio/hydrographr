@@ -178,7 +178,8 @@ get_distance_graph <- function(g, subc_id = NULL, variable = "length",
     # get the actual distance in meters along the paths
 
     # Rename the length column for igraph::distances
-    names(edge_attr(g))[which(names(edge_attr(g)) == variable)] <- "weight"
+    names_edg_attr <- names(edge_attr(g))
+    names_edg_attr[which(names_edg_attr == variable)] <- "weight"
 
     # Get a matrix of the distances [m] between the input IDs
     dist_out <- distances(g,
