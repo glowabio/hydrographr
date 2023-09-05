@@ -79,10 +79,10 @@
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Usage of hydrographr with other stream networks</h1>
             <h3 data-toc-skip class="subtitle">Examples showing how to
-use the hydrographr package with the NHDPlus dataset</h3>
+use the hydrographr package with the NHDPlusHR dataset</h3>
                         <h4 data-toc-skip class="author"></h4>
             
-            <h4 data-toc-skip class="date">2023-09-04</h4>
+            <h4 data-toc-skip class="date">2023-09-05</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/glowabio/hydrographr/blob/HEAD/vignettes/example_other_stream_networks.Rmd" class="external-link"><code>vignettes/example_other_stream_networks.Rmd</code></a></small>
       <div class="d-none name"><code>example_other_stream_networks.Rmd</code></div>
@@ -104,7 +104,7 @@ use the hydrographr package with the NHDPlus dataset</h3>
 <code class="sourceCode R"><span><span class="va">wdir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu">here</span><span class="op">(</span><span class="op">)</span>, <span class="st">"/vignettes/data_other_networks"</span><span class="op">)</span></span>
 <span><span class="kw">if</span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.exists</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <div class="section level3">
-<h3 id="download-nhdplus-data">Download NHDPlus data<a class="anchor" aria-label="anchor" href="#download-nhdplus-data"></a>
+<h3 id="download-nhdplushr-data">Download NHDPlusHR data<a class="anchor" aria-label="anchor" href="#download-nhdplushr-data"></a>
 </h3>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Define the working directory for the region Hawaii</span></span>
@@ -121,12 +121,13 @@ use the hydrographr package with the NHDPlus dataset</h3>
 <span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="va">vect_dir</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="va">sp_dir</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="va">out_dir</span><span class="op">)</span></span></code></pre></div>
-<p>Data of the NHDPlus dataset can be downloaded using the R package
+<p>Data of the NHDPlusHR dataset can be downloaded using the R package
 <code>nhdplusTools</code> or from this USGS website: <a href="https://apps.nationalmap.gov/downloader/" class="external-link uri">https://apps.nationalmap.gov/downloader/</a></p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Download NHDPlus raster data for Hawaii </span></span>
 <span><span class="fu"><a href="https://doi-usgs.github.io/nhdplusTools/reference/download_nhdplusv2.html" class="external-link">download_nhdplusv2</a></span><span class="op">(</span>outdir <span class="op">=</span> <span class="va">rast_dir</span>,</span>
-<span>                   url <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"https://prd-tnm.s3.amazonaws.com/StagedProducts/"</span>,</span>
+<span>                   url <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span>
+<span>                     <span class="st">"https://prd-tnm.s3.amazonaws.com/StagedProducts/"</span>,</span>
 <span>                                <span class="st">"Hydrography/NHDPlusHR/Beta/GDB/"</span>,</span>
 <span>                                <span class="st">"NHDPLUS_H_2006_HU4_RASTER.7z"</span><span class="op">)</span>,</span>
 <span>                   progress <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
@@ -139,9 +140,10 @@ use the hydrographr package with the NHDPlus dataset</h3>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Download NHDPlus vector data for Hawaii </span></span>
 <span><span class="fu"><a href="https://doi-usgs.github.io/nhdplusTools/reference/download_nhdplusv2.html" class="external-link">download_nhdplusv2</a></span><span class="op">(</span>outdir <span class="op">=</span> <span class="va">vect_dir</span>,</span>
-<span>                   url <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"https://prd-tnm.s3.amazonaws.com/StagedProducts/"</span>,</span>
-<span>                                <span class="st">"Hydrography/NHDPlusHR/Beta/GDB/"</span>,</span>
-<span>                                <span class="st">"NHDPLUS_H_2006_HU4_GDB.zip"</span><span class="op">)</span>,</span>
+<span>                   url <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span>
+<span>                     <span class="st">"https://prd-tnm.s3.amazonaws.com/StagedProducts/"</span>,</span>
+<span>                      <span class="st">"Hydrography/NHDPlusHR/Beta/GDB/"</span>,</span>
+<span>                      <span class="st">"NHDPLUS_H_2006_HU4_GDB.zip"</span><span class="op">)</span>,</span>
 <span>                   progress <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Unzip -- can also be done manually</span></span>
@@ -194,10 +196,11 @@ GBIF.org using the R package <code>rgbif</code>.</p>
 <span></span>
 <span><span class="va">m</span></span></code></pre></div>
 <p><img src="../reference/figures/hawaii_map.png"></p>
-<p>By inspecting the NHDPlus data, we observe that the coordinate
+<p>By inspecting the NHDPlusHR data, we observe that the coordinate
 reference system is not WGS84, but the EPSG:26904.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/rast.html" class="external-link">rast</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">rast_dir</span>, <span class="st">"/NHDPLUS_H_2006_HU4_RASTER/HRNHDPlusRasters2006/cat.tif"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/rast.html" class="external-link">rast</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">rast_dir</span>, </span>
+<span>            <span class="st">"/NHDPLUS_H_2006_HU4_RASTER/HRNHDPlusRasters2006/cat.tif"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>Therefore we will need to convert the species points’ coordinates to
 EPSG:26904, so that they match with the spatial layers.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
@@ -279,8 +282,10 @@ EPSG:26904, so that they match with the spatial layers.</p>
 <span><span class="va">spdata_ids</span></span></code></pre></div>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Don't run:</span></span>
-<span><span class="co"># If we wanted to change the no data value of a layer, we could do it using the function:</span></span>
-<span><span class="fu"><a href="../reference/set_no_data.html">set_no_data</a></span><span class="op">(</span>data_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">rast_dir</span>, <span class="st">"/NHDPLUS_H_2006_HU4_RASTER/HRNHDPlusRasters2006"</span><span class="op">)</span>, var_layer <span class="op">=</span> <span class="st">"cat.tif"</span>, </span>
+<span><span class="co"># If we wanted to change the no data value of a layer, we could do it using the </span></span>
+<span><span class="co"># function:</span></span>
+<span><span class="fu"><a href="../reference/set_no_data.html">set_no_data</a></span><span class="op">(</span>data_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">rast_dir</span>, <span class="st">"/NHDPLUS_H_2006_HU4_RASTER/HRNHDPlusRasters2006"</span><span class="op">)</span>, </span>
+<span>            var_layer <span class="op">=</span> <span class="st">"cat.tif"</span>, </span>
 <span>            no_data <span class="op">=</span> <span class="op">-</span><span class="fl">32768</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Remember to set it back to the original value!</span></span></code></pre></div>
@@ -297,12 +302,14 @@ the cat.tif raster to EPSG:4326 using the ‘terra’ package, so that it is
 compatible with the coordinate system of CHELSA Bioclim files.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Download bio12 in the rast_dir</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/download.file.html" class="external-link">download.file</a></span><span class="op">(</span><span class="st">"https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio12_1981-2010_V.2.1.tif"</span>,</span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/download.file.html" class="external-link">download.file</a></span><span class="op">(</span></span>
+<span>  <span class="st">"https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio12_1981-2010_V.2.1.tif"</span>,</span>
 <span>destfile <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">rast_dir</span>, <span class="st">"/bio12_1981-2010.tif"</span><span class="op">)</span>, mode <span class="op">=</span> <span class="st">"wb"</span><span class="op">)</span></span>
 <span></span>
 <span></span>
 <span><span class="co"># Crop bio12 to bounding box</span></span>
-<span><span class="co"># We first need to convert the bounding box coordinates to WGS84, that is the coordinate system of the CHELSA Bioclim layers.</span></span>
+<span><span class="co"># We first need to convert the bounding box coordinates to WGS84, that is the </span></span>
+<span><span class="co"># coordinate system of the CHELSA Bioclim layers.</span></span>
 <span><span class="va">bbox_wgs84</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/project.html" class="external-link">project</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/ext.html" class="external-link">ext</a></span><span class="op">(</span><span class="va">bbox</span><span class="op">)</span>, from <span class="op">=</span> <span class="st">"EPSG:26904"</span>, to <span class="op">=</span> <span class="st">"EPSG:4326"</span><span class="op">)</span></span>
 <span><span class="co"># Now crop</span></span>
 <span><span class="fu"><a href="../reference/crop_to_extent.html">crop_to_extent</a></span><span class="op">(</span>raster_layer <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">rast_dir</span>, <span class="st">"/bio12_1981-2010.tif"</span><span class="op">)</span>, </span>
@@ -317,15 +324,15 @@ compatible with the coordinate system of CHELSA Bioclim files.</p>
 <span></span>
 <span><span class="co"># Reproject to WGS84 and write out the file with a new name</span></span>
 <span><span class="va">cat_rast</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/project.html" class="external-link">project</a></span><span class="op">(</span><span class="va">cat_rast</span>, </span>
-<span>                    y <span class="op">=</span> <span class="st">"epsg:4326"</span>, </span>
-<span>                    filename <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">rast_dir</span>, <span class="st">"/NHDPLUS_H_2006_HU4_RASTER/HRNHDPlusRasters2006/cat_wgs84.tif"</span><span class="op">)</span><span class="op">)</span></span>
+<span>                  y <span class="op">=</span> <span class="st">"epsg:4326"</span>, </span>
+<span>                  filename <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">rast_dir</span>, <span class="st">"/NHDPLUS_H_2006_HU4_RASTER/HRNHDPlusRasters2006/cat_wgs84.tif"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Extract the zonal statistics of bio12 based on the NHDPlus basins</span></span>
 <span><span class="va">zonal_stats</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_zonal_stat.html">extract_zonal_stat</a></span><span class="op">(</span>data_dir <span class="op">=</span> <span class="va">out_dir</span>,</span>
-<span>                  subc_id <span class="op">=</span> <span class="st">"all"</span>, </span>
-<span>                  subc_layer <span class="op">=</span>  <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">rast_dir</span>, <span class="st">"/NHDPLUS_H_2006_HU4_RASTER/HRNHDPlusRasters2006/cat_wgs84.tif"</span><span class="op">)</span>,</span>
-<span>                  var_layer <span class="op">=</span> <span class="st">"bio12_crop.tif"</span>,</span>
-<span>                  quiet <span class="op">=</span> <span class="cn">F</span><span class="op">)</span></span>
+<span>                subc_id <span class="op">=</span> <span class="st">"all"</span>, </span>
+<span>                subc_layer <span class="op">=</span>  <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">rast_dir</span>, <span class="st">"/NHDPLUS_H_2006_HU4_RASTER/HRNHDPlusRasters2006/cat_wgs84.tif"</span><span class="op">)</span>,</span>
+<span>                var_layer <span class="op">=</span> <span class="st">"bio12_crop.tif"</span>,</span>
+<span>                quiet <span class="op">=</span> <span class="cn">F</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Same as before, we need to filter out the no data values to get a better </span></span>
 <span><span class="co"># grasp of the resulting table</span></span>
@@ -361,8 +368,8 @@ compatible with the coordinate system of CHELSA Bioclim files.</p>
 <div class="section level3">
 <h3 id="read-a--gpkg">Read a .GPKG<a class="anchor" aria-label="anchor" href="#read-a--gpkg"></a>
 </h3>
-<p>See <a href="#download-nhdplus-data">Download NHDPlus data</a> to
-download NHDPlus vector data for Hawaii.</p>
+<p>See [Download NHDPlus data] to download NHDPlus vector data for
+Hawaii.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">gdb_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">vect_dir</span>, <span class="st">"/NHDPLUS_H_2006_HU4_GDB"</span><span class="op">)</span></span>
 <span></span>
@@ -374,12 +381,14 @@ download NHDPlus vector data for Hawaii.</p>
 <span>                layer_name <span class="op">=</span> <span class="st">"NHDFlowline"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Import flow line as a graph</span></span>
-<span><span class="va">flow_line_graph</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_geopackage.html">read_geopackage</a></span><span class="op">(</span>gpkg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">gdb_dir</span>, <span class="st">"/nhdplus_2006-HU4.gpkg"</span><span class="op">)</span>, </span>
+<span><span class="va">flow_line_graph</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_geopackage.html">read_geopackage</a></span><span class="op">(</span></span>
+<span>                gpkg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">gdb_dir</span>, <span class="st">"/nhdplus_2006-HU4.gpkg"</span><span class="op">)</span>, </span>
 <span>                layer_name <span class="op">=</span> <span class="st">"NHDFlowline"</span>,</span>
 <span>                import_as <span class="op">=</span> <span class="st">"graph"</span>, name <span class="op">=</span> <span class="st">"Permanent_Identifier"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Import the catchment layer as a spatial vector</span></span>
-<span><span class="va">catchment_sp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_geopackage.html">read_geopackage</a></span><span class="op">(</span>gpkg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">gdb_dir</span>, <span class="st">"/nhdplus_2006-HU4.gpkg"</span><span class="op">)</span>, </span>
+<span><span class="va">catchment_sp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_geopackage.html">read_geopackage</a></span><span class="op">(</span></span>
+<span>                gpkg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">gdb_dir</span>, <span class="st">"/nhdplus_2006-HU4.gpkg"</span><span class="op">)</span>, </span>
 <span>                layer_name <span class="op">=</span> <span class="st">"NHDPlusCatchment"</span>,</span>
 <span>                name <span class="op">=</span> <span class="st">"REACHCODE"</span>,</span>
 <span>                import_as <span class="op">=</span> <span class="st">"SpatVect"</span><span class="op">)</span></span></code></pre></div>
@@ -392,7 +401,8 @@ download NHDPlus vector data for Hawaii.</p>
 <span><span class="va">stream_rast</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">rast_dir</span>, <span class="st">"/NHDPLUS_H_2006_HU4_RASTER/HRNHDPlusRasters2006/swnet.tif"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Define full path to the flow accumulation raster layer</span></span>
-<span><span class="va">flow_rast</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">rast_dir</span>, <span class="st">"/NHDPLUS_H_2006_HU4_RASTER/HRNHDPlusRasters2006/fac.tif"</span><span class="op">)</span></span>
+<span><span class="va">flow_rast</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">rast_dir</span>, </span>
+<span>                    <span class="st">"/NHDPLUS_H_2006_HU4_RASTER/HRNHDPlusRasters2006/fac.tif"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Define thresholds for the flow accumulation of the stream segment, where</span></span>
 <span><span class="co"># the point location should be snapped to</span></span>
@@ -469,7 +479,7 @@ Computing</em>. Vienna, Austria: R Foundation for Statistical Computing.
 <a href="https://www.R-project.org/" class="external-link">https://www.R-project.org/</a>.
 </div>
 <div id="ref-R-hydrographr" class="csl-entry">
-Üblacker, Maria, Afroditi Grigoropoulou, Jaime Garcia Marquez, Yusdiel
+Schürz, Marlene, Afroditi Grigoropoulou, Jaime Garcia Marquez, Yusdiel
 Torres Cambas, Christoph Schürz, Mathieu Floury, Thomas Tomiczek,
 Vanessa Bremerich, Giuseppe Amatulli, and Sami Domisch. 2023.
 <em>Hydrographr: Scalable Hydrographic Data Processing in r</em>. <a href="https://glowabio.github.io/hydrographr/" class="external-link">https://glowabio.github.io/hydrographr/</a>.

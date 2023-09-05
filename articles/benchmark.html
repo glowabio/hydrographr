@@ -83,7 +83,7 @@
 <code>terra</code> workflows</h3>
                         <h4 data-toc-skip class="author"></h4>
             
-            <h4 data-toc-skip class="date">2023-09-04</h4>
+            <h4 data-toc-skip class="date">2023-09-05</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/glowabio/hydrographr/blob/HEAD/vignettes/benchmark.Rmd" class="external-link"><code>vignettes/benchmark.Rmd</code></a></small>
       <div class="d-none name"><code>benchmark.Rmd</code></div>
@@ -208,10 +208,10 @@ of memory.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Small helper function to print benchmark experiments</span></span>
 <span><span class="va">print_experiment</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">micro</span><span class="op">)</span> <span class="op">{</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Run times in seconds:\n"</span><span class="op">)</span></span>
-<span><span class="va">t</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="va">micro</span><span class="op">$</span><span class="va">time</span><span class="op">*</span><span class="fl">1e-9</span><span class="op">)</span>, digits <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">t</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"min"</span>, <span class="st">"median"</span>, <span class="st">"max"</span><span class="op">)</span></span>
-<span><span class="va">t</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Run times in seconds:\n"</span><span class="op">)</span></span>
+<span>  <span class="va">t</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="va">micro</span><span class="op">$</span><span class="va">time</span><span class="op">*</span><span class="fl">1e-9</span><span class="op">)</span>, digits <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">t</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"min"</span>, <span class="st">"median"</span>, <span class="st">"max"</span><span class="op">)</span></span>
+<span>  <span class="va">t</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p>Define working directory:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
@@ -568,7 +568,7 @@ Mersmann, Olaf. 2023. <em>Microbenchmark: Accurate Timing
 Functions</em>. <a href="https://CRAN.R-project.org/package=microbenchmark" class="external-link">https://CRAN.R-project.org/package=microbenchmark</a>.
 </div>
 <div id="ref-hydrographr" class="csl-entry">
-Üblacker, Maria, Afroditi Grigoropoulou, Jaime Garcia Marquez, Yusdiel
+Schürz, Marlene, Afroditi Grigoropoulou, Jaime Garcia Marquez, Yusdiel
 Torres Cambas, Christoph Schürz, Mathieu Floury, Thomas Tomiczek,
 Vanessa Bremerich, Giuseppe Amatulli, and Sami Domisch. 2023.
 <em>Hydrographr: Scalable Hydrographic Data Processing in r</em>. <a href="https://glowabio.github.io/hydrographr/" class="external-link">https://glowabio.github.io/hydrographr/</a>.
