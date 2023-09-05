@@ -181,7 +181,7 @@ get_distance_graph <- function(g, subc_id = NULL, variable = "length",
     # names_edg_attr <- names(edge_attr(g))
     # names_edg_attr[which(names_edg_attr == variable)] <- "weight"
 
-    names(edge_attr(g))[which(names(edge_attr(g)) == variable)] <- "weight"
+    names(igraph::edge_attr(g))[which(names(igraph::edge_attr(g)) == variable)] <- "weight"
 
     # Get a matrix of the distances [m] between the input IDs
     dist_out <- distances(g,
@@ -199,7 +199,7 @@ get_distance_graph <- function(g, subc_id = NULL, variable = "length",
                                  distance = dist_out[dist_out_ind])
 
     # get only the number of segments along the paths
-    } else if(distance_m == FALSE) {
+  } else if(distance_m == FALSE) {
 
     dist_out <- distances(g,
                           v = as.character(subc_id),
@@ -214,18 +214,14 @@ get_distance_graph <- function(g, subc_id = NULL, variable = "length",
                                  to = dist_out_ind_name[[2]][dist_out_ind[, 2]],
                                  segments = dist_out[dist_out_ind])
 
-    }
+  }
 
 
-    # Remove the zero self-distances
-    dist_out_table <- dist_out_table[-which(dist_out_table["from"] == dist_out_table["to"]),]
+  # Remove the zero self-distances
+  dist_out_table <- dist_out_table[-which(dist_out_table["from"] == dist_out_table["to"]),]
 
-    # Return as data.table
-    dist_out_table <- setDT(dist_out_table)
-    return(dist_out_table)
+  # Return as data.table
+  dist_out_table <- setDT(dist_out_table)
+  return(dist_out_table)
 
 }
-
-
-
-
