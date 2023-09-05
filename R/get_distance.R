@@ -174,7 +174,7 @@ get_distance <- function(data, lon, lat, id, basin_id = NULL,
   if (!(distance == "both" || distance == "network")) {
     if (!is.null(basin_layer))
       stop("For distance = 'network' or 'both', basin_layer needs to be defined.")
-    if (!is.null(stream_layer))
+    if (is.null(stream_layer))
       stop("For distance = 'network' or 'both', stream_layer needs to be defined.")
   }
 
@@ -237,32 +237,9 @@ get_distance <- function(data, lon, lat, id, basin_id = NULL,
   }
 
 
-  # If basin_id is NULL
-  # Extract ids first
-  if (is.null(basin_id) & distance != "euclidean") {
-    # Extract basin ids
-    basin_ids <- extract_ids(data = data, lon = lon, lat = lat,
-                             subc_layer = NULL,basin_layer = basin_layer,
-                             quiet = quiet)
-
-    # Join with data and select columns needed for the bash script
-    # Note: "id" should be the first column
-    columns <- c(id, lon, lat, "basin_id")
-    ids <- as.data.table(data) %>%
-      left_join(., basin_ids, by = c(lon, lat)) %>%
-      .[, ..columns]
-
-  } else if (!is.null(basin_id) & distance != "euclidean"){
-    # Select columns needed for the bash script to calculate network distances
-    columns <- c(id, lon, lat, basin_id)
-    ids <- as.data.table(data)[, ..columns]
-
-  } else {
-    # Select columns needed for the bash script to calculate euclidean distances
+    # Select columns needed for the bash script to calculate distances
     columns <- c(id, lon, lat)
     ids <- as.data.table(data)[, ..columns]
-
-  }
 
   # Create random string to attach to the file name of the temporary
   # output tables and input ids file
