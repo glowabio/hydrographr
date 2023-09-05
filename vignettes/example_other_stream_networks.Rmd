@@ -1,11 +1,11 @@
 ---
 title: "Usage of hydrographr with other stream networks"
-subtitle: "Examples showing how to use the hydrographr package with the NHDPlus dataset"
+subtitle: "Examples showing how to use the hydrographr package with the NHDPlusHR dataset"
 author: ""
 date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
+output: html_vignette
 vignette: >
-  %\VignetteIndexEntry{Other stream networks}
+  %\VignetteIndexEntry{Usage of hydrographr with other stream networks}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 bibliography: bib/references_nhdp.bib
@@ -69,10 +69,11 @@ dir.create("data")
 ```
 
 ```{r, eval = FALSE, include=FALSE}
-wdir <- paste0("/home/mueblacker/Documents/Glowabio/Code/hydrographr/vignettes/data_hawaii")
+wdir <- paste0(
+  "/home/mueblacker/Documents/Glowabio/Code/hydrographr/vignettes/data_hawaii")
 ```
 
-### Download NHDPlus data
+### Download NHDPlusHR data
 
 ```{r, eval=F}
 
@@ -92,14 +93,15 @@ dir.create(sp_dir)
 dir.create(out_dir)
 ```
 
-Data of the NHDPlus dataset can be downloaded using the R package
+Data of the NHDPlusHR dataset can be downloaded using the R package
 `nhdplusTools` or from this USGS website:
 <https://apps.nationalmap.gov/downloader/>
 
 ```{r download, eval=F}
 # Download NHDPlus raster data for Hawaii 
 download_nhdplusv2(outdir = rast_dir,
-                   url = paste0("https://prd-tnm.s3.amazonaws.com/StagedProducts/",
+                   url = paste0(
+                     "https://prd-tnm.s3.amazonaws.com/StagedProducts/",
                                 "Hydrography/NHDPlusHR/Beta/GDB/",
                                 "NHDPLUS_H_2006_HU4_RASTER.7z"),
                    progress = TRUE)
@@ -115,9 +117,10 @@ archive_extract(archive = paste0(rast_dir, "/NHDPLUS_H_2006_HU4_RASTER.7z"),
 
 # Download NHDPlus vector data for Hawaii 
 download_nhdplusv2(outdir = vect_dir,
-                   url = paste0("https://prd-tnm.s3.amazonaws.com/StagedProducts/",
-                                "Hydrography/NHDPlusHR/Beta/GDB/",
-                                "NHDPLUS_H_2006_HU4_GDB.zip"),
+                   url = paste0(
+                     "https://prd-tnm.s3.amazonaws.com/StagedProducts/",
+                      "Hydrography/NHDPlusHR/Beta/GDB/",
+                      "NHDPLUS_H_2006_HU4_GDB.zip"),
                    progress = TRUE)
 
 # Unzip -- can also be done manually
@@ -185,11 +188,12 @@ m
 
 ![](../man/figures/hawaii_map.png)
 
-By inspecting the NHDPlus data, we observe that the coordinate reference
+By inspecting the NHDPlusHR data, we observe that the coordinate reference
 system is not WGS84, but the EPSG:26904.
 
 ```{r, eval=F}
-rast(paste0(rast_dir, "/NHDPLUS_H_2006_HU4_RASTER/HRNHDPlusRasters2006/cat.tif"))
+rast(paste0(rast_dir, 
+            "/NHDPLUS_H_2006_HU4_RASTER/HRNHDPlusRasters2006/cat.tif"))
 ```
 
 Therefore we will need to convert the species points' coordinates to
@@ -279,13 +283,13 @@ spdata_ids
 
 ```{r, eval = FALSE}
 # Don't run:
-# If we wanted to change the no data value of a layer, we could do it using the function:
-set_no_data(data_dir = paste0(rast_dir, "/NHDPLUS_H_2006_HU4_RASTER/HRNHDPlusRasters2006"), var_layer = "cat.tif", 
+# If we wanted to change the no data value of a layer, we could do it using the 
+# function:
+set_no_data(data_dir = paste0(rast_dir, "/NHDPLUS_H_2006_HU4_RASTER/HRNHDPlusRasters2006"), 
+            var_layer = "cat.tif", 
             no_data = -32768)
 
 # Remember to set it back to the original value!
-
-
 ```
 
 ### Extract zonal statistics
@@ -302,12 +306,14 @@ compatible with the coordinate system of CHELSA Bioclim files.
 ```{r, eval=F}
 
 # Download bio12 in the rast_dir
-download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio12_1981-2010_V.2.1.tif",
+download.file(
+  "https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio12_1981-2010_V.2.1.tif",
 destfile = paste0(rast_dir, "/bio12_1981-2010.tif"), mode = "wb")
 
 
 # Crop bio12 to bounding box
-# We first need to convert the bounding box coordinates to WGS84, that is the coordinate system of the CHELSA Bioclim layers.
+# We first need to convert the bounding box coordinates to WGS84, that is the 
+# coordinate system of the CHELSA Bioclim layers.
 bbox_wgs84 <- project(ext(bbox), from = "EPSG:26904", to = "EPSG:4326")
 # Now crop
 crop_to_extent(raster_layer = paste0(rast_dir, "/bio12_1981-2010.tif"), 
@@ -322,15 +328,15 @@ cat_rast <- rast(paste0(rast_dir, "/NHDPLUS_H_2006_HU4_RASTER/HRNHDPlusRasters20
 
 # Reproject to WGS84 and write out the file with a new name
 cat_rast <- project(cat_rast, 
-                    y = "epsg:4326", 
-                    filename = paste0(rast_dir, "/NHDPLUS_H_2006_HU4_RASTER/HRNHDPlusRasters2006/cat_wgs84.tif"))
+                  y = "epsg:4326", 
+                  filename = paste0(rast_dir, "/NHDPLUS_H_2006_HU4_RASTER/HRNHDPlusRasters2006/cat_wgs84.tif"))
 
 # Extract the zonal statistics of bio12 based on the NHDPlus basins
 zonal_stats <- extract_zonal_stat(data_dir = out_dir,
-                  subc_id = "all", 
-                  subc_layer =  paste0(rast_dir, "/NHDPLUS_H_2006_HU4_RASTER/HRNHDPlusRasters2006/cat_wgs84.tif"),
-                  var_layer = "bio12_crop.tif",
-                  quiet = F)
+                subc_id = "all", 
+                subc_layer =  paste0(rast_dir, "/NHDPLUS_H_2006_HU4_RASTER/HRNHDPlusRasters2006/cat_wgs84.tif"),
+                var_layer = "bio12_crop.tif",
+                quiet = F)
 
 # Same as before, we need to filter out the no data values to get a better 
 # grasp of the resulting table
@@ -390,12 +396,14 @@ flow_line <- read_geopackage(gpkg = paste0(gdb_dir, "/nhdplus_2006-HU4.gpkg"),
                 layer_name = "NHDFlowline")
 
 # Import flow line as a graph
-flow_line_graph <- read_geopackage(gpkg = paste0(gdb_dir, "/nhdplus_2006-HU4.gpkg"), 
+flow_line_graph <- read_geopackage(
+                gpkg = paste0(gdb_dir, "/nhdplus_2006-HU4.gpkg"), 
                 layer_name = "NHDFlowline",
                 import_as = "graph", name = "Permanent_Identifier")
 
 # Import the catchment layer as a spatial vector
-catchment_sp <- read_geopackage(gpkg = paste0(gdb_dir, "/nhdplus_2006-HU4.gpkg"), 
+catchment_sp <- read_geopackage(
+                gpkg = paste0(gdb_dir, "/nhdplus_2006-HU4.gpkg"), 
                 layer_name = "NHDPlusCatchment",
                 name = "REACHCODE",
                 import_as = "SpatVect")
@@ -409,7 +417,8 @@ catchment_sp <- read_geopackage(gpkg = paste0(gdb_dir, "/nhdplus_2006-HU4.gpkg")
 stream_rast <- paste0(rast_dir, "/NHDPLUS_H_2006_HU4_RASTER/HRNHDPlusRasters2006/swnet.tif")
 
 # Define full path to the flow accumulation raster layer
-flow_rast <- paste0(rast_dir, "/NHDPLUS_H_2006_HU4_RASTER/HRNHDPlusRasters2006/fac.tif")
+flow_rast <- paste0(rast_dir, 
+                    "/NHDPLUS_H_2006_HU4_RASTER/HRNHDPlusRasters2006/fac.tif")
 
 # Define thresholds for the flow accumulation of the stream segment, where
 # the point location should be snapped to

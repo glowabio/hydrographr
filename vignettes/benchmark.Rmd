@@ -18,7 +18,7 @@ editor_options:
   wrap: 72
 ---
   
-  ```{r, include = FALSE, eval = FALSE}
+```{r, include = FALSE, eval = FALSE}
 # writes out the references for all packages
 knitr::write_bib(file = "packages.bib")
 ```
@@ -29,7 +29,7 @@ The main focus of `hydrographr` is to process Hydrography90m [@amatulli2022hydro
 
 We focused on five common geospatial tasks that can be easily implemented with both `hydrographr` and `terra`:
   
-  - Merging multiple raster layers to one file.
+- Merging multiple raster layers to one file.
 - Cropping a raster layer to a bounding box extent.
 - Cropping a raster layer to an irregular boundary of a vector polygon.
 - Reclassifying the values of a raster layer.
@@ -68,7 +68,7 @@ To assess the performance of computing zonal statistics using `hydrographr::extr
 
 Load required libraries:
   
-  ```{r, eval=F}
+```{r, eval=F}
 library(hydrographr)
 library(terra)
 library(microbenchmark)
@@ -77,7 +77,7 @@ library(readr)
 
 Function definitions:
   
-  ```{r, eval=FALSE}
+```{r, eval=FALSE}
 # Small helper function to print benchmark experiments
 print_experiment <- function(micro) {
   cat("Run times in seconds:\n")
@@ -90,7 +90,7 @@ print_experiment <- function(micro) {
 
 Define working directory:
   
-  ```{r, eval=FALSE, include=FALSE}
+```{r, eval=FALSE, include=FALSE}
 wdir <- "/home/mueblacker/Documents/Glowabio/Code/hydrographr/vignettes/benchmark"
 data_dir <- paste0(wdir, "/data")
 out_dir  <- paste0(wdir, "/output")
