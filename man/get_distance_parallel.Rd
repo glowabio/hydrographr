@@ -131,6 +131,8 @@ distance_table
 }
 \seealso{
 \itemize{
+\item \code{\link{get_distance()}} to calculate the distance along the
+network in points located in only one basin.
 \item \code{\link{snap_to_network()}} to snap the data points to the next stream
 segment within a given radius and/or a given flow accumulation threshold
 value.

@@ -2,7 +2,8 @@
 % Please edit documentation in R/get_distance.R
 \name{get_distance}
 \alias{get_distance}
-\title{Calculate euclidean or along the network distance between points}
+\title{Calculate euclidean or along the network distance between points
+located in one basin}
 \usage{
 get_distance(
   data,
@@ -51,10 +52,10 @@ of the shortest path along the network from the point "from_id" to the point
 "to_id". If distance='both', a list containing both objects is returned.
 }
 \description{
-Calculate euclidean or along-the-network distance (in meters) between points.
-To calculate the distance along the network, point coordinates need to be
-snapped to the stream network using the function \code{\link{snap_to_network()}}
-or \code{\link{snap_to_subc_segment()}}.
+Calculate euclidean or along-the-network distance (in meters) between points
+located in one basin. To calculate the distance along the network, point
+coordinates need to be snapped to the stream network using the function
+\code{\link{snap_to_network()}} or \code{\link{snap_to_subc_segment()}}.
 }
 \details{
 To calculate the euclidean distance between all pairs of points the function

@@ -65,6 +65,8 @@
 #' \url{https://grass.osgeo.org/grass82/manuals/v.distance.html}
 #'
 #' @seealso
+#' * \code{\link{get_distance()}} to calculate the distance along the
+#' network in points located in only one basin.
 #' * \code{\link{snap_to_network()}} to snap the data points to the next stream
 #' segment within a given radius and/or a given flow accumulation threshold
 #' value.

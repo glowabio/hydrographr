@@ -1,10 +1,11 @@
 #' @title Calculate euclidean or along the network distance between points
+#' located in one basin
 #'
 #' @description
-#' Calculate euclidean or along-the-network distance (in meters) between points.
-#' To calculate the distance along the network, point coordinates need to be
-#' snapped to the stream network using the function \code{\link{snap_to_network()}}
-#' or \code{\link{snap_to_subc_segment()}}.
+#' Calculate euclidean or along-the-network distance (in meters) between points
+#' located in one basin. To calculate the distance along the network, point
+#' coordinates need to be snapped to the stream network using the function
+#' \code{\link{snap_to_network()}} or \code{\link{snap_to_subc_segment()}}.
 #'
 #'
 #' @param data a data.frame or data.table that contains the columns regarding
