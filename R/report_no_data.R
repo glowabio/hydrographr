@@ -16,7 +16,7 @@
 #' @importFrom parallel detectCores
 #' @export
 #'
-#' @author Afroditi Grigoropoulou, Maria M. Üblacker
+#' @author Afroditi Grigoropoulou, Marlene Schürz
 #'
 #' @references
 #' \url{https://gdal.org/programs/gdalinfo.html}

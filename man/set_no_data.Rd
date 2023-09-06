@@ -39,5 +39,5 @@ set_no_data(data_dir = paste0(my_directory, "/hydrography90m_test_data"),
 \url{https://gdal.org/programs/gdal_edit.html}
 }
 \author{
-Afroditi Grigoropoulou, Maria M. Üblacker
+Afroditi Grigoropoulou, Marlene Schürz
 }

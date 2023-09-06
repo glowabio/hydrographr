@@ -134,5 +134,5 @@ value.
 }
 }
 \author{
-Jaime Garcia Marquez, Maria M. Üblacker
+Jaime Garcia Marquez, Marlene Schürz
 }

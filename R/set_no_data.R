@@ -16,7 +16,7 @@
 #' @importFrom stringr str_split
 #' @export
 #'
-#' @author Afroditi Grigoropoulou, Maria M. Üblacker
+#' @author Afroditi Grigoropoulou, Marlene Schürz
 #'
 #' @references
 #' \url{https://gdal.org/programs/gdal_edit.html}

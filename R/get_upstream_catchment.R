@@ -32,7 +32,7 @@
 #' @importFrom parallel detectCores
 #' @export
 #'
-#' @author Jaime Garcia Marquez, Afroditi Grigoropoulou, Maria M. Üblacker
+#' @author Jaime Garcia Marquez, Afroditi Grigoropoulou, Marlene Schürz
 #'
 #' @references
 #' * \url{https://grass.osgeo.org/grass82/manuals/r.water.outlet.html}

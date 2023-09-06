@@ -102,5 +102,5 @@ str_ord_rast <- reclass_raster(data = str_ord,
 https://grass.osgeo.org/grass82/manuals/r.reclass.html
 }
 \author{
-Maria M. Üblacker
+Marlene Schürz
 }
