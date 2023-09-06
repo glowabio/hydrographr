@@ -13,11 +13,6 @@
 #' @param lat character. The name of the column with the latitude coordinates.
 #' @param id character. The name of a column containing unique IDs for each row
 #' of "data" (e.g., occurrence or site IDs).
-#' @param basin_id character. The name of the column with the basin IDs.
-#' If NULL and distance is set to 'network' or 'both', the basin IDs will be
-#' extracted automatically. Default is NULL.
-#' @param basin_layer character. Full path to the basin ID .tif layer. Needs to
-#' be defined to calculate the distance along the network.
 #' @param stream_layer character. Full path of the stream network .gpkg file.
 #' Needs to be defined to calculate the distance along the network.
 #' @param distance character. One of "euclidean", "network", or "both".
@@ -39,16 +34,14 @@
 #' @export
 #'
 #' @details
-#' To calculate the euclidian distance between all pairs of points the function
+#' To calculate the euclidean distance between all pairs of points the function
 #' uses the v.distance command of GRASS GIS, which has been set up to produce a
 #' square matrix of distances. The calculation of distances along the stream
 #' network has been implemented with the command v.net.allpairs of GRASS GIS.
 #' The along-the-network distance calculation is done for all pairs of points
 #' located within the same basin. If the points are located in
-#' different basins, the function can be run in parallel (i.e., each core for
-#' the distance calculations of all points within one basin). The
-#' distance between points located in different basins is zero because they are
-#' not connected through the network.
+#' different basins, the function \code{\link{get_distance_parallel()}}
+#' should be used.
 #'
 #' @returns
 #' If distance='euclidean', a distance matrix, in meters, of the euclidean
@@ -70,7 +63,8 @@
 #' value.
 #' * \code{\link{snap_to_subc_segment()}} to snap the data points to the next stream
 #' segment of the sub-catchment the data point is located.
-#' * \code{\link{extract_ids()}} to extract basin and sub-catchment IDs.
+#' * \code{\link{get_distance_parallel()}} to calculate the distance along the
+#' network in more than two basins in parallel.
 #' @md
 #'
 #'@examples
@@ -115,21 +109,18 @@
 #'                                lon = "lon_snap",
 #'                                lat = "lat_snap",
 #'                                id = "occurrence_id",
-#'                                basin_id = "basin_id",
-#'                                basin_layer = basin_rast,
 #'                                stream_layer = stream_vect,
 #'                                distance = "network")
 #' # Show table
 #' distance_table
 
 
-get_distance <- function(data, lon, lat, id, basin_id = NULL,
-                         basin_layer = NULL, stream_layer = NULL,
+get_distance <- function(data, lon, lat, id, stream_layer = NULL,
                          distance = "both", n_cores = 1, quiet = TRUE) {
 
 
   # Check if any of the arguments is missing
-  for (arg in  c(data, lon, lat, id, basin_layer, stream_layer)) {
+  for (arg in  c(data, lon, lat, id, stream_layer)) {
     if (missing(arg))
       stop(paste0(quote(arg), " is missing."))
     }
@@ -139,28 +130,19 @@ get_distance <- function(data, lon, lat, id, basin_id = NULL,
   if (!is(data, "data.frame"))
     stop("data: Has to be of class 'data.frame'.")
 
-  # Check if lon, lat, id, basin_id column names
+  # Check if lon, lat, id column names
   # are character strings
   for (name in  c(lon, lat, id)) {
   if (!is.character(name))
     stop(paste0("Column name ", name, " is not a character string."))
   }
 
-  if (!is.null(basin_id))
-    if (!is.character(basin_id))
-      stop(paste0("Column name ", basin_id, " is not a character string."))
 
-
-  # Check if lon, lat, id, basin_id column names exist
+  # Check if lon, lat, id column names exist
   for (name in c(lon, lat, id)) {
     if (is.null(data[[name]]))
       stop(paste0("Column name '", name, "' does not exist."))
   }
-
-  if (!is.null(basin_id))
-    if (is.null(data[[basin_id]]))
-      stop(paste0("Column name '", basin_id, "' does not exist."))
-
 
   # Check id for duplicated IDs
   if (length(unique(data[[id]])) != length(data[[id]]))
@@ -172,26 +154,17 @@ get_distance <- function(data, lon, lat, id, basin_id = NULL,
 
   # Check if needed layers are defined
   if (!(distance == "both" || distance == "network")) {
-    if (!is.null(basin_layer))
-      stop("For distance = 'network' or 'both', basin_layer needs to be defined.")
     if (is.null(stream_layer))
       stop("For distance = 'network' or 'both', stream_layer needs to be defined.")
   }
 
-
    # Check if paths exists
-  for (path in c(basin_layer, stream_layer)) {
+  for (path in c(stream_layer)) {
    if (!file.exists(path))
      stop(paste0("File path: ", path, " does not exist."))
   }
 
-  # Check if basin_layer ends with .tif
-  for (path in basin_layer) {
-    if (!endsWith(path, ".tif"))
-      stop(paste0("File path: ", path, " does not end with .tif"))
-  }
-
-  # Check if basin_layer ends with .gpkg
+  # Check if stream_layer ends with .gpkg
   if (!is.null(stream_layer))
     if (!endsWith(stream_layer, ".gpkg"))
       stop(paste0("File path: ", stream_layer, " does not end with .gpkg"))
@@ -237,9 +210,9 @@ get_distance <- function(data, lon, lat, id, basin_id = NULL,
   }
 
 
-    # Select columns needed for the bash script to calculate distances
-    columns <- c(id, lon, lat)
-    ids <- as.data.table(data)[, ..columns]
+  # Select columns needed for the bash script to calculate distances
+  columns <- c(id, lon, lat)
+  ids <- as.data.table(data)[, ..columns]
 
   # Create random string to attach to the file name of the temporary
   # output tables and input ids file
@@ -275,9 +248,7 @@ get_distance <- function(data, lon, lat, id, basin_id = NULL,
 
   # Convert NULL argument to "NA" so that the bash script can evaluate
   # the argument
-  basin_id <- ifelse(is.null(basin_id), "basin_id", basin_id)
   stream_layer <- ifelse(is.null(stream_layer), "NA", stream_layer)
-  basin_layer <- ifelse(is.null(basin_layer), "NA", basin_layer)
   dist_eucl_tmp_path <- ifelse(is.null(dist_eucl_tmp_path), "NA",
                                dist_eucl_tmp_path)
   dist_net_tmp_path <- ifelse(is.null(dist_net_tmp_path), "NA",
@@ -293,8 +264,8 @@ get_distance <- function(data, lon, lat, id, basin_id = NULL,
 
     processx::run(system.file("sh", "get_distance.sh",
                     package = "hydrographr"),
-        args = c(dist_tmp_dir, ids_tmp_path, lon, lat, basin_id,
-                 stream_layer, basin_layer, dist_eucl_tmp_path,
+        args = c(dist_tmp_dir, ids_tmp_path, lon, lat,
+                 stream_layer, dist_eucl_tmp_path,
                  dist_net_tmp_path, n_cores, distance),
         echo = !quiet)
 
@@ -315,9 +286,9 @@ get_distance <- function(data, lon, lat, id, basin_id = NULL,
 
     processx::run(system.file("bat", "get_distance.bat",
                     package = "hydrographr"),
-        args = c(wsl_dist_tmp_dir, wsl_ids_tmp_path, lon, lat, basin_id,
-                 wsl_stream_layer, wsl_basin_layer, wsl_dist_eucl_tmp_path,
-                 wsl_dist_net_tmp_path, n_cores, distance, wsl_sh_file),
+        args = c(wsl_dist_tmp_dir, wsl_ids_tmp_path, lon, lat, wsl_stream_layer,
+                 wsl_dist_eucl_tmp_path, wsl_dist_net_tmp_path, n_cores,
+                 distance, wsl_sh_file),
         echo = !quiet)
   }
 
