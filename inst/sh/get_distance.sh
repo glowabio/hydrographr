@@ -43,9 +43,8 @@ then
   #  Calculate Euclidean distance between all points
   grass  -f --gtext --tmp-location  EPSG:4326 <<'EOF'
 
-  #  import points
-  v.in.ascii in=$DATA out=allpoints separator=comma \
-    cat=1 x=2 y=3 skip=1
+  #  Import points
+  v.in.ascii in=$DATA out=allpoints separator=comma cat=1 x=2 y=3 skip=1
 
   #  Calculate distance, results are given in meters
   v.distance -pas from=allpoints to=allpoints upload=dist separator=comma \
@@ -70,9 +69,8 @@ DistCalc(){
 
   grass -f --gtext --tmp-location  $STREAM <<'EOF'
 
-    # Points available in each basin
-    v.in.ascii in=$DATA out=data_points separator=comma \
-    cat=1 x=2 y=3 skip=1
+    # Import points
+    v.in.ascii in=$DATA out=data_points separator=comma cat=1 x=2 y=3 skip=1
 
     RANGE=$(v.db.select -c data_points col=$SITE)
 
