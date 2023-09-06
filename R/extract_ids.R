@@ -32,7 +32,7 @@
 #' @note
 #' Duplicated rows will be removed.
 #'
-#' @author Afroditi Grigoropoulou, Maria Üblacker
+#' @author Afroditi Grigoropoulou, Marlene Schürz
 #'
 #' @references
 #' \url{https://gdal.org/programs/gdallocationinfo.html}

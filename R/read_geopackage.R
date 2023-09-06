@@ -31,7 +31,7 @@
 #' @importFrom terra vect
 #' @export
 #'
-#' @author Sami Domisch, Maria M.Üblacker
+#' @author Sami Domisch, Marlene Schürz
 #'
 #' @examples
 #' # Download test data into the temporary R folder
