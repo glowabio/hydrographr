@@ -43,7 +43,7 @@
 #' @importFrom terra rast
 #' @export
 #'
-#' @author Maria M. Üblacker
+#' @author Marlene Schürz
 #'
 #' @references
 #' https://grass.osgeo.org/grass82/manuals/r.reclass.html

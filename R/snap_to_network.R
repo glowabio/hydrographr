@@ -56,7 +56,7 @@
 #' provided stream network layer.
 #'
 #'
-#' @author Maria M. Üblacker, Jaime Garcia Marquez
+#' @author Marlene Schürz, Jaime Garcia Marquez
 #'
 #' @references
 #' \url{https://grass.osgeo.org/grass78/manuals/addons/r.stream.snap.html}

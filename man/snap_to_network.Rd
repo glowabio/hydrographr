@@ -114,5 +114,5 @@ head(snapped_coordinates)
 \url{https://grass.osgeo.org/grass78/manuals/addons/r.stream.snap.html}
 }
 \author{
-Maria M. Üblacker, Jaime Garcia Marquez
+Marlene Schürz, Jaime Garcia Marquez
 }

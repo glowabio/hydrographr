@@ -58,7 +58,7 @@
 #' of the shortest path along the network from the point "from_id" to the point
 #' "to_id". If distance='both', a list containing both objects is returned.
 #'
-#' @author Afroditi Grigoropoulou, Maria M. Üblacker, Jaime Garcia Marquez
+#' @author Afroditi Grigoropoulou, Marlene Schürz, Jaime Garcia Marquez
 #'
 #' @references
 #' \url{https://grass.osgeo.org/grass82/manuals/v.net.allpairs.html}

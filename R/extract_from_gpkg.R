@@ -36,7 +36,7 @@
 #' @import dplyr
 #' @export
 #'
-#' @author Afroditi Grigoropoulou, Jaime Garcia Marquez, Maria M. Üblacker
+#' @author Afroditi Grigoropoulou, Jaime Garcia Marquez, Marlene Schürz
 #'
 #' @references
 #' \url{https://grass.osgeo.org/grass82/manuals/v.in.ogr.html}
