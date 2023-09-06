@@ -40,7 +40,7 @@
 #' @import dplyr
 #' @export
 #'
-#' @author Afroditi Grigoropoulou, Jaime Garcia Marquez, Maria M. Üblacker
+#' @author Afroditi Grigoropoulou, Jaime Garcia Marquez, Marlene Schürz
 #'
 #' @seealso
 #' * \code{\link{report_no_data()}} to check the defined NoData value.

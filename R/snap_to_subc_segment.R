@@ -41,7 +41,7 @@
 #' points within the sub-catchment. In this way the snapping will always take
 #' place. From the new location, the function extracts the new snapped coordinates.
 #'
-#' @author Jaime Garcia Marquez, Maria M. Üblacker
+#' @author Jaime Garcia Marquez, Marlene Schürz
 #'
 #' @returns
 #' A data.table of the original and new coordinates, along with the

@@ -109,5 +109,5 @@ attribute_table
 \url{https://grass.osgeo.org/grass82/manuals/addons/r.stream.order.html}
 }
 \author{
-Afroditi Grigoropoulou, Jaime Garcia Marquez, Maria M. Üblacker
+Afroditi Grigoropoulou, Jaime Garcia Marquez, Marlene Schürz
 }

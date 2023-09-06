@@ -117,5 +117,5 @@ sub-catchments (subc_layer).
 }
 }
 \author{
-Afroditi Grigoropoulou, Jaime Garcia Marquez, Maria M. Üblacker
+Afroditi Grigoropoulou, Jaime Garcia Marquez, Marlene Schürz
 }

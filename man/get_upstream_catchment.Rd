@@ -124,5 +124,5 @@ segment within the sub-catchment the point is located.
 }
 }
 \author{
-Jaime Garcia Marquez, Afroditi Grigoropoulou, Maria M. Üblacker
+Jaime Garcia Marquez, Afroditi Grigoropoulou, Marlene Schürz
 }
