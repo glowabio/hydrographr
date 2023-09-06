@@ -192,8 +192,8 @@ m
 
 ![](../man/figures/hawaii_map.png)
 
-By inspecting the NHDPlusHR data, we observe that the coordinate reference
-system is not WGS84, but the EPSG:26904.
+By inspecting the NHDPlusHR data, we observe that the coordinate
+reference system is not WGS84, but the EPSG:26904.
 
 ```{r, eval=F}
 rast(paste0(rast_dir, 
