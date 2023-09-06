@@ -444,4 +444,27 @@ table "point_locations_snapped" are only meaningful in case that the
 stream and flow accumulation raster layers were derived from the
 Hydrography90m.
 
+### Calculate distances
+
+Input points need to be snapped. See [Snap points to the network].
+
+```{r, eval = F}
+# Define full path to the vector file of the stream network
+stream_vect <- paste0(gdb_dir, "/nhdplus_2006-HU4.gpkg")
+
+# Get the euclidean distance and the distance along the network between all
+# pairs of points
+distance_table <- get_distance(data = point_locations_snapped,
+                               lon = "lon_snap_dist",
+                               lat = "lat_snap_dist",
+                               id = "occurrence_id",
+                               stream_layer = stream_vect,
+                               distance = "both",
+                               quiet=F)
+
+# gives error
+
+```
+
+
 ### References
