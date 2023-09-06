@@ -29,12 +29,6 @@ export DIST=$9
 
 
 
-##  Convert the file of the snapped coordinates to gpkg
-ogr2ogr -f "GPKG" -overwrite -nln ref_points -nlt POINT -a_srs EPSG:4326 \
-    $OUTDIR/ref_points.gpkg $DATA -oo X_POSSIBLE_NAMES=$LON \
-    -oo Y_POSSIBLE_NAMES=$LAT -oo AUTODETECT_TYPE=YES
-
-
 # Name of column for unique ID
 export SITE=$( awk -F, 'NR==1 {print $1}' $DATA )
 
@@ -50,8 +44,8 @@ then
   grass  -f --gtext --tmp-location  EPSG:4326 <<'EOF'
 
   #  import points
-  v.in.ogr --o input=$OUTDIR/ref_points.gpkg layer=ref_points \
-  output=allpoints type=point key=$SITE
+  v.in.ascii in=$DATA out=allpoints separator=comma \
+    cat=1 x=2 y=3 skip=1
 
   #  Calculate distance, results are given in meters
   v.distance -pas from=allpoints to=allpoints upload=dist separator=comma \
@@ -77,8 +71,8 @@ DistCalc(){
   grass -f --gtext --tmp-location  $STREAM <<'EOF'
 
     # Points available in each basin
-    v.in.ogr --o input=$OUTDIR/ref_points.gpkg layer=ref_points \
-        output=data_points type=point  key=$SITE
+    v.in.ascii in=$DATA out=data_points separator=comma \
+    cat=1 x=2 y=3 skip=1
 
     RANGE=$(v.db.select -c data_points col=$SITE)
 
@@ -118,6 +112,5 @@ DistCalc
 
 fi
 
-rm $OUTDIR/ref_points.gpkg
 
 exit
