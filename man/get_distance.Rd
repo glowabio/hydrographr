@@ -9,8 +9,6 @@ get_distance(
   lon,
   lat,
   id,
-  basin_id = NULL,
-  basin_layer = NULL,
   stream_layer = NULL,
   distance = "both",
   n_cores = 1,
@@ -27,13 +25,6 @@ the longitude / latitude coordinates in WGS84.}
 
 \item{id}{character. The name of a column containing unique IDs for each row
 of "data" (e.g., occurrence or site IDs).}
-
-\item{basin_id}{character. The name of the column with the basin IDs.
-If NULL and distance is set to 'network' or 'both', the basin IDs will be
-extracted automatically. Default is NULL.}
-
-\item{basin_layer}{character. Full path to the basin ID .tif layer. Needs to
-be defined to calculate the distance along the network.}
 
 \item{stream_layer}{character. Full path of the stream network .gpkg file.
 Needs to be defined to calculate the distance along the network.}
@@ -66,16 +57,14 @@ snapped to the stream network using the function \code{\link{snap_to_network()}}
 or \code{\link{snap_to_subc_segment()}}.
 }
 \details{
-To calculate the euclidian distance between all pairs of points the function
+To calculate the euclidean distance between all pairs of points the function
 uses the v.distance command of GRASS GIS, which has been set up to produce a
 square matrix of distances. The calculation of distances along the stream
 network has been implemented with the command v.net.allpairs of GRASS GIS.
 The along-the-network distance calculation is done for all pairs of points
 located within the same basin. If the points are located in
-different basins, the function can be run in parallel (i.e., each core for
-the distance calculations of all points within one basin). The
-distance between points located in different basins is zero because they are
-not connected through the network.
+different basins, the function \code{\link{get_distance_parallel()}}
+should be used.
 }
 \examples{
 # Download test data into the temporary R folder
@@ -118,8 +107,6 @@ distance_table <- get_distance(data = snapped_coordinates,
                                lon = "lon_snap",
                                lat = "lat_snap",
                                id = "occurrence_id",
-                               basin_id = "basin_id",
-                               basin_layer = basin_rast,
                                stream_layer = stream_vect,
                                distance = "network")
 # Show table
@@ -136,7 +123,8 @@ segment within a given radius and/or a given flow accumulation threshold
 value.
 \item \code{\link{snap_to_subc_segment()}} to snap the data points to the next stream
 segment of the sub-catchment the data point is located.
-\item \code{\link{extract_ids()}} to extract basin and sub-catchment IDs.
+\item \code{\link{get_distance_parallel()}} to calculate the distance along the
+network in more than two basins in parallel.
 }
 }
 \author{
