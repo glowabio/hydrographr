@@ -82,5 +82,5 @@ hydrography90m_ids
 \url{https://gdal.org/programs/gdallocationinfo.html}
 }
 \author{
-Afroditi Grigoropoulou, Maria Üblacker
+Afroditi Grigoropoulou, Marlene Schürz
 }

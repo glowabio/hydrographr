@@ -78,6 +78,8 @@
 #'
 #' subc_path <- as.numeric(as_ids(subc_path$res[[1]]))
 #'
+#' We can then attach environmental data to the sub-catchments along the path,
+#' using the functions read_geopackage or extract_zonal_statistics
 #'
 #'
 #' @examples

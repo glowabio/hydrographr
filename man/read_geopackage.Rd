@@ -89,5 +89,5 @@ my_sv <- read_geopackage(gpkg = paste0(my_directory,
 
 }
 \author{
-Sami Domisch, Maria M.Üblacker
+Sami Domisch, Marlene Schürz
 }
