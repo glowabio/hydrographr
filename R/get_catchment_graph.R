@@ -112,7 +112,6 @@ get_catchment_graph <- function(g, subc_id = NULL, outlet = FALSE, mode = NULL,
     stop("Please provide at least one segment ID of the input graph,
         or set outlet=TRUE. The subc_id must be a numeric vector.")
 
-
   if (missing(mode))
     stop("Please provide the mode as 'in', 'out' or 'all'.")
 
