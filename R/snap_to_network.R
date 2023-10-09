@@ -136,7 +136,7 @@ snap_to_network <- function(data, lon, lat, id, stream_layer,
     stop(paste0("Column ", lat, " has to be numeric."))
 
   # Check if id is less than 9 characters
-  if(nchar(id)>9)
+  if(any(nchar(data[[id]]) > 9))
     stop("The id column has to be less than 10 characters long.")
   # Add here: if condition to check if lat/long columns are in WGS84
 

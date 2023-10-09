@@ -164,7 +164,7 @@ snap_to_subc_segment <- function(data, lon, lat, id, basin_id = NULL,
       stop(paste0("Column name '", subc_id, "' does not exist."))
 
   # Check if id is less than 9 characters
-  if(nchar(id)>9)
+  if(any(nchar(data[[id]]) > 9))
     stop("The id column has to be less than 10 characters long.")
 
   # Check id for duplicated IDs
