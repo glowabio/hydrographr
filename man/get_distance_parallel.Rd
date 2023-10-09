@@ -26,7 +26,8 @@ the longitude / latitude coordinates in WGS84.}
 \item{lat}{character. The name of the column with the latitude coordinates.}
 
 \item{id}{character. The name of a column containing unique IDs for each row
-of "data" (e.g., occurrence or site IDs).}
+of "data" (e.g., occurrence or site IDs). The unique IDs need to be
+numeric and less than 10 characters long.}
 
 \item{basin_id}{character. The name of the column with the basin IDs.
 If NULL and distance is set to 'network' or 'both', the basin IDs will be

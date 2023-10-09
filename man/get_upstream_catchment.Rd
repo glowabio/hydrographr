@@ -24,7 +24,8 @@ be snapped to the stream network with \code{\link{snap_to_network()}} or
 \code{\link{snap_to_subc_segment()}}.}
 
 \item{id}{character. The name of a column containing unique IDs for each row
-of "data" (e.g., occurrence or site IDs).}
+of "data" (e.g., occurrence or site IDs). The unique IDs need to be
+numeric and less than 10 characters long.}
 
 \item{lon}{character. The name of the column with the longitude coordinates.}
 

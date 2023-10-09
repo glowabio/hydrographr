@@ -8,7 +8,8 @@
 #' be snapped to the stream network with \code{\link{snap_to_network()}} or
 #' \code{\link{snap_to_subc_segment()}}.
 #' @param id character. The name of a column containing unique IDs for each row
-#' of "data" (e.g., occurrence or site IDs).
+#' of "data" (e.g., occurrence or site IDs). The unique IDs need to be
+#' numeric and less than 10 characters long.
 #' @param lon character. The name of the column with the longitude coordinates.
 #' @param lat character. The name of the column with the latitude coordinates.
 #' @param direction_layer character. Full path to the flow direction raster file.
@@ -138,6 +139,10 @@ get_upstream_catchment <- function(data, id, lon, lat, direction_layer = NULL,
     stop(paste0("Column name '", lat, "' does not exist."))
   if (is.null(data[[id]]))
     stop(paste0("Column name '", id, "' does not exist."))
+
+  # Check if id is less than 9 characters
+  if(any(nchar(data[[id]]) > 9))
+    stop("The id column has to be less than 10 characters long.")
 
   # Check if values of the lon/lat columns are numeric
   if (!is.numeric(data[[lon]]))

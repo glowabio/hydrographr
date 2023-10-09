@@ -12,7 +12,8 @@
 #' @param lon character. The name of the column with the longitude coordinates.
 #' @param lat character. The name of the column with the latitude coordinates.
 #' @param id character. The name of a column containing unique IDs for each row
-#' of "data" (e.g., occurrence or site IDs).
+#' of "data" (e.g., occurrence or site IDs). The unique IDs need to be
+#' numeric and less than 10 characters long.
 #' @param basin_id character. The name of the column with the basin IDs.
 #' If NULL and distance is set to 'network' or 'both', the basin IDs will be
 #' extracted automatically. Default is NULL.
@@ -167,6 +168,10 @@ get_distance_parallel <- function(data, lon, lat, id, basin_id = NULL,
   # Check id for duplicated IDs
   if (length(unique(data[[id]])) != length(data[[id]]))
     stop(paste0("Column '", id, "' has rows with duplicated IDs."))
+
+  # Check if id is less than 9 characters
+  if(any(nchar(data[[id]]) > 9))
+    stop("The id column has to be less than 10 characters long.")
 
   # Check if distance is set properly
   if (!(distance == "both" || distance == "euclidean" || distance == "network"))
