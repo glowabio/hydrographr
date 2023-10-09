@@ -9,7 +9,7 @@
 #' @param lat character. The name of the column with the latitude coordinates.
 #' @param id  character. The name of a column containing unique IDs for
 #' each row of "data" (e.g., occurrence or site IDs). The unique IDs need to be
-#' numeric.
+#' numeric and less than 10 characters long.
 #' @param stream_layer character. Full path of the stream network .tif file
 #' @param accu_layer character. Full path of the flow accumulation .tif file.
 #' Needed if the point should be snapped to the next stream segment having
@@ -135,6 +135,9 @@ snap_to_network <- function(data, lon, lat, id, stream_layer,
   if (!is.numeric(data[[lat]]))
     stop(paste0("Column ", lat, " has to be numeric."))
 
+  # Check if id is less than 9 characters
+  if(nchar(id)>9)
+    stop("The id column has to be less than 10 characters long.")
   # Add here: if condition to check if lat/long columns are in WGS84
 
   # Check if stream_layer is defined
@@ -233,8 +236,7 @@ snap_to_network <- function(data, lon, lat, id, stream_layer,
                  wsl_snap_tmp_path, wsl_tmp_path, wsl_sh_file),
         echo = !quiet)
   }
-  snapped_coord <- fread(paste0(tempdir(), "/snapped_points_",
-                                rand_string, ".txt"),
+  snapped_coord <- fread(snap_tmp_path,
                          keepLeadingZeros = TRUE,
                          header = TRUE, sep = " ")
 
