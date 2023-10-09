@@ -27,7 +27,7 @@ the longitude / latitude coordinates in WGS84.}
 
 \item{id}{character. The name of a column containing unique IDs for
 each row of "data" (e.g., occurrence or site IDs). The unique IDs need to be
-numeric.}
+numeric and less than 10 characters long.}
 
 \item{stream_layer}{character. Full path of the stream network .tif file}
 
