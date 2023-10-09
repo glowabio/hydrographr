@@ -9,7 +9,9 @@
 #' @param lon character. The name of the column with the longitude coordinates.
 #' @param lat character. The name of the column with the latitude coordinates.
 #' @param id character. The name of a column containing unique IDs for each row
-#' of "data" (e.g., occurrence or site IDs). The unique IDs need to be numeric.
+#' of "data" (e.g., occurrence or site IDs). The unique IDs need to be
+#' numeric and less than 10 characters long.
+#'
 #' @param basin_id character. The name of the column with the basin IDs.
 #' If NULL, the basin IDs will be extracted automatically. Optional.
 #' Default is NULL
@@ -160,6 +162,10 @@ snap_to_subc_segment <- function(data, lon, lat, id, basin_id = NULL,
   if (!is.null(subc_id))
     if (is.null(data[[subc_id]]))
       stop(paste0("Column name '", subc_id, "' does not exist."))
+
+  # Check if id is less than 9 characters
+  if(nchar(id)>9)
+    stop("The id column has to be less than 10 characters long.")
 
   # Check id for duplicated IDs
   if (length(unique(data[[id]])) != length(data[[id]]))
