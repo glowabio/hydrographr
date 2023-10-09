@@ -103,7 +103,8 @@ the longitude / latitude coordinates in WGS84.</p></dd>
 
 <dt>id</dt>
 <dd><p>character. The name of a column containing unique IDs for each row
-of "data" (e.g., occurrence or site IDs).</p></dd>
+of "data" (e.g., occurrence or site IDs). The unique IDs need to be
+numeric and less than 10 characters long.</p></dd>
 
 
 <dt>basin_id</dt>
@@ -222,7 +223,7 @@ segment of the sub-catchment the data point is located.</p></li>
 <span>                                            stream_layer <span class="op">=</span> <span class="va">stream_vect</span>,</span>
 <span>                                            n_cores <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="co"># Show head of output table</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">snapped_coordinates</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">snapped_coordinates</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Get the euclidean distance and the distance along the network between all</span></span>
 <span><span class="co"># pairs of points</span></span>
