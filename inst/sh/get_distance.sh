@@ -28,6 +28,10 @@ export PAR=$8
 export DIST=$9
 
 
+##  make the file a gpkg
+ogr2ogr -f "GPKG" -overwrite -nln ref_points -nlt POINT -a_srs EPSG:4326 \
+    $OUTDIR/ref_points.gpkg $DATA -oo X_POSSIBLE_NAMES=$LON \
+    -oo Y_POSSIBLE_NAMES=$LAT -oo AUTODETECT_TYPE=YES
 
 # Name of column for unique ID
 export SITE=$( awk -F, 'NR==1 {print $1}' $DATA )
@@ -70,7 +74,11 @@ DistCalc(){
   grass -f --gtext --tmp-location  $STREAM <<'EOF'
 
     # Import points
-    v.in.ascii in=$DATA out=data_points separator=comma cat=1 x=2 y=3 skip=1
+    # v.in.ascii in=$DATA out=data_points separator=comma cat=1 x=2 y=3 skip=1
+
+    # read reference points
+    v.in.ogr --o input=$OUTDIR/ref_points.gpkg layer=ref_points output=data_points \
+        type=point key=$SITE
 
     RANGE=$(v.db.select -c data_points col=$SITE)
 
