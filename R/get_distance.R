@@ -17,6 +17,8 @@
 #' numeric and less than 10 characters long.
 #' @param stream_layer character. Full path of the stream network .gpkg file.
 #' Needs to be defined to calculate the distance along the network.
+#' (In the case of Hydrography90m, the relevant files have the format
+#' "order_vect_segment_h??v??.gpkg")
 #' @param distance character. One of "euclidean", "network", or "both".
 #' If "euclidean", the euclidean distances between all pairs of points are
 #' calculated. If "network", the shortest path along the network between all
