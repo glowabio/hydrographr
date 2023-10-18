@@ -238,6 +238,6 @@ sudo apt install -y dos2unix
 
 We recommend to reboot your computer after the installation.
 
-# General instructions regarding paths
+## General instructions regarding paths
 Make sure that your data is stored under C:, and not under the U: or G: drives, otherwise they can't be read by the WSL. 
 Additionaly, you should avoid using whitespaces in all paths. 
