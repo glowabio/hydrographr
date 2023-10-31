@@ -41,6 +41,9 @@ Enter `wsl --install` to enable the features necessary to run WSL and also direc
 # install the Ubuntu distribution of Linux. 
 wsl --install
 
+# If the above doesn't work, then try:
+wsl --install -d Ubuntu
+
 #> Installing: Virtual Machine Platform
 #> Virtual Machine Platform has been installed.
 #> Installing: Windows Subsystem for Linux
