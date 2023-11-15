@@ -20,17 +20,15 @@ only upstream segments will be considered. If "all", then the flow direction
 will be ignored and all streams will be considered.}
 }
 \value{
-A graph or data.table that reports all subc_ids.
-In case of multiple input segments, the results are stored in a list.
+A data.table that reports all subc_id and their centrality values.
 }
 \description{
 Calculate centrality indexes from a directed stream network
-graph
-
+graph.
 By switching the mode to either "in", "out" or "all", only the upstream,
 downstream or all connected segments will be considered, respectively. The
 function \code{\link{read_geopackage()}} can be used to create the input
- network graph.
+network graph.
 }
 \details{
 The degree of a node is the number of its adjacent edges.
@@ -67,5 +65,5 @@ InterJournal, Complex Systems 1695. 2006. \url{https://igraph.org}
 \code{\link{read_geopackage()}} to create a network graph.
 }
 \author{
-Afroditi Grigoropoulou, Sami Domisch
+Afroditi Grigoropoulou
 }

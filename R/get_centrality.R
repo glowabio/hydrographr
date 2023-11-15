@@ -1,15 +1,16 @@
 #' @title Get centrality indexes from stream network graph
 #'
 #' @description Calculate centrality indexes from a directed stream network
-#' graph
-#'
+#' graph.
 #' By switching the mode to either "in", "out" or "all", only the upstream,
 #' downstream or all connected segments will be considered, respectively. The
 #' function \code{\link{read_geopackage()}} can be used to create the input
-#'  network graph.
+#' network graph.
 #'
 #'
 #' @param g igraph object. A directed graph.
+#' @param index character. One of "all", "closeness", "farness",
+#' "betweenness", "degree", "eccentricity". See @Details
 #' @param mode character. One of "in", "out" or "all". Defines whether the
 #' shortest paths to (upstream) or from (downstream) the given
 #' segments/sub-catchments should be calculated.
@@ -18,17 +19,13 @@
 #' will be ignored and all streams will be considered.
 #'
 #'
-#' @param index character. One of "all", "closeness", "farness",
-#' "betweenness", "degree", "eccentricity". See @Details
-
-#' @returns A graph or data.table that reports all subc_ids.
-#' In case of multiple input segments, the results are stored in a list.
+#' @returns A data.table that reports all subc_id and their centrality values.
 #'
-#' @importFrom data.table setDT as.data.table
+#' @importFrom data.table setDT
 #' @importFrom igraph is_directed V degree closeness betweenness eccentricity
 #' @export
 #'
-#' @author Afroditi Grigoropoulou, Sami Domisch
+#' @author Afroditi Grigoropoulou
 #'
 #' @references
 #' Csardi G, Nepusz T: The igraph software package for complex network research,
@@ -95,7 +92,8 @@ get_centrality <- function(g, index = "all", mode = NULL) {
                      normalized = FALSE) %>%
     as.data.frame() %>%
     setDT(keep.rownames = T) %>%
-    rename(subc_id = "rn", degree = ".") #%>%
+    rename(subc_id = "rn", degree = ".") %>%
+      filter(subc_id != -1)
   }
 
   if (index == "closeness") {
@@ -103,7 +101,8 @@ get_centrality <- function(g, index = "all", mode = NULL) {
     normalized = FALSE, cutoff = -1) %>%
     as.data.frame() %>%
     setDT(keep.rownames = T) %>%
-    rename(subc_id = "rn", closeness = ".")
+    rename(subc_id = "rn", closeness = ".") %>%
+      filter(subc_id != -1)
   }
 
   if (index == "farness") {
@@ -111,53 +110,62 @@ get_centrality <- function(g, index = "all", mode = NULL) {
                            normalized = FALSE, cutoff = -1) %>%
     as.data.frame() %>%
     setDT(keep.rownames = T) %>%
-    rename(subc_id = "rn", closeness = ".")
+    rename(subc_id = "rn", closeness = ".") %>%
+      filter(subc_id != -1)
 
     centr_ind <- closeness %>%
       mutate(farness = 1/closeness) %>%
-      select(subc_id, farness)
+      select(subc_id, farness) %>%
+      filter(subc_id != -1)
   }
 
   if (index == "betweenness") {
     centr_ind <- betweenness(graph = g) %>%
       as.data.frame() %>%
       setDT(keep.rownames = T) %>%
-      rename(subc_id = "rn", betweeness = ".")
+      rename(subc_id = "rn", betweeness = ".") %>%
+      filter(subc_id != -1)
   }
 
   if (index == "eccentricity") {
     centr_ind <- eccentricity(graph = g, v = V(g), mode = mode) %>%
       as.data.frame() %>%
       setDT(keep.rownames = T) %>%
-      rename(subc_id = "rn", eccentricity = ".")
+      rename(subc_id = "rn", eccentricity = ".") %>%
+      filter(subc_id != -1)
   }
 
   if (index == "all") {
-    degree <- degree(graph = g,  v = V(g),  mode = mode,  loops = TRUE,
+    degree <- degree(graph = g,  v = V(g),  mode = mode, loops = TRUE,
                         normalized = FALSE) %>%
       as.data.frame() %>%
       setDT(keep.rownames = T) %>%
-      rename(subc_id = "rn", degree = ".") #%>%
+      rename(subc_id = "rn", degree = ".") %>%
+      filter(subc_id != -1)
 
     closeness <- closeness(graph = g, vids = V(g), mode = mode, weights = NULL,
                            normalized = FALSE, cutoff = -1) %>%
       as.data.frame() %>%
       setDT(keep.rownames = T) %>%
-      rename(subc_id = "rn", closeness = ".")
+      rename(subc_id = "rn", closeness = ".") %>%
+      filter(subc_id != -1)
 
     farness <- closeness %>%
       mutate(farness = 1/closeness) %>%
-      select(subc_id, farness)
+      select(subc_id, farness) %>%
+      filter(subc_id != -1)
 
     betweenness <- betweenness(graph = g) %>%
       as.data.frame() %>%
       setDT(keep.rownames = T) %>%
-      rename(subc_id = "rn", betweeness = ".")
+      rename(subc_id = "rn", betweeness = ".") %>%
+      filter(subc_id != -1)
 
     eccentricity <- eccentricity(graph = g, v = V(g), mode = mode) %>%
       as.data.frame() %>%
       setDT(keep.rownames = T) %>%
-      rename(subc_id = "rn", eccentricity = ".")
+      rename(subc_id = "rn", eccentricity = ".") %>%
+      filter(subc_id != -1)
 
     centr_ind_list <- list(degree, closeness, farness, betweenness, eccentricity)
     centr_ind <- Reduce(function(...)
