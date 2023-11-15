@@ -29,7 +29,7 @@ knitr::write_bib(file = 'packages.bib')
 knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE,  
                       out.width='50%', fig.align='center')
 knitr::opts_knit$set(root.dir = "./data_germany")
-install.packages(pkgs)
+
 
 library(hydrographr)
 library(rgbif)
