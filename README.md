@@ -5,7 +5,10 @@
 
 `hydrographr` provides a collection of `R` function wrappers for GDAL and GRASS-GIS functions to efficiently work with [Hydrography90m](https://essd.copernicus.org/articles/14/4525/2022/essd-14-4525-2022.html) and spatial biodiversity data. The easy-to-use functions process large raster and vector data directly on disk in parallel, such that the memory of R does not get overloaded. This allows creating scalable data processing and analysis workflows in R, even though the data is not processed directly in R.
 
+<img src="man/figures/function_icons.png" align="left" />
+
 We invite users to test the package and to provide feedback. Please notify us of any possible issues, bugs and feature requests under the [issues tab](https://github.com/glowabio/hydrographr/issues) on the top of this page.
+
 
 Installation
 -----------
@@ -22,7 +25,14 @@ The pdf manual of the `hydrographr` package can be downloaded [here](https://git
 Publication
 -----------
 You can find more details on the package and its applications in our recently published
-[paper](https://besjournals.onlinelibrary.wiley.com/doi/10.1111/2041-210X.14226). 
+[paper in _Methods in Ecology and Evolution_](https://besjournals.onlinelibrary.wiley.com/doi/10.1111/2041-210X.14226). 
+
+
+Please cite the hydrographr package as:
+Schürz, M., Grigoropoulou, A., Garcia Marquez, J.R., Tomiczek, T., Floury, M., Schürz, C., Amatulli, G., Grossart, H.-P., Domisch, S. (2023). hydrographr: an R package for scalable hydrographic data processing. _Methods in Ecology and Evolution_, 10.1111/2041-210X.14226
+
+Please also cite the Hydrography90m data:
+Amatulli, G., Garcia Marquez, J.R., Sethi, T., Kiesel, J., Grigoropoulou, A., Üblacker, M., Shen, L., Domisch, S. (2022). Hydrography90m: A new high-resolution global hydrographic dataset. _Earth System Science Data_, 14, 4525–4550. 
 
 
 We thank [NFDI4Biodiversity](https://www.nfdi4biodiversity.org/en/) and [NFDI4Earth](https://www.nfdi4earth.de/) for providing the funding that helped us getting the hydrographr package together!
