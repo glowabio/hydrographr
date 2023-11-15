@@ -1,0 +1,482 @@
+---
+title: "Data processing prior to network analyses for freshwater fish in Germany"
+subtitle: "Processing of spatial and species data"
+author: ""
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Case study - Germany}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+bibliography: bib/references_fish_germany.bib
+link-citations: yes
+linkcolor: blue
+# csl: copernicus.csl
+nocite: '@*'
+editor_options:
+  markdown:
+    wrap: 72
+---
+
+```{r, include = FALSE, eval = FALSE}
+# writes out the references for all packages
+knitr::write_bib(file = 'packages.bib')
+```
+
+### Introduction
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE,  
+                      out.width='50%', fig.align='center')
+knitr::opts_knit$set(root.dir = "./data_germany")
+install.packages(pkgs)
+
+library(hydrographr)
+library(rgbif)
+library(terra)
+library(tools)
+library(data.table)
+library(dplyr)
+library(stringr)
+library(knitr)
+library(kableExtra)
+library(leaflet)
+library(leafem)
+library(htmlwidgets)
+library(mapview)
+library(here)
+```
+
+Load required libraries
+
+```{r}
+library(hydrographr)
+library(rgbif)
+library(data.table)
+library(dplyr)
+library(terra)
+library(tools)
+library(stringr)
+library(leaflet)
+library(leafem)
+```
+
+Define working directory
+
+```{r, eval=FALSE, include=FALSE}
+wdir <- paste0(here(), "/vignettes/data_germany")
+if(!dir.exists(paste0(wdir, "/data"))) dir.create(paste0(wdir, "/data"))
+```
+
+```{r, eval = FALSE}
+# Define the "data_germany" directory, where you have downloaded all the data,
+# as the working directory
+wdir <- "my/working/directory/data_germany"
+setwd(wdir)
+
+# Create a new folder in the working directory to store all the data
+dir.create("data")
+```
+
+### Species data
+
+We first download the occurrence data with coordinates from GBIF
+
+```{r, eval = FALSE}
+
+# Once: Download species occurrence data based on the key of the dataset
+# and write out to working directory
+# spdata_all <- occ_download_get(key="0004551-231002084531237",
+#                               overwrite = TRUE) %>%
+#   occ_download_import
+# fwrite(spdata_all, paste0(wdir, "/data/fish_germany_gbif.csv"),
+#     row.names = F, quote = F, sep = "\t")
+
+
+# Import and clean the data
+spdata <- fread(paste0(wdir, "/data/fish_germany_gbif.csv"), sep = "\t") %>%
+  select(gbifID, decimalLongitude, decimalLatitude, species,
+         occurrenceStatus, year) %>%
+  rename("longitude" = "decimalLongitude",
+         "latitude" = "decimalLatitude")
+```
+
+```{r, eval = F}
+spdata
+```
+
+```{r, echo=F}
+kbl(spdata) %>%
+  kable_styling(bootstrap_options = "striped", full_width = F, position = "left") %>%
+  scroll_box(width = "500px", height = "200px")
+```
+
+Let's visualise the species occurrences on the map
+
+Let's define the extent (bounding box) of the study area (xmin, ymin,
+xmax, ymax)
+
+```{r}
+# Define the extent
+bbox <- c(min(spdata$longitude), min(spdata$latitude),
+          max(spdata$longitude), max(spdata$latitude))
+```
+
+```{r}
+# Define color palette for the different years of record
+factpal <- colorFactor(hcl.colors(unique(spdata$year)), spdata$year)
+
+# Create leaflet plot
+spdata_plot <- leaflet(spdata) %>%
+  addProviderTiles('Esri.WorldShadedRelief') %>%
+  setMaxBounds(bbox[1], bbox[2], bbox[3], bbox[4]) %>%
+  addCircles(lng = ~longitude, lat = ~ latitude, color =  ~factpal(as.factor(year)),
+             opacity = 1) %>%
+  addLegend(pal = factpal, values = ~as.factor(year),
+            title = "Year of record")
+spdata_plot
+saveWidget(spdata_plot, file=paste0(here(), "man/figures/germany_map.html"))
+
+```
+
+![](images/germany_map.png)
+
+### Download files
+
+In order to download layers of the Hydrography90m, we need to know the
+IDs of the 20°x20° tiles in which they are located. We can obtain these
+IDs using the function *get_tile_id()*. This function downloads and uses
+the auxiliary raster file that contains all the regional units globally,
+and thus requires an active internet connection.
+
+```{r, eval = FALSE}
+tile_id <- get_tile_id(data = spdata,
+                     lon = "longitude", lat = "latitude")
+
+# Get reg unit id to crop all the regular tile layers so that we have uninterrupted basins
+reg_unit_id <- get_regional_unit_id(data = spdata,
+                                  lon = "longitude", lat = "latitude")
+
+```
+
+```{r, echo = FALSE}
+tile_id <- c("h16v02", "h18v00", "h18v02")
+```
+
+```{r}
+tile_id
+```
+
+Currently the function returns all the tiles of the regional unit where
+the input points are located. However, some of them may be far from the
+study area and hence not always needed in further steps. Please double
+check which tile IDs are relevant for your purpose using the **Tile
+map** found
+[here](https://hydrography.org/hydrography90m/hydrography90m_layers/).
+
+In our case, Germany spreads in just one tile, with the ID "h18v02", so
+we will keep only this one.
+
+```{r}
+tile_id <- "h18v02"
+```
+
+Then we define the names of the raster and vector layers we want to
+download.
+
+```{r, eval = FALSE}
+# Define the raster layers
+vars_tif <- c("basin", "sub_catchment", "segment", "accumulation", "direction",
+              "outlet_dist_dw_basin", "outlet_dist_dw_scatch",
+              "channel_dist_up_seg", "order_strahler")
+# Define the vector layers
+# The "basin" layer contains the polygons of the drainage basins while the
+# "order_vect_segment" layer is the stream network vector file
+vars_gpkg <- c("basin", "order_vect_segment")
+
+```
+
+```{r, eval = FALSE}
+# Extend timeout to 1000s to allow uninterrupted downloading
+options(timeout = 1000)
+# Download the .tif tiles of the desired variables
+download_tiles(variable = vars_tif, tile_id = tile_id, file_format = "tif",
+               download_dir = "data")
+
+# Download the .gpkg tiles of the desired variables
+download_tiles(variable = vars_gpkg, tile_id = tile_id, file_format = "gpkg",
+               download_dir = "data")
+
+# Download the raster mask of the regional unit
+download_tiles(variable = "regional_unit",
+               file_format = "tif",
+               reg_unit_id = reg_unit_id,
+               download_dir = "data")
+```
+
+To download the elevation files of MERIT-HYDRO, we visit
+<https://hydro.iis.u-tokyo.ac.jp/~yamadai/MERIT_Hydro/> to define the
+tiles that need to be downloaded. We download the zipped tiles into a
+new directory called ***elv***, unzip the downloaded .tar file and keep
+only the tiles that we need
+
+```{r, eval = FALSE}
+elv_dir <- paste0(wdir, "/data/elv") 
+dir.create(elv_dir)
+```
+
+### Extraction of sub-catchment IDs
+
+Extract the IDs of the sub-catchments where the points are located. This
+step is crucial, as many of the functions that we will later use require
+a vector of sub-catchment IDs as input. Note that the function
+*extract_ids()* can be used to extract the values at specific points of
+any raster file provided to the argument *subc_layer*. It can be safely
+used to query very large raster files, as these are not loaded into R.
+
+```{r, eval = FALSE}
+spdata_ids <- extract_ids(data = spdata,
+  id = "gbifID",
+  lon = "longitude", lat = "latitude",
+  basin_layer = paste0(wdir, "/data/r.watershed/basin_tiles20d/basin_h18v02.tif"),
+  subc_layer = paste0(wdir, "/data/r.watershed/sub_catchment_tiles20d/sub_catchment_h18v02.tif"))
+
+```
+
+```{r, echo = FALSE}
+knitr::kable(head(spdata_ids),
+             caption = "The species data have now their corresponding sub-catchment ids")
+```
+
+```{r, echo = FALSE}
+# # write points as gpkg
+# spdata_vect <- vect(spdata_ids, geom=c("longitude", "latitude"))
+# writeVector(spdata_vect, paste0(wdir, "/data/spdata.gpkg"), overwrite=T)
+```
+
+### Cropping
+
+After having downloaded all the layers, we need to crop them to the
+extent of our study area extended by 500 km, so that our basins are not
+split in half.
+
+```{r, echo = FALSE}
+# Define and create a directory for the study area
+study_area_dir <-  paste0(wdir, "/data/study_area")
+if(!dir.exists(study_area_dir)) dir.create(study_area_dir)
+
+
+# Get the full paths of the raster tiles
+raster_tiles_watershed <- list.files(paste0(wdir, "/data/r.watershed"),
+                          pattern = ".tif", full.names = TRUE, recursive = TRUE)
+raster_tiles_dist <- list.files(paste0(wdir, "/data/r.stream.distance"),
+                          pattern = ".tif", full.names = TRUE, recursive = TRUE)
+raster_tiles_chan <- list.files(paste0(wdir, "/data/r.stream.channel"),
+                          pattern = ".tif", full.names = TRUE, recursive = TRUE)
+raster_tiles_ord <- list.files(paste0(wdir, "/data/r.stream.order"),
+                               pattern = ".tif", full.names = TRUE, recursive = TRUE)
+raster_tiles <- c(raster_tiles_watershed, raster_tiles_dist, raster_tiles_chan, raster_tiles_ord)
+```
+
+Let's define the extent (bounding box) of the study area (xmin, ymin,
+xmax, ymax)
+
+```{r, echo = FALSE}
+bb <- ext(vect(paste0(wdir, "/data/r.watershed/basin_tiles20d/basin_h18v02_filtered.gpkg")))
+```
+
+```{r}
+bb <- c(0.256, 20, 45, 55.4325)
+```
+
+We then crop the raster tiles to the extent using the function
+*crop_to_extent()* in a loop
+
+```{r}
+
+for(itile in raster_tiles) {
+
+  crop_to_extent(raster_layer = itile,
+                 bounding_box = bb,
+                 out_dir = study_area_dir,
+                 file_name =  paste0(str_remove(basename(itile), ".tif"),
+                                     "_crop.tif"),
+                 quiet = FALSE,
+                 compression = "high",
+                 bigtiff = TRUE,
+                 read = FALSE)
+}
+```
+
+### Filtering sub-catchment and basin .gpkg files
+
+In case you don't work on a server, we suggest you to download the
+output files of this chunk from the following links and then copy them
+in the folder *`study_area_dir`*:
+
+-   [order_vect_segment_h18v02_crop.gpkg](li)
+
+-   [basin_h18v02_crop.gpkg](https://drive.google.com/file/d/1l9l7k3s9YIVkjhSoRqLVb8L2rGStSvz0/view?usp=drive_link)
+
+```{r, evaluate = FALSE}
+# !! Only run this chunk on a machine with more than XX GB RAM, as the input files are really big !!
+
+# Load the cropped stream and basin raster layer of the study area
+# The stream raster can be used interchangeably with the sub_catchment raster, 
+# because the stream IDs are the same as the sub-catchment IDs. 
+# Here we use the stream raster because it's smaller in size. 
+stream_layer <- rast(paste0(study_area_dir, "/segment_h18v02_crop.tif"))
+basin_layer <- rast(paste0(study_area_dir, "/basin_h18v02_crop.tif"))
+# Get all sub-catchment and basin IDs of the study area
+subc_ids <- terra::unique(stream_layer)
+basin_ids <- terra::unique(basin_layer)
+
+# Get the full path of the stream order segment GeoPackage tile
+order_tile <- list.files(wdir, pattern = "order.+_h[v0-8]+.gpkg$",
+                         full.names = TRUE, recursive = TRUE)
+basin_gpkg_tile <- list.files(wdir, pattern = "bas.+_h[v0-8]+.gpkg$",
+                              full.names = TRUE, recursive = TRUE)
+
+# Filter the sub-catchment IDs from the GeoPackage of the order_vector_segment
+# tiles (sub-catchment ID = stream ID)
+# Save the stream segments of the study area
+filtered_stream <- read_geopackage(order_tile,
+                                 import_as = "sf",
+                                 subc_id = subc_ids$segment_h18v02_crop,
+                                 name = "stream")
+
+sf::write_sf(filtered_stream, paste(study_area_dir,
+                                  paste0(str_remove(basename(order_tile), ".gpkg"),
+                                         "_crop.gpkg"), sep="/"))
+
+filtered_bas <- read_geopackage(basin_gpkg_tile,
+                                 import_as = "sf",
+                                 subc_id = basin_ids$basin_h18v02_crop,
+                                 name = "ID")
+
+sf::write_sf(filtered_bas, paste(study_area_dir,
+                                  paste0(str_remove(basename(basin_gpkg_tile), ".gpkg"),
+                                         "_crop.gpkg"), sep="/"))
+
+```
+
+# Merging the elevation tiles
+
+```{r, evaluate = FALSE}
+# These are the elevation tiles that include our study area
+elv_tiles <- c("n45e000_elv.tif", "n50e010_elv.tif", "n60e000_elv.tif",
+                "n45e005_elv.tif", "n50e015_elv.tif", "n60e005_elv.tif",
+                "n45e010_elv.tif", "n55e000_elv.tif", "n60e010_elv.tif",
+                "n45e015_elv.tif", "n55e005_elv.tif", "n60e015_elv.tif",
+                "n50e000_elv.tif", "n55e010_elv.tif", "n50e005_elv.tif",
+                "n55e015_elv.tif")
+
+merge_tiles(tile_dir = elv_dir, 
+            tile_names = elv_tiles,
+            out_dir = study_area_dir, 
+            file_name = "elv_study_area.tif",
+            compression = "high",
+            bigtiff = TRUE,
+            quiet = FALSE)
+
+
+# crop to our extent
+crop_to_extent(raster_layer = paste0(study_area_dir, "/elv_study_area.tif"),
+               bounding_box = bb,
+               out_dir = study_area_dir,
+               file_name =  "elv_study_area_crop.tif",
+               quiet = FALSE,
+               compression = "high", 
+               bigtiff = TRUE, 
+               read = FALSE)
+
+```
+
+### Snapping points to network
+
+```{r, evaluate = FALSE}
+
+# We need to shorten the gbifIDs because they are too long for GRASS-GIS
+spdata_ids$gbifID_tmp <- str_replace(spdata_ids$gbifID, "40", "")
+
+spdata_snap <- snap_to_subc_segment(spdata_ids[1:2],
+  id = "gbifID_tmp",
+  lon = "longitude", lat = "latitude",
+  basin_id = "basin_id",
+  subc_id = "subcatchment_id",
+  stream_layer = paste0(study_area_dir, "/order_vect_segment_h18v02_crop.gpkg"),
+  basin_layer = paste0(study_area_dir, "/basin_h18v02_crop.tif"),
+  subc_layer = paste0(study_area_dir, "/sub_catchment_h18v02_crop.tif"),
+  quiet = F)
+
+```
+
+### Snap points to subcatchment segment
+
+```{r, evaluate = FALSE}
+spdata_snap_netw <- snap_to_network(data = spdata_ids[1:2],
+           id = "gbifID_tmp",
+           lon = "longitude", lat = "latitude",
+           stream_layer = paste0(study_area_dir, "/segment_h18v02_crop.tif"),
+           accu_layer = paste0(study_area_dir, "/accumulation_h18v02_crop.tif"),
+           method = "both",
+           distance = 500,
+           accumulation = 0.5,
+           quiet = F)
+```
+
+### Distances calculation
+
+The points are spread across multiple basins, so we will use the
+function "get_distance_parallel" to parallelise the process across
+basins.
+
+```{r, evaluate = FALSE}
+netw_dist <- get_distance_parallel(data = spdata_snap[1:2],
+  id = "gbifID_tmp", 
+  lon = "lon_snap", lat = "lat_snap",
+  basin_id = "basin_id",
+  basin_layer = paste0(study_area_dir, "/basin_h18v02_crop.tif"),
+  stream_layer =  paste0(study_area_dir, "/order_vect_segment_h18v02_crop.gpkg"),
+  distance = "network",
+  n_cores = 1,
+  quiet = FALSE
+)
+```
+
+We will now get the points' distance from the outlet of the basin, by
+extracting the pixel values of the ***outlet_dist_dw_basin*** raster
+layer
+
+```{r, evaluate = FALSE}
+spdata_dist_bas_outlet <- extract_ids(data = spdata_snap,
+  lon = "lon_snap", lat = "lat_snap",
+  id = "gbifID",
+  basin_layer = paste0(study_area_dir, "/outlet_dist_dw_basin_h18v02_crop.tif"),
+  subc_layer = paste0(study_area_dir, "/outlet_dist_dw_scatch_h18v02_crop.tif")) %>%
+  rename(outlet_dist_dw_basin = basin_id,
+         outlet_dist_dw_scatch = subcatchment_id)
+```
+
+#### Distances between points
+
+The following chunks are computationally heavy, so we suggest to run
+them on a server
+
+```{r, evaluate = FALSE}
+# Load as graph
+stream_graph <- read_geopackage(gpkg = paste0(study_area_dir, "/order_vect_segment_h18v02_crop.gpkg"),
+                                  import_as = "graph")
+
+# Get the network distance (in meters) between all input pairs:
+subc_distances <- get_distance_graph(my_graph,
+                                    subc_id = subc_id,
+                                    variable = "length",
+                                    distance_m = TRUE)
+
+```
+
+```{r, evaluate = FALSE}
+```
+
+### References
