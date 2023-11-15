@@ -29,9 +29,11 @@ You can find more details on the package and its applications in our recently pu
 
 
 Please cite the hydrographr package as:
+
 Schürz, M., Grigoropoulou, A., Garcia Marquez, J.R., Tomiczek, T., Floury, M., Schürz, C., Amatulli, G., Grossart, H.-P., Domisch, S. (2023). hydrographr: an R package for scalable hydrographic data processing. _Methods in Ecology and Evolution_, 10.1111/2041-210X.14226
 
 Please also cite the Hydrography90m data:
+
 Amatulli, G., Garcia Marquez, J.R., Sethi, T., Kiesel, J., Grigoropoulou, A., Üblacker, M., Shen, L., Domisch, S. (2022). Hydrography90m: A new high-resolution global hydrographic dataset. _Earth System Science Data_, 14, 4525–4550. 
 
 
