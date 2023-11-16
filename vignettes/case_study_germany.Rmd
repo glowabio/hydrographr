@@ -8,7 +8,7 @@ vignette: >
   %\VignetteIndexEntry{Case study - Germany}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
-bibliography: bib/references_fish_germany.bib
+bibliography: bib/references_germany.bib
 link-citations: yes
 linkcolor: blue
 # csl: copernicus.csl
@@ -20,7 +20,7 @@ editor_options:
 
 ```{r, include = FALSE, eval = FALSE}
 # writes out the references for all packages
-knitr::write_bib(file = 'packages.bib')
+knitr::write_bib(file = 'references_germany.bib')
 ```
 
 ### Introduction
@@ -63,7 +63,7 @@ library(leafem)
 
 Define working directory
 
-```{r, eval=FALSE, include=FALSE}
+```{r, eval=TRUE, include=FALSE}
 wdir <- paste0(here(), "/vignettes/data_germany")
 if(!dir.exists(paste0(wdir, "/data"))) dir.create(paste0(wdir, "/data"))
 ```
@@ -82,7 +82,7 @@ dir.create("data")
 
 We first download the occurrence data with coordinates from GBIF
 
-```{r, eval = FALSE}
+```{r}
 
 # Once: Download species occurrence data based on the key of the dataset
 # and write out to working directory
@@ -122,7 +122,7 @@ bbox <- c(min(spdata$longitude), min(spdata$latitude),
           max(spdata$longitude), max(spdata$latitude))
 ```
 
-```{r}
+```{r, eval = F}
 # Define color palette for the different years of record
 factpal <- colorFactor(hcl.colors(unique(spdata$year)), spdata$year)
 
@@ -135,8 +135,11 @@ spdata_plot <- leaflet(spdata) %>%
   addLegend(pal = factpal, values = ~as.factor(year),
             title = "Year of record")
 spdata_plot
-saveWidget(spdata_plot, file=paste0(here(), "man/figures/germany_map.html"))
 
+```
+
+```{r, eval = F, echo = F}
+saveWidget(spdata_plot, file=paste0(here(), "man/figures/germany_map.html"))
 ```
 
 ![](images/germany_map.png)
@@ -225,35 +228,6 @@ elv_dir <- paste0(wdir, "/data/elv")
 dir.create(elv_dir)
 ```
 
-### Extraction of sub-catchment IDs
-
-Extract the IDs of the sub-catchments where the points are located. This
-step is crucial, as many of the functions that we will later use require
-a vector of sub-catchment IDs as input. Note that the function
-*extract_ids()* can be used to extract the values at specific points of
-any raster file provided to the argument *subc_layer*. It can be safely
-used to query very large raster files, as these are not loaded into R.
-
-```{r, eval = FALSE}
-spdata_ids <- extract_ids(data = spdata,
-  id = "gbifID",
-  lon = "longitude", lat = "latitude",
-  basin_layer = paste0(wdir, "/data/r.watershed/basin_tiles20d/basin_h18v02.tif"),
-  subc_layer = paste0(wdir, "/data/r.watershed/sub_catchment_tiles20d/sub_catchment_h18v02.tif"))
-
-```
-
-```{r, echo = FALSE}
-knitr::kable(head(spdata_ids),
-             caption = "The species data have now their corresponding sub-catchment ids")
-```
-
-```{r, echo = FALSE}
-# # write points as gpkg
-# spdata_vect <- vect(spdata_ids, geom=c("longitude", "latitude"))
-# writeVector(spdata_vect, paste0(wdir, "/data/spdata.gpkg"), overwrite=T)
-```
-
 ### Cropping
 
 After having downloaded all the layers, we need to crop them to the
@@ -262,7 +236,9 @@ split in half.
 
 ```{r, echo = FALSE}
 # Define and create a directory for the study area
-study_area_dir <-  paste0(wdir, "/data/study_area")
+#study_area_dir <-  paste0(wdir, "/data/study_area")
+study_area_dir <- "/home/afroditi/Documents/PhD/external/fish_germany/data/study_area"
+
 if(!dir.exists(study_area_dir)) dir.create(study_area_dir)
 
 
@@ -292,7 +268,7 @@ bb <- c(0.256, 20, 45, 55.4325)
 We then crop the raster tiles to the extent using the function
 *crop_to_extent()* in a loop
 
-```{r}
+```{r, eval = FALSE}
 
 for(itile in raster_tiles) {
 
@@ -314,11 +290,11 @@ In case you don't work on a server, we suggest you to download the
 output files of this chunk from the following links and then copy them
 in the folder *`study_area_dir`*:
 
--   [order_vect_segment_h18v02_crop.gpkg](li)
+-   [order_vect_segment_h18v02_crop.gpkg](https://drive.google.com/file/d/14jh2zG7eqlS-KQZlZufLcZfPdEhRncd8/view?usp=drive_link)
 
 -   [basin_h18v02_crop.gpkg](https://drive.google.com/file/d/1l9l7k3s9YIVkjhSoRqLVb8L2rGStSvz0/view?usp=drive_link)
 
-```{r, evaluate = FALSE}
+```{r, eval = FALSE}
 # !! Only run this chunk on a machine with more than XX GB RAM, as the input files are really big !!
 
 # Load the cropped stream and basin raster layer of the study area
@@ -360,9 +336,9 @@ sf::write_sf(filtered_bas, paste(study_area_dir,
 
 ```
 
-# Merging the elevation tiles
+### Merging the elevation tiles
 
-```{r, evaluate = FALSE}
+```{r, eval = FALSE}
 # These are the elevation tiles that include our study area
 elv_tiles <- c("n45e000_elv.tif", "n50e010_elv.tif", "n60e000_elv.tif",
                 "n45e005_elv.tif", "n50e015_elv.tif", "n60e005_elv.tif",
@@ -392,46 +368,156 @@ crop_to_extent(raster_layer = paste0(study_area_dir, "/elv_study_area.tif"),
 
 ```
 
-### Snapping points to network
+### Extraction of sub-catchment IDs
 
-```{r, evaluate = FALSE}
+Extract the IDs of the sub-catchments where the points are located. This
+step is crucial, as many of the functions that we will later use require
+a vector of sub-catchment IDs as input. Note that the function
+*extract_ids()* can be used to extract the values at specific points of
+any raster file provided to the argument *subc_layer*. It can be safely
+used to query very large raster files, as these are not loaded into R.
 
-# We need to shorten the gbifIDs because they are too long for GRASS-GIS
-spdata_ids$gbifID_tmp <- str_replace(spdata_ids$gbifID, "40", "")
-
-spdata_snap <- snap_to_subc_segment(spdata_ids[1:2],
-  id = "gbifID_tmp",
+```{r, eval = TRUE}
+spdata_ids <- extract_ids(data = spdata,
+  id = "gbifID",
   lon = "longitude", lat = "latitude",
-  basin_id = "basin_id",
-  subc_id = "subcatchment_id",
-  stream_layer = paste0(study_area_dir, "/order_vect_segment_h18v02_crop.gpkg"),
   basin_layer = paste0(study_area_dir, "/basin_h18v02_crop.tif"),
-  subc_layer = paste0(study_area_dir, "/sub_catchment_h18v02_crop.tif"),
-  quiet = F)
-
+  subc_layer = paste0(study_area_dir, "/sub_catchment_h18v02_crop.tif"))
 ```
 
-### Snap points to subcatchment segment
+```{r, echo = FALSE}
+knitr::kable(head(spdata_ids),
+             caption = "The species data have now their corresponding sub-catchment ids")
+```
 
-```{r, evaluate = FALSE}
-spdata_snap_netw <- snap_to_network(data = spdata_ids[1:2],
-           id = "gbifID_tmp",
-           lon = "longitude", lat = "latitude",
-           stream_layer = paste0(study_area_dir, "/segment_h18v02_crop.tif"),
-           accu_layer = paste0(study_area_dir, "/accumulation_h18v02_crop.tif"),
-           method = "both",
-           distance = 500,
-           accumulation = 0.5,
-           quiet = F)
+```{r, echo = FALSE}
+# # write points as gpkg
+# spdata_vect <- vect(spdata_ids, geom=c("longitude", "latitude"))
+# writeVector(spdata_vect, paste0(wdir, "/data/spdata.gpkg"), overwrite=T)
+```
+
+### Snapping points to the network
+
+Before we can calculate the distance along the stream network between
+species occurrences, we need to snap the coordinates of the sites to the
+stream network. Recorded coordinates of point locations usually do not
+exactly overlap with the digital stream network and, therefore, need to
+be slightly corrected.
+
+The hydrographr package offers two different snapping functions,
+`snap_to_network` and `snap_to_subc_segment`. The first function uses a
+defined distance radius and a flow accumulation threshold, while the
+second function snaps the point to the stream segment of the
+sub-catchment the point was originally located in.
+
+For this case study we will use the function `snap_to_network` to be
+able to define a certain flow accumulation threshold and ensure that the
+fish occurrences will not be snapped to a headwater stream (first order
+stream) if there is also a higher order stream next to it.
+
+![](images/snapping.png)
+
+```{r, eval = FALSE}
+# Define full paths of raster layers
+stream_rast <- paste0(study_area_dir, "/segment_h18v02_crop.tif")
+flow_rast <- paste0(study_area_dir, "/accumulation_h18v02_crop.tif")
+```
+
+```{r, eval = FALSE}
+# We need to shorten the gbifIDs because they are too long for GRASS-GIS
+# We will delete the first 2 characters ("40") from all IDs
+spdata_ids$gbifID_tmp <- str_replace(spdata_ids$gbifID, "40", "")
+```
+
+The function is implemented in a for-loop that starts searching for
+streams with a very high flow accumulation of 400,000 km² in a very
+short distance and then slowly decreases the flow accumulation to 100
+km². If there are still sites left which were not snapped to a stream
+segment, the distance will increase from 10 up to 30 cells.
+
+```{r, eval = FALSE}
+# Define thresholds for the flow accumulation of the stream segment, where
+# the point location should be snapped to
+accu_threshold <- c(400000, 300000, 100000, 50000, 10000, 5000, 1000, 500, 100) 
+# Define the distance radius
+dist_radius <- c(10, 20, 30)
+
+# Create a temporary data.table
+point_locations_tmp <- spdata_ids
+
+# Note: The for loop takes about 9 minutes
+first <- TRUE
+for (idist in dist_radius) {
+    
+   # If the distance increases to 20 cells only a flow accumulation of 100 km²
+   # will be used
+   if (idist == 20) {
+    # Set accu_threshold to 100
+    accu_threshold <- c(100)
+   }
+  
+
+  for (iaccu in accu_threshold) {
+    # Snap point locations to the stream network
+    point_locations_snapped_tmp <- snap_to_network(data = point_locations_tmp,
+                                    id = "gbifID",
+                                    lon = "longitude", lat = "latitude",
+                                    stream_layer = stream_rast,
+                                    accu_layer = flow_rast,
+                                    method = "accumulation",
+                                    distance = idist,
+                                    accumulation = iaccu,
+                                    quiet = FALSE)
+
+    
+    # Keep point location with NAs for the next loop
+    point_locations_tmp <- point_locations_snapped_tmp %>% 
+      filter(is.na(subc_id_snap_accu))
+  
+  if (first == TRUE) {
+    # Keep the point locations with the new coordinates and remove rows with NA
+    point_locations_snapped <- point_locations_snapped_tmp %>% 
+    filter(!is.na(subc_id_snap_accu))
+    first <- FALSE
+  } else {
+    # Bind the new data.frame to the data.frame of the loop before
+    # and remove the NA
+    point_locations_snapped <- point_locations_snapped %>% 
+      bind_rows(point_locations_snapped_tmp) %>% 
+      filter(!is.na(subc_id_snap_accu))
+    
+  }
+  
+  }
+    
+}
+
+fwrite(point_locations_snapped, paste0(wdir, "/data/spdata_snapped.csv"), sep = ",", 
+                      row.names = FALSE, quote = FALSE)
+```
+
+```{r}
+point_locations_snapped <- fread(paste0(wdir, "/data/spdata_snapped.csv"), sep = ",")
+```
+
+
+```{r, eval = F}
+point_locations_snapped
+```
+
+```{r, echo = FALSE}
+knitr::kable(head(point_locations_snapped),
+      caption = "The species data have been attributed new coordinates and in 
+      some cases a new sub-catchment id")
 ```
 
 ### Distances calculation
 
-The points are spread across multiple basins, so we will use the
-function "get_distance_parallel" to parallelise the process across
-basins.
+We will calculate the distance between all point locations. The points
+are spread across multiple basins, so we will use the function
+`get_distance_parallel` to parallelise the process across basins.
 
-```{r, evaluate = FALSE}
+```{r, eval = FALSE}
 netw_dist <- get_distance_parallel(data = spdata_snap[1:2],
   id = "gbifID_tmp", 
   lon = "lon_snap", lat = "lat_snap",
@@ -448,7 +534,7 @@ We will now get the points' distance from the outlet of the basin, by
 extracting the pixel values of the ***outlet_dist_dw_basin*** raster
 layer
 
-```{r, evaluate = FALSE}
+```{r, eval = FALSE}
 spdata_dist_bas_outlet <- extract_ids(data = spdata_snap,
   lon = "lon_snap", lat = "lat_snap",
   id = "gbifID",
@@ -463,20 +549,22 @@ spdata_dist_bas_outlet <- extract_ids(data = spdata_snap,
 The following chunks are computationally heavy, so we suggest to run
 them on a server
 
-```{r, evaluate = FALSE}
+```{r, eval = FALSE}
 # Load as graph
-stream_graph <- read_geopackage(gpkg = paste0(study_area_dir, "/order_vect_segment_h18v02_crop.gpkg"),
-                                  import_as = "graph")
+stream_graph <- read_geopackage(
+  gpkg = paste0(study_area_dir, "/order_vect_segment_h18v02_crop.gpkg"),
+  import_as = "graph")
 
-# Get the network distance (in meters) between all input pairs:
-subc_distances <- get_distance_graph(my_graph,
-                                    subc_id = subc_id,
-                                    variable = "length",
-                                    distance_m = TRUE)
+# Get the network distance (in meters) between all input pairs.
+# We provide the subcatchment ids of the snapped points to the argument "subc_id"
+subc_distances <- get_distance_graph(stream_graph,
+                            subc_id = point_locations_snapped$subc_id_snap_accu,
+                            variable = "length",
+                            distance_m = TRUE)
 
 ```
 
-```{r, evaluate = FALSE}
+```{r, eval = FALSE}
 ```
 
 ### References
