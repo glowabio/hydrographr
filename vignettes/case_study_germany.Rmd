@@ -767,6 +767,7 @@ kbl(stats_table_zon) %>%
                 full_width = F, position = "left") %>%
   scroll_box(width = "500px", height = "200px")
 
+
 ```
 
 
