@@ -1,6 +1,6 @@
 ---
-title: "Data processing prior to network analyses for freshwater fish in Germany"
-subtitle: "Processing of spatial and species data"
+title: "Case study - Germany"
+subtitle: "Processing of spatial and species data prior to network analyses for freshwater fish in Germany"
 author: ""
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
