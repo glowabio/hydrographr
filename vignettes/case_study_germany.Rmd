@@ -502,66 +502,38 @@ for (idist in dist_radius) {
   }
     
 }
+```
 
+We can write out the result of the snapping
+
+```{r, eval=F}
 fwrite(point_locations_snapped, paste0(wdir, "/data/spdata_snapped.csv"), sep = ",", 
                       row.names = FALSE, quote = FALSE)
 ```
 
-```{r}
-point_locations_snapped <- fread(paste0(wdir, "/data/spdata_snapped.csv"), sep = ",")
-```
-
 ```{r, echo = F}
-point_locations_snapped <- head(point_locations_snapped)
+point_locations_snapped <- fread(paste0(wdir, "/data/spdata_snapped.csv"), sep = ",") %>% 
+  head()
 ```
 
 ```{r, eval = F}
-point_locations_snapped
+head(point_locations_snapped)
 ```
 
 ```{r, echo = FALSE}
 knitr::kable(head(point_locations_snapped),
       caption = "The species data have been attributed new coordinates and in 
-      some cases a new sub-catchment id")
+      some cases a new sub-catchment id (\"subc_id_snap_accu\")")
 ```
 
 ### Calculating distances
 
-We will calculate the distance between all point locations. The points
-are spread across multiple basins, so we will use the function
-`get_distance_parallel` to parallelise the process across basins.
+#### 1. Distances between points
 
-```{r, eval = FALSE}
-netw_dist <- get_distance_parallel(data = spdata_snap[1:2],
-  id = "gbifID_tmp", 
-  lon = "lon_snap", lat = "lat_snap",
-  basin_id = "basin_id",
-  basin_layer = paste0(study_area_dir, "/basin_h18v02_crop.tif"),
-  stream_layer =  paste0(study_area_dir, "/order_vect_segment_h18v02_crop.gpkg"),
-  distance = "network",
-  n_cores = 1,
-  quiet = FALSE
-)
-```
-
-We will now get the points' distance from the outlet of the basin, by
-extracting the pixel values of the ***outlet_dist_dw_basin*** raster
-layer
-
-```{r, eval = FALSE}
-spdata_dist_bas_outlet <- extract_ids(data = spdata_snap,
-  lon = "lon_snap", lat = "lat_snap",
-  id = "gbifID",
-  basin_layer = paste0(study_area_dir, "/outlet_dist_dw_basin_h18v02_crop.tif"),
-  subc_layer = paste0(study_area_dir, "/outlet_dist_dw_scatch_h18v02_crop.tif")) %>%
-  rename(outlet_dist_dw_basin = basin_id,
-         outlet_dist_dw_scatch = subcatchment_id)
-```
-
-#### Distances between points
+We will calculate the distance between all point locations.
 
 The following chunks are computationally heavy, so we suggest to run
-them on a server
+them on a server.
 
 ```{r, eval = FALSE}
 # Load as graph
@@ -578,7 +550,121 @@ subc_distances <- get_distance_graph(stream_graph,
 
 ```
 
-```{r, eval = FALSE}
+```{r, echo = F, eval = FALSE}
+fwrite(subc_distances, 
+        paste0(wdir, "/subc_distances.csv"), sep = ",", row.names = F, quote = F)
 ```
+
+```{r, echo = F}
+subc_distances <- fread(paste0(wdir, "/data/subc_distances.csv")) %>% head()
+```
+
+```{r, eval = F}
+head(subc_distances)
+```
+
+```{r, echo =F}
+kbl(subc_distances) %>%
+  kable_styling(bootstrap_options = "striped", 
+                full_width = F, position = "left") %>%
+  scroll_box(width = "500px", height = "200px")
+```
+
+#### 2. Distances from the basin's outlet
+
+We will now get the points' distance from the outlet of the basin, by
+extracting the pixel values of the ***outlet_dist_dw_basin*** raster
+layer
+
+```{r, eval = FALSE}
+spdata_dist_bas_outlet <- extract_ids(data = spdata_snap,
+  lon = "lon_snap", lat = "lat_snap",
+  id = "gbifID",
+  basin_layer = paste0(study_area_dir, "/outlet_dist_dw_basin_h18v02_crop.tif"),
+  subc_layer = paste0(study_area_dir, "/outlet_dist_dw_scatch_h18v02_crop.tif")) %>%
+  rename(outlet_dist_dw_basin = basin_id,
+         outlet_dist_dw_scatch = subcatchment_id)
+```
+
+### Obtaining network centrality indices
+
+We will now calculate centrality indices using the directed stream
+network graph and the function `get_centrality` We want to consider only
+the upstream connected segments, so we set `mode = "in".`
+
+The following chunks are computationally heavy, so we suggest to run
+them on a server
+
+```{r, eval = F}
+spdata_centr <- get_centrality(stream_graph, index = "all", mode = "in")
+```
+
+```{r, eval = F, echo = F}
+fwrite(spdata_centr, paste0(wdir, "/data/subc_centrality.csv"), 
+       sep = ",", row.names = F, quote = F)
+```
+
+```{r, echo = F}
+# spdata_centr <- fread(paste0(wdir, "/data/subc_centrality.csv")) %>% head()
+```
+
+```{r, eval = F}
+head(spdata_centr)
+```
+
+```{r, echo =F}
+# kbl(spdata_centr) %>%
+#   kable_styling(bootstrap_options = "striped", 
+#                 full_width = F, position = "left") %>%
+#   scroll_box(width = "500px", height = "200px")
+```
+
+We now attach the centrality indices to the species data 
+using the subcatchment id
+```{r}
+# point_locations_snapped <- left_join(point_locations_snapped, spdata_centr)
+```
+
+### Extracting zonal statistics of topographic variables
+
+We will calculate the zonal statistics of the Hydrography90m
+variables for all the sub-catchments of the study area.
+Caution, don't increase the number of cores to more than 3 as this can
+cause memory problems. However, this highly depends to the number of
+sub-catchments as well. We recommend to test the function with different
+parameters to find out what works best for your case.
+
+# ```{r, eval = FALSE}
+# # Define input var_layers for the extract_zonal_stat() function
+# var_layers <- list.files(study_area_dir)
+# var_layers
+# ```
+
+```{r}
+elv_layer <- "elv_study_area_crop.tif"
+```
+A good practice before aggregating the variables is to check their
+NoData values:
+
+```{r, eval = FALSE}
+report_no_data(data_dir = study_area_dir, var_layer = elv_layer)
+#                    Raster NoData
+# 1 elv_study_area_crop.tif  -9999
+```
+
+
+
+```{r, eval = FALSE}
+# Run the function that returns the zonal statistics
+system.time(stats_table_zon <- extract_zonal_stat(
+          data_dir = study_area_dir,
+          subc_layer = paste0(study_area_dir, "/sub_catchment_h18v02_crop.tif"),
+          subc_id = "all",
+          var_layer = elv_layer,
+          out_dir = paste0(wdir, "/data"),
+          file_name = "zonal_stats_elv.csv",
+          n_cores = 2))
+```
+
 
 ### References
