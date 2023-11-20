@@ -95,8 +95,7 @@ fwrite(spdata_all, paste0(wdir, "/data/fish_germany_gbif.csv"),
 ```{r}
 # Import and clean the data
 spdata <- fread(paste0(wdir, "/data/fish_germany_gbif.csv"), sep = "\t") %>%
-  select(gbifID, decimalLongitude, decimalLatitude, species,
-         occurrenceStatus, year) %>%
+  select(gbifID, decimalLongitude, decimalLatitude, species, year) %>%
   rename("longitude" = "decimalLongitude",
          "latitude" = "decimalLatitude")
 ```
@@ -151,6 +150,8 @@ saveWidget(spdata_plot, file=paste0(here(), "man/figures/germany_map.html"))
 ![](../man/figures/germany_map.png){width="800"}
 
 ### Abiotic variables data
+
+#### 1. Hydrography90m
 
 In order to download layers of the Hydrography90m, we need to know the
 IDs of the 20°x20° tiles in which they are located. We can obtain these
@@ -224,6 +225,8 @@ download_tiles(variable = "regional_unit",
                download_dir = "data")
 ```
 
+#### 2. Elevation - MERIT-HYDRO
+
 To download the elevation files of MERIT-HYDRO, we visit
 <https://hydro.iis.u-tokyo.ac.jp/~yamadai/MERIT_Hydro/> to define the
 tiles that need to be downloaded. We download the zipped tiles into a
@@ -233,6 +236,31 @@ only the tiles that we need
 ```{r, eval = FALSE}
 elv_dir <- paste0(wdir, "/data/elv") 
 dir.create(elv_dir)
+```
+
+#### 3. Climate - CHELSA Bioclim
+
+Finally, we will download three CHELSA present Bioclim variables. For a
+quick outlook on the bioclimatic variables you can have a look
+[here](https://chelsa-climate.org/bioclim/).
+
+```{r, eval = FALSE}
+# Create download directory
+dir.create(paste0(wdir, "/data/chelsa_bioclim"))
+```
+
+```{r, eval = FALSE}
+# Extend timeout to 1000s to allow uninterrupted downloading
+options(timeout = 1000)
+
+# Download
+# Present, 1981-2010
+download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio12_1981-2010_V.2.1.tif",
+destfile = "data/chelsa_bioclim/bio12_1981-2010.tif", mode = "wb")
+download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio15_1981-2010_V.2.1.tif",
+destfile = "data/chelsa_bioclim/bio15_1981-2010.tif", mode = "wb")
+download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio1_1981-2010_V.2.1.tif",
+destfile = "data/chelsa_bioclim/bio1_1981-2010.tif", mode = "wb")
 ```
 
 ### Cropping the raster files
@@ -377,6 +405,28 @@ crop_to_extent(raster_layer = paste0(study_area_dir, "/elv_study_area.tif"),
                bigtiff = TRUE, 
                read = FALSE)
 
+```
+
+Finally, we will crop the CHELSA Bioclim layers.
+
+We define the directory containing the layers to be cropped and we list
+their file names
+
+```{r, eval = FALSE}
+dir_chelsa <- paste0(wdir, "/data/chelsa_bioclim")
+files_chelsa <- list.files(dir_chelsa, pattern = ".tif", full.names = TRUE)
+```
+
+```{r, eval = FALSE}
+for(ifile in files_chelsa) {
+    crop_to_extent(
+      raster_layer = ifile,
+      bounding_box = bb,
+      out_dir = study_area_dir,
+      file_name = basename(ifile),
+      read = FALSE,
+      quiet = TRUE)
+}
 ```
 
 ### Extracting sub-catchment IDs
@@ -526,12 +576,9 @@ knitr::kable(head(point_locations_snapped),
       some cases a new sub-catchment id (\"subc_id_snap_accu\")")
 ```
 
-### Calculating distances
-
-#### 1. Distances between points
+### Calculating distances between points
 
 We will calculate the distance between all point locations.
-
 The following chunks are computationally heavy, so we suggest to run
 them on a server.
 
@@ -564,27 +611,10 @@ head(subc_distances)
 ```
 
 ```{r, echo =F}
-kbl(subc_distances) %>%
-  kable_styling(bootstrap_options = "striped", 
-                full_width = F, position = "left") %>%
-  scroll_box(width = "500px", height = "200px")
+kbl(subc_distances)
 ```
 
-#### 2. Distances from the basin's outlet
 
-We will now get the points' distance from the outlet of the basin, by
-extracting the pixel values of the ***outlet_dist_dw_basin*** raster
-layer
-
-```{r, eval = FALSE}
-spdata_dist_bas_outlet <- extract_ids(data = spdata_snap,
-  lon = "lon_snap", lat = "lat_snap",
-  id = "gbifID",
-  basin_layer = paste0(study_area_dir, "/outlet_dist_dw_basin_h18v02_crop.tif"),
-  subc_layer = paste0(study_area_dir, "/outlet_dist_dw_scatch_h18v02_crop.tif")) %>%
-  rename(outlet_dist_dw_basin = basin_id,
-         outlet_dist_dw_scatch = subcatchment_id)
-```
 
 ### Obtaining network centrality indices
 
@@ -593,78 +623,193 @@ network graph and the function `get_centrality` We want to consider only
 the upstream connected segments, so we set `mode = "in".`
 
 The following chunks are computationally heavy, so we suggest to run
-them on a server
+them on a server.
 
 ```{r, eval = F}
-spdata_centr <- get_centrality(stream_graph, index = "all", mode = "in")
+centrality <- get_centrality(stream_graph, index = "all", mode = "in")
 ```
 
 ```{r, eval = F, echo = F}
-fwrite(spdata_centr, paste0(wdir, "/data/subc_centrality.csv"), 
+fwrite(centrality, paste0(wdir, "/data/subc_centrality.csv"), 
        sep = ",", row.names = F, quote = F)
 ```
 
-```{r, echo = F}
-# spdata_centr <- fread(paste0(wdir, "/data/subc_centrality.csv")) %>% head()
-```
+We now attach the centrality indices to the species data using the
+subcatchment id
 
 ```{r, eval = F}
-head(spdata_centr)
+point_locations_snapped <- left_join(point_locations_snapped, centrality, 
+                          by = c('subc_id_snap_accu'= 'subc_id'))
 ```
 
-```{r, echo =F}
-# kbl(spdata_centr) %>%
-#   kable_styling(bootstrap_options = "striped", 
-#                 full_width = F, position = "left") %>%
-#   scroll_box(width = "500px", height = "200px")
+```{r, echo = F}
+point_locations_snapped <- fread(paste0(wdir, "/data/spdata_centrality.csv")) %>% 
+  head()
 ```
 
-We now attach the centrality indices to the species data 
-using the subcatchment id
 ```{r}
-# point_locations_snapped <- left_join(point_locations_snapped, spdata_centr)
+kbl(point_locations_snapped)
+
+```
+
+Bonus! If we want to include the centrality indices to the stream
+network .gpkg, we can import the .gpkg and merge it with the centrality
+table
+
+```{r, eval = F}
+# Load stream network .gpkg as vector
+stream_vect <- read_geopackage(paste0(study_area_dir, "/order_vect_segment_h18v02_crop.gpkg"),
+                               import_as = "SpatVect")
+
+# Merge the centrality table with the vector
+stream_vect <- terra::merge(stream_vect, spdata_centr, 
+                        by.x = c('stream'), by.y="subc_id")
+
+# Write out the stream gpkg including the centrality indices
+writeVector(stream_vect, paste0(study_area_dir, "/order_vect_segment_centr.gpkg"))
 ```
 
 ### Extracting zonal statistics of topographic variables
 
-We will calculate the zonal statistics of the Hydrography90m
-variables for all the sub-catchments of the study area.
-Caution, don't increase the number of cores to more than 3 as this can
-cause memory problems. However, this highly depends to the number of
-sub-catchments as well. We recommend to test the function with different
-parameters to find out what works best for your case.
+We will calculate the zonal statistics of the Hydrography90m,
+MERIT-HYDRO DEM and the CHELSA Bioclim variables for the sub-catchments
+of our species points. Caution, don't increase the number of cores to
+more than 3 as this can cause memory problems. However, this highly
+depends to the number of sub-catchments as well. We recommend to test
+the function with different parameters to find out what works best for
+your case.
 
-# ```{r, eval = FALSE}
-# # Define input var_layers for the extract_zonal_stat() function
-# var_layers <- list.files(study_area_dir)
-# var_layers
-# ```
-
-```{r}
-elv_layer <- "elv_study_area_crop.tif"
+Let's first define the input `var_layers` for the `extract_zonal_stat`
+function
+```{r, eval = F}
+list.files(study_area_dir)
+var_layers <- c("bio1_1981-2010.tif", "bio12_1981-2010.tif",
+                "bio15_1981-2010.tif", "elv_study_area_crop.tif",
+                "outlet_dist_dw_basin_h18v02_crop.tif")
 ```
+
+
 A good practice before aggregating the variables is to check their
 NoData values:
 
 ```{r, eval = FALSE}
-report_no_data(data_dir = study_area_dir, var_layer = elv_layer)
-#                    Raster NoData
-# 1 elv_study_area_crop.tif  -9999
+report_no_data(data_dir = study_area_dir, var_layer = var_layers)
 ```
 
-
+```{r, eval = F}
+#                                 Raster                  NoData
+# 1                   bio1_1981-2010.tif                  -99999
+# 2                  bio15_1981-2010.tif 3.40282346600000016e+38
+# 3 outlet_dist_dw_basin_h18v02_crop.tif                   -9999
+# 4                  bio12_1981-2010.tif                  -99999
+# 5              elv_study_area_crop.tif                   -9999
+```
 
 ```{r, eval = FALSE}
-# Run the function that returns the zonal statistics
-system.time(stats_table_zon <- extract_zonal_stat(
-          data_dir = study_area_dir,
-          subc_layer = paste0(study_area_dir, "/sub_catchment_h18v02_crop.tif"),
-          subc_id = "all",
-          var_layer = elv_layer,
-          out_dir = paste0(wdir, "/data"),
-          file_name = "zonal_stats_elv.csv",
-          n_cores = 2))
+# Run the function that returns the zonal statistics.
+# We provide the subcatchment ids of the fish points to the argument 'subc_id'.
+stats_table_zon <- extract_zonal_stat(
+                    data_dir = study_area_dir,
+                    subc_layer = paste0(study_area_dir, "/sub_catchment_h18v02_crop.tif"),
+                    subc_id = point_locations_snapped$subc_id_snap_accu,
+                    var_layer = var_layers,
+                    out_dir = paste0(wdir, "/data"),
+                    file_name = "zonal_stats.csv",
+                    n_cores = 3)
 ```
+
+The function also reports the NoData values that are used in the
+calculation of the zonal statistics of each variable.
+
+We will keep only the mean and sd of each variable of the stats_table:
+
+```{r, eval = F}
+stats_table_zon <- stats_table_zon %>%
+  dplyr::select(contains("subc") |  ends_with("_mean") | ends_with("_sd")) %>%
+  rename('subcatchment_id' = 'subc_id')
+
+```
+
+
+
+The values in some of the original raster files were scaled, so we need to
+re-scale them before proceeding to any analyses.
+
+We define the following functions:
+
+```{r, eval = F}
+clim_scale <- function(x, na.rm = F) (x * 0.1)
+offset <- function(x, na.rm = F) (x - 273.15)
+```
+
+... and apply them to rescale the values
+
+```{r, eval = F}
+stats_table_zon <- stats_table_zon  %>%
+  mutate(across(starts_with("bio"), clim_scale))  %>%
+  mutate(across(matches("bio1_.*_mean"), offset))
+```
+
+
+```{r, eval = F, echo = F}
+fwrite(stats_table_zon, paste0(wdir, "/data/zonal_stats.csv"), 
+       sep =",", quote=F, row.names=F)
+```
+
+```{r, eval=F}
+head(stats_table_zon)
+```
+
+```{r, echo = F}
+stats_table_zon <- fread(paste0(wdir, "/data/zonal_stats.csv")) %>% head()
+kbl(stats_table_zon) %>% 
+  kable_styling(bootstrap_options = "striped", 
+                full_width = F, position = "left") %>%
+  scroll_box(width = "500px", height = "200px")
+
+```
+
+
+### Putting together the final table
+
+We will now perform some left joins to match the zonal statistics table 
+with the original species data. 
+```{r, eval = F}
+data_fin <- left_join(point_locations_snapped, stats_table_zon, 
+          by = c('subc_id_snap_accu'= 'subcatchment_id'))
+
+data_fin$gbifID <- as.character(data_fin$gbifID)
+data_fin <- left_join(spdata_ids, data_fin)
+
+# Convert the gbifIDs back to the original values
+data_fin$gbifID <- str_c("40", data_fin$gbifID)
+spdata$gbifID <- as.character(spdata$gbifID)
+
+data_fin <- left_join(spdata, data_fin)
+```
+
+
+```{r, eval=F, echo=F}
+fwrite(data_fin, paste0(wdir, "/data/data_final.csv"), 
+       sep = ",", quote = F, row.names = F)
+```
+
+```{r, eval = F}
+head(data_fin)
+```
+
+```{r, echo = F}
+data_fin <- fread(paste0(wdir, "/data/data_final.csv")) %>% head()
+kbl(data_fin) %>% 
+  kable_styling(bootstrap_options = "striped", 
+                full_width = F, position = "left") %>%
+  scroll_box(width = "500px", height = "200px")
+```
+
+
+
+
+
 
 
 ### References
