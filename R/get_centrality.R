@@ -61,6 +61,20 @@
 #' # Get the all the centrality indexes
 #' centrality <- get_centrality(g = my_graph, index = "all", mode = "in")
 #'
+#' # Load stream network as a vector
+#' stream_vect <- read_geopackage(gpkg = paste0(my_directory,
+#'                                              "/hydrography90m_test_data",
+#'                                              "/order_vect_59.gpkg"),
+#'                                import_as = "SpatVect")
+#'
+#' # Merge the centrality table with the vector
+#' stream_vect <- terra::merge(stream_vect, centrality,
+#'                             by.x = c('stream'), by.y="subc_id")
+#'
+#' # Write out the stream network vector including the centrality indices
+#' writeVector(stream_vect, paste0(my_directory,
+#'                                 "/hydrography90m_test_data",
+#'                                 "/order_vect_59_centr.gpkg"))
 
 
 get_centrality <- function(g, index = "all", mode = NULL) {
