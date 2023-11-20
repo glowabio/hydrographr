@@ -20,7 +20,7 @@ editor_options:
 
 ```{r, include = FALSE, eval = FALSE}
 # writes out the references for all packages
-knitr::write_bib(file = 'references_germany.bib')
+knitr::write_bib(file = 'bib/references_germany.bib')
 ```
 
 ### Introduction
@@ -45,6 +45,7 @@ library(leafem)
 library(htmlwidgets)
 library(mapview)
 library(here)
+library(sf)
 ```
 
 Load required libraries
@@ -59,6 +60,7 @@ library(tools)
 library(stringr)
 library(leaflet)
 library(leafem)
+library(sf)
 ```
 
 Define working directory
