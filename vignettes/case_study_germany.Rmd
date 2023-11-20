@@ -82,17 +82,17 @@ dir.create("data")
 
 We first download the occurrence data with coordinates from GBIF
 
-```{r}
-
+```{r, eval = F}
 # Once: Download species occurrence data based on the key of the dataset
 # and write out to working directory
-# spdata_all <- occ_download_get(key="0004551-231002084531237",
-#                               overwrite = TRUE) %>%
-#   occ_download_import
-# fwrite(spdata_all, paste0(wdir, "/data/fish_germany_gbif.csv"),
-#     row.names = F, quote = F, sep = "\t")
+spdata_all <- occ_download_get(key="0004551-231002084531237",
+                              overwrite = TRUE) %>%
+  occ_download_import
+fwrite(spdata_all, paste0(wdir, "/data/fish_germany_gbif.csv"),
+    row.names = F, quote = F, sep = "\t")
+```
 
-
+```{r}
 # Import and clean the data
 spdata <- fread(paste0(wdir, "/data/fish_germany_gbif.csv"), sep = "\t") %>%
   select(gbifID, decimalLongitude, decimalLatitude, species,
@@ -101,13 +101,18 @@ spdata <- fread(paste0(wdir, "/data/fish_germany_gbif.csv"), sep = "\t") %>%
          "latitude" = "decimalLatitude")
 ```
 
-```{r, eval = F}
-spdata
+```{r, echo = F}
+spdata <- head(spdata)
 ```
 
-```{r, echo=F}
-kbl(spdata) %>%
-  kable_styling(bootstrap_options = "striped", full_width = F, position = "left") %>%
+```{r, eval = F}
+head(spdata)
+```
+
+```{r, echo = F}
+kbl(head(spdata)) %>%
+  kable_styling(bootstrap_options = "striped", 
+                full_width = F, position = "left") %>%
   scroll_box(width = "500px", height = "200px")
 ```
 
@@ -116,7 +121,7 @@ Let's visualise the species occurrences on the map
 Let's define the extent (bounding box) of the study area (xmin, ymin,
 xmax, ymax)
 
-```{r}
+```{r, eval = F}
 # Define the extent
 bbox <- c(min(spdata$longitude), min(spdata$latitude),
           max(spdata$longitude), max(spdata$latitude))
@@ -130,7 +135,8 @@ factpal <- colorFactor(hcl.colors(unique(spdata$year)), spdata$year)
 spdata_plot <- leaflet(spdata) %>%
   addProviderTiles('Esri.WorldShadedRelief') %>%
   setMaxBounds(bbox[1], bbox[2], bbox[3], bbox[4]) %>%
-  addCircles(lng = ~longitude, lat = ~ latitude, color =  ~factpal(as.factor(year)),
+  addCircles(lng = ~longitude, lat = ~ latitude, 
+             color =  ~factpal(as.factor(year)),
              opacity = 1) %>%
   addLegend(pal = factpal, values = ~as.factor(year),
             title = "Year of record")
@@ -138,13 +144,13 @@ spdata_plot
 
 ```
 
-```{r, eval = F, echo = F}
+```{r, echo = F, eval = F}
 saveWidget(spdata_plot, file=paste0(here(), "man/figures/germany_map.html"))
 ```
 
-![](images/germany_map.png)
+![](../man/figures/germany_map.png){width="800"}
 
-### Download files
+### Abiotic variables data
 
 In order to download layers of the Hydrography90m, we need to know the
 IDs of the 20°x20° tiles in which they are located. We can obtain these
@@ -156,13 +162,14 @@ and thus requires an active internet connection.
 tile_id <- get_tile_id(data = spdata,
                      lon = "longitude", lat = "latitude")
 
-# Get reg unit id to crop all the regular tile layers so that we have uninterrupted basins
+# Get reg unit id to crop all the regular tile layers so that 
+# we have uninterrupted basins
 reg_unit_id <- get_regional_unit_id(data = spdata,
                                   lon = "longitude", lat = "latitude")
 
 ```
 
-```{r, echo = FALSE}
+```{r, include = FALSE}
 tile_id <- c("h16v02", "h18v00", "h18v02")
 ```
 
@@ -228,13 +235,13 @@ elv_dir <- paste0(wdir, "/data/elv")
 dir.create(elv_dir)
 ```
 
-### Cropping
+### Cropping the raster files
 
 After having downloaded all the layers, we need to crop them to the
 extent of our study area extended by 500 km, so that our basins are not
 split in half.
 
-```{r, echo = FALSE}
+```{r, include = FALSE}
 # Define and create a directory for the study area
 #study_area_dir <-  paste0(wdir, "/data/study_area")
 study_area_dir <- "/home/afroditi/Documents/PhD/external/fish_germany/data/study_area"
@@ -251,17 +258,18 @@ raster_tiles_chan <- list.files(paste0(wdir, "/data/r.stream.channel"),
                           pattern = ".tif", full.names = TRUE, recursive = TRUE)
 raster_tiles_ord <- list.files(paste0(wdir, "/data/r.stream.order"),
                                pattern = ".tif", full.names = TRUE, recursive = TRUE)
-raster_tiles <- c(raster_tiles_watershed, raster_tiles_dist, raster_tiles_chan, raster_tiles_ord)
+raster_tiles <- c(raster_tiles_watershed, raster_tiles_dist, 
+                  raster_tiles_chan, raster_tiles_ord)
 ```
 
 Let's define the extent (bounding box) of the study area (xmin, ymin,
 xmax, ymax)
 
-```{r, echo = FALSE}
+```{r, include = FALSE}
 bb <- ext(vect(paste0(wdir, "/data/r.watershed/basin_tiles20d/basin_h18v02_filtered.gpkg")))
 ```
 
-```{r}
+```{r, eval = F}
 bb <- c(0.256, 20, 45, 55.4325)
 ```
 
@@ -284,7 +292,7 @@ for(itile in raster_tiles) {
 }
 ```
 
-### Filtering sub-catchment and basin .gpkg files
+### Filtering the sub-catchment and basin .gpkg files
 
 In case you don't work on a server, we suggest you to download the
 output files of this chunk from the following links and then copy them
@@ -295,14 +303,17 @@ in the folder *`study_area_dir`*:
 -   [basin_h18v02_crop.gpkg](https://drive.google.com/file/d/1l9l7k3s9YIVkjhSoRqLVb8L2rGStSvz0/view?usp=drive_link)
 
 ```{r, eval = FALSE}
-# !! Only run this chunk on a machine with more than XX GB RAM, as the input files are really big !!
+# !! Only run this chunk on a machine with more than 16 GB RAM, 
+# as the input files are really big !!
 
-# Load the cropped stream and basin raster layer of the study area
+# Load the cropped stream and basin raster layer of the study area.
 # The stream raster can be used interchangeably with the sub_catchment raster, 
 # because the stream IDs are the same as the sub-catchment IDs. 
 # Here we use the stream raster because it's smaller in size. 
+
 stream_layer <- rast(paste0(study_area_dir, "/segment_h18v02_crop.tif"))
 basin_layer <- rast(paste0(study_area_dir, "/basin_h18v02_crop.tif"))
+
 # Get all sub-catchment and basin IDs of the study area
 subc_ids <- terra::unique(stream_layer)
 basin_ids <- terra::unique(basin_layer)
@@ -322,7 +333,7 @@ filtered_stream <- read_geopackage(order_tile,
                                  name = "stream")
 
 sf::write_sf(filtered_stream, paste(study_area_dir,
-                                  paste0(str_remove(basename(order_tile), ".gpkg"),
+                              paste0(str_remove(basename(order_tile), ".gpkg"),
                                          "_crop.gpkg"), sep="/"))
 
 filtered_bas <- read_geopackage(basin_gpkg_tile,
@@ -331,7 +342,7 @@ filtered_bas <- read_geopackage(basin_gpkg_tile,
                                  name = "ID")
 
 sf::write_sf(filtered_bas, paste(study_area_dir,
-                                  paste0(str_remove(basename(basin_gpkg_tile), ".gpkg"),
+                          paste0(str_remove(basename(basin_gpkg_tile), ".gpkg"),
                                          "_crop.gpkg"), sep="/"))
 
 ```
@@ -368,7 +379,7 @@ crop_to_extent(raster_layer = paste0(study_area_dir, "/elv_study_area.tif"),
 
 ```
 
-### Extraction of sub-catchment IDs
+### Extracting sub-catchment IDs
 
 Extract the IDs of the sub-catchments where the points are located. This
 step is crucial, as many of the functions that we will later use require
@@ -415,7 +426,7 @@ able to define a certain flow accumulation threshold and ensure that the
 fish occurrences will not be snapped to a headwater stream (first order
 stream) if there is also a higher order stream next to it.
 
-![](images/snapping.png)
+![](../man/figures/snapping.png)
 
 ```{r, eval = FALSE}
 # Define full paths of raster layers
@@ -500,6 +511,9 @@ fwrite(point_locations_snapped, paste0(wdir, "/data/spdata_snapped.csv"), sep = 
 point_locations_snapped <- fread(paste0(wdir, "/data/spdata_snapped.csv"), sep = ",")
 ```
 
+```{r, echo = F}
+point_locations_snapped <- head(point_locations_snapped)
+```
 
 ```{r, eval = F}
 point_locations_snapped
@@ -511,7 +525,7 @@ knitr::kable(head(point_locations_snapped),
       some cases a new sub-catchment id")
 ```
 
-### Distances calculation
+### Calculating distances
 
 We will calculate the distance between all point locations. The points
 are spread across multiple basins, so we will use the function
