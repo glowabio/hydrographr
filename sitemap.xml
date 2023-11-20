@@ -16,6 +16,9 @@
     <loc>/articles/case_study_cuba.html</loc>
   </url>
   <url>
+    <loc>/articles/case_study_germany.html</loc>
+  </url>
+  <url>
     <loc>/articles/example_other_stream_networks.html</loc>
   </url>
   <url>
@@ -67,10 +70,16 @@
     <loc>/reference/extract_zonal_stat.html</loc>
   </url>
   <url>
+    <loc>/reference/figures/germany_map.html</loc>
+  </url>
+  <url>
     <loc>/reference/fix_path.html</loc>
   </url>
   <url>
     <loc>/reference/get_catchment_graph.html</loc>
+  </url>
+  <url>
+    <loc>/reference/get_centrality.html</loc>
   </url>
   <url>
     <loc>/reference/get_distance.html</loc>
