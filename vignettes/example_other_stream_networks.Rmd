@@ -400,9 +400,11 @@ get_nhdplushr(gdb_dir, file.path(gdb_dir, "nhdplus_2006-HU4.gpkg"))
 flow_line <- read_geopackage(gpkg = paste0(gdb_dir, "/nhdplus_2006-HU4.gpkg"), 
                 layer_name = "NHDFlowline")
 
+
 # To import flow line as a graph, first import the attribute table as a 
 # data.table and then transform to a graph. Note that the first two columns 
 # need to be the "from" and "to" columns
+
 setcolorder(flow_line, c("FromNode", "ToNode"))
 
 # Create the graph
