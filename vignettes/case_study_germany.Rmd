@@ -640,6 +640,7 @@ subcatchment id
 ```{r, eval = F}
 point_locations_snapped <- left_join(point_locations_snapped, centrality, 
                           by = c('subc_id_snap_accu'= 'subc_id'))
+head(point_locations_snapped)
 ```
 
 ```{r, echo = F}
@@ -647,10 +648,27 @@ point_locations_snapped <- fread(paste0(wdir, "/data/spdata_centrality.csv")) %>
   head()
 ```
 
-```{r}
+```{r, echo = F}
 kbl(point_locations_snapped)
-
 ```
+
+
+We can reclassify the stream segment raster layer based on the centrality value
+of each stream, using the function `reclass_raster`. Essentially, we will create 
+a new raster file, in which each stream pixel will have a centrality value, 
+instead of the unique ID of the stream (or sub-catchment ID). 
+
+```{r, eval = F}
+reclass_raster(data = point_locations_snapped, 
+              rast_val = "subc_id", 
+              new_val = "betweeness",
+              raster_layer = paste0(study_area_dir, "/segment_h18v02_crop.tif"),
+              recl_layer =  paste0(study_area_dir,"/segment_h18v02_betweeness.tif"), 
+              read = TRUE)
+```
+
+
+
 
 Bonus! If we want to include the centrality indices to the stream
 network .gpkg, we can import the .gpkg and merge it with the centrality
