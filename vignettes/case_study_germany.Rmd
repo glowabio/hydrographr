@@ -46,6 +46,7 @@ library(htmlwidgets)
 library(mapview)
 library(here)
 library(sf)
+library(tidyr)
 ```
 
 Load required libraries
@@ -61,6 +62,7 @@ library(stringr)
 library(leaflet)
 library(leafem)
 library(sf)
+library(tidyr)
 ```
 
 Define working directory
@@ -629,13 +631,69 @@ them on a server.
 centrality <- get_centrality(stream_graph, index = "all", mode = "in")
 ```
 
-```{r, eval = F, echo = F}
-fwrite(centrality, paste0(wdir, "/data/subc_centrality.csv"), 
-       sep = ",", row.names = F, quote = F)
+```{r, echo = F}
+centrality <- fread(paste0(wdir, "/data/subc_centrality.csv"), sep = ",", quote = F)
 ```
 
-We now attach the centrality indices to the species data using the
-subcatchment id
+We can reclassify the stream segment and sub-catchment raster layers
+based on the centrality value of each stream, using the function
+`reclass_raster`. Essentially, we will create two new raster files, in
+which each stream pixel will have a centrality value, instead of the
+unique ID of the stream or sub-catchment.
+
+```{r, eval = F}
+
+# This data.frame includes some NAs in some of the columns, because some centrality metrics by default cannot be defined for some the subcatchments. We have to discard subcatchments with NAs before reclassifying.
+centrality <- drop_na(centrality)
+
+# Then we convert the values in the centrality data.frame into integers
+centrality <- centrality %>% mutate_if(is.numeric, as.integer)
+
+reclass_raster(data = centrality, 
+                            rast_val = "subc_id", 
+                            new_val = "betweeness", 
+                            raster_layer = paste0(study_area_dir, "/segment_h18v02_crop.tif"), 
+                            recl_layer = paste0(study_area_dir,"/segment_h18v02_betweeness_all.tif"), 
+                            read = F)
+
+reclass_raster(data = centrality, 
+               rast_val = "subc_id", 
+               new_val = "degree", 
+               raster_layer = paste0(study_area_dir, "/sub_catchment_h18v02_crop.tif"),
+               recl_layer = paste0(study_area_dir,"/sub_catchment_h18v02_degree_all.tif"), 
+               read = F)
+
+reclass_raster(data = centrality, 
+               rast_val = "subc_id", 
+               new_val = "betweeness", 
+               raster_layer = paste0(study_area_dir, "/sub_catchment_h18v02_crop.tif"),
+               recl_layer = paste0(study_area_dir,"/sub_catchment_h18v02_betweeness_all.tif"), 
+               read = F)
+
+reclass_raster(data = centrality, rast_val = "subc_id", 
+               new_val = "farness", 
+               raster_layer = paste0(study_area_dir, "/sub_catchment_h18v02_crop.tif"),
+               recl_layer = paste0(study_area_dir,"/sub_catchment_h18v02_farness_all.tif"), 
+               read = F)
+
+reclass_raster(data = centrality, 
+               rast_val = "subc_id", 
+               new_val = "eccentricity", 
+               raster_layer = paste0(study_area_dir, "/sub_catchment_h18v02_crop.tif"),
+               recl_layer = paste0(study_area_dir,"/sub_catchment_h18v02_eccentricity_all.tif"), 
+               read = F)
+
+```
+
+Here's what the new segment and sub-catchment layers look like on QGIS.
+Yellow sub-catchments have the lowest values, whereas dark blue have the
+lowest values for the different metrics.
+
+![betweenness centrality](../man/figures/betweeness.png)
+
+![degree centrality](../man/figures/degree.png)
+![farness](../man/figures/farness.png)
+![eccentricity](../man/figures/eccentricity.png)
 
 ```{r, eval = F}
 point_locations_snapped <- left_join(point_locations_snapped, centrality, 
@@ -644,6 +702,7 @@ head(point_locations_snapped)
 ```
 
 ```{r, echo = F}
+
 point_locations_snapped <- fread(paste0(wdir, "/data/spdata_centrality.csv")) %>% 
   head()
 ```
