@@ -691,9 +691,9 @@ lowest values for the different metrics.
 
 ![betweenness centrality](../man/figures/betweeness.png)
 
-![degree centrality](../man/figures/degree.png)
-![farness](../man/figures/farness.png)
-![eccentricity](../man/figures/eccentricity.png)
+![degree centrality](../man/figures/degree.png) degree
+centrality![farness](../man/figures/farness.png)
+farness![eccentricity](../man/figures/eccentricity.png)eccentricity
 
 ```{r, eval = F}
 point_locations_snapped <- left_join(point_locations_snapped, centrality, 
