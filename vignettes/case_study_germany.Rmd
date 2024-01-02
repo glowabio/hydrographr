@@ -677,7 +677,7 @@ reclass_raster(data = point_locations_snapped,
 Here's what the new segment and sub-catchment layers look like on QGIS,
 when overlayed with the original layers. The yellow streams, or
 sub-catchments, have high betweenness values, whereas the darker ones
-have lower betweenness
+have lower betweenness.
 
 ![](../man/figures/reclass_segm_centrality.png)
 
