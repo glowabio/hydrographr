@@ -711,37 +711,6 @@ point_locations_snapped <- fread(paste0(wdir, "/data/spdata_centrality.csv")) %>
 kbl(point_locations_snapped)
 ```
 
-We can reclassify the stream segment and sub-catchment raster layers
-based on the centrality value of each stream, using the function
-`reclass_raster`. Essentially, we will create two new raster files, in
-which each stream pixel will have a centrality value, instead of the
-unique ID of the stream or sub-catchment.
-
-```{r, eval = F}
-reclass_raster(data = point_locations_snapped, 
-              rast_val = "subc_id", 
-              new_val = "betweeness",
-              raster_layer = paste0(study_area_dir, "/segment_h18v02_crop.tif"),
-              recl_layer =  paste0(study_area_dir,"/segment_h18v02_betweeness.tif"), 
-              read = TRUE)
-
-reclass_raster(data = point_locations_snapped, 
-              rast_val = "subc_id", 
-              new_val = "betweeness",
-              raster_layer = paste0(study_area_dir, "/sub_catchment_h18v02_crop.tif"),
-              recl_layer =  paste0(study_area_dir,"/sub_catchment_h18v02_betweeness.tif"), 
-              read = TRUE)
-```
-
-Here's what the new segment and sub-catchment layers look like on QGIS,
-when overlayed with the original layers. The yellow streams, or
-sub-catchments, have high betweenness values, whereas the darker ones
-have lower betweenness.
-
-![](../man/figures/reclass_segm_centrality.png)
-
-![](../man/figures/reclass_subcs_centrality.png)
-
 Bonus! If we want to include the centrality indices to the stream
 network .gpkg, we can import the .gpkg and merge it with the centrality
 table
