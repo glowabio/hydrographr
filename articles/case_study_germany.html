@@ -106,7 +106,8 @@ Germany</h3>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://stringr.tidyverse.org" class="external-link">stringr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rstudio.github.io/leaflet/" class="external-link">leaflet</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/r-spatial/leafem" class="external-link">leafem</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/" class="external-link">sf</a></span><span class="op">)</span></span></code></pre></div>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/" class="external-link">sf</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyr.tidyverse.org" class="external-link">tidyr</a></span><span class="op">)</span></span></code></pre></div>
 <p>Define working directory</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Define the "data_germany" directory, where you have downloaded all the data,</span></span>
@@ -1003,9 +1004,59 @@ consider only the upstream connected segments, so we set
 them on a server.</p>
 <div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">centrality</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_centrality.html">get_centrality</a></span><span class="op">(</span><span class="va">stream_graph</span>, index <span class="op">=</span> <span class="st">"all"</span>, mode <span class="op">=</span> <span class="st">"in"</span><span class="op">)</span></span></code></pre></div>
-<p>We now attach the centrality indices to the species data using the
-subcatchment id</p>
+<p>We can reclassify the stream segment and sub-catchment raster layers
+based on the centrality value of each stream, using the function
+<code>reclass_raster</code>. Essentially, we will create two new raster
+files, in which each stream pixel will have a centrality value, instead
+of the unique ID of the stream or sub-catchment.</p>
 <div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># This data.frame includes some NAs in some of the columns, because some centrality metrics by default cannot be defined for some the subcatchments. We have to discard subcatchments with NAs before reclassifying.</span></span>
+<span><span class="va">centrality</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tidyr.tidyverse.org/reference/drop_na.html" class="external-link">drop_na</a></span><span class="op">(</span><span class="va">centrality</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Then we convert the values in the centrality data.frame into integers</span></span>
+<span><span class="va">centrality</span> <span class="op">&lt;-</span> <span class="va">centrality</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate_all.html" class="external-link">mutate_if</a></span><span class="op">(</span><span class="va">is.numeric</span>, <span class="va">as.integer</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/reclass_raster.html">reclass_raster</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">centrality</span>, </span>
+<span>                            rast_val <span class="op">=</span> <span class="st">"subc_id"</span>, </span>
+<span>                            new_val <span class="op">=</span> <span class="st">"betweeness"</span>, </span>
+<span>                            raster_layer <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">study_area_dir</span>, <span class="st">"/segment_h18v02_crop.tif"</span><span class="op">)</span>, </span>
+<span>                            recl_layer <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">study_area_dir</span>,<span class="st">"/segment_h18v02_betweeness_all.tif"</span><span class="op">)</span>, </span>
+<span>                            read <span class="op">=</span> <span class="cn">F</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/reclass_raster.html">reclass_raster</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">centrality</span>, </span>
+<span>               rast_val <span class="op">=</span> <span class="st">"subc_id"</span>, </span>
+<span>               new_val <span class="op">=</span> <span class="st">"degree"</span>, </span>
+<span>               raster_layer <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">study_area_dir</span>, <span class="st">"/sub_catchment_h18v02_crop.tif"</span><span class="op">)</span>,</span>
+<span>               recl_layer <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">study_area_dir</span>,<span class="st">"/sub_catchment_h18v02_degree_all.tif"</span><span class="op">)</span>, </span>
+<span>               read <span class="op">=</span> <span class="cn">F</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/reclass_raster.html">reclass_raster</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">centrality</span>, </span>
+<span>               rast_val <span class="op">=</span> <span class="st">"subc_id"</span>, </span>
+<span>               new_val <span class="op">=</span> <span class="st">"betweeness"</span>, </span>
+<span>               raster_layer <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">study_area_dir</span>, <span class="st">"/sub_catchment_h18v02_crop.tif"</span><span class="op">)</span>,</span>
+<span>               recl_layer <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">study_area_dir</span>,<span class="st">"/sub_catchment_h18v02_betweeness_all.tif"</span><span class="op">)</span>, </span>
+<span>               read <span class="op">=</span> <span class="cn">F</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/reclass_raster.html">reclass_raster</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">centrality</span>, rast_val <span class="op">=</span> <span class="st">"subc_id"</span>, </span>
+<span>               new_val <span class="op">=</span> <span class="st">"farness"</span>, </span>
+<span>               raster_layer <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">study_area_dir</span>, <span class="st">"/sub_catchment_h18v02_crop.tif"</span><span class="op">)</span>,</span>
+<span>               recl_layer <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">study_area_dir</span>,<span class="st">"/sub_catchment_h18v02_farness_all.tif"</span><span class="op">)</span>, </span>
+<span>               read <span class="op">=</span> <span class="cn">F</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/reclass_raster.html">reclass_raster</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">centrality</span>, </span>
+<span>               rast_val <span class="op">=</span> <span class="st">"subc_id"</span>, </span>
+<span>               new_val <span class="op">=</span> <span class="st">"eccentricity"</span>, </span>
+<span>               raster_layer <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">study_area_dir</span>, <span class="st">"/sub_catchment_h18v02_crop.tif"</span><span class="op">)</span>,</span>
+<span>               recl_layer <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">study_area_dir</span>,<span class="st">"/sub_catchment_h18v02_eccentricity_all.tif"</span><span class="op">)</span>, </span>
+<span>               read <span class="op">=</span> <span class="cn">F</span><span class="op">)</span></span></code></pre></div>
+<p>Here’s what the new segment and sub-catchment layers look like on
+QGIS. Yellow sub-catchments have the lowest values, whereas dark blue
+have the lowest values for the different metrics.</p>
+<div class="float">
+<img src="../reference/figures/betweeness.png" alt="betweenness centrality"><div class="figcaption">betweenness centrality</div>
+</div>
+<p><img src="../reference/figures/degree.png" alt="degree centrality"><img src="../reference/figures/farness.png" alt="farness"><img src="../reference/figures/eccentricity.png" alt="eccentricity"></p>
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">point_locations_snapped</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">point_locations_snapped</span>, <span class="va">centrality</span>, </span>
 <span>                          by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'subc_id_snap_accu'</span><span class="op">=</span> <span class="st">'subc_id'</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">point_locations_snapped</span><span class="op">)</span></span></code></pre></div>
@@ -1153,31 +1204,6 @@ eccentricity
 </tr>
 </tbody>
 </table>
-<p>We can reclassify the stream segment and sub-catchment raster layers
-based on the centrality value of each stream, using the function
-<code>reclass_raster</code>. Essentially, we will create two new raster
-files, in which each stream pixel will have a centrality value, instead
-of the unique ID of the stream or sub-catchment.</p>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/reclass_raster.html">reclass_raster</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">point_locations_snapped</span>, </span>
-<span>              rast_val <span class="op">=</span> <span class="st">"subc_id"</span>, </span>
-<span>              new_val <span class="op">=</span> <span class="st">"betweeness"</span>,</span>
-<span>              raster_layer <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">study_area_dir</span>, <span class="st">"/segment_h18v02_crop.tif"</span><span class="op">)</span>,</span>
-<span>              recl_layer <span class="op">=</span>  <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">study_area_dir</span>,<span class="st">"/segment_h18v02_betweeness.tif"</span><span class="op">)</span>, </span>
-<span>              read <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="../reference/reclass_raster.html">reclass_raster</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">point_locations_snapped</span>, </span>
-<span>              rast_val <span class="op">=</span> <span class="st">"subc_id"</span>, </span>
-<span>              new_val <span class="op">=</span> <span class="st">"betweeness"</span>,</span>
-<span>              raster_layer <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">study_area_dir</span>, <span class="st">"/sub_catchment_h18v02_crop.tif"</span><span class="op">)</span>,</span>
-<span>              recl_layer <span class="op">=</span>  <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">study_area_dir</span>,<span class="st">"/sub_catchment_h18v02_betweeness.tif"</span><span class="op">)</span>, </span>
-<span>              read <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<p>Here’s what the new segment and sub-catchment layers look like on
-QGIS, when overlayed with the original layers. The yellow streams, or
-sub-catchments, have high betweenness values, whereas the darker ones
-have lower betweenness</p>
-<p><img src="../reference/figures/reclass_segm_centrality.png"></p>
-<p><img src="../reference/figures/reclass_subcs_centrality.png"></p>
 <p>Bonus! If we want to include the centrality indices to the stream
 network .gpkg, we can import the .gpkg and merge it with the centrality
 table</p>
