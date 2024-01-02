@@ -83,7 +83,7 @@
 data before and after a Species Distribution Model</h3>
                         <h4 data-toc-skip class="author"></h4>
             
-            <h4 data-toc-skip class="date">2023-11-20</h4>
+            <h4 data-toc-skip class="date">2024-01-02</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/glowabio/hydrographr/blob/HEAD/vignettes/case_study_cuba.Rmd" class="external-link"><code>vignettes/case_study_cuba.Rmd</code></a></small>
       <div class="d-none name"><code>case_study_cuba.Rmd</code></div>
@@ -155,7 +155,7 @@ Salina, 2022).</p>
 interest, sampled after the year 1980 (to match with the climate
 data)</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">spdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/fread.html" class="external-link">fread</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data/spdata_cuba.csv"</span><span class="op">)</span>, sep <span class="op">=</span> <span class="st">"\t"</span>, fill <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<code class="sourceCode R"><span><span class="va">spdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/fread.html" class="external-link">fread</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data/spdata_cuba.csv"</span><span class="op">)</span>, sep <span class="op">=</span> <span class="st">"\t"</span>, fill <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>          <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">species</span> <span class="op">==</span> <span class="st">"Hypolestes_trinitatis"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>          <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">year</span> <span class="op">&gt;</span> <span class="fl">1980</span><span class="op">)</span></span></code></pre></div>
 <p>Subset columns</p>
@@ -1294,7 +1294,7 @@ NoData values:</p>
 calculation of the zonal statistics of each variable.</p>
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Read the previously created file</span></span>
-<span><span class="va">stats_table_zon</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/fread.html" class="external-link">fread</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data/zonal_stats.csv"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">stats_table_zon</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/fread.html" class="external-link">fread</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data/zonal_stats.csv"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>Let’s inspect the resulting table</p>
 <div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:200px; overflow-x: scroll; width:800px; ">
 <table class="table table table-striped" style="width: auto !important; ">
@@ -3486,8 +3486,8 @@ an indicator of the sub-catchment size</p>
 <span><span class="co"># Clear up memory</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">stats_gpkg_h08v06</span>, <span class="va">stats_gpkg_h10v06</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/base/gc.html" class="external-link">gc</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##            used  (Mb) gc trigger  (Mb)  max used  (Mb)</span></span>
-<span><span class="co">## Ncells  4627921 247.2    8677814 463.5   7056605 376.9</span></span>
-<span><span class="co">## Vcells 27081049 206.7   83906424 640.2 104364599 796.3</span></span></code></pre>
+<span><span class="co">## Ncells  4627996 247.2    8678097 463.5   7056354 376.9</span></span>
+<span><span class="co">## Vcells 27081171 206.7   83906542 640.2 104364691 796.3</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="prepare-data-for-modelling">Prepare data for modelling<a class="anchor" aria-label="anchor" href="#prepare-data-for-modelling"></a>
@@ -4814,230 +4814,230 @@ length
 <tbody>
 <tr>
 <td style="text-align:right;">
-422813581
+422630951
 </td>
 <td style="text-align:right;">
-23.45769
+25.55000
 </td>
 <td style="text-align:right;">
-2112.892
+1374.226
 </td>
 <td style="text-align:right;">
-42.86154
+50.77447
 </td>
 <td style="text-align:right;">
--0.0594350
+-0.0129669
 </td>
 <td style="text-align:right;">
-2.1538462
+1.6595745
 </td>
 <td style="text-align:right;">
-0.0997037
+0.0000000
 </td>
 <td style="text-align:right;">
-29.9111109
+8.639628
 </td>
 <td style="text-align:right;">
-0.1495556
+0.1536341
 </td>
 <td style="text-align:right;">
-0.0718994
+0.0286386
 </td>
 <td style="text-align:right;">
-3.2068713
+2.6439541
 </td>
 <td style="text-align:right;">
-184.5159
+748.06903
 </td>
 </tr>
 <tr>
 <td style="text-align:right;">
-422594536
+422504229
 </td>
 <td style="text-align:right;">
-25.35000
+25.45000
 </td>
 <td style="text-align:right;">
-1462.253
+1411.078
 </td>
 <td style="text-align:right;">
-59.91667
+52.37778
 </td>
 <td style="text-align:right;">
--0.0079326
+-0.0147949
 </td>
 <td style="text-align:right;">
-0.6944444
+0.4615385
 </td>
 <td style="text-align:right;">
 0.0000000
 </td>
 <td style="text-align:right;">
-1.5008305
+0.041574
 </td>
 <td style="text-align:right;">
-0.1572330
+0.0415740
 </td>
 <td style="text-align:right;">
-0.0100042
+0.0190969
 </td>
 <td style="text-align:right;">
-1.6802686
+0.8871202
 </td>
 <td style="text-align:right;">
-677.2502
+251.94736
 </td>
 </tr>
 <tr>
 <td style="text-align:right;">
-399875642
+422865582
 </td>
 <td style="text-align:right;">
-24.95000
+24.64091
 </td>
 <td style="text-align:right;">
-1241.280
+1887.473
 </td>
 <td style="text-align:right;">
-56.30000
+55.64091
 </td>
 <td style="text-align:right;">
--0.0023256
+-0.1071475
 </td>
 <td style="text-align:right;">
-2.8000000
+9.9090909
 </td>
 <td style="text-align:right;">
-0.0000000
+0.4916661
 </td>
 <td style="text-align:right;">
-0.3600000
+52.608271
 </td>
 <td style="text-align:right;">
-0.0000000
+0.0491666
 </td>
 <td style="text-align:right;">
-0.0052659
+0.1853097
 </td>
 <td style="text-align:right;">
-3.4292856
+5.4264428
 </td>
 <td style="text-align:right;">
-184.5610
-</td>
-</tr>
-<tr>
-<td style="text-align:right;">
-422757745
-</td>
-<td style="text-align:right;">
-26.58636
-</td>
-<td style="text-align:right;">
-1067.055
-</td>
-<td style="text-align:right;">
-60.40000
-</td>
-<td style="text-align:right;">
--0.0035123
-</td>
-<td style="text-align:right;">
-0.3636364
-</td>
-<td style="text-align:right;">
-0.0481046
-</td>
-<td style="text-align:right;">
-2.8381696
-</td>
-<td style="text-align:right;">
-0.0000000
-</td>
-<td style="text-align:right;">
-0.0048347
-</td>
-<td style="text-align:right;">
-0.6428243
-</td>
-<td style="text-align:right;">
-530.0850
+253.80490
 </td>
 </tr>
 <tr>
 <td style="text-align:right;">
-422727032
+422879565
 </td>
 <td style="text-align:right;">
-25.93841
+25.85779
 </td>
 <td style="text-align:right;">
-1296.120
+1213.656
 </td>
 <td style="text-align:right;">
-60.10000
+53.69351
 </td>
 <td style="text-align:right;">
--0.0088054
+-0.0484886
 </td>
 <td style="text-align:right;">
-9.5652174
+4.8961039
 </td>
 <td style="text-align:right;">
-0.0320155
+0.0963843
 </td>
 <td style="text-align:right;">
-6.5832810
+9.888528
 </td>
 <td style="text-align:right;">
-0.0000000
+0.0246411
 </td>
 <td style="text-align:right;">
-0.0150803
+0.1041196
 </td>
 <td style="text-align:right;">
-17.9528192
+6.6422192
 </td>
 <td style="text-align:right;">
-1192.7881
+1282.05783
 </td>
 </tr>
 <tr>
 <td style="text-align:right;">
-422494959
+422555857
 </td>
 <td style="text-align:right;">
-25.75000
+23.91486
 </td>
 <td style="text-align:right;">
-1141.348
+1956.645
 </td>
 <td style="text-align:right;">
-46.50000
+68.58108
 </td>
 <td style="text-align:right;">
--0.0063166
+-0.0754300
 </td>
 <td style="text-align:right;">
-0.2500000
+462.5945946
+</td>
+<td style="text-align:right;">
+0.0845216
+</td>
+<td style="text-align:right;">
+17.831396
+</td>
+<td style="text-align:right;">
+0.0391659
+</td>
+<td style="text-align:right;">
+0.1606845
+</td>
+<td style="text-align:right;">
+1034.8075408
+</td>
+<td style="text-align:right;">
+1140.92978
+</td>
+</tr>
+<tr>
+<td style="text-align:right;">
+422658875
+</td>
+<td style="text-align:right;">
+26.05000
+</td>
+<td style="text-align:right;">
+1119.500
+</td>
+<td style="text-align:right;">
+67.10000
+</td>
+<td style="text-align:right;">
+-0.0051445
+</td>
+<td style="text-align:right;">
+3.5000000
 </td>
 <td style="text-align:right;">
 0.0000000
 </td>
 <td style="text-align:right;">
-0.5306053
+0.000000
 </td>
 <td style="text-align:right;">
 0.0000000
 </td>
 <td style="text-align:right;">
-0.0096997
+0.0179563
 </td>
 <td style="text-align:right;">
-0.5361903
+4.5000000
 </td>
 <td style="text-align:right;">
-218.2012
+86.42887
 </td>
 </tr>
 </tbody>
@@ -5050,7 +5050,7 @@ variables table</p>
 <p>We then join the predictors of the presences and those of the
 pseudoabsences, to obtain the modelling data table</p>
 <div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">data_model</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/rbindlist.html" class="external-link">rbindlist</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">presence</span>, <span class="va">pseudoabs</span><span class="op">)</span>, fill <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">data_model</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/rbindlist.html" class="external-link">rbindlist</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">presence</span>, <span class="va">pseudoabs</span><span class="op">)</span>, fill <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p>Define a binary column of presence-absence (0-1) and set it to
 factor</p>
 <div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
@@ -5481,7 +5481,7 @@ presences.</p>
 <span><span class="co">## Target node size:                 10 </span></span>
 <span><span class="co">## Variable importance mode:         impurity </span></span>
 <span><span class="co">## Splitrule:                        gini </span></span>
-<span><span class="co">## OOB prediction error (Brier s.):  0.09331557</span></span></code></pre>
+<span><span class="co">## OOB prediction error (Brier s.):  0.09139415</span></span></code></pre>
 <p>The model can be evaluated based on the OOB prediction error. This
 metric lies on the fact that the data points that are not used in
 training a tree can be used to test the tree. The errors on the OOB
@@ -5505,7 +5505,7 @@ values of which need to be integers.</p>
 with the corresponding sub-catchment IDs, to create a table with
 reclassification rules</p>
 <div class="sourceCode" id="cb61"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">prediction</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></span><span class="op">(</span>subcatchment_id <span class="op">=</span> <span class="va">stats_table_future</span><span class="op">$</span><span class="va">subcatchment_id</span>,</span>
+<code class="sourceCode R"><span><span class="va">prediction</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></span><span class="op">(</span>subcatchment_id <span class="op">=</span> <span class="va">stats_table_future</span><span class="op">$</span><span class="va">subcatchment_id</span>,</span>
 <span>                         pred_occur <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">pred</span><span class="op">$</span><span class="va">predictions</span><span class="op">[</span>,<span class="fl">2</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb62"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">prediction</span><span class="op">)</span></span></code></pre></div>

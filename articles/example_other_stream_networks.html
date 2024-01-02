@@ -83,7 +83,7 @@
 use the hydrographr package with the NHDPlusHR dataset</h3>
                         <h4 data-toc-skip class="author"></h4>
             
-            <h4 data-toc-skip class="date">2023-11-20</h4>
+            <h4 data-toc-skip class="date">2024-01-02</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/glowabio/hydrographr/blob/HEAD/vignettes/example_other_stream_networks.Rmd" class="external-link"><code>vignettes/example_other_stream_networks.Rmd</code></a></small>
       <div class="d-none name"><code>example_other_stream_networks.Rmd</code></div>
@@ -389,7 +389,7 @@ Hawaii.</p>
 <span><span class="co"># data.table and then transform to a graph. Note that the first two columns </span></span>
 <span><span class="co"># need to be the "from" and "to" columns</span></span>
 <span></span>
-<span><span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/setcolorder.html" class="external-link">setcolorder</a></span><span class="op">(</span><span class="va">flow_line</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"FromNode"</span>, <span class="st">"ToNode"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/setcolorder.html" class="external-link">setcolorder</a></span><span class="op">(</span><span class="va">flow_line</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"FromNode"</span>, <span class="st">"ToNode"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Create the graph</span></span>
 <span><span class="va">flow_line_graph</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://r.igraph.org/reference/graph_from_data_frame.html" class="external-link">graph_from_data_frame</a></span><span class="op">(</span><span class="va">flow_line</span>, directed <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
