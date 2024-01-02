@@ -580,9 +580,9 @@ knitr::kable(head(point_locations_snapped),
 
 ### Calculating distances between points
 
-We will calculate the distance between all point locations.
-The following chunks are computationally heavy, so we suggest to run
-them on a server.
+We will calculate the distance between all point locations. The
+following chunks are computationally heavy, so we suggest to run them on
+a server.
 
 ```{r, eval = FALSE}
 # Load as graph
@@ -615,8 +615,6 @@ head(subc_distances)
 ```{r, echo =F}
 kbl(subc_distances)
 ```
-
-
 
 ### Obtaining network centrality indices
 
@@ -654,11 +652,11 @@ point_locations_snapped <- fread(paste0(wdir, "/data/spdata_centrality.csv")) %>
 kbl(point_locations_snapped)
 ```
 
-
-We can reclassify the stream segment raster layer based on the centrality value
-of each stream, using the function `reclass_raster`. Essentially, we will create 
-a new raster file, in which each stream pixel will have a centrality value, 
-instead of the unique ID of the stream (or sub-catchment ID). 
+We can reclassify the stream segment and sub-catchment raster layers
+based on the centrality value of each stream, using the function
+`reclass_raster`. Essentially, we will create two new raster files, in
+which each stream pixel will have a centrality value, instead of the
+unique ID of the stream or sub-catchment.
 
 ```{r, eval = F}
 reclass_raster(data = point_locations_snapped, 
@@ -667,10 +665,23 @@ reclass_raster(data = point_locations_snapped,
               raster_layer = paste0(study_area_dir, "/segment_h18v02_crop.tif"),
               recl_layer =  paste0(study_area_dir,"/segment_h18v02_betweeness.tif"), 
               read = TRUE)
+
+reclass_raster(data = point_locations_snapped, 
+              rast_val = "subc_id", 
+              new_val = "betweeness",
+              raster_layer = paste0(study_area_dir, "/sub_catchment_h18v02_crop.tif"),
+              recl_layer =  paste0(study_area_dir,"/sub_catchment_h18v02_betweeness.tif"), 
+              read = TRUE)
 ```
 
+Here's what the new segment and sub-catchment layers look like on QGIS,
+when overlayed with the original layers. The yellow streams, or
+sub-catchments, have high betweenness values, whereas the darker ones
+have lower betweenness
 
+![](../man/figures/reclass_segm_centrality.png)
 
+![](../man/figures/reclass_subcs_centrality.png)
 
 Bonus! If we want to include the centrality indices to the stream
 network .gpkg, we can import the .gpkg and merge it with the centrality
@@ -701,13 +712,13 @@ your case.
 
 Let's first define the input `var_layers` for the `extract_zonal_stat`
 function
+
 ```{r, eval = F}
 list.files(study_area_dir)
 var_layers <- c("bio1_1981-2010.tif", "bio12_1981-2010.tif",
                 "bio15_1981-2010.tif", "elv_study_area_crop.tif",
                 "outlet_dist_dw_basin_h18v02_crop.tif")
 ```
-
 
 A good practice before aggregating the variables is to check their
 NoData values:
@@ -750,10 +761,8 @@ stats_table_zon <- stats_table_zon %>%
 
 ```
 
-
-
-The values in some of the original raster files were scaled, so we need to
-re-scale them before proceeding to any analyses.
+The values in some of the original raster files were scaled, so we need
+to re-scale them before proceeding to any analyses.
 
 We define the following functions:
 
@@ -769,7 +778,6 @@ stats_table_zon <- stats_table_zon  %>%
   mutate(across(starts_with("bio"), clim_scale))  %>%
   mutate(across(matches("bio1_.*_mean"), offset))
 ```
-
 
 ```{r, eval = F, echo = F}
 fwrite(stats_table_zon, paste0(wdir, "/data/zonal_stats.csv"), 
@@ -790,11 +798,11 @@ kbl(stats_table_zon) %>%
 
 ```
 
-
 ### Putting together the final table
 
-We will now perform some left joins to match the zonal statistics table 
-with the original species data. 
+We will now perform some left joins to match the zonal statistics table
+with the original species data.
+
 ```{r, eval = F}
 data_fin <- left_join(point_locations_snapped, stats_table_zon, 
           by = c('subc_id_snap_accu'= 'subcatchment_id'))
@@ -808,7 +816,6 @@ spdata$gbifID <- as.character(spdata$gbifID)
 
 data_fin <- left_join(spdata, data_fin)
 ```
-
 
 ```{r, eval=F, echo=F}
 fwrite(data_fin, paste0(wdir, "/data/data_final.csv"), 
@@ -826,11 +833,5 @@ kbl(data_fin) %>%
                 full_width = F, position = "left") %>%
   scroll_box(width = "500px", height = "200px")
 ```
-
-
-
-
-
-
 
 ### References
