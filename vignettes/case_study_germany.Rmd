@@ -689,13 +689,24 @@ Here's what the new segment and sub-catchment layers look like on QGIS.
 Yellow sub-catchments have the highest values, whereas dark blue have
 the lowest values for the different metrics.
 
-![](../man/figures/betweeness.png){width="800"}
+The node **betweenness** is (roughly) defined by the number of geodesics
+(shortest paths) going through a node:
 
-betweenness centrality
+![](../man/figures/betweenness.png)
 
-![degree centrality](../man/figures/degree.png){width="800"} degree
-centrality![farness](../man/figures/farness.png){width="800"}
-farness![eccentricity](../man/figures/eccentricity.png){width="800"}eccentricity
+The **degree** of a node is the number of its adjacent edges:
+
+![](../man/figures/degree.png){width="800"}
+
+**Farness** centrality is the sum of the length of the shortest paths
+between the node and all other nodes. It is the reciprocal of closeness
+(Altermatt, 2013):
+
+![](../man/figures/farness.png){width="800"}
+
+The **eccentricity** of a node is its shortest path distance from the
+farthest other node in the graph (West,
+1996):![eccentricity](../man/figures/eccentricity.png){width="800"}
 
 We can add the centrality metrics' values to the table of our points,
 using the sub-catchment id:
