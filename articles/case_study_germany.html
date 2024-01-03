@@ -1052,10 +1052,18 @@ of the unique ID of the stream or sub-catchment.</p>
 <p>Here’s what the new segment and sub-catchment layers look like on
 QGIS. Yellow sub-catchments have the highest values, whereas dark blue
 have the lowest values for the different metrics.</p>
-<p><img src="../reference/figures/betweeness.png" width="800"></p>
-<p>betweenness centrality</p>
-<p><img src="../reference/figures/degree.png" width="800" alt="degree centrality"> degree centrality<img src="../reference/figures/farness.png" width="800" alt="farness">
-farness<img src="../reference/figures/eccentricity.png" width="800" alt="eccentricity">eccentricity</p>
+<p>The node <strong>betweenness</strong> is (roughly) defined by the
+number of geodesics (shortest paths) going through a node:</p>
+<p><img src="../reference/figures/betweenness.png"></p>
+<p>The <strong>degree</strong> of a node is the number of its adjacent
+edges:</p>
+<p><img src="../reference/figures/degree.png" width="800"></p>
+<p><strong>Farness</strong> centrality is the sum of the length of the
+shortest paths between the node and all other nodes. It is the
+reciprocal of closeness (Altermatt, 2013):</p>
+<p><img src="../reference/figures/farness.png" width="800"></p>
+<p>The <strong>eccentricity</strong> of a node is its shortest path
+distance from the farthest other node in the graph (West, 1996):<img src="../reference/figures/eccentricity.png" width="800" alt="eccentricity"></p>
 <p>We can add the centrality metrics’ values to the table of our points,
 using the sub-catchment id:</p>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
