@@ -84,7 +84,7 @@ species data prior to network analyses for freshwater fish in
 Germany</h3>
                         <h4 data-toc-skip class="author"></h4>
             
-            <h4 data-toc-skip class="date">2024-01-02</h4>
+            <h4 data-toc-skip class="date">2024-01-03</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/glowabio/hydrographr/blob/HEAD/vignettes/case_study_germany.Rmd" class="external-link"><code>vignettes/case_study_germany.Rmd</code></a></small>
       <div class="d-none name"><code>case_study_germany.Rmd</code></div>
@@ -1050,12 +1050,14 @@ of the unique ID of the stream or sub-catchment.</p>
 <span>               recl_layer <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">study_area_dir</span>,<span class="st">"/sub_catchment_h18v02_eccentricity_all.tif"</span><span class="op">)</span>, </span>
 <span>               read <span class="op">=</span> <span class="cn">F</span><span class="op">)</span></span></code></pre></div>
 <p>Here’s what the new segment and sub-catchment layers look like on
-QGIS. Yellow sub-catchments have the lowest values, whereas dark blue
+QGIS. Yellow sub-catchments have the highest values, whereas dark blue
 have the lowest values for the different metrics.</p>
-<div class="float">
-<img src="../reference/figures/betweeness.png" alt="betweenness centrality"><div class="figcaption">betweenness centrality</div>
-</div>
-<p><img src="../reference/figures/degree.png" alt="degree centrality"><img src="../reference/figures/farness.png" alt="farness"><img src="../reference/figures/eccentricity.png" alt="eccentricity"></p>
+<p><img src="../reference/figures/betweeness.png" width="800"></p>
+<p>betweenness centrality</p>
+<p><img src="../reference/figures/degree.png" width="800" alt="degree centrality"> degree centrality<img src="../reference/figures/farness.png" width="800" alt="farness">
+farness<img src="../reference/figures/eccentricity.png" width="800" alt="eccentricity">eccentricity</p>
+<p>We can add the centrality metrics’ values to the table of our points,
+using the sub-catchment id:</p>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">point_locations_snapped</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">point_locations_snapped</span>, <span class="va">centrality</span>, </span>
 <span>                          by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'subc_id_snap_accu'</span><span class="op">=</span> <span class="st">'subc_id'</span><span class="op">)</span><span class="op">)</span></span>
