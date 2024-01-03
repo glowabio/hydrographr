@@ -686,14 +686,19 @@ reclass_raster(data = centrality,
 ```
 
 Here's what the new segment and sub-catchment layers look like on QGIS.
-Yellow sub-catchments have the lowest values, whereas dark blue have the
-lowest values for the different metrics.
+Yellow sub-catchments have the highest values, whereas dark blue have
+the lowest values for the different metrics.
 
-![betweenness centrality](../man/figures/betweeness.png)
+![](../man/figures/betweeness.png){width="800"}
 
-![degree centrality](../man/figures/degree.png) degree
-centrality![farness](../man/figures/farness.png)
-farness![eccentricity](../man/figures/eccentricity.png)eccentricity
+betweenness centrality
+
+![degree centrality](../man/figures/degree.png){width="800"} degree
+centrality![farness](../man/figures/farness.png){width="800"}
+farness![eccentricity](../man/figures/eccentricity.png){width="800"}eccentricity
+
+We can add the centrality metrics' values to the table of our points,
+using the sub-catchment id:
 
 ```{r, eval = F}
 point_locations_snapped <- left_join(point_locations_snapped, centrality, 
