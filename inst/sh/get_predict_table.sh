@@ -7,10 +7,9 @@
 ###  2. list of statistics of interest :  default "ALL" or list separated by commas 
 ###  3. list of neccesary tiles IDs: list separated by commas
 ###  4. path to environmental tables
-###  5. file with the list of subcatchments IDs
-###  6. path to output file
-###  7. path to temporal folder
-###  8. number of cores (if possible) to run internal process in parallel: 
+###  5. path to output file
+###  6. path to temporal folder
+###  7. number of cores (if possible) to run internal process in parallel: 
 ###     Highest number needed = (n.tiles * n.variables)
 
 
@@ -19,7 +18,6 @@
 #  mean,sd \
 #  h18v02,h18v04,h20v02,h20v04 \
 #  /data/marquez/vignette/env_tables  \
-#  /mnt/shared/sosw/tmp/danube_subcatchments.tif  \
 #  /data/marquez/vignette/out/subc_IDs.txt  \
 #  /data/marquez/vignette/out/projectionTB.csv  \
 #  /data/marquez/vignette/out  \
