@@ -83,7 +83,7 @@ for (path in c(subc_layer, predict_table)) {
 }
 
 # Check if values of the rast_val/new_val columns are numeric
-if (!is.integer(pseudoabs)
+if (!is.integer(pseudoabs))
   stop(paste0("Pseudo absences have to be integers."))
 
 # Check if raster_layer is defined
