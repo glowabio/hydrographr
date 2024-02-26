@@ -38,12 +38,10 @@
 #' @examples
 #' # add example here
 
-get_modelfit_table <- function(data, spec, lon, lat, # id = NULL,
+get_modelfit_table <- function(data, spec, lon, lat,
                                pseudoabs = NULL, subc_id, predict_table,
                                mod_fit_table, read = FALSE, quiet = TRUE) {
 
-# Check operating system
-sys_os <- get_os()
 # Check if data.frame is defined
 if (missing(data))
   stop("data: Input data.frame is missing.")
@@ -59,25 +57,25 @@ if (missing(spec))
 
 # Check if lon, lat, side_id, and subc_id column names
 # are character vectors
-for (name in  c(lon, lat, id)) {
-  if (!is.null(name))
-    if (!is.character(name))
-      stop(paste0("Column name ", name, " is not a character vector."))
-}
-
-# Check if lon, lat, id, and subc_id column names exist
-for (name in c(lon, lat, id)) {
-  if (!is.null(name))
-    if (is.null(data[[name]]))
-      stop(paste0("Column name '", name, "' does not exist."))
-}
+# for (name in  c(lon, lat)) {
+#   if (!is.null(name))
+#     if (!is.character(name))
+#       stop(paste0("Column name ", name, " is not a character vector."))
+# }
+#
+# # Check if lon, lat, id, and subc_id column names exist
+# for (name in c(lon, lat)) {
+#   if (!is.null(name))
+#     if (is.null(data[[name]]))
+#       stop(paste0("Column name '", name, "' does not exist."))
+# }
 
 # Check if rast_val/new_val column names exist
 if (is.null(data[[spec]]))
   stop(paste0("spec: Column name '", spec,
               "' does not exist."))
 # Check if paths exists
-for (path in c(subc_layer, predict_table)) {
+for (path in predict_table) {
   if (!file.exists(path))
     stop(paste0("File path: ", path, " does not exist."))
 }
@@ -91,8 +89,8 @@ if (missing(predict_table))
   stop("predict_table: Path of the input predict table is missing.")
 
 # Check if add object ends with add specific ending
-if (!endsWith(raster_layer, ""))
-  stop("add object: Input object is not a add ending file.")
+# if (!endsWith(raster_layer, ""))
+#   stop("add object: Input object is not a add ending file.")
 
 # Check if add missing object is defined
 if (missing(mod_fit_table))
@@ -123,7 +121,7 @@ fwrite(coord, coord_tmp_path, col.names = TRUE,
   # Make bash scripts executable
   make_sh_exec()
 
-  f (sys_os == "linux" || sys_os == "osx") {
+  if (sys_os == "linux" || sys_os == "osx") {
 
 # Call external GRASS GIS command r.reclass
 processx::run(system.file("sh", "get_modelfit_table.sh",
