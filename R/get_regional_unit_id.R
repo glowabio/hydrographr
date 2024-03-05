@@ -114,20 +114,29 @@ get_regional_unit_id <- function(data, lon, lat, quiet = TRUE) {
   #  > - (118M) is too large for Google to scan for viruses.
   #  > Would you still like to download this file?"
 
-  if (file.size(reg_unit_file) < 10000) {
-    
-    message(paste('The file',reg_unit_file,'is only',file.size(reg_unit_file),
-      'bytes, maybe the download went wrong.'))
-    if (grepl("still like to download",
-      readLines(reg_unit_file, warn=FALSE), fixed=TRUE)) {
-      gdrive_path <- "https://drive.google.com/uc?export=download&id="
-      gdrive_download_url <- paste0(gdrive_path, "1ykV0jRCglz-_fdc4CJDMZC87VMsxzXE4&confirm=t")
-      message(paste('The file',reg_unit_file,'contains text asking you',
-        'whether to download, so the download definitely went wrong.'))
-      stop(paste('Downloading the file "regional_unit_ovr.tif" went wrong,',
+  if (file.size(reg_unit_file) < 10000) { # bytes
+
+    gdrive_path <- "https://drive.google.com/uc?export=download&id="
+    gdrive_download_url <- paste0(gdrive_path, "1ykV0jRCglz-_fdc4CJDMZC87VMsxzXE4&confirm=t")
+
+    # Checking the actual text content (only first 10 lines):
+    first_lines = readLines(reg_unit_file, warn=FALSE)[1:10]
+    if (any(grepl("still like to download", first_lines, fixed=TRUE))) {
+      msg = paste('Downloading the file "regional_unit_ovr.tif" went wrong,',
         'as you manually need to confirm skipping the virus check.\nPlease',
-        'download manually at', gdrive_download_url, 'and store to', reg_unit_file,
-        '. Stopping.'))
+        'download manually at', gdrive_download_url, 'or', nimbus_download_url,
+         'and store to', reg_unit_file, '. Stopping.')
+      stop(msg)
+
+    # In case the text is in a different locale and does not contain those
+    # exact words, still warn the user:
+
+    } else {
+      msg = paste0('Downloading the file "regional_unit_ovr.tif" probably went',
+        ' wrong, it is only ', file.size(reg_unit_file), ' bytes.\nIf this function',
+        ' fails, please download manually at ', gdrive_download_url, ' or ',
+        nimbus_download_url, ' and store to ', reg_unit_file, '.')
+      warning(msg)
     }
   }
 
@@ -184,6 +193,13 @@ get_regional_unit_id <- function(data, lon, lat, quiet = TRUE) {
   # Read in the file containing the ids
   data_reg_unit_ids <- fread(ids_tmp_path, keepLeadingZeros = TRUE,
                              header = TRUE, sep = " ")
+
+  # If something went wrong, e.g. a corrupted regional_unit_ovr.tif is used,
+  # the file is written but contains no ids:
+  if (nrow(data_reg_unit_ids) == 0) {
+    warning(paste('No regional unit could be extracted. Check whether',
+      'your coordinates are ok, and whether', reg_unit_file, 'is a valid raster file.'))
+  }
 
   # Remove all files in the tmp folder
   file.remove(ids_tmp_path)
