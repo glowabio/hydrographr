@@ -83,6 +83,27 @@ get_regional_unit_id <- function(data, lon, lat, quiet = TRUE) {
     download.file("https://drive.google.com/uc?export=download&id=1ykV0jRCglz-_fdc4CJDMZC87VMsxzXE4&confirm=t",
                   destfile = reg_unit_file, mode = "wb")
 
+  # Adding a check for correct file contents:
+  if (file.size(reg_unit_file) < 10000) {
+    # Note: The correct file is 123262363 bytes on disk (123,3 MB).
+    # A few times, I got 2433 bytes (2,4 kB), containing text about:
+    #  > "Google Drive - Virus scan warning [...]
+    #  > Google Drive can't scan this file for viruses. regional_unit_ovr.tif
+    #  > - (118M) is too large for Google to scan for viruses.
+    #  > Would you still like to download this file?"
+    message(paste('The file',reg_unit_file,'is only',file.size(reg_unit_file),
+      'bytes, maybe the download went wrong.'))
+    if (grepl("still like to download",
+      readLines(reg_unit_file, warn=FALSE), fixed=TRUE)) {
+      gdrive_path <- "https://drive.google.com/uc?export=download&id="
+      gdrive_download_url <- paste0(gdrive_path, "1ykV0jRCglz-_fdc4CJDMZC87VMsxzXE4&confirm=t")
+      message(paste('The file',reg_unit_file,'contains text asking you',
+        'whether to download, so the download definitely went wrong.'))
+      stop(paste('Downloading the file "regional_unit_ovr.tif" went wrong,',
+        'as you manually need to confirm skipping the virus check.\nPlease',
+        'download manually at', gdrive_download_url, 'and store to', reg_unit_file,
+        '. Stopping.'))
+    }
   }
 
   # Create random string to attach to the file name of the temporary
