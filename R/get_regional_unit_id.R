@@ -77,11 +77,32 @@ get_regional_unit_id <- function(data, lon, lat, quiet = TRUE) {
   reg_unit_file <- paste0(tempdir(), "/regional_unit_ovr.tif")
 
   # If the required file does not already exist,
-  # download it in the tempdir()
-  if (!file.exists(reg_unit_file)) {
-    print("Downloading the global regional unit file")
-    download.file("https://drive.google.com/uc?export=download&id=1ykV0jRCglz-_fdc4CJDMZC87VMsxzXE4&confirm=t",
-                  destfile = reg_unit_file, mode = "wb")
+  # download it into the tempdir()
+  if (file.exists(reg_unit_file)) {
+    message(paste('Will use this file (already downloaded):', reg_unit_file))
+  } else {
+    message(paste0("Downloading the global regional unit file to ", reg_unit_file, "..."))
+
+    # Two possible download paths, first try Nimbus, then GDrive:
+    nimbus_path <- "https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4/download?path=%2F"
+    nimbus_download_url <- paste0(nimbus_path, "global&files=regional_unit_ovr.tif")
+    gdrive_path <- "https://drive.google.com/uc?export=download&id="
+    gdrive_download_url <- paste0(gdrive_path, "1ykV0jRCglz-_fdc4CJDMZC87VMsxzXE4&confirm=t")
+
+    tryCatch(
+      {
+        download.file(nimbus_download_url, destfile = reg_unit_file, mode = "wb")
+      },
+      warning = function(warn) {
+        message(paste('Download failed, reason: ', warn[1]))
+        download.file(gdrive_download_url, destfile = reg_unit_file, mode = "wb")
+      },
+      error = function(err) {
+        message(paste('Download failed, reason: ', err[1]))
+        download.file(gdrive_download_url, destfile = reg_unit_file, mode = "wb")
+      }
+    )
+  }
 
   # Adding a check for correct file contents:
   if (file.size(reg_unit_file) < 10000) {
