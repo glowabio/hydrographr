@@ -104,14 +104,18 @@ get_regional_unit_id <- function(data, lon, lat, quiet = TRUE) {
     )
   }
 
-  # Adding a check for correct file contents:
+  # Adding a check for correct file size and contents.
+  # Why?
+  # The correct file is 123262363 bytes on disk (123,3 MB).
+  # When downloading from GDrive, you may receive a file
+  # sized 2433 bytes (2,4 kB), containing text about a virus scan:
+  #  > "Google Drive - Virus scan warning [...]
+  #  > Google Drive can't scan this file for viruses. regional_unit_ovr.tif
+  #  > - (118M) is too large for Google to scan for viruses.
+  #  > Would you still like to download this file?"
+
   if (file.size(reg_unit_file) < 10000) {
-    # Note: The correct file is 123262363 bytes on disk (123,3 MB).
-    # A few times, I got 2433 bytes (2,4 kB), containing text about:
-    #  > "Google Drive - Virus scan warning [...]
-    #  > Google Drive can't scan this file for viruses. regional_unit_ovr.tif
-    #  > - (118M) is too large for Google to scan for viruses.
-    #  > Would you still like to download this file?"
+    
     message(paste('The file',reg_unit_file,'is only',file.size(reg_unit_file),
       'bytes, maybe the download went wrong.'))
     if (grepl("still like to download",
@@ -142,7 +146,7 @@ get_regional_unit_id <- function(data, lon, lat, quiet = TRUE) {
   fwrite(coord, coord_tmp_path, col.names = TRUE,
          row.names = FALSE, quote = FALSE, sep = " ")
 
-  # Path for tmp regional unit ids text file
+  # Path where tmp regional unit ids text file will be written
   ids_tmp_path <- paste0(tempdir(), "/reg_unit_ids", rand_string, ".txt")
 
   # Check operating system
