@@ -204,6 +204,12 @@ get_regional_unit_id <- function(data, lon, lat, quiet = TRUE) {
   # Remove all files in the tmp folder
   file.remove(ids_tmp_path)
 
+  # Check if zero is in there:
+  if (0 %in% data_reg_unit_ids$reg_unit_id) {
+    message('The regional units contain zero, so some point(s) were in the ocean instead of on land.')
+  }
+
+
   # Return vector of regional unit ids
   data_reg_unit_ids$reg_unit_id
 
