@@ -31,7 +31,8 @@ check_tiles_filesize <- function(variable, file_format = "tif",
   match.arg(variable, choices = h90m_varnames)
 
   # Check that the requested file_format is a tif or gpkg
-  match.arg(file_format, choices = c("tif", "gpkg"))
+  # Added "zip" for env data!
+  match.arg(file_format, choices = c("tif", "gpkg", "zip"))
 
   # Regional unit case
 
