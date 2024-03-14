@@ -167,52 +167,45 @@ download_tiles <- function(variable, file_format = "tif",
   file_size_table <- fread(file_size_file, sep = ";")
 
   # Separate the table to get the names of the hydrography90m variables
-  file_size_table_sep <- separate(
-    data = file_size_table,
-    col = file_path,
-    into = c("grass_module", "foldername", "varname_tile"),
-    sep = "/",
-    fill = "left",
-  )
+  file_size_table$file_name = basename(file_size_table$file_path)
 
-  file_size_table_sep$grass_module[
-    is.na(file_size_table_sep$grass_module)] <- ""
   # Get the valid names of the hydrography variables
   # to check that the requested variable exists
-  h90m_varnames <- sort(unique(sub("_[^_]+$", "",
-                                    file_size_table_sep$varname_tile)))
-  # Get the valid file_formats of the hydrography variables
+  all_varnames <- sort(unique(sub("_[^_]+$", "",
+                                    file_size_table$file_name)))
+
+  # Get all file names. This is used in check_tiles_filesize() to
+  # get the valid file_formats of the hydrography variables
   # to check that the requested variable exists
-  h90m_file_formats <- sort(unique(file_size_table_sep$varname_tile))
+  all_file_names <- sort(unique(file_size_table$file_name))
 
   # Get the valid tile ids of the hydrography
   # to check that the requested tile exists
-  h90m_tile_id <- unique(str_extract(
+  all_tile_ids <- unique(str_extract(
     file_size_table$file_path, "h[0-9]+v[0-9]+"))
 
-  h90m_tile_id <- h90m_tile_id[!is.na(h90m_tile_id)]
+  all_tile_ids <- all_tile_ids[!is.na(all_tile_ids)]
 
+
+  # Collect the file sizes of all requested variables and tiles together:
   variable_size_sum <- 0
 
   for (ivar in variable) {
 
-
     if (global == TRUE) {
-      tile_id <-  "_ovr"
+      tile_id <-  "_ovr" # TODO: Tile_id is not always a tile_id! That is confusing. Spatial_unit_id?
 
     } else if (global == FALSE) {
 
       if (ivar == "regional_unit") {
-
         tile_id <- as.character(reg_unit_id)
 
       } else {
         tile_id <- tile_id
       }
-
     }
 
-
+    # Collect the file sizes of all requested tiles for one variable:
     tile_size_sum <- 0
 
     for (itile in tile_id) {
@@ -221,10 +214,10 @@ download_tiles <- function(variable, file_format = "tif",
                                         file_format = file_format,
                                         tile_id = itile,
                                         global = global,
-                                        h90m_varnames = h90m_varnames,
-                                        h90m_tile_id = h90m_tile_id,
-                                        h90m_file_formats = h90m_file_formats,
-                                        file_size_table_sep = file_size_table_sep)
+                                        h90m_varnames = all_varnames,
+                                        h90m_tile_id = all_tile_ids,
+                                        h90m_file_names = all_file_names,
+                                        file_size_table = file_size_table)
 
       tile_size_sum <- tile_size_sum + tile_size
 
@@ -233,6 +226,7 @@ download_tiles <- function(variable, file_format = "tif",
     variable_size_sum <- tile_size_sum + variable_size_sum
   }
 
+  # This is the added file sizes of all files to be downloaded:
   variable_size_sum
 
   # Print warning on file size and ask for input from the user
@@ -254,7 +248,10 @@ download_tiles <- function(variable, file_format = "tif",
     # General path to the download folder in GDrive
     gdrive_path <- "https://drive.google.com/uc?export=download&id="
 
-    # Use README file as a test to check if Nimbus is up.
+    # Download README file as a test to check whether Nimbus is up.
+    # If Nimbus is not available, download README from GDrive to check
+    # whether GDrive is up.
+
     server_url <- tryCatch(
       {
         download.file(paste0(nimbus_path, "README/README.txt"),
@@ -263,9 +260,10 @@ download_tiles <- function(variable, file_format = "tif",
         server_url
       },
       warning = function(c) {
+
         # Get gdrive file id of the README.txt file
-        readme_id <- file_size_table_sep[
-          file_size_table_sep$varname_tile == "README.txt", ]$file_id
+        readme_id <- file_size_table[
+          file_size_table$file_name == "README.txt", ]$file_id
         # Download README.txt file
         download.file(paste0(gdrive_path, readme_id),
                       destfile = paste0(download_dir, "/README.txt"), mode = "wb")
@@ -278,13 +276,15 @@ download_tiles <- function(variable, file_format = "tif",
       }
     )
 
+    # Now perform the download:
+
     for (ivar in variable) {
       for (itile in tile_id) {
 
         download_tiles_base(variable = ivar, file_format = file_format,
                             tile_id = itile, global = global,
                             download_dir = download_dir,
-                            file_size_table_sep = file_size_table_sep,
+                            file_size_table = file_size_table,
                             server_url = server_url
         )
       }
