@@ -12,7 +12,7 @@
 #' @param lat character. The name of the column with the latitude coordinates.
 #' @param id character. The name of a column containing unique IDs for each row
 #' of "data" (e.g., occurrence or site IDs).
-#' @param pseudoabs
+#' @param pseudoabs number of pseudo abscenses
 #' @param subc_id character. Full path to the .csv table with the
 #' sub-catchment ID.
 #' @param predict_table character. Full path of the predict.csv table
@@ -22,7 +22,6 @@
 #' @param quiet logical. If FALSE, the standard output will be printed.
 #' Default is TRUE.
 #'
-#' @importFrom import needed R packages here
 #' @importFrom stringi stri_rand_strings
 #' @importFrom data.table fread fwrite
 #' @importFrom processx run
