@@ -79,27 +79,28 @@ get_regional_unit_id <- function(data, lon, lat, quiet = TRUE) {
   # If the required file does not already exist,
   # download it into the tempdir()
   if (file.exists(reg_unit_file)) {
-    message(paste('Will use this file (already downloaded):', reg_unit_file))
+    message(paste("Will use this file (already downloaded):", reg_unit_file))
   } else {
-    message(paste0("Downloading the global regional unit file to ", reg_unit_file, "..."))
+    message(paste0("Downloading the global regional unit file to ",
+                   reg_unit_file, "..."))
 
     # Two possible download paths, first try Nimbus, then GDrive:
-    nimbus_path <- "https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4/download?path=%2F"
-    nimbus_download_url <- paste0(nimbus_path, "global&files=regional_unit_ovr.tif")
-    gdrive_path <- "https://drive.google.com/uc?export=download&id="
-    gdrive_download_url <- paste0(gdrive_path, "1ykV0jRCglz-_fdc4CJDMZC87VMsxzXE4&confirm=t")
+    nimbus_url_base <- "https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4/download?path=%2F"
+    nimbus_url_full <- paste0(nimbus_url_base, "global&files=regional_unit_ovr.tif")
+    gdrive_url_base <- "https://drive.google.com/uc?export=download&id="
+    gdrive_url_full <- paste0(gdrive_url_base, "1ykV0jRCglz-_fdc4CJDMZC87VMsxzXE4&confirm=t")
 
     tryCatch(
       {
-        download.file(nimbus_download_url, destfile = reg_unit_file, mode = "wb")
+        download.file(nimbus_url_full, destfile = reg_unit_file, mode = "wb")
       },
       warning = function(warn) {
-        message(paste('Download failed, reason: ', warn[1]))
-        download.file(gdrive_download_url, destfile = reg_unit_file, mode = "wb")
+        message(paste("Download failed, reason: ", warn[1]))
+        download.file(gdrive_url_full, destfile = reg_unit_file, mode = "wb")
       },
       error = function(err) {
-        message(paste('Download failed, reason: ', err[1]))
-        download.file(gdrive_download_url, destfile = reg_unit_file, mode = "wb")
+        message(paste("Download failed, reason: ", err[1]))
+        download.file(gdrive_url_full, destfile = reg_unit_file, mode = "wb")
       }
     )
   }
@@ -116,26 +117,27 @@ get_regional_unit_id <- function(data, lon, lat, quiet = TRUE) {
 
   if (file.size(reg_unit_file) < 10000) { # bytes
 
-    gdrive_path <- "https://drive.google.com/uc?export=download&id="
-    gdrive_download_url <- paste0(gdrive_path, "1ykV0jRCglz-_fdc4CJDMZC87VMsxzXE4&confirm=t")
+    gdrive_url_base <- "https://drive.google.com/uc?export=download&id="
+    gdrive_url_full <- paste0(gdrive_url_base, "1ykV0jRCglz-_fdc4CJDMZC87VMsxzXE4&confirm=t")
 
     # Checking the actual text content (only first 10 lines):
-    first_lines = readLines(reg_unit_file, warn=FALSE)[1:10]
-    if (any(grepl("still like to download", first_lines, fixed=TRUE))) {
-      msg = paste('Downloading the file "regional_unit_ovr.tif" went wrong,',
-        'as you manually need to confirm skipping the virus check.\nPlease',
-        'download manually at', gdrive_download_url, 'or', nimbus_download_url,
-         'and store to', reg_unit_file, '. Stopping.')
+    first_lines <- readLines(reg_unit_file, warn = FALSE)[1:10]
+    if (any(grepl("still like to download", first_lines, fixed = TRUE))) {
+      msg <- paste("Downloading the file 'regional_unit_ovr.tif' went wrong,",
+                   "as you manually need to confirm skipping the virus check.",
+                   "\nPlease, download manually at", gdrive_url_full, "or",
+                   nimbus_url_full, "and store to", reg_unit_file,
+                   ". Stopping.")
       stop(msg)
 
-    # In case the text is in a different locale and does not contain those
-    # exact words, still warn the user:
-
     } else {
-      msg = paste0('Downloading the file "regional_unit_ovr.tif" probably went',
-        ' wrong, it is only ', file.size(reg_unit_file), ' bytes.\nIf this function',
-        ' fails, please download manually at ', gdrive_download_url, ' or ',
-        nimbus_download_url, ' and store to ', reg_unit_file, '.')
+      # In case the text is in a different locale and does not contain those
+      # exact words, still warn the user:
+      msg <- paste0("Downloading the file 'regional_unit_ovr.tif' probably",
+                    " went wrong, it is only ", file.size(reg_unit_file),
+                    " bytes.\nIf this function fails, please download",
+                    " manually at ", gdrive_url_full, " or ",
+                    nimbus_url_full, " and store to ", reg_unit_file, ".")
       warning(msg)
     }
   }
@@ -167,10 +169,10 @@ get_regional_unit_id <- function(data, lon, lat, quiet = TRUE) {
   if (sys_os == "linux" || sys_os == "osx") {
 
     processx::run(system.file("sh", "get_regional_unit_id.sh",
-                  package = "hydrographr"),
-      args = c(coord_tmp_path, lon, lat,
-               reg_unit_file,  ids_tmp_path),
-      echo = !quiet)
+                              package = "hydrographr"),
+                  args = c(coord_tmp_path, lon, lat,
+                           reg_unit_file,  ids_tmp_path),
+                  echo = !quiet)
 
   } else {
     # Check if WSL and Ubuntu is installed
@@ -184,11 +186,11 @@ get_regional_unit_id <- function(data, lon, lat, quiet = TRUE) {
                                         package = "hydrographr"))
 
     processx::run(system.file("bat", "get_regional_unit_id.bat",
-                    package = "hydrographr"),
-        args = c(wsl_coord_tmp_path, lon, lat,
-                 wsl_reg_unit_file, wsl_ids_tmp_path,
-                 wsl_sh_file),
-        echo = !quiet)
+                              package = "hydrographr"),
+                  args = c(wsl_coord_tmp_path, lon, lat,
+                           wsl_reg_unit_file, wsl_ids_tmp_path,
+                           wsl_sh_file),
+                  echo = !quiet)
   }
   # Read in the file containing the ids
   data_reg_unit_ids <- fread(ids_tmp_path, keepLeadingZeros = TRUE,
@@ -197,8 +199,9 @@ get_regional_unit_id <- function(data, lon, lat, quiet = TRUE) {
   # If something went wrong, e.g. a corrupted regional_unit_ovr.tif is used,
   # the file is written but contains no ids:
   if (nrow(data_reg_unit_ids) == 0) {
-    warning(paste('No regional unit could be extracted. Check whether',
-      'your coordinates are ok, and whether', reg_unit_file, 'is a valid raster file.'))
+    warning(paste("No regional unit could be extracted. Check whether",
+                  "your coordinates are ok, and whether", reg_unit_file,
+                  "is a valid raster file."))
   }
 
   # Remove all files in the tmp folder
@@ -206,7 +209,8 @@ get_regional_unit_id <- function(data, lon, lat, quiet = TRUE) {
 
   # Check if zero is in there:
   if (0 %in% data_reg_unit_ids$reg_unit_id) {
-    message('The regional units contain zero, so some point(s) were in the ocean instead of on land.')
+    message("The regional units contain zero, so some point(s) were in",
+            " the ocean instead of on land.")
   }
 
 
