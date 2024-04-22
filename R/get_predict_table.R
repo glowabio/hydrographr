@@ -20,13 +20,13 @@
 #' @importFrom processx run
 #' @importFrom stringi stri_rand_strings
 #' @importFrom stringi stri_rand_strings
-#' @exportFrom data.table fread
+#' @importFrom data.table fread
 #'
 #' @return The function returns...
 #'
 #' @author Jaime García Márquez, Yusdiel Torres-Cambas
 #'s
-#' @examples
+#' @examples bla
 
 get_predict_table <- function(variable,
                               statistics = "ALL",
