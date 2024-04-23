@@ -72,86 +72,31 @@ paste -d"," \
 
 ## (Pseudo)absences
 
-####   Procedure by selecting random rows from predict_table $PTB
-shuf -n$ABS $PTB --output=$TMP/abs_tmp1.csv
+if [[ "$ABS" -eq 0  ]]
+then 
+    cp $TMP/pa_env_tmp.csv $OUTF
+else
 
-#  number of rows in the absence table 
-A=$( wc -l < $TMP/abs_tmp1.csv )
+    ####   Procedure by selecting random rows from predict_table $PTB
+    shuf -n$ABS $PTB --output=$TMP/abs_tmp1.csv
 
-# create preliminary table with same format as tmp1
-paste -d"," \
-    <(awk -F, '{print $1}' $TMP/abs_tmp1.csv) \
-    <(printf '0%.0s\n' $(eval "echo {1.."$(($A))"}")) \
-    <(cut -d"," --complement -f 1 $TMP/abs_tmp1.csv) \
-    > $TMP/abs_tmp2.csv
+    #  number of rows in the absence table 
+    A=$( wc -l < $TMP/abs_tmp1.csv )
 
-####   Join presences and absences
+    # create preliminary table with same format as tmp1
+    paste -d"," \
+        <(awk -F, '{print $1}' $TMP/abs_tmp1.csv) \
+        <(printf '0%.0s\n' $(eval "echo {1.."$(($A))"}")) \
+        <(cut -d"," --complement -f 1 $TMP/abs_tmp1.csv) \
+        > $TMP/abs_tmp2.csv
 
-### Join presences and absences
-cat $TMP/pa_env_tmp.csv $TMP/abs_tmp2.csv > $OUTF  
+    ### Join presences and absences
+    cat $TMP/pa_env_tmp.csv $TMP/abs_tmp2.csv > $OUTF  
+fi
 
 ### remove temporal files
 rm $TMP/*tmp* 
 
 exit
 
-
-#### Procedure by spatial selection of random points and including X and Y
-####  coordinates
-
-
-#grass --text --tmp-location $SUBC <<'EOF' 
-#r.external input=$SUBC out=sub
-#r.random -s input=sub vector=abs npoints=$ABS
-#v.out.ascii -c input=abs column=value precision=3 separator=space \
-#    | awk 'BEGIN{OFS=","} NR > 1  {print int($4), $1, $2}' \
-#    > $TMP/abs_tmp1.csv
-#EOF
-
-
-## remove duplicates
-##awk -F, '!a[$1]++'  $TMP/abs_tmp1.csv > $TMP/abs_tmp2.csv
-#
-## remove duplicates in absences if subcatchment id also exist in presence
-#awk -F, 'NR==FNR {a[$1]; next} $1 in a' \
-#    $TMP/tmp1.csv $TMP/abs_tmp1.csv > $TMP/abs_rm.txt
-#
-#if [[ $(wc -l < $TMP/abs_rm.txt) -gt 0  ]]
-#then
-#    awk -F, '{print $1}' $TMP/abs_rm.txt > $TMP/abs_indx_rm.txt
-#    awk -F, 'NR==FNR {a[$1]; next} ! ($1 in a)' \
-#        $TMP/abs_indx_rm.txt $TMP/abs_tmp1.csv > $TMP/abs_tmp2.csv
-#else
-#    cp $TMP/abs_tmp1.csv $TMP/abs_tmp2.csv
-#fi
-#
-##  number of rows in the absence table 
-#A=$( wc -l < $TMP/abs_tmp2.csv )
-#
-## create preliminary table with same format as tmp1
-#paste -d"," \
-##    <(printf "${SPPN}%.0s\n" $(eval "echo {1.."$(($A))"}")) \
-#    <(awk -F, 'BEGIN{OFS=","} {print $2, $3, $1}' $TMP/abs_tmp2.csv) \
-#    <(printf '0%.0s\n' $(eval "echo {1.."$(($A))"}")) \
-#    > $TMP/abs_tmp3.csv
-#
-## extract from projecton table the environmental data for the absences 
-#awk -F, 'NR==FNR {a[$4]; next} $1 in a' \
-#    $TMP/abs_tmp4.csv $PTB  >  $TMP/abs_tmp5.csv
-#
-## join tables
-#paste -d"," \
-#    <(sort -t, -g -k4 $TMP/abs_tmp4.csv) \
-#    <(sort -t, -g -k1 $TMP/abs_tmp5.csv) \
-#    | cut -d"," --complement -f 6 \
-#    > $TMP/abs_env_tmp.csv
-
-### Join presences and absences
-#cat $TMP/pa_env_tmp.csv $TMP/abs_env_tmp.csv > $OUTF 
-
-### remove temporal files
-#rm $TMP/*tmp* 
-
-
-exit
 
