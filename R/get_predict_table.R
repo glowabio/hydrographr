@@ -4,7 +4,7 @@
 #' an specific subset of subcatchments.
 #'
 #' @param variable character vector of variable names. Possible values are:
-#' @param statistics character vector of statics names. Possible values are
+#' @param statistics character vector of statistics names. Possible values are
 #' "sd", "mean", "range" or "ALL". Default "ALL"
 #' @param tile_id character. The IDs of the tiles of interest.
 #' @param input_var_path path to table with environmental variables for entire
@@ -25,7 +25,7 @@
 #' @return The function returns...
 #'
 #' @author Jaime García Márquez, Yusdiel Torres-Cambas
-#'s
+#'
 #' @examples bla
 
 get_predict_table <- function(variable,
@@ -39,55 +39,55 @@ get_predict_table <- function(variable,
                               quiet = TRUE) {
 
   #Check if one of the arguments is missing
-  if (missing(variable))
-    stop("variable is missing.
-    Please provide at least the name of one variable. Possible names are: ")
-
-  if (missing(tile_id))
-    stop("Please provide at least one tile ID")
-
-  if (missing(input_var_path))
-    stop("Please provide a path to the table with environmental variables for
-    the entire tiles")
-
-  if (missing(subcatch_id))
-    stop("Please provide at least one subcatchment ID")
-
-  if (missing(out_file_path))
-    stop("Please provide a path to the output file")
-
-  # Check if paths exists
-  if (!file.exists(input_var_path))
-    stop(paste0("Path: ", input_var_path, " does not exist."))
-
-  if (!file.exists(out_file_path))
-    stop(paste0("Path: ", out_file_path, " does not exist."))
-
-  # Check if the variable name provided is one of the accepted values
-  if (!variable %in% c()) {
-    stop("Please provide a valid variable name. Variable must be one of:
-                ")
-  }
-
-  # Check if statistics name provided is one of the accepted values
-  if (statistics != "ALL") {
-    if (!statistics %in% c("sd", "mean", "range"))
-      stop("Please provide a valid statistics name. Possible values are
-             sd, mean, range")
-  }
-
-
-  # Check if n_cores is numeric
-  if (!is.numeric(n_cores))
-    stop(paste0("n_cores: Has to be numeric."))
-
-  # Check if quiet is logical
-  if (!is.logical(quiet))
-    stop("quiet: Has to be TRUE or FALSE.")
-
-  # Check if read is logical
-  if (!is.logical(read))
-    stop("read: Has to be TRUE or FALSE.")
+  # if (missing(variable))
+  #   stop("variable is missing.
+  #   Please provide at least the name of one variable. Possible names are: ")
+  #
+  # if (missing(tile_id))
+  #   stop("Please provide at least one tile ID")
+  #
+  # if (missing(input_var_path))
+  #   stop("Please provide a path to the table with environmental variables for
+  #   the entire tiles")
+  #
+  # if (missing(subcatch_id))
+  #   stop("Please provide at least one subcatchment ID")
+  #
+  # if (missing(out_file_path))
+  #   stop("Please provide a path to the output file")
+  #
+  # # Check if paths exists
+  # if (!file.exists(input_var_path))
+  #   stop(paste0("Path: ", input_var_path, " does not exist."))
+  #
+  # if (!file.exists(out_file_path))
+  #   stop(paste0("Path: ", out_file_path, " does not exist."))
+  #
+  # # Check if the variable name provided is one of the accepted values
+  # if (!variable %in% c()) {
+  #   stop("Please provide a valid variable name. Variable must be one of:
+  #               ")
+  # }
+  #
+  # # Check if statistics name provided is one of the accepted values
+  # if (statistics != "ALL") {
+  #   if (!statistics %in% c("sd", "mean", "range"))
+  #     stop("Please provide a valid statistics name. Possible values are
+  #            sd, mean, range")
+  # }
+  #
+  #
+  # # Check if n_cores is numeric
+  # if (!is.numeric(n_cores))
+  #   stop(paste0("n_cores: Has to be numeric."))
+  #
+  # # Check if quiet is logical
+  # if (!is.logical(quiet))
+  #   stop("quiet: Has to be TRUE or FALSE.")
+  #
+  # # Check if read is logical
+  # if (!is.logical(read))
+  #   stop("read: Has to be TRUE or FALSE.")
 
   # Check operating system
   sys_os <- get_os()
@@ -146,7 +146,7 @@ get_predict_table <- function(variable,
   }
 
   # Delete temporary output directory
-  unlink(tmp_dir, recursive = TRUE)
+  #unlink(tmp_dir, recursive = TRUE)
 
   if (read == TRUE) {
     # Read predict table
