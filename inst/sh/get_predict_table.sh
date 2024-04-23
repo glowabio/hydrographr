@@ -29,16 +29,22 @@
 
 # variables of interest
 #export var=( bio1 c10_2020 spi stright )
-export var=( $(echo $1 | tr "," "\n") )
+VAR=( $(echo $1 | tr "," "\n") )
+[[ "${#VAR[@]}" -eq 1 ]] && var=($(echo $1)) || var=("${VAR[@]}")
+export var
 
 # select summary statistics
 # ALL
 # c(mean, sd)
-export SS=( $(echo $2 | tr "," "\n") )
+ss=( $(echo $2 | tr "," "\n") )
+[[ "${#ss[@]}" -eq 1 ]] && SS=($(echo $2)) || SS=("${ss[@]}")
+export SS
 
 # tiles of interest
 #export tiles=( h18v02 h18v04 h20v02 h20v04 )
-export tiles=( $(echo $3 | tr "," "\n") )
+TT=($(echo "$3" | tr "," "\n"))
+[[ "${#TT[@]}" -eq 1 ]] && tiles=($(echo $3)) || tiles=("${TT[@]}")
+export tiles
 
 #  path to environmental tables for each tile
 export ENVTB=$4
@@ -164,11 +170,11 @@ rm $TMP/aggreg_${X}_tmp*.txt
 
 #################
 ## join all the environmental variables together
-paste -d" " $(find $TMP/aggreg_*.txt) > $TMP/aggreg_all.txt
+paste -d" " $(find $TMP/aggreg_*.txt) > $TMP/all_var_full.txt
 
 ## the previous line creates repetition of the subcID column
 ## Chunk to delete the subCid column 
-read -a header < $TMP/aggreg_all.txt  # read first line into array "header"
+read -a header < $TMP/all_var_full.txt  # read first line into array "header"
 declare -a arr=() # array to store the position in which the subCid columns are
 
 for i in ${!header[@]}               # iterate through array indexes
@@ -182,13 +188,11 @@ done
 printf -v joined '%s,' "${arr[@]:1}"  # remove from array the first column
 
 ##  remove subcID columns (except column 1) and make the table comma separated
-cut -d" " --complement -f $(echo "${joined%,}") $TMP/aggreg_all.txt \
-    | tr -s ' ' ',' > $TMP/aggreg_all_trim.csv
+cut -d" " --complement -f $(echo "${joined%,}") $TMP/all_var_full.txt \
+    | tr -s ' ' ',' > $TMP/all_var_trim.csv
 
 ##  remove duplicates and create final output table
-awk -F, '!a[$0]++'  $TMP/aggreg_all_trim.csv > $OUTFILE
-
-
+[[ "${#tiles[@]}" -gt 1  ]] && awk -F, '!a[$0]++'  $TMP/all_var_trim.csv > $OUTFILE || cp $TMP/all_var_trim.csv $OUTFILE
 
 #########################
 # remove temporal files
