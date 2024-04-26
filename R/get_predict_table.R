@@ -39,55 +39,69 @@ get_predict_table <- function(variable,
                               quiet = TRUE) {
 
   #Check if one of the arguments is missing
-  # if (missing(variable))
-  #   stop("variable is missing.
-  #   Please provide at least the name of one variable. Possible names are: ")
-  #
-  # if (missing(tile_id))
-  #   stop("Please provide at least one tile ID")
-  #
-  # if (missing(input_var_path))
-  #   stop("Please provide a path to the table with environmental variables for
-  #   the entire tiles")
-  #
-  # if (missing(subcatch_id))
-  #   stop("Please provide at least one subcatchment ID")
-  #
-  # if (missing(out_file_path))
-  #   stop("Please provide a path to the output file")
-  #
-  # # Check if paths exists
-  # if (!file.exists(input_var_path))
-  #   stop(paste0("Path: ", input_var_path, " does not exist."))
-  #
-  # if (!file.exists(out_file_path))
-  #   stop(paste0("Path: ", out_file_path, " does not exist."))
-  #
-  # # Check if the variable name provided is one of the accepted values
-  # if (!variable %in% c()) {
-  #   stop("Please provide a valid variable name. Variable must be one of:
-  #               ")
-  # }
-  #
-  # # Check if statistics name provided is one of the accepted values
-  # if (statistics != "ALL") {
-  #   if (!statistics %in% c("sd", "mean", "range"))
-  #     stop("Please provide a valid statistics name. Possible values are
-  #            sd, mean, range")
-  # }
-  #
-  #
-  # # Check if n_cores is numeric
-  # if (!is.numeric(n_cores))
-  #   stop(paste0("n_cores: Has to be numeric."))
-  #
-  # # Check if quiet is logical
-  # if (!is.logical(quiet))
-  #   stop("quiet: Has to be TRUE or FALSE.")
-  #
-  # # Check if read is logical
-  # if (!is.logical(read))
-  #   stop("read: Has to be TRUE or FALSE.")
+  if (missing(variable))
+    stop("variable is missing.
+    Please provide at least the name of one variable. Possible names are: ")
+
+  if (missing(tile_id))
+    stop("Please provide at least one tile ID")
+
+  if (missing(input_var_path))
+    stop("Please provide a path to the table with environmental variables for
+    the entire tiles")
+
+  if (missing(subcatch_id))
+    stop("Please provide at least one subcatchment ID")
+
+  if (missing(out_file_path))
+    stop("Please provide a path to the output file")
+
+  # Check if paths exists
+  if (!file.exists(input_var_path))
+    stop(paste0("Path: ", input_var_path, " does not exist."))
+
+  if (!file.exists(out_file_path))
+    stop(paste0("Path: ", out_file_path, " does not exist."))
+
+  # Check variable name is one of the accepted values
+  accepted_vars <- c("bio1", "bio10", "bio11", "bio12", "bio13",
+                     "bio14", "bio15", "bio16", "bio17", "bio18",
+                     "bio19", "bio2", "bio3", "bio4", "bio5",
+                     "bio6", "bio7", "bio8", "bio9", "c100",
+                     "c10", "c20", "c30", "c40", "c50",
+                     "c60", "c70", "c80", "c90", "chancurv",
+                     "chandistdwseg", "chandistupcel", "chandistupseg",
+                     "chanelvdwcel", "chanelvdwseg", "chanelvupcel",
+                     "chanelvupseg", "changraddwseg", "changradupcel",
+                     "changradupseg", "elev", "flow", "flowpos",
+                     "gradient", "length", "out", "outdiffdwbasin",
+                     "outdiffdwscatch", "outdistdwbasin", "outdistdwscatch",
+                     "outlet", "slopdiff", "slopgrad", "soil", "source",
+                     "strdiffdwnear", "strdiffupfarth", "strdiffupnear",
+                     "strdistdwnear", "strdistprox", "strdistupfarth",
+                     "strdistupnear", "stright")
+  # if (!variable %in% accepted_vars)
+  #   stop("Please provide a valid variable name.")
+
+  # Check if statistics name provided is one of the accepted values
+  if (statistics != "ALL") {
+    if (!statistics %in% c("sd", "mean", "range"))
+      stop("Please provide a valid statistics name. Possible values are
+             sd, mean, range")
+  }
+
+
+  # Check if n_cores is numeric
+  if (!is.numeric(n_cores))
+    stop(paste0("n_cores: Has to be numeric."))
+
+  # Check if quiet is logical
+  if (!is.logical(quiet))
+    stop("quiet: Has to be TRUE or FALSE.")
+
+  # Check if read is logical
+  if (!is.logical(read))
+    stop("read: Has to be TRUE or FALSE.")
 
   # Check operating system
   sys_os <- get_os()
