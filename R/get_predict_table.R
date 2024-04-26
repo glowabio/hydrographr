@@ -83,7 +83,7 @@ get_predict_table <- function(variable,
   #Check if one of the arguments is missing
   if (missing(variable))
     stop("variable is missing.
-    Please provide at least the name of one variable. Possible names are: ")
+    Please provide at least the name of one variable")
 
   if (missing(tile_id))
     stop("Please provide at least one tile ID")
@@ -101,6 +101,7 @@ get_predict_table <- function(variable,
   # Check if paths exists
   if (!file.exists(input_var_path))
     stop(paste0("Path: ", input_var_path, " does not exist."))
+
 
   # Check variable name is one of the accepted values
   accepted_vars <- c("bio1", "bio10", "bio11", "bio12", "bio13",
@@ -204,7 +205,7 @@ get_predict_table <- function(variable,
   }
 
   # Delete temporary output directory
-  unlink(tmp_dir, recursive = TRUE)
+  #unlink(tmp_dir, recursive = TRUE)
 
   if (read == TRUE) {
     # Read predict table
