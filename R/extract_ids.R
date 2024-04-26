@@ -87,7 +87,7 @@ extract_ids <- function(data = NULL, lon, lat, id = NULL, basin_layer = NULL,
 
   # Extract all the ID values of the subcatchment layer if no point
   # location is provided
-  if(is.null(data)) {
+  if (is.null(data)) {
 
     # Check if paths exists
     if (!file.exists(subc_layer))
@@ -101,7 +101,7 @@ extract_ids <- function(data = NULL, lon, lat, id = NULL, basin_layer = NULL,
     # Return data frame
     return(data_ids)
   } else {
-  # Extract IDs at point location
+    # Extract IDs at point location
     # Check if input data is of type data.frame,
     # data.table or tibble
     if (!is(data, "data.frame"))
@@ -177,7 +177,8 @@ extract_ids <- function(data = NULL, lon, lat, id = NULL, basin_layer = NULL,
       bas_path <- ifelse(is.null(basin_layer), 0, basin_layer)
 
       # Call the external .sh script extract_ids() containing the gdal function
-      processx::run(system.file("sh", "extract_ids.sh", package = "hydrographr"),
+      processx::run(system.file("sh", "extract_ids.sh",
+                                package = "hydrographr"),
                     args = c(coord_tmp_path, lon, lat, subc_layer, bas_path,
                              tempdir(), ids_tmp_path),
                     echo = !quiet)
@@ -192,10 +193,8 @@ extract_ids <- function(data = NULL, lon, lat, id = NULL, basin_layer = NULL,
       wsl_bas_path <- ifelse(is.null(basin_layer), 0, fix_path(basin_layer))
       wsl_tmp_path <- fix_path(tempdir())
       wsl_ids_tmp_path <- fix_path(ids_tmp_path)
-      wsl_sh_file <- fix_path(
-        system.file("sh", "extract_ids.sh",
-                    package = "hydrographr"))
-
+      wsl_sh_file <- fix_path(system.file("sh", "extract_ids.sh",
+                                          package = "hydrographr"))
       processx::run(system.file("bat", "extract_ids.bat",
                                 package = "hydrographr"),
                     args = c(wsl_coord_tmp_path, lon, lat, wsl_subc_layer,
