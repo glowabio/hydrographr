@@ -185,19 +185,34 @@ do
     fi
 done
 
-printf -v joined '%s,' "${arr[@]:1}"  # remove from array the first column
+if [[ "${#arr[@]}" -gt 1 ]]
+then
+    printf -v joined '%s,' "${arr[@]:1}"  # remove from array the first column
 
 ##  remove subcID columns (except column 1) and make the table comma separated
-cut -d" " --complement -f $(echo "${joined%,}") $TMP/all_var_full.txt \
+    cut -d" " --complement -f $(echo "${joined%,}") $TMP/all_var_full.txt \
     | tr -s ' ' ',' > $TMP/all_var_trim.csv
 
 ##  remove duplicates and create final output table
-[[ "${#tiles[@]}" -gt 1  ]] && awk -F, '!a[$0]++'  $TMP/all_var_trim.csv > $OUTFILE || cp $TMP/all_var_trim.csv $OUTFILE
+    [[ "${#tiles[@]}" -gt 1  ]] && awk -F, '!a[$0]++'  $TMP/all_var_trim.csv > $OUTFILE || cp $TMP/all_var_trim.csv $OUTFILE
+
+else
+
+    cat $TMP/all_var_full.txt |  tr -s ' ' ',' > $TMP/all_var_trim.csv
+##  remove duplicates and create final output table
+    [[ "${#tiles[@]}" -gt 1  ]] && awk -F, '!a[$0]++'  $TMP/all_var_trim.csv > $OUTFILE || cp $TMP/all_var_trim.csv $OUTFILE
+    
+fi
+
 
 #########################
 # remove temporal files
 rm $TMP/aggreg*
 rm $TMP/ENV*  
+rm $TMP/all_var_trim.csv
+rm $TMP/all_var_full.txt
+
+
 
 exit
  
