@@ -2,10 +2,15 @@
 #'
 #' @description Extracts the ID value of the basin and/or sub-catchment raster
 #' layer at given point locations. Can also be used for point-based extraction
-#' of any .tif layer by specifying the layer in the "basin" parameter.
+#' of any .tif layer by specifying the layer in the "basin" parameter. The
+#' function can be used to extract all the sub-catchment IDs present in a
+#' sub-catchment raster as well, by providing the the sub-catchment raster
+#' layer as the only input.
 #'
 #' @param data a data.frame or data.table that contains the columns regarding
-#' the longitude / latitude coordinates in WGS84.
+#' the longitude / latitude coordinates in WGS84. If data is missing and a
+#' sub-catchment raster layer is provided, the function will extract all the
+#' ID value present in the layer.
 #' @param lon character. The name of the column with the longitude coordinates.
 #' @param lat character. The name of the column with the latitude coordinates.
 #' @param id character. The name of a column containing unique IDs for each row
@@ -28,7 +33,9 @@
 #' function 'gdallocationinfo' is used. The point locations have to be defined
 #' by coordinates in the WGS84 reference system. The function can also be used
 #' to extract any value from a given raster layer in a WGS84 projection, such
-#' as environmental information that is stored in the input raster file.
+#' as environmental information that is stored in the input raster file. The
+#' extraction of all ID values from a sub-catchment raster layer is done with
+#' terra::unique.
 #'
 #' @note
 #' Duplicated rows will be removed.
@@ -209,10 +216,4 @@ extract_ids <- function(data = NULL, lon, lat, id = NULL, basin_layer = NULL,
     return(data_ids)
 
   }
-
-
-
-
-
-
 }
