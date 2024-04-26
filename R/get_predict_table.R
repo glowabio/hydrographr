@@ -4,6 +4,22 @@
 #' an specific subset of subcatchments.
 #'
 #' @param variable character vector of variable names. Possible values are:
+#' c("bio1", "bio10", "bio11", "bio12", "bio13",
+#' "bio14", "bio15", "bio16", "bio17", "bio18",
+#' "bio19", "bio2", "bio3", "bio4", "bio5",
+#' "bio6", "bio7", "bio8", "bio9", "c100",
+#' "c10", "c20", "c30", "c40", "c50",
+#' "c60", "c70", "c80", "c90", "chancurv",
+#' "chandistdwseg", "chandistupcel", "chandistupseg",
+#' "chanelvdwcel", "chanelvdwseg","chanelvupcel", "chanelvupseg",
+#' "changraddwseg", "changradupcel", "changradupseg",
+#' "elev", "flow", "flowpos", "gradient", "length",
+#' "out", "outdiffdwbasin", "outdiffdwscatch", "outdistdwbasin",
+#' "outdistdwscatch", "outlet", "slopdiff", "slopgrad", "soil",
+#' "source", "strdiffdwnear", "strdiffupfarth", "strdiffupnear",
+#' "strdistdwnear", "strdistprox","strdistupfarth",
+#' "strdistupnear", "stright").
+#'
 #' @param statistics character vector of statics names. Possible values are
 #' "sd", "mean", "range" or "ALL". Default "ALL"
 #' @param tile_id character. The IDs of the tiles of interest.
@@ -41,7 +57,7 @@ get_predict_table <- function(variable,
   #Check if one of the arguments is missing
   if (missing(variable))
     stop("variable is missing.
-    Please provide at least the name of one variable. Possible names are: ")
+    Please provide at least the name of one variable")
 
   if (missing(tile_id))
     stop("Please provide at least one tile ID")
@@ -64,9 +80,23 @@ get_predict_table <- function(variable,
     stop(paste0("Path: ", out_file_path, " does not exist."))
 
   # Check if the variable name provided is one of the accepted values
-  if (!variable %in% c()) {
-    stop("Please provide a valid variable name. Variable must be one of:
-                ")
+  var_list <- c("bio1", "bio10", "bio11", "bio12", "bio13",
+                "bio14", "bio15", "bio16", "bio17", "bio18",
+                "bio19", "bio2", "bio3", "bio4", "bio5",
+                "bio6", "bio7", "bio8", "bio9", "c100",
+                "c10", "c20", "c30", "c40", "c50",
+                "c60", "c70", "c80", "c90", "chancurv",
+                "chandistdwseg", "chandistupcel", "chandistupseg",
+                "chanelvdwcel", "chanelvdwseg","chanelvupcel", "chanelvupseg",
+                "changraddwseg", "changradupcel", "changradupseg",
+                "elev", "flow", "flowpos", "gradient", "length",
+                "out", "outdiffdwbasin", "outdiffdwscatch", "outdistdwbasin",
+                "outdistdwscatch", "outlet", "slopdiff", "slopgrad", "soil",
+                "source", "strdiffdwnear", "strdiffupfarth", "strdiffupnear",
+                "strdistdwnear", "strdistprox","strdistupfarth",
+                "strdistupnear", "stright")
+  if (!variable %in% var_list) {
+    stop("Please provide a valid variable name")
   }
 
   # Check if statistics name provided is one of the accepted values
@@ -146,7 +176,7 @@ get_predict_table <- function(variable,
   }
 
   # Delete temporary output directory
-  unlink(tmp_dir, recursive = TRUE)
+  #unlink(tmp_dir, recursive = TRUE)
 
   if (read == TRUE) {
     # Read predict table
