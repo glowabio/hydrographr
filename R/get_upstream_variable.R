@@ -17,22 +17,22 @@
 #' with \code{\link{extract_zonal_stat()}}.
 #'
 #' @param g igraph object. A directed graph.
-#' @param network_table a data.table that includes the "stream" column
+#' @param variable_table a data.table that includes the "stream" column
 #' (corresponding to the subc_id) as well as the attributes that should be
 #' aggregated across the the upstream network subc_id. Default is NULL.
 #' @param subc_id A vector of subc_id for which to calculate the
 #' upstream variables. Optional; default is to use all subc_id of the input graph.
 #' @param var_layer character vector. One or more attributes (variable layers)
-#' of the network_table should be reported for each output subc_id.
+#' of the variable_table should be reported for each output subc_id.
 #' Default is NULL.
-#' @param stat one of the functions mean, median, min, max, sd, sum
+#' @param upstream_stat one of the functions mean, median, min, max, sd, sum
 #' (without quotes). The function will be used to aggregate (or summarize)
 #' the upstream variables for each subc_id (e.g., the average
 #' land cover acorss the entire upstream area. Default is NULL.
 #' @param include_focal Whether the focal subc_id should be
 #' included in the aggregation (include_focal = TRUE, which is the default). Set
 #' to FALSE if the focal subc_id should not be included.
-#' @param save_output Set to TRUE if you want to save the intermediate result
+#' @param save_up_conn Set to TRUE if you want to save the intermediate result
 #' consisting of a data.table that includes all upstream connections for each
 #' subc_id. Useful for large study areas as it avoids re-running
 #' the possibly time-consuming pre-processing. The data.table will be saved as
@@ -48,34 +48,31 @@
 #' parallel back-end in MB. Default is 1500 (1.5 GB). Consider a higher value
 #' for large study areas (more than one 20°x20° tile). Optional.
 #'
-#' @importFrom foreach foreach
+#' @importFrom foreach foreach getDoParWorkers
 #' @importFrom doFuture registerDoFuture
-#' @importFrom parallel stopCluster
-#' @importFrom data.table as.data.table setDT setnames
-#' rbindlist setcolorder setkey
-#' @importFrom igraph ego as_ids is_directed as_data_frame
-#' @importFrom future.apply future_lapply future_sapply future_mapply
+#' @importFrom parallel makePSOCKcluster stopCluster
+#' @importFrom doParallel
+#' @importFrom data.table data.table setDT setnames  rbindlist
+#' @importFrom igraph  subcomponent as_ids is_directed degree edge_attr_names
+#' delete_edge_attr
+#' @importFrom future.apply future_lapply future_mapply
 #' @importFrom dplyr mutate
 #' @importFrom memuse Sys.meminfo
 #' @export
 #'
 #'
 #' @returns
-#' A data.table indicating the connected segments (stream  | to_stream), or a
-#' data.table that summarizes the attributes of those neighbours contributing
-#' to each segment.
+#' A data.table indicating the "stream" (=subc_id) and the upstream variables
+#' which have the same column names as the \code{var_layer} argument. The
+#' intermediate output can be saved to disk (requires setting \code{save_up_conn} = TRUE).
 #'
-#' #' @note
-#' Currently the attributes are not provided for the outlet (the selected
-#' subc_id segment). If the attributes are also needed for the outlet subc_id,
-#' then the next downstream sub_id can be selected (enlarge the study area)
-#' using e.g. \code{\link{get_catchment_graph()}}.
 #'
 #' @author Sami Domisch
 #'
 #' @references
 #' Csardi G, Nepusz T: The igraph software package for complex network research,
 #' InterJournal, Complex Systems 1695. 2006. \url{https://igraph.org}
+#'
 #'
 #' @seealso
 #' \code{\link{read_geopackage()}} and \code{\link{get_catchment_graph()}} to
@@ -87,117 +84,103 @@
 #' # Download test data into the temporary R folder
 #' # or define a different directory
 #' my_directory <- tempdir()
+#' setwd(my_directory)
 #' download_test_data(my_directory)
 #'
 #' # Load the stream network as graph
-#' my_graph <- read_geopackage(gpkg= paste0(my_directory,
+#' my_graph <- read_geopackage(gpkg = paste0(my_directory,
 #'                                          "/hydrography90m_test_data",
 #'                                          "/order_vect_59.gpkg"),
-#'                             import_as = "graph")
+#'                                           import_as = "graph")
 #'
 #' # Subset the graph and get a smaller catchment
-#' my_graph <- get_catchment_graph(g = my_graph, subc_id = 513866048, mode = "in",
-#'                                 outlet = FALSE, as_graph = TRUE, n_cores = 1)
+#' my_graph <- get_catchment_graph(g = my_graph,
+#'                                 subc_id = 513867228,
+#'                                 mode = "in",
+#'                                 outlet = FALSE,
+#'                                 as_graph = TRUE,
+#'                                 n_cores = 1)
 #'
 #'
-#' # Get a vector of all segment IDs
-#' library(igraph)
-#' subc_id <- as_ids(V(my_graph))
+#' ## Prepare the variables that should be accumulated.
+#' ## Load the table
+#' variable_table <- read_geopackage(gpkg = paste0(my_directory,
+#'                                                "/hydrography90m_test_data",
+#'                                               "/order_vect_59.gpkg"),
+#'                                               import_as = "data.table")
+#'
+#' ## Specify the layers for the upstream aggregation
+#' var_layer= c("length", "flow_accum")
+#'
+#' ## Subset the table
+#' keep_these <- c("stream", var_layer)
+#' variable_table <- variable_table[, ..keep_these]
 #'
 #'
-#' # Get all (up-and downstream) directly adjacent neighbours of each segment
-#' get_segment_neighbours(g = my_graph, subc_id = subc_id,
-#'                        order = 1, mode = "all")
+#' ## Get the upstream sum of the variables "length" and "flow_accum"
+#' result <- get_upstream_variable(my_graph,
+#'                                 variable_table = variable_table,
+#'                                 var_layer = var_layer,
+#'                                 upstream_stat=sum,
+#'                                 include_focal = TRUE,
+#'                                 save_up_conn = FALSE)
 #'
-#' # Get the upstream segment neighbours in the 5th order
-#' # and report the length and source elevation
-#' # for the neighbours of each input segment
-#' get_segment_neighbours(g = my_graph, subc_id = subc_id,
-#'                        order = 5, mode = "in", n_cores = 1,
-#'                        var_layer = c("length", "source_elev"),
-#'                        attach_only = TRUE)
 #'
-#' # Get the downstream segment neighbours in the 5th order
-#' # and calculate the median length and source elevation
-#' # across the neighbours of each input segment
-#' get_segment_neighbours(g = my_graph, subc_id = subc_id,
-#'                        order = 2, mode ="out", n_cores = 1,
-#'                        var_layer = c("length", "source_elev"),
-#'                        stat = median)
+#' ## Map the new variable across the network
 #'
-#' # Get the up-and downstream segment neighbours in the 5th order
-#' # and report the median length and source elevation
-#' # for the neighbours of each input segment
-#' get_segment_neighbours(g = my_graph, subc_id = subc_id, order = 2,
-#'                        mode = "all", n_cores = 1,
-#'                        var_layer = c("length", "source_elev"),
-#'                        stat = mean, attach_only = TRUE)
+#' ## Specify tif-layer for reclassification
+#' subc_raster <- paste0(my_directory, "/hydrography90m_test_data/subcatchment_1264942.tif")
+#' recl_raster <- paste0(my_directory, "/upstream_sum.tif")
+#'
+#' ## Set columns as integer
+#' result <- result[, names(result) := lapply(.SD, as.integer)]
+#'
+#' ### Not working in case not all subc_is are present in the raster
+#'
+#' ### Create raster - select the "to" column which represents the unique subc_id
+#' reclass_raster(data = result,
+#'                rast_val = "stream",
+#'                new_val = "length",
+#'                raster_layer = subc_raster,
+#'               recl_layer = recl_raster)
+#'
+#'
+#'
 #'
 
 
-### Downstream accumulation
-library(hydrographr)
-library(doFuture)
-library(doParallel)
-library(future.apply)
-library(foreach)
-library(parallel)
-library(data.table)
-library(dplyr)
-library(igraph)
-
-options(scipen = 999)
-
-### Get the path number as an additional column in the graph list.vs
-mapply_fun <- function(element,name){
-  mutate(element, PATH_ID = name)
-}
-
-
-## Download test data into the temporary R folder
-## or define a different directory
-wdir <- "D:/test/break_network"
-# download_test_data(my_directory)
-
-
-## Prepare the variables that should be accumulated.
-## Load the table
-
-network_table <- hydrographr::read_geopackage(gpkg = paste0(wdir,
-                                                            "/hydrography90m_test_data",
-                                                            "/order_vect_59.gpkg"),
-                                              import_as = "data.table")
-
-keep_these <- c("stream", var_layer)
-network_table <- network_table[, ..keep_these]
 
 
 
-## Load stream network as a graph
-g <- hydrographr::read_geopackage(gpkg = paste0(wdir,
-                                                "/hydrography90m_test_data",
-                                                "/order_vect_59.gpkg"),
-                                  import_as = "graph")
 
-
-subc_id <- c(513890159, 513884933)
-
-g
-network_table=
-  var_layer= c("length", "flow_accum")
-stat=sum
-include_focal = TRUE default
-n_cores=4
-max_size=3000
-
-54.206.981, 4 tiles
-
-accumulate_downstream <- function(g, network_table = NULL, subc_id = NULL,
-                                  var_layer = NULL, stat = NULL,
-                                  include_focal = FALSE,
+get_upstream_variable <- function(g, variable_table = NULL, subc_id = NULL,
+                                  var_layer = NULL, upstream_stat = NULL,
+                                  include_focal = FALSE, save_up_conn = FALSE,
                                   n_cores = 1, max_size = 3000) {
 
 
+
+  ### Upstream variables
+  # library(hydrographr)
+  # library(doFuture)
+  # library(doParallel)
+  # library(future.apply)
+  # library(foreach)
+  # library(parallel)
+  # library(data.table)
+  # library(dplyr)
+  # library(igraph)
+
+
+
+  ## Function for getting the path number as an additional column in the
+  ## graph list
+  mapply_fun <- function(element,name){
+    mutate(element, PATH_ID = name)
+  }
+
+  ## Make sure that long integers are not in exponential mode
+  options(scipen = 999)
 
   # Check input arguments
   if (class(g) != "igraph")
@@ -206,13 +189,22 @@ accumulate_downstream <- function(g, network_table = NULL, subc_id = NULL,
   if (!is_directed(g))
     stop("The input graph must be a directed graph.")
 
-  if (missing(network_table))
+  if (missing(variable_table))
     stop("Please provide a table that includes the variable for each
          sub-catchment, and which should be used for the upstream aggregation.")
+
+  if (missing(subc_id))
+    cat("No subc_id specified. Using all subc_id of the entire network. \n")
 
   if (missing(var_layer))
     stop("Please provide the name(s) of the variable that should be should be
          used for the upstream aggregation.")
+
+  if (missing(upstream_stat))
+    stop("Please provide the aggregation statistic, either mean, min, max, sd, or sum.")
+
+
+
 
   cat("Setting up parallel backend...\n")
 
@@ -224,7 +216,9 @@ accumulate_downstream <- function(g, network_table = NULL, subc_id = NULL,
 
   cl <- makePSOCKcluster(n_cores, outfile="")
   registerDoParallel(cl) # register parallel backend
-  # getDoParWorkers() # show number of workers
+
+
+  cat("using", getDoParWorkers(), "CPUs..\n")  # show number of workers
   registerDoFuture()
 
   ## Drop graph attributes to reduce object size and avoid a bottleneck in foreach
@@ -233,11 +227,11 @@ accumulate_downstream <- function(g, network_table = NULL, subc_id = NULL,
     g <- delete_edge_attr(g, i)
   }
 
-
   ### Specify all headwater segments
   headwater = which(degree(g, v = V(g), mode = "in")==0, useNames = T)
-  ### Specify all segments except headwaters
+  headwater <- names(headwater)
 
+  ###Specify all segments except headwaters
   ## Check if the user supplied the subc_id. If not, use all subc_id of the graph
   if(!missing(subc_id)){
     if (is.data.frame(subc_id) == TRUE)
@@ -260,65 +254,69 @@ accumulate_downstream <- function(g, network_table = NULL, subc_id = NULL,
                         }
   end1 <- Sys.time()
 
-  ### Get into datatable format
-  names(l) <- names(subc_id)
+  ### Get into data.table format
+  names(l) <- subc_id
   l <- future_lapply(l, as_ids)
   l <- future_lapply(l, as.data.table)
 
   ### Get the path number as an additional column
   l <- future_mapply(mapply_fun,l,names(l),SIMPLIFY = F)
 
-  ### Merge as datatable
+  ### Merge as data.table
   upstream_dt <- rbindlist(l)
-  rm(l)
-  setnames(upstream_dt, c("upstream_subc_id", "stream"))
+  rm(l); gc() # free RAM
+  setnames(upstream_dt, c("stream", "base"))
 
-  ### remove the rows that have the same subc_id in from and to
-  if(include_focal == FALSE) {
-    upstream_dt <- upstream_dt[!upstream_dt$upstream_subc_id == upstream_dt$stream]
+  ## Remove the rows that have the same subc_id in from and to
+  ## Check which opttion was chosen by the user
+  if(include_focal == FALSE) { # default
+    upstream_dt <- upstream_dt[!upstream_dt$stream == upstream_dt$base]
   }
 
   ### Attach the headwaters
-  headwater <- data.table(stream = names(headwater),
-                          upstream_subc_id = NA)
+  headwater <- data.table(base = headwater,
+                          stream = NA)
 
   upstream_dt <- rbind(upstream_dt, headwater)
 
-  ## Write the stream (subc_id) into the upstream_subc_id-column --> fill the
+  ## Write the base (subc_id) into the upstream_subc_id-column --> fill the
   ## headwaters that do not have any upstream subc_id and were not needed for
   ## the previous calculation
-  upstream_dt$upstream_subc_id <- ifelse(is.na(upstream_dt$upstream_subc_id),
-                                         upstream_dt$stream,
-                                         upstream_dt$upstream_subc_id)
+  upstream_dt$stream <- ifelse(is.na(upstream_dt$stream),
+                                         upstream_dt$base,
+                                         upstream_dt$stream)
 
 
-
-  # Change to integers
-  upstream_dt$upstream_subc_id <- as.integer(upstream_dt$upstream_subc_id)
+  ## Change to integers
   upstream_dt$stream <- as.integer(upstream_dt$stream)
+  upstream_dt$base <- as.integer(upstream_dt$base)
 
-  # Optional: save the data.table as a .RData file
-  if(save_output == TRUE) {
-    save(upstream_dt, file=paste(getwd(), "/tmp_accumulate_upstream.RData"))
+  ## Optional: save the data.table as a .RData file
+  if(save_up_conn == TRUE) {
+    save(upstream_dt, file=paste(getwd(), "/tmp_all_upstream_connections.RData"))
   }
 
-
-  # Attach the attributes that should be aggregated. Must have the same subc_ids
-  # as the "stream" in the table
+  ## Attach the attributes that should be aggregated. Must have the same subc_ids
+  ## as the "base" in the table
   cat("Attaching the attributes...", "\n")
-  upstream_dt <- upstream_dt[network_table, on = "stream"]
+  upstream_dt <- upstream_dt[variable_table, on = "stream"]
 
 
   ### Aggregate the variables for each subc_id
-  cat("Aggregating variable(s)", var_layer, "for each subc_id.\n")
-  if(!missing(stat) {
-  dt_agg <- upstream_dt[, lapply(.SD, stat, na.rm = TRUE),
+  cat("Aggregating upstream variable(s):", var_layer, "\n")
+
+  if(!missing(upstream_stat)) {
+  dt_agg <- upstream_dt[, lapply(.SD, upstream_stat, na.rm = TRUE),
                         .SDcols = var_layer,
-                        by = "stream"]
+                        by = "base"]
+
+  setnames(dt_agg, c("stream", var_layer))
 
   } else {
     stop("Please provide the summary statistic for the aggregation.")
   }
+
+  return(dt_agg)
 
   ## Stop the cluster object
   stopCluster(cl)
@@ -327,7 +325,7 @@ accumulate_downstream <- function(g, network_table = NULL, subc_id = NULL,
 end2 <- Sys.time()
 
 
-  # if(nrow(network_table) != nrow(dt_agg) {
+  # if(nrow(variable_table) != nrow(dt_agg) {
   #   cat("Please note that the output has a different number or rows than the
   #       input table.", "\n")
   # }

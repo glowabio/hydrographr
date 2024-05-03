@@ -104,6 +104,7 @@ Collate:
     'get_segment_neighbours.R'
     'get_tile_id.R'
     'get_upstream_catchment.R'
+    'get_upstream_variable.R'
     'utils.R'
     'merge_tile.R'
     'read_geopackage.R'
