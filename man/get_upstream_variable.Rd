@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_upstream_variable.R
 \name{get_upstream_variable}
 \alias{get_upstream_variable}
-\title{Calculate upstream variable for each sub-catchment}
+\title{Calculate upstream variables for each sub-catchment}
 \usage{
 get_upstream_variable(
   g,
@@ -11,7 +11,8 @@ get_upstream_variable(
   var_layer = NULL,
   upstream_stat = NULL,
   include_focal = FALSE,
-  save_up_conn = FALSE,
+  save_up_conn = NULL,
+  load_up_conn = NULL,
   n_cores = 1,
   max_size = 3000
 )
@@ -19,12 +20,12 @@ get_upstream_variable(
 \arguments{
 \item{g}{igraph object. A directed graph.}
 
-\item{variable_table}{a data.table that includes the "stream" column
+\item{variable_table}{a data.table that includes the \code{stream} column
 (corresponding to the subc_id) as well as the attributes that should be
 aggregated across the the upstream network subc_id. Default is NULL.}
 
-\item{subc_id}{A vector of subc_id for which to calculate the
-upstream variables. Optional; default is to use all subc_id of the input graph.}
+\item{subc_id}{A vector of subc_id for which the upstream variables should
+be calculated. Optional; default is to use all subc_id of the input graph.}
 
 \item{var_layer}{character vector. One or more attributes (variable layers)
 of the variable_table should be reported for each output subc_id.
@@ -33,25 +34,36 @@ Default is NULL.}
 \item{upstream_stat}{one of the functions mean, median, min, max, sd, sum
 (without quotes). The function will be used to aggregate (or summarize)
 the upstream variables for each subc_id (e.g., the average
-land cover acorss the entire upstream area. Default is NULL.}
+land cover across the entire upstream area). Default is NULL.}
 
 \item{include_focal}{Whether the focal subc_id should be
-included in the aggregation (include_focal = TRUE, which is the default). Set
-to FALSE if the focal subc_id should not be included.}
+included in the aggregation with \code{include_focal = TRUE} which is the
+default. Set to FALSE if the focal subc_id should not be included in the
+upstream aggregation of the given sub-catchment.}
 
-\item{save_up_conn}{Set to TRUE if you want to save the intermediate result
+\item{save_up_conn}{character. Provide a name of the .RData file that will be
+written to disk (to \code{getwd()}), and which includes the intermediate result
 consisting of a data.table that includes all upstream connections for each
 subc_id. Useful for large study areas as it avoids re-running
-the possibly time-consuming pre-processing. The data.table will be saved as
-an .RData file to getwd(). Default is FALSE.}
+the possibly time-consuming pre-processing to obtain other metrics (e.g.
+mean, sum) or other variables. The data.table is called \code{upstream_dt}
+and has the columns \code{stream} and \code{base}. Default is FALSE.}
 
-\item{n_cores}{numeric. Number of cores used for parallelisation. Default is 1.
-In case the graph is very large, and many segments are
-used as an input, setting n_cores to a higher value can speed up the
-computation. Note however that the parallelisation process requires copying
-the input graph to each core. This may result in possible RAM limitations
-and even slower processing. Hence consider testing first with a lower numver
-of cores. Default is n_cores = 1. Optional.}
+\item{load_up_conn}{Optional, and if used, it should be \code{upstream_dt}.
+In case the file with the upstream connections was previously written to
+disk (using e.g. \code{save_up_conn = "my_file"}), then this data.table can
+be first loaded with \code{load(paste0(getwd(), "/my_file.RData"))}, which
+loads the \code{upstream_dt} data.table with the columns
+\code{c("stream", "base")}. Use  \code{load_up_conn = upstream_dt} to then
+skip the pre-processing. Optional, default is NULL.}
+
+\item{n_cores}{numeric. Number of cores used for parallelisation. In case
+the graph is very large, and many segments are used as an input, setting
+n_cores to a higher value can speed up the computation. Note however that
+the parallelisation process requires copying the input graph to each core.
+This may result in possible RAM limitations and even slower processing.
+Hence consider testing first with a lower number of cores. Default is
+n_cores = 1. Optional.}
 
 \item{max_size}{numeric. Specifies the maximum size of the data passed to the
 parallel back-end in MB. Default is 1500 (1.5 GB). Consider a higher value
@@ -60,7 +72,8 @@ for large study areas (more than one 20°x20° tile). Optional.}
 \value{
 A data.table indicating the "stream" (=subc_id) and the upstream variables
 which have the same column names as the \code{var_layer} argument. The
-intermediate output can be saved to disk (requires setting \code{save_up_conn} = TRUE).
+intermediate output can be saved to disk (requires setting
+\code{save_up_conn} = "my_file").
 }
 \description{
 For each input sub-catchment, the function calculates the
@@ -116,13 +129,38 @@ keep_these <- c("stream", var_layer)
 variable_table <- variable_table[, ..keep_these]
 
 
-## Get the upstream sum of the variables "length" and "flow_accum"
+## Get the upstream sum of the variables "length" and "flow_accum" for
+## single subc_id
+result <- get_upstream_variable(my_graph,
+                                variable_table = variable_table,
+                                var_layer = var_layer,
+                                upstream_stat=sum,
+                                subc_id = c(513861908, 513864129),
+                                include_focal = TRUE)
+
+
+## Get the upstream sum of the variables "length" and "flow_accum" across the
+## entire network
 result <- get_upstream_variable(my_graph,
                                 variable_table = variable_table,
                                 var_layer = var_layer,
                                 upstream_stat=sum,
                                 include_focal = TRUE,
-                                save_up_conn = FALSE)
+                                n_cores = 4,
+                                save_up_conn = "my_file")
+
+
+## Alternatively, load the previously generated upstream connections
+## and use it directly, skipping the pre-processing
+load(paste0(getwd(), "/my_file.RData"))
+
+result <- get_upstream_variable(my_graph,
+                                variable_table = variable_table,
+                                var_layer = var_layer,
+                                upstream_stat=max,
+                                include_focal = TRUE,
+                                load_up_conn = upstream_dt)
+
 
 
 ## Map the new variable across the network
@@ -134,16 +172,16 @@ recl_raster <- paste0(my_directory, "/upstream_sum.tif")
 ## Set columns as integer
 result <- result[, names(result) := lapply(.SD, as.integer)]
 
-### Not working in case not all subc_is are present in the raster
-
 ### Create raster - select the "to" column which represents the unique subc_id
-reclass_raster(data = result,
-               rast_val = "stream",
-               new_val = "length",
-               raster_layer = subc_raster,
-              recl_layer = recl_raster)
+r <- reclass_raster(data = result,
+                   rast_val = "stream",
+                   new_val = "flow_accum",
+                   raster_layer = subc_raster,
+                   recl_layer = recl_raster,
+                   read = TRUE)
 
-
+## Plot the map
+terra::plot(r, background = "grey")
 
 
 }
