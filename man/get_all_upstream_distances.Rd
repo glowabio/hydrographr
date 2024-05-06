@@ -63,8 +63,7 @@ network_table <- hydrographr::get_catchment_graph(g = my_graph ,
                                                   n_cores = 1)
 
 ## Condense the table supplied to the function to save RAM
-VAR <- "out_dist"
-keep_these <- c("stream", "next_stream", VAR)
+keep_these <- c("stream", "next_stream", "out_dist")
 network_table <- network_table[, ..keep_these]
 
 ## Change to integers

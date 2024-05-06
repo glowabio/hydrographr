@@ -73,8 +73,7 @@
 #'                                                   n_cores = 1)
 #'
 #' ## Condense the table supplied to the function to save RAM
-#' VAR <- "out_dist"
-#' keep_these <- c("stream", "next_stream", VAR)
+#' keep_these <- c("stream", "next_stream", "out_dist")
 #' network_table <- network_table[, ..keep_these]
 #'
 #' ## Change to integers
@@ -93,13 +92,15 @@
 get_all_upstream_distances <- function(network_table = network_table,
                                        n_cores = 1) {
 
+  options(scipen = 999)
+  "%ni%" <- Negate("%in%")
 
   ## Check if input exists
   if(missing(network_table) == TRUE)
     stop("Please provide the input data.table.")
 
    ## Check if input is a data.table
-  if(checkDT(network_table) != TRUE)
+  if("data.table" %ni% class(network_table))
     stop("The input must be data.table object.")
 
   ## Check columns of upstream_dt
@@ -107,18 +108,20 @@ get_all_upstream_distances <- function(network_table = network_table,
     stop("The input datatable needs to have")
 
 
+
+
 ## Register parallel backend
 ## Make cluster object
-n_cores=4
 cl <- makePSOCKcluster(n_cores) # outfile=""
 registerDoParallel(cl) # register parallel backend
-getDoParWorkers() # show number of workers
+cat("using", getDoParWorkers(), "CPUs...\n") # show number of workers
 
-
-options(scipen = 999)
 
 ## List for storing the results
 results <- list()
+
+
+cat("Calculating the network connections across subc_ids...\n")
 
 # .combine=rbindlist,
 ### Start loop in parallel
@@ -193,6 +196,8 @@ results <- rbindlist(results)
 ### Stop the cluster object
 stopCluster(cl)
 
+cat("Attaching the network distance...\n")
+
 ## Remove NAs
 results <- results[complete.cases(results),]
 
@@ -216,11 +221,10 @@ setnames(results, c("stream", "stream_up"))
 setkey(results, stream)
 
 
+## Merge distance from each subc_id (in m) to main outlet separately
 
-### Merge distance from each subc_id (in m) to main outlet separately
-
-### Distance from each segement to the downstream pour point-segment
-### Create ID column
+## Distance from each segement to the downstream pour point-segment
+## Create ID column
 results$seq_id <- seq.int(1:nrow(results))
 
 
@@ -240,8 +244,8 @@ results_stream_up <- results_stream_up[with(results_stream_up, order(seq_id)), ]
 results$dist_m <-  results_stream_up$out_dist - results_stream$out_dist
 results$dist_m <- as.integer(round(results$dist_m))
 results[,seq_id:=NULL] # remove id column
-return(results)
 
+return(results)
 }
 
 
