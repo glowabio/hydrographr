@@ -12,6 +12,8 @@
 #' sub-catchments for spatially explicit models or for spatial prioritization
 #' analyses (e.g. Marxan/Gurobi). By selecting a wider radius, the spatial
 #' dependency of the neighbouring segments / sub-catchments can be increased.
+#' See also \code{\link{get_all_upstream_distances()}} which creates the input
+#' for addressing the longitudinal connectivity for the spatial prioritization.
 #'
 #' @param g igraph object. A directed graph.
 #' @param subc_id numeric vector of the input sub-catchment IDs
@@ -75,7 +77,9 @@
 #'
 #' @seealso
 #' \code{\link{read_geopackage()}} and \code{\link{get_catchment_graph.()}} to
-#' create the input graph.
+#' create the input graph. The function \code{\link{get_all_upstream_distances()}}
+#' can be be used to obtain the network distance for all upstream subc_id (useful
+#' as an input for a subsequent spatial prioritization analysis).
 #'
 #' @examples
 #' # Download test data into the temporary R folder
