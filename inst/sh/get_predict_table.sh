@@ -4,12 +4,12 @@
 #### parameters
 
 ###  1. list of variables of interest: list separated by commas
-###  2. list of statistics of interest :  default "ALL" or list separated by commas 
+###  2. list of statistics of interest :  default "ALL" or list separated by commas
 ###  3. list of neccesary tiles IDs: list separated by commas
 ###  4. path to environmental tables
 ###  5. path to output file
 ###  6. path to temporal folder
-###  7. number of cores (if possible) to run internal process in parallel: 
+###  7. number of cores (if possible) to run internal process in parallel:
 ###     Highest number needed = (n.tiles * n.variables)
 
 
@@ -29,20 +29,20 @@
 
 # variables of interest
 #export var=( bio1 c10_2020 spi stright )
-VAR=( $(echo $1 | tr "," "\n") )
+VAR=( $(echo $1 | tr "/" "\n") )
 [[ "${#VAR[@]}" -eq 1 ]] && var=($(echo $1)) || var=("${VAR[@]}")
 export var
 
 # select summary statistics
 # ALL
 # c(mean, sd)
-ss=( $(echo $2 | tr "," "\n") )
+ss=( $(echo $2 | tr "/" "\n") )
 [[ "${#ss[@]}" -eq 1 ]] && SS=($(echo $2)) || SS=("${ss[@]}")
 export SS
 
 # tiles of interest
 #export tiles=( h18v02 h18v04 h20v02 h20v04 )
-TT=($(echo "$3" | tr "," "\n"))
+TT=($(echo "$3" | tr "/" "\n"))
 [[ "${#TT[@]}" -eq 1 ]] && tiles=($(echo $3)) || tiles=("${TT[@]}")
 export tiles
 
@@ -81,7 +81,7 @@ export NCORES=$8
 
 ##################
 # Move through each tiles and extract the subcatchment of interests for
-# all variables 
+# all variables
 
 subsetTB(){
     TL=$1  # tile
@@ -105,9 +105,9 @@ then
     do
         NR=$(awk 'NR == 1 {print NF}' $TB)
         [[ "$NR" != 6 ]] && continue
-        
+
         RAND_STRING=$(xxd -l 8 -c 32 -p < /dev/random)
-       
+
         read -a header <  $TB   # read first line into array "header"
         declare -a arr=() # array to store the position in which the subCid name is
 
@@ -150,7 +150,7 @@ read -a header < $TMP/aggreg_${X}.txt
 declare -a elem=()
 for e in mean min maxsd range
 do
-    [[ ${header[@]} =~ $e ]] && elem+=1 || elem+=0 
+    [[ ${header[@]} =~ $e ]] && elem+=1 || elem+=0
 done
 
 # set the right name for the header (e.g. bio1_mean)
@@ -173,7 +173,7 @@ rm $TMP/aggreg_${X}_tmp*.txt
 paste -d" " $(find $TMP/aggreg_*.txt) > $TMP/all_var_full.txt
 
 ## the previous line creates repetition of the subcID column
-## Chunk to delete the subCid column 
+## Chunk to delete the subCid column
 read -a header < $TMP/all_var_full.txt  # read first line into array "header"
 declare -a arr=() # array to store the position in which the subCid columns are
 
@@ -201,18 +201,18 @@ else
     cat $TMP/all_var_full.txt |  tr -s ' ' ',' > $TMP/all_var_trim.csv
 ##  remove duplicates and create final output table
     [[ "${#tiles[@]}" -gt 1  ]] && awk -F, '!a[$0]++'  $TMP/all_var_trim.csv > $OUTFILE || cp $TMP/all_var_trim.csv $OUTFILE
-    
+
 fi
 
 
 #########################
 # remove temporal files
 rm $TMP/aggreg*
-rm $TMP/ENV*  
+rm $TMP/ENV*
 rm $TMP/all_var_trim.csv
 rm $TMP/all_var_full.txt
 
 
 
 exit
- 
+

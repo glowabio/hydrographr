@@ -4,8 +4,19 @@
 #' an specific subset of subcatchments.
 #'
 #' @param variable character vector of variable names. Possible values are:
+#' c("bio1", "bio10", "bio11", "bio12", "bio13","bio14", "bio15", "bio16",
+#'  "bio17", "bio18","bio19", "bio2", "bio3", "bio4", "bio5","bio6", "bio7",
+#'  "bio8", "bio9", "c100", "c10", "c20", "c30", "c40", "c50","c60", "c70",
+#'  "c80", "c90", "chancurv","chandistdwseg", "chandistupcel", "chandistupseg",
+#'  "chanelvdwcel", "chanelvdwseg", "chanelvupcel","chanelvupseg",
+#'  "changraddwseg", "changradupcel", "changradupseg", "elev", "flow",
+#'  "flowpos", "gradient", "length", "out", "outdiffdwbasin", "outdiffdwscatch",
+#'  "outdistdwbasin", "outdistdwscatch", "outlet", "slopdiff", "slopgrad",
+#'  "soil", "source", "strdiffdwnear", "strdiffupfarth", "strdiffupnear",
+#'  "strdistdwnear", "strdistprox", "strdistupfarth", "strdistupnear",
+#'  "stright").
 #' @param statistics character vector of statistics names. Possible values are
-#' "sd", "mean", "range" or "ALL". Default "ALL"
+#' "sd", "mean", "range" or "ALL". Default "ALL".
 #' @param tile_id character. The IDs of the tiles of interest.
 #' @param input_var_path path to table with environmental variables for entire
 #' tiles.
@@ -22,11 +33,17 @@
 #' @importFrom stringi stri_rand_strings
 #' @importFrom data.table fread
 #'
-#' @return The function returns...
-#'
 #' @author Jaime García Márquez, Yusdiel Torres-Cambas
 #'
-#' @examples bla
+#' @return The function returns a table with
+#' * sub-catchment ID (subcID)
+#' * a column for each descriptive statistic of each variable (eg. bio1_mean:
+#' mean of the variable bio1)
+#' @md
+#'
+#' @examples
+#' # TODO
+
 
 get_predict_table <- function(variable,
                               statistics = "ALL",
@@ -60,9 +77,6 @@ get_predict_table <- function(variable,
   if (!file.exists(input_var_path))
     stop(paste0("Path: ", input_var_path, " does not exist."))
 
-  if (!file.exists(out_file_path))
-    stop(paste0("Path: ", out_file_path, " does not exist."))
-
   # Check variable name is one of the accepted values
   accepted_vars <- c("bio1", "bio10", "bio11", "bio12", "bio13",
                      "bio14", "bio15", "bio16", "bio17", "bio18",
@@ -80,14 +94,14 @@ get_predict_table <- function(variable,
                      "strdiffdwnear", "strdiffupfarth", "strdiffupnear",
                      "strdistdwnear", "strdistprox", "strdistupfarth",
                      "strdistupnear", "stright")
-  # if (!variable %in% accepted_vars)
-  #   stop("Please provide a valid variable name.")
+  if (any(!variable %in% accepted_vars))
+    stop("Please provide a valid variable name")
 
   # Check if statistics name provided is one of the accepted values
-  if (statistics != "ALL") {
-    if (!statistics %in% c("sd", "mean", "range"))
+  if (any(!(statistics %in% "ALL"))) {
+    if (any(!(statistics %in% c("sd", "mean", "range"))))
       stop("Please provide a valid statistics name. Possible values are
-             sd, mean, range")
+             sd, mean, range or ALL")
   }
 
 
@@ -115,6 +129,11 @@ get_predict_table <- function(variable,
 
   # Create temporary output directory
   dir.create(tmp_dir, showWarnings = FALSE)
+
+  # Format variable, statistics and tile_id vectors so they can be read in bash
+  variable <- paste(variable, collapse = "/")
+  statistics <- paste(statistics, collapse = "/")
+  tile_id <- paste(tile_id, collapse = "/")
 
   # Make bash scripts executable
   make_sh_exec()
@@ -160,7 +179,7 @@ get_predict_table <- function(variable,
   }
 
   # Delete temporary output directory
-  #unlink(tmp_dir, recursive = TRUE)
+  unlink(tmp_dir, recursive = TRUE)
 
   if (read == TRUE) {
     # Read predict table
