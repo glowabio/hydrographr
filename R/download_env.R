@@ -90,10 +90,8 @@ download_env <- function(variable, file_format = "zip",
   file_size_file <- paste0(tempdir(), "/env90m_paths_file_sizes.txt")
   if (!file.exists(file_size_file)) {
     message('Downloading env90m_paths_file_sizes.txt...')
-    # TODO: Replace this URL by the URL of the env file sizes file!
-    download.file("https://drive.google.com/uc?export=download&id=1SEkcgGPutP6ZQPvYtzICh_gcGnVgH_uR&confirm=t", # not yet correct!
+    download.file("https://public.igb-berlin.de/index.php/s/zw56kEd25NsQqcQ/download?path=%2FREADME/environment90m_paths_file_sizes.txt",
                   destfile = file_size_file, mode = "wb")
-
   }
 
   # Import lookup table with the size of each file
@@ -108,7 +106,7 @@ download_env <- function(variable, file_format = "zip",
   all_varnames <- sort(unique(sub("_[^_]+$", "",
                                     file_size_table$file_name)))
 
-  # Get the valid file_formats of the environment90m variables
+  # Get the valid file_names of the environment90m variables
   all_file_names <- sort(unique(file_size_table$file_name))
 
   # Get the valid tile ids of the environment90m
@@ -135,6 +133,11 @@ download_env <- function(variable, file_format = "zip",
                                         h90m_tile_id = all_tile_ids,
                                         h90m_file_names = all_file_names,
                                         file_size_table = file_size_table)
+
+      #message(paste0("Variable '",ivar,"', tile '",itile, "': Size: ", tile_size, " bytes."))
+      if (length(tile_size) == 0) {
+        warning(paste0("Error: Tile '", itile, "', of variable '", ivar, "' not available!"))
+      }
 
       tile_size_sum <- tile_size_sum + tile_size
 
