@@ -157,31 +157,21 @@ download_env <- function(variable, file_format = "zip",
          round(variable_size_sum / 1000000, 2),
          " MB."))
 
-  # General path to the download folder in Nimbus resp. GDrive
+  # General path to the download folder in Nimbus
+  # (GDrive is not available for environment90m data)
   nimbus_path <- "https://public.igb-berlin.de/index.php/s/zw56kEd25NsQqcQ/download?path=%2F"
-  gdrive_path <- "https://drive.google.com/uc?export=download&id="
 
   # Use README file as a test to check if Nimbus is up.
-  server_url <- tryCatch(
+  tryCatch(
     {
-      download.file(paste0(nimbus_path, "README/README.txt"),
-                    destfile = paste0(download_dir, "/README.txt"), mode = "wb")
-      server_url <- nimbus_path
-      server_url
+      nimbus_readme = paste0(nimbus_path, "README/README.txt")
+      download.file(nimbus_readme, destfile = paste0(download_dir, "/README.txt"), mode = "wb")
     },
     warning = function(c) {
-      # Get gdrive file id of the README.txt file
-      readme_id <- file_size_table[
-        file_size_table$file_name == "README.txt", ]$file_id
-      # Download README.txt file
-      download.file(paste0(gdrive_path, readme_id),
-                    destfile = paste0(download_dir, "/README.txt"), mode = "wb")
-      server_url <- gdrive_path
-      server_url
+      message(paste0('Error: Could not download README.txt from ', nimbus_readme, ', maybe the server is down.'))
     },
     error = function(c) {
-      server_url <- gdrive_path
-      server_url
+      message(paste0('Error: Could not download README.txt from ', nimbus_readme, ', maybe the server is down.'))
     }
   )
 
@@ -192,7 +182,7 @@ download_env <- function(variable, file_format = "zip",
                           tile_id = itile, global = FALSE,
                           download_dir = download_dir,
                           file_size_table = file_size_table,
-                          server_url = server_url
+                          server_url = nimbus_path
       )
     }
   }
