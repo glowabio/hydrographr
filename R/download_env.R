@@ -137,6 +137,7 @@ download_env <- function(variable, file_format = "zip",
       #message(paste0("Variable '",ivar,"', tile '",itile, "': Size: ", tile_size, " bytes."))
       if (length(tile_size) == 0) {
         warning(paste0("Error: Tile '", itile, "', of variable '", ivar, "' not available!"))
+        tile_size <- 0 # Will be skipped during download later!
       }
 
       tile_size_sum <- tile_size_sum + tile_size
