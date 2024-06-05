@@ -32,9 +32,15 @@ download_tiles_base <- function(variable, file_format = "tif",
   row_selector <- file_size_table$file_name == file_name
   file_path <- file_size_table[row_selector,]$file_path
 
+  if (!(any(row_selector))){
+    message('Skipping file "', file_name, '" (not found)...')
+    warning('Problem: Did not find any file "', file_name, '"" in the list of files - are you sure it is a valid file?')
+    return()
+  }
+
   # Get parent folder structure to reproduce it in the download path
   # e.g. "r.stream.distance/stream_dist_up_farth_tiles20d"
-  folder_structure <- dirname(file_size_table[row_selector,]$file_path)
+  folder_structure <- dirname(file_path)
 
   # Create download directories
   dir.create(paste0(download_dir, "/", folder_structure),
