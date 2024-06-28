@@ -102,10 +102,14 @@ split_table <- function(data, split = NULL, split_tbl_path,
                   # fill = TRUE)
 
   split_files <- list.files(split_tbl_path)
-  for(i in 1:length(split_files)) {                              # Head of for-loop
+  for(i in 1:length(split_files)) {                             # Head of for-loop
     assign(paste0("data", i),                                   # Read and store data frames
            fread(paste0(split_tbl_path,
-                            data_files[i])))
+                        split_files[i])))
+
+    tbl_fread <-
+      list.files(pattern = "\split_tbl_path\.csv$") %>%
+      map_df(~fread(.))
   }
   # Remove all files in the tmp folder
   file.remove(table_tmp_path)
