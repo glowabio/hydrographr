@@ -108,18 +108,15 @@ split_table <- function(data, split = NULL, split_tbl_path,
 
   # Read stored data frames
   if (read == TRUE) {
-    # Read reclassified .tif layer
     split_files <- list.files(split_tbl_path)
 
     for (i in seq_along(split_files)) {
       assign(paste0("data", i),
              fread(paste0(split_tbl_path,
                           split_files[i])))
-    # Return data frame
-    return(split_files)
     }
   } else {
-    print(paste0("Split tables are stored under", split_tbl_path))
+    cat(paste0("Split tables are stored under", split_tbl_path))
   }
 
     # Remove all files in the tmp folder
