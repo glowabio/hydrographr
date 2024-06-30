@@ -5,7 +5,10 @@
 #'
 #' @param data a data.frame or data.table
 #' @param split_tbl_path character. Full path to store the split tables
-#' @param split number of rows selected to split the table
+#' @param split numeric. number of rows selected to split the table
+#' @param read logical. If TRUE, then the split data tables
+#' get read into R as a data tables.
+#' If FALSE, the tables are only stored on disk. Default is FALSE.
 #' @param quiet logical. If FALSE, the standard output will be printed.
 #' Default is TRUE.
 #'
@@ -35,7 +38,7 @@
 #' my_directory <- tempdir()
 #' split_tbl_path <- paste0(my_directory,
 #'                      "/hydrography90m_test_data/")
-#' Split data table
+#' # Split data table
 #' split_table <- (df, split = 2000, split_tbl_path)
 #'
 #' # Show the output table
@@ -43,21 +46,27 @@
 
 
 split_table <- function(data, split = NULL, split_tbl_path,
-                        quiet = TRUE) {
+                        read = FALSE, quiet = TRUE) {
 
   # Check if input data is of type data.frame,
   # data.table or tibble
   if (!is(data, "data.frame"))
     stop("data: Has to be of class 'data.frame'.")
 
-  for (name in split) {
-    if (!is.null(name))
-        stop(paste0("Please specify a number to split the table"))
-  }
+  # Check if value of split is numeric
+  if (!is.numeric(split))
+    stop("split: Value has to be numeric.")
 
   # Check if paths exists
   if (!dir.exists(split_tbl_path))
     stop(paste0("Path: ", split_tbl_path, " does not exist."))
+
+  if (!is.logical(read))
+    stop("read: Has to be TRUE or FALSE.")
+
+  # Check if quiet is logical
+  if (!is.logical(quiet))
+    stop("quiet: Has to be TRUE or FALSE.")
 
   rand_string <- stri_rand_strings(n = 1, length = 8, pattern = "[A-Za-z0-9]")
 
@@ -97,24 +106,24 @@ split_table <- function(data, split = NULL, split_tbl_path,
                            wsl_sh_file, echo = !quiet))
   }
 
-  # data_ids <- fread(paste0(split_tbl_path, ".csv"),
-                  #  keepLeadingZeros = TRUE, header = TRUE, sep = ",",
-                  # fill = TRUE)
+  # Read stored data frames
+  if (read == TRUE) {
+    # Read reclassified .tif layer
+    split_files <- list.files(split_tbl_path)
 
-  split_files <- list.files(split_tbl_path)
-  for(i in 1:length(split_files)) {                             # Head of for-loop
-    assign(paste0("data", i),                                   # Read and store data frames
-           fread(paste0(split_tbl_path,
-                        split_files[i])))
-
-    tbl_fread <-
-      list.files(pattern = "\split_tbl_path\.csv$") %>%
-      map_df(~fread(.))
+    for (i in seq_along(split_files)) {
+      assign(paste0("data", i),
+             fread(paste0(split_tbl_path,
+                          split_files[i])))
+    # Return data frame
+    return(split_files)
+    }
+  } else {
+    print(paste0("Split tables are stored under", split_tbl_path))
   }
-  # Remove all files in the tmp folder
-  file.remove(table_tmp_path)
 
-  # Return data frame
-  return(split_files)
+    # Remove all files in the tmp folder
+    file.remove(table_tmp_path)
+
 
 }
