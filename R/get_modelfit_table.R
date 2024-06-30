@@ -36,7 +36,39 @@
 #'
 #'
 #' @examples
-#' # add example here
+#' # Download test data into the temporary R folder
+#' # or define a different directory
+#' my_directory <- tempdir()
+#' download_test_data(my_directory)
+#'
+#' # Load occurrence data
+#' species_occurrence <- read.table(paste0(my_directory,
+#'                                         "/hydrography90m_test_data",
+#'                                         "/spp.csv"),
+#'                                  header = TRUE)
+#'
+#' # Define full path to the sub-catchments raster layer
+#' subc_raster <- paste0(my_directory,
+#'                      "/hydrography90m_test_data/sub_catchment_h10v06.tif")
+#'
+#' # Define full path to the prediction table
+#' predict_tbl <- paste0(my_directory,
+#'                      "/hydrography90m_test_data/projectionTB.csv")
+#'
+#' # Define full path to the output model fit table
+#' model_fit <- paste0(my_directory,
+#'                      "/hydrography90m_test_data/model_table.csv")
+#'
+#' # Get table with environmental variables at each occurrence
+#' # and pseudo absence point location
+#' modelfit_table <- get_modelfit_table(data = species_occurrence,
+#'                                   spec = "species",
+#'                                   lon = "long",
+#'                                   lat = "lat",
+#'                                   pseudoabs = 10000,
+#'                                   subc = subc_raster,
+#'                                   predict_table =  predict_tbl,
+#'                                   mod_fit_table = model_fit)
 
 get_modelfit_table <- function(data, spec, lon, lat,
                                pseudoabs = NULL, subc, predict_table,
