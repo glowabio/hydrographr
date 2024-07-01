@@ -32,11 +32,6 @@
 #'
 #' @author Jaime Garcia Marquez, Thomas Tomiczek
 #'
-#' @references
-#' add reference manual html here
-#' https://grass.osgeo.org/grass82/manuals/
-#'
-#'
 #' @examples
 #' # Download test data into the temporary R folder
 #' # or define a different directory
