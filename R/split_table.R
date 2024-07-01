@@ -3,6 +3,8 @@
 #' @description Split the table along a set number of rows into multiple parts
 #' of equal length.
 #'
+#' Note that duplicated rows will be removed.
+#'
 #' @param data a data.frame or data.table
 #' @param split_tbl_path character. Full path to store the split tables
 #' @param split numeric. number of rows selected to split the table
@@ -17,16 +19,7 @@
 #' @importFrom processx run
 #' @export
 #'
-#' @details
-#' add details here
-#'
-#' @note
-#' Duplicated rows will be removed.
-#'
 #' @author Jaime Garcia Marquez, Thomas Tomiczek
-#'
-#' @references
-#' add references here
 #'
 #' @examples
 #' # Create data table
@@ -114,13 +107,13 @@ split_table <- function(data, split = NULL, split_tbl_path,
       assign(paste0("data", i),
              fread(paste0(split_tbl_path,
                           split_files[i])))
+      return(split_files[i])
     }
   } else {
     cat(paste0("Split tables are stored under", split_tbl_path))
   }
 
-    # Remove all files in the tmp folder
+  # Remove all files in the tmp folder
     file.remove(table_tmp_path)
-
 
 }
