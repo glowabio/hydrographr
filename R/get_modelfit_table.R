@@ -1,9 +1,11 @@
-#' @title Get table with environmental variables at each occurrence
-#' and pseudo absence point location
+#' @title Get environmental variables at each occurrence
+#' and pseudo-absence point location
 #'
-#' @description Add describtion text here
-#'
-#'  Any thing the user needs to notice? add Note
+#' @description Get the environmental variables for each
+#' species occurrences and pseudo-absences at given point locations
+#' by extracting the environmental information from
+#' the prediction table produced from the get_predict_table function
+#' see also help(get_predict_table).
 #'
 #' @param data a data.frame or data.table that contains the columns regarding
 #' the species name and the longitude / latitude coordinates in WGS84.
@@ -60,7 +62,7 @@
 #'                      "/hydrography90m_test_data/model_table.csv")
 #'
 #' # Get table with environmental variables at each occurrence
-#' # and pseudo absence point location
+#' # and pseudo-absence point location
 #' modelfit_table <- get_modelfit_table(data = species_occurrence,
 #'                                   spec = "species",
 #'                                   lon = "long",
