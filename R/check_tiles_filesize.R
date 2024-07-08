@@ -61,11 +61,19 @@ check_tiles_filesize <- function(variable, file_format = "tif",
                     paste0(variable, "_", tile_id, ".", file_format))
 
   # Find valid file_formats for the requested variable
-  # to check that the requested file_format exists
-  valid_file_format_var <- unique(
-    str_split_fixed(
-      h90m_file_names[grep(paste0(variable, "_"), h90m_file_names)],
-      "\\.", 2)[, 2])
+  # to check that the requested file_format exists.
+  # Important: TODO: Do not just split at the dot, as in the future climate
+  # variables, we have files like this:
+  #   bio18_2071-2100_mpi-esm1-2-hr_ssp585_V.2.1_h04v00.zip
+  #   bio18_2071-2100_ukesm1-0-ll_ssp370_V.2.1_h20v00.zip
+  #   bio18_2071-2100_ipsl-cm6a-lr_ssp585_V.2.1_h16v10.zip
+  # Works, but inelegant:
+  valid_file_format_var = c()
+  for (filename in h90m_file_names) {
+    pieces = str_split(filename, "\\.")[[1]]
+    format = pieces[length(pieces)]
+    valid_file_format_var <- unique(c(valid_file_format_var, format))
+  }
 
   # Check that the requested file_format is among the valid ones
   match.arg(file_format, choices = valid_file_format_var)
