@@ -161,21 +161,21 @@ download_env <- function(variable, file_format = "zip",
          round(variable_size_sum / 1000000, 2),
          " MB."))
 
-  # General path to the download folder in Nimbus
+  # General path to the download folder at IGB
   # (GDrive is not available for environment90m data)
-  nimbus_path <- "https://public.igb-berlin.de/index.php/s/zw56kEd25NsQqcQ/download?path=%2F"
+  igb_path <- "https://public.igb-berlin.de/index.php/s/zw56kEd25NsQqcQ/download?path=%2F"
 
   # Use README file as a test to check if Nimbus is up.
   tryCatch(
     {
-      nimbus_readme = paste0(nimbus_path, "README/README.txt")
-      download.file(nimbus_readme, destfile = paste0(download_dir, "/README.txt"), mode = "wb")
+      igb_readme = paste0(igb_path, "README/README.txt")
+      download.file(igb_readme, destfile = paste0(download_dir, "/README.txt"), mode = "wb")
     },
     warning = function(c) {
-      message(paste0('Error: Could not download README.txt from ', nimbus_readme, ', maybe the server is down.'))
+      message(paste0('Error: Could not download README.txt from ', igb_readme, ', maybe the server is down.'))
     },
     error = function(c) {
-      message(paste0('Error: Could not download README.txt from ', nimbus_readme, ', maybe the server is down.'))
+      message(paste0('Error: Could not download README.txt from ', igb_readme, ', maybe the server is down.'))
     }
   )
 
@@ -188,7 +188,7 @@ download_env <- function(variable, file_format = "zip",
                           tile_id = itile, global = FALSE,
                           download_dir = download_dir,
                           file_size_table = file_size_table,
-                          server_url = nimbus_path
+                          server_url = igb_path
       )
     }
   }
