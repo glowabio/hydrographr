@@ -13,6 +13,8 @@
 #'
 #' @param variable character vector of variable names. See Details for all the
 #' variable names.
+#' @param years character vector of years. Only valid for ESA Land Cover variables,
+#' ignored otherwise.
 #' @param file_format character. Format of the requested file. "zip" and "csv"
 #' are supported. Default is "csv", which means that the zip files are unzipped
 #' after downloading. Note that this will take more space on disk than zips.
@@ -108,10 +110,22 @@
 #' # Download data for two variables in three regular tiles
 #' # to the current working directory
 #' download_env(variable = c("bio1", "bio1"),
+#'                tile_id = c("h00v02","h16v02", "h16v04"))
+#'
+#' # Download them as zip, to save disk space:
+#' download_env(variable = c("bio1", "bio1"),
 #'                file_format = "zip",
 #'                tile_id = c("h00v02","h16v02", "h16v04"))
 #'
-
+#' # Download land cover data for two years
+#' download_env(variable = c("c20", "c30"), years = c(1992, 1996)
+#'                file_format = "zip",
+#'                tile_id = c("h00v02","h16v02", "h16v04"))
+#
+#' # Download land cover data for specific variables and  years
+#' download_env(variable = c("c20_1996", "c30_1992"),
+#'                file_format = "zip",
+#'                tile_id = c("h00v02","h16v02", "h16v04"))
 
 ### TODO:
 # Make the file with file sizes
@@ -119,7 +133,7 @@
 # Regional Unit Ids?
 
 
-download_env <- function(variable, file_format = "csv",
+download_env <- function(variable, file_format = "csv", years = NULL,
                          tile_id = NULL, reg_unit_id = NULL,
                          download_dir = ".", delete_zips = TRUE) {
 
@@ -150,6 +164,59 @@ download_env <- function(variable, file_format = "csv",
   all_varnames <- sort(unique(sub("_[^_]+$", "",
                                     file_size_table$file_name)))
   #message(paste('Available variables:', paste(all_varnames, collapse=', ')))
+
+
+  ### If the user requests years: ###
+  if (length(years) > 0) {
+
+    # Which years are requested:
+    if (!(all(grepl("[[:digit:]]{4}", years)))) { # matches 0000
+      which_valid <- grepl("[[:digit:]]{4}", years)
+      message(paste('Years are not valid:', paste(years[!which_valid], collapse=', ', '(ignoring)')))
+      if (length(years[which_valid]) == 0){
+        message('No valid years passed! All invalid:', years)
+      }
+      years <- years[which_valid]
+    }
+
+    # Are those years available?
+    #regex <- "^c[[:digit:]]+_[[:digit:]]{4}_h[[:digit:]]{2}v[[:digit:]]{2}" # matches  
+    regex <- "^c[[:digit:]]+_[[:digit:]]{4}"   # matches c00_0000
+    available_landcover_varnames <- all_varnames[grepl(regex, all_varnames)]
+    available_years <- unique(gsub("^c[[:digit:]]+_", "", available_landcover_varnames))
+    years_ok <- years %in% available_years
+    requested_years <- years[years_ok]
+    if (!(all(years_ok))){
+      message(paste('Requested years not available:', paste(years[!years_ok], collapse=', ', '(ignoring)')))
+      message(paste('Keeping years:', paste(requested_years, collapse=', ')))
+    }
+
+    # Which requested variables can be combined with years, i.e. match c10, c20 or similar:
+    regex <- "^c[[:digit:]]+$" # matches c00
+    which_are_landcover <- grepl(regex, variable)
+    requested_landcover_vars = variable[which_are_landcover]
+    if (any(which_vars)) {
+      message(paste('These variables can be combined with years:', paste(requested_landcover_vars, collapse=', ')))
+    } else {
+      message(paste('No variables can be combined with years:', paste(variable[!which_are_landcover], collapse=', ')))
+    }
+
+    # Now merge them all:
+    landcover_with_years <- c()
+    for (ivar in requested_landcover_vars) {
+      tmp <- paste0(ivar, '_', requested_years)
+      landcover_with_years <- c(landcover_with_years, tmp)
+    }
+
+    # And modify vector "variable":
+    # Remove the land cover vars without years:
+    variable_no_landcover <- variable[!variable %in% requested_landcover_vars]
+    # Add the land cover vars with years:
+    variable <- unique(c(variable_no_landcover, landcover_with_years))
+    message(paste('These variables will be downloaded:', paste(variable, collapse=', ')))
+  }
+
+
 
   # Get the valid file_names of the environment90m variables
   all_file_names <- sort(unique(file_size_table$file_name))
