@@ -87,7 +87,7 @@ download_env <- function(variable, file_format = "zip",
 
   # Download lookup table with the size of each file
   # if it doesn't exist in the tempdir()
-  file_size_file <- paste0(tempdir(), "/env90m_paths_file_sizes.txt")
+  file_size_file <- paste0(tempdir(), "/environment90m_paths_file_sizes.txt")
   if (!file.exists(file_size_file)) {
     message('Downloading env90m_paths_file_sizes.txt...')
     download.file("https://public.igb-berlin.de/index.php/s/zw56kEd25NsQqcQ/download?path=%2FREADME/environment90m_paths_file_sizes.txt",
@@ -103,8 +103,10 @@ download_env <- function(variable, file_format = "zip",
   # to check that the requested variable exists
 
   # Get the valid names of the environment90m variables
+  # Expecting tile_id at the end: <variable>_<tile_id>
   all_varnames <- sort(unique(sub("_[^_]+$", "",
                                     file_size_table$file_name)))
+  #message(paste('Available variables:', paste(all_varnames, collapse=', ')))
 
   # Get the valid file_names of the environment90m variables
   all_file_names <- sort(unique(file_size_table$file_name))
@@ -115,6 +117,7 @@ download_env <- function(variable, file_format = "zip",
 
   # Remove NA from list of tile ids:
   all_tile_ids <- all_tile_ids[!is.na(all_tile_ids)]
+  #message(paste('Available tiles:', paste(all_tile_ids, collapse=', ')))
 
   # Compute overall size of download, by iterating
   # over each variable and there over each tile:
@@ -179,6 +182,8 @@ download_env <- function(variable, file_format = "zip",
   for (ivar in variable) {
     for (itile in tile_id) {
 
+      message("Downloading variable ", ivar, " for tile ", itile, " in format ", file_format, "...")
+
       download_tiles_base(variable = ivar, file_format = file_format,
                           tile_id = itile, global = FALSE,
                           download_dir = download_dir,
@@ -187,6 +192,7 @@ download_env <- function(variable, file_format = "zip",
       )
     }
   }
+
   cat("Please cite the Hydrography90m publication:\n
       Amatulli, G., Garcia Marquez, J., Sethi, T., Kiesel, J., Grigoropoulou, A.,
       Üblacker, M. M., Shen, L. Q., and Domisch, S.: Hydrography90m: a new
