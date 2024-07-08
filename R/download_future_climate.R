@@ -12,13 +12,18 @@
 #' \url{https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4?path=%2F}.
 #'
 #' @param variable character vector of variable names. See Details for all the
-#' variable names.
-#' @param years character vector of years. Only valid for ESA Land Cover variables,
-#' ignored otherwise.
+#' variable names. No default, has to be provided.
+#' @param scenario character vector of scenarios, e.g. "ssp370", "ssp585". See
+#' Details for all the scenario names. No default, has to be provided.
+#' @param model character vector of models, e.g. "mpi-esm1-2-hr", "ukesm1-0-ll",
+#' "ipsl-cm6a-lr". See Details for all the scenario names. No default, has to be
+#' provided.
 #' @param file_format character. Format of the requested file. "zip" and "csv"
 #' are supported. Default is "csv", which means that the zip files are unzipped
 #' after downloading. Note that this will take more space on disk than zips.
 #' @param tile_id character vector. The IDs of the requested tiles.
+#' @param time_period character vector of time periods. Default: "2071-2100".
+#' Currently only "2071-2100" is available, so this can be omitted. 
 #' @param download_dir character. The directory where the files will be
 #' downloaded. Default is the working directory.
 #' @param delete_zips boolean If FALSE, the downloaded zip files are not deleted
@@ -45,59 +50,39 @@
 #' \url{https://hydrography.org/hydrography90m/hydrography90m_layers/}.
 #' For details on the bioclimatic variables, please refer to 
 #' \url{https://www.worldclim.org/data/bioclim.html} (TODO correct?).
-#' For details on the ESA Land Cover variables, please refer to 
-#' \url{https://dunno.com} (TODO add!!).
 #'
 #' TODO: The units also have scale and offset! What about them?
-#' TODO: The c10 etc. have numbers behind their descriptions, what do they say?
 #'
-#'  | **Variable type**                 | **Variable name**            | **Variable** | **Unit**  | **File format** |
-#'  |-----------------------------------|-------------------------------------|-------|-----------------|-----------|
-#'  | Bioclimatic variables (present)   | Annual Mean Temperature             | bio1  | degrees Celsius | zip / csv |
-#'  | Bioclimatic variables (present)   | Mean Diurnal Range                  | bio2  | degrees Celsius | zip / csv |
-#'  | Bioclimatic variables (present)   | Isothermality                       | bio3  | degrees Celsius | zip / csv |
-#'  | Bioclimatic variables (present)   | Temperature Seasonality             | bio4  | degrees Celsius | zip / csv |
-#'  | Bioclimatic variables (present)   | Max Temperature of Warmest Month    | bio5  | degrees Celsius | zip / csv |
-#'  | Bioclimatic variables (present)   | Min Temperature of Coldest Month    | bio6  | degrees Celsius | zip / csv |
-#'  | Bioclimatic variables (present)   | Temperature Annual Range            | bio7  | degrees Celsius | zip / csv |
-#'  | Bioclimatic variables (present)   | Mean Temperature of Wettest Quarter | bio8  | degrees Celsius | zip / csv |
-#'  | Bioclimatic variables (present)   | Mean Temperature of Driest Quarter  | bio9  | degrees Celsius | zip / csv |
-#'  | Bioclimatic variables (present)   | Mean Temperature of Warmest Quarter | bio10 | degrees Celsius | zip / csv |
-#'  | Bioclimatic variables (present)   | Mean Temperature of Coldest Quarter | bio11 | degrees Celsius | zip / csv |
-#'  | Bioclimatic variables (present)   | Annual Precipitation                | bio12 | kg/m^2          | zip / csv |
-#'  | Bioclimatic variables (present)   | Precipitation of Wettest Month      | bio13 | kg/m^2          | zip / csv |
-#'  | Bioclimatic variables (present)   | Precipitation of Driest Month       | bio14 | kg/m^2          | zip / csv |
-#'  | Bioclimatic variables (present)   | Precipitation Seasonality           | bio15 | kg/m^2          | zip / csv |
-#'  | Bioclimatic variables (present)   | Precipitation of Wettest Quarter    | bio16 | kg/m^2          | zip / csv |
-#'  | Bioclimatic variables (present)   | Precipitation of Driest Quarter     | bio17 | kg/m^2          | zip / csv |
-#'  | Bioclimatic variables (present)   | Precipitation of Warmest Quarter    | bio18 | kg/m^2          | zip / csv |
-#'  | Bioclimatic variables (present)   | Precipitation of Coldest Quarter    | bio19 | kg/m^2          | zip / csv |
-#'  | Bioclimatic variables (2071-2100) | Same as above                       |       |                 | zip / csv |
-#'  | ESA Land Cover (1992-2018) | Cropland, rainfed                                          | c10_<year> | % | zip / csv  |
-#'  | ESA Land Cover (1992-2018) | Cropland, irrigated or post-flooding                       | c20_<year> | % | zip / csv  |
-#'  | ESA Land Cover (1992-2018) | Mosaic cropland (>50%) / natural vegetation (tree, shrub, herbaceous cover) (<50%) | c30_<year> | % | zip / csv |
-#'  | ESA Land Cover (1992-2018) | Mosaic natural vegetation (tree, shrub, herbaceous cover) (>50%) / cropland (<50%) | c40_<year> | % | zip / csv |
-#'  | ESA Land Cover (1992-2018) | Tree cover, broadleaved, evergreen, closed to open (>15%)  | c50_<year> | % | zip / csv  |
-#'  | ESA Land Cover (1992-2018) | Tree cover, broadleaved, deciduous, closed to open (>15%)  | c60_<year> | % | zip / csv  |
-#'  | ESA Land Cover (1992-2018) | Tree cover, needleleaved, evergreen, closed to open (>15%) | c70_<year> | % | zip / csv  |
-#'  | ESA Land Cover (1992-2018) | Tree cover, needleleaved, deciduous, closed to open (>15%) | c80_<year> | % | zip / csv  |
-#'  | ESA Land Cover (1992-2018) | Tree cover, mixed leaf type (broadleaved and needleleaved) | c90_<year> | % | zip / csv  |
-#'  | ESA Land Cover (1992-2018) | Mosaic tree and shrub (>50%) / herbaceous cover (<50%)    | c100_<year> | % | zip / csv  |
-#'  | ESA Land Cover (1992-2018) | Mosaic herbaceous cover (>50%) / tree and shrub (<50%)    | c110_<year> | % | zip / csv  |
-#'  | ESA Land Cover (1992-2018) | Shrubland                                                 | c120_<year> | % | zip / csv  |
-#'  | ESA Land Cover (1992-2018) | Grassland                                                 | c130_<year> | % | zip / csv  |
-#'  | ESA Land Cover (1992-2018) | Lichens and mosses                                        | c140_<year> | % | zip / csv  |
-#'  | ESA Land Cover (1992-2018) | Sparse vegetation (tree, shrub, herbaceous cover) (<15%)  | c150_<year> | % | zip / csv  |
-#'  | ESA Land Cover (1992-2018) | Tree cover, flooded, fresh or brackish water              | c160_<year> | % | zip / csv  |
-#'  | ESA Land Cover (1992-2018) | Tree cover, flooded, saline water                         | c170_<year> | % | zip / csv  |
-#'  | ESA Land Cover (1992-2018) | Shrub or herbaceous cover, flooded, fresh/saline/brackish water | c180_<year> | % | zip / csv |
-#'  | ESA Land Cover (1992-2018) | Urban areas                                               | c190_<year> | % | zip / csv  |
-#'  | ESA Land Cover (1992-2018) | Bare areas                                                | c200_<year> | % | zip / csv  |
-#'  | ESA Land Cover (1992-2018) | Water bodies                                              | c210_<year> | % | zip / csv  |
-#'  | ESA Land Cover (1992-2018) | Permanent snow and ice                                    | c220_<year> | % | zip / csv  |
-#'  | Soil                       | Depth to bedrock (R horizon) up to 200cm                  | soil_BDRICM | cm | zip / csv |
-#'  | Soil                       | Grade of a sub-soil being acid                            | soil_ACDWRB | pH | zip / csv |
+#'  | **Variable type**                 | **Variable name**            | **Variable**   | **Unit**  | **File format** |
+#'  |-----------------------------------|------------------------------|----------------|-----------------|-----------|
+#'  | Bioclimatic variables (2071-2100)   | Annual Mean Temperature             | bio1  | degrees Celsius | zip / csv |
+#'  | Bioclimatic variables (2071-2100)   | Mean Diurnal Range                  | bio2  | degrees Celsius | zip / csv |
+#'  | Bioclimatic variables (2071-2100)   | Isothermality                       | bio3  | degrees Celsius | zip / csv |
+#'  | Bioclimatic variables (2071-2100)   | Temperature Seasonality             | bio4  | degrees Celsius | zip / csv |
+#'  | Bioclimatic variables (2071-2100)   | Max Temperature of Warmest Month    | bio5  | degrees Celsius | zip / csv |
+#'  | Bioclimatic variables (2071-2100)   | Min Temperature of Coldest Month    | bio6  | degrees Celsius | zip / csv |
+#'  | Bioclimatic variables (2071-2100)   | Temperature Annual Range            | bio7  | degrees Celsius | zip / csv |
+#'  | Bioclimatic variables (2071-2100)   | Mean Temperature of Wettest Quarter | bio8  | degrees Celsius | zip / csv |
+#'  | Bioclimatic variables (2071-2100)   | Mean Temperature of Driest Quarter  | bio9  | degrees Celsius | zip / csv |
+#'  | Bioclimatic variables (2071-2100)   | Mean Temperature of Warmest Quarter | bio10 | degrees Celsius | zip / csv |
+#'  | Bioclimatic variables (2071-2100)   | Mean Temperature of Coldest Quarter | bio11 | degrees Celsius | zip / csv |
+#'  | Bioclimatic variables (2071-2100)   | Annual Precipitation                | bio12 | kg/m^2          | zip / csv |
+#'  | Bioclimatic variables (2071-2100)   | Precipitation of Wettest Month      | bio13 | kg/m^2          | zip / csv |
+#'  | Bioclimatic variables (2071-2100)   | Precipitation of Driest Month       | bio14 | kg/m^2          | zip / csv |
+#'  | Bioclimatic variables (2071-2100)   | Precipitation Seasonality           | bio15 | kg/m^2          | zip / csv |
+#'  | Bioclimatic variables (2071-2100)   | Precipitation of Wettest Quarter    | bio16 | kg/m^2          | zip / csv |
+#'  | Bioclimatic variables (2071-2100)   | Precipitation of Driest Quarter     | bio17 | kg/m^2          | zip / csv |
+#'  | Bioclimatic variables (2071-2100)   | Precipitation of Warmest Quarter    | bio18 | kg/m^2          | zip / csv |
+#'  | Bioclimatic variables (2071-2100)   | Precipitation of Coldest Quarter    | bio19 | kg/m^2          | zip / csv |
 #'
+#'  | **Scenario name** | **Scenario description**   |
+#'  | ssp370            | TODO: Scenario description |
+#'  | ssp585            | TODO: Scenario description |
+#'
+#'  | **Model name** | **Scenario description** |
+#'  | mpi-esm1-2-hr  | TODO: Model description  |
+#'  | psl-cm6a-lr    | TODO: Model description  |
+#'  | ukesm1-0-ll    | TODO: MOdel description  |
 #'
 #' @md
 #' @note
@@ -107,38 +92,15 @@
 #' message in your browser.
 #'
 #' @examples
-#' # Download data for two variables in three regular tiles
-#' # to the current working directory
-#' download_env(variable = c("bio1", "bio1"),
+#' # Download bioclimatic variables for specific variables, scenarios, models:
+#' variable = c("bio1")
+#' scenario = c("ssp370")
+#' model = c("ipsl-cm6a-lr")
+#' time_period = c("2071-2100")
+#' download_future_climate(variable = variable, file_format = "zip",
+#'                time_period = time_period, scenario = scenario,
+#'                model = model,
 #'                tile_id = c("h00v02","h16v02", "h16v04"))
-#'
-#' # Download them as zip, to save disk space:
-#' download_env(variable = c("bio1", "bio1"),
-#'                file_format = "zip",
-#'                tile_id = c("h00v02","h16v02", "h16v04"))
-#'
-#' # Download land cover data for two years
-#' download_env(variable = c("c20", "c30"), years = c(1992, 1996)
-#'                file_format = "zip",
-#'                tile_id = c("h00v02","h16v02", "h16v04"))
-#
-#' # Download land cover data for specific variables and  years
-#variable = c("bio1")
-#scenario = c("ssp370")
-#model = c("iiipsl-cm6a-lr")
-#time_period = c("2071-2100")
-#download_future_climate(variable = variable, file_format = "zip",
-#                time_period = time_period, scenario = scenario,
-#                model = model,
-#                tile_id = c("h00v02","h16v02", "h16v04"))
-
-### TODO:
-# Make the file with file sizes
-# Examples above!
-# Regional Unit Ids?
-# bio1_2071-2100_ipsl_cm6a-lr_ssp370_v2.1_h00v00.zip
-
-
 
 
 download_future_climate <- function(variable, file_format = "csv",
