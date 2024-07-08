@@ -134,7 +134,7 @@
 
 
 download_env <- function(variable, file_format = "csv", years = NULL,
-                         tile_id = NULL, reg_unit_id = NULL,
+                         tile_id = NULL,
                          download_dir = ".", delete_zips = TRUE) {
 
   # Introductory steps
@@ -146,7 +146,7 @@ download_env <- function(variable, file_format = "csv", years = NULL,
   # if it doesn't exist in the tempdir()
   file_size_file <- paste0(tempdir(), "/environment90m_paths_file_sizes.txt")
   if (!file.exists(file_size_file)) {
-    message('Downloading env90m_paths_file_sizes.txt...')
+    message('Downloading environment90m_paths_file_sizes.txt...')
     download.file("https://public.igb-berlin.de/index.php/s/zw56kEd25NsQqcQ/download?path=%2FREADME/environment90m_paths_file_sizes.txt",
                   destfile = file_size_file, mode = "wb")
   }
@@ -180,6 +180,8 @@ download_env <- function(variable, file_format = "csv", years = NULL,
     }
 
     # Are those years available?
+    # TODO: Hardcoding available years would be more efficient, but less flexible in case we
+    # add more years!
     #regex <- "^c[[:digit:]]+_[[:digit:]]{4}_h[[:digit:]]{2}v[[:digit:]]{2}" # matches  
     regex <- "^c[[:digit:]]+_[[:digit:]]{4}"   # matches c00_0000
     available_landcover_varnames <- all_varnames[grepl(regex, all_varnames)]
