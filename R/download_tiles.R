@@ -281,7 +281,7 @@ download_tiles <- function(variable, file_format = "tif",
     for (ivar in variable) {
       for (itile in tile_id) {
 
-        download_tiles_base(variable = ivar, file_format = file_format,
+        downloaded_path <- download_tiles_base(variable = ivar, file_format = file_format,
                             tile_id = itile, global = global,
                             download_dir = download_dir,
                             file_size_table = file_size_table,

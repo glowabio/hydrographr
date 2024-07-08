@@ -46,6 +46,8 @@ download_tiles_base <- function(variable, file_format = "tif",
   dir.create(paste0(download_dir, "/", folder_structure),
              showWarnings = FALSE, recursive = TRUE)
 
+  destfile <- paste0(download_dir, "/", file_path)
+
   # Always download cti_ovr.tif from GDrive:
   if (file_name == "cti_ovr.tif") {
 
@@ -61,14 +63,14 @@ download_tiles_base <- function(variable, file_format = "tif",
     # skips the virus scan of the gdrive
     gdrive_path <- "https://drive.google.com/uc?export=download&id="
     download.file(paste0(gdrive_path, file_id, "&confirm=t"),
-                  destfile = paste0(download_dir, "/", file_path), mode = "wb")
+                  destfile = destfile, mode = "wb")
 
 
   # Download from Nimbus
   } else if (grepl("public.igb-berlin.de", server_url, fixed=TRUE)) {
 
     download.file(paste0(server_url, gsub("/", "%2F", file_path)),
-                  destfile = paste0(download_dir, "/", file_path), mode = "wb")
+                  destfile = destfile, mode = "wb")
 
 
   # Download from GDrive
@@ -80,9 +82,11 @@ download_tiles_base <- function(variable, file_format = "tif",
     # The addition of &confirm=t in the download link
     # skips the virus scan of the gdrive
     download.file(paste0(server_url, file_id, "&confirm=t"),
-                  destfile = paste0(download_dir, "/", file_path), mode = "wb")
+                  destfile = destfile, mode = "wb")
 
   } else {
     warning("Unrecognized download URL, cannot download:", server_url)
   }
+
+  return(destfile)
 }

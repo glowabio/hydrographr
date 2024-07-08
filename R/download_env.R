@@ -13,11 +13,14 @@
 #'
 #' @param variable character vector of variable names. See Details for all the
 #' variable names.
-#' @param file_format character. Format of the requested file. Currently only
-#' "zip" is supported. See Details.
+#' @param file_format character. Format of the requested file. "zip" and "csv"
+#' are supported. Default is "csv", which means that the zip files are unzipped
+#' after downloading. Note that this will take more space on disk than zips.
 #' @param tile_id character vector. The IDs of the requested tiles.
 #' @param download_dir character. The directory where the files will be
 #' downloaded. Default is the working directory.
+#' @param delete_zips boolean If FALSE, the downloaded zip files are not deleted
+#' after unzipping. Defaults to TRUE. This is ignored if you request file format zip.
 #' @importFrom tidyr separate
 #' @importFrom stringr str_split_fixed str_extract
 #' @export
@@ -116,9 +119,9 @@
 # Regional Unit Ids?
 
 
-download_env <- function(variable, file_format = "zip",
+download_env <- function(variable, file_format = "csv",
                          tile_id = NULL, reg_unit_id = NULL,
-                         download_dir = ".") {
+                         download_dir = ".", delete_zips = TRUE) {
 
   # Introductory steps
 
@@ -170,7 +173,7 @@ download_env <- function(variable, file_format = "zip",
     for (itile in tile_id) {
 
       tile_size <- check_tiles_filesize(variable = ivar,
-                                        file_format = file_format,
+                                        file_format = "zip",
                                         tile_id = itile,
                                         h90m_varnames = all_varnames,
                                         h90m_tile_id = all_tile_ids,
@@ -219,17 +222,40 @@ download_env <- function(variable, file_format = "zip",
     }
   )
 
+  all_downloaded_zips = c()
   for (ivar in variable) {
     for (itile in tile_id) {
 
-      message("Downloading variable ", ivar, " for tile ", itile, " in format ", file_format, "...")
+      message("Downloading variable ", ivar, " for tile ", itile, "...")
 
-      download_tiles_base(variable = ivar, file_format = file_format,
+      downloaded_path <- download_tiles_base(variable = ivar, file_format = "zip",
                           tile_id = itile, global = FALSE,
                           download_dir = download_dir,
                           file_size_table = file_size_table,
                           server_url = igb_path
       )
+      all_downloaded_zips <- c(all_downloaded_zips, downloaded_path)
+    }
+  }
+
+  message(paste('Downloaded zip files:', paste(all_downloaded_zips, collapse=', ')))
+
+
+  # Unzip and delete zipfiles, if requested...
+  # TODO: This could start to run in parallel, maybe?
+  if (file_format == "csv") {
+    if (delete_zips) {
+      message("Unzipping and deleting zipfiles...")
+    } else {
+      message("Unzipping...")
+    }
+    for (zipfile in all_downloaded_zips) {
+      destdir <- dirname(zipfile)
+      message("Unzipping file ", zipfile, "...")
+      utils::unzip(zipfile, exdir = destdir)
+      if (delete_zips) {
+        file.remove(zipfile)
+      }
     }
   }
 
