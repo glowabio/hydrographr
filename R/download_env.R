@@ -49,11 +49,14 @@
 #' and unit of the values, please refer to
 #' \url{http://chelsa-climate.org/}.
 #' For details on the ESA Land Cover variables, please refer to
-#' \url{https://www.climatologylab.org/terraclimate.html}.
+#' \url{https://www.climatologylab.org/terraclimate.html}. Please note that some
+#' values in this dataset are aggregated from similar classes (see table below,
+#' see Environment90m publication).
 #' For details on the Soil data, please refer to
 #' \url{https://soilgrids.org}.
 #'
 #' TODO: The CHELSA units also have scale and offset! Explain them here?
+#' TODO: The ESA LandCover data are aggregated. Document!
 #'
 #'  | **Variable type**                 | **Variable name**            | **Variable** | **Unit**  | **File format** |
 #'  |-----------------------------------|-------------------------------------|-------|-----------------|-----------|
@@ -77,25 +80,25 @@
 #'  | Bioclimatic variables (present)   | Precipitation of Warmest Quarter    | bio18 | kg/m^2          | zip / txt |
 #'  | Bioclimatic variables (present)   | Precipitation of Coldest Quarter    | bio19 | kg/m^2          | zip / txt |
 #'  | Bioclimatic variables (2071-2100) | Same as above                       |       |                 | zip / txt |
-#'  | ESA Land Cover (1992-2018) | Cropland, rainfed                                          | c10_<year> | % | zip / txt  |
+#'  | ESA Land Cover (1992-2018) | Cropland, rainfed (aggregated from original classes 10,11,12)         | c10_<year> | % | zip / txt  |
 #'  | ESA Land Cover (1992-2018) | Cropland, irrigated or post-flooding                       | c20_<year> | % | zip / txt  |
 #'  | ESA Land Cover (1992-2018) | Mosaic cropland (>50%) / natural vegetation (tree, shrub, herbaceous cover) (<50%) | c30_<year> | % | zip / txt |
 #'  | ESA Land Cover (1992-2018) | Mosaic natural vegetation (tree, shrub, herbaceous cover) (>50%) / cropland (<50%) | c40_<year> | % | zip / txt |
 #'  | ESA Land Cover (1992-2018) | Tree cover, broadleaved, evergreen, closed to open (>15%)  | c50_<year> | % | zip / txt  |
-#'  | ESA Land Cover (1992-2018) | Tree cover, broadleaved, deciduous, closed to open (>15%)  | c60_<year> | % | zip / txt  |
-#'  | ESA Land Cover (1992-2018) | Tree cover, needleleaved, evergreen, closed to open (>15%) | c70_<year> | % | zip / txt  |
-#'  | ESA Land Cover (1992-2018) | Tree cover, needleleaved, deciduous, closed to open (>15%) | c80_<year> | % | zip / txt  |
+#'  | ESA Land Cover (1992-2018) | Tree cover, broadleaved, deciduous, closed to open (>15%) (aggregated from original classes 60, 61, 62)  | c60_<year> | % | zip / txt  |
+#'  | ESA Land Cover (1992-2018) | Tree cover, needleleaved, evergreen, closed to open (>15%) (aggregated from original classes 70, 71, 72) | c70_<year> | % | zip / txt  |
+#'  | ESA Land Cover (1992-2018) | Tree cover, needleleaved, deciduous, closed to open (>15%) (aggregated from original classes 80, 81, 82) | c80_<year> | % | zip / txt  |
 #'  | ESA Land Cover (1992-2018) | Tree cover, mixed leaf type (broadleaved and needleleaved) | c90_<year> | % | zip / txt  |
 #'  | ESA Land Cover (1992-2018) | Mosaic tree and shrub (>50%) / herbaceous cover (<50%)    | c100_<year> | % | zip / txt  |
 #'  | ESA Land Cover (1992-2018) | Mosaic herbaceous cover (>50%) / tree and shrub (<50%)    | c110_<year> | % | zip / txt  |
-#'  | ESA Land Cover (1992-2018) | Shrubland                                                 | c120_<year> | % | zip / txt  |
+#'  | ESA Land Cover (1992-2018) | Shrubland (aggregated from original classes 120, 121, 122) | c120_<year> | % | zip / txt  |
 #'  | ESA Land Cover (1992-2018) | Grassland                                                 | c130_<year> | % | zip / txt  |
 #'  | ESA Land Cover (1992-2018) | Lichens and mosses                                        | c140_<year> | % | zip / txt  |
-#'  | ESA Land Cover (1992-2018) | Sparse vegetation (tree, shrub, herbaceous cover) (<15%)  | c150_<year> | % | zip / txt  |
+#'  | ESA Land Cover (1992-2018) | Sparse vegetation (tree, shrub, herbaceous cover) (<15%) (aggregated from original classes 150, 151, 152, 153) | c150_<year> | % | zip / txt  |
 #'  | ESA Land Cover (1992-2018) | Tree cover, flooded, fresh or brackish water              | c160_<year> | % | zip / txt  |
 #'  | ESA Land Cover (1992-2018) | Tree cover, flooded, saline water                         | c170_<year> | % | zip / txt  |
 #'  | ESA Land Cover (1992-2018) | Shrub or herbaceous cover, flooded, fresh/saline/brackish water | c180_<year> | % | zip / txt |
-#'  | ESA Land Cover (1992-2018) | Urban areas                                               | c190_<year> | % | zip / txt  |
+#'  | ESA Land Cover (1992-2018) | Urban areas (aggregated from original classes 200, 201, 202) | c190_<year> | % | zip / txt  |
 #'  | ESA Land Cover (1992-2018) | Bare areas                                                | c200_<year> | % | zip / txt  |
 #'  | ESA Land Cover (1992-2018) | Water bodies                                              | c210_<year> | % | zip / txt  |
 #'  | ESA Land Cover (1992-2018) | Permanent snow and ice                                    | c220_<year> | % | zip / txt  |
