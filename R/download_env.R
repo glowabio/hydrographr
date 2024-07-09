@@ -15,8 +15,8 @@
 #' variable names.
 #' @param years character vector of years. Only valid for ESA Land Cover variables,
 #' ignored otherwise.
-#' @param file_format character. Format of the requested file. "zip" and "csv"
-#' are supported. Default is "csv", which means that the zip files are unzipped
+#' @param file_format character. Format of the requested file. "zip" and "txt"
+#' are supported. Default is "txt", which means that the zip files are unzipped
 #' after downloading. Note that this will take more space on disk than zips.
 #' @param tile_id character vector. The IDs of the requested tiles.
 #' @param download_dir character. The directory where the files will be
@@ -53,50 +53,50 @@
 #'
 #'  | **Variable type**                 | **Variable name**            | **Variable** | **Unit**  | **File format** |
 #'  |-----------------------------------|-------------------------------------|-------|-----------------|-----------|
-#'  | Bioclimatic variables (present)   | Annual Mean Temperature             | bio1  | degrees Celsius | zip / csv |
-#'  | Bioclimatic variables (present)   | Mean Diurnal Range                  | bio2  | degrees Celsius | zip / csv |
-#'  | Bioclimatic variables (present)   | Isothermality                       | bio3  | degrees Celsius | zip / csv |
-#'  | Bioclimatic variables (present)   | Temperature Seasonality             | bio4  | degrees Celsius | zip / csv |
-#'  | Bioclimatic variables (present)   | Max Temperature of Warmest Month    | bio5  | degrees Celsius | zip / csv |
-#'  | Bioclimatic variables (present)   | Min Temperature of Coldest Month    | bio6  | degrees Celsius | zip / csv |
-#'  | Bioclimatic variables (present)   | Temperature Annual Range            | bio7  | degrees Celsius | zip / csv |
-#'  | Bioclimatic variables (present)   | Mean Temperature of Wettest Quarter | bio8  | degrees Celsius | zip / csv |
-#'  | Bioclimatic variables (present)   | Mean Temperature of Driest Quarter  | bio9  | degrees Celsius | zip / csv |
-#'  | Bioclimatic variables (present)   | Mean Temperature of Warmest Quarter | bio10 | degrees Celsius | zip / csv |
-#'  | Bioclimatic variables (present)   | Mean Temperature of Coldest Quarter | bio11 | degrees Celsius | zip / csv |
-#'  | Bioclimatic variables (present)   | Annual Precipitation                | bio12 | kg/m^2          | zip / csv |
-#'  | Bioclimatic variables (present)   | Precipitation of Wettest Month      | bio13 | kg/m^2          | zip / csv |
-#'  | Bioclimatic variables (present)   | Precipitation of Driest Month       | bio14 | kg/m^2          | zip / csv |
-#'  | Bioclimatic variables (present)   | Precipitation Seasonality           | bio15 | kg/m^2          | zip / csv |
-#'  | Bioclimatic variables (present)   | Precipitation of Wettest Quarter    | bio16 | kg/m^2          | zip / csv |
-#'  | Bioclimatic variables (present)   | Precipitation of Driest Quarter     | bio17 | kg/m^2          | zip / csv |
-#'  | Bioclimatic variables (present)   | Precipitation of Warmest Quarter    | bio18 | kg/m^2          | zip / csv |
-#'  | Bioclimatic variables (present)   | Precipitation of Coldest Quarter    | bio19 | kg/m^2          | zip / csv |
-#'  | Bioclimatic variables (2071-2100) | Same as above                       |       |                 | zip / csv |
-#'  | ESA Land Cover (1992-2018) | Cropland, rainfed                                          | c10_<year> | % | zip / csv  |
-#'  | ESA Land Cover (1992-2018) | Cropland, irrigated or post-flooding                       | c20_<year> | % | zip / csv  |
-#'  | ESA Land Cover (1992-2018) | Mosaic cropland (>50%) / natural vegetation (tree, shrub, herbaceous cover) (<50%) | c30_<year> | % | zip / csv |
-#'  | ESA Land Cover (1992-2018) | Mosaic natural vegetation (tree, shrub, herbaceous cover) (>50%) / cropland (<50%) | c40_<year> | % | zip / csv |
-#'  | ESA Land Cover (1992-2018) | Tree cover, broadleaved, evergreen, closed to open (>15%)  | c50_<year> | % | zip / csv  |
-#'  | ESA Land Cover (1992-2018) | Tree cover, broadleaved, deciduous, closed to open (>15%)  | c60_<year> | % | zip / csv  |
-#'  | ESA Land Cover (1992-2018) | Tree cover, needleleaved, evergreen, closed to open (>15%) | c70_<year> | % | zip / csv  |
-#'  | ESA Land Cover (1992-2018) | Tree cover, needleleaved, deciduous, closed to open (>15%) | c80_<year> | % | zip / csv  |
-#'  | ESA Land Cover (1992-2018) | Tree cover, mixed leaf type (broadleaved and needleleaved) | c90_<year> | % | zip / csv  |
-#'  | ESA Land Cover (1992-2018) | Mosaic tree and shrub (>50%) / herbaceous cover (<50%)    | c100_<year> | % | zip / csv  |
-#'  | ESA Land Cover (1992-2018) | Mosaic herbaceous cover (>50%) / tree and shrub (<50%)    | c110_<year> | % | zip / csv  |
-#'  | ESA Land Cover (1992-2018) | Shrubland                                                 | c120_<year> | % | zip / csv  |
-#'  | ESA Land Cover (1992-2018) | Grassland                                                 | c130_<year> | % | zip / csv  |
-#'  | ESA Land Cover (1992-2018) | Lichens and mosses                                        | c140_<year> | % | zip / csv  |
-#'  | ESA Land Cover (1992-2018) | Sparse vegetation (tree, shrub, herbaceous cover) (<15%)  | c150_<year> | % | zip / csv  |
-#'  | ESA Land Cover (1992-2018) | Tree cover, flooded, fresh or brackish water              | c160_<year> | % | zip / csv  |
-#'  | ESA Land Cover (1992-2018) | Tree cover, flooded, saline water                         | c170_<year> | % | zip / csv  |
-#'  | ESA Land Cover (1992-2018) | Shrub or herbaceous cover, flooded, fresh/saline/brackish water | c180_<year> | % | zip / csv |
-#'  | ESA Land Cover (1992-2018) | Urban areas                                               | c190_<year> | % | zip / csv  |
-#'  | ESA Land Cover (1992-2018) | Bare areas                                                | c200_<year> | % | zip / csv  |
-#'  | ESA Land Cover (1992-2018) | Water bodies                                              | c210_<year> | % | zip / csv  |
-#'  | ESA Land Cover (1992-2018) | Permanent snow and ice                                    | c220_<year> | % | zip / csv  |
-#'  | Soil                       | Depth to bedrock (R horizon) up to 200cm                  | soil_BDRICM | cm | zip / csv |
-#'  | Soil                       | Grade of a sub-soil being acid                            | soil_ACDWRB | pH | zip / csv |
+#'  | Bioclimatic variables (present)   | Annual Mean Temperature             | bio1  | degrees Celsius | zip / txt |
+#'  | Bioclimatic variables (present)   | Mean Diurnal Range                  | bio2  | degrees Celsius | zip / txt |
+#'  | Bioclimatic variables (present)   | Isothermality                       | bio3  | degrees Celsius | zip / txt |
+#'  | Bioclimatic variables (present)   | Temperature Seasonality             | bio4  | degrees Celsius | zip / txt |
+#'  | Bioclimatic variables (present)   | Max Temperature of Warmest Month    | bio5  | degrees Celsius | zip / txt |
+#'  | Bioclimatic variables (present)   | Min Temperature of Coldest Month    | bio6  | degrees Celsius | zip / txt |
+#'  | Bioclimatic variables (present)   | Temperature Annual Range            | bio7  | degrees Celsius | zip / txt |
+#'  | Bioclimatic variables (present)   | Mean Temperature of Wettest Quarter | bio8  | degrees Celsius | zip / txt |
+#'  | Bioclimatic variables (present)   | Mean Temperature of Driest Quarter  | bio9  | degrees Celsius | zip / txt |
+#'  | Bioclimatic variables (present)   | Mean Temperature of Warmest Quarter | bio10 | degrees Celsius | zip / txt |
+#'  | Bioclimatic variables (present)   | Mean Temperature of Coldest Quarter | bio11 | degrees Celsius | zip / txt |
+#'  | Bioclimatic variables (present)   | Annual Precipitation                | bio12 | kg/m^2          | zip / txt |
+#'  | Bioclimatic variables (present)   | Precipitation of Wettest Month      | bio13 | kg/m^2          | zip / txt |
+#'  | Bioclimatic variables (present)   | Precipitation of Driest Month       | bio14 | kg/m^2          | zip / txt |
+#'  | Bioclimatic variables (present)   | Precipitation Seasonality           | bio15 | kg/m^2          | zip / txt |
+#'  | Bioclimatic variables (present)   | Precipitation of Wettest Quarter    | bio16 | kg/m^2          | zip / txt |
+#'  | Bioclimatic variables (present)   | Precipitation of Driest Quarter     | bio17 | kg/m^2          | zip / txt |
+#'  | Bioclimatic variables (present)   | Precipitation of Warmest Quarter    | bio18 | kg/m^2          | zip / txt |
+#'  | Bioclimatic variables (present)   | Precipitation of Coldest Quarter    | bio19 | kg/m^2          | zip / txt |
+#'  | Bioclimatic variables (2071-2100) | Same as above                       |       |                 | zip / txt |
+#'  | ESA Land Cover (1992-2018) | Cropland, rainfed                                          | c10_<year> | % | zip / txt  |
+#'  | ESA Land Cover (1992-2018) | Cropland, irrigated or post-flooding                       | c20_<year> | % | zip / txt  |
+#'  | ESA Land Cover (1992-2018) | Mosaic cropland (>50%) / natural vegetation (tree, shrub, herbaceous cover) (<50%) | c30_<year> | % | zip / txt |
+#'  | ESA Land Cover (1992-2018) | Mosaic natural vegetation (tree, shrub, herbaceous cover) (>50%) / cropland (<50%) | c40_<year> | % | zip / txt |
+#'  | ESA Land Cover (1992-2018) | Tree cover, broadleaved, evergreen, closed to open (>15%)  | c50_<year> | % | zip / txt  |
+#'  | ESA Land Cover (1992-2018) | Tree cover, broadleaved, deciduous, closed to open (>15%)  | c60_<year> | % | zip / txt  |
+#'  | ESA Land Cover (1992-2018) | Tree cover, needleleaved, evergreen, closed to open (>15%) | c70_<year> | % | zip / txt  |
+#'  | ESA Land Cover (1992-2018) | Tree cover, needleleaved, deciduous, closed to open (>15%) | c80_<year> | % | zip / txt  |
+#'  | ESA Land Cover (1992-2018) | Tree cover, mixed leaf type (broadleaved and needleleaved) | c90_<year> | % | zip / txt  |
+#'  | ESA Land Cover (1992-2018) | Mosaic tree and shrub (>50%) / herbaceous cover (<50%)    | c100_<year> | % | zip / txt  |
+#'  | ESA Land Cover (1992-2018) | Mosaic herbaceous cover (>50%) / tree and shrub (<50%)    | c110_<year> | % | zip / txt  |
+#'  | ESA Land Cover (1992-2018) | Shrubland                                                 | c120_<year> | % | zip / txt  |
+#'  | ESA Land Cover (1992-2018) | Grassland                                                 | c130_<year> | % | zip / txt  |
+#'  | ESA Land Cover (1992-2018) | Lichens and mosses                                        | c140_<year> | % | zip / txt  |
+#'  | ESA Land Cover (1992-2018) | Sparse vegetation (tree, shrub, herbaceous cover) (<15%)  | c150_<year> | % | zip / txt  |
+#'  | ESA Land Cover (1992-2018) | Tree cover, flooded, fresh or brackish water              | c160_<year> | % | zip / txt  |
+#'  | ESA Land Cover (1992-2018) | Tree cover, flooded, saline water                         | c170_<year> | % | zip / txt  |
+#'  | ESA Land Cover (1992-2018) | Shrub or herbaceous cover, flooded, fresh/saline/brackish water | c180_<year> | % | zip / txt |
+#'  | ESA Land Cover (1992-2018) | Urban areas                                               | c190_<year> | % | zip / txt  |
+#'  | ESA Land Cover (1992-2018) | Bare areas                                                | c200_<year> | % | zip / txt  |
+#'  | ESA Land Cover (1992-2018) | Water bodies                                              | c210_<year> | % | zip / txt  |
+#'  | ESA Land Cover (1992-2018) | Permanent snow and ice                                    | c220_<year> | % | zip / txt  |
+#'  | Soil                       | Depth to bedrock (R horizon) up to 200cm                  | soil_BDRICM | cm | zip / txt |
+#'  | Soil                       | Grade of a sub-soil being acid                            | soil_ACDWRB | pH | zip / txt |
 #'
 #'
 #' @md
@@ -133,7 +133,7 @@
 # Regional Unit Ids?
 
 
-download_env <- function(variable, file_format = "csv", years = NULL,
+download_env <- function(variable, file_format = "txt", years = NULL,
                          tile_id = NULL,
                          download_dir = ".", delete_zips = TRUE) {
 
@@ -312,7 +312,7 @@ download_env <- function(variable, file_format = "csv", years = NULL,
 
   # Unzip and delete zipfiles, if requested...
   # TODO: This could start to run in parallel, maybe?
-  if (file_format == "csv") {
+  if (file_format == "txt") {
     if (delete_zips) {
       message("Unzipping and deleting zipfiles...")
     } else {
