@@ -41,15 +41,19 @@
 #' that should be used as an input in the parameter "variable" of the function.
 #' Likewise, the column "File format" contains the input that should be given to
 #' the "file_format" parameter.
-#' For more details and visualisations of the spatial layers, please refer to TODO
-#' \url{https://hydrography.org/hydrography90m/hydrography90m_layers/}.
-#' For details on the bioclimatic variables, please refer to 
-#' \url{https://www.worldclim.org/data/bioclim.html} (TODO correct?).
-#' For details on the ESA Land Cover variables, please refer to 
-#' \url{https://dunno.com} (TODO add!!).
 #'
-#' TODO: The units also have scale and offset! What about them?
-#' TODO: The c10 etc. have numbers behind their descriptions, what do they say?
+#' For more details and visualisations of the spatial layers (e.g. the available
+#' tiles), please refer to
+#' \url{https://hydrography.org/hydrography90m/hydrography90m_layers/}.
+#' For details on the bioclimatic variables, especially for details of the scale
+#' and unit of the values, please refer to
+#' \url{http://chelsa-climate.org/}.
+#' For details on the ESA Land Cover variables, please refer to
+#' \url{https://www.climatologylab.org/terraclimate.html}.
+#' For details on the Soil data, please refer to
+#' \url{https://soilgrids.org}.
+#'
+#' TODO: The CHELSA units also have scale and offset! Explain them here?
 #'
 #'  | **Variable type**                 | **Variable name**            | **Variable** | **Unit**  | **File format** |
 #'  |-----------------------------------|-------------------------------------|-------|-----------------|-----------|
@@ -109,13 +113,13 @@
 #' @examples
 #' # Download data for two variables in three regular tiles
 #' # to the current working directory
-#' download_env(variable = c("bio1", "bio1"),
-#'                tile_id = c("h00v02","h16v02", "h16v04"))
+#' download_env(variable = c("bio1", "bio2"),
+#'                tile_id = c("h00v02", "h16v02", "h16v04"))
 #'
 #' # Download them as zip, to save disk space:
-#' download_env(variable = c("bio1", "bio1"),
+#' download_env(variable = c("bio1", "bio2"),
 #'                file_format = "zip",
-#'                tile_id = c("h00v02","h16v02", "h16v04"))
+#'                tile_id = c("h00v02", "h16v02", "h16v04"))
 #'
 #' # Download land cover data for two years
 #' download_env(variable = c("c20", "c30"), years = c(1992, 1996)
@@ -125,7 +129,7 @@
 #' # Download land cover data for specific variables and  years
 #' download_env(variable = c("c20_1996", "c30_1992"),
 #'                file_format = "zip",
-#'                tile_id = c("h00v02","h16v02", "h16v04"))
+#'                tile_id = c("h00v02", "h16v02", "h16v04"))
 
 ### TODO:
 # Make the file with file sizes
