@@ -78,8 +78,9 @@
 #'
 #' # Example 2: Extract ID values of all subcatchments
 #' subc_raster <- paste0(my_directory,
-#' "/hydrographr_data/subcatchment_1264942.tif")
+#' "/hydrography90m_test_data/subcatchment_1264942.tif")
 #' hydrography90m_ids <- extract_ids(subc_layer = subc_raster)
+#' fwrite(hydrography90m_ids, paste0(my_directory, '/subc_IDs.txt'))
 
 
 extract_ids <- function(data = NULL, lon, lat, id = NULL, basin_layer = NULL,
