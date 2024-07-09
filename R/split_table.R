@@ -26,13 +26,16 @@
 #'
 #' df <- data.frame(matrix(ncol = 2, nrow = 10000))
 #' colnames(df) <- c('var1', 'var2')
+#' # or with real data
+#' my_directory <- tempdir()
+#' download_test_data(my_directory)
+#' df <- fread(paste0(my_directory, '/projectionTB.csv'), fill=TRUE)
 #'
 #' # Define full path to store split data tables
-#' my_directory <- tempdir()
 #' split_tbl_path <- paste0(my_directory,
 #'                      "/hydrography90m_test_data/")
 #' # Split data table
-#' split_table <- (df, split = 2000, split_tbl_path)
+#' hydrography90m_ids <- split_table(df, split = 20000, split_tbl_path)
 #'
 #' # Show the output table
 #' hydrography90m_ids
@@ -110,7 +113,7 @@ split_table <- function(data, split = NULL, split_tbl_path,
       return(split_files[i])
     }
   } else {
-    cat(paste0("Split tables are stored under", split_tbl_path))
+    cat(paste0("Split tables are stored under ", split_tbl_path))
   }
 
   # Remove all files in the tmp folder
