@@ -37,7 +37,9 @@ Authors@R:
       person("Sami", "Domisch",
              email = "sami.domisch@igb-berlin.de",
              role = c("aut")))
-Maintainer: Marlene Schürz <marlene.schuerz@igb-berlin.de> and 
+Maintainer: Thomas Tomiczek <thomas.tomiczek@igb-berlin.de>,
+    Merret Buurman <merret.buurman@igb-berlin.de>,
+    Marlene Schürz <marlene.schuerz@igb-berlin.de> and
     Afroditi Grigoropoulou <afroditi.grigoropoulou@igb-berlin.de>
 Description: Scalable hydrographic geospatial data processing tools using 
     open-source command-line utilities. The package provides functions to 
