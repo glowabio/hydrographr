@@ -42,7 +42,32 @@
 #' @md
 #'
 #' @examples
-#' # TODO
+#' # Download test data into the temporary R folder
+#' # or define a different directory
+#' my_directory <- tempdir()
+#' download_test_data(my_directory) # TODO make test data available for download!
+#'
+#' # Define variable and tile:
+#' var <- c("bio1")
+#' tile_id <- c("h18v02")
+#'
+#' # Point to input data
+#' in_path <- paste0(my_directory, '/hydrography90m_test_data')
+#' subc_ids <- paste0(my_directory, '/hydrography90m_test_data/subc_IDs.txt')
+#' output <- paste0(my_directory, '/hydrography90m_test_data/predictTB.csv')
+#'
+#' # Run the function with 2 cores and calculate all statistics:
+#' get_predict_table(variable = var,
+#'                   statistics = c("ALL"),
+#'                   tile_id = tile_id,
+#'                   input_var_path = in_path,
+#'                   subcatch_id = subc_ids,
+#'                   out_file_path = output,
+#'                   read = FALSE, quiet = FALSE,
+#'                   n_cores = 2)
+#'
+#' # Now you can see the result in /tmp/.../hydrography90m_test_data/predictTB.csv
+#'
 
 
 get_predict_table <- function(variable,
