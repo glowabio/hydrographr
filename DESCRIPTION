@@ -100,6 +100,7 @@ Collate:
     'get_distance.R'
     'get_distance_parallel.R'
     'get_distance_graph.R'
+    'get_modelfit_table.R'
     'get_pfafstetter_basins.R'
     'get_regional_unit_id.R'
     'get_segment_neighbours.R'
