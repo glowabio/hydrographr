@@ -39,14 +39,14 @@
 #' download_test_data(my_directory)
 #'
 #' # Load occurrence data
-#' species_occurrence <- read.table(paste0(my_directory,
-#'                                         "/hydrography90m_test_data",
-#'                                         "/spp.csv"),
-#'                                  header = TRUE)
+#species_occurrence <- fread(paste0(my_directory,
+#                                         "/hydrography90m_test_data",
+#                                         "/spp.csv"),
+#                                  header = TRUE)
 #'
 #' # Define full path to the sub-catchments raster layer
-#' subc_raster <- paste0(my_directory,
-#'                      "/hydrography90m_test_data/sub_catchment_h10v06.tif")
+#subc_raster <- paste0(my_directory,
+#                      "/hydrography90m_test_data/danube_subcatchments.tif")
 #'
 #' # Define full path to the prediction table
 #' predict_tbl <- paste0(my_directory,
