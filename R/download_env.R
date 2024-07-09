@@ -102,9 +102,23 @@
 #'  | ESA Land Cover (1992-2018) | Bare areas                                                | c200_<year> | % | zip / txt  |
 #'  | ESA Land Cover (1992-2018) | Water bodies                                              | c210_<year> | % | zip / txt  |
 #'  | ESA Land Cover (1992-2018) | Permanent snow and ice                                    | c220_<year> | % | zip / txt  |
-#'  | Soil                       | Depth to bedrock (R horizon) up to 200cm                  | soil_BDRICM | cm | zip / txt |
-#'  | Soil                       | Grade of a sub-soil being acid                            | soil_ACDWRB | pH | zip / txt |
-#'
+#'  | Soil (Global gridded soil information) | Depth to bedrock (R horizon) up to 200cm      | soil_BDRICM | cm | zip / txt |
+#'  | Soil (Global gridded soil information) | Grade of a sub-soil being acid                | soil_ACDWRB | pH | zip / txt |
+#'  | Soil (Global gridded soil information) | Derived saturated water content               | soil_AWCTS  |    | zip / txt |
+#'  | Soil (Global gridded soil information) | Clay content                                  | soil_CLYPPT | %  | zip / txt |
+#'  | Soil (Global gridded soil information) | Sand content                                  | soil_SNDPPT | %  | zip / txt |
+#'  | Soil (Global gridded soil information) | Silt content                                  | soil_SLTPPT | %  | zip / txt |
+#'  | Soil (Global gridded soil information) | Derived available soil water capacity         | soil_WWP    |    | zip / txt |
+#'  | Soil (Global gridded soil information) | Texture class (USDA system)                   | soil_TEXMHT |    | zip / txt |
+#'  | Soil (Global gridded soil information) | Soil organic carbon content (fine earth fraction) | soil_ORCDRC | g/kg | zip / txt |
+#'  | Soil (Global gridded soil information) | Soil pH x 10 in H2O                          | soil_PHIHOX  | pH  | zip / txt |
+#'  | Soil (Global gridded soil information) | Bulk density (fine earth)                    | soil_BLDFIE  | kg / cubic-meter | zip / txt |
+#'  | Soil (Global gridded soil information) | Cation exchange capacity                     | soil_CECSOL  | cmolc/kg | zip / txt |
+#'  | Soil (Global gridded soil information) | Coarse fragments volumetric                  | soil_CRFVOL  | %    | zip / txt |
+#'  | Soil (Global gridded soil information) | Grade of a sub-soil being acid e.g. having a pH < 5 and low BS | soil_ACDWRB  | ph | zip / txt |
+#'  | Soil (Global gridded soil information) | Probability of occurence of R horizon (0-100%) | soil_BDRLOG  | %  | zip / txt |
+#'  | Soil (Global gridded soil information) | Cummulative probability of organic soil based on the TAXOUSDA and TAXNWRB | soil_HISTPR | | zip / txt |
+#'  | Soil (Global gridded soil information) | Sodic soil grade based on WRB soil types and soil pH | soil_SLGWRB  | pH  | zip / txt |
 #'
 #' @md
 #' @note
