@@ -328,10 +328,11 @@ download_env <- function(variable, file_format = "csv", years = NULL,
     }
   }
 
-  cat("Please cite the Hydrography90m publication:\n
-      Amatulli, G., Garcia Marquez, J., Sethi, T., Kiesel, J., Grigoropoulou, A.,
-      Üblacker, M. M., Shen, L. Q., and Domisch, S.: Hydrography90m: a new
-      high-resolution global hydrographic dataset, Earth Syst. Sci. Data, 14,
-      4525–4550, https://doi.org/10.5194/essd-14-4525-2022, 2022.")
+  cat("Please cite the Environment90m publication:\n
+      Garcia Marquez, J., Amatulli, G., Grigoropoulou, A.,
+      Schürz, M., Tomiczek, T., Buurman, M., and Domisch, S.:
+      Global datasets of aggregated environmental variables at the
+      sub-cachment scale for freshwater biodiversity modeling, in prep.
+      Please contact the authors for more up-to-date citation info.")
   # TODO: Adapt citation!
 }
