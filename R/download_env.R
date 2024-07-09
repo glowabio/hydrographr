@@ -197,7 +197,7 @@ download_env <- function(variable, file_format = "csv", years = NULL,
     regex <- "^c[[:digit:]]+$" # matches c00
     which_are_landcover <- grepl(regex, variable)
     requested_landcover_vars = variable[which_are_landcover]
-    if (any(which_vars)) {
+    if (any(which_are_landcover)) {
       message(paste('These variables can be combined with years:', paste(requested_landcover_vars, collapse=', ')))
     } else {
       message(paste('No variables can be combined with years:', paste(variable[!which_are_landcover], collapse=', ')))
