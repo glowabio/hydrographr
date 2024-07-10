@@ -122,7 +122,7 @@
 
 
 download_future_climate <- function(variable, file_format = "csv",
-                         time_period = c("2071-2100"), scenario = NULL,
+                         time_period = NULL, scenario = NULL,
                          model = NULL, tile_id = NULL,
                          download_dir = ".", delete_zips = TRUE) {
 
