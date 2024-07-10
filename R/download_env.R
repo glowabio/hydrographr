@@ -25,6 +25,7 @@
 #' after unzipping. Defaults to TRUE. This is ignored if you request file format zip.
 #' @importFrom tidyr separate
 #' @importFrom stringr str_split_fixed str_extract
+#' @importFrom data.table fread
 #' @export
 #'
 #' @author Afroditi Grigoropoulou, Merret Buurman
@@ -139,7 +140,7 @@
 #'                tile_id = c("h00v02", "h16v02", "h16v04"))
 #'
 #' # Download land cover data for two years
-#' download_env(variable = c("c20", "c30"), years = c(1992, 1996)
+#' download_env(variable = c("c20", "c30"), years = c(1992, 1996),
 #'                file_format = "zip",
 #'                tile_id = c("h00v02","h16v02", "h16v04"))
 #
@@ -173,7 +174,7 @@ download_env <- function(variable, file_format = "txt", years = NULL,
   }
 
   # Import lookup table with the size of each file
-  file_size_table <- fread(file_size_file, sep = ";")
+  file_size_table <- data.table::fread(file_size_file, sep = ";")
   file_size_table$file_name = basename(file_size_table$file_path)
 
   # Extract entire lists of possible variable names, 
@@ -265,7 +266,7 @@ download_env <- function(variable, file_format = "txt", years = NULL,
   all_file_names <- sort(unique(file_size_table$file_name))
 
   # Get the valid tile ids of the environment90m
-  all_tile_ids <- unique(str_extract(
+  all_tile_ids <- unique(stringr::str_extract(
     file_size_table$file_path, "h[0-9]+v[0-9]+"))
 
   # Remove NA from list of tile ids:
