@@ -98,15 +98,10 @@
 #' variable = c("bio1")
 #' scenario = c("ssp370")
 #' model = c("ipsl-cm6a-lr")
+#' time_period = c("2071-2100")
 #' download_future_climate(variable = variable, file_format = "zip",
 #'                scenario = scenario, model = model,
-#'                tile_id = c("h00v02","h16v02", "h16v04"))
-#'
-#' # Eventually, other time periods may be added:
-#' time_period = c("2071-2100", ...)
-#' download_future_climate(variable = variable, file_format = "zip",
 #'                time_period = time_period,
-#'                scenario = scenario, model = model,
 #'                tile_id = c("h00v02","h16v02", "h16v04"))
 #'
 #' # Download many bioclimatic variables:
@@ -115,8 +110,10 @@
 #'              "bio16", "bio17", "bio18", "bio19")
 #' scenario = c("ssp370", "ssp585")
 #' model = c("ipsl-cm6a-lr", "mpi-esm1-2-hr", "ukesm1-0-ll")
+#'                time_period = time_period,
 #' download_future_climate(variable = variable, file_format = "zip",
 #'                scenario = scenario, model = model,
+#'                time_period = time_period,
 #'                tile_id = c("h00v02", "h16v02", "h16v04"))
 #'
 
