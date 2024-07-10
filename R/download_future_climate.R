@@ -46,12 +46,14 @@
 #' that should be used as an input in the parameter "variable" of the function.
 #' Likewise, the column "File format" contains the input that should be given to
 #' the "file_format" parameter.
-#' For more details and visualisations of the spatial layers, please refer to TODO
+#' For more details and visualisations of the spatial layers (e.g. the available
+#' tiles), please refer to
 #' \url{https://hydrography.org/hydrography90m/hydrography90m_layers/}.
-#' For details on the bioclimatic variables, please refer to 
-#' \url{https://www.worldclim.org/data/bioclim.html} (TODO correct?).
+#' For details on the bioclimatic variables, especially for details of the scale
+#' and unit of the values, please refer to
+#' \url{http://chelsa-climate.org/}.
 #'
-#' TODO: The units also have scale and offset! What about them?
+#' TODO: The CHELSA units also have scale and offset! Explain them here?
 #'
 #'  | **Variable type**                 | **Variable name**            | **Variable**   | **Unit**  | **File format** |
 #'  |-----------------------------------|------------------------------|----------------|-----------------|-----------|
@@ -329,10 +331,11 @@ download_future_climate <- function(variable, file_format = "csv",
     }
   }
 
-  cat("Please cite the Hydrography90m publication:\n
-      Amatulli, G., Garcia Marquez, J., Sethi, T., Kiesel, J., Grigoropoulou, A.,
-      Üblacker, M. M., Shen, L. Q., and Domisch, S.: Hydrography90m: a new
-      high-resolution global hydrographic dataset, Earth Syst. Sci. Data, 14,
-      4525–4550, https://doi.org/10.5194/essd-14-4525-2022, 2022.")
+  cat("Please cite the Environment90m publication:\n
+      Garcia Marquez, J., Amatulli, G., Grigoropoulou, A.,
+      Schürz, M., Tomiczek, T., Buurman, M., and Domisch, S.:
+      Global datasets of aggregated environmental variables at the
+      sub-cachment scale for freshwater biodiversity modeling, in prep.
+      Please contact the authors for more up-to-date citation info.")
   # TODO: Adapt citation!
 }
