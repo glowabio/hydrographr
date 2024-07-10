@@ -40,19 +40,20 @@ test_that("downloading WITH preexisting environment90m_paths_file_sizes.txt", {
 
 # test 2
 # For LATER:
-#test_that("downloading bioclimatic variables", {
-#  # Prepare:
-#  download_dir = paste0(tempdir, "/test2")
-#
-#  # Run:
-#  download_env(variable = c("bio1", "bio2"), tile_id = c("h00v02", "h16v02"), download_dir = download_dir)
-#
-#  # Check:
-#  created_files <- list.files(paste0(download_dir, '/LandCover/c20')
-#  expected_files <- c("bio1_h00v02.txt", "bio1_h16v02.txt", "bio2_h00v02.txt", "bio2_h16v02.txt")
-#  expect_length(created_files, 4)
-#    expect_true(all(sort(expected_files) == sort(created_files)))
-#})
+test_that("downloading bioclimatic variables", {
+    # Prepare:
+    download_dir = paste0(tempdir, "/test2")
+
+    # Run:
+    skip("We will test this once bioclimatic variables are renamed on the server!")
+    download_env(variable = c("bio1", "bio2"), tile_id = c("h00v02", "h16v02"), download_dir = download_dir)
+
+    # Check:
+    created_files <- list.files(paste0(download_dir, '/LandCover/c20'))
+    expected_files <- c("bio1_h00v02.txt", "bio1_h16v02.txt", "bio2_h00v02.txt", "bio2_h16v02.txt")
+    expect_length(created_files, 4)
+    expect_true(all(sort(expected_files) == sort(created_files)))
+})
 
 # test 3
 test_that("downloading WITH preexisting environment90m_paths_file_sizes.txt, not-unzipping, passing land cover as one string", {
