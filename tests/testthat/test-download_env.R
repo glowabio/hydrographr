@@ -35,7 +35,7 @@ test_that("downloading WITH preexisting environment90m_paths_file_sizes.txt", {
     created_files <- list.files(paste0(download_dir, '/LandCover/c20'))
     expected_files <- c("c20_1992_h00v02.txt")
     expect_length(created_files, 1)
-    expect_true(all(expected_files == created_files))
+    expect_true(all(sort(expected_files) == sort(created_files)))
 })
 
 # test 2
