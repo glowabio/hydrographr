@@ -129,25 +129,31 @@
 #' message in your browser.
 #'
 #' @examples
+#' # Define directory
+#' my_directory <- tempdir()
 #' # Download data for two variables in three regular tiles
 #' # to the current working directory
 #' download_env(variable = c("bio1", "bio2"),
-#'                tile_id = c("h00v02", "h16v02", "h16v04"))
+#'                tile_id = c("h00v02", "h16v02", "h16v04"),
+#'                download_dir = my_directory)
 #'
 #' # Download them as zip, to save disk space:
 #' download_env(variable = c("bio1", "bio2"),
 #'                file_format = "zip",
-#'                tile_id = c("h00v02", "h16v02", "h16v04"))
+#'                tile_id = c("h00v02", "h16v02", "h16v04"),
+#'                download_dir = my_directory)
 #'
 #' # Download land cover data for two years
 #' download_env(variable = c("c20", "c30"), years = c(1992, 1996),
 #'                file_format = "zip",
-#'                tile_id = c("h00v02","h16v02", "h16v04"))
+#'                tile_id = c("h00v02","h16v02", "h16v04"),
+#'                download_dir = my_directory)
 #
 #' # Download land cover data for specific variables and  years
 #' download_env(variable = c("c20_1996", "c30_1992"),
 #'                file_format = "zip",
-#'                tile_id = c("h00v02", "h16v02", "h16v04"))
+#'                tile_id = c("h00v02", "h16v02", "h16v04"),
+#'                download_dir = my_directory)
 
 ### TODO:
 # Make the file with file sizes
