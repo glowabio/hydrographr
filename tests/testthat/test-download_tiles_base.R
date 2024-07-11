@@ -50,22 +50,21 @@ file_size_table <- fread(file_size_file, sep = ";")
 file_size_table$file_name = basename(file_size_table$file_path)
 
 # Server URL, is usually passed by calling function
-server_url <- "https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4/download?path=%2F"
-
+server_url_igb <- "https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4/download?path=%2F"
 
 #############
 ### Tests ###
 #############
 
 # test 1
-test_that("global case: direction", {
+test_that("1 Global case: 'direction_ovr.tif' (from IGB)", {
 
     # Prepare:
     download_dir <- file.path(tmpdir, "test_download_tiles_base_1")
 
     # Run:
     skip_if(SKIP_SUPERSLOW, 'Downloading this is 7431.1 MB, so we skip it this time...')
-    download_tiles_base(variable = "direction", file_format = "tif", global = TRUE, file_size_table = file_size_table, server_url = server_url, download_dir = download_dir)
+    download_tiles_base(variable = "direction", file_format = "tif", global = TRUE, file_size_table = file_size_table, server_url = server_url_igb, download_dir = download_dir)
 
     # Check:
     created_files <- list.files(file.path(download_dir, 'global'))
@@ -77,14 +76,14 @@ test_that("global case: direction", {
 })
 
 # test 2
-test_that("global cti special case", {
+test_that("2 Global special case 'cti_ovr.tif': Always downloaded from GDrive", {
 
     # Prepare:
     download_dir <- file.path(tmpdir, "test_download_tiles_base_2")
 
     # Run:
     skip_if(SKIP_SUPERSLOW, 'Downloading this is 82 GB, so we skip it this time...')
-    download_tiles_base(variable = "cti", file_format = "tif", global = TRUE, file_size_table = file_size_table, server_url = server_url, download_dir = download_dir)
+    download_tiles_base(variable = "cti", file_format = "tif", global = TRUE, file_size_table = file_size_table, server_url = server_url_igb, download_dir = download_dir)
 
     # Check:
     # TODO: How to check where it is downloaded from?
@@ -98,14 +97,14 @@ test_that("global cti special case", {
 
 
 # test 3
-test_that("non-global", {
+test_that("3 Normal case, not global, from IGB", {
 
     # Prepare:
     download_dir <- file.path(tmpdir, "test_download_tiles_base_3")
 
     # Run: Downloads 15 MB
     skip_if(SKIP_SLOW, 'Downloading this is 15 MB, so we skip it this time...')
-    download_tiles_base(variable = "direction", file_format = "tif", tile_id = "h00v02", file_size_table = file_size_table, server_url = server_url, download_dir = download_dir)
+    download_tiles_base(variable = "direction", file_format = "tif", tile_id = "h00v02", file_size_table = file_size_table, server_url = server_url_igb, download_dir = download_dir)
 
     # Check:
     created_files <- list.files(file.path(download_dir, 'r.watershed', 'direction_tiles20d'))
@@ -119,7 +118,7 @@ test_that("non-global", {
 
 
 # test 4
-test_that("non-existing file", {
+test_that("4 Try downloading non-existing file", {
 
     # Prepare:
     download_dir <- file.path(tmpdir, "test_download_tiles_base_4")
@@ -127,11 +126,10 @@ test_that("non-existing file", {
     # Run: Downloads nothgin
     expected_warning <- "Problem: Did not find any file \"idontexist_h00v02.tif\" in the list of files - are you sure it is a valid file?"
     expect_warning(
-        res <- download_tiles_base(variable = "idontexist", file_format = "tif", tile_id = "h00v02", file_size_table = file_size_table, server_url = server_url, download_dir = download_dir),
+        res <- download_tiles_base(variable = "idontexist", file_format = "tif", tile_id = "h00v02", file_size_table = file_size_table, server_url = server_url_igb, download_dir = download_dir),
         regexp = expected_warning
     )
 
     # Check:
     expect_true(is.null(res))
-
 })
