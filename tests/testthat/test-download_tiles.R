@@ -46,7 +46,7 @@ test_that("example 1, global", {
     created_files <- list.files(paste0(download_dir, '/global'))
     expected_files <- c("direction_ovr.tif")
     expect_length(created_files, 1)
-    expect_true(all(sort(expected_files) == sort(created_files)))
+    expect_setequal(created_files, expected_files)
     file_size = file.info(paste0(download_dir, '/global/direction_ovr.tif'))[["size"]]
     skip('That damn virus check is beating me again...')
     expect_true(file_size > 5000)
@@ -65,7 +65,7 @@ test_that("example 2, two regional unit raster masks", {
     created_files <- list.files(paste0(download_dir, '/r.watershed/regional_unit'))
     expected_files <- c("regional_unit_33.tif", "regional_unit_34.tif")
     expect_length(created_files, 2)
-    expect_true(all(sort(expected_files) == sort(created_files)))
+    expect_setequal(created_files, expected_files)
     file_size33 = file.info(paste0(download_dir, '/r.watershed/regional_unit/regional_unit_33.tif'))[["size"]]
     file_size34 = file.info(paste0(download_dir, '/r.watershed/regional_unit/regional_unit_34.tif'))[["size"]]
     expect_true(file_size33 > 5000)
@@ -89,7 +89,7 @@ test_that("downloading WITHOUT preexisting hydrography90m_paths_file_sizes.txt",
     created_files <- list.files(paste0(download_dir, '/r.watershed/regional_unit'))
     expected_files <- c("regional_unit_33.tif")
     expect_length(created_files, 1)
-    expect_true(all(sort(expected_files) == sort(created_files)))
+    expect_setequal(created_files, expected_files)
     file_size33 = file.info(paste0(download_dir, '/r.watershed/regional_unit/regional_unit_33.tif'))[["size"]]
     expect_true(file_size33 > 5000)
 })
@@ -111,7 +111,7 @@ test_that("downloading WITH preexisting hydrography90m_paths_file_sizes.txt", {
     created_files <- list.files(paste0(download_dir, '/r.watershed/regional_unit'))
     expected_files <- c("regional_unit_33.tif")
     expect_length(created_files, 1)
-    expect_true(all(sort(expected_files) == sort(created_files)))
+    expect_setequal(created_files, expected_files)
     file_size33 = file.info(paste0(download_dir, '/r.watershed/regional_unit/regional_unit_33.tif'))[["size"]]
     expect_true(file_size33 > 5000)
 })

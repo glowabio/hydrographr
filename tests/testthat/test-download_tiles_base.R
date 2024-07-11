@@ -13,7 +13,7 @@
 
 
 SKIP_SUPERSLOW = TRUE
-SKIP_SLOW = TRUE
+SKIP_SLOW = FALSE
 
 
 #########################
@@ -61,7 +61,7 @@ test_that("global case: direction", {
     created_files <- list.files(paste0(download_dir, '/global'))
     expected_files <- c("direction_ovr.tif")
     expect_length(created_files, 1)
-    expect_true(all(sort(expected_files) == sort(created_files)))
+    expect_setequal(created_files, expected_files)
     file_size = file.info(paste0(download_dir, '/global/direction_ovr.tif'))[["size"]]
     expect_true(file_size > 5000)
 })
@@ -82,7 +82,7 @@ test_that("global cti special case", {
     created_files <- list.files(paste0(download_dir, '/global'))
     expected_files <- c("cti_ovr.tif")
     expect_length(created_files, 1)
-    expect_true(all(sort(expected_files) == sort(created_files)))
+    expect_setequal(created_files, expected_files)
     file_size = file.info(paste0(download_dir, '/global/cti_ovr.tif'))[["size"]]
     expect_true(file_size > 5000)
 })
@@ -95,14 +95,14 @@ test_that("non-global", {
     download_dir <- paste0(tmpdir, "/test_download_tiles_base_3")
 
     # Run: Downloads 15 MB
-    skip_if(SKIP_SUPERSLOW, 'Downloading this is 15 MB, so we skip it this time...')
+    skip_if(SKIP_SLOW, 'Downloading this is 15 MB, so we skip it this time...')
     download_tiles_base(variable = "direction", file_format = "tif", tile_id = "h00v02", file_size_table = file_size_table, server_url = server_url, download_dir = download_dir)
 
     # Check:
     created_files <- list.files(paste0(download_dir, '/r.watershed/direction_tiles20d/'))
     expected_files <- c("direction_h00v02.tif")
     expect_length(created_files, 1)
-    expect_true(all(sort(expected_files) == sort(created_files)))
+    expect_setequal(created_files, expected_files)
     file_size = file.info(paste0(download_dir, '/r.watershed/direction_tiles20d/direction_h00v02.tif'))[["size"]]
     expect_true(file_size > 5000)
 })

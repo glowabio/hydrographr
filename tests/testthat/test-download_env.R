@@ -36,7 +36,7 @@ test_that("downloading WITHOUT preexisting environment90m_paths_file_sizes.txt",
     created_files <- list.files(paste0(download_dir, '/LandCover/c20'))
     expected_files <- c("c20_1992_h00v02.txt")
     expect_length(created_files, 1)
-    expect_true(all(sort(expected_files) == sort(created_files)))
+    expect_setequal(created_files, expected_files)
 })
 
 # test 2
@@ -53,7 +53,7 @@ test_that("downloading bioclimatic variables", {
     created_files <- list.files(paste0(download_dir, '/LandCover/c20'))
     expected_files <- c("bio1_h00v02.txt", "bio1_h16v02.txt", "bio2_h00v02.txt", "bio2_h16v02.txt")
     expect_length(created_files, 4)
-    expect_true(all(sort(expected_files) == sort(created_files)))
+    expect_setequal(created_files, expected_files)
 })
 
 # test 3
@@ -73,7 +73,7 @@ test_that("downloading WITH preexisting environment90m_paths_file_sizes.txt, not
     created_files <- list.files(paste0(download_dir, '/LandCover/c20'))
     expected_files <- c("c20_1992_h00v02.zip", "c20_1992_h16v02.zip", "c20_1996_h00v02.zip", "c20_1996_h16v02.zip")
     expect_length(created_files, 4)
-    expect_true(all(sort(expected_files) == sort(created_files)))
+    expect_setequal(created_files, expected_files)
 })
 
 
@@ -92,7 +92,7 @@ test_that("unzipping without removing the zips", {
     expected_files <- c("c20_1992_h00v02.txt", "c20_1992_h16v02.txt", "c20_1996_h00v02.txt", "c20_1996_h16v02.txt",
                         "c20_1992_h00v02.zip", "c20_1992_h16v02.zip", "c20_1996_h00v02.zip", "c20_1996_h16v02.zip")
     expect_length(created_files, 8)
-    expect_true(all(sort(expected_files) == sort(created_files)))
+    expect_setequal(created_files, expected_files)
 })
 
 
