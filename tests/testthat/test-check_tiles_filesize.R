@@ -15,8 +15,6 @@
 # * normal case goes bad: unmatching file format (test 9, test 10)
 
 
-SKIP_KNOWN_ISSUES = TRUE
-
 tmpdir <- tempdir()
 print(paste0('Tempdir: ', tmpdir))
 
@@ -139,25 +137,8 @@ test_that("MUST FAIL: Passing integer tile_id instead of h00v00 pattern", {
 })
 
 
-# test 7, existing regional unit
-# TODO: DOES NOT FAIL!
-# We pass reg_unit_id, but that is never read...
-test_that("7a Normal regional unit case, known issue!", {
-
-    # Run:
-    skip_if(SKIP_KNOWN_ISSUES)
-    size <- check_tiles_filesize('regional_unit', file_format = "tif", reg_unit_id = "190",
-        h90m_varnames = all_varnames_hy, h90m_tile_id = all_tile_ids_hy,
-        h90m_file_names = all_file_names_hy, file_size_table = file_size_table_hy)
-
-    # Check:
-    expect_equal(size, 780854)
-})
-
-
-# test 7b, existing regional unit
-# TODO: We pass tile_id, but it shold be reg_unit_id
-test_that("7b Normal regional unit case", {
+# test 7a, existing regional unit
+test_that("7a Normal regional unit case", {
 
     # Run:
     size <- check_tiles_filesize('regional_unit', file_format = "tif", tile_id = "190",
@@ -183,28 +164,9 @@ test_that("7c Normal regional unit case, passing tile_id as integer (which is wr
 
 # test 8a, non-existing regional unit!
 # We ask for regional unit 140, which does not exist.
-# TODO: This passes reg_unit_id, which is not read. KNOWN ISSUE.
-test_that("MUST FAIL: 8a: Regional unit case, but regional unit 140 does not exist! Passing reg_unit_id as char.", {
+test_that("MUST FAIL: 8a: Regional unit case, but regional unit 140 does not exist! Passing tile_id as char.", {
 
     # Run:
-    # TODO: Pass as reg_unit_id!!
-    skip_if(SKIP_KNOWN_ISSUES)
-    expect_error(
-        size <- check_tiles_filesize('regional_unit', file_format = "tif", reg_unit_id = "140",
-            h90m_varnames = all_varnames_hy, h90m_tile_id = all_tile_ids_hy,
-            h90m_file_names = all_file_names_hy, file_size_table = file_size_table_hy),
-        regexp = "'arg' should be one of “1”, “2”, “3”.+", fixed=FALSE
-    )
-})
-
-
-# test 8b, non-existing regional unit!
-# We ask for regional unit 140, which does not exist.
-# TODO: This works, but it shouldn't
-test_that("MUST FAIL: 8b: Regional unit case, but regional unit 140 does not exist! Passing tile_id as char.", {
-
-    # Run:
-    # TODO: Pass as reg_unit_id!!
     expect_error(
         size <- check_tiles_filesize('regional_unit', file_format = "tif", tile_id = "140",
             h90m_varnames = all_varnames_hy, h90m_tile_id = all_tile_ids_hy,
@@ -213,14 +175,13 @@ test_that("MUST FAIL: 8b: Regional unit case, but regional unit 140 does not exi
     )
 })
 
-# test 8c, non-existing regional unit!
+# test 8b, non-existing regional unit!
 # We ask for regional unit 140, which does not exist.
 # We would like regional unit 140, and pass it as integer. So it first fails as it expects characters,
 # before even checking whether 140 exists (hint: it doesn't...)
-test_that("MUST FAIL: 8c: Regional unit case, but regional unit 140 does not exist! Passing tile_id as integer.", {
+test_that("MUST FAIL: 8b: Regional unit case, but regional unit 140 does not exist! Passing tile_id as integer.", {
 
     # Run:
-    # TODO: Pass as reg_unit_id!!
     expect_error(
         size <- check_tiles_filesize('regional_unit', file_format = "tif", tile_id = 140,
             h90m_varnames = all_varnames_hy, h90m_tile_id = all_tile_ids_hy,
@@ -229,44 +190,8 @@ test_that("MUST FAIL: 8c: Regional unit case, but regional unit 140 does not exi
     )
 })
 
-# test 8d
-# TODO: DOES NOT FAIL!
-# We pass reg_unit_id, but that is never read... Instead it expects tile_id, which is not set, thus seen as NULL.
-# tile_id is not checked for non-nullness, so it gives out the file name "regional_unit_.tif", which returns a size
-# of length zero! There is so much wrong here...
-test_that("MUST FAIL: 8d Regional unit case, but regional unit 140 does not exist! Passing reg_unit_id as integer.", {
-
-    # Run:
-    skip_if(SKIP_KNOWN_ISSUES)
-    size <- check_tiles_filesize('regional_unit', file_format = "tif", reg_unit_id = 140,
-        h90m_varnames = all_varnames_hy, h90m_tile_id = all_tile_ids_hy,
-        h90m_file_names = all_file_names_hy, file_size_table = file_size_table_hy)
-
-    # TODO: This is true and shouldn't!!!
-    expect_true(length(size) == 0)
-
-
-    # Check:
-    #expect_equal(size, 273300052)
-})
-
-# test 9a, MUST FAIL, but does not! TODO KNOWN ISSUE
-# TODO: This does not throw an error - because reg_unit_id is not read!!
-test_that("MUST FAIL: 9a: Regional unit case, unit is wrong: h00v00 instead of an integer", {
-
-    # Run:
-    skip_if(SKIP_KNOWN_ISSUES)
-    expect_error(
-        size <- check_tiles_filesize('regional_unit', file_format = "tif", reg_unit_id = "h16v02",
-            h90m_varnames = all_varnames_hy, h90m_tile_id = all_tile_ids_hy,
-            h90m_file_names = all_file_names_hy, file_size_table = file_size_table_hy),
-        regexp = "bli")
-
-})
-
-# test 9b, MUST FAIL
-# TODO: This does not throw an error - because reg_unit_id is not read!!
-test_that("MUST FAIL: 9b: Regional unit case, unit is wrong: h00v00 instead of an integer", {
+# test 9, MUST FAIL
+test_that("MUST FAIL: 9: Regional unit case, unit is wrong: h00v00 instead of an integer", {
 
     # Run:
     expect_error(
@@ -275,8 +200,6 @@ test_that("MUST FAIL: 9b: Regional unit case, unit is wrong: h00v00 instead of a
             h90m_file_names = all_file_names_hy, file_size_table = file_size_table_hy),
         regexp = "'arg' should be one of “1”, “2”, “3”.+", fixed=FALSE
     )
-
-
 })
 
 # test 10, MUST FAIL:
