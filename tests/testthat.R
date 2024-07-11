@@ -11,6 +11,9 @@
 #setwd("/.../.../.../hydrographr/")
 #devtools::test()
 
+# Or to run single test files:
+# test_file("/home/.../hydrographr/tests/testthat/test-download_tiles_base.R")
+
 
 
 library(testthat)
