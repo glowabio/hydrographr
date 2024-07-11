@@ -102,7 +102,7 @@
 #' download_future_climate(variable = variable, file_format = "zip",
 #'                scenario = scenario, model = model,
 #'                time_period = time_period,
-#'                tile_id = c("h00v02","h16v02", "h16v04"))
+#'                tile_id = c("h00v02", "h16v02", "h16v04"))
 #'
 #' # Download many bioclimatic variables:
 #' variable = c("bio1", "bio2", "bio3", "bio4", "bio5", "bio6", "bio7", "bio8",

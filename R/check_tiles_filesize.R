@@ -16,7 +16,7 @@
 #' @param file_size_table data.frame. Lookup table including file names
 #' and sizes (inherited by 'download_tiles()').
 #'
-#' @importFrom stringr str_split_fixed
+#' @importFrom stringr str_split_i
 #' @keywords internal
 #'
 
@@ -69,7 +69,7 @@ check_tiles_filesize <- function(variable, file_format = "tif",
   #   bio18_2071-2100_ipsl-cm6a-lr_ssp585_V.2.1_h16v10.zip
   index_filenames <- grep(paste0(variable, "_"), h90m_file_names)
   valid_file_format_var <- unique(
-    str_split_i(
+    stringr::str_split_i(
       h90m_file_names[index_filenames],
       "\\.",   # regex: split at dot!
        -1))    # take first piece from right hand side
