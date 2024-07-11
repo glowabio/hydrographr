@@ -380,7 +380,7 @@ download_env <- function(variable, file_format = "txt", years = NULL,
       Garcia Marquez, J., Amatulli, G., Grigoropoulou, A.,
       Schürz, M., Tomiczek, T., Buurman, M., and Domisch, S.:
       Global datasets of aggregated environmental variables at the
-      sub-cachment scale for freshwater biodiversity modeling, in prep.
+      sub-catchment scale for freshwater biodiversity modeling, in prep.
       Please contact the authors for more up-to-date citation info.")
   # TODO: Adapt citation!
 }
