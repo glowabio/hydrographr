@@ -34,7 +34,7 @@ download_tiles_base <- function(variable, file_format = "tif",
 
   if (!(any(row_selector))){
     message('Skipping file "', file_name, '" (not found)...')
-    warning('Problem: Did not find any file "', file_name, '"" in the list of files - are you sure it is a valid file?')
+    warning('Problem: Did not find any file "', file_name, '" in the list of files - are you sure it is a valid file?')
     return()
   }
 
