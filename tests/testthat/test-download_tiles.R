@@ -16,13 +16,12 @@ if (SKIP_SUPERSLOW) {
     print('SKIP_SUPERSLOW is set to FALSE, not skipping superslow tests. If you want to skip them, set SKIP_SUPERSLOW to TRUE')
 }
 
+
+# TODO: Make small test data on the server, to run these faster!
+
 #########################
 ### Some preparations ###
 #########################
-
-# TODO They might be better in a setup file?
-# TODO: Make small test data on the server, to run these faster!
-
 
 # Temp dir for storing the results
 tmpdir <- tempdir()

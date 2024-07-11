@@ -11,6 +11,8 @@
 # * Proper tiles with tile ids
 # * ...? TODO Think of more cases!
 
+# TODO They might be better in a setup file?
+# TODO: Make small test data on the server, to run these faster!
 
 
 SKIP_SUPERSLOW <- Sys.getenv("SKIP_SUPERSLOW") == "TRUE" # empty string / FALSE if not set
@@ -32,10 +34,6 @@ if (SKIP_SLOW) {
 ### Some preparations ###
 #########################
 
-# TODO They might be better in a setup file?
-# TODO: Make small test data on the server, to run these faster!
-
-
 # Temp dir for storing the results
 tmpdir <- tempdir()
 print(paste0('Tempdir: ', tmpdir))
@@ -52,6 +50,7 @@ file_size_table$file_name = basename(file_size_table$file_path)
 # Server URL, is usually passed by calling function
 server_url_igb <- "https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4/download?path=%2F"
 server_url_gdrive <- "https://drive.google.com/uc?export=download&id="
+
 
 #############
 ### Tests ###

@@ -12,6 +12,9 @@
 # * files are unzipped to txt, zips are NOT removed (test 4)
 # * files are NOT unzipped to txt (test 1, test 2)
 
+#########################
+### Some preparations ###
+#########################
 
 tmpdir <- tempdir()
 print(paste0('Tempdir: ', tmpdir))
@@ -19,6 +22,9 @@ file_size_file <- paste0(tmpdir,'/futureclimate90m_paths_file_sizes.txt')
 file_size_file_url <- "https://public.igb-berlin.de/index.php/s/zw56kEd25NsQqcQ/download?path=%2FREADME/futureclimate90m_paths_file_sizes.txt"
 # TODO: Make small test data on the server, to run these faster!
 
+#############
+### Tests ###
+#############
 
 # test 1
 test_that("1 downloading WITHOUT preexisting futureclimate90m_paths_file_sizes.txt", {

@@ -14,6 +14,7 @@ if (SKIP_ALL_WITH_BASH_SCRIPT) {
     message('SKIP_ALL_WITH_BASH_SCRIPT is set to FALSE, not skipping tests that call bash scripts. If you want to skip them, set SKIP_ALL_WITH_BASH_SCRIPT to TRUE')
 }
 
+
 #########################
 ### Some preparations ###
 #########################
@@ -24,6 +25,10 @@ ratzeburgersee <- c(53.76921119083455, 10.77521394785896)
 df <- data.frame(t(data.frame(schaalsee, ratzeburgersee)))
 colnames(df) <- c("lati", "longi")
 
+#############
+### Tests ###
+#############
+
 # Test get_regional_unit_id:
 test_that("get_regional_unit_id works", {
   skip_if(SKIP_ALL_WITH_BASH_SCRIPT, 'Testing functions that call a bash script in the background fails on Thomas Windows machine, so we skip this...')
@@ -31,3 +36,4 @@ test_that("get_regional_unit_id works", {
   reg_id <- get_regional_unit_id(df, "longi", "lati")
   expect_equal(reg_id, 58)
 })
+

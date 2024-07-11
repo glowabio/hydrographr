@@ -15,16 +15,18 @@
 # * normal case goes bad: unmatching file format (test 9, test 10)
 
 
+#########################
+### Some preparations ###
+#########################
+
 tmpdir <- tempdir()
 print(paste0('Tempdir: ', tmpdir))
 
-
-
 # Get file size table (code from: download_tiles.R)
 file_size_file_hy <- paste0(tmpdir,'/hydrography90m_paths_file_sizes.txt')
+file_size_file_hy_url <- "https://drive.google.com/uc?export=download&id=1SEkcgGPutP6ZQPvYtzICh_gcGnVgH_uR&confirm=t"
 if (!(file.exists(file_size_file_hy))) {
-    download.file("https://drive.google.com/uc?export=download&id=1SEkcgGPutP6ZQPvYtzICh_gcGnVgH_uR&confirm=t",
-        destfile = file_size_file_hy, mode = "wb")
+    download.file(file_size_file_hy_url, destfile = file_size_file_hy, mode = "wb")
 }
 file_size_table_hy <- fread(file_size_file_hy, sep = ";")
 file_size_table_hy$file_name = basename(file_size_table_hy$file_path)
@@ -33,8 +35,12 @@ all_file_names_hy <- sort(unique(file_size_table_hy$file_name))
 all_tile_ids_hy <- unique(str_extract(file_size_table_hy$file_path, "h[0-9]+v[0-9]+"))
 all_tile_ids_hy <- all_tile_ids_hy[!is.na(all_tile_ids_hy)]
 
+file_size_file_env_url <- "https://public.igb-berlin.de/index.php/s/zw56kEd25NsQqcQ/download?path=%2FREADME/environment90m_paths_file_sizes.txt"
 file_size_file_futclim_url <- "https://public.igb-berlin.de/index.php/s/zw56kEd25NsQqcQ/download?path=%2FREADME/futureclimate90m_paths_file_sizes.txt"
 
+#############
+### Tests ###
+#############
 
 # test 1
 test_that("hydrography90m_paths_file_sizes.txt", {
@@ -55,7 +61,7 @@ test_that("environment90m_paths_file_sizes.txt", {
     # Get file size table (code from: download_tiles.R)
     file_size_file <- paste0(tmpdir,'/environment90m_paths_file_sizes.txt')
     if (!(file.exists(file_size_file))) {
-        download.file("https://public.igb-berlin.de/index.php/s/zw56kEd25NsQqcQ/download?path=%2FREADME/environment90m_paths_file_sizes.txt",
+        download.file(file_size_file_env_url,
             destfile = file_size_file, mode = "wb")
     }
     file_size_table <- fread(file_size_file, sep = ";")
