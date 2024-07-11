@@ -60,7 +60,8 @@ download_test_data <- function(download_dir = ".") {
   # First try downloading at IGB, then at GDrive:
   server_url <- tryCatch(
     {
-      download.file(igb_url, destfile = full_path_local_zip, mode = "wb")
+      options(timeout=10) # seconds
+      utils::download.file(igb_url, destfile = full_path_local_zip, mode = "wb")
       # This may run into a timeout of 60 seconds, if IGB servers are not reachable
     },
     warning = function(c) {
