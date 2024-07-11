@@ -78,7 +78,7 @@ download_test_data <- function(download_dir = ".") {
 
   # Checking file size, if too small it is probably a HTML page with
   # a virus check warning...
-  if (file.size(full_path_local_zip) < 30000000) { # bytes: real size is > 36 MB
+  if (file.size(full_path_local_zip) < 30000000) { # bytes (real size is > 36 MB)
 
     gdrive_url_base <- "https://drive.google.com/uc?export=download&id="
     gdrive_url_full <- paste0(gdrive_url_base, "1ykV0jRCglz-_fdc4CJDMZC87VMsxzXE4&confirm=t")
@@ -101,7 +101,7 @@ download_test_data <- function(download_dir = ".") {
                     " bytes.\nIf this function fails, please download",
                     " manually at ", gdrive_url, " or ",
                     igb_url, " and store to ", full_path_local_zip, ".")
-      warning(msg)
+      stop(msg)
     }
   }
 
@@ -112,10 +112,12 @@ download_test_data <- function(download_dir = ".") {
         unzip = getOption("unzip"))
 
   # remove the zip file
-  #unlink(paste0(download_dir, "/hydrography90m_test_data.zip"))
+  unlink(full_path_local_zip)
 
   # Report
-  cat("Data downloaded and unzipped to ",
-  download_dir, "/hydrography90m_test_data\n", sep = "")
-
+  if (length(list.files(where_to_store)) > 40) {
+    cat("Data downloaded and unzipped to ",
+        download_dir, "/hydrography90m_test_data\n", sep = ""
+    )
+  }
 }
