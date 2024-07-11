@@ -57,9 +57,23 @@ download_test_data <- function(download_dir = ".") {
   ifelse(!dir.exists(where_to_store),
          dir.create(where_to_store), FALSE)
 
-  download.file(gdrive_url,
-                destfile = full_path_local_zip,
-                  mode = "wb")
+  # First try downloading at IGB, then at GDrive:
+  server_url <- tryCatch(
+    {
+      download.file(igb_url, destfile = full_path_local_zip, mode = "wb")
+      # This may run into a timeout of 60 seconds, if IGB servers are not reachable
+    },
+    warning = function(c) {
+      warning("Could not download test data from ", igb_url, ", trying now at ", gdrive_url)
+      download.file(gdrive_url, destfile = full_path_local_zip, mode = "wb")
+      # This may run into a problem that you need to manually skip the virus check
+    },
+    error = function(c) {
+      warning("Could not download test data from ", igb_url, ", trying now at ", gdrive_url)
+      download.file(gdrive_url, destfile = full_path_local_zip, mode = "wb")
+      # This may run into a problem that you need to manually skip the virus check
+    }
+  )
 
   # Checking file size, if too small it is probably a HTML page with
   # a virus check warning...
@@ -81,7 +95,7 @@ download_test_data <- function(download_dir = ".") {
     } else {
       # In case the text is in a different locale and does not contain those
       # exact words, still warn the user:
-      msg <- paste0("Downloading the zipped data from GDrive probably",
+      msg <- paste0("Downloading the zipped data probably",
                     " went wrong, it is only ", file.size(full_path_local_zip),
                     " bytes.\nIf this function fails, please download",
                     " manually at ", gdrive_url, " or ",
