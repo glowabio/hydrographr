@@ -23,7 +23,7 @@
 
 
 check_tiles_filesize <- function(variable, file_format = "tif",
-                                 tile_id = NULL, reg_unit_id = NULL,
+                                 tile_id = NULL,
                                  global = FALSE, h90m_varnames, h90m_tile_id,
                                  h90m_file_names, file_size_table) {
 
