@@ -312,7 +312,7 @@ download_future_climate <- function(variable, file_format = "csv",
 
   # Unzip and delete zipfiles, if requested...
   # TODO: This could start to run in parallel, maybe?
-  if (file_format == "csv") {
+  if (file_format == "txt") {
     if (delete_zips) {
       message("Unzipping and deleting zipfiles...")
     } else {
