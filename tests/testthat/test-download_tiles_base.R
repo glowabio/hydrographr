@@ -51,6 +51,7 @@ file_size_table$file_name = basename(file_size_table$file_path)
 
 # Server URL, is usually passed by calling function
 server_url_igb <- "https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4/download?path=%2F"
+server_url_gdrive <- "https://drive.google.com/uc?export=download&id="
 
 #############
 ### Tests ###
@@ -116,12 +117,32 @@ test_that("3 Normal case, not global, from IGB", {
 })
 
 
-
 # test 4
-test_that("4 Try downloading non-existing file", {
+test_that("4 Normal case, not global, from GDrive", {
 
     # Prepare:
     download_dir <- file.path(tmpdir, "test_download_tiles_base_4")
+
+    # Run: Downloads 15 MB
+    skip_if(SKIP_SLOW, 'Downloading this is 15 MB, so we skip it this time...')
+    download_tiles_base(variable = "direction", file_format = "tif", tile_id = "h00v02", file_size_table = file_size_table, server_url = server_url_gdrive, download_dir = download_dir)
+
+    # Check:
+    created_files <- list.files(paste0(download_dir, '/r.watershed/direction_tiles20d/'))
+    expected_files <- c("direction_h00v02.tif")
+    expect_length(created_files, 1)
+    expect_true(all(sort(expected_files) == sort(created_files)))
+    file_size = file.info(paste0(download_dir, '/r.watershed/direction_tiles20d/direction_h00v02.tif'))[["size"]]
+    expect_true(file_size > 5000)
+})
+
+
+
+# test 5
+test_that("5 Try downloading non-existing file", {
+
+    # Prepare:
+    download_dir <- paste0(tmpdir, "/test_download_tiles_base_5")
 
     # Run: Downloads nothgin
     expected_warning <- "Problem: Did not find any file \"idontexist_h00v02.tif\" in the list of files - are you sure it is a valid file?"
