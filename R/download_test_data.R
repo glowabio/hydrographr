@@ -65,14 +65,20 @@ download_test_data <- function(download_dir = ".") {
       # This may run into a timeout of 60 seconds, if IGB servers are not reachable
     },
     warning = function(c) {
-      warning("Could not download test data from ", igb_url, ", trying now at ", gdrive_url)
-      download.file(gdrive_url, destfile = full_path_local_zip, mode = "wb")
+      #warning("Could not download test data from ", igb_url, ", trying now at ", gdrive_url)
+      #download.file(gdrive_url, destfile = full_path_local_zip, mode = "wb")
       # This may run into a problem that you need to manually skip the virus check
+      stop("Could not download test data from ", igb_url,
+              ".\nPlease, download manually at", gdrive_url, "or",
+              igb_url, ", store to", full_path_local_zip, "and unzip!")
     },
     error = function(c) {
-      warning("Could not download test data from ", igb_url, ", trying now at ", gdrive_url)
-      download.file(gdrive_url, destfile = full_path_local_zip, mode = "wb")
+      #warning("Could not download test data from ", igb_url, ", trying now at ", gdrive_url)
+      #download.file(gdrive_url, destfile = full_path_local_zip, mode = "wb")
       # This may run into a problem that you need to manually skip the virus check
+      stop("Could not download test data from ", igb_url,
+              ".\nPlease, download manually at ", gdrive_url, " or ",
+              igb_url, ", store to ", full_path_local_zip, " and unzip!")
     }
   )
 
