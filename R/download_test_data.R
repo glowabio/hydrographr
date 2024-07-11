@@ -47,6 +47,7 @@ download_test_data <- function(download_dir = ".") {
 
   # Entire URL to download the zipped test data:
   gdrive_url <- paste0(gdrive_path, file_id, "&confirm=t")
+  igb_url <- "https://public.igb-berlin.de/index.php/s/9XGDD3EmHTs69g8/download"
 
   # Local directory where to store it:
   where_to_store <- paste0(download_dir, "/hydrography90m_test_data")
@@ -60,6 +61,35 @@ download_test_data <- function(download_dir = ".") {
                 destfile = full_path_local_zip,
                   mode = "wb")
 
+  # Checking file size, if too small it is probably a HTML page with
+  # a virus check warning...
+  if (file.size(full_path_local_zip) < 30000000) { # bytes: real size is > 36 MB
+
+    gdrive_url_base <- "https://drive.google.com/uc?export=download&id="
+    gdrive_url_full <- paste0(gdrive_url_base, "1ykV0jRCglz-_fdc4CJDMZC87VMsxzXE4&confirm=t")
+
+    # Checking the actual text content (only first 10 lines):
+    first_lines <- readLines(full_path_local_zip, warn = FALSE)[1:10]
+    if (any(grepl("still like to download", first_lines, fixed = TRUE))) {
+      msg <- paste("Downloading the zipped data from GDrive went wrong,",
+                   "as you manually need to confirm skipping the virus check.",
+                   "\nPlease, download manually at", gdrive_url, "or",
+                   igb_url, "and store to", full_path_local_zip,
+                   ". Stopping.")
+      stop(msg)
+
+    } else {
+      # In case the text is in a different locale and does not contain those
+      # exact words, still warn the user:
+      msg <- paste0("Downloading the zipped data from GDrive probably",
+                    " went wrong, it is only ", file.size(full_path_local_zip),
+                    " bytes.\nIf this function fails, please download",
+                    " manually at ", gdrive_url, " or ",
+                    igb_url, " and store to ", full_path_local_zip, ".")
+      warning(msg)
+    }
+  }
+
   # Unzip the data
   unzip(full_path_local_zip,
         overwrite = TRUE,
@@ -67,7 +97,7 @@ download_test_data <- function(download_dir = ".") {
         unzip = getOption("unzip"))
 
   # remove the zip file
-  unlink(paste0(download_dir, "/hydrography90m_test_data.zip"))
+  #unlink(paste0(download_dir, "/hydrography90m_test_data.zip"))
 
   # Report
   cat("Data downloaded and unzipped to ",
