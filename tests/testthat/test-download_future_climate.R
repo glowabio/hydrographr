@@ -91,7 +91,6 @@ test_that("3 unzipping, removing the zips", {
 
     # Check:
     created_files <- list.files(paste0(download_dir, '/Climate/2071_2100/bio1'))
-    print(paste0('CREATED TEST 1', created_files))
     expected_files <- c("bio1_2071-2100_ipsl-cm6a-lr_ssp370_V.2.1_h00v02.txt")
     expect_length(created_files, 1)
     expect_true(all(sort(expected_files) == sort(created_files)))
@@ -114,7 +113,6 @@ test_that("4 unzipping without removing the zips", {
 
     # Check:
     created_files <- list.files(paste0(download_dir, '/Climate/2071_2100/bio1'))
-    print(paste0('CREATED TEST 4', created_files))
     expected_files <- c("bio1_2071-2100_ipsl-cm6a-lr_ssp370_V.2.1_h00v02.txt",
      "bio1_2071-2100_ipsl-cm6a-lr_ssp370_V.2.1_h00v02.zip")
     expect_length(created_files,2)
