@@ -23,7 +23,7 @@ print(paste0('Tempdir: ', tmpdir))
 test_that("test 1: download from IGB", {
 
     # Prepare:
-    download_dir = paste0(tmpdir, "/test_download_test_data_1")
+    download_dir = file.path(tmpdir, "test_download_test_data_1")
     ifelse(!dir.exists(download_dir), dir.create(download_dir), FALSE)
 
     # Run:
@@ -31,7 +31,7 @@ test_that("test 1: download from IGB", {
 
     # Check:
     expect_true(TRUE)
-    created_files <- list.files(paste0(download_dir, '/hydrography90m_test_data'))
+    created_files <- list.files(file.path(download_dir, 'hydrography90m_test_data'))
     expect_length(created_files, 45)
     expected_files <- c("basin_1264942.tif", "basin_59.gpkg", "bid_59_bin.gpkg",
         "chancurv_1264942.tif", "chandistdwseg_1264942.tif", "chandistupcel_1264942.tif",

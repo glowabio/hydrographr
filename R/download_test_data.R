@@ -50,8 +50,8 @@ download_test_data <- function(download_dir = ".") {
   igb_url <- "https://public.igb-berlin.de/index.php/s/9XGDD3EmHTs69g8/download"
 
   # Local directory where to store it:
-  where_to_store <- paste0(download_dir, "/hydrography90m_test_data")
-  full_path_local_zip <- paste0(where_to_store, "/hydrography90m_test_data.zip")
+  where_to_store <- file.path(download_dir, "hydrography90m_test_data")
+  full_path_local_zip <- file.path(where_to_store, "hydrography90m_test_data.zip")
 
   # Create the folder where the files will be downloaded if it doesn't exist
   ifelse(!dir.exists(where_to_store),
