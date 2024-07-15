@@ -24,7 +24,7 @@ print(paste0('Tempdir: ', tmpdir))
 test_that("downloading WITHOUT preexisting environment90m_paths_file_sizes.txt", {
 
     # Prepare:
-    download_dir = paste0(tmpdir, "/test_download_env_1")
+    download_dir <- file.path(tmpdir, "test_download_env_1")
     if (file.exists(paste0(tmpdir,'/environment90m_paths_file_sizes.txt'))) {
         file.remove(paste0(tmpdir,'/environment90m_paths_file_sizes.txt'))
     }
@@ -43,7 +43,7 @@ test_that("downloading WITHOUT preexisting environment90m_paths_file_sizes.txt",
 # For LATER:
 test_that("downloading bioclimatic variables", {
     # Prepare:
-    download_dir = paste0(tmpdir, "/test_download_env_2")
+    download_dir <- file.path(tmpdir, "test_download_env_2")
 
     # Run:
     skip("We will test this once bioclimatic variables are renamed on the server!")
@@ -60,7 +60,7 @@ test_that("downloading bioclimatic variables", {
 test_that("downloading WITH preexisting environment90m_paths_file_sizes.txt, not-unzipping, passing land cover as one string", {
 
     # Prepare:
-    download_dir = paste0(tmpdir, "/test_download_env_3")
+    download_dir <- file.path(tmpdir, "test_download_env_3")
     if (!(file.exists(paste0(tmpdir,'/environment90m_paths_file_sizes.txt')))) {
         # TODO: Download file to here!
     }
@@ -81,7 +81,7 @@ test_that("downloading WITH preexisting environment90m_paths_file_sizes.txt, not
 test_that("unzipping without removing the zips", {
 
     # Prepare:
-    download_dir = paste0(tmpdir, "/test_download_env_4")
+    download_dir <- file.path(tmpdir, "test_download_env_4")
 
     # Run:
     download_env(variable = c("c20_1992", "c20_1996"), tile_id = c("h00v02", "h16v02"), file_format='txt', delete_zips = FALSE, download_dir = download_dir)
@@ -100,7 +100,7 @@ test_that("unzipping without removing the zips", {
 test_that("land cover: specifying years separately, as int and string", {
 
     # Prepare:
-    download_dir = paste0(tmpdir, "/test_download_env_5")
+    download_dir <- file.path(tmpdir, "test_download_env_5")
 
     # Run:
     download_env(variable = c("c10", "c20"), years = c(1992, '1996'), file_format = "zip", tile_id = c("h00v02", "h16v02"), download_dir = download_dir)
@@ -121,7 +121,7 @@ test_that("land cover: specifying years separately, as int and string", {
 test_that("land cover: pass variables in a mixed way (one as one string, another with years passed separately)", {
 
     # Prepare:
-    download_dir = paste0(tmpdir, "/test_download_env_6")
+    download_dir <- file.path(tmpdir, "test_download_env_6")
 
     # Run:
     download_env(variable = c("c20_1992", "c10"), years = c(1996, 1997), tile_id = c("h00v02", "h16v02"), download_dir = download_dir)
