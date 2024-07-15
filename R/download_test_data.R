@@ -84,10 +84,7 @@ download_test_data <- function(download_dir = ".") {
 
   # Checking file size, if too small it is probably a HTML page with
   # a virus check warning...
-  if (file.size(full_path_local_zip) < 30000000) { # bytes (real size is > 36 MB)
-
-    gdrive_url_base <- "https://drive.google.com/uc?export=download&id="
-    gdrive_url_full <- paste0(gdrive_url_base, "1ykV0jRCglz-_fdc4CJDMZC87VMsxzXE4&confirm=t")
+  if (file.size(full_path_local_zip) < 30000000) { # 30000000 bytes = 30 MB (real size is > 36 MB)
 
     # Checking the actual text content (only first 10 lines):
     first_lines <- readLines(full_path_local_zip, warn = FALSE)[1:10]
