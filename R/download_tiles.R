@@ -252,6 +252,10 @@ download_tiles <- function(variable, file_format = "tif",
     # If Nimbus is not available, download README from GDrive to check
     # whether GDrive is up.
 
+    # Download_dir needs to exist, otherwise this will cause an error and GDrive will
+    # be used, even if IGB servers may be up! So we create it.
+    dir.create(download_dir, showWarnings = FALSE, recursive = TRUE)
+
     server_url <- tryCatch(
       {
         download.file(paste0(nimbus_path, "README/README.txt"),
