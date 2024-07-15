@@ -12,8 +12,20 @@
 # * ...? TODO Think of more cases!
 
 
-SKIP_SUPERSLOW = TRUE
-SKIP_SLOW = FALSE
+
+SKIP_SUPERSLOW <- Sys.getenv("SKIP_SUPERSLOW") == "TRUE" # empty string / FALSE if not set
+if (SKIP_SUPERSLOW) {
+    print('SKIP_SUPERSLOW is set to TRUE, skipping superslow tests. If you want to run them, set SKIP_SUPERSLOW to FALSE')
+} else {
+    print('SKIP_SUPERSLOW is set to FALSE, not skipping superslow tests. If you want to skip them, set SKIP_SUPERSLOW to TRUE')
+}
+
+SKIP_SLOW <- Sys.getenv("SKIP_SLOW") == "TRUE" # empty string / FALSE if not set
+if (SKIP_SLOW) {
+    print('SKIP_SLOW is set to TRUE, skipping slow tests. If you want to run them, set SKIP_SLOW to FALSE')
+} else {
+    print('SKIP_SLOW is set to FALSE, not skipping slow tests. If you want to skip them, set SKIP_SLOW to TRUE')
+}
 
 
 #########################
@@ -51,9 +63,6 @@ test_that("global case: direction", {
     # Prepare:
     download_dir <- file.path(tmpdir, "test_download_tiles_base_1")
 
-    dir.create(download_dir)
-
-
     # Run:
     skip_if(SKIP_SUPERSLOW, 'Downloading this is 7431.1 MB, so we skip it this time...')
     download_tiles_base(variable = "direction", file_format = "tif", global = TRUE, file_size_table = file_size_table, server_url = server_url, download_dir = download_dir)
@@ -72,7 +81,6 @@ test_that("global cti special case", {
 
     # Prepare:
     download_dir <- file.path(tmpdir, "test_download_tiles_base_2")
-    dir.create(download_dir)
 
     # Run:
     skip_if(SKIP_SUPERSLOW, 'Downloading this is 82 GB, so we skip it this time...')

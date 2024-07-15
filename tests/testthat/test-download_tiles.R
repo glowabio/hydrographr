@@ -9,9 +9,12 @@
 # * Proper tiles with tile ids
 # * ...? TODO Think of more cases!
 
-SKIP_SUPERSLOW = TRUE
-
-
+SKIP_SUPERSLOW <- Sys.getenv("SKIP_SUPERSLOW") == "TRUE" # empty string / FALSE if not set
+if (SKIP_SUPERSLOW) {
+    print('SKIP_SUPERSLOW is set to TRUE, skipping superslow tests. If you want to run them, set SKIP_SUPERSLOW to FALSE')
+} else {
+    print('SKIP_SUPERSLOW is set to FALSE, not skipping superslow tests. If you want to skip them, set SKIP_SUPERSLOW to TRUE')
+}
 
 #########################
 ### Some preparations ###
