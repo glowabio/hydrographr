@@ -26,7 +26,18 @@ test_that("downloading WITHOUT preexisting environment90m_paths_file_sizes.txt",
     # Prepare:
     download_dir <- file.path(tmpdir, "test_download_env_1")
     if (file.exists(file.path(tmpdir, 'environment90m_paths_file_sizes.txt'))) {
+        print(paste0(
+            'Removing environment90m_paths_file_sizes.txt from ',
+            file.path(tmpdir, 'environment90m_paths_file_sizes.txt'),
+            ' because it exists!'
+        ))
         file.remove(file.path(tmpdir, 'environment90m_paths_file_sizes.txt'))
+    } else {
+        print(paste0(
+            'Not removing environment90m_paths_file_sizes.txt from ',
+            file.path(tmpdir, 'environment90m_paths_file_sizes.txt'),
+            ' because it does not exist!'
+        ))
     }
 
     # Run:
