@@ -30,7 +30,7 @@ print(paste0('Tempdir: ', tmpdir))
 
 # File of file sizes that the function needs
 # (Is usually downloaded and passed by the calling function)
-file_size_file <- paste0(tempdir(), "/hydrography90m_paths_file_sizes.txt")
+file_size_file <- file.path(tempdir(), "hydrography90m_paths_file_sizes.txt")
 if (!file.exists(file_size_file)) {
     download.file("https://drive.google.com/uc?export=download&id=1SEkcgGPutP6ZQPvYtzICh_gcGnVgH_uR&confirm=t", destfile = file_size_file, mode = "wb")
 }
@@ -49,7 +49,8 @@ server_url <- "https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4/download
 test_that("global case: direction", {
 
     # Prepare:
-    download_dir <- paste0(tmpdir, "/test_download_tiles_base_1")
+    download_dir <- file.path(tmpdir, "test_download_tiles_base_1")
+
     dir.create(download_dir)
 
 
@@ -58,11 +59,11 @@ test_that("global case: direction", {
     download_tiles_base(variable = "direction", file_format = "tif", global = TRUE, file_size_table = file_size_table, server_url = server_url, download_dir = download_dir)
 
     # Check:
-    created_files <- list.files(paste0(download_dir, '/global'))
+    created_files <- list.files(file.path(download_dir, 'global'))
     expected_files <- c("direction_ovr.tif")
     expect_length(created_files, 1)
     expect_setequal(created_files, expected_files)
-    file_size = file.info(paste0(download_dir, '/global/direction_ovr.tif'))[["size"]]
+    file_size = file.info(file.path(download_dir, 'global', 'direction_ovr.tif'))[["size"]]
     expect_true(file_size > 5000)
 })
 
@@ -70,7 +71,7 @@ test_that("global case: direction", {
 test_that("global cti special case", {
 
     # Prepare:
-    download_dir <- paste0(tmpdir, "/test_download_tiles_base_2")
+    download_dir <- file.path(tmpdir, "test_download_tiles_base_2")
     dir.create(download_dir)
 
     # Run:
@@ -79,11 +80,11 @@ test_that("global cti special case", {
 
     # Check:
     # TODO: How to check where it is downloaded from?
-    created_files <- list.files(paste0(download_dir, '/global'))
+    created_files <- list.files(file.path(download_dir, 'global'))
     expected_files <- c("cti_ovr.tif")
     expect_length(created_files, 1)
     expect_setequal(created_files, expected_files)
-    file_size = file.info(paste0(download_dir, '/global/cti_ovr.tif'))[["size"]]
+    file_size = file.info(file.path(download_dir, 'global', 'cti_ovr.tif'))[["size"]]
     expect_true(file_size > 5000)
 })
 
@@ -92,18 +93,18 @@ test_that("global cti special case", {
 test_that("non-global", {
 
     # Prepare:
-    download_dir <- paste0(tmpdir, "/test_download_tiles_base_3")
+    download_dir <- file.path(tmpdir, "test_download_tiles_base_3")
 
     # Run: Downloads 15 MB
     skip_if(SKIP_SLOW, 'Downloading this is 15 MB, so we skip it this time...')
     download_tiles_base(variable = "direction", file_format = "tif", tile_id = "h00v02", file_size_table = file_size_table, server_url = server_url, download_dir = download_dir)
 
     # Check:
-    created_files <- list.files(paste0(download_dir, '/r.watershed/direction_tiles20d/'))
+    created_files <- list.files(file.path(download_dir, 'r.watershed', 'direction_tiles20d'))
     expected_files <- c("direction_h00v02.tif")
     expect_length(created_files, 1)
     expect_setequal(created_files, expected_files)
-    file_size = file.info(paste0(download_dir, '/r.watershed/direction_tiles20d/direction_h00v02.tif'))[["size"]]
+    file_size = file.info(file.path(download_dir, 'r.watershed', 'direction_tiles20d', 'direction_h00v02.tif'))[["size"]]
     expect_true(file_size > 5000)
 })
 
@@ -113,7 +114,7 @@ test_that("non-global", {
 test_that("non-existing file", {
 
     # Prepare:
-    download_dir <- paste0(tmpdir, "/test_download_tiles_base_4")
+    download_dir <- file.path(tmpdir, "test_download_tiles_base_4")
 
     # Run: Downloads nothgin
     expected_warning <- "Problem: Did not find any file \"idontexist_h00v02.tif\" in the list of files - are you sure it is a valid file?"

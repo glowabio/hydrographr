@@ -25,15 +25,15 @@ test_that("downloading WITHOUT preexisting environment90m_paths_file_sizes.txt",
 
     # Prepare:
     download_dir <- file.path(tmpdir, "test_download_env_1")
-    if (file.exists(paste0(tmpdir,'/environment90m_paths_file_sizes.txt'))) {
-        file.remove(paste0(tmpdir,'/environment90m_paths_file_sizes.txt'))
+    if (file.exists(file.path(tmpdir, 'environment90m_paths_file_sizes.txt'))) {
+        file.remove(file.path(tmpdir, 'environment90m_paths_file_sizes.txt'))
     }
 
     # Run:
     download_env(variable = c("c20_1992"), tile_id = c("h00v02"), download_dir = download_dir)
 
     # Check:
-    created_files <- list.files(paste0(download_dir, '/LandCover/c20'))
+    created_files <- list.files(file.path(download_dir, 'LandCover', 'c20'))
     expected_files <- c("c20_1992_h00v02.txt")
     expect_length(created_files, 1)
     expect_setequal(created_files, expected_files)
@@ -50,7 +50,7 @@ test_that("downloading bioclimatic variables", {
     download_env(variable = c("bio1", "bio2"), tile_id = c("h00v02", "h16v02"), download_dir = download_dir)
 
     # Check:
-    created_files <- list.files(paste0(download_dir, '/LandCover/c20'))
+    created_files <- list.files(file.path(download_dir, 'LandCover', 'c20'))
     expected_files <- c("bio1_h00v02.txt", "bio1_h16v02.txt", "bio2_h00v02.txt", "bio2_h16v02.txt")
     expect_length(created_files, 4)
     expect_setequal(created_files, expected_files)
@@ -61,7 +61,7 @@ test_that("downloading WITH preexisting environment90m_paths_file_sizes.txt, not
 
     # Prepare:
     download_dir <- file.path(tmpdir, "test_download_env_3")
-    if (!(file.exists(paste0(tmpdir,'/environment90m_paths_file_sizes.txt')))) {
+    if (!(file.exists(file.path(tmpdir,'environment90m_paths_file_sizes.txt')))) {
         # TODO: Download file to here!
     }
 
@@ -70,7 +70,7 @@ test_that("downloading WITH preexisting environment90m_paths_file_sizes.txt, not
 
 
     # Check:
-    created_files <- list.files(paste0(download_dir, '/LandCover/c20'))
+    created_files <- list.files(file.path(download_dir, 'LandCover', 'c20'))
     expected_files <- c("c20_1992_h00v02.zip", "c20_1992_h16v02.zip", "c20_1996_h00v02.zip", "c20_1996_h16v02.zip")
     expect_length(created_files, 4)
     expect_setequal(created_files, expected_files)
@@ -88,7 +88,7 @@ test_that("unzipping without removing the zips", {
 
 
     # Check:
-    created_files <- list.files(paste0(download_dir, '/LandCover/c20'))
+    created_files <- list.files(file.path(download_dir, 'LandCover', 'c20'))
     expected_files <- c("c20_1992_h00v02.txt", "c20_1992_h16v02.txt", "c20_1996_h00v02.txt", "c20_1996_h16v02.txt",
                         "c20_1992_h00v02.zip", "c20_1992_h16v02.zip", "c20_1996_h00v02.zip", "c20_1996_h16v02.zip")
     expect_length(created_files, 8)
@@ -106,8 +106,8 @@ test_that("land cover: specifying years separately, as int and string", {
     download_env(variable = c("c10", "c20"), years = c(1992, '1996'), file_format = "zip", tile_id = c("h00v02", "h16v02"), download_dir = download_dir)
 
     # Check:
-    created_files10 <- list.files(paste0(download_dir, '/LandCover/c10'))
-    created_files20 <- list.files(paste0(download_dir, '/LandCover/c20'))
+    created_files10 <- list.files(file.path(download_dir, 'LandCover', 'c10'))
+    created_files20 <- list.files(file.path(download_dir, 'LandCover'. 'c20'))
     expect_length(created_files10, 4)
     expect_length(created_files20, 4)
     expected_files10 <- c("c10_1992_h00v02.zip", "c10_1992_h16v02.zip", "c10_1996_h00v02.zip", "c10_1996_h16v02.zip")
@@ -127,8 +127,8 @@ test_that("land cover: pass variables in a mixed way (one as one string, another
     download_env(variable = c("c20_1992", "c10"), years = c(1996, 1997), tile_id = c("h00v02", "h16v02"), download_dir = download_dir)
 
     # Check:
-    created_files10 <- list.files(paste0(download_dir, '/LandCover/c10'))
-    created_files20 <- list.files(paste0(download_dir, '/LandCover/c20'))
+    created_files10 <- list.files(file.path(download_dir, 'LandCover', 'c10'))
+    created_files20 <- list.files(file.path(download_dir, 'LandCover', 'c20'))
     expect_length(created_files10, 4)
     expect_length(created_files20, 2)
     expected_files10 <- c("c10_1996_h00v02.txt", "c10_1997_h00v02.txt", "c10_1996_h16v02.txt", "c10_1997_h16v02.txt")
