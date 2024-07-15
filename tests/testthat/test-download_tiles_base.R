@@ -116,7 +116,7 @@ test_that("non-existing file", {
     download_dir <- paste0(tmpdir, "/test_download_tiles_base_4")
 
     # Run: Downloads nothgin
-    expected_warning <- "Problem: Did not find any file \"idontexist_h00v02.tif\"\" in the list of files - are you sure it is a valid file?"
+    expected_warning <- "Problem: Did not find any file \"idontexist_h00v02.tif\" in the list of files - are you sure it is a valid file?"
     expect_warning(
         res <- download_tiles_base(variable = "idontexist", file_format = "tif", tile_id = "h00v02", file_size_table = file_size_table, server_url = server_url, download_dir = download_dir),
         regexp = expected_warning
