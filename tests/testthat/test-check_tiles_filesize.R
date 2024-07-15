@@ -23,7 +23,7 @@ tmpdir <- tempdir()
 print(paste0('Tempdir: ', tmpdir))
 
 # Get file size table (code from: download_tiles.R)
-file_size_file_hy <- paste0(tmpdir,'/hydrography90m_paths_file_sizes.txt')
+file_size_file_hy <- file.path(tmpdir, 'hydrography90m_paths_file_sizes.txt')
 file_size_file_hy_url <- "https://drive.google.com/uc?export=download&id=1SEkcgGPutP6ZQPvYtzICh_gcGnVgH_uR&confirm=t"
 if (!(file.exists(file_size_file_hy))) {
     download.file(file_size_file_hy_url, destfile = file_size_file_hy, mode = "wb")
@@ -59,7 +59,7 @@ test_that("environment90m_paths_file_sizes.txt", {
 
     # Prepare:
     # Get file size table (code from: download_tiles.R)
-    file_size_file <- paste0(tmpdir,'/environment90m_paths_file_sizes.txt')
+    file_size_file <- file.path(tmpdir, 'environment90m_paths_file_sizes.txt')
     if (!(file.exists(file_size_file))) {
         download.file(file_size_file_env_url,
             destfile = file_size_file, mode = "wb")
@@ -84,7 +84,7 @@ test_that("environment90m_paths_file_sizes.txt", {
 test_that("futureclimate90m_paths_file_sizes.txt", {
 
     # Get file size table (code from: download_tiles.R)
-    file_size_file <- paste0(tmpdir,'/futureclimate90m_paths_file_sizes.txt')
+    file_size_file <- file.path(tmpdir, 'futureclimate90m_paths_file_sizes.txt')
     if (!(file.exists(file_size_file))) {
         download.file(file_size_file_futclim_url, destfile = file_size_file, mode = "wb")
     }

@@ -127,11 +127,11 @@ test_that("4 Normal case, not global, from GDrive", {
     download_tiles_base(variable = "direction", file_format = "tif", tile_id = "h00v02", file_size_table = file_size_table, server_url = server_url_gdrive, download_dir = download_dir)
 
     # Check:
-    created_files <- list.files(paste0(download_dir, '/r.watershed/direction_tiles20d/'))
+    created_files <- list.files(file.path(download_dir, 'r.watershed', 'direction_tiles20d'))
     expected_files <- c("direction_h00v02.tif")
     expect_length(created_files, 1)
     expect_true(all(sort(expected_files) == sort(created_files)))
-    file_size = file.info(paste0(download_dir, '/r.watershed/direction_tiles20d/direction_h00v02.tif'))[["size"]]
+    file_size = file.info(file.path(download_dir, 'r.watershed', 'direction_tiles20d', 'direction_h00v02.tif'))[["size"]]
     expect_true(file_size > 5000)
 })
 
@@ -141,7 +141,7 @@ test_that("4 Normal case, not global, from GDrive", {
 test_that("5 Try downloading non-existing file", {
 
     # Prepare:
-    download_dir <- paste0(tmpdir, "/test_download_tiles_base_5")
+    download_dir <- file.path(tmpdir, "test_download_tiles_base_5")
 
     # Run: Downloads nothgin
     expected_warning <- "Problem: Did not find any file \"idontexist_h00v02.tif\" in the list of files - are you sure it is a valid file?"
