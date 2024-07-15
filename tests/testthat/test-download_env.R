@@ -107,7 +107,7 @@ test_that("land cover: specifying years separately, as int and string", {
 
     # Check:
     created_files10 <- list.files(file.path(download_dir, 'LandCover', 'c10'))
-    created_files20 <- list.files(file.path(download_dir, 'LandCover'. 'c20'))
+    created_files20 <- list.files(file.path(download_dir, 'LandCover', 'c20'))
     expect_length(created_files10, 4)
     expect_length(created_files20, 4)
     expected_files10 <- c("c10_1992_h00v02.zip", "c10_1992_h16v02.zip", "c10_1996_h00v02.zip", "c10_1996_h16v02.zip")
