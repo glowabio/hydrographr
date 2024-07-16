@@ -93,6 +93,7 @@ Collate:
     'download_test_data.R'
     'download_tiles.R'
     'download_env.R'
+    'download_future_climate.R'
     'download_tiles_base.R'
     'extract_from_gpkg.R'
     'extract_ids.R'

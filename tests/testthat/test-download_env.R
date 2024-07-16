@@ -14,11 +14,17 @@
 # * files are unzipped to txt, zips are NOT removed (test 4)
 # * files are NOT unzipped to txt (test 3, test 5)
 
+#########################
+### Some preparations ###
+#########################
 
 tmpdir <- tempdir()
 print(paste0('Tempdir: ', tmpdir))
 # TODO: Make small test data on the server, to run these faster!
 
+#############
+### Tests ###
+#############
 
 # test 1
 test_that("downloading WITHOUT preexisting environment90m_paths_file_sizes.txt", {

@@ -16,14 +16,14 @@
 #' @param file_size_table data.frame. Lookup table including file names
 #' and sizes (inherited by 'download_tiles()').
 #'
-#' @importFrom stringr str_split_fixed
+#' @importFrom stringr str_split_i
 #' @keywords internal
 #'
 
 
 
 check_tiles_filesize <- function(variable, file_format = "tif",
-                                 tile_id = NULL, reg_unit_id = NULL,
+                                 tile_id = NULL,
                                  global = FALSE, h90m_varnames, h90m_tile_id,
                                  h90m_file_names, file_size_table) {
 
@@ -61,11 +61,18 @@ check_tiles_filesize <- function(variable, file_format = "tif",
                     paste0(variable, "_", tile_id, ".", file_format))
 
   # Find valid file_formats for the requested variable
-  # to check that the requested file_format exists
+  # to check that the requested file_format exists.
+  # Important: Do not just split at the dot, as in the future climate
+  # variables, we have files like this:
+  #   bio18_2071-2100_mpi-esm1-2-hr_ssp585_V.2.1_h04v00.zip
+  #   bio18_2071-2100_ukesm1-0-ll_ssp370_V.2.1_h20v00.zip
+  #   bio18_2071-2100_ipsl-cm6a-lr_ssp585_V.2.1_h16v10.zip
+  index_filenames <- grep(paste0(variable, "_"), h90m_file_names)
   valid_file_format_var <- unique(
-    str_split_fixed(
-      h90m_file_names[grep(paste0(variable, "_"), h90m_file_names)],
-      "\\.", 2)[, 2])
+    stringr::str_split_i(
+      h90m_file_names[index_filenames],
+      "\\.",   # regex: split at dot!
+       -1))    # take first piece from right hand side
 
   # Check that the requested file_format is among the valid ones
   match.arg(file_format, choices = valid_file_format_var)

@@ -164,7 +164,7 @@ download_tiles <- function(variable, file_format = "tif",
   }
 
   # Import lookup table with the size of each file
-  file_size_table <- fread(file_size_file, sep = ";")
+  file_size_table <- data.table::fread(file_size_file, sep = ";")
 
   # Separate the table to get the names of the hydrography90m variables
   file_size_table$file_name = basename(file_size_table$file_path)
@@ -181,7 +181,7 @@ download_tiles <- function(variable, file_format = "tif",
 
   # Get the valid tile ids of the hydrography
   # to check that the requested tile exists
-  all_tile_ids <- unique(str_extract(
+  all_tile_ids <- unique(stringr::str_extract(
     file_size_table$file_path, "h[0-9]+v[0-9]+"))
 
   all_tile_ids <- all_tile_ids[!is.na(all_tile_ids)]
