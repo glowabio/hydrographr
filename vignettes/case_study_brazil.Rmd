@@ -431,7 +431,7 @@ fhred_corr <- fread(paste0(wdir,
 # Load the polygon of the drainage basin
 basin_poly <- read_sf(paste0(saofra_dir,"/basin_481051.gpkg"))
 
-# Create simply features from the data tables 
+# Create simple features from the data tables
 spdata_pts <- st_as_sf(spdata,  
                        coords = c("longitude","latitude"), 
                        remove = FALSE, crs="WGS84")
@@ -445,7 +445,7 @@ grand_pts_481051 <- st_filter(grand_pts, basin_poly)
 fhred_pts_481051 <- st_filter(fhred_pts, basin_poly)
 
 
-# Transfer the simply featurs back to a data table  and harmonise the column names
+# Transfer the simple features back to a data table and harmonise the column names
 # Existing dams (ED)
 existing_dams <- grand_pts_481051 %>% 
   mutate(longitude = st_coordinates(.)[,1],
@@ -784,7 +784,7 @@ write_sf(upstream_segment_vect, paste0(upcatch_dir,
                                        "/order_vect_segment_2516.gpkg"))
                               
 
-# Convert the data.frame into a simply feature
+# Convert the data.frame into a simple feature
 point_locations_snapped_pts <- st_as_sf(point_locations_snapped,  
                                         coords = c("lon_snap_accu",
                                                    "lat_snap_accu"), 
