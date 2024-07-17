@@ -5,7 +5,7 @@
 \title{Extract sub-catchment and/or basin IDs}
 \usage{
 extract_ids(
-  data,
+  data = NULL,
   lon,
   lat,
   id = NULL,
@@ -16,7 +16,9 @@ extract_ids(
 }
 \arguments{
 \item{data}{a data.frame or data.table that contains the columns regarding
-the longitude / latitude coordinates in WGS84.}
+the longitude / latitude coordinates in WGS84. If data is missing and a
+sub-catchment raster layer is provided, the function will extract all the
+ID value present in the layer.}
 
 \item{lon}{character. The name of the column with the longitude coordinates.}
 
@@ -36,7 +38,10 @@ Default is TRUE.}
 \description{
 Extracts the ID value of the basin and/or sub-catchment raster
 layer at given point locations. Can also be used for point-based extraction
-of any .tif layer by specifying the layer in the "basin" parameter.
+of any .tif layer by specifying the layer in the "basin" parameter. The
+function can be used to extract all the sub-catchment IDs present in a
+sub-catchment raster as well, by providing the the sub-catchment raster
+layer as the only input.
 }
 \details{
 For the extraction of a value at a given point location from the basin
@@ -44,7 +49,9 @@ and/or sub-catchment raster layer of the Hydrography90m dataset, the GDAL
 function 'gdallocationinfo' is used. The point locations have to be defined
 by coordinates in the WGS84 reference system. The function can also be used
 to extract any value from a given raster layer in a WGS84 projection, such
-as environmental information that is stored in the input raster file.
+as environmental information that is stored in the input raster file. The
+extraction of all ID values from a sub-catchment raster layer is done with
+terra::unique.
 }
 \note{
 Duplicated rows will be removed.
@@ -54,6 +61,8 @@ Duplicated rows will be removed.
 # or define a different directory
 my_directory <- tempdir()
 download_test_data(my_directory)
+
+# Example 1: Extracts the ID value at given point locations
 
 # Load occurrence data
 species_occurrence <- read.table(paste0(my_directory,
@@ -77,6 +86,12 @@ hydrography90m_ids <- extract_ids(data = species_occurrence,
 
 # Show the output table
 hydrography90m_ids
+
+# Example 2: Extract ID values of all subcatchments
+subc_raster <- paste0(my_directory,
+"/hydrography90m_test_data/subcatchment_1264942.tif")
+hydrography90m_ids <- extract_ids(subc_layer = subc_raster)
+fwrite(hydrography90m_ids, paste0(my_directory, '/subc_IDs.txt'))
 }
 \references{
 \url{https://gdal.org/programs/gdallocationinfo.html}
