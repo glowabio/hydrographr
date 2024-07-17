@@ -4,14 +4,18 @@
 \alias{split_table}
 \title{Split table}
 \usage{
-split_table(data, split = NULL, split_tbl_path, quiet = TRUE)
+split_table(data, split = NULL, split_tbl_path, read = FALSE, quiet = TRUE)
 }
 \arguments{
 \item{data}{a data.frame or data.table}
 
-\item{split}{number of rows selected to split the table}
+\item{split}{numeric. number of rows selected to split the table}
 
 \item{split_tbl_path}{character. Full path to store the split tables}
+
+\item{read}{logical. If TRUE, then the split data tables
+get read into R as a data tables.
+If FALSE, the tables are only stored on disk. Default is FALSE.}
 
 \item{quiet}{logical. If FALSE, the standard output will be printed.
 Default is TRUE.}
@@ -19,31 +23,27 @@ Default is TRUE.}
 \description{
 Split the table along a set number of rows into multiple parts
 of equal length.
-}
-\details{
-add details here
-}
-\note{
-Duplicated rows will be removed.
+
+Note that duplicated rows will be removed.
 }
 \examples{
 # Create data table
 
 df <- data.frame(matrix(ncol = 2, nrow = 10000))
 colnames(df) <- c('var1', 'var2')
+# or with real data
+my_directory <- tempdir()
+download_test_data(my_directory)
+df <- fread(paste0(my_directory, '/projectionTB.csv'), fill=TRUE)
 
 # Define full path to store split data tables
-my_directory <- tempdir()
 split_tbl_path <- paste0(my_directory,
                      "/hydrography90m_test_data/")
-Split data table
-split_table <- (df, split = 2000, split_tbl_path)
+# Split data table
+hydrography90m_ids <- split_table(df, split = 20000, split_tbl_path)
 
 # Show the output table
 hydrography90m_ids
-}
-\references{
-add references here
 }
 \author{
 Jaime Garcia Marquez, Thomas Tomiczek
