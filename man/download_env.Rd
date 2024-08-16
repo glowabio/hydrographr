@@ -123,7 +123,7 @@ TODO: The ESA LandCover data are aggregated. Document!\tabular{lllll}{
    Soil (Global gridded soil information) \tab Cation exchange capacity \tab soil_CECSOL \tab cmolc/kg \tab zip / txt \cr
    Soil (Global gridded soil information) \tab Coarse fragments volumetric \tab soil_CRFVOL \tab \% \tab zip / txt \cr
    Soil (Global gridded soil information) \tab Grade of a sub-soil being acid e.g. having a pH < 5 and low BS \tab soil_ACDWRB \tab ph \tab zip / txt \cr
-   Soil (Global gridded soil information) \tab Probability of occurence of R horizon (0-100\%) \tab soil_BDRLOG \tab \% \tab zip / txt \cr
+   Soil (Global gridded soil information) \tab Probability of occurrence of R horizon (0-100\%) \tab soil_BDRLOG \tab \% \tab zip / txt \cr
    Soil (Global gridded soil information) \tab Cummulative probability of organic soil based on the TAXOUSDA and TAXNWRB \tab soil_HISTPR \tab  \tab zip / txt \cr
    Soil (Global gridded soil information) \tab Sodic soil grade based on WRB soil types and soil pH \tab soil_SLGWRB \tab pH \tab zip / txt \cr
 }

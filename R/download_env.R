@@ -117,7 +117,7 @@
 #'  | Soil (Global gridded soil information) | Cation exchange capacity                     | soil_CECSOL  | cmolc/kg | zip / txt |
 #'  | Soil (Global gridded soil information) | Coarse fragments volumetric                  | soil_CRFVOL  | %    | zip / txt |
 #'  | Soil (Global gridded soil information) | Grade of a sub-soil being acid e.g. having a pH < 5 and low BS | soil_ACDWRB  | ph | zip / txt |
-#'  | Soil (Global gridded soil information) | Probability of occurence of R horizon (0-100%) | soil_BDRLOG  | %  | zip / txt |
+#'  | Soil (Global gridded soil information) | Probability of occurrence of R horizon (0-100%) | soil_BDRLOG  | %  | zip / txt |
 #'  | Soil (Global gridded soil information) | Cummulative probability of organic soil based on the TAXOUSDA and TAXNWRB | soil_HISTPR | | zip / txt |
 #'  | Soil (Global gridded soil information) | Sodic soil grade based on WRB soil types and soil pH | soil_SLGWRB  | pH  | zip / txt |
 #'

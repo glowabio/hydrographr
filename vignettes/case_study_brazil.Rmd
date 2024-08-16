@@ -1,6 +1,6 @@
 ---
 title: "Case study - São Francisco drainage basin"
-subtitle: "Processing of spatial data and calculating the number of dams and the distance along the stream network to the clostest dam up- and downstream of fish occurence sites"
+subtitle: "Processing of spatial data and calculating the number of dams and the distance along the stream network to the clostest dam up- and downstream of fish occurrence sites"
 author: ""
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
@@ -133,7 +133,7 @@ spdata <- gbif_data$data %>%
          country, year) %>% 
   filter(!is.na(year)) %>% 
   distinct() %>% 
-  mutate(occurence_id = 1:nrow(.)) %>% 
+  mutate(occurrence_id = 1:nrow(.)) %>% 
   rename("longitude" = "decimalLongitude",
          "latitude" = "decimalLatitude") %>% 
   select(7, 1:6)
@@ -468,7 +468,7 @@ future_dams <- fhred_pts_481051 %>%
 species_occurrence <- spdata_pts_481051 %>%
   sf::st_drop_geometry() %>% 
   mutate(type = "FS") %>% 
-  rename(site_id = occurence_id) %>%
+  rename(site_id = occurrence_id) %>%
   select(site_id, type, longitude, latitude)
 
 # Bind the data.frames of the dam  and the fish occurrence locations
