@@ -76,6 +76,12 @@ get_regional_unit_id <- function(data, lon, lat, quiet = TRUE) {
   # global file of regional units ids
   reg_unit_file <- paste0(tempdir(), "/regional_unit_ovr.tif")
 
+  # define download paths (two options):
+  nimbus_url_base <- "https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4/download?path=%2F"
+  nimbus_url_full <- paste0(nimbus_url_base, "global&files=regional_unit_ovr.tif")
+  gdrive_url_base <- "https://drive.google.com/uc?export=download&id="
+  gdrive_url_full <- paste0(gdrive_url_base, "1ykV0jRCglz-_fdc4CJDMZC87VMsxzXE4&confirm=t")
+
   # If the required file does not already exist,
   # download it into the tempdir()
   if (file.exists(reg_unit_file)) {
@@ -83,13 +89,7 @@ get_regional_unit_id <- function(data, lon, lat, quiet = TRUE) {
   } else {
     message(paste0("Downloading the global regional unit file to ",
                    reg_unit_file, "..."))
-
-    # Two possible download paths, first try Nimbus, then GDrive:
-    nimbus_url_base <- "https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4/download?path=%2F"
-    nimbus_url_full <- paste0(nimbus_url_base, "global&files=regional_unit_ovr.tif")
-    gdrive_url_base <- "https://drive.google.com/uc?export=download&id="
-    gdrive_url_full <- paste0(gdrive_url_base, "1ykV0jRCglz-_fdc4CJDMZC87VMsxzXE4&confirm=t")
-
+    # first try Nimbus, then GDrive:
     tryCatch(
       {
         download.file(nimbus_url_full, destfile = reg_unit_file, mode = "wb")
@@ -129,6 +129,9 @@ get_regional_unit_id <- function(data, lon, lat, quiet = TRUE) {
                    nimbus_url_full, "and store to", reg_unit_file,
                    ". Stopping.")
       stop(msg)
+      # TODO: Need to write unit test for these cases - a user ran into a stupid bug
+      # here that was caused by the nimbus_url_full not being defined, as the file
+      # had already been downloaded.
 
     } else {
       # In case the text is in a different locale and does not contain those
