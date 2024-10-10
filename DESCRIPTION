@@ -97,6 +97,7 @@ Collate:
     'download_tiles_base.R'
     'extract_from_gpkg.R'
     'extract_ids.R'
+    'extract_lake_ids.R'
     'extract_zonal_stat.R'
     'get_all_upstream_distances.R'
     'get_catchment_graph.R'
