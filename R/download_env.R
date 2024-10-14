@@ -246,28 +246,6 @@ download_env <- function(variable, file_format = "txt", years = NULL,
     message(paste('These variables will be downloaded:', paste(variable, collapse=', ')))
   }
 
-  # Piece of code to avoid trying to download files that are not (yet) there!
-  # As of 9 July 2024, only c10 and c20 work, the rest still has to be renamed. TODO.
-  available_c10 <- paste0('c10_',
-    c('1992', '1993', '1994', '1995', '1996', '1997', '1998', '1999', '2000', '2001',
-      '2002', '2003', '2004', '2005', '2006', '2007', '2008', '2009', '2010', '2011',
-      '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020'))
-  available_c20 <- paste0('c20_',
-    c('1992', '1993', '1994', '1995', '1996', '1997', '1998', '1999', '2000', '2001',
-      '2002', '2003', '2004', '2005', '2006', '2007', '2008', '2009', '2010', '2011',
-      '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020'))
-  currently_available <- c(available_c10, available_c20)
-  which_ok <- variable %in% currently_available
-  if (!(all(which_ok))) {
-    message(paste('Sorry, currently not available yet (work in progress):',
-      paste0(variable[!which_ok], collapse=', '), '(ignoring)'))
-    variable <- variable[which_ok]
-    if (length(variable) == 0){
-      stop('No variables left to download...')
-    }
-  }
-
-
   # Get the valid file_names of the environment90m variables
   all_file_names <- sort(unique(file_size_table$file_name))
 
