@@ -32,6 +32,7 @@
 #' @importFrom stringi stri_rand_strings
 #' @importFrom stringi stri_rand_strings
 #' @importFrom data.table fread
+#' @export
 #'
 #' @author Jaime García Márquez, Yusdiel Torres-Cambas
 #'
