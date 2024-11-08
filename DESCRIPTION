@@ -1,8 +1,8 @@
 Package: hydrographr
 Type: Package
 Title: Scalable Hydrographic Data Processing in R
-Date: 2023
-Version: 1.0.16
+Date: 2024
+Version: 1.2.0
 Authors@R:
     c(person("Marlene", "Schürz",
              email = "marlene.schuerz@igb-berlin.de",
@@ -28,13 +28,18 @@ Authors@R:
       person("Vanessa", "Bremerich",
              email = "vanessa.bremerich@igb-berlin.de",
              role = c("aut")),
+      person("Merret", "Buurman",
+             email = "merret.buurman@igb-berlin.de",
+             role = c("aut")),
       person("Giuseppe", "Amatulli",
              email = "giuseppe.amatulli@gmail.com",
              role = c("aut")),
       person("Sami", "Domisch",
              email = "sami.domisch@igb-berlin.de",
              role = c("aut")))
-Maintainer: Marlene Schürz <marlene.schuerz@igb-berlin.de> and 
+Maintainer: Thomas Tomiczek <thomas.tomiczek@igb-berlin.de>,
+    Merret Buurman <merret.buurman@igb-berlin.de>,
+    Marlene Schürz <marlene.schuerz@igb-berlin.de> and
     Afroditi Grigoropoulou <afroditi.grigoropoulou@igb-berlin.de>
 Description: Scalable hydrographic geospatial data processing tools using 
     open-source command-line utilities. The package provides functions to 
@@ -87,21 +92,26 @@ Collate:
     'crop_to_extent.R'
     'download_test_data.R'
     'download_tiles.R'
+    'download_env.R'
+    'download_future_climate.R'
     'download_tiles_base.R'
     'extract_from_gpkg.R'
     'extract_ids.R'
     'extract_zonal_stat.R'
+    'get_all_upstream_distances.R'
     'get_catchment_graph.R'
     'get_centrality.R'
     'get_distance.R'
     'get_distance_parallel.R'
     'get_distance_graph.R'
+    'get_modelfit_table.R'
     'get_pfafstetter_basins.R'
     'get_predict_table.R'
     'get_regional_unit_id.R'
     'get_segment_neighbours.R'
     'get_tile_id.R'
     'get_upstream_catchment.R'
+    'get_upstream_variable.R'
     'utils.R'
     'merge_tile.R'
     'read_geopackage.R'
@@ -110,3 +120,4 @@ Collate:
     'set_no_data.R'
     'snap_to_network.R'
     'snap_to_subc_segment.R'
+    'split_table.R'

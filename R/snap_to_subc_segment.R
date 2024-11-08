@@ -66,7 +66,7 @@
 #' download_test_data(my_directory)
 #'
 #' # Load occurrence data
-#' species_occurence <- read.table(paste0(my_directory,
+#' species_occurrence <- read.table(paste0(my_directory,
 #'                             "/hydrography90m_test_data/spdata_1264942.txt"),
 #'                               header = TRUE)
 # Define full path to the basin and sub-catchments raster layer
@@ -81,7 +81,7 @@
 #'
 # EITHER
 # Extract basin and sub-catchment IDs from the Hydrography90m layers beforehand
-#' hydrography90m_ids <- extract_ids(data = species_occurence,
+#' hydrography90m_ids <- extract_ids(data = species_occurrence,
 #'                                   lon = "longitude",
 #'                                   lat = "latitude",
 #'                                   id = "occurrence_id",
@@ -105,7 +105,7 @@
 #' # OR
 #' # Automatically extract the basin and sub-catchment IDs and
 #' # snap the data points to the stream segment
-#' snapped_coordinates <- snap_to_subc_segment(data = species_occurence,
+#' snapped_coordinates <- snap_to_subc_segment(data = species_occurrence,
 #'                                             lon = "longitude",
 #'                                             lat = "latitude",
 #'                                             id = "occurrence_id",

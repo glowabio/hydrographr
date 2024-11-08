@@ -32,13 +32,13 @@ my_directory <- tempdir()
 download_test_data(my_directory)
 
 # Read the species data
-species_occurence <- read.table(paste0(my_directory,
+species_occurrence <- read.table(paste0(my_directory,
                                        "/hydrography90m_test_data",
                                        "/spdata_1264942.txt"),
                               header = TRUE)
 
 # Get the regional unit ID
-get_regional_unit_id(species_occurence, lon = "longitude",
+get_regional_unit_id(species_occurrence, lon = "longitude",
                     lat = "latitude")
 }
 \references{

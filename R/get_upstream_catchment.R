@@ -60,7 +60,7 @@
 #' # one example:
 #'
 #' # Load occurrence data
-#' species_occurence <- read.table(paste0(my_directory,
+#' species_occurrence <- read.table(paste0(my_directory,
 #'                                        "/hydrography90m_test_data",
 #'                                        "/spdata_1264942.txt"),
 #'                               header = TRUE)
@@ -77,7 +77,7 @@
 #'
 #' # Automatically extract the basin and sub-catchment IDs and
 #' # snap the data points to the stream segment
-#' snapped_coordinates <- snap_to_subc_segment(data = species_occurence,
+#' snapped_coordinates <- snap_to_subc_segment(data = species_occurrence,
 #'                                             lon = "longitude",
 #'                                             lat = "latitude",
 #'                                             id = "occurrence_id",
