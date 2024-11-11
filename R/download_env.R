@@ -263,6 +263,16 @@ download_env <- function(variable, file_format = "txt", years = NULL,
 
   for (ivar in variable) {
 
+    # Check if the variable exists, otherwise ignore:
+    if (!(ivar %in% all_varnames)){
+      # shown right away:
+      message(paste0("Variable '", ivar, "' not available! Will be ignored..."))
+      # shown at the end:
+      warning(paste0("Variable '", ivar, "' not available! Please check your spelling and try again!"))
+      # skip and go to next variable:
+      next
+    }
+
     tile_size_sum <- 0
 
     for (itile in tile_id) {
@@ -275,7 +285,7 @@ download_env <- function(variable, file_format = "txt", years = NULL,
                                         h90m_file_names = all_file_names,
                                         file_size_table = file_size_table)
 
-      #message(paste0("Variable '",ivar,"', tile '",itile, "': Size: ", tile_size, " bytes."))
+      message(paste0("Variable '",ivar,"', tile '",itile, "': Size: ", tile_size, " bytes."))
       if (length(tile_size) == 0) {
         warning(paste0("Error: Tile '", itile, "', of variable '", ivar, "' not available!"))
         tile_size <- 0 # Will be skipped during download later!
@@ -319,6 +329,12 @@ download_env <- function(variable, file_format = "txt", years = NULL,
 
   all_downloaded_zips = c()
   for (ivar in variable) {
+
+    if (!(ivar %in% all_varnames)){
+      # we already warned the user above, so just skip and go to next variable:
+      next
+    }
+
     for (itile in tile_id) {
 
       message("Downloading variable ", ivar, " for tile ", itile, "...")
