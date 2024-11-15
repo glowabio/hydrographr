@@ -23,6 +23,13 @@
 #' downloaded. Default is the working directory.
 #' @param delete_zips boolean If FALSE, the downloaded zip files are not deleted
 #' after unzipping. Defaults to TRUE. This is ignored if you request file format zip.
+#' @param ignore_missing boolean What to do if some of the variables are not available,
+#' which is most frequently caused by a typo the variable name. If TRUE, the missing or
+#' misspelled ones are ignored while the others are downloaded. If FALSE, the function
+#' will fail to allow the user to check the variable names and their spelling. Defaults
+#' to FALSE.
+#' @param tempdir character Optional (rarely needed): Pass a directory to be used as
+#' temporary directory. If not provided, the result of a call to tempdir() is used.
 #' @importFrom tidyr separate
 #' @importFrom stringr str_split_fixed str_extract
 #' @importFrom data.table fread
@@ -162,17 +169,23 @@
 
 
 download_env <- function(variable, file_format = "txt", years = NULL,
-                         tile_id = NULL,
-                         download_dir = ".", delete_zips = TRUE) {
+                         tile_id = NULL, tempdir = NULL,
+                         download_dir = ".", delete_zips = TRUE,
+                         ignore_missing = FALSE) {
 
   # Introductory steps
 
   # Set timeout option for download to 4 hours (14400 seconds)
   options(timeout=14400)
 
+  # Define tempdir:
+  if (is.null(tempdir)) {
+    tempdir <- tempdir()
+  }
+
   # Download lookup table with the size of each file
   # if it doesn't exist in the tempdir()
-  file_size_file <- paste0(tempdir(), "/environment90m_paths_file_sizes.txt")
+  file_size_file <- paste0(tempdir, "/environment90m_paths_file_sizes.txt")
   if (!file.exists(file_size_file)) {
     message('Downloading environment90m_paths_file_sizes.txt...')
     download.file("https://public.igb-berlin.de/index.php/s/zw56kEd25NsQqcQ/download?path=%2FREADME/environment90m_paths_file_sizes.txt",
@@ -265,12 +278,21 @@ download_env <- function(variable, file_format = "txt", years = NULL,
 
     # Check if the variable exists, otherwise ignore:
     if (!(ivar %in% all_varnames)){
-      # shown right away:
-      message(paste0("Variable '", ivar, "' not available! Will be ignored..."))
-      # shown at the end:
-      warning(paste0("Variable '", ivar, "' not available! Please check your spelling and try again!"))
-      # skip and go to next variable:
-      next
+      err_msg <- paste0("Variable '", ivar, "' not available!")
+
+      if (ignore_missing) {
+
+        # shown right away:
+        message(paste0(err_msg, " Will be ignored..."))
+        # shown at the end:
+        warning(paste0(err_msg, " Was ignored..."))
+        # skip and go to next variable:
+        next
+
+      } else {
+        stop(paste0(err_msg, ' Please check your spelling and try again!'))
+      }
+
     }
 
     tile_size_sum <- 0

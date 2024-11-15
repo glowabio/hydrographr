@@ -28,6 +28,11 @@
 #' downloaded. Default is the working directory.
 #' @param delete_zips boolean If FALSE, the downloaded zip files are not deleted
 #' after unzipping. Defaults to TRUE. This is ignored if you request file format zip.
+#' @param ignore_missing boolean What to do if some of the variables are not available,
+#' which is most frequently caused by a typo the variable name. If TRUE, the missing or
+#' misspelled ones are ignored while the others are downloaded. If FALSE, the function
+#' will fail to allow the user to check the variable names and their spelling. Defaults
+#' to FALSE.
 #' @importFrom tidyr separate
 #' @importFrom stringr str_split_fixed str_extract
 #' @export
@@ -121,7 +126,8 @@
 download_future_climate <- function(variable, file_format = "csv",
                          time_period = NULL, scenario = NULL,
                          model = NULL, tile_id = NULL,
-                         download_dir = ".", delete_zips = TRUE) {
+                         download_dir = ".", delete_zips = TRUE,
+                         ignore_missing = FALSE) {
 
   # Introductory steps
 
@@ -238,6 +244,24 @@ download_future_climate <- function(variable, file_format = "csv",
   for (ivar in entire_name) {
 
     tile_size_sum <- 0
+
+    # Check if the variable exists, otherwise ignore:
+    if (!(ivar %in% all_varnames)){
+      err_msg = paste0("Variable '", ivar, "' not available! Please check your spelling and try again!")
+
+      if (ignore_missing) {
+
+        # shown right away:
+        message(paste0("Variable '", ivar, "' not available! Will be ignored..."))
+        # shown at the end:
+        warning(err_msg)
+        # skip and go to next variable:
+        next
+
+      } else {
+        stop(err_msg)
+      }
+    }
 
     for (itile in tile_id) {
 
