@@ -33,6 +33,8 @@
 #' misspelled ones are ignored while the others are downloaded. If FALSE, the function
 #' will fail to allow the user to check the variable names and their spelling. Defaults
 #' to FALSE.
+#' @param tempdir character Optional (rarely needed): Pass a directory to be used as
+#' temporary directory. If not provided, the result of a call to tempdir() is used.
 #' @importFrom tidyr separate
 #' @importFrom stringr str_split_fixed str_extract
 #' @export
@@ -127,16 +129,21 @@ download_future_climate <- function(variable, file_format = "csv",
                          time_period = NULL, scenario = NULL,
                          model = NULL, tile_id = NULL,
                          download_dir = ".", delete_zips = TRUE,
-                         ignore_missing = FALSE) {
+                         ignore_missing = FALSE, tempdir = NULL) {
 
   # Introductory steps
 
   # Set timeout option for download to 4 hours (14400 seconds)
   options(timeout=14400)
 
+  # Define tempdir:
+  if (is.null(tempdir)) {
+    tempdir <- tempdir()
+  }
+
   # Download lookup table with the size of each file
   # if it doesn't exist in the tempdir()
-  file_size_file <- paste0(tempdir(), "/futureclimate90m_paths_file_sizes.txt")
+  file_size_file <- paste0(tempdir, "/futureclimate90m_paths_file_sizes.txt")
   if (!file.exists(file_size_file)) {
     message('Downloading futureclimate90m_paths_file_sizes.txt...')
     download.file("https://public.igb-berlin.de/index.php/s/zw56kEd25NsQqcQ/download?path=%2FREADME/futureclimate90m_paths_file_sizes.txt",
