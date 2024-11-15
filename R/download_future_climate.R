@@ -37,6 +37,7 @@
 #' temporary directory. If not provided, the result of a call to tempdir() is used.
 #' @importFrom tidyr separate
 #' @importFrom stringr str_split_fixed str_extract
+#' @importFrom data.table fread
 #' @export
 #'
 #' @author Afroditi Grigoropoulou, Merret Buurman
@@ -83,6 +84,8 @@
 #'  | Bioclimatic variables (2071-2100)   | Precipitation of Driest Quarter     | bio17 | kg/m^2          | zip / csv |
 #'  | Bioclimatic variables (2071-2100)   | Precipitation of Warmest Quarter    | bio18 | kg/m^2          | zip / csv |
 #'  | Bioclimatic variables (2071-2100)   | Precipitation of Coldest Quarter    | bio19 | kg/m^2          | zip / csv |
+#'
+#'  TODO: Remove period from table above, make a table about periods maybe.
 #'
 #'  | **Scenario name** | **Scenario description**   |
 #'  | ssp370            | TODO: Scenario description |
@@ -151,7 +154,7 @@ download_future_climate <- function(variable, file_format = "csv",
   }
 
   # Import lookup table with the size of each file
-  file_size_table <- fread(file_size_file, sep = ";")
+  file_size_table <- data.table::fread(file_size_file, sep = ";")
   file_size_table$file_name = basename(file_size_table$file_path)
 
   # Extract entire lists of possible variable names, 
@@ -295,7 +298,7 @@ download_future_climate <- function(variable, file_format = "csv",
   #message(paste('Requested all_file_names: ', paste(all_file_names, collapse=', ')))
 
   # Get the valid tile ids of the environment90m
-  all_tile_ids <- unique(str_extract(
+  all_tile_ids <- unique(stringr::str_extract(
     file_size_table$file_path, "h[0-9]+v[0-9]+"))
 
   # Remove NA from list of tile ids:
@@ -381,7 +384,16 @@ download_future_climate <- function(variable, file_format = "csv",
   )
 
   all_downloaded_zips = c()
+  final_variables = c()
   for (ivar in entire_name) {
+
+    if (!(ivar %in% all_varnames)){
+      # we already warned the user above, so just skip and go to next variable:
+      next
+    } else {
+      final_variables <- c(final_variables, ivar)
+    }
+
     for (itile in tile_id) {
 
       message("Downloading variable ", ivar, " for tile ", itile, "...")
@@ -424,4 +436,7 @@ download_future_climate <- function(variable, file_format = "csv",
       sub-catchment scale for freshwater biodiversity modeling, in prep.
       Please contact the authors for more up-to-date citation info.")
   # TODO: Adapt citation!
+
+  # Return variable names, but without tiles!
+  return(final_variables)
 }

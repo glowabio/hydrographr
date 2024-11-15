@@ -350,11 +350,14 @@ download_env <- function(variable, file_format = "txt", years = NULL,
   )
 
   all_downloaded_zips = c()
+  final_variables = c()
   for (ivar in variable) {
 
     if (!(ivar %in% all_varnames)){
       # we already warned the user above, so just skip and go to next variable:
       next
+    } else {
+      final_variables <- c(final_variables, ivar)
     }
 
     for (itile in tile_id) {
@@ -399,4 +402,7 @@ download_env <- function(variable, file_format = "txt", years = NULL,
       sub-catchment scale for freshwater biodiversity modeling, in prep.
       Please contact the authors for more up-to-date citation info.")
   # TODO: Adapt citation!
+
+  # Return variable names, but without tiles!
+  return(final_variables)
 }
