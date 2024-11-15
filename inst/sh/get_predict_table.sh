@@ -86,8 +86,9 @@ export NCORES=$8
 subsetTB(){
     TL=$1  # tile
     k=$2   # variable
+    TB=$(find $ENVTB -name "${k}_${TL}.txt")
     awk 'NR==FNR {a[$1]; next} FNR==1 || $1 in a' \
-     $SUBCIDS $ENVTB/${k}_${TL}.txt \
+     $SUBCIDS $TB \
      | awk 'NR > 1 {for(i=1; i<=NF; i++) $i+=0}1' CONVFMT="%.3f" \
      >  $TMP/ENV_${TL}_${k}.txt
 }
