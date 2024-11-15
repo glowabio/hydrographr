@@ -161,11 +161,22 @@ download_future_climate <- function(variable, file_format = "csv",
   all_base_vars = c("bio1", "bio2", "bio8", "bio9") # TODO not hardcode!
   which_ok <- variable %in% all_base_vars
   if (!(all(which_ok))) {
-    message(paste('Variable not available:', paste(variable[!which_ok], ' (ignoring)', collapse=', ')))
-    message(paste('All available variables:', paste(all_base_vars, collapse=', ')))
+
+      err_msg <- paste0('Variable(s) not available: ', paste(variable[!which_ok], collapse=', '))
+
+      if (ignore_missing) {
+        message(paste0(err_msg, "! Will be ignored..."))
+        message(paste('All available variables:', paste(all_base_vars, collapse=', ')))
+        warning(paste0(err_msg, "! Was ignored..."))
+      } else {
+        message(paste('All available variables:', paste(all_base_vars, collapse=', ')))
+        stop(paste0(err_msg, '! Please check your spelling and try again!'))
+      }
+
     variable <- variable[which_ok]
     if (length(variable) == 0) {
-      stop('No valid variable requested!')
+      message(paste('All available variables:', paste(all_base_vars, collapse=', ')))
+      stop('No valid variable requested!') # cannot be ignored
     }
     message(paste('Requesting these variables:', paste(variable, collapse=', ')))
   }
@@ -174,11 +185,22 @@ download_future_climate <- function(variable, file_format = "csv",
   all_periods = c("2071-2100") # TODO not hardcode!
   which_ok <- time_period %in% all_periods
   if (!(all(which_ok))) {
-    message(paste('Time period not available:', paste(time_period[!which_ok], ' (ignoring)', collapse=', ')))
-    message(paste('All available time periods:', paste(all_periods, collapse=', ')))
+
+    err_msg <- paste0('Time period(s) not available: ', paste(time_period[!which_ok], collapse=', '))
+
+    if (ignore_missing) {
+      message(paste0(err_msg, "! Will be ignored..."))
+      message(paste('All available time periods:', paste(all_periods, collapse=', ')))
+      warning(paste0(err_msg, "! Was ignored..."))
+    } else {
+      message(paste('All available time periods:', paste(all_periods, collapse=', ')))
+      stop(paste0(err_msg, '! Please check your spelling and try again!'))
+    }
+
     time_period <- time_period[which_ok]
     if (length(time_period) == 0) {
-      stop('No valid time period requested!')
+      message(paste('All available time periods:', paste(all_periods, collapse=', ')))
+      stop('No valid time period requested!') # cannot be ignored
     }
     message(paste('Requesting these time periods:', paste(time_period, collapse=', ')))
   }
@@ -187,11 +209,22 @@ download_future_climate <- function(variable, file_format = "csv",
   all_models = c("ipsl-cm6a-lr", "ukesm1-0-ll", "mpi-esm1-2-hr") # TODO not hardcode!
   which_ok <- model %in% all_models
   if (!(all(which_ok))) {
-    message(paste('Model not available:', paste(model[!which_ok], ' (ignoring)', collapse=', ')))
-    message(paste('All available models:', paste(all_models, collapse=', ')))
+
+    err_msg <- paste0('Model not available: ', paste(model[!which_ok], collapse=', '))
+
+    if (ignore_missing) {
+      message(paste0(err_msg, "! Will be ignored..."))
+      message(paste('All available models:', paste(all_models, collapse=', ')))
+      warning(paste0(err_msg, "! Was ignored..."))
+    } else {
+      message(paste('All available models:', paste(all_models, collapse=', ')))
+      stop(paste0(err_msg, '! Please check your spelling and try again!'))
+    }
+
     model <- model[which_ok]
     if (length(model) == 0) {
-      stop('No valid model requested!')
+      message(paste('All available models:', paste(all_models, collapse=', ')))
+      stop('No valid model requested!') # cannot be ignored
     }
     message(paste('Requesting these models:', paste(model, collapse=', ')))
   }
@@ -200,11 +233,21 @@ download_future_climate <- function(variable, file_format = "csv",
   all_scenarios = c("ssp370", "ssp585") # TODO not hardcode!
   which_ok <- scenario %in% all_scenarios
   if (!(all(which_ok))) {
-    message(paste('Scenario not available:', paste(scenario[!which_ok], ' (ignoring)', collapse=', ')))
-    message(paste('All available scenarios:', paste(all_scenarios, collapse=', ')))
+    err_msg <- paste0('Scenario not available: ', paste(scenario[!which_ok], collapse=', '))
+
+    if (ignore_missing) {
+      message(paste0(err_msg, "! Will be ignored..."))
+      message(paste('All available scenarios:', paste(all_scenarios, collapse=', ')))
+      warning(paste0(err_msg, "! Was ignored..."))
+    } else {
+      message(paste('All available scenarios:', paste(all_scenarios, collapse=', ')))
+      stop(paste0(err_msg, '! Please check your spelling and try again!'))
+    }
+
     scenario <- scenario[which_ok]
     if (length(scenario) == 0) {
-      stop('No valid scenario requested!')
+      message(paste('All available scenarios:', paste(all_scenarios, collapse=', ')))
+      stop('No valid scenario requested!') # cannot be ignored
     }
     message(paste('Requesting these scenarios:', paste(scenario, collapse=', ')))
   }
@@ -247,19 +290,19 @@ download_future_climate <- function(variable, file_format = "csv",
 
     # Check if the variable exists, otherwise ignore:
     if (!(ivar %in% all_varnames)){
-      err_msg = paste0("Variable '", ivar, "' not available! Please check your spelling and try again!")
+      err_msg <- paste0("Variable '", ivar, "' not available!")
 
       if (ignore_missing) {
 
         # shown right away:
-        message(paste0("Variable '", ivar, "' not available! Will be ignored..."))
+        message(paste0(err_msg, " Will be ignored..."))
         # shown at the end:
-        warning(err_msg)
+        warning(paste0(err_msg, " Was ignored..."))
         # skip and go to next variable:
         next
 
       } else {
-        stop(err_msg)
+        stop(paste0(err_msg, ' Please check your spelling and try again!'))
       }
     }
 
