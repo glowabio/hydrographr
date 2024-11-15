@@ -115,7 +115,7 @@
 #'              "bio16", "bio17", "bio18", "bio19")
 #' scenario = c("ssp370", "ssp585")
 #' model = c("ipsl-cm6a-lr", "mpi-esm1-2-hr", "ukesm1-0-ll")
-#'                time_period = time_period,
+#' time_period = c("2071-2100")
 #' download_future_climate(variable = variable, file_format = "zip",
 #'                scenario = scenario, model = model,
 #'                time_period = time_period,
@@ -157,7 +157,9 @@ download_future_climate <- function(variable, file_format = "csv",
                                     file_size_table$file_name)))
   #message(paste('Available variables:', paste(all_varnames, collapse=', ')))
 
-  ### Check if base variable is available
+  ###########################################
+  ### Check if base variable is available ###
+  ###########################################
   all_base_vars = c("bio1", "bio2", "bio8", "bio9") # TODO not hardcode!
   which_ok <- variable %in% all_base_vars
   if (!(all(which_ok))) {
@@ -181,7 +183,10 @@ download_future_climate <- function(variable, file_format = "csv",
     message(paste('Requesting these variables:', paste(variable, collapse=', ')))
   }
 
-  ### Check if time_period is available
+
+  #########################################
+  ### Check if time_period is available ###
+  #########################################
   all_periods = c("2071-2100") # TODO not hardcode!
   which_ok <- time_period %in% all_periods
   if (!(all(which_ok))) {
@@ -205,7 +210,9 @@ download_future_climate <- function(variable, file_format = "csv",
     message(paste('Requesting these time periods:', paste(time_period, collapse=', ')))
   }
 
-  ### Check if model is available
+  ###################################
+  ### Check if model is available ###
+  ###################################
   all_models = c("ipsl-cm6a-lr", "ukesm1-0-ll", "mpi-esm1-2-hr") # TODO not hardcode!
   which_ok <- model %in% all_models
   if (!(all(which_ok))) {
@@ -229,7 +236,9 @@ download_future_climate <- function(variable, file_format = "csv",
     message(paste('Requesting these models:', paste(model, collapse=', ')))
   }
 
-  ### Check if scenario is available
+  ######################################
+  ### Check if scenario is available ###
+  ######################################
   all_scenarios = c("ssp370", "ssp585") # TODO not hardcode!
   which_ok <- scenario %in% all_scenarios
   if (!(all(which_ok))) {
@@ -251,6 +260,12 @@ download_future_climate <- function(variable, file_format = "csv",
     }
     message(paste('Requesting these scenarios:', paste(scenario, collapse=', ')))
   }
+
+
+  #########################
+  ### Combine var names ###
+  ### and download      ###
+  #########################
 
   # Combine them into variable names, the way they are stored:
   # bio18_2071-2100_ipsl-cm6a-lr_ssp585_V.2.1_h34v06.zip
