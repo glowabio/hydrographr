@@ -18,6 +18,7 @@
 #' @param model character vector of models, e.g. "mpi-esm1-2-hr", "ukesm1-0-ll",
 #' "ipsl-cm6a-lr". See Details for all the scenario names. No default, has to be
 #' provided.
+#' @param version string. e.g. "V.2.1". Defaults to "V.2.1".
 #' @param file_format character. Format of the requested file. "zip" and "csv"
 #' are supported. Default is "csv", which means that the zip files are unzipped
 #' after downloading. Note that this will take more space on disk than zips.
@@ -86,6 +87,8 @@
 #'  | psl-cm6a-lr    | TODO: Model description  |
 #'  | ukesm1-0-ll    | TODO: MOdel description  |
 #'
+#' TODO: Also add something on versions!
+#'
 #' @md
 #' @note
 #' If there is an error during the download of a file
@@ -120,7 +123,7 @@
 
 download_future_climate <- function(variable, file_format = "csv",
                          time_period = NULL, scenario = NULL,
-                         model = NULL, tile_id = NULL,
+                         model = NULL, tile_id = NULL, version = "V.2.1",
                          download_dir = ".", delete_zips = TRUE) {
 
   # Introductory steps
@@ -260,6 +263,13 @@ download_future_climate <- function(variable, file_format = "csv",
     message(paste('Requesting these scenarios:', paste(scenario, collapse=', ')))
   }
 
+  ## Check if version is available - there is only one version so far!
+  if (!(version %in% all_versions)) {
+    message(paste('Version not available:', version))
+    message(paste('All available versions:', paste(all_versions, collapse=', ')))
+    stop('No valid version requested!')
+  }
+
   # Combine them into variable names, the way they are stored:
   # bio18_2071-2100_ipsl-cm6a-lr_ssp585_V.2.1_h34v06.zip
   # Nested loops, probably not very efficient. Also: Predefine array length!
@@ -268,8 +278,7 @@ download_future_climate <- function(variable, file_format = "csv",
     for (iperiod in time_period) {
       for (imodel in model){
         for (iscenario in scenario){
-          # TODO: Not hardcode version!
-          tmp <- paste0(ivar, '_', iperiod, '_', imodel, '_', iscenario, '_V.2.1')
+          tmp <- paste0(ivar, '_', iperiod, '_', imodel, '_', iscenario, '_', version)
             entire_name = c(entire_name, tmp)
         }
       }
