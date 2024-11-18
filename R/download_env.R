@@ -356,9 +356,10 @@ download_env <- function(variable, file_format = "txt", years = NULL,
 
   cat("Please cite the Environment90m publication:\n
       Garcia Marquez, J., Amatulli, G., Grigoropoulou, A.,
-      Schürz, M., Tomiczek, T., Buurman, M., and Domisch, S.:
+      Schürz, M., Tomiczek, T., Buurman, M., Bremerich, V.,
+      Bego, K. and Domisch, S.:
       Global datasets of aggregated environmental variables at the
       sub-catchment scale for freshwater biodiversity modeling, in prep.
       Please contact the authors for more up-to-date citation info.")
-  # TODO: Adapt citation!
+  # TODO: Adapt citation once the publication is out!
 }
