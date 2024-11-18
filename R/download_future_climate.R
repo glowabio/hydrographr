@@ -141,18 +141,78 @@ download_future_climate <- function(variable, file_format = "csv",
   file_size_table <- fread(file_size_file, sep = ";")
   file_size_table$file_name = basename(file_size_table$file_path)
 
+  ##############################
+  ### Extract base variables ###
+  ##############################
+
   # Extract entire lists of possible variable names, 
-  # file formats and tile_ids,
+  # file formats, tile_ids, etc.
   # to check that the requested variable exists
 
   # Get the valid names of the environment90m variables
-  # Expecting tile_id at the end: <variable>_<tile_id>
-  all_varnames <- sort(unique(sub("_[^_]+$", "",
-                                    file_size_table$file_name)))
+  # Expecting tile_id at the end:
+  # <variable>_<tile_id>.zip
+  # Split even more:
+  # <base_variable>_<period>_<model>_<scenario>_<version>_<tile_id>.zip
+  # Example:
+  # "bio9_2071-2100_ukesm1-0-ll_ssp585_V.2.1_h32v00.zip"
+
+  # Extract/remove format from end of string
+  regex_format <- ".[a-z]+$"
+  all_formats <- unique(stringr::str_extract(file_size_table$file_name, regex_format))
+  all_formats <- unique(sub("^.", "", all_formats))
+  filenames_without_format <- unique(sub(regex_format, "", file_size_table$file_name))
+  # "bio9_2071-2100_ukesm1-0-ll_ssp585_V.2.1_h32v00"
+
+  # Extract/remove tile_id from end of string
+  regex_tile <- "_h[0-9]+v[0-9]+$"
+  all_tile_ids <- unique(stringr::str_extract(filenames_without_format, regex_tile))
+  all_tile_ids <- unique(sub("^_", "", all_tile_ids))
+  filenames_without_tile <- unique(sub(regex_tile, "", filenames_without_format))
+  all_varnames <- filenames_without_tile
+  # "bio9_2071-2100_ukesm1-0-ll_ssp585_V.2.1"
+
+  # Extract/remove version from end of string
+  regex_version <- "_[^_]+$"
+  all_versions <- unique(stringr::str_extract(filenames_without_tile, regex_version))
+  all_versions <- sub("^_", "", all_versions)
+  filenames_without_version <- unique(sub(regex_version, "", filenames_without_tile))
+  # "bio9_2071-2100_ukesm1-0-ll_ssp585"
+
+  # Extract/remove scenario from end of string
+  regex_scenario <- "_[^_]+$"
+  all_scenarios <- unique(stringr::str_extract(filenames_without_version, regex_scenario))
+  all_scenarios <- sub("^_", "", all_scenarios)
+  filenames_without_scenario <- unique(sub(regex_scenario, "", filenames_without_version))
+  # "bio9_2071-2100_ukesm1-0-ll"
+
+  # Extract/remove model from end of string
+  regex_model <- "_[^_]+$"
+  all_models <- unique(stringr::str_extract(filenames_without_scenario, regex_model))
+  all_models <- sub("^_", "", all_models)
+  filenames_without_model <- unique(sub(regex_model, "", filenames_without_scenario))
+  # "bio9_2071-2100"
+
+  # Extract/remove period from end of string
+  #regex_period <- "[0-9]{4}-[0-9]{4}$"
+  regex_period <- "_[^_]+$"
+  all_periods <- unique(stringr::str_extract(filenames_without_model, regex_period))
+  all_periods <- sub("^_", "", all_periods)
+
+  # Extract base vars from beginning of string
+  regex_base <- "^[^_]+_"
+  all_base_vars <- unique(stringr::str_extract(file_size_table$file_name, regex_base))
+  all_base_vars <- sub("_$", "", all_base_vars)
+
   #message(paste('Available variables:', paste(all_varnames, collapse=', ')))
 
+
+  ##########################################
+  ### Check if desired variables/periods ###
+  ### etc. are available                 ###
+  ##########################################
+
   ### Check if base variable is available
-  all_base_vars = c("bio1", "bio2", "bio8", "bio9") # TODO not hardcode!
   which_ok <- variable %in% all_base_vars
   if (!(all(which_ok))) {
     message(paste('Variable not available:', paste(variable[!which_ok], ' (ignoring)', collapse=', ')))
@@ -165,7 +225,6 @@ download_future_climate <- function(variable, file_format = "csv",
   }
 
   ### Check if time_period is available
-  all_periods = c("2071-2100") # TODO not hardcode!
   which_ok <- time_period %in% all_periods
   if (!(all(which_ok))) {
     message(paste('Time period not available:', paste(time_period[!which_ok], ' (ignoring)', collapse=', ')))
@@ -178,7 +237,6 @@ download_future_climate <- function(variable, file_format = "csv",
   }
 
   ### Check if model is available
-  all_models = c("ipsl-cm6a-lr", "ukesm1-0-ll", "mpi-esm1-2-hr") # TODO not hardcode!
   which_ok <- model %in% all_models
   if (!(all(which_ok))) {
     message(paste('Model not available:', paste(model[!which_ok], ' (ignoring)', collapse=', ')))
@@ -191,7 +249,6 @@ download_future_climate <- function(variable, file_format = "csv",
   }
 
   ### Check if scenario is available
-  all_scenarios = c("ssp370", "ssp585") # TODO not hardcode!
   which_ok <- scenario %in% all_scenarios
   if (!(all(which_ok))) {
     message(paste('Scenario not available:', paste(scenario[!which_ok], ' (ignoring)', collapse=', ')))
@@ -211,6 +268,7 @@ download_future_climate <- function(variable, file_format = "csv",
     for (iperiod in time_period) {
       for (imodel in model){
         for (iscenario in scenario){
+          # TODO: Not hardcode version!
           tmp <- paste0(ivar, '_', iperiod, '_', imodel, '_', iscenario, '_V.2.1')
             entire_name = c(entire_name, tmp)
         }
@@ -222,10 +280,6 @@ download_future_climate <- function(variable, file_format = "csv",
   # Get the valid file_names of the environment90m variables
   all_file_names <- sort(unique(file_size_table$file_name))
   #message(paste('Requested all_file_names: ', paste(all_file_names, collapse=', ')))
-
-  # Get the valid tile ids of the environment90m
-  all_tile_ids <- unique(str_extract(
-    file_size_table$file_path, "h[0-9]+v[0-9]+"))
 
   # Remove NA from list of tile ids:
   all_tile_ids <- all_tile_ids[!is.na(all_tile_ids)]
