@@ -2,7 +2,7 @@
 #'
 #' @description The function downloads data of the Environment90m
 #' dataset, which is split into 20°x20° tiles. If a tile ID is specified, then
-#' the selected layers (variable) will be downloaded. 
+#' the selected layers (variable) will be downloaded.
 #' Multiple regular tiles, e.g. belonging to regional units, can be
 #' downloaded in a single request. The tile or regional unit IDs can be
 #' obtained using the functions "get_tile_id" and "get_regional_unit_id",
@@ -24,7 +24,7 @@
 #' after downloading. Note that this will take more space on disk than zips.
 #' @param tile_id character vector. The IDs of the requested tiles.
 #' @param time_period character vector of time periods. Default: "2071-2100".
-#' Currently only "2071-2100" is available, so this can be omitted. 
+#' Currently only "2071-2100" is available, so this can be omitted.
 #' @param download_dir character. The directory where the files will be
 #' downloaded. Default is the working directory.
 #' @param delete_zips boolean If FALSE, the downloaded zip files are not deleted
@@ -113,7 +113,7 @@
 #'              "bio16", "bio17", "bio18", "bio19")
 #' scenario = c("ssp370", "ssp585")
 #' model = c("ipsl-cm6a-lr", "mpi-esm1-2-hr", "ukesm1-0-ll")
-#'                time_period = time_period,
+#' time_period = c("2071-2100")
 #' download_future_climate(variable = variable, file_format = "zip",
 #'                scenario = scenario, model = model,
 #'                time_period = time_period,
@@ -148,7 +148,7 @@ download_future_climate <- function(variable, file_format = "csv",
   ### Extract base variables ###
   ##############################
 
-  # Extract entire lists of possible variable names, 
+  # Extract entire lists of possible variable names,
   # file formats, tile_ids, etc.
   # to check that the requested variable exists
 
