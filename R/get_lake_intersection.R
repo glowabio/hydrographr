@@ -66,7 +66,7 @@ get_lake_intersection <- function(data, lake_id = "HydroLAKES_polys_v10", lakes,
   if (!is.logical(quiet))
     stop("quiet: Has to be TRUE or FALSE.")
 
-  mspa_content <- ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+mspa_content <- ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; GWB_MSPA parameter file:
 ;; NOTE: do NOT delete or add any lines in this parameter file!
 ;;
@@ -94,14 +94,32 @@ get_lake_intersection <- function(data, lake_id = "HydroLAKES_polys_v10", lakes,
 ****************************************************************************
 8
 1
-1
+0
 1
 0
 0
 ****************************************************************************"
 
-  writeLines(mspa_content, paste0(tempdir(), "mspa-parameters.txt"))
-  writeLines(mspa_content, paste0(edge,"input/", "mspa-parameters.txt"))
+# writeLines(mspa_content, paste0(tempdir(), "/mspa-parameters.txt"))
+writeLines(mspa_content, paste0(edge,"input/", "mspa-parameters.txt"))
+
+  values <- rep(0, 256) # Create a vector of 256 zeros
+
+  # Set the specific indices to 1
+  indices <- c(3, 33, 67, 103) # These are the positions you want to set to 1
+  values[indices + 1] <- 1 # +1 because R indexing starts at 1
+
+  # Create the data.frame
+  result <- data.frame(
+    index = 0:255,   # Create an index column from 0 to 255
+    value = values   # Assign the values vector
+  )
+
+  fwrite(result, paste0(tempdir(), "/mspa_reclass_code.txt"), col.names = FALSE,
+         row.names = FALSE, quote = FALSE, sep = " ")
+
+  # Print the resulting data.frame
+  # print(result)
 
   # write a line of code to transform number in meters to units in degree
   if (is.numeric(buffer) && length(buffer) > 0) {

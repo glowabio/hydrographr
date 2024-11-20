@@ -52,7 +52,7 @@ ogr2ogr $TMPDIR/lake_${LK}.shp \
        -sql "SELECT * FROM $SHP_NAME WHERE $VAR_ID = ${LK}"
 
 # if its a shapefile use the following
-# ogr2ogr -where "$VAR_ID = $LK" $TMPDIR/lake_${LK}.shp $LAKE_SHAPE
+ogr2ogr -where "$VAR_ID = $LK" $TMPDIR/lake_${LK}.shp $LAKE_SHAPE
 # ogr2ogr -f "ESRI Shapefile" -sql "SELECT * FROM $SHP_NAME WHERE $VAR_ID = ${LK}" $TMPDIR/lake_${LK}.shp $LAKE_SHAPE
 # this name of the shape file HydroLAKES_polys_v10 needs to be defined before either by the user or automatically
         export LAKE=$TMPDIR/lake_${LK}.shp
@@ -77,6 +77,10 @@ ogr2ogr $TMPDIR/lake_${LK}.shp \
         $TMPDIR/buffer_${LK}.shp \
         $TMPDIR/lake_${LK}.shp
 
+        export LAKE=$TMPDIR/buffer_${LK}.shp
+
+    echo "The buffer size is $bd"
+
   elif [[ "$BUF" =~ ^[0-9]+([.][0-9]+)?$ ]]; ### example use correct code line
   then
   export bd=$BUF
@@ -84,13 +88,15 @@ ogr2ogr $TMPDIR/lake_${LK}.shp \
     ogr2ogr -dialect sqlite -sql "SELECT ST_Buffer(Geometry, ${bd}) FROM ${pn}" \
         $TMPDIR/buffer_${LK}.shp \
         $TMPDIR/lake_${LK}.shp
+    export LAKE=$TMPDIR/buffer_${LK}.shp
 
   elif [ "$BUF" = "FALSE" ]
   then
    echo "No buffer applied"
+   export LAKE=$TMPDIR/lake_${LK}.shp
  fi
 
-export LAKE=$TMPDIR/buffer_${LK}.shp
+# export LAKE=$TMPDIR/buffer_${LK}.shp
 export pn=$(basename $LAKE .shp)
 
 EXTENSION=($( ogrinfo  $LAKE -so -al | grep Extent \
@@ -147,13 +153,6 @@ grass -f --text --tmp-location $TMPDIR/lake_${LK}cp.tif <<EOF
     format=GTiff type=Byte createopt="COMPRESS=DEFLATE" nodata=0 --overwrite
 EOF
 
-grass -f --text --tmp-location $TMPDIR/lake_1239cp.tif <<EOF
-    r.external -o input=$TMPDIR/lake_1239cp.tif  output=out
-    g.region zoom=out
-    r.out.gdal -cm input=out out=$TMPDIR/lake_1239rm.tif \
-    format=GTiff type=Byte createopt="COMPRESS=DEFLATE" nodata=0 --overwrite
-EOF
-
 xmin=$(pkinfo -i $TMPDIR/lake_${LK}rm.tif -te | awk '{print $2-0.001666667}')
 ymin=$(pkinfo -i $TMPDIR/lake_${LK}rm.tif -te | awk '{print $3-0.001666667}')
 xmax=$(pkinfo -i $TMPDIR/lake_${LK}rm.tif -te | awk '{print $4+0.001666667}')
@@ -162,6 +161,8 @@ ymax=$(pkinfo -i $TMPDIR/lake_${LK}rm.tif -te | awk '{print $5+0.001666667}')
 gdalwarp -te $xmin $ymin $xmax $ymax -tr 0.000833333333333 -0.000833333333333 \
     -co COMPRESS=DEFLATE -co ZLEVEL=9 -ot Byte \
     $TMPDIR/lake_${LK}rm.tif $TMPDIR/lake_${LK}.tif
+
+cp $TMPDIR/lake_${LK}.tif $OUTDIR/lake_${LK}.tif
 
 # crop basin raster file to the lake extention
 gdal_translate \
@@ -266,10 +267,14 @@ pkreclass -co COMPRESS=LZW -co ZLEVEL=9 -ot Byte -of GTiff \
         -o $GWB/input/lake_${LK}.tif \
         -c 1 -r 2 -c 0 -r 1
 
+echo "START MSPA"
+cp $TMPDIR/lakes_ref_extent_${LK}.txt $OUTDIR/lakes_ref_extent_${LK}.txt
 # create mspa-parameters.txt before in R (check if its always the same structure)
-cp $TMPDIR/mspa-parameters.txt $GWB/input # this file needs to be created in R!
+# cp $TMPDIR/mspa-parameters.txt $GWB/input # this file needs to be created in R!
+# cat $GWB/input/mspa-parameters.txt
 GWB_MSPA -i=$GWB/input -o=$GWB/output
-cp $GWB/output/lake_${LK}_mspa/lake_${LK}*.tif $TMPDIR
+cp $GWB/output/lake_${LK}_mspa/lake_${LK}_8_1_0_1.tif $TMPDIR
+rm $GWB/output/mspa.log
 
 echo "MSPA is finished"
 
@@ -277,7 +282,7 @@ echo "MSPA is finished"
 
 ### reclassification of MSPA output to retain only the outer borders
 pkreclass -co COMPRESS=LZW -co ZLEVEL=9 \
-    -i $TMPDIR/lake_${LK}*.tif \
+    -i $TMPDIR/lake_${LK}_8_1_0_1.tif \
     -o $TMPDIR/mspa_${LK}.tif --code $TMPDIR/mspa_reclass_code.txt
 
 ### create mspa_reclass_code.txt in R (check if its is always the same) ###
@@ -300,10 +305,11 @@ gdal_translate -co COMPRESS=LZW -co ZLEVEL=9 \
     -projwin $( pkinfo -i $TMPDIR/mspa_${LK}_l.tif -bb | grep  -Eo '[+-]?[0-9]+([.][0-9]+)?' ) \
     $FLOW $TMPDIR/flow_${LK}.tif
 
-rm $TMPDIR/mspa_${LK}.tif
+# rm $TMPDIR/mspa_${LK}.tif
 cp $TMPDIR/mspa_${LK}_l.tif $TMPDIR/mspa_${LK}.tif
-rm $TMPDIR/mspa_${LK}_l.tif
-rm $GWB/input/lake_${LK}.tif
+# rm $TMPDIR/mspa_${LK}_l.tif
+# rm $GWB/input/lake_${LK}.tif
+
 
 grass  -f --text --tmp-location $TMPDIR/overlapping_${LK}.tif <<EOF
 r.external -o input=$TMPDIR/overlapping_${LK}.tif  output=out
@@ -337,7 +343,7 @@ paste -d " " <(seq 1 $(wc -l < $TMPDIR/coord_lake_${LK}.txt))  \
 
 rm $TMPDIR/coord_lake_${LK}.txt $TMPDIR/coord_flowInt_${LK}.txt
 rm $TMPDIR/coord_flowMax_${LK}.txt $TMPDIR/coord_flowAve_${LK}.txt
-rm $TMPDIR/overlapping_${LK}.tif
+# rm $TMPDIR/overlapping_${LK}.tif
 rm $GWB/input/mspa-parameters.txt
 
 # Identify streamIDs that have more than one duplicate
@@ -379,7 +385,7 @@ awk -v var=$LK '$(NF+1) = var' $TMPDIR/coord_lake_${LK}_tmp.txt \
 > $TMPDIR/coord_lake_${LK}_pro.txt
 
 awk '{print $1,$9,$3,$4,$5,$6,$7,$8}' "$TMPDIR/coord_lake_${LK}_pro.txt" \
-> $OUTDIR/coord_lake_${LK}.txt
+> $OUTDIR/coord_lake_${LK}_tmp.txt
 
 # Calculate minutes and seconds
 minutes=$(( SECONDS / 60 ))
@@ -395,17 +401,32 @@ echo "Time taken: ${minutes} minutes and ${seconds} seconds"
 headers="outlet_ID lake_ID lon lat subc_id flow_accu flow_accu_max flow_accu_mean"
 
 # Write headers to the output file
-echo "$headers" > "$OUTDIR/coord_lake_${LK}_tmp.txt"
+echo "$headers" > "$OUTDIR/coord_lake_${LK}.txt"
 
 # Append the contents of the .txt file to the output file
-cat "$OUTDIR/coord_lake_${LK}.txt" >> "$OUTDIR/coord_lake_${LK}_tmp.txt"
+cat "$OUTDIR/coord_lake_${LK}_tmp.txt" >> "$OUTDIR/coord_lake_${LK}.txt"
 
-# rm $TMPDIR/coord_lake_${LK}.txt
-rm $TMPDIR/coord_lake_${LK}_pro.txt
+rm $TMPDIR/ALLbasins_${LK}.tif
+rm $TMPDIR/lbasin_reclass_${LK}.vrt
+rm $TMPDIR/coord_lake_${LK}*
+rm $TMPDIR/buffer_${LK}*
+rm $TMPDIR/flow_${LK}.tif
+rm $TMPDIR/overlapping_${LK}.tif
+rm $TMPDIR/CompUnits_${LK}.vrt
+rm $TMPDIR/mspa_reclass_code.txt
+rm $TMPDIR/mspa_${LK}*
+rm $TMPDIR/lake_${LK}*
+rm $TMPDIR/stream_${LK}.tif
+rm $TMPDIR/lakes_ref_extent_${LK}.txt
+rm $TMPDIR/ref_lbasinIDs_${LK}.txt
+rm $TMPDIR/ref_CompUnitIDs_${LK}.txt
+rm $GWB/input/lake_${LK}.tif
+rm -rf $GWB/output/lake_${LK}_mspa*
+rm $OUTDIR/coord_lake_${LK}_tmp.txt
 
 echo "Finished with lake $LK"
 echo "Time taken: ${minutes} minutes and ${seconds} seconds"
-exit
+
 }
 
 export -f get_lake_intersection
