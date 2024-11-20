@@ -344,7 +344,7 @@ paste -d " " <(seq 1 $(wc -l < $TMPDIR/coord_lake_${LK}.txt))  \
 rm $TMPDIR/coord_lake_${LK}.txt $TMPDIR/coord_flowInt_${LK}.txt
 rm $TMPDIR/coord_flowMax_${LK}.txt $TMPDIR/coord_flowAve_${LK}.txt
 # rm $TMPDIR/overlapping_${LK}.tif
-rm $GWB/input/mspa-parameters.txt
+# rm $GWB/input/mspa-parameters.txt
 
 # Identify streamIDs that have more than one duplicate
 DUP=$(awk '{print $4}' $TMPDIR/coord_lake_${LK}_p.txt | sort | uniq -c | awk '$1 > 1 {print $2}')
@@ -413,7 +413,7 @@ rm $TMPDIR/buffer_${LK}*
 rm $TMPDIR/flow_${LK}.tif
 rm $TMPDIR/overlapping_${LK}.tif
 rm $TMPDIR/CompUnits_${LK}.vrt
-rm $TMPDIR/mspa_reclass_code.txt
+# rm $TMPDIR/mspa_reclass_code.txt
 rm $TMPDIR/mspa_${LK}*
 rm $TMPDIR/lake_${LK}*
 rm $TMPDIR/stream_${LK}.tif
