@@ -139,7 +139,7 @@ sort -g $TMP/aggreg_${X}_tmp1.txt > $TMP/aggreg_${X}.txt
 read -a header < $TMP/aggreg_${X}.txt
 
 declare -a elem=()
-for e in mean min maxsd range
+for e in mean min max sd range
 do
     [[ ${header[@]} =~ $e ]] && elem+=1 || elem+=0
 done
