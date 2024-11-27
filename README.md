@@ -35,7 +35,7 @@ Schürz, M., Grigoropoulou, A., Garcia Marquez, J.R., Tomiczek, T., Floury, M., 
 
 Please also cite the Hydrography90m data:
 
-Amatulli, G., Garcia Marquez, J.R., Sethi, T., Kiesel, J., Grigoropoulou, A., Üblacker, M., Shen, L., Domisch, S. (2022). Hydrography90m: A new high-resolution global hydrographic dataset. _Earth System Science Data_, 14, 4525–4550.
+Amatulli, G., Garcia Marquez, J.R., Sethi, T., Kiesel, J., Grigoropoulou, A., Üblacker, M., Shen, L., Domisch, S. (2022). Hydrography90m: A new high-resolution global hydrographic dataset. _Earth System Science Data_, 14, 4525–4550, 10.5194/essd-14-4525-2022.
 
 If you're using the environmental data, please also cite the Environment90m data:
 
