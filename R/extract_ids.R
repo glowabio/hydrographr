@@ -182,7 +182,7 @@ extract_ids <- function(data = NULL, lon, lat, id = NULL, basin_layer = NULL,
     fwrite(coord, coord_tmp_path, col.names = TRUE,
            row.names = FALSE, quote = FALSE, sep = " ")
     # Path for tmp ids.txt file
-    ids_tmp_path <- paste0(res_dir, "/ids_", rand_string, ".txt")
+    res_file <- paste0(res_dir, "/ids_", rand_string, ".txt")
 
     # Check operating system
     sys_os <- get_os()
@@ -200,7 +200,7 @@ extract_ids <- function(data = NULL, lon, lat, id = NULL, basin_layer = NULL,
       processx::run(system.file("sh", "extract_ids.sh",
                                 package = "hydrographr"),
                     args = c(coord_tmp_path, lon, lat, subc_layer, bas_path,
-                             tempdir, ids_tmp_path),
+                             tempdir, res_file),
                     echo = !quiet)
 
     } else {
@@ -212,24 +212,24 @@ extract_ids <- function(data = NULL, lon, lat, id = NULL, basin_layer = NULL,
                                fix_path(subc_layer))
       wsl_bas_path <- ifelse(is.null(basin_layer), 0, fix_path(basin_layer))
       wsl_tmp_path <- fix_path(tempdir)
-      wsl_ids_tmp_path <- fix_path(ids_tmp_path)
+      wsl_res_file <- fix_path(res_file)
       wsl_sh_file <- fix_path(system.file("sh", "extract_ids.sh",
                                           package = "hydrographr"))
       processx::run(system.file("bat", "extract_ids.bat",
                                 package = "hydrographr"),
                     args = c(wsl_coord_tmp_path, lon, lat, wsl_subc_layer,
-                             wsl_bas_path, wsl_tmp_path, wsl_ids_tmp_path,
+                             wsl_bas_path, wsl_tmp_path, wsl_res_file,
                              wsl_sh_file, echo = !quiet))
 
     }
     # Read in the file containing the ids setting fill=TRUE, for the case that
     # some coordinates were in null cells so they did not get an ID
-    data_ids <- fread(paste0(res_dir,  "/ids_", rand_string, ".txt"),
+    data_ids <- fread(res_file,
                       keepLeadingZeros = TRUE, header = TRUE, sep = " ",
                       fill = TRUE)
 
-    # Remove all files in the tmp folder
-    file.remove(coord_tmp_path, ids_tmp_path)
+    # Remove the result file
+    file.remove(coord_tmp_path, res_file)
 
     # Return data frame
     return(data_ids)
