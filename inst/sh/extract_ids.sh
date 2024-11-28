@@ -17,6 +17,24 @@ export RAND_STRING=$(xxd -l 8 -c 32 -p < /dev/random)
 # BASIN_LAYER: Path to the raster file from which to get the subcatchment ids, or "0".
 # TMPDIR: Path to a directory where gdal will store its immediate results, i.e. the extracted subcatchment_ids and/or basin_ids will be stored temporarily (will be removed before finishing).
 # RES_FILE: Path to the file where to store the final result, which is the text file in DATA with one or two columns added ("subcatchment" and/or "basin").
+#
+# Example DATA:
+#cat ~/test_inputs.txt
+#lon lat
+#8.4 51.9
+#7.9 50.2
+#
+# Example temporary result written by gdal:
+#cat /tmp/basin_ids_c54966d7faeb70f0.txt
+#subcatchment_id
+#1292342
+#1173482
+#
+# Example RES_FILE:
+#cat ~/test_results.txt
+#lon lat subcatchment_id
+#8.4 51.9 1292342
+#7.9 50.2 1173482
 
 
 if [ "$SUBC_LAYER" = "0"  ] ; then
