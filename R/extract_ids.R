@@ -118,7 +118,9 @@ extract_ids <- function(data = NULL, lon, lat, id = NULL, basin_layer = NULL,
 
     # Return data frame
     return(data_ids)
+
   } else {
+
     # Extract IDs at point location
     # Check if input data is of type data.frame,
     # data.table or tibble
