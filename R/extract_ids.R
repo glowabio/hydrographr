@@ -20,6 +20,9 @@
 #' sub-catchment ID.
 #' @param quiet logical. If FALSE, the standard output will be printed.
 #' Default is TRUE.
+#' @param tempdir character Optional (rarely needed): Pass a directory to be
+#' used as temporary directory. If not provided, the result of a call to
+#' tempdir() is used.
 #'
 #' @importFrom stringi stri_rand_strings
 #' @importFrom data.table fread fwrite
@@ -84,7 +87,12 @@
 
 
 extract_ids <- function(data = NULL, lon, lat, id = NULL, basin_layer = NULL,
-                        subc_layer = NULL, quiet = TRUE) {
+                        subc_layer = NULL, quiet = TRUE, tempdir = NULL) {
+
+  # Define tempdir:
+  if (is.null(tempdir)) {
+    tempdir <- tempdir()
+  }
 
   # Extract all the ID values of the subcatchment layer if no point
   # location is provided
@@ -158,12 +166,12 @@ extract_ids <- function(data = NULL, lon, lat, id = NULL, basin_layer = NULL,
 
     }
     # Export taxon occurrence points
-    coord_tmp_path <- paste0(tempdir(), "/coordinates_", rand_string, ".txt")
+    coord_tmp_path <- paste0(tempdir, "/coordinates_", rand_string, ".txt")
     ## Note:Only export lon/lat column
     fwrite(coord, coord_tmp_path, col.names = TRUE,
            row.names = FALSE, quote = FALSE, sep = " ")
     # Path for tmp ids.txt file
-    ids_tmp_path <- paste0(tempdir(), "/ids_", rand_string, ".txt")
+    ids_tmp_path <- paste0(tempdir, "/ids_", rand_string, ".txt")
 
     # Check operating system
     sys_os <- get_os()
@@ -181,7 +189,7 @@ extract_ids <- function(data = NULL, lon, lat, id = NULL, basin_layer = NULL,
       processx::run(system.file("sh", "extract_ids.sh",
                                 package = "hydrographr"),
                     args = c(coord_tmp_path, lon, lat, subc_layer, bas_path,
-                             tempdir(), ids_tmp_path),
+                             tempdir, ids_tmp_path),
                     echo = !quiet)
 
     } else {
@@ -192,7 +200,7 @@ extract_ids <- function(data = NULL, lon, lat, id = NULL, basin_layer = NULL,
       wsl_subc_layer <- ifelse(is.null(subc_layer), 0,
                                fix_path(subc_layer))
       wsl_bas_path <- ifelse(is.null(basin_layer), 0, fix_path(basin_layer))
-      wsl_tmp_path <- fix_path(tempdir())
+      wsl_tmp_path <- fix_path(tempdir
       wsl_ids_tmp_path <- fix_path(ids_tmp_path)
       wsl_sh_file <- fix_path(system.file("sh", "extract_ids.sh",
                                           package = "hydrographr"))
@@ -205,7 +213,7 @@ extract_ids <- function(data = NULL, lon, lat, id = NULL, basin_layer = NULL,
     }
     # Read in the file containing the ids setting fill=TRUE, for the case that
     # some coordinates were in null cells so they did not get an ID
-    data_ids <- fread(paste0(tempdir(),  "/ids_", rand_string, ".txt"),
+    data_ids <- fread(paste0(tempdir,  "/ids_", rand_string, ".txt"),
                       keepLeadingZeros = TRUE, header = TRUE, sep = " ",
                       fill = TRUE)
 
