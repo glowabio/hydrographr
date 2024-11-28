@@ -26,6 +26,8 @@
 #' @param res_dir character Optional (rarely needed): Pass a directory to be
 #' used as result directory. If not provided, the same directory as tempdir
 #' (above) is used.
+#' @param keep_res_file logical. If TRUE, the result text file will not be.
+#' deleted. Default is FALSE.
 #'
 #' @importFrom stringi stri_rand_strings
 #' @importFrom data.table fread fwrite
@@ -91,7 +93,7 @@
 
 extract_ids <- function(data = NULL, lon, lat, id = NULL, basin_layer = NULL,
                         subc_layer = NULL, quiet = TRUE, tempdir = NULL,
-                        res_dir = NULL) {
+                        res_dir = NULL, keep_res_file = FALSE) {
 
   # Define tempdir:
   if (is.null(tempdir)) {
@@ -229,7 +231,11 @@ extract_ids <- function(data = NULL, lon, lat, id = NULL, basin_layer = NULL,
                       fill = TRUE)
 
     # Remove the result file
-    file.remove(coord_tmp_path, res_file)
+    if (keep_res_file) {
+      message(paste0("Result file can be found here: ", res_file))
+    } else {
+      file.remove(coord_tmp_path, res_file)
+    }
 
     # Return data frame
     return(data_ids)
