@@ -25,7 +25,7 @@ export RAND_STRING=$(xxd -l 8 -c 32 -p < /dev/random)
 #7.9 50.2
 #
 # Example temporary result written by gdal:
-#cat /tmp/basin_ids_c54966d7faeb70f0.txt
+#cat /tmp/subc_ids_c54966d7faeb70f0.txt
 #subcatchment_id
 #1292342
 #1173482
@@ -54,6 +54,7 @@ if [ "$SUBC_LAYER" = "0"  ] ; then
 
     # merge input lon-lat columns with temporary result file to one result file
 	paste -d" " $DATA $TMPDIR/subc_ids_${RAND_STRING}.txt > $RES_FILE
+    #echo "Result (hopefully) pasted to "$RES_FILE
 
     # remove temporary result file
 	rm $TMPDIR/subc_ids_${RAND_STRING}.txt
@@ -75,6 +76,7 @@ elif [ "$BASIN_LAYER" = "0"  ] ; then
 
     # merge input lon-lat columns with temporary result file to one result file
     paste -d" " $DATA $TMPDIR/basin_ids_${RAND_STRING}.txt > $RES_FILE
+    #echo "Result (hopefully) pasted to "$RES_FILE
 
     # remove temporary result file
     rm  $TMPDIR/basin_ids_${RAND_STRING}.txt
@@ -108,6 +110,7 @@ else
 
     # merge input lon-lat columns with both temporary result files to one result file
     paste -d" " $DATA $TMPDIR/subc_ids_${RAND_STRING}.txt $TMPDIR/basin_ids_${RAND_STRING}.txt > $RES_FILE
+    #echo "Result (hopefully) pasted to "$RES_FILE
 
     # remove both temporary result files
     rm $TMPDIR/subc_ids_${RAND_STRING}.txt $TMPDIR/basin_ids_${RAND_STRING}.txt
