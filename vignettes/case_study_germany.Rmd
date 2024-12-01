@@ -90,10 +90,11 @@ We first download the occurrence data with coordinates from GBIF
 # Once: Download species occurrence data based on the key of the dataset
 # and write out to working directory
 spdata_all <- occ_download_get(key="0004551-231002084531237",
-                              overwrite = TRUE) %>%
+                               overwrite = TRUE) %>%
   occ_download_import
+
 fwrite(spdata_all, paste0(wdir, "/data/fish_germany_gbif.csv"),
-    row.names = F, quote = F, sep = "\t")
+       row.names = F, quote = F, sep = "\t")
 ```
 
 ```{r}
@@ -165,12 +166,12 @@ and thus requires an active internet connection.
 
 ```{r, eval = FALSE}
 tile_id <- get_tile_id(data = spdata,
-                     lon = "longitude", lat = "latitude")
+                       lon = "longitude", lat = "latitude")
 
 # Get reg unit id to crop all the regular tile layers so that 
 # we have uninterrupted basins
 reg_unit_id <- get_regional_unit_id(data = spdata,
-                                  lon = "longitude", lat = "latitude")
+                                    lon = "longitude", lat = "latitude")
 
 ```
 
@@ -259,11 +260,11 @@ options(timeout = 1000)
 
 # Download
 # Present, 1981-2010
-download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio12_1981-2010_V.2.1.tif",
+download.file("https://os.zhdk.cloud.switch.ch/chelsav2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio12_1981-2010_V.2.1.tif ",
 destfile = "data/chelsa_bioclim/bio12_1981-2010.tif", mode = "wb")
-download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio15_1981-2010_V.2.1.tif",
+download.file("https://os.zhdk.cloud.switch.ch/chelsav2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio15_1981-2010_V.2.1.tif ",
 destfile = "data/chelsa_bioclim/bio15_1981-2010.tif", mode = "wb")
-download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio1_1981-2010_V.2.1.tif",
+download.file("https://os.zhdk.cloud.switch.ch/chelsav2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio1_1981-2010_V.2.1.tif ",
 destfile = "data/chelsa_bioclim/bio1_1981-2010.tif", mode = "wb")
 ```
 
@@ -273,23 +274,26 @@ After having downloaded all the layers, we need to crop them to the
 extent of our study area extended by 500 km, so that our basins are not
 split in half.
 
-```{r, include = FALSE}
+```{r }
 # Define and create a directory for the study area
-#study_area_dir <-  paste0(wdir, "/data/study_area")
-study_area_dir <- "/home/afroditi/Documents/PhD/external/fish_germany/data/study_area"
-
+study_area_dir <-  paste0(wdir, "/data/study_area")
 if(!dir.exists(study_area_dir)) dir.create(study_area_dir)
 
 
 # Get the full paths of the raster tiles
 raster_tiles_watershed <- list.files(paste0(wdir, "/data/r.watershed"),
-                          pattern = ".tif", full.names = TRUE, recursive = TRUE)
+                                     pattern = ".tif", full.names = TRUE, 
+                                     recursive = TRUE)
 raster_tiles_dist <- list.files(paste0(wdir, "/data/r.stream.distance"),
-                          pattern = ".tif", full.names = TRUE, recursive = TRUE)
+                                pattern = ".tif", full.names = TRUE, 
+                                recursive = TRUE)
 raster_tiles_chan <- list.files(paste0(wdir, "/data/r.stream.channel"),
-                          pattern = ".tif", full.names = TRUE, recursive = TRUE)
+                                pattern = ".tif", full.names = TRUE, 
+                                recursive = TRUE)
 raster_tiles_ord <- list.files(paste0(wdir, "/data/r.stream.order"),
-                               pattern = ".tif", full.names = TRUE, recursive = TRUE)
+                               pattern = ".tif", full.names = TRUE, 
+                               recursive = TRUE)
+
 raster_tiles <- c(raster_tiles_watershed, raster_tiles_dist, 
                   raster_tiles_chan, raster_tiles_ord)
 ```
@@ -297,11 +301,11 @@ raster_tiles <- c(raster_tiles_watershed, raster_tiles_dist,
 Let's define the extent (bounding box) of the study area (xmin, ymin,
 xmax, ymax)
 
-```{r, include = FALSE}
+```{r eval=FALSE, include=FALSE}
 bb <- ext(vect(paste0(wdir, "/data/r.watershed/basin_tiles20d/basin_h18v02_filtered.gpkg")))
 ```
 
-```{r, eval = F}
+```{r, eval=FALSE}
 bb <- c(0.256, 20, 45, 55.4325)
 ```
 
@@ -334,7 +338,7 @@ in the folder *`study_area_dir`*:
 
 -   [basin_h18v02_crop.gpkg](https://drive.google.com/file/d/1l9l7k3s9YIVkjhSoRqLVb8L2rGStSvz0/view?usp=drive_link)
 
-```{r, eval = FALSE}
+```{r eval=FALSE}
 # !! Only run this chunk on a machine with more than 16 GB RAM, 
 # as the input files are really big !!
 
@@ -360,22 +364,22 @@ basin_gpkg_tile <- list.files(wdir, pattern = "bas.+_h[v0-8]+.gpkg$",
 # tiles (sub-catchment ID = stream ID)
 # Save the stream segments of the study area
 filtered_stream <- read_geopackage(order_tile,
-                                 import_as = "sf",
-                                 subc_id = subc_ids$segment_h18v02_crop,
-                                 name = "stream")
+                                   import_as = "sf",
+                                   subc_id = subc_ids$segment_h18v02_crop,
+                                   name = "stream")
 
 sf::write_sf(filtered_stream, paste(study_area_dir,
                               paste0(str_remove(basename(order_tile), ".gpkg"),
-                                         "_crop.gpkg"), sep="/"))
+                                     "_crop.gpkg"), sep="/"))
 
 filtered_bas <- read_geopackage(basin_gpkg_tile,
-                                 import_as = "sf",
-                                 subc_id = basin_ids$basin_h18v02_crop,
-                                 name = "ID")
+                                import_as = "sf",
+                                subc_id = basin_ids$basin_h18v02_crop,
+                                name = "ID")
 
 sf::write_sf(filtered_bas, paste(study_area_dir,
-                          paste0(str_remove(basename(basin_gpkg_tile), ".gpkg"),
-                                         "_crop.gpkg"), sep="/"))
+                                 paste0(str_remove(basename(basin_gpkg_tile), ".gpkg"),
+                                        "_crop.gpkg"), sep="/"))
 
 ```
 
@@ -444,10 +448,13 @@ used to query very large raster files, as these are not loaded into R.
 
 ```{r, eval = TRUE}
 spdata_ids <- extract_ids(data = spdata,
-  id = "gbifID",
-  lon = "longitude", lat = "latitude",
-  basin_layer = paste0(study_area_dir, "/basin_h18v02_crop.tif"),
-  subc_layer = paste0(study_area_dir, "/sub_catchment_h18v02_crop.tif"))
+                          id = "gbifID",
+                          lon = "longitude", 
+                          lat = "latitude",
+                          basin_layer = paste0(study_area_dir, 
+                                               "/basin_h18v02_crop.tif"),
+                          subc_layer = paste0(study_area_dir, 
+                                              "/sub_catchment_h18v02_crop.tif"))
 ```
 
 ```{r, echo = FALSE}
