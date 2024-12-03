@@ -108,7 +108,7 @@
 #' my_graph <- get_catchment_graph(g = my_graph,
 #'                                 subc_id = 513867228,
 #'                                 mode = "in",
-#'                                 outlet = FALSE,
+#'                                 use_outlet = FALSE,
 #'                                 as_graph = TRUE,
 #'                                 n_cores = 1)
 #'
