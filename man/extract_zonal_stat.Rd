@@ -27,10 +27,10 @@ the resulting data.frame.}
 \item{subc_layer}{character. Full path to the sub-catchment ID .tif layer.}
 
 \item{var_layer}{character vector of variable raster layers on disk,
-e.g. "slope_grad_dw_cel_h00v00.tif". Variable names should remain intact in
-file names, even after file processing, i.e., slope_grad_dw_cel should appear
-in the file name. The files should be cropped to the extent of the
-sub-catchment layer to speed up the computation.}
+e.g. "slope_grad_dw_cel_h00v00.tif". Note that the variable name appears in
+the output table columns (e.g. slope_grad_dw_cel_mean). To speed up the
+processing, the selected variable raster layers can be cropped to the extent
+of the sub-catchment layer, e.g. with \code{\link{crop_to_extent()}}.}
 
 \item{out_dir}{character. The directory where the output will be stored.
 If the out_dir and file_name are specified, the output table will be stored
@@ -41,20 +41,41 @@ loaded in R and not stored on disk.}
 will be stored. out_dir should also be specified for this purpose.}
 
 \item{n_cores}{numeric. Number of cores used for parallelization, in case
-multiple .tif files are provided to var_layer.}
+multiple .tif files are provided to var_layer. Default is 1.}
 
 \item{quiet}{logical. If FALSE, the standard output will be printed.
 Default is TRUE.}
 }
+\value{
+Returns a table with
+\itemize{
+\item sub-catchment ID (subc_id)
+\item number of cells with a value (data_cells)
+\item number of cells with a NoData value (nodata_cells)
+\item minimum value (min)
+\item maximum value (max)
+\item value range (range)
+\item arithmetic mean (mean)
+\item arithmetic mean of the absolute values (mean_abs)
+\item standard deviation (sd)
+\item variance (var)
+\item coefficient of variation (cv)
+\item sum (sum)
+\item sum of the absolute values (sum_abs).
+}
+}
 \description{
-Calculate zonal statistics based on one or more environmental variable
-raster .tif layers.
-This function can be used to aggregate data across a set (or all)
-sub-catchments. The sub-catchment raster (.tif) input file is stored on disk.
-The output is a data.table which is loaded into R.
+Calculate zonal statistics based on one or more environmental
+variable raster .tif layers. This function aggregates data to
+12 summary statistics (mean, min, max, range, ...) for selected or all
+sub-catchments of the input file. The sub-catchment raster (.tif) input
+file is read directly from disk. The output is a data.table which is loaded
+into R. This function can also be used for any zonal statistic calculation
+by specifying the raster layer zones in the subc_layer parameter and
+optionally, also the target zone IDs in the subc_id parameter.
 }
 \examples{
-# Download test data into temporary R folder
+# Download test data into the temporary R folder
 # or define a different directory
 my_directory <- tempdir()
 download_test_data(my_directory)
@@ -88,9 +109,13 @@ stat
 \url{https://grass.osgeo.org/grass82/manuals/r.univar.html}
 }
 \seealso{
-\code{\link{report_no_data}} to check the defined NoData value.
-\code{\link{set_no_data}} to define a NoData value.
+\itemize{
+\item \code{\link{report_no_data()}} to check the defined NoData value.
+\item \code{\link{set_no_data()}} to define a NoData value.
+\item \code{\link{crop_to_extent()}} to crop the data to the same extent as the
+sub-catchments (subc_layer).
+}
 }
 \author{
-Afroditi Grigoropoulou, Jaime Garcia Marquez, Maria M. Üblacker
+Afroditi Grigoropoulou, Jaime Garcia Marquez, Marlene Schürz
 }

@@ -10,6 +10,7 @@ extract_from_gpkg(
   subc_layer,
   var_layer,
   out_dir = NULL,
+  file_name = NULL,
   n_cores = NULL,
   quiet = TRUE
 )
@@ -34,6 +35,9 @@ files in this location, named after their input variable vector files
 (e.g. "/path/to/stats_order_vect_point_h18v04.csv").
 If NULL, the output is only loaded in R and not stored on disk.}
 
+\item{file_name}{character. Name of the .csv file where the output table
+will be stored. out_dir should also be specified for this purpose.}
+
 \item{n_cores}{numeric. Number of cores used for parallelization, in case
 multiple .gpkg files are provided to var_layer.
 If NULL, available cores - 1 will be used.}
@@ -46,6 +50,35 @@ The function reads the attribute table of the stream network GeoPackage file
 (.gpkg) stored on disk and extracts the data for one or more (or all) input
 sub-catchment (i.e. stream segment) IDs. The output is a data.table, and only
 the output is loaded into R.
+}
+\details{
+The following attributes are stored in the stream network .gpkg files (as
+produced by the GRASS GIS function r.stream.order:
+\itemize{
+\item cat - category
+\item stream - sub-catchment / stream segment ID (equal to cat)
+\item next_stream - downstream sub-catchment / stream segment ID
+\item prev_streams; two or more uptstream sub-catchment / stream segment IDs
+\item strahler - Strahler's stream order
+\item horton - Hortons's stream order
+\item shreve - Shreve's stream magnitude
+\item hack - Hack's main streams or Gravelius order
+\item topo_dim - Topological dimension streams order
+\item scheidegger - Scheidegger's Consisted Associated Integers
+\item drwal - Drwal's stream hierarchy
+\item length - length of the stream segment
+\item stright - length of the stream segment as a stright line
+\item sinusoid - fractal dimension: stream segment length / stright stream
+\item segment length;
+\item cum_length - length of the stream from the source
+\item flow_accum - flow accumulation within the sub-catchment of a stream segment
+\item out_dist - distance of current stream initialisation from outlet
+\item source_elev - elevation at stream segment initialisation
+\item outlet_elev - elevation at stream segment outlet
+\item elev_drop difference between source_elev and outlet_elev + drop outlet
+\item out_drop - drop at the outlet of the stream segment
+\item gradient - drop/length
+}
 }
 \examples{
 # Download test data into temporary R folder
@@ -73,7 +106,8 @@ attribute_table
 }
 \references{
 \url{https://grass.osgeo.org/grass82/manuals/v.in.ogr.html}
+\url{https://grass.osgeo.org/grass82/manuals/addons/r.stream.order.html}
 }
 \author{
-Afroditi Grigoropoulou, Jaime Garcia Marquez, Maria M. Üblacker
+Afroditi Grigoropoulou, Jaime Garcia Marquez, Marlene Schürz
 }

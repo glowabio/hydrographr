@@ -10,6 +10,8 @@ crop_to_extent(
   bounding_box = NULL,
   out_dir,
   file_name,
+  compression = "low",
+  bigtiff = TRUE,
   read = TRUE,
   quiet = TRUE
 )
@@ -28,6 +30,14 @@ or other spatial object.}
 
 \item{file_name}{character. Name of the cropped output raster .tif file.}
 
+\item{compression}{character. Compression of the written output file.
+Compression levels can be defined as "none", "low", or "high". Default is
+"low".}
+
+\item{bigtiff}{logical. Define whether the output file is expected to be a
+BIGTIFF (file size larger than 4 GB). If FALSE and size > 4GB no file will be
+written. Default is TRUE.}
+
 \item{read}{logical. If TRUE, the cropped raster .tif layer gets read into R.
 If FALSE, the layer is only stored on disk. Default is TRUE.}
 
@@ -40,19 +50,16 @@ Optionally, a SpatRaster (terra object) can be loaded into R with
 read = TRUE.
 }
 \description{
-This function crops an input raster layer directly on disk,
-i.e. the input layer does not need to be loaded into R. The raster .tif is
-cropped to a polygon border line if a vector layer (cutline source) is
-provided, otherwise if a bounding box is provided
-(xmin, ymin, xmax, ymax coordinates or a spatial object from which to extract
-a bounding box), the raster is cropped to the extent of the bounding box. At
-least a cutline source (vector_layer) or a bounding box (bounding_box)
-should be provided. The output is always written to disk, and can be
-optionally loaded into R as a SpatRaster (terra package) object
-(using read = TRUE).
+This function crops an input raster layer (.tif) given a
+bounding box (xmin, ymin, xmax, ymax coordinates, or a spatial object from
+which to extract a bounding box) or to the boundary of a polygon vector
+layer (cutline source). The cropping is performed directly on disk, i.e.
+the input layer does not need to be loaded into R. The output is always
+written to disk, and can be optionally loaded into R as a SpatRaster
+(terra package) object (using read = TRUE).
 }
 \examples{
-# Download test data into temporary R folder
+# Download test data into the temporary R folder
 # or define a different directory
 my_directory <- tempdir()
 download_test_data(my_directory)

@@ -9,12 +9,11 @@ check_tiles_filesize(
   variable,
   file_format = "tif",
   tile_id = NULL,
-  reg_unit_id = NULL,
   global = FALSE,
   h90m_varnames,
   h90m_tile_id,
-  h90m_file_formats,
-  file_size_table_sep
+  h90m_file_names,
+  file_size_table
 )
 }
 \arguments{
@@ -33,10 +32,11 @@ files available for download, (inherited by 'download_tiles()').}
 \item{h90m_tile_id}{character vector. The valid IDs of the hydrography90m.
 regular tiles available for download (inherited by 'download_tiles()').}
 
-\item{h90m_file_formats}{character vector. The valid file types of the files
-available for download (inherited by 'download_tiles()').}
+\item{h90m_file_names}{character vector. The names of the files available
+for download. Used to verify whether the requested format is valid 
+(inherited by 'download_tiles()').}
 
-\item{file_size_table_sep}{data.frame. Lookup table including file names
+\item{file_size_table}{data.frame. Lookup table including file names
 and sizes (inherited by 'download_tiles()').}
 }
 \description{

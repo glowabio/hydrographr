@@ -18,30 +18,32 @@ snap_to_network(
 )
 }
 \arguments{
-\item{data}{a data.frame or data.table with lat/lon coordinates in WGS84.}
+\item{data}{a data.frame or data.table that contains the columns regarding
+the longitude / latitude coordinates in WGS84.}
 
 \item{lon}{character. The name of the column with the longitude coordinates.}
 
 \item{lat}{character. The name of the column with the latitude coordinates.}
 
 \item{id}{character. The name of a column containing unique IDs for
-each row of "data" (e.g., occurrence or site IDs).}
+each row of "data" (e.g., occurrence or site IDs). The unique IDs need to be
+numeric and less than 10 characters long.}
 
-\item{stream_layer}{character. Full path of the stream network .gpkg file}
+\item{stream_layer}{character. Full path of the stream network .tif file}
 
 \item{accu_layer}{character. Full path of the flow accumulation .tif file.
 Needed if the point should be snapped to the next stream segment having
 an accumulation value higher than the flow accumulation threshold
 (set by 'accumulation'). This prevents points from being snapped to small
-stream tributaries.}
+stream tributaries. Optional. Default is NULL.}
 
 \item{method}{character. One of "distance", "accumulation", or "both".
 Defines if the points are snapped using the distance or flow accumulation
 (see "Details" for more information). If method is set to "both" the output
 will contain the new coordinates for both calculations.
-Default is "distance".}
+Default is "distance" (in map pixels).}
 
-\item{distance}{numeric. Maximum radius in meters. The points will be
+\item{distance}{numeric. Maximum radius in map pixels. The points will be
 snapped to the next stream within this radius. Default is 500.}
 
 \item{accumulation}{numeric. Minimum flow accumulation. Points will be
@@ -51,36 +53,46 @@ given value. Default is 0.5.}
 \item{quiet}{logical. If FALSE, the standard output will be printed.
 Default is TRUE.}
 }
+\value{
+Returns a data.frame with the snapped coordinates and the sub-catchment ID
+of the snapped stream segment. If the sub-catchment ID is NA, no stream segment
+was found within the given distance (method = "distance") or no stream segment
+wad found within the given distance and a flow accumulation equal or higher
+than the given threshold (method = "accumulation"). "out-bbox" means that the
+provided coordinates are not within the extend (bounding box) of the
+provided stream network layer.
+}
 \description{
 Snap points to the next stream segment within a defined radius
-or a minimum flow accumulation.
+(in map pixels) or a minimum flow accumulation.
 }
 \details{
-The function makes use of the r.stream.snap command available in GRASS GIS to
-simultaneously a number of points to a stream network. A distance threshold
+The function makes use of the r.stream.snap function available in GRASS GIS to
+simultaneously snap a number of points to the stream network. A distance threshold
 can be specified and points will be snapped to any stream segment within this
-distance radius. However, to avoid snapping to small tributaries, an
+distance radius (in map pixels). However, to avoid snapping to small tributaries, an
 accumulation threshold can be used and the snapping occurs on stream segment
 with equal or higher accumulation threshold and within the given distance
 radius.
 }
 \note{
-Duplicated rows will be removed.
+Duplicated rows will be removed from the input data.
 }
 \examples{
-# Download test data into temporary R folder
+# Download test data into the temporary R folder
+# or define a different directory
 my_directory <- tempdir()
 download_test_data(my_directory)
 
 # Load occurrence data
-species_occurence <- read.table(paste0(my_directory,
+species_occurrence <- read.table(paste0(my_directory,
                             "/hydrography90m_test_data/spdata_1264942.txt"),
                               header = TRUE)
 
-# Define full path to flow accumulation
-stream_rast <- paste0(my_directory,
+# Define full path to stream network and flow accumulation
+stream_raster <- paste0(my_directory,
                      "/hydrography90m_test_data/stream_1264942.tif")
-flow_rast <- paste0(my_directory,
+flow_raster <- paste0(my_directory,
                      "/hydrography90m_test_data/flow_1264942.tif")
 
 # To calculate the new (snapped) coordinates for a radius and a flow
@@ -88,8 +100,8 @@ snapped_coordinates <- snap_to_network(data = species_occurrence,
                                        lon = "longitude",
                                        lat = "latitude",
                                        id = "occurrence_id",
-                                       stream_layer = stream_vect,
-                                       accu_layer = flow_rast,
+                                       stream_layer = stream_raster,
+                                       accu_layer = flow_raster,
                                        method = "both",
                                        distance = 300,
                                        accumulation = 0.8)
@@ -99,8 +111,8 @@ head(snapped_coordinates)
 
 }
 \references{
-\link[https://grass.osgeo.org/grass78/manuals/addons/r.stream.snap.html]
+\url{https://grass.osgeo.org/grass78/manuals/addons/r.stream.snap.html}
 }
 \author{
-Maria M. Üblacker, Jaime Garcia Marquez
+Marlene Schürz, Jaime Garcia Marquez
 }

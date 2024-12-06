@@ -1,41 +1,52 @@
-#' @title Reclassify an integer raster layer
+#' @title Reclassify a raster layer
 #'
-#' @description Reclassifies an integer raster .tif layer using the r.reclass
-#' function of GRASS GIS. To reclassify the raster layer the present raster
-#' values and the new raster values have to be defined.
+#' @description Reclassifies a raster .tif layer based on a look-up table, such
+#' that the output raster contains the new values. The function uses the r.reclass
+#' function of GRASS GIS.
 #'
-#' If the input raster layer has floating point values, you should multiply
-#' the input data by some factor (e.g. 1000) to achieve integer values,
-#' otherwise the GRASS GIS r.reclass will round the raster values down to
-#' the next integer which is not always desired.
+#' Note that the input raster needs to be of type integer. If the input raster
+#' layer has floating point values, you can multiply it by some factor
+#' (e.g. 1000) to achieve integer values, otherwise the GRASS GIS r.reclass will
+#' round the raster values down to the next integer which is not always desired.
 #'
-#' @param data a data.frame or data.table with the present and new raster
+#' @param data a data.frame or data.table with the original and new values to be
+#' written to the raster.
+#' @param rast_val character. The name of the column with the original raster
 #' values.
-#' @param rast_val character. The name of the column with the present
-#' raster values.
-#' @param new_val character. The name of the column with the new raster values.
+#' @param new_val character. The name of the column with the new raster values,
+#' which need to be integer values. In case of floating point values, consider
+#' multiplying the values e.g. by 1000 to keep three decimals.
 #' @param reclass_value integer. Value to reclassify the entire raster.
-#' Default is FALSE. Note in case reclass_value is provided, new_val parameter
-#' needs to be empty, otherwise the raster is reclassified based on the new_val column.
+#' Default is FALSE. Note that in case reclass_value and new_val 
+#' is provided the raster is reclassified on reclass_value.
 #' @param raster_layer Full path to the input raster .tif layer.
-#' @param recl_layer character. Full path of the output .tif layer
-#' of the reclassified raster file.
-#' @param read logical. If TRUE, then the reclassified raster .tif layer
-#' gets read into R as a SpatRaster (terra object).
-#' If FALSE, the layer is only stored on disk. Default is TRUE.
+#' @param recl_layer character. Full path of the output .tif layer, i.e., the
+#' reclassified raster file.
 #' @param no_data numeric. The no_data value of the new .tif layer.
 #' Default is -9999.
 #' @param type character. Data type; Options are Byte, Int16, UInt16, Int32,
-#' UInt32,CInt16, CInt32. Default is Int32.
-#' @param compress Compression type: DEFLATE or LZW. Default is DEFLATE.
+#' UInt32,CInt16, CInt32. Default is Int32. Note that only integer values are
+#' allowed.
+#' @param compression character. Compression of the written output file.
+#' Compression levels can be defined as "none", "low", or "high". Default is
+#' "low", referring to compression type "DEFLATE" and compression level 2.
+#' "high" refers to compression level 9.
+#' @param bigtiff logical. Define whether the output file is expected to be a
+#' BIGTIFF (file size larger than 4 GB). If FALSE and size > 4GB no file will be
+#' written. Default is TRUE.
+#' @param read logical. If TRUE, then the reclassified raster .tif layer
+#' gets read into R as a SpatRaster (terra object).
+#' If FALSE, the layer is only stored on disk. Default is FALSE.
+#' @param quiet logical. If FALSE, the standard output will be printed.
+#' Default is TRUE.
 #'
 #' @importFrom stringi stri_rand_strings
-#' @importFrom data.table fwrite
+#' @importFrom data.table data.table fwrite
 #' @importFrom processx run
 #' @importFrom terra rast
 #' @export
 #'
-#' @author Maria M. Üblacker, Thomas Tomiczek
+#' @author Marlene Schürz, Thomas Tomiczek
 #'
 #' @references
 #' https://grass.osgeo.org/grass82/manuals/r.reclass.html
@@ -82,7 +93,7 @@ reclass_raster <- function(data, rast_val, new_val = FALSE, raster_layer,
                            compression = "low", bigtiff = TRUE,
                            read = FALSE, quiet = TRUE) {
   # Check operating system
-  system <- get_os()
+  sys_os <- get_os()
   # Check if data.frame is defined
   if (missing(data))
     stop("data: Input data.frame is missing.")
@@ -144,9 +155,6 @@ reclass_raster <- function(data, rast_val, new_val = FALSE, raster_layer,
   if (missing(recl_layer))
     stop("recl_layer: Path for the output raster layer is missing.")
 
-  if (!is.logical(read))
-   stop("read: Has to be TRUE or FALSE.")
-
   # Check if type is one of the listed types
   if (!(type == "Int16" || type == "UInt16" || type == "CInt16" ||
         type == "Int32" || type == "UInt32" || type == "CInt32" ||
@@ -177,6 +185,8 @@ reclass_raster <- function(data, rast_val, new_val = FALSE, raster_layer,
     bigtiff <- "NO"
   }
 
+  if (!is.logical(read))
+   stop("read: Has to be TRUE or FALSE.")
 
   # Check if quiet is logical
   if (!is.logical(quiet))
@@ -202,7 +212,8 @@ reclass_raster <- function(data, rast_val, new_val = FALSE, raster_layer,
     indx_miss_raster <- which(rast_dat[[1]] %in% data[[rast_val]])
     # Get missing raster values
     miss_raster <- rast_dat[-c(indx_miss_raster),]
-    print(paste0("These values of the raster were not found in the data table:", paste(miss_raster, collapse = ", ")))
+    print(paste0("These values of the raster were not found in the data table:", 
+                 paste(miss_raster, collapse = ", ")))
     # Write all values found in raster tif file and input data table as data frame
     same_val1 <- as.data.frame(rast_dat[c(indx_miss_raster),])
     # Set name for raster values
@@ -213,7 +224,8 @@ reclass_raster <- function(data, rast_val, new_val = FALSE, raster_layer,
     miss_rast_val <- data[-c(indx_miss_rast_val),]
     # Get only missing raster input data values to throw out message
     missing_rast_values <- data[-c(indx_miss_rast_val),1]
-    print(paste0("These raster values of the data table were not found in the raster:", paste(missing_rast_values, collapse = ", ")))
+    print(paste0("These raster values of the data table were not found in the raster:", 
+                 paste(missing_rast_values, collapse = ", ")))
     # Write all values found in input data table and raster file as data frame
     same_val2 <- data[c(indx_miss_raster),]
     # Combine all values found in raster and input data table
@@ -290,6 +302,7 @@ reclass_raster <- function(data, rast_val, new_val = FALSE, raster_layer,
      miss_rast_val, missing_rast_values, same_val2, same_val)
 
   if (system == "linux" || system == "osx") {
+
   # Open GRASS GIS session
   # Call external GRASS GIS command r.reclass
   processx::run(system.file("sh", "reclass_raster.sh",
@@ -312,11 +325,11 @@ reclass_raster <- function(data, rast_val, new_val = FALSE, raster_layer,
     # Open GRASS GIS session on WSL
     # Call external GRASS GIS command r.reclass
     processx::run(system.file("bat", "reclass_raster.bat",
-                              package = "hydrographr"),
-                  args = c(wsl_raster_layer, wsl_rules_path, wsl_recl_layer,
-                           no_data, type, compression_type, compression_level, bigtiff,
-                           wsl_sh_file),
-                  echo = !quiet)
+                    package = "hydrographr"),
+        args = c(wsl_raster_layer, wsl_rules_path, wsl_recl_layer,
+                 no_data, type, compression_type, compression_level, bigtiff,
+                 wsl_sh_file),
+        echo = !quiet)
 
   }
   # Remove temporary rules file

@@ -23,6 +23,7 @@ knitr::opts_chunk$set(
 
 If you do not have installed any of the GIS tools, please, install before using `hydrographr`. If you use Ubuntu you can copy-paste the commands below. If you use another Linux distribution, please, see the linked software webpage below for installation instruction.
 
+Warning! Sometimes the installation does not work within a VPN connection. If you fail to fetch data from online repositories during the installation, please try deactivating your VPN connection. 
 
 **Add the Ubuntugis repository**
 
@@ -62,7 +63,7 @@ sudo apt install gdal-bin python3-gdal
 
 **GRASS GIS**
 
-GRASS GIS is a powerful raster, vector, and geospatial processing engine including tools for terrain and ecosystem modeling, hydrology and the processing of satellite and aerial imagery. For more detailed installation instructions check the [GRASS GIS users wiki](https://grasswiki.osgeo.org/wiki/Installation_Guide#Ubuntu) or the [GRASS GIS](https://grass.osgeo.org/) website.
+GRASS GIS is a powerful raster, vector, and geospatial processing engine including tools for terrain and ecosystem modeling, hydrology and the processing of satellite and aerial imagery. For more detailed installation instructions check the [GRASS GIS users wiki](https://grasswiki.osgeo.org/wiki/Installation_Guide#Ubuntu) or the [GRASS GIS](https://grass.osgeo.org/) website. Please, make sure that you have grass8.2 installed.
 
 ```{bash, eval=FALSE}
 # Install GRASS GIS
@@ -86,6 +87,8 @@ $GRASSEXEC  g.extension  extension=r.stream.basins
 
 
 **GNU parallel**
+
+GNU parallel is a shell tool for executing jobs in parallel on multiple cores. For a faster processing, some of the `hydrographr` functions such as `snap_to_subc_segment()` and `extract_zonal_stat()` have GNU parallel implemented. For more information check the [GNU parallel](https://www.gnu.org/software/parallel/) website.
 
 ```{bash, eval=FALSE}
 # Download the latest version of GNU parallel 
@@ -146,6 +149,17 @@ will cite
 #> It is really appreciated. The citation notice is now silenced.
 ```
 
+Now type ctrl+z to exit the GNU parallel environment.
+
+**GNU bc**
+
+GNU bc (Basic Calculator) is an arbitrary precision numeric processing language, which is used in the function `snap_to_subc_segment()`. For more information check the [GNU bc](https://www.gnu.org/software/bc/) website.
+
+```{bash, eval=FALSE}
+# Install bc
+sudo apt install bc
+
+```
 
 
-
+We recommend to reboot your computer after the installation.

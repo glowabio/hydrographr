@@ -7,32 +7,38 @@
 get_regional_unit_id(data, lon, lat, quiet = TRUE)
 }
 \arguments{
-\item{data}{a data.frame or data.table with lat/lon coordinates in WGS84.}
+\item{data}{a data.frame or data.table that contains the columns regarding
+the longitude / latitude coordinates in WGS84.}
 
 \item{lon}{character. The name of the column with the longitude coordinates.}
 
 \item{lat}{character. The name of the column with the latitude coordinates.}
+
+\item{quiet}{logical. If FALSE, the standard output will be printed.
+Default is TRUE.}
 }
 \description{
-Identifies the IDs of the regional units within the Hydrography90m data
-in which the input points are located. The IDs are required to then download
-the data using download_tiles().
-Input is a point data frame.
+Given the coordinates of input points (in WGS84), the function
+identifies the IDs of the regional units of the Hydrography90m in which the
+points are located. Input is a point data frame. The regional units refer to
+non-interrupted basins (as opposed to the 20°x20° tiles).
+These IDs can then be used to download the Hydrography90m regional unit
+raster mask(s) using \code{\link{download_tiles()}}.
 }
 \examples{
-# Download test data into temporary R folder
+# Download test data into the temporary R folder
 # or define a different directory
 my_directory <- tempdir()
 download_test_data(my_directory)
 
 # Read the species data
-species_occurence <- read.table(paste0(my_directory,
+species_occurrence <- read.table(paste0(my_directory,
                                        "/hydrography90m_test_data",
                                        "/spdata_1264942.txt"),
                               header = TRUE)
 
 # Get the regional unit ID
-get_regional_unit_id(species_occurence, lon = "longitude",
+get_regional_unit_id(species_occurrence, lon = "longitude",
                     lat = "latitude")
 }
 \references{

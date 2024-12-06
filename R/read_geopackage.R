@@ -1,159 +1,196 @@
 #' @title Read a GeoPackage file
 #'
-#' @description Reads a GeoPackage vector file from disk either as a table
-#' (data.table), as a directed graph object (igraph), a spatial dataframe (sf)
-#' or a SpatVect object (terra).
+#' @description Reads an entire, or a subset of a GeoPackage vector file
+#' from disk either as a table (data.table), as a directed graph object
+#' (igraph), a spatial dataframe (sf) or a SpatVect object (terra).
 #'
-#' @param file_name character. Name of the GeoPackage file to import,
-#' e.g. "order_vect_segment_h00v00.gpkg".
-#' @param type character. Either "net" for importing a network, "subc" for
-#' sub-catchments, "basin" for drainage basins, or "outlet" for outlet points.
-#' @param SQL_table character. Name of the specific data to import from the
-#' GeoPackage. This is set automatically for the Hydrography90m data,
-#' but needs to be specified for any other data. Optional.
-#' @param as_dt logical. If TRUE, import the GeoPackage as a data.table.
-#' Default is FALSE.
-#' @param as_graph "logical. If TRUE, import the GeoPackage as a directed graph
-#' (igraph object). Only possible for a network layer. Default is FALSE.
-#' @param as_sf logical. If TRUE, import the GeoPackage as a spatial dataframe
-#' (sf object). Default is FALSE.
-#' @param as_SpatVect logical. If TRUE, import the GeoPackage as a
-#' SpatVector (terra object). Default is FALSE.
-
+#' @param gpkg character. Full path of the GeoPackage file.
+#' @param import_as character. "data.table", "graph", "sf", or "SpatVect".
+#' "data.table" imports data as a data.table. "graph" imports the layer as a
+#' directed graph (igraph object). This option is only possible for a network
+#' layer (e.g. the stream network) and it needs to contain the attributes "stream"
+#' and "next_stream". "sf" imports the layer as a  spatial data
+#' frame (sf object). "SpatVect" imports the layer as a SpatVector (terra
+#' object). Default is "data.table".
+#' @param layer_name character. Name of the specific data layer to import from
+#' the GeoPackage. A specific data layer only needs to be defined if the
+#' GeoPackage contains multiple layers. To see the available layers the function
+#' st_layers() from the R package 'sf' can be used. Optional. Default is NULL.
+#' @param subc_id numeric. Vector of the sub-catchment (or stream
+#' segment) IDs in the form of (c(ID1, ID2, ...) for which the spatial objects
+#' or attributes of the GeoPackage should be imported. Optional. Default is NULL.
+#' @param name character. The attribute table column name of the stream segment
+#' ("stream"), sub-catchment ("ID"), basin ("ID") or outlet ("ID") column which
+#' is used for subsetting the GeoPackage prior importing. Optional. Default is
+#' "stream".
 #' @importFrom DBI dbConnect dbListTables dbGetQuery dbDisconnect
 #' @importFrom RSQLite SQLite
 #' @importFrom data.table setDT
 #' @importFrom igraph graph_from_data_frame
-#' @importFrom sf read_sf
+#' @importFrom sf st_layers read_sf
 #' @importFrom terra vect
 #' @export
 #'
-#' @examples
-#' library(hydrographr)
+#' @author Sami Domisch, Marlene Schürz
 #'
-#' # Download test data into temporary R folder
+#' @examples
+#' # Download test data into the temporary R folder
+#' # or define a different directory
 #' my_directory <- tempdir()
 #' download_test_data(my_directory)
 #'
+#'
 #' # Read the stream network as a graph
-#' my_graph <- read_geopackage(paste0(my_directory, "/order_vect_59.gpkg"),
-#' type = "net", as_graph = T)
+#' my_graph <- read_geopackage(gpkg = paste0(my_directory,
+#'                                           "/hydrography90m_test_data",
+#'                                           "/order_vect_59.gpkg"),
+#'                                           import_as = "graph")
 #'
 #' # Read the stream network as a data.table
-#' my_dt <- read_geopackage(paste0(my_directory, "/order_vect_59.gpkg"),
-#' type = "net", as_dt = T)
+#' my_dt <- read_geopackage(gpkg = paste0(my_directory,
+#'                                        "/hydrography90m_test_data",
+#'                                        "/order_vect_59.gpkg"))
 #'
-#' # Read the sub-catchments as a data.table
-#' my_dt <- read_geopackage(paste0(my_directory, "/order_vect_59.gpkg"),
-#' type = "subc", as_dt = T)
+#' # Read the stream network as a data.table for specific IDs
+#' my_dt <- read_geopackage(gpkg = paste0(my_directory,
+#'                                        "/hydrography90m_test_data",
+#'                                        "/order_vect_59.gpkg"),
+#'                                        subc_id = c(513833203, 513833594))
 #'
-#' # Read the basin as a SF-object
-#' my_sf <- read_geopackage(paste0(my_directory, "/order_vect_59.gpkg"),
-#' type = "basin", as_sf = T)
+#' # Read the sub-catchments as a SF-object
+#' my_sf <- read_geopackage(gpkg = paste0(my_directory,
+#'                                        "/hydrography90m_test_data",
+#'                                        "/sub_catchment_59.gpkg"),
+#'                                        import_as = "sf",
+#'                                        layer_name = "sub_catchment")
 #'
-#'#' # Read the basin as SpatVect object
-#' my_sf <- read_geopackage(paste0(my_directory, "/order_vect_59.gpkg"),
-#' type = "basin", as_SpatVect = T)
-#' # Read the outlets as data.table
-#' my_sf <- read_geopackage(paste0(my_directory, "/order_vect_59.gpkg"),
-#' type = "outlet", as_sf = T)
+#' # Read a subset of sub-catchments as a SF-object
+#' my_sf <- read_geopackage(gpkg = paste0(my_directory,
+#'                                        "/hydrography90m_test_data",
+#'                                        "/sub_catchment_59.gpkg"),
+#'                                        import_as = "sf",
+#'                                        subc_id = c(513833203, 513833594),
+#'                                        name = "ID")
 #'
-#' @author Sami Domisch
+#' # Read the basin as SpatVect object
+#' my_sv <- read_geopackage(gpkg = paste0(my_directory,
+#'                                        "/hydrography90m_test_data",
+#'                                        "/basin_59.gpkg"),
+#'                                        import_as = "SpatVect")
+#'
+
 
 
 
 # Import a geopackage from disk as a data.table
-read_geopackage <- function(file_name, type = NULL, SQL_table = NULL,
-                            as_dt = FALSE, as_graph = FALSE, as_sf = FALSE,
-                            as_SpatVect = FALSE) {
+read_geopackage <- function(gpkg, import_as = "data.table", layer_name = NULL,
+                            subc_id = NULL, name = "stream") {
 
   # Test input arguments
-  if (missing(file_name)) stop("Please specify the input geopackage file.")
-  if (!grepl(".gpkg", file_name, fixed = TRUE)) stop(
-    "Input must be a GeoPackage file."
-    )
-  # If all options are missing
-  if (as_dt == FALSE && as_graph == FALSE && as_sf == FALSE
-      && as_SpatVect == FALSE) {
-    stop("Please select one output type.\n")
+  if (!file.exists(gpkg))
+    stop(paste0("File: ", gpkg, "does not exist."))
+
+  if (!grepl(".gpkg", gpkg, fixed = TRUE))
+    stop("Input must be a GeoPackage file.")
+
+  if (!any(c("data.table", "graph", "sf", "SpatVect") %in% import_as))
+    stop("Please specify the input import type: one of 'data.table', 'graph',
+         'sf','SpatVect'.")
+
+  # Specify the layer name if no layer was defined
+  if (missing(layer_name)) {
+    layer_name <- st_layers(gpkg)$name
   }
-  if (missing(type)) stop(
-    "Please specify 'net' or 'subc' as the input file type."
-    )
-  if (!any(c("net", "subc", "basin", "outlet") %in% type)) stop(
-    "Please specify the input file type:
-    one of 'net', 'subc', 'basin' or 'outlet'."
-    )
-  if (any(c("subc", "basin", "outlet") %in% type) && as_graph == TRUE) stop(
-    "A graph can only be created from a network.")
+
+  # Check number of available layers
+  if (length(layer_name) > 1)
+    stop("The GeoPackage contains multiple layers. Please, define the layer
+         name you like to import.")
 
 
   # Avoid exponential numbers in the table and IDs,
-  # only set this only within the function
+  # set this only within the function
   options(scipen = 999)
 
-  if (as_dt == TRUE || as_graph == TRUE) {
-   if (as_dt == TRUE && as_graph == FALSE) cat("Importing as a data.table...\n")
-   if (as_graph == TRUE) cat("Importing as a graph...\n")
+  if (import_as == "data.table" || import_as == "graph") {
 
-  # create a connection to the SQLite database
-  cat("Opening SQL connection...\n")
-  conn <- dbConnect(drv = RSQLite::SQLite(), dbname = file_name) # get connection
-  # SQL_table <- dbListTables(conn)
-  # list all tables
-  # specify the layer name
-  if (missing(SQL_table)) {
-    if (type == "net") {
-      SQL_table <- "merged"
-        } else if (type == "subc") {
-          SQL_table <- "sub_catchment"
-        } else if (type == "basin") {
-          SQL_table <- "basin"
-          } else if (type == "outlet") {
-            SQL_table <- "outlet"
-          }
-  }
+    # Print message
+    if (import_as == "data.table")
+      cat("Importing as a data.table...\n")
 
-  cat("Reading GeoPackage file...\n")
-  network_table <- dbGetQuery(conn = conn,
-  statement = paste0("SELECT * FROM '", SQL_table, "'")) # Read the database
-  setDT(network_table) # convert to data.table
+    if ( import_as == "graph")
+      cat("Importing as a graph...\n")
 
-  #If vertices is NULL, then the first two columns of d
-  # are used as a symbolic edge list and additional columns
-  # as edge attributes.
-  # The names of the attributes are taken from the names of the columns.
-  # Remove the columns for the subsequent igraph functions.
+    # Create a connection to the SQLite database
+    cat("Opening SQL connection...\n")
+    conn <- dbConnect(drv = RSQLite::SQLite(), dbname = gpkg)
+    # List all tables
+    # layer_name <- dbListTables(conn
 
-  # which columns to remove:
-  toss_these <- which(
-    network_table[, !names(network_table) %in% c("geom", "fid", "cat")] == TRUE
-    )
-  network_table <- network_table[, ..toss_these]
+    # Read the database
+    cat("Reading GeoPackage file...\n")
+    if (missing(subc_id)) {
+    network_table <- dbGetQuery(conn = conn,
+                                statement = paste0("SELECT * FROM '",
+                                                   layer_name, "'"))
+    } else {
+      subc_id2 <- paste(subc_id, collapse = ", ")
+      network_table <- dbGetQuery(conn=conn, statement=paste0("SELECT * FROM '",
+                                                  layer_name, "' WHERE ", name,
+                                                  " in (", subc_id2, ")"))
+    }
 
-  cat("Closing SQL connection...\n")
-  dbDisconnect(conn) # close db connection
+    # Convert to data.table
+    setDT(network_table)
 
-  if (as_dt == TRUE && as_graph == FALSE) {
+    # If vertices is NULL, then the first two columns of the data.frame
+    # are used as a symbolic edge list and additional columns as edge attributes.
+    # The names of the attributes are taken from the names of the columns.
+    # Remove the columns for the subsequent igraph functions.
+
+    # Which columns to remove:
+    keep_these <- which(network_table[, !names(network_table) %in%
+                                        c("fid", "geom", "cat")] == TRUE)
+    network_table <- network_table[, ..keep_these]
+
+    # Close db connection
+    cat("Closing SQL connection...\n")
+    dbDisconnect(conn)
+
+    if (import_as == "data.table") {
     return(network_table)
     }
 
-  if (as_graph == TRUE && type == "net") { # only for network
-    cat("Building graph...\n")
-    g_out <- graph_from_data_frame(network_table, directed = TRUE)
-    return(g_out)
-    }
+    if (import_as == "graph") { # only for network
+      cat("Building graph...\n")
+      g_out <- graph_from_data_frame(network_table, directed = TRUE)
+      return(g_out)
+      }
 
-} else if (as_sf == TRUE) {
+  } else if (import_as == "sf") {
     cat("Importing as a sf spatial dataframe...\n")
     # tibble=F to avoid exponential numbers
-    sf <- read_sf(file_name, as_tibble = FALSE)
+    if (missing(subc_id)) {
+    sf <- read_sf(gpkg, as_tibble = FALSE)
+    } else {
+    subc_id2 <- paste(subc_id, collapse = ", ")
+    sf <- read_sf(gpkg, query=paste0("SELECT * FROM '",
+                                    layer_name, "' WHERE ", name,
+                                    " in (", subc_id2, ")"))
+    }
     return(sf)
-    } else if (as_SpatVect == TRUE) {
+
+  } else if (import_as == "SpatVect") {
     cat("Importing as a terra SpatVect object...\n")
-    sf <- read_sf(file_name)
-    vect <- vect(sf)
+    if (missing(subc_id)) {
+    vect <- vect(gpkg)
+    } else {
+    subc_id2 <- paste(subc_id, collapse = ", ")
+    vect <- vect(gpkg, query=paste0("SELECT * FROM '",
+                                  layer_name, "' WHERE ", name,
+                                  " in (", subc_id2, ")"))
     return(vect)
     }
+  }
 
 }
