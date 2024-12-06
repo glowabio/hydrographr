@@ -7,13 +7,15 @@
 reclass_raster(
   data,
   rast_val,
-  new_val,
+  new_val = FALSE,
   raster_layer,
   recl_layer,
-  read = TRUE,
+  reclass_value = FALSE,
   no_data = -9999,
   type = "Int32",
-  compress = "DEFLATE",
+  compression = "low",
+  bigtiff = TRUE,
+  read = FALSE,
   quiet = TRUE
 )
 }
@@ -31,9 +33,9 @@ raster values.}
 \item{recl_layer}{character. Full path of the output .tif layer
 of the reclassified raster file.}
 
-\item{read}{logical. If TRUE, then the reclassified raster .tif layer
-gets read into R as a SpatRaster (terra object).
-If FALSE, the layer is only stored on disk. Default is TRUE.}
+\item{reclass_value}{integer. Value to reclassify the entire raster.
+Default is FALSE. Note in case reclass_value is provided, new_val parameter
+needs to be empty, otherwise the raster is reclassified based on the new_val column.}
 
 \item{no_data}{numeric. The no_data value of the new .tif layer.
 Default is -9999.}
@@ -41,10 +43,21 @@ Default is -9999.}
 \item{type}{character. Data type; Options are Byte, Int16, UInt16, Int32,
 UInt32,CInt16, CInt32. Default is Int32.}
 
+\item{read}{logical. If TRUE, then the reclassified raster .tif layer
+gets read into R as a SpatRaster (terra object).
+If FALSE, the layer is only stored on disk. Default is TRUE.}
+
 \item{compress}{Compression type: DEFLATE or LZW. Default is DEFLATE.}
 }
 \description{
-Reclassify an integer raster layer
+Reclassifies an integer raster .tif layer using the r.reclass
+function of GRASS GIS. To reclassify the raster layer the present raster
+values and the new raster values have to be defined.
+
+If the input raster layer has floating point values, you should multiply
+the input data by some factor (e.g. 1000) to achieve integer values,
+otherwise the GRASS GIS r.reclass will round the raster values down to
+the next integer which is not always desired.
 }
 \examples{
 # Download test data into the temporary R folder
@@ -53,10 +66,8 @@ my_directory <- tempdir()
 download_test_data(my_directory)
 
 # Read the stream order for each sub-catchment as a data.table
-my_dt <- read_geopackage(gpkg= paste0(my_directory,
-                                         "/hydrography90m_test_data",
-                                         "/order_vect_1264942.gpkg"),
-                         import_as = "data.table")
+# my_dt <- read_geopackage(paste0(my_directory, "/order_vect_59.gpkg"),
+type = "net", as_dt = T)
 
 
 # Select the stream segment ID and and the Strahler stream order
@@ -76,10 +87,15 @@ str_ord_rast <- reclass_raster(data = str_ord,
                                raster_layer = stream_raster,
                                recl_layer = recl_raster)
 
+str_ord_rast <- reclass_raster(data = str_ord$stream,
+                               reclass_value = 1,
+                               rast_val = "stream",
+                               raster_layer = stream_raster,
+                               recl_layer = recl_raster)
 }
 \references{
 https://grass.osgeo.org/grass82/manuals/r.reclass.html
 }
 \author{
-Maria M. Üblacker
+Maria M. Üblacker, Thomas Tomiczek
 }
