@@ -102,8 +102,8 @@ split_table <- function(data, split = NULL, split_tbl_path,
     processx::run(system.file("bat", "split_table.bat",
                               package = "hydrographr"),
                   args = c(wsl_table_tmp_path, wsl_split_tbl_path,
-                           wsl_split,
-                           wsl_sh_file, echo = !quiet))
+                           split, wsl_sh_file,
+                           echo = !quiet))
   }
 
   # Read stored data frames
