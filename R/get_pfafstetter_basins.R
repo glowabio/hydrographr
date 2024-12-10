@@ -165,7 +165,15 @@ g_dt_tmp <- setDT(igraph::as_data_frame(g))
 g <- graph.data.frame(g_dt_tmp[,c("from", "to")], directed = T)
 # Get all possible paths from the outlet
 outlet = which(degree(g, v = V(g), mode = "out")==0, useNames = T)
-headwater = which(degree(g, v = V(g), mode = "in")==0, useNames = T)
+#headwater = which(degree(g, v = V(g), mode = "in")==0, useNames = T) # all, slow
+
+
+### Get a pre-selection of those 100 main stream candidates that have the
+### longest distance to the outlet (the most contributing stream is likely to
+### to be one of these)
+headwater <- g_dt_tmp[order(-out_dist)]$from[1:100]
+headwater <- headwater[!is.na(headwater)] # remove NAs if less than 100 subc_id
+
 
 # Stop if too many outlets
 if (length(outlet)!=1) {
