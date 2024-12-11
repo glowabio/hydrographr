@@ -1,0 +1,11 @@
+bibentry(
+  bibtype  = "Article",
+  title    = "hydrographr: An R package for scalable hydrographic data processing",
+  author   = as.person("Marlene Schürz [aut],  Afroditi Grigoropoulou [aut],  Jaime García Márquez [aut],  Yusdiel Torres-Cambas [aut],  Thomas Tomiczek [aut],  Mathieu Floury [aut],  Vanessa Bremerich [aut],  Christoph Schürz [aut],  Giuseppe Amatulli [aut],  Hans-Peter Grossart [aut],  Sami Domisch [aut]"),
+  journal  = "Methods in Ecology and Evolution",
+  year     = "2023",
+  volume   = "0",
+  number   = "0",
+  pages    = "1-11",
+  doi      = "https://doi.org/10.1111/2041-210X.14226"
+)

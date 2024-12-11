@@ -1,48 +1,51 @@
-#' Get Pfafstetter basins
+#' Get Pfafstetter sub-basins
 #'
-#' Subset a basin or catchment into up to nine smaller units following the
-#' Pfafstetter basin delineation scheme.
-#'
-#' Each drainage basin can be split into smaller sub-basins following a
+#' Subset a basin or catchment into up to nine smaller sub-basins following the
+#' Pfafstetter basin delineation scheme. The functions takes a network graph as
+#' the input and splits it into smaller sub-basins following a
 #' hierarchical topological coding scheme (see Verdin & Verdin (1999) for
-#' details). This function splits a given basin into up to nine sub-basins
-#' using the flow accumulation as the basis. The user has to define the
-#' sub-catchment (stream segment) ID
+#' details), using the flow accumulation as the basis. The user has to define the
+#' sub-catchment (stream segment) ID that serves as the outlet of the basin.
+#' Note that this can be any stream segment that has an upstream catchment.
+#' The input graph can be created with \code{\link{read_geopackage()}} and
+#' \code{\link{get_catchment_graph()}}.
 #'
-#' @param g A directed graph of a basin with one outlet. The outlet can be any
-#' stream / sub-catchment for which the upstream basin should be split
-#' into smaller ones.
-#' @param outlet The stream or sub-catchment ID that serves as the outlet of
-#' the basin for which the Pfafstetter basins should be delineated.
-#' @param subc_raster Full path to the sub-catchment raster file of the basin.
-#' Does not need to be cropped / masked to the basin.
+#' @param g igraph object. A directed graph of a basin with one outlet.
+#' The outlet can be any stream / sub-catchment for which the upstream basin
+#' should be split into smaller sub-basins. The input graph can be created with
+#' \code{\link{read_geopackage()}} and \code{\link{get_catchment_graph()}}.
+#'
+#' @param subc_raster character. Full path to the sub-catchment raster file of
+#' the basin. Does not need to be cropped / masked to the basin, but the IDs
+#' of the sub-catchments need to match with those in the input graph.
 #' @param data_table Logical. If TRUE, then the result will be loaded into R
 #' as a 2-column data.table (sub-catchment ID and Pfafstetter code). If FALSE,
-#' the result is provided as a raster (terra object) and written to disk.
+#' the result is loaded as a raster (terra object) in R and written to disk.
 #' Default is FALSE.
-#' @param out_dir The path of the output directory where the Pfafstetter
-#' raster layer will be written.
-#' @param file_name The filename and extension of the Pfafstetter raster
-#' layer (e.g. 'pfafstetter_raster.tif")
-#' @param n_cores numeric. Number of cores used for parallelization. Default is
-#' detectCores(logical=FALSE)-2
+#' @param out_dir character. The path of the output directory where the
+#' Pfafstetter raster layer will be written. Only needed when data.table=FALSE.
+#' @param file_name character. The filename and extension of the Pfafstetter
+#' raster layer (e.g. 'pfafstetter_raster.tif"). Only needed when
+#' data.table=FALSE.
+#' @param n_cores numeric. Number of cores used for parallelisation. Default is
+#' NULL (= detectCores(logical=FALSE)-1). Optional.
 #'
-#' @return Either a data.table, or a raster (terra object) loaded into R. In
+#' @returns Either a data.table, or a raster (terra object) loaded into R. In
 #' case the result is a raster, then a .tif file is written to disk.
 #'
 #' @importFrom data.table setDT rbindlist setorder setnames as.data.table setkey
-#' @importFrom foreach foreach
-#' @importFrom parallel detectCores
+#' @importFrom foreach getDoParWorkers %dopar%
+#' @importFrom parallel detectCores stopCluster makePSOCKcluster
 #' @importFrom dplyr mutate
-#' @importFrom igraph graph.data.frame subcomponent V degree all_simple_paths
-#' as_ids delete_edges adjacent_vertices
+#' @importFrom igraph graph.data.frame is_directed subcomponent V degree
+#' all_simple_paths as_ids delete_edges delete_vertices adjacent_vertices gsize
 #' @importFrom future.apply future_lapply  future_mapply future_sapply
 #' @importFrom tidyr fill
-#' @importFrom parallel stopCluster
+#' @importFrom doParallel registerDoParallel
 #' @importFrom doFuture registerDoFuture
 #' @importFrom future plan multisession multicore sequential
 #' @importFrom terra rast expanse
-#'
+#' @export
 #'
 #' @author Sami Domisch
 #'
@@ -50,7 +53,9 @@
 #' for delineation and codification of the Earth’s river basins. Journal
 #' of Hydrology, 218(1-2), 1-12. doi:10.1016/s0022-1694(99)00011-6
 #'
-#'
+#' @seealso
+#' \code{\link{read_geopackage()}} and \code{\link{get_catchment_graph.()}} to
+#' create the input graph.
 #'
 #' @examples
 #' # Download test data into the temporary R folder
@@ -59,31 +64,35 @@
 #' download_test_data(my_directory)
 #'
 #' # Import the stream network as a graph
-#' g <- read_geopackage("order_vect_59.gpkg",
-#'                       import_as ="graph")
+#' # Load stream network as a graph
+#' my_graph <- read_geopackage(gpkg = paste0(my_directory,
+#'                                          "/hydrography90m_test_data",
+#'                                          "/order_vect_59.gpkg"),
+#'                            import_as = "graph")
 #'
-#' # Subset the graph such that it contains only one one basin. You can use
-#' a random ID, i.e. it does not need to be the real outlet of the basin.
-#' g <- get_catchment_graph(g,
-#'                          stream=513867228,
-#'                          outlet=FALSE,
-#'                          mode="in",
+#' # Subset the graph such that it contains only one basin. You can use
+#' # a random ID, i.e. it does not need to be the real outlet of the basin.
+#' g_subset <- get_catchment_graph(g = my_graph,
+#'                          subc_id = "513867227",
+#'                          use_outlet = FALSE,
+#'                          mode = "in",
 #'                          as_graph = TRUE)
 #'
 #' # Specify the sub-catchment raster file
-#' subc_raster <- paste0(DIR, "/sub_catchment_h34v10.tif")
+#' subc_raster <- paste0(my_directory,"/hydrography90m_test_data",
+#'                      "/subcatchment_1264942.tif")
 #'
-#' Specify the output directory
+#' # Specify the output directory
 #' out_dir <- my_directory
 #'
-#' Calculate the Pfafstetter sub-basins and write the raster layer to disk (
-#' and import into R)
-#' pfafstetter <- get_pfafstetter_basins(g=my_graph,
-#'                                       subc_raster=subc_raster,
-#'                                       out_dir=out_dir,
-#'                                       file_name="pfafstetter_raster.tif",
-#'                                       data_table=FALSE,
-#'                                       n_cores=4)
+#' # Calculate the Pfafstetter sub-basins and write the raster layer to disk (
+#' # and import into R)
+#' pfafstetter <- get_pfafstetter_basins(g = g_subset ,
+#'                                       subc_raster = subc_raster,
+#'                                       out_dir = out_dir,
+#'                                       file_name = "pfafstetter_raster.tif",
+#'                                       data_table = FALSE,
+#'                                       n_cores = 4)
 #'
 #'
 #' @note You can use the online map at https://geo.igb-berlin.de/maps/351/view
@@ -93,12 +102,8 @@
 
 
 
-get_pfafstetter_basins <- function(g=g,
-                                   subc_raster=subc_raster,
-                                   out_dir=out_dir,
-                                   file_name=file_name,
-                                   data_table=FALSE,
-                                   n_cores=n_cores) {
+get_pfafstetter_basins <- function(g, subc_raster, out_dir, file_name,
+                                   data_table = FALSE, n_cores = NULL) {
 
 
 
@@ -126,10 +131,13 @@ get_pfafstetter_basins <- function(g=g,
 
 cat("Setting up parallel backend...\n")
 
-  # Set up parallel backend
-  if (!hasArg(n_cores)) {
-    n_cores <- detectCores(logical=FALSE)-2
-    }
+  # Setting up parallelization if n_cores is not provided
+  if (is.null(n_cores)) {
+
+  #  Detect number of available cores
+  n_cores <- detectCores(logical = FALSE) - 1
+
+  }
 
   # Check parallel backend depending on the OS
   if (get_os() == "windows") {
@@ -143,7 +151,7 @@ cat("Setting up parallel backend...\n")
 # Foreach
 cl <- makePSOCKcluster(n_cores)
 registerDoParallel(cl)
-
+cat("Using", foreach::getDoParWorkers(), "CPUs...", "\n")
 
 # Avoid exponential numbers in the reclassification
 options(scipen=999)
@@ -175,12 +183,19 @@ headwater <- g_dt_tmp[order(-out_dist)]$from[1:100]
 headwater <- headwater[!is.na(headwater)] # remove NAs if less than 100 subc_id
 
 
+
+# Stop if too few stream segments (currently three, need to go lower?)
+if (gsize(g_subset)<3) {
+  stop("The input basin has too few stream segments / sub-catchments. Please
+       select another outlet segment with get_catchment_graph()")
+}
+
+
 # Stop if too many outlets
 if (length(outlet)!=1) {
   stop("Only one outlet possible. You may want to run get_catchment_graph()
        to get a single drainage basin.")
 }
-
 
 
 
@@ -204,7 +219,7 @@ cat("Finding the most contributing stream...", "\n")
 ### Run only with foreach (future / lapply results in strange results
 # for very small basins)
 
-l <- foreach (i=names(headwater), .inorder=FALSE,
+l <- foreach::foreach (i=names(headwater), .inorder=FALSE,
               .packages = "igraph")  %dopar% {
               out <-subcomponent(g, i, mode = c("out"))
               }
@@ -387,7 +402,7 @@ delete_these <- append(as.character(main_trib_all_id$stream),
                        as.character(trib_order$stream) )
 delete_these <- unique(delete_these)
 
-g_del_for_interbas <- delete_vertices(g, V(g)[paste(delete_these)])
+g_del_for_interbas <- igraph::delete_vertices(g, V(g)[paste(delete_these)])
 
 # Get the most downstream interbasin stream reach for which to search
 first_interbas_id <- main_dt[match(unique(main_dt$code), main_dt$code),]

@@ -30,26 +30,39 @@ get_os <- function() {
 }
 
 
+#' Make bash scripts executable
+#'
+#' @keywords internal
+#
+
+make_sh_exec <- function() {
+  sh_files <- list.files(system.file("sh", package = "hydrographr"),
+                      pattern = "\\.sh", full.names = TRUE)
+  lapply(sh_files, function(x) system(command = paste0("chmod u+x ", "'", x, "'")))
+
+}
+
+
 #' Check if WSL and Ubuntu is installed on Windows
 #'
 #' @keywords internal
 #'
 check_wsl <- function() {
   # Check if lxss folder exists under C:\Windows\System32
-  lxss <- file.exists(paste0(Sys.getenv("windir"),"/System32/lxss"))
+  lxss <- file.exists(paste0(Sys.getenv("windir"), "/System32/lxss"))
   # Check if Ubuntu exists under ~\Appdata\Local\...
   ubuntu <- list.files(paste0(Sys.getenv("localappdata"), "/Packages"),
-                       pattern ="Ubuntu")
+                       pattern = "Ubuntu")
 
-  if (lxss == TRUE & length(ubuntu) == 0) {
+  if (lxss == TRUE && length(ubuntu) == 0) {
     stop("Ubuntu is not installed!")
   }
 
-  if (lxss == FALSE & length(ubuntu) == 1) {
+  if (lxss == FALSE && length(ubuntu) == 1) {
     stop("WSL is not installed!")
   }
 
-  if (lxss == FALSE & length(ubuntu) == 0)  {
+  if (lxss == FALSE && length(ubuntu) == 0)  {
     stop("WSL and Ubuntu are not installed!")
   }
 
@@ -69,7 +82,9 @@ fix_path <- function(path) {
   mnt <- paste0("/mnt/", tolower(substr(drive, 1, 1)))
 
   path %>%
-  stri_replace_all_fixed(., "\\", "/") %>%
-  stri_replace_first_fixed(., drive, mnt)
+    stri_replace_all_fixed(., "\\", "/") %>%
+    stri_replace_first_fixed(., drive, mnt) %>%
+    stri_replace_first_fixed(., "Program Files (x86)", "PROGRA~2") %>%
+    stri_replace_first_fixed(., "Program Files", "PROGRA~1") 
 
 }
