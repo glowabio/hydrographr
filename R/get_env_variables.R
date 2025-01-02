@@ -134,7 +134,7 @@ get_future_climate_variables <- function(separated = TRUE, tempdir = NULL,
                                          quiet = FALSE, file_size_table = NULL,
                                          base_vars = NULL, time_periods = NULL, 
                                          scenarios = NULL, models = NULL,
-                                         versions = NULL) {
+                                         versions = NULL, ignore_missing = FALSE) {
 
   # Use existing file_size_table, so we don't have to redownload every time:
   if (is.null(file_size_table)) {
@@ -235,8 +235,17 @@ get_future_climate_variables <- function(separated = TRUE, tempdir = NULL,
   } else {
     # If user requested specific scenarios, return requested available scenarios:
     returned_models <- models[models %in% all_models]
-    if ((!(quiet)) && (!(all(models %in% all_models))))
-      message('Not available: ', paste(models[!models %in% all_models], collapse=', '))
+
+    # If some models are not available, warn or stop:
+    if (!(all(models %in% all_models))) {
+      err_msg <- paste0('Not available: Model(s) ', paste(models[!models %in% all_models], collapse=', '))
+      if (ignore_missing) {
+        message(paste0(err_msg, " Will be ignored...")) # shown right away
+        warning(paste0(err_msg, " Was ignored...")) # shown at the end
+      } else {
+        stop(paste0(err_msg, '. Please check your spelling and try again!'))
+      }
+    }
   }
 
   # Restrict scenarios to what the user requested:
@@ -246,8 +255,17 @@ get_future_climate_variables <- function(separated = TRUE, tempdir = NULL,
   } else {
     # If user requested specific scenarios, return requested available scenarios:
     returned_scenarios <- scenarios[scenarios %in% all_scenarios]
-    if ((!(quiet)) && (!(all(scenarios %in% all_scenarios))))
-      message('Not available: ', paste(scenarios[!scenarios %in% all_scenarios], collapse=', '))
+
+    # If some scenarios are not available, warn or stop:
+    if (!(all(scenarios %in% all_scenarios))) {
+      err_msg <- paste0('Not available: Scenario(s) ', paste(scenarios[!scenarios %in% all_scenarios], collapse=', '))
+      if (ignore_missing) {
+        message(paste0(err_msg, " Will be ignored...")) # shown right away
+        warning(paste0(err_msg, " Was ignored...")) # shown at the end
+      } else {
+        stop(paste0(err_msg, '. Please check your spelling and try again!'))
+      }
+    }
   }
 
   # Restrict time periods to what the user requested:
@@ -255,21 +273,38 @@ get_future_climate_variables <- function(separated = TRUE, tempdir = NULL,
     # If user did not request specific time periods, return all available:
     returned_time_periods <- all_periods
   } else {
-    # If user requested specific years, return requested available years:
+    # If user requested specific time periods, return requested available years:
     returned_time_periods <- time_periods[time_periods %in% all_periods]
-    if ((!(quiet)) && (!(all(time_periods %in% all_periods))))
-      message('Not available: ', paste(time_periods[!time_periods %in% all_periods], collapse=', '))
+
+    # If some timeperiods are not available, warn or stop:
+    if (!(all(time_periods %in% all_periods))) {
+      err_msg <- paste0('Not available: Time period(s) ', paste(time_periods[!time_periods %in% all_periods], collapse=', '))
+      if (ignore_missing) {
+        message(paste0(err_msg, " Will be ignored...")) # shown right away
+        warning(paste0(err_msg, " Was ignored...")) # shown at the end
+      } else {
+        stop(paste0(err_msg, '. Please check your spelling and try again!'))
+      }
+    }
   }
 
   # Restrict versions to what the user requested:
   if (is.null(versions)) {
-    # If user did not request specific time periods, return all available:
+    # If user did not request specific versions, return all available:
     returned_versions <- all_versions
   } else {
     # If user requested specific years, return requested available years:
     returned_versions <- versions[versions %in% all_versions]
-    if ((!(quiet)) && (!(all(versions %in% all_versions))))
-      message('Not available: ', paste(versions[!versions %in% all_versions], collapse=', '))
+    # If some versions are not available, warn or stop:
+    if (!(all(versions %in% all_versions))) {
+      err_msg <- paste0('Not available: Version(s) ', paste(versions[!versions %in% all_versions], collapse=', '))
+      if (ignore_missing) {
+        message(paste0(err_msg, " Will be ignored...")) # shown right away
+        warning(paste0(err_msg, " Was ignored...")) # shown at the end
+      } else {
+        stop(paste0(err_msg, '. Please check your spelling and try again!'))
+      }
+    }
   }
 
   # Restrict base vars to what the user requested:
@@ -279,8 +314,16 @@ get_future_climate_variables <- function(separated = TRUE, tempdir = NULL,
   } else {
     # If user requested specific base vars, return requested available base vars:
     returned_base_vars <- base_vars[base_vars %in% all_base_vars]
-    if ((!(quiet)) && (!(all(base_vars %in% all_base_vars))))
-      message('Not available: ', paste(base_vars[!base_vars %in% all_base_vars], collapse=', '))
+    # If some basevars are not available, warn or stop:
+    if (!(all(base_vars %in% all_base_vars))) {
+      err_msg <- paste0('Not available: Base var(s) ', paste(base_vars[!base_vars %in% all_base_vars], collapse=', '))
+      if (ignore_missing) {
+        message(paste0(err_msg, " Will be ignored...")) # shown right away
+        warning(paste0(err_msg, " Was ignored...")) # shown at the end
+      } else {
+        stop(paste0(err_msg, '. Please check your spelling and try again!'))
+      }
+    }
   }
 
   # Return list of user-requested variables:
@@ -317,7 +360,8 @@ get_future_climate_variables <- function(separated = TRUE, tempdir = NULL,
 
 get_landcover_variables <- function(separated = TRUE, years = NULL,
                                     base_vars = NULL, quiet = FALSE,
-                                    file_size_table = NULL, tempdir = NULL) {
+                                    file_size_table = NULL, tempdir = NULL,
+                                    ignore_missing = FALSE) {
 
   # Use existing file_size_table, so we don't have to redownload every time:
   if (is.null(file_size_table)) {
@@ -391,8 +435,16 @@ get_landcover_variables <- function(separated = TRUE, years = NULL,
   } else {
     # If user requested specific years, return requested available years:
     returned_years <- years[years %in% all_years]
-    if ((!(quiet)) && (!(all(years %in% all_years))))
-      message('Not available: ', paste(years[!years %in% all_years], collapse=', '))
+    # If some years are not available, warn or stop:
+    if (!(all(years %in% all_years))) {
+      err_msg <- paste0('Not available: Year(s) ', paste(years[!years %in% all_years], collapse=', '))
+      if (ignore_missing) {
+        message(paste0(err_msg, " Will be ignored...")) # shown right away
+        warning(paste0(err_msg, " Was ignored...")) # shown at the end
+      } else {
+        stop(paste0(err_msg, '. Please check your spelling and try again!'))
+      }
+    }
   }
 
   # Restrict base_vars to what the user requested:
@@ -402,8 +454,17 @@ get_landcover_variables <- function(separated = TRUE, years = NULL,
   } else {
     # If user requested specific base_vars, return requested available base_vars:
     returned_base_vars <- base_vars[base_vars %in% all_base_vars]
-    if ((!(quiet)) && (!(all(base_vars %in% all_base_vars))))
-      message('Not available: ', paste(base_vars[!base_vars %in% all_base_vars], collapse=', '))
+
+    # If some base vars are not available, warn or stop:
+    if (!(all(base_vars %in% all_base_vars))) {
+      err_msg <- paste0('Not available: Base var(s) ', paste(base_vars[!base_vars %in% all_base_vars], collapse=', '))
+      if (ignore_missing) {
+        message(paste0(err_msg, " Will be ignored...")) # shown right away
+        warning(paste0(err_msg, " Was ignored...")) # shown at the end
+      } else {
+        stop(paste0(err_msg, '. Please check your spelling and try again!'))
+      }
+    }
   }
 
   # Return list of user-requested variables:
@@ -421,9 +482,16 @@ get_landcover_variables <- function(separated = TRUE, years = NULL,
         sep="_"
       ))
 
-      if (!(quiet)) {
-        not_available <- candidates[! candidates %in% all_varnames]
-        if (length(not_available) > 0) message(paste0('Not available: ', paste(not_available, collapse=", ")))
+      # If some vars are not available, warn or stop:
+      not_available <- candidates[! candidates %in% all_varnames]
+      if (length(not_available) > 0) {
+        err_msg <- paste0('Not available: Variable(s) ', paste(not_available, collapse=", "))
+        if (ignore_missing) {
+          message(paste0(err_msg, " Will be ignored...")) # shown right away
+          warning(paste0(err_msg, " Was ignored...")) # shown at the end
+        } else {
+          stop(paste0(err_msg, '. Please check your spelling and try again!'))
+        }
       }
 
       returned_varnames <- candidates[candidates %in% all_varnames]
