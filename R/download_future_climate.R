@@ -157,6 +157,9 @@ download_future_climate <- function(variable, file_format = "csv",
   file_size_table <- data.table::fread(file_size_file, sep = ";")
   file_size_table$file_name = basename(file_size_table$file_path)
 
+  ##############################
+  ### Extract base variables ###
+  ##############################
   # Extract entire lists of possible variable names, 
   # file formats and tile_ids,
   # to check that the requested variable exists
@@ -391,6 +394,8 @@ download_future_climate <- function(variable, file_format = "csv",
       # we already warned the user above, so just skip and go to next variable:
       next
     } else {
+      # Collecting the variables we will (try to) download - if a download fails, the variable name
+      # is not removed from this list.
       final_variables <- c(final_variables, ivar)
     }
 
@@ -437,6 +442,7 @@ download_future_climate <- function(variable, file_format = "csv",
       Please contact the authors for more up-to-date citation info.")
   # TODO: Adapt citation!
 
-  # Return variable names, but without tiles!
+  # Return variable names, without tiles! And if a download fails, that particular variable is
+  # still included in this list, so this is not the list of downloaded, but of planned downloads.
   return(final_variables)
 }

@@ -171,7 +171,7 @@
 download_env <- function(variable, file_format = "txt", years = NULL,
                          tile_id = NULL, tempdir = NULL,
                          download_dir = ".", delete_zips = TRUE,
-                         ignore_missing = FALSE) {
+                         ignore_missing = FALSE, quiet = FALSE) {
 
   # Introductory steps
 
@@ -357,12 +357,18 @@ download_env <- function(variable, file_format = "txt", years = NULL,
       # we already warned the user above, so just skip and go to next variable:
       next
     } else {
+      if (!(quiet))
+        message(paste0('Downloading variable: ', ivar))
+
+      # Collecting the variables we will (try to) download - if a download fails, the variable name
+      # is not removed from this list.
       final_variables <- c(final_variables, ivar)
     }
 
     for (itile in tile_id) {
 
-      message("Downloading variable ", ivar, " for tile ", itile, "...")
+      if (!(quiet))
+        message("Downloading variable ", ivar, " for tile ", itile, "...")
 
       downloaded_path <- download_tiles_base(variable = ivar, file_format = "zip",
                           tile_id = itile, global = FALSE,
@@ -403,6 +409,7 @@ download_env <- function(variable, file_format = "txt", years = NULL,
       Please contact the authors for more up-to-date citation info.")
   # TODO: Adapt citation!
 
-  # Return variable names, but without tiles!
+  # Return variable names, without tiles! And if a download fails, that particular variable is
+  # still included in this list, so this is not the list of downloaded, but of planned downloads.
   return(final_variables)
 }
