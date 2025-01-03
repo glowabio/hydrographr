@@ -276,7 +276,8 @@ test_that("2.1 landcover: show all", {
     quiet=FALSE)
 
   # Check:
-  expect_equal(sort(names(vars)), sort(c("comment", "base_vars", "years", "variable_names")))
+  expect_equal(sort(names(vars)), sort(c("comment", "base_vars", "years", "variable_names", "dataset_name")))
+  expect_equal(vars$dataset_name, "esa_cci_landcover_v2_1_1")
   expect_length(vars$base_vars, 22)
   expect_length(vars$years, 29)
   examples <- c("c100_1992", "c100_1993", "c100_1994", "c100_1995", "c100_1996", "c100_1997")
@@ -295,7 +296,8 @@ test_that("2.2.1 landcover: show subset (specified: subset)", {
     subset=mysubset)
 
   # Check:
-  expect_equal(sort(names(vars)), sort(c("comment", "variable_names")))
+  expect_equal(sort(names(vars)), sort(c("comment", "variable_names", "dataset_name")))
+  expect_equal(vars$dataset_name, "esa_cci_landcover_v2_1_1")
   expect_length(vars$variable_names, 4)
   expect_equal(sort(vars$variable_names), sort(mysubset))
 })
@@ -315,7 +317,8 @@ test_that("2.2.2 landcover: show subset (specified: base_vars and years)", {
     years=myyears)
 
   # Check:
-  expect_equal(sort(names(vars)), sort(c("comment", "variable_names", "base_vars", "years")))
+  expect_equal(sort(names(vars)), sort(c("comment", "variable_names", "base_vars", "years", "dataset_name")))
+  expect_equal(vars$dataset_name, "esa_cci_landcover_v2_1_1")
   expect_equal(sort(vars$variable_names), sort(mysubset))
   expect_equal(sort(vars$base_vars), sort(mybasevars))
   expect_equal(sort(vars$years), sort(myyears))
@@ -336,7 +339,8 @@ test_that("2.3.1 landcover: show subset and download_size (specified: subset)", 
     tile_ids=mytiles)
 
   # Check:
-  expect_equal(sort(names(vars)), sort(c("comment", "variable_names", "download_bytes", "tile_ids")))
+  expect_equal(sort(names(vars)), sort(c("comment", "variable_names", "download_bytes", "tile_ids", "dataset_name")))
+  expect_equal(vars$dataset_name, "esa_cci_landcover_v2_1_1")
   expect_equal(sort(vars$variable_names), sort(mysubset))
   expect_equal(vars$download_bytes, expected_bytes)
   expect_equal(sort(vars$tile_ids), sort(mytiles))
@@ -360,7 +364,8 @@ test_that("2.3.2 landcover: show subset and download_size (specified: base_vars 
     tile_ids=mytiles)
 
   # Check:
-  expect_equal(sort(names(vars)), sort(c("comment", "variable_names", "base_vars", "years", "tile_ids", "download_bytes")))
+  expect_equal(sort(names(vars)), sort(c("comment", "variable_names", "base_vars", "years", "tile_ids", "download_bytes", "dataset_name")))
+  expect_equal(vars$dataset_name, "esa_cci_landcover_v2_1_1")
   expect_equal(sort(vars$variable_names), sort(mysubset))
   expect_equal(sort(vars$base_vars), sort(mybasevars))
   expect_equal(sort(vars$years), sort(myyears))
@@ -388,7 +393,8 @@ test_that("2.4.1 landcover: show subset and download size, then download (specif
     delete_zips=FALSE)
 
   # Check:
-  expect_equal(sort(names(vars)), sort(c("comment", "variable_names", "download_bytes", "tile_ids", "downloaded")))
+  expect_equal(sort(names(vars)), sort(c("comment", "variable_names", "download_bytes", "tile_ids", "downloaded", "dataset_name")))
+  expect_equal(vars$dataset_name, "esa_cci_landcover_v2_1_1")
   expect_equal(sort(vars$variable_names), sort(mysubset))
   expect_equal(vars$download_bytes, expected_bytes)
   expect_equal(sort(vars$tile_ids), sort(mytiles))
@@ -422,7 +428,8 @@ test_that("2.4.2 landcover: show subset and download size, then download (specif
     delete_zips=FALSE)
 
   # Check:
-  expect_equal(sort(names(vars)), sort(c("comment", "variable_names", "base_vars", "years", "tile_ids", "download_bytes")))
+  expect_equal(sort(names(vars)), sort(c("comment", "variable_names", "base_vars", "years", "tile_ids", "download_bytes", "dataset_name")))
+  expect_equal(vars$dataset_name, "esa_cci_landcover_v2_1_1")
   expect_equal(sort(vars$variable_names), sort(mysubset))
   expect_equal(sort(vars$base_vars), sort(mybasevars))
   expect_equal(sort(vars$years), sort(myyears))
@@ -443,11 +450,12 @@ test_that("3.1 future climate: show all", {
     quiet=FALSE)
 
   # Check: WIP
-  expect_equal(sort(names(vars)), sort(c("comment", "base_vars", "models", "scenarios", "time_periods", "versions", "variable_names")))
+  expect_equal(sort(names(vars)), sort(c("comment", "base_vars", "models", "scenarios", "time_periods", "versions", "variable_names", "dataset_name")))
   all_base_vars <- c(
     "bio1",  "bio10", "bio11", "bio12", "bio13", "bio14", "bio15", "bio16", "bio17", "bio18",
     "bio19", "bio2",  "bio3",  "bio4",  "bio5",  "bio6",  "bio7",  "bio8",  "bio9")
   expect_equal(sort(vars$base_vars), all_base_vars)
+  expect_equal(vars$dataset_name, "chelsa_bioclim_v2_1")
   expect_equal(sort(vars$models), c("ipsl-cm6a-lr", "mpi-esm1-2-hr", "ukesm1-0-ll"))
   expect_equal(sort(vars$scenarios), c("ssp126", "ssp370", "ssp585"))
   expect_equal(sort(vars$time_periods), c("2041-2070", "2071-2100"))
@@ -473,7 +481,8 @@ test_that("3.2.1 futureclimate: show subset (specified: subset)", {
     subset=mysubset)
 
   # Check:
-  expect_equal(sort(names(vars)), sort(c("comment", "variable_names")))
+  expect_equal(sort(names(vars)), sort(c("comment", "variable_names", "dataset_name")))
+  expect_equal(vars$dataset_name, "chelsa_bioclim_v2_1")
   expect_equal(sort(vars$variable_names), sort(mysubset))
 })
 
@@ -497,7 +506,8 @@ test_that("3.2.2 futureclimate: show subset (specified: various components)", {
     versions=myversions)
 
   # Check:
-  expect_equal(sort(names(vars)), sort(c("comment", "variable_names", "models", "scenarios", "versions", "time_periods", "base_vars")))
+  expect_equal(sort(names(vars)), sort(c("comment", "variable_names", "models", "scenarios", "versions", "time_periods", "base_vars", "dataset_name")))
+  expect_equal(vars$dataset_name, "chelsa_bioclim_v2_1")
   expect_equal(sort(vars$variable_names), mysubset)
   expect_equal(sort(vars$models), mymodels)
   expect_equal(sort(vars$scenarios), myscenarios)
@@ -520,7 +530,8 @@ test_that("3.3.1 futureclimate: show subset and download size (specified: subset
     tile_ids=mytiles)
 
   # Check:
-  expect_equal(sort(names(vars)), sort(c("comment", "variable_names", "tile_ids", "download_bytes")))
+  expect_equal(sort(names(vars)), sort(c("comment", "variable_names", "tile_ids", "download_bytes", "dataset_name")))
+  expect_equal(vars$dataset_name, "chelsa_bioclim_v2_1")
   expect_equal(sort(vars$variable_names), mysubset)
   expect_equal(sort(vars$tile_ids), mytiles)
   expect_equal(vars$download_bytes, 250104945)
@@ -548,7 +559,8 @@ test_that("3.3.2 futureclimate: show subset and download size (specified: variou
     tile_ids=mytiles)
 
   # Check:
-  all_colnames <- c("comment", "variable_names", "models", "scenarios", "versions", "time_periods", "base_vars", "tile_ids", "download_bytes")
+  all_colnames <- c("comment", "variable_names", "models", "scenarios", "versions", "time_periods", "base_vars", "tile_ids", "download_bytes", "dataset_name")
+  expect_equal(vars$dataset_name, "chelsa_bioclim_v2_1")
   expect_equal(sort(names(vars)), sort(all_colnames))
   expect_equal(sort(vars$variable_names), mysubset)
   expect_equal(sort(vars$models), mymodels)
@@ -579,7 +591,8 @@ test_that("3.4.1 futureclimate: show subset and download size, then download (sp
     delete_zips=FALSE)
 
   # Check:
-  expect_equal(sort(names(vars)), sort(c("comment", "variable_names", "download_bytes", "tile_ids", "downloaded")))
+  expect_equal(sort(names(vars)), sort(c("comment", "variable_names", "download_bytes", "tile_ids", "downloaded", "dataset_name")))
+  expect_equal(vars$dataset_name, "chelsa_bioclim_v2_1")
   expect_equal(sort(vars$variable_names), sort(mysubset))
   expect_equal(vars$download_bytes, expected_bytes)
   expect_equal(sort(vars$tile_ids), sort(mytiles))
@@ -618,7 +631,8 @@ test_that("3.4.2 futureclimate: show subset and download size, then download (sp
     delete_zips=FALSE)
 
   # Check:
-  expected_cols <- c("comment", "variable_names", "download_bytes", "tile_ids", "downloaded", "versions", "models", "scenarios", "base_vars", "time_periods") 
+  expected_cols <- c("comment", "variable_names", "download_bytes", "tile_ids", "downloaded", "versions", "models", "scenarios", "base_vars", "time_periods", "dataset_name")
+  expect_equal(vars$dataset_name, "chelsa_bioclim_v2_1")
   expect_equal(sort(names(vars)), sort(expected_cols))
   expect_equal(sort(vars$variable_names), sort(mysubset))
   expect_equal(vars$download_bytes, expected_bytes)
@@ -744,7 +758,8 @@ test_that("4.1 presentclimate: show all", {
   all_clim_vars <- c(
     "bio1",  "bio10", "bio11", "bio12", "bio13", "bio14", "bio15", "bio16", "bio17", "bio18",
     "bio19", "bio2",  "bio3",  "bio4",  "bio5",  "bio6",  "bio7",  "bio8",  "bio9")
-  expect_equal(sort(names(vars)), sort(c("comment", "variable_names")))
+  expect_equal(sort(names(vars)), sort(c("comment", "variable_names", "dataset_name")))
+  expect_equal(vars$dataset_name, "chelsa_bioclim_v2_1")
   expect_equal(sort(vars$variable_names), all_clim_vars)
 })
 
@@ -760,7 +775,8 @@ test_that("4.2 presentclimate: show subset (specified: subset)", {
     subset=mysubset)
 
   # Check:
-  expect_equal(sort(names(vars)), sort(c("comment", "variable_names")))
+  expect_equal(sort(names(vars)), sort(c("comment", "variable_names", "dataset_name")))
+  expect_equal(vars$dataset_name, "chelsa_bioclim_v2_1")
   expect_equal(sort(vars$variable_names), mysubset)
 })
 
@@ -779,7 +795,8 @@ test_that("4.3 presentclimate: show subset and download size (specified: subset)
     tile_ids=mytiles)
 
   # Check:
-  expect_equal(sort(names(vars)), sort(c("comment", "variable_names", "tile_ids", "download_bytes")))
+  expect_equal(sort(names(vars)), sort(c("comment", "variable_names", "tile_ids", "download_bytes", "dataset_name")))
+  expect_equal(vars$dataset_name, "chelsa_bioclim_v2_1")
   expect_equal(sort(vars$variable_names), mysubset)
   expect_equal(sort(vars$tile_ids), mytiles)
   expect_equal(vars$download_bytes, expected_bytes)
@@ -805,7 +822,8 @@ test_that("4.4 presentclimate: show subset and download size, then download (spe
     delete_zips=FALSE)
 
   # Check:
-  expect_equal(sort(names(vars)), sort(c("comment", "variable_names", "tile_ids", "download_bytes", "downloaded")))
+  expect_equal(sort(names(vars)), sort(c("comment", "variable_names", "tile_ids", "download_bytes", "downloaded", "dataset_name")))
+  expect_equal(vars$dataset_name, "chelsa_bioclim_v2_1")
   expect_equal(sort(vars$variable_names), mysubset)
   expect_equal(sort(vars$tile_ids), mytiles)
   expect_equal(vars$download_bytes, expected_bytes)
@@ -842,7 +860,8 @@ test_that("5.1 soil: show all", {
     quiet=FALSE)
 
   # Check:
-  expect_equal(sort(names(vars)), sort(c("comment", "variable_names")))
+  expect_equal(sort(names(vars)), sort(c("comment", "variable_names", "dataset_name")))
+  expect_equal(vars$dataset_name, "soilgrids250m_v2_0")
   all_soils <- c(
     "acdwrb", "awcts", "bdricm", "bdrlog", "bldfie", "cecsol", "clyppt", "crfvol",
     "histpr", "orcdrc", "phihox", "slgwrb", "sltppt", "sndppt", "texmht", "wwp")
@@ -861,7 +880,8 @@ test_that("5.2 soil: show subset (specified: subset)", {
     subset=mysubset)
 
   # Check:
-  expect_equal(sort(names(vars)), sort(c("comment", "variable_names")))
+  expect_equal(sort(names(vars)), sort(c("comment", "variable_names", "dataset_name")))
+  expect_equal(vars$dataset_name, "soilgrids250m_v2_0")
   expect_equal(sort(vars$variable_names), mysubset)
 })
 
@@ -880,7 +900,8 @@ test_that("5.3 soil: show subset and download size (specified: subset)", {
     tile_ids=mytiles)
 
   # Check:
-  expect_equal(sort(names(vars)), sort(c("comment", "variable_names", "tile_ids", "download_bytes")))
+  expect_equal(sort(names(vars)), sort(c("comment", "variable_names", "tile_ids", "download_bytes", "dataset_name")))
+  expect_equal(vars$dataset_name, "soilgrids250m_v2_0")
   expect_equal(sort(vars$variable_names), mysubset)
   expect_equal(sort(vars$tile_ids), mytiles)
   expect_equal(vars$download_bytes, expected_bytes)
@@ -906,7 +927,8 @@ test_that("5.4 soil: show subset and download size, then download (specified: su
     delete_zips=FALSE)
 
   # Check:
-  expect_equal(sort(names(vars)), sort(c("comment", "variable_names", "tile_ids", "download_bytes", "downloaded")))
+  expect_equal(sort(names(vars)), sort(c("comment", "variable_names", "tile_ids", "download_bytes", "downloaded", "dataset_name")))
+  expect_equal(vars$dataset_name, "soilgrids250m_v2_0")
   expect_equal(sort(vars$variable_names), mysubset)
   expect_equal(sort(vars$tile_ids), mytiles)
   expect_equal(vars$download_bytes, expected_bytes)
@@ -943,7 +965,8 @@ test_that("6.1 hydro90m: show all", {
     quiet=FALSE)
 
   # Check:
-  expect_equal(sort(names(vars)), sort(c("comment", "variable_names")))
+  expect_equal(sort(names(vars)), sort(c("comment", "variable_names", "dataset_name")))
+  expect_equal(vars$dataset_name, "hydrography90m_v1_0")
   all_hy90m_vars <- c(
     "channel_curv_cel", "channel_dist_dw_seg", "channel_dist_up_cel",
     "channel_dist_up_seg", "channel_elv_dw_cel", "channel_elv_dw_seg",
@@ -973,7 +996,8 @@ test_that("6.2 hydro90m: show subset (specified: subset)", {
     subset=mysubset)
 
   # Check:
-  expect_equal(sort(names(vars)), sort(c("comment", "variable_names")))
+  expect_equal(sort(names(vars)), sort(c("comment", "variable_names", "dataset_name")))
+  expect_equal(vars$dataset_name, "hydrography90m_v1_0")
   expect_equal(sort(vars$variable_names), mysubset)
 })
 
@@ -992,7 +1016,8 @@ test_that("6.3 hydro90m: show subset and download size (specified: subset)", {
     tile_ids=mytiles)
 
   # Check:
-  expect_equal(sort(names(vars)), sort(c("comment", "variable_names", "tile_ids", "download_bytes")))
+  expect_equal(sort(names(vars)), sort(c("comment", "variable_names", "tile_ids", "download_bytes", "dataset_name")))
+  expect_equal(vars$dataset_name, "hydrography90m_v1_0")
   expect_equal(sort(vars$variable_names), mysubset)
   expect_equal(sort(vars$tile_ids), mytiles)
   expect_equal(vars$download_bytes, expected_bytes)
@@ -1018,7 +1043,8 @@ test_that("6.4 hydro90m: show subset and download size, then download (specified
     delete_zips=FALSE)
 
   # Check:
-  expect_equal(sort(names(vars)), sort(c("comment", "variable_names", "tile_ids", "download_bytes", "downloaded")))
+  expect_equal(sort(names(vars)), sort(c("comment", "variable_names", "tile_ids", "download_bytes", "downloaded", "dataset_name")))
+  expect_equal(vars$dataset_name, "hydrography90m_v1_0")
   expect_equal(sort(vars$variable_names), mysubset)
   expect_equal(sort(vars$tile_ids), mytiles)
   expect_equal(vars$download_bytes, expected_bytes)

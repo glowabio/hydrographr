@@ -146,6 +146,7 @@ get_future_climate_variables <- function(tempdir = NULL,
   if (return_all) {
     variables <- list(
       comment = "All available variables for this dataset.",
+      dataset_name = "chelsa_bioclim_v2_1",
       base_vars = sort(all_base_vars),
       models = sort(all_models),
       scenarios = sort(all_scenarios),
@@ -171,6 +172,7 @@ get_future_climate_variables <- function(tempdir = NULL,
     # Construct the list to be returned to the user
     variables <- list(
       comment = "Subset of variables for this dataset.",
+      dataset_name = "chelsa_bioclim_v2_1",
       variable_names = sort(varnames_to_be_returned)
     )
 
@@ -291,6 +293,7 @@ get_future_climate_variables <- function(tempdir = NULL,
     # Construct the list to be returned to the user
     variables <- list(
       comment = "Subset of variables for this dataset.",
+      dataset_name = "chelsa_bioclim_v2_1",
       variable_names = sort(varnames_to_be_returned),
       time_periods = sort(returned_time_periods),
       scenarios = sort(returned_scenarios),
@@ -382,6 +385,7 @@ get_landcover_variables <- function(subset = NULL, years = NULL, base_vars = NUL
   if (return_all) {
     variables <- list(
       comment = "All available variables for this dataset.",
+      dataset_name = "esa_cci_landcover_v2_1_1",
       base_vars = sort(all_base_vars),
       years = sort(all_years),
       variable_names = sort(all_varnames)
@@ -404,6 +408,7 @@ get_landcover_variables <- function(subset = NULL, years = NULL, base_vars = NUL
     # Construct the list to be returned to the user
     variables <- list(
       comment = "Subset of variables for this dataset.",
+      dataset_name = "esa_cci_landcover_v2_1_1",
       variable_names = sort(varnames_to_be_returned)
     )
 
@@ -463,6 +468,7 @@ get_landcover_variables <- function(subset = NULL, years = NULL, base_vars = NUL
     # Construct the list to be returned to the user
     variables <- list(
       comment = "Subset of variables for this dataset.",
+      dataset_name = "esa_cci_landcover_v2_1_1",
       variable_names = sort(varnames_to_be_returned),
       base_vars = sort(base_vars_to_be_returned),
       years = sort(years_to_be_returned)
@@ -514,6 +520,7 @@ get_soil_variables <- function(subset = NULL, tile_ids = NULL,
 
   return(get_simple_variables(
     "env90m_soil_paths_file_sizes.txt",
+    "soilgrids250m_v2_0",
     subset, tile_ids, download, download_dir, ignore_missing,
     quiet, tempdir, delete_zips, file_format
   ))
@@ -527,6 +534,7 @@ get_present_climate_variables <- function(subset = NULL, tile_ids = NULL,
 
   return(get_simple_variables(
     "env90m_presentclimate_paths_file_sizes.txt",
+    "chelsa_bioclim_v2_1",
     subset, tile_ids, download, download_dir, ignore_missing,
     quiet, tempdir, delete_zips, file_format
   ))
@@ -540,12 +548,13 @@ get_hydrography90m_variables <- function(subset = NULL, tile_ids = NULL,
 
   return(get_simple_variables(
     "env90m_hydro_paths_file_sizes.txt",
+    "hydrography90m_v1_0", 
     subset, tile_ids, download, download_dir, ignore_missing,
     quiet, tempdir, delete_zips, file_format
   ))
 }
 
-get_simple_variables <- function(table_file_name,
+get_simple_variables <- function(table_file_name, dataset_name,
                                  subset, tile_ids,
                                  download, download_dir,
                                  ignore_missing, quiet,
@@ -563,6 +572,7 @@ get_simple_variables <- function(table_file_name,
   if (is.null(subset)){
     variables <- list(
       comment = "All available variables for this dataset.",
+      dataset_name = dataset_name,
       variable_names = sort(all_varnames)
     )
     return(variables)
@@ -588,6 +598,7 @@ get_simple_variables <- function(table_file_name,
   # Construct the list to be returned to the user
   variables <- list(
     comment = "Subset of variables for this dataset.",
+    dataset_name = dataset_name,
     variable_names = sort(varnames_to_be_returned)
   )
 
