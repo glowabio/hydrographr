@@ -134,7 +134,8 @@ get_future_climate_variables <- function(separated = TRUE, tempdir = NULL,
                                          quiet = FALSE, file_size_table = NULL,
                                          base_vars = NULL, time_periods = NULL, 
                                          scenarios = NULL, models = NULL,
-                                         versions = NULL, ignore_missing = FALSE) {
+                                         versions = NULL, ignore_missing = FALSE,
+                                         tile_ids = NULL) {
 
   # Use existing file_size_table, so we don't have to redownload every time:
   if (is.null(file_size_table)) {
@@ -149,10 +150,8 @@ get_future_climate_variables <- function(separated = TRUE, tempdir = NULL,
   # Should we return everything, or restrict by scenario/model/time period?
   if (is.null(time_periods) && is.null(scenarios) && is.null(models) && is.null(base_vars) && is.null(versions)){
     return_all <- TRUE
-    if (!(quiet)) message('Will return all variable names...')
   } else {
     return_all <- FALSE
-    if (!(quiet)) message('Will return requested subset of variable names...')
   }
 
   ###########################################
@@ -173,6 +172,16 @@ get_future_climate_variables <- function(separated = TRUE, tempdir = NULL,
   # If we don't want them separately, return them now:
   if (return_all) {
     if (!(separated)) {
+
+      # Compute download size and print to screen, if tile_ids specified:
+      if (!(is.null(tile_ids))) {
+        download_bytes <- download_size(tile_ids, all_varnames, file_size_table, quiet)
+        message(paste0("Download size: ",
+          length(all_varnames), " variables, ",
+          length(tile_ids), " tiles: ",
+          download_bytes/1000000000, " GB (", download_bytes, " bytes)."))
+      }
+
       return (all_varnames)
     }
   }
@@ -213,12 +222,27 @@ get_future_climate_variables <- function(separated = TRUE, tempdir = NULL,
   # Return list of splitted variables:
   if (return_all) {
     if (separated) {
+
+      # Compute download size and print to screen, if tile_ids specified:
+      if (is.null(tile_ids)) {
+        download_bytes <- NA
+      } else {
+        download_bytes <- download_size(tile_ids, all_varnames, file_size_table, quiet)
+        message(paste0("Download size: ",
+          length(all_varnames), " variables, ",
+          length(tile_ids), " tiles: ",
+          download_bytes/1000000000, " GB (", download_bytes, " bytes)."))
+      }
+
       variables <- list(
+        comment = "Returned all available variables for this dataset.",
         time_periods = sort(all_periods),
         scenarios = sort(all_scenarios),
         models = sort(all_models),
         base_vars = sort(all_base_vars),
-        versions = sort(all_versions)
+        versions = sort(all_versions),
+        download_bytes = download_bytes,
+        complete_variable_names = all_varnames
       )
       return(variables)
     }
@@ -326,33 +350,56 @@ get_future_climate_variables <- function(separated = TRUE, tempdir = NULL,
     }
   }
 
+  # Restrict all vars to what the user requested:
+  # TODO: This causes warning "longer object length is not a multiple of shorter object length"
+  candidates <- levels(interaction(
+    returned_base_vars,
+    returned_time_periods,
+    returned_models,
+    returned_scenarios,
+    returned_versions,
+    sep="_"
+  ))
+  returned_varnames <- candidates[candidates %in% all_varnames]
+
+  # If some vars are not available, warn or stop:
+  not_available <- candidates[! candidates %in% all_varnames]
+  if (length(not_available) > 0) {
+    err_msg <- paste0('Not available: Variable(s) ', paste(not_available, collapse=", "))
+    if (ignore_missing) {
+      message(paste0(err_msg, " Will be ignored...")) # shown right away
+      warning(paste0(err_msg, " Was ignored...")) # shown at the end
+    } else {
+      stop(paste0(err_msg, '. Please check your spelling and try again!'))
+    }
+  }
+
+  # Compute download size and print to screen, if tile_ids specified:
+  if (is.null(tile_ids)) {
+    download_bytes <- NA
+  } else {
+    download_bytes <- download_size(tile_ids, returned_varnames, file_size_table, quiet)
+    message(paste0("Download size: ",
+      length(returned_varnames), " variables, ",
+      length(tile_ids), " tiles: ",
+      download_bytes/1000000000, " GB (", download_bytes, " bytes)."))
+  }
+
   # Return list of user-requested variables:
   if (!(return_all)){
     if (separated) {
       variables <- list(
+        comment = "Returned all requested variables for this dataset that are available.",
         time_periods = sort(returned_time_periods),
         scenarios = sort(returned_scenarios),
         models = sort(returned_models),
         base_vars = sort(returned_base_vars),
-        versions = sort(returned_versions)
+        versions = sort(returned_versions),
+        download_bytes = download_bytes,
+        complete_variable_names = returned_varnames
       )
       return(variables)
     } else {
-      candidates <- levels(interaction(
-        returned_base_vars,
-        returned_time_periods,
-        returned_models,
-        returned_scenarios,
-        returned_versions,
-        sep="_"
-      ))
-      
-      if (!(quiet)) {
-        not_available <- candidates[! candidates %in% all_varnames]
-        if (length(not_available) > 0) message(paste0('Not available: ', paste(not_available, collapse=", ")))
-      }
-
-      returned_varnames <- candidates[candidates %in% all_varnames]
       return(returned_varnames)
     }
   }
@@ -361,7 +408,7 @@ get_future_climate_variables <- function(separated = TRUE, tempdir = NULL,
 get_landcover_variables <- function(separated = TRUE, years = NULL,
                                     base_vars = NULL, quiet = FALSE,
                                     file_size_table = NULL, tempdir = NULL,
-                                    ignore_missing = FALSE) {
+                                    ignore_missing = FALSE, tile_ids = NULL) {
 
   # Use existing file_size_table, so we don't have to redownload every time:
   if (is.null(file_size_table)) {
@@ -376,10 +423,8 @@ get_landcover_variables <- function(separated = TRUE, years = NULL,
   # Should we return everything, or restrict by scenario/model/time period?
   if (is.null(years) && is.null(base_vars)){
     return_all <- TRUE
-    if (!(quiet)) message('Will return all variable names...')
   } else {
     return_all <- FALSE
-    if (!(quiet)) message('Will return requested subset of variable names...')
   }
 
   ###########################################
@@ -394,6 +439,15 @@ get_landcover_variables <- function(separated = TRUE, years = NULL,
   # If we don't want them separately, return them now:
   if (!(separated)) {
     if (return_all){
+
+      # Compute download size and print to screen, if tile_ids specified:
+      if (!(is.null(tile_ids))) {
+        download_bytes <- download_size(tile_ids, all_varnames, file_size_table, quiet)
+        message(paste0("Download size: ",
+          length(all_varnames), " variables, ",
+          length(tile_ids), " tiles: ",
+          download_bytes/1000000000, " GB (", download_bytes, " bytes)."))
+      }
       return(all_varnames)
     }
   }
@@ -416,9 +470,24 @@ get_landcover_variables <- function(separated = TRUE, years = NULL,
   # Return list of all splitted variables:
   if (separated) {
     if (return_all) {
+
+      # Compute download size and print to screen, if tile_ids specified:
+      if (is.null(tile_ids)){
+        download_bytes <- NA
+      } else {
+        download_bytes <- download_size(tile_ids, all_varnames, file_size_table, quiet)
+        message(paste0("Download size: ",
+          length(all_varnames), " variables, ",
+          length(tile_ids), " tiles: ",
+          download_bytes/1000000000, " GB (", download_bytes, " bytes)."))
+      }
+
       variables <- list(
+        comment = "Returned all available variables for this dataset.",
         base_vars = sort(all_base_vars),
-        years = sort(all_years)
+        years = sort(all_years),
+        download_bytes = download_bytes,
+        complete_variable_names = all_varnames
       )
       return(variables)
     }
@@ -467,69 +536,231 @@ get_landcover_variables <- function(separated = TRUE, years = NULL,
     }
   }
 
+  # Restrict all vars to what the user requested:
+  # TODO: This causes warning "longer object length is not a multiple of shorter object length"
+  candidates <- levels(interaction(
+    returned_base_vars,
+    returned_years,
+    sep="_"
+  ))
+  returned_varnames <- candidates[candidates %in% all_varnames]
+
+  # If some vars are not available, warn or stop:
+  not_available <- candidates[! candidates %in% all_varnames]
+  if (length(not_available) > 0) {
+    err_msg <- paste0('Not available: Variable(s) ', paste(not_available, collapse=", "))
+    if (ignore_missing) {
+      message(paste0(err_msg, " Will be ignored...")) # shown right away
+      warning(paste0(err_msg, " Was ignored...")) # shown at the end
+    } else {
+      stop(paste0(err_msg, '. Please check your spelling and try again!'))
+    }
+  }
+
+  # Compute download size and print to screen, if tile_ids specified:
+  if (is.null(tile_ids)) {
+    download_bytes <- NA
+  } else {
+    download_bytes <- download_size(tile_ids, returned_varnames, file_size_table, quiet)
+    message(paste0("Download size: ",
+      length(returned_varnames), " variables, ",
+      length(tile_ids), " tiles: ",
+      download_bytes/1000000000, " GB (", download_bytes, " bytes)."))
+  }
+
   # Return list of user-requested variables:
   if (!(return_all)) {
     if (separated) {
       variables <- list(
+        comment = "Returned all requested variables for this dataset that are available.",
         base_vars = sort(returned_base_vars),
-        years = sort(returned_years)
+        years = sort(returned_years),
+        download_bytes = download_bytes,
+        complete_variable_names = returned_varnames
       )
       return(variables)
     } else {
-      candidates <- levels(interaction(
-        returned_base_vars,
-        returned_years,
-        sep="_"
-      ))
-
-      # If some vars are not available, warn or stop:
-      not_available <- candidates[! candidates %in% all_varnames]
-      if (length(not_available) > 0) {
-        err_msg <- paste0('Not available: Variable(s) ', paste(not_available, collapse=", "))
-        if (ignore_missing) {
-          message(paste0(err_msg, " Will be ignored...")) # shown right away
-          warning(paste0(err_msg, " Was ignored...")) # shown at the end
-        } else {
-          stop(paste0(err_msg, '. Please check your spelling and try again!'))
-        }
-      }
-
-      returned_varnames <- candidates[candidates %in% all_varnames]
       return(returned_varnames)
     }
   }
 }
 
-get_soil_variables <- function(file_size_table = NULL, tempdir = NULL, quiet = FALSE) {
+get_soil_variables <- function(tile_ids = NULL, tempdir = NULL, quiet = FALSE,
+                               file_size_table = NULL, ignore_missing = FALSE,
+                               separated = FALSE) {
 
   # Use existing file_size_table, so we don't have to redownload every time:
   if (is.null(file_size_table)) {
     file_size_table <- get_soil_variable_table(tempdir = tempdir)
   }
 
+  # Get all variable name from the table:
   all_varnames <- unique(sub("_[^_]+$", "", file_size_table$file_name))
-  return (sort(all_varnames))
+
+  # Compute download size, if tile_ids is specified:
+  if (is.null(tile_ids)) {
+    download_bytes <- NA
+  } else {
+    download_bytes <- download_size(tile_ids, all_varnames, file_size_table, quiet)
+    message(paste0("Download size: ",
+      length(all_varnames), " variables, ",
+      length(tile_ids), " tiles: ",
+      download_bytes/1000000000, " GB (", download_bytes, " bytes)."))
+  }
+
+  # Return all variable names
+  if (!(separated)) {
+    return (sort(all_varnames))
+  } else {
+    # Return as a list including download_size if separated=TRUE
+    variables <- list(
+      comment = "Returned all available variables for this dataset.",
+      complete_variable_names = sort(all_varnames),
+      download_bytes = download_bytes
+    )
+    return(variables)
+  }
 }
 
-get_present_climate_variables <- function(file_size_table = NULL, tempdir = NULL, quiet = FALSE) {
+get_present_climate_variables <- function(tile_ids = NULL, tempdir = NULL,
+                                          quiet = FALSE, ignore_missing = FALSE,
+                                          file_size_table = NULL, separated = FALSE) {
 
   # Use existing file_size_table, so we don't have to redownload every time:
   if (is.null(file_size_table)) {
     file_size_table <- get_present_climate_variable_table(tempdir = tempdir)
   }
 
+  # Get all variable name from the table:
   all_varnames <- unique(sub("_[^_]+$", "", file_size_table$file_name))
-  return (sort(all_varnames))
+
+  # Compute download size, if tile_ids is specified:
+  if (is.null(tile_ids)) {
+    download_bytes <- NA
+  } else {
+    download_bytes <- download_size(tile_ids, all_varnames, file_size_table, quiet)
+    message(paste0("Download size: ",
+      length(all_varnames), " variables, ",
+      length(tile_ids), " tiles: ",
+      download_bytes/1000000000, " GB (", download_bytes, " bytes)."))
+  }
+
+  # Return all variable names
+  if (!(separated)) {
+    return (sort(all_varnames))
+  } else {
+    # Return as a list including download_size if separated=TRUE
+    variables <- list(
+      comment = "Returned all available variables for this dataset.",
+      complete_variable_names = sort(all_varnames),
+      download_bytes = download_bytes
+    )
+    return(variables)
+  }
 }
 
-get_hydrography90m_variables <- function(file_size_table = NULL, tempdir = NULL, quiet = FALSE) {
+get_hydrography90m_variables <- function(tile_ids = NULL, ignore_missing = FALSE,
+                                         quiet = NULL, file_size_table = NULL,
+                                         tempdir = NULL, separated = FALSE) {
 
   # Use existing file_size_table, so we don't have to redownload every time:
   if (is.null(file_size_table)) {
     file_size_table <- get_hydro90m_variable_table(tempdir = tempdir)
   }
 
+  # Get all variable name from the table:
   all_varnames <- unique(sub("_[^_]+$", "", file_size_table$file_name))
-  return (sort(all_varnames))
+
+  # Compute download size, if tile_ids is specified:
+  if (is.null(tile_ids)) {
+    download_bytes <- NA
+  } else {
+    download_bytes <- download_size(tile_ids, all_varnames, file_size_table, quiet)
+    message(paste0("Download size: ",
+      length(all_varnames), " variables, ",
+      length(tile_ids), " tiles: ",
+      download_bytes/1000000000, " GB (", download_bytes, " bytes)."))
+  }
+
+  # Return all variable names
+  if (!(separated)) {
+    return (sort(all_varnames))
+  } else {
+    # Return as a list including download_size if separated=TRUE
+    variables <- list(
+      comment = "Returned all available variables for this dataset.",
+      complete_variable_names = sort(all_varnames),
+      download_bytes = download_bytes
+    )
+    return(variables)
+  }
 }
+
+download_size <- function(tile_ids, all_varnames, file_size_table, quiet = FALSE, ignore_missing = FALSE) {
+
+  # Get the valid tile ids and files names
+  all_tile_ids <- unique(stringr::str_extract(file_size_table$file_path, "h[0-9]+v[0-9]+"))
+  all_tile_ids <- all_tile_ids[!is.na(all_tile_ids)]
+  all_file_names <- sort(unique(file_size_table$file_name))
+
+  # Which of the requested tile ids are available?
+  not_available <- tile_ids[! tile_ids %in% all_tile_ids]
+  if (length(not_available) > 0) {
+    err_msg <- paste0('Not available: Tile id(s) ', paste(not_available, collapse=", "))
+    if (ignore_missing) {
+      warning(err_msg)
+    } else {
+      stop(paste0(err_msg, '. Please check your spelling and try again!'))
+    }
+  }
+
+  # Compute overall size of download, by iterating
+  # over each variable and there over each tile:
+  download_bytes <- 0
+  i <- 0
+
+  for (ivar in all_varnames) {
+    i <- i+1
+    j <- 0
+    byte_sum_one_var <- 0
+
+    # All tiles of this variable:
+    for (itile in tile_ids) {
+      j <- j+1
+
+      tile_byte <- check_tiles_filesize(
+        variable = ivar,
+        file_format = "zip",
+        tile_id = itile,
+        h90m_varnames = all_varnames,
+        h90m_tile_id = all_tile_ids,
+        h90m_file_names = all_file_names,
+        file_size_table = file_size_table
+      )
+    
+      if (length(tile_byte) == 0) {
+        tile_byte <- 0
+        warning(paste0("Not available: Tile '", itile, "', of variable '", ivar, "'!"))
+      } else {
+        #if (!quiet) message(paste0("  Tile ", j, " ('", itile, "') of variable '", ivar, "': Size: ", tile_byte, " bytes."))
+      }
+
+      # Sum up for all tiles:
+      byte_sum_one_var <- byte_sum_one_var + tile_byte
+    }
+
+    # Download size for one variable:
+    if (!quiet) message(paste0("Variable '", ivar, "' (", j," tiles): ", byte_sum_one_var/1000000, " MB (", byte_sum_one_var, " bytes)."))
+
+    # Sum up for all variables:
+    download_bytes <- download_bytes + byte_sum_one_var
+  }
+
+  # Download size for all variables:
+  #message(paste0("Overall: ", length(tile_ids), " tiles: ", download_bytes/1000000000, " GB ( ", download_bytes," bytes)."))
+  return(download_bytes)
+}
+
+
+# Questions: Return download size or not?
 
