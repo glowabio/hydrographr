@@ -11,18 +11,41 @@
 ### Some preparations ###
 #########################
 
+# Where to store and download files:
 tmpdir <- tempdir()
 tmpdir <- "/tmp"
-print(paste0('Tempdir: ', tmpdir))
+download_dir <- "/tmp"
 
-#Sys.setenv(SKIP_SLOW = "FALSE")
+# Set which tests to skip:
+Sys.setenv(SKIP_SLOW = "FALSE")
 #Sys.setenv(SKIP_SLOW = "TRUE")
+#Sys.setenv(SKIP_DOWNLOAD = "FALSE")
+Sys.setenv(SKIP_DOWNLOAD = "FALSE")
+#Sys.setenv(SKIP_FAILING_DOWNLOAD = "FALSE")
+Sys.setenv(SKIP_FAILING_DOWNLOAD = "TRUE")
 
+# Get which tests to skip:
 SKIP_SLOW <- Sys.getenv("SKIP_SLOW") == "TRUE" # empty string / FALSE if not set
+SKIP_DOWNLOAD <- Sys.getenv("SKIP_DOWNLOAD") == "TRUE" # empty string / FALSE if not set
+SKIP_FAILING_DOWNLOAD <- Sys.getenv("SKIP_FAILING_DOWNLOAD") == "TRUE" # empty string / FALSE if not set
+
+# Inform user about which tests to skip:
 if (SKIP_SLOW) {
     print('SKIP_SLOW is set to TRUE, skipping slow tests. If you want to run them, set SKIP_SLOW to FALSE')
 } else {
     print('SKIP_SLOW is set to FALSE, not skipping slow tests. If you want to skip them, set SKIP_SLOW to TRUE')
+}
+
+if (SKIP_DOWNLOAD) {
+    print('SKIP_DOWNLOAD is set to TRUE, skipping slow tests. If you want to run them, set SKIP_DOWNLOAD to FALSE')
+} else {
+    print('SKIP_DOWNLOAD is set to FALSE, not skipping slow tests. If you want to skip them, set SKIP_DOWNLOAD to TRUE')
+}
+
+if (SKIP_FAILING_DOWNLOAD) {
+    print('SKIP_FAILING_DOWNLOAD is set to TRUE, skipping slow tests. If you want to run them, set SKIP_DOWNLOAD to FALSE')
+} else {
+    print('SKIP_FAILING_DOWNLOAD is set to FALSE, not skipping slow tests. If you want to skip them, set SKIP_DOWNLOAD to TRUE')
 }
 
 
@@ -30,13 +53,14 @@ if (SKIP_SLOW) {
 ### Tests ###
 #############
 
-test_that("1 test base function", {
+test_that("1.1 helpers: table getter", {
 
   # Prepare:
+  fname <- "env90m_presentclimate_paths_file_sizes.txt"
 
   # Run:
   tab <- get_file_size_table(
-    file_name = "env90m_presentclimate_paths_file_sizes.txt",
+    file_name = fname,
     tempdir = tmpdir)
 
   # Check:
@@ -47,872 +71,980 @@ test_that("1 test base function", {
   expect_length(tab$file_name, 2204)
 })
 
-test_that("2.1 landcover table getter", {
+test_that("1.1.2 helpers: table getter: failure", {
 
   # Prepare:
+  fname <- "env90m_presentclimate_paths_file_sizes.txt"
 
   # Run:
-  tab <- get_landcover_variable_table(tempdir=tmpdir)
-
-  # Check:
-  expect_length(tab, 4)
-  expected_cols <- c("file_path", "file_id", "file_size", "file_name")
-  expect_equal(sort(names(tab)), sort(expected_cols))
-  expect_length(tab$file_name, 73840)
+  expect_warning(expect_error(
+    tab <- get_file_size_table(
+      file_name = "BLABLUB.txt",
+      tempdir = tmpdir)
+  ))
 })
 
-test_that("2.2.1 landcover, all vars, not sep, no tiles", {
+test_that("1.2.1: helpers: compute download size", {
 
   # Prepare:
-  tab <- get_landcover_variable_table(tempdir=tmpdir)
+  mytiles <- c("h02v02", "h04v02")
+  # mysubset <- c("awcts", "wwp")
+  # fname <- "env90m_soil_paths_file_sizes.txt"
+  # expected_bytes <- 310093648
+  # mysubset <- c("c20_1992", "c20_1994")
+  # fname <- "env90m_landcover_paths_file_sizes.txt"
+  # expected_bytes <- 53921030
+  mysubset <- c("bio1_2041-2070_ipsl-cm6a-lr_ssp126_V.2.1", "bio1_2071-2100_ipsl-cm6a-lr_ssp126_V.2.1")
+  fname <- "env90m_futureclimate_paths_file_sizes.txt"
+  expected_bytes <- 250104945
+  file_size_table <- get_file_size_table(
+    file_name = fname,
+    tempdir = tmpdir)
+  
+  # Run:
+  bytes <- compute_download_size(
+    mytiles,
+    mysubset,
+    file_size_table,
+    quiet = FALSE,
+    ignore_missing = FALSE
+  )
+
+  # Check:
+  expect_equal(bytes, expected_bytes)
+})
+
+test_that("1.2.2: helpers: compute download size: failure", {
+
+  # Prepare:
+  expected_error_message <- "Not available: Tile id(s) h99v99. Please check your spelling and try again!"
+  mytiles <- c("h02v02", "h04v02")
+  # mysubset <- c("awcts", "wwp")
+  # fname <- "env90m_soil_paths_file_sizes.txt"
+  # expected_bytes <- 310093648
+  # mysubset <- c("c20_1992", "c20_1994")
+  # fname <- "env90m_landcover_paths_file_sizes.txt"
+  # expected_bytes <- 53921030
+  mysubset <- c("bio1_2041-2070_ipsl-cm6a-lr_ssp126_V.2.1", "bio1_2071-2100_ipsl-cm6a-lr_ssp126_V.2.1")
+  fname <- "env90m_futureclimate_paths_file_sizes.txt"
+  expected_bytes <- 250104945
+  file_size_table <- get_file_size_table(
+    file_name = fname,
+    tempdir = tmpdir)
+
+  # Run:
+  expect_error(
+    bytes <- compute_download_size(
+      c("h02v02", "h04v02", "h99v99"),
+      mysubset,
+      file_size_table,
+      quiet = FALSE,
+      ignore_missing = FALSE
+    ),
+    expected_error_message, fixed=TRUE
+  )
+})
+
+test_that("1.3.1: helpers: download zips (not delete)", {
+
+  # Prepare:
+  mytiles <- c("h02v02")
+  mysubset <- c("bio1_2041-2070_ipsl-cm6a-lr_ssp126_V.2.1", "bio1_2071-2100_ipsl-cm6a-lr_ssp126_V.2.1")
+  fname <- "env90m_futureclimate_paths_file_sizes.txt"
+  file_size_table <- get_file_size_table(
+    file_name = fname,
+    tempdir = tmpdir)
+
+  # Run:
+  skip_if(SKIP_DOWNLOAD, 'This downloads data, so we skip it this time...')
+  result <- do_download(
+    mysubset, # TODO: Look for small subset for testing download...
+    mytiles,
+    file_size_table,
+    download_dir = ".",
+    file_format = "zip",
+    quiet = FALSE,
+    delete_zips = FALSE)
+
+  # Check:
+  expected_zips <- c(
+    "./chelsa_bioclim_v2_1/2041_2070/bio1/bio1_2041-2070_ipsl-cm6a-lr_ssp126_V.2.1_h02v02.zip",
+    "./chelsa_bioclim_v2_1/2071_2100/bio1/bio1_2071-2100_ipsl-cm6a-lr_ssp126_V.2.1_h02v02.zip"
+  )
+  # Check whether zips are reported:
+  expect_equal(result$downloaded, expected_zips)
+  # Check whether zips actually exist:
+  for (zipfilename in expected_zips) {
+    expect_true(file.exists(zipfilename))
+  }
+})
+
+test_that("1.3.2: helpers: download zip, unzip to txt (not delete)", {
+
+  # Prepare:
+  mytiles <- c("h02v02")
+  mysubset <- c("bio1_2041-2070_ipsl-cm6a-lr_ssp126_V.2.1", "bio1_2071-2100_ipsl-cm6a-lr_ssp126_V.2.1")
+  fname <- "env90m_futureclimate_paths_file_sizes.txt"
+  file_size_table <- get_file_size_table(
+    file_name = fname,
+    tempdir = tmpdir)
+
+  # Run:
+  skip_if(SKIP_DOWNLOAD, 'This downloads data, so we skip it this time...')
+  result <- do_download(
+    mysubset, # TODO: Look for small subset for testing download...
+    mytiles,
+    file_size_table,
+    download_dir = ".",
+    file_format = "txt",
+    quiet = FALSE,
+    delete_zips = FALSE)
+
+  # Check:
+  expected_zips <- c(
+    "./chelsa_bioclim_v2_1/2041_2070/bio1/bio1_2041-2070_ipsl-cm6a-lr_ssp126_V.2.1_h02v02.zip",
+    "./chelsa_bioclim_v2_1/2071_2100/bio1/bio1_2071-2100_ipsl-cm6a-lr_ssp126_V.2.1_h02v02.zip"
+  )
+  expected_unzipped <- c(
+    "./chelsa_bioclim_v2_1/2041_2070/bio1",
+    "./chelsa_bioclim_v2_1/2071_2100/bio1"
+  )
+  # Check whether zips are reported:
+  expect_equal(result$downloaded, expected_zips)
+  # Check whether zips actually exist:
+  for (zipfilename in expected_zips) {
+    expect_true(file.exists(zipfilename))
+  }
+  # Check whether unzipped is reported:
+  expect_equal(result$unzipped, expected_unzipped)
+  # Check whether unzipped files actually exist:
+  for (zipfilename in expected_zips) {
+    expect_true(file.exists(gsub('zip', 'txt', zipfilename)))
+  }
+})
+
+test_that("1.3.3: helpers: download zip, unzip to txt (do delete)", {
+
+  # Prepare:
+  mytiles <- c("h02v02")
+  mysubset <- c("bio1_2041-2070_ipsl-cm6a-lr_ssp126_V.2.1", "bio1_2071-2100_ipsl-cm6a-lr_ssp126_V.2.1")
+  fname <- "env90m_futureclimate_paths_file_sizes.txt"
+  file_size_table <- get_file_size_table(
+    file_name = fname,
+    tempdir = tmpdir)
+
+  # Run:
+  skip_if(SKIP_DOWNLOAD, 'This downloads data, so we skip it this time...')
+  result <- do_download(
+    mysubset, # TODO: Look for small subset for testing download...
+    mytiles,
+    file_size_table,
+    download_dir = ".",
+    file_format = "txt",
+    quiet = FALSE,
+    delete_zips = TRUE)
+
+  # Check:
+  expected_zips <- c(
+    "./chelsa_bioclim_v2_1/2041_2070/bio1/bio1_2041-2070_ipsl-cm6a-lr_ssp126_V.2.1_h02v02.zip",
+    "./chelsa_bioclim_v2_1/2071_2100/bio1/bio1_2071-2100_ipsl-cm6a-lr_ssp126_V.2.1_h02v02.zip"
+  )
+  expected_unzipped <- c(
+    "./chelsa_bioclim_v2_1/2041_2070/bio1",
+    "./chelsa_bioclim_v2_1/2071_2100/bio1"
+  )
+  # Check whether zips and their deletion are reported:
+  expect_equal(result$downloaded, expected_zips)
+  expect_equal(result$deleted, expected_zips)
+  # Check whether zips actually were deleted:
+  for (zipfilename in expected_zips) {
+    expect_false(file.exists(zipfilename))
+  }
+  # Check whether unzipped is reported:
+  expect_equal(result$unzipped, expected_unzipped)
+  # Check whether unzipped files actually exist:
+  for (zipfilename in expected_zips) {
+    expect_true(file.exists(gsub('zip', 'txt', zipfilename)))
+  }
+})
+
+test_that("2.1 landcover: show all", {
 
   # Run:
   vars <- get_landcover_variables(
-    separated = FALSE,
-    file_size_table = tab,
     tempdir=tmpdir,
     quiet=FALSE)
 
   # Check:
-  expect_length(vars, 638)
-  some_examples <- c("c100_1992", "c100_1993", "c100_1994", "c100_1995", "c100_1996", "c100_1997")
-  expect_true(all(some_examples %in% vars))
-})
-
-test_that("2.2.2 landcover, all vars, download size as message (slow)", {
-
-  # Prepare:
-  tab <- get_landcover_variable_table(tempdir=tmpdir)
-  tiles <- c("h02v02", "h04v02")
-  expected_message <- "Download size: 638 variables, 2 tiles: 19.295762175 GB (19295762175 bytes)."
-
-  # Run and check:
-  skip_if(SKIP_SLOW, 'Slow, so we skip it this time...')
-  expect_message(
-    vars <- get_landcover_variables(
-        separated = FALSE,
-        file_size_table = tab,
-        tempdir = tmpdir,
-        quiet = TRUE,
-        tile_ids = tiles),
-    expected_message, fixed=TRUE)
-
-  # Check:
-  expect_length(vars, 638)
-  some_examples <- c("c100_1992", "c100_1993", "c100_1994", "c100_1995", "c100_1996", "c100_1997")
-  expect_true(all(some_examples %in% vars))
-})
-
-test_that("2.3.1 landcover, all vars, sep, no tiles", {
-
-  # Prepare:
-  tab <- get_landcover_variable_table(tempdir=tmpdir)
-
-  # Run:
-  vars <- get_landcover_variables(
-    separated = TRUE,
-    file_size_table = tab,
-    tempdir=tmpdir,
-    quiet=FALSE)
-
-  # Check:
-  expect_length(vars, 5)
-  expected_names <- c("base_vars", "years", "download_bytes", "comment", "complete_variable_names")
-  expect_equal(sort(names(vars)), sort(expected_names))
+  expect_equal(sort(names(vars)), sort(c("comment", "base_vars", "years", "variable_names")))
   expect_length(vars$base_vars, 22)
   expect_length(vars$years, 29)
-  expect_equal(vars$download_bytes, NA)
+  examples <- c("c100_1992", "c100_1993", "c100_1994", "c100_1995", "c100_1996", "c100_1997")
+  expect_true(all(examples %in% vars$variable_names))
 })
 
-test_that("2.3.2 landcover, all vars, download size as number (sep only) (slow)", {
+test_that("2.2.1 landcover: show subset (specified: subset)", {
 
   # Prepare:
-  tab <- get_landcover_variable_table(tempdir=tmpdir)
-
-  # Run:
-  skip_if(SKIP_SLOW, 'Slow, so we skip it this time...')
-  vars <- get_landcover_variables(
-    separated = TRUE,
-    file_size_table = tab,
-    tempdir=tmpdir,
-    quiet=FALSE,
-    tile_ids = c("h02v02", "h04v02")
-  )
-
-  # Check:
-  expect_length(vars, 5)
-  expected_names <- c("base_vars", "years", "download_bytes", "comment", "complete_variable_names")
-  expect_equal(sort(names(vars)), sort(expected_names))
-  expect_equal(vars$download_bytes, 19295762175)
-})
-
-test_that("2.4.1 landcover, not all vars, not sep", {
-
-  # Prepare:
-  tab <- get_landcover_variable_table(tempdir=tmpdir)
+  mysubset <- c("c20_1992", "c20_1994", "c30_1992", "c30_1994")
 
   # Run:
   vars <- get_landcover_variables(
-    separated = FALSE,
-    file_size_table = tab,
     tempdir=tmpdir,
     quiet=FALSE,
-    years=c(1992, 1994)
-  )
+    subset=mysubset)
 
   # Check:
-  expect_length(vars, 44)
-  some_examples <- c("c100_1992", "c100_1994", "c20_1992", "c20_1994", "c30_1992", "c30_1994")
-  expect_true(all(some_examples %in% vars))
-  some_examples <- c("c100_1993", "c100_1995", "c20_1993", "c20_1995", "c30_1993", "c30_1995")
-  expect_false(any(some_examples %in% vars))
+  expect_equal(sort(names(vars)), sort(c("comment", "variable_names")))
+  expect_length(vars$variable_names, 4)
+  expect_equal(sort(vars$variable_names), sort(mysubset))
 })
 
-test_that("2.4.2 landcover, not all vars, not sep 2", {
+test_that("2.2.2 landcover: show subset (specified: base_vars and years)", {
 
   # Prepare:
-  tab <- get_landcover_variable_table(tempdir=tmpdir)
-
-  # Run:
-  vars <- get_landcover_variables(
-    separated = FALSE,
-    file_size_table = tab,
-    tempdir=tmpdir,
-    quiet=FALSE,
-    years=c(1992, 1994),
-    base_vars=c("c10", "c20", "c30")
-  )
-
-  # Check:
-  all_expected <- c("c10_1992", "c10_1994", "c20_1992", "c20_1994", "c30_1992", "c30_1994")
-  expect_equal(sort(vars), sort(all_expected))
-})
-
-test_that("2.4.3 landcover, not all vars, download size as message", {
-
-  # Prepare:
-  tab <- get_landcover_variable_table(tempdir=tmpdir)
-  expected_message <- "Download size: 44 variables, 2 tiles: 1.332422613 GB (1332422613 bytes)."
+  mysubset <- c("c20_1992", "c20_1994", "c30_1992", "c30_1994")
+  mybasevars <- c("c20", "c30")
+  myyears <- c(1992, 1994)
   
   # Run:
-  expect_message(
-    vars <- get_landcover_variables(
-      separated = FALSE,
-      file_size_table = tab,
-      tempdir=tmpdir,
-      quiet=TRUE,
-      years=c(1992, 1994),
-      tile_ids = c("h02v02", "h04v02")),
-    expected_message, fixed=TRUE)
+  vars <- get_landcover_variables(
+    tempdir=tmpdir,
+    quiet=FALSE,
+    base_vars=mybasevars,
+    years=myyears)
 
   # Check:
-  expect_length(vars, 44)
-  some_examples <- c("c100_1992", "c100_1994", "c20_1992", "c20_1994", "c30_1992", "c30_1994")
-  expect_true(all(some_examples %in% vars))
-  some_examples <- c("c100_1993", "c100_1995", "c20_1993", "c20_1995", "c30_1993", "c30_1995")
-  expect_false(any(some_examples %in% vars))
+  expect_equal(sort(names(vars)), sort(c("comment", "variable_names", "base_vars", "years")))
+  expect_equal(sort(vars$variable_names), sort(mysubset))
+  expect_equal(sort(vars$base_vars), sort(mybasevars))
+  expect_equal(sort(vars$years), sort(myyears))
 })
 
-test_that("2.5.1 landcover, not all vars, sep", {
+test_that("2.3.1 landcover: show subset and download_size (specified: subset)", {
 
   # Prepare:
-  tab <- get_landcover_variable_table(tempdir=tmpdir)
+  mysubset <- c("c20_1992", "c20_1994", "c30_1992", "c30_1994")
+  mytiles <- c("h02v02", "h04v02")
+  expected_bytes <- 107945857
+  
+  # Run:
+  vars <- get_landcover_variables(
+    tempdir=tmpdir,
+    quiet=FALSE,
+    subset=mysubset,
+    tile_ids=mytiles)
+
+  # Check:
+  expect_equal(sort(names(vars)), sort(c("comment", "variable_names", "download_bytes", "tile_ids")))
+  expect_equal(sort(vars$variable_names), sort(mysubset))
+  expect_equal(vars$download_bytes, expected_bytes)
+  expect_equal(sort(vars$tile_ids), sort(mytiles))
+})
+
+test_that("2.3.2 landcover: show subset and download_size (specified: base_vars and years)", {
+
+  # Prepare:
+  mysubset <- c("c20_1992", "c20_1994", "c30_1992", "c30_1994")
+  mybasevars <- c("c20", "c30")
+  myyears <- c(1992, 1994)
+  mytiles <- c("h02v02", "h04v02")
+  expected_bytes <- 107945857
 
   # Run:
   vars <- get_landcover_variables(
-    separated = TRUE,
-    file_size_table = tab,
     tempdir=tmpdir,
     quiet=FALSE,
-    years=c(1992, 1994))
+    base_vars=mybasevars,
+    years=myyears,
+    tile_ids=mytiles)
 
   # Check:
-  expect_length(vars, 5)
-  expected_names <- c("base_vars", "years", "download_bytes", "comment", "complete_variable_names")
-  expect_equal(sort(names(vars)), sort(expected_names))
-  expect_length(vars$base_vars, 22)
-  expect_length(vars$years, 2)
-  expect_equal(vars$years, c(1992, 1994))
+  expect_equal(sort(names(vars)), sort(c("comment", "variable_names", "base_vars", "years", "tile_ids", "download_bytes")))
+  expect_equal(sort(vars$variable_names), sort(mysubset))
+  expect_equal(sort(vars$base_vars), sort(mybasevars))
+  expect_equal(sort(vars$years), sort(myyears))
+  expect_equal(sort(vars$tile_ids), sort(mytiles))
+  expect_equal(vars$download_bytes, expected_bytes)
 })
 
-test_that("2.5.2 landcover, not all vars, download size as number (sep only)", {
+test_that("2.4.1 landcover: show subset and download size, then download (specified: subset)", {
 
   # Prepare:
-  tab <- get_landcover_variable_table(tempdir=tmpdir)
+  mysubset <- c("c20_1992", "c20_1994", "c30_1992", "c30_1994")
+  mytiles <- c("h02v02", "h04v02")
+  expected_bytes <- 107945857
 
   # Run:
+  skip_if(SKIP_FAILING_DOWNLOAD, 'This downloads data, so we skip it this time...')
   vars <- get_landcover_variables(
-    separated = TRUE,
-    file_size_table = tab,
     tempdir=tmpdir,
     quiet=FALSE,
-    tile_ids = c("h02v02", "h04v02"),
-    years=c(1992),
-    base_vars=c("c10")
-  )
+    subset=mysubset,
+    tile_ids=mytiles,
+    download=TRUE,
+    download_dir=download_dir,
+    file_format="zip",
+    delete_zips=FALSE)
 
   # Check:
-  expect_length(vars, 5)
-  expected_names <- c("base_vars", "years", "download_bytes", "comment", "complete_variable_names")
-  expect_equal(sort(names(vars)), sort(expected_names))
-  expect_equal(vars$base_vars, "c10")
-  expect_equal(vars$years, 1992)
-  expect_equal(vars$download_bytes, 27700300)
+  expect_equal(sort(names(vars)), sort(c("comment", "variable_names", "download_bytes", "tile_ids", "downloaded")))
+  expect_equal(sort(vars$variable_names), sort(mysubset))
+  expect_equal(vars$download_bytes, expected_bytes)
+  expect_equal(sort(vars$tile_ids), sort(mytiles))
+  # Check whether downloaded zips actually exist:
+  for (zipfilename in vars$downloaded) {
+    expect_true(file.exists(zipfilename))
+  }
+  expect_true(FALSE) # TODO: Check if the criteria are ok! When writing this test, the files to be downloaded were not on the server yet.
 })
 
-test_that("2.6.1 landcover, not all vars, not sep: Years not available!", {
+test_that("2.4.2 landcover: show subset and download size, then download (specified: base_vars and years)", {
 
   # Prepare:
-  tab <- get_landcover_variable_table(tempdir=tmpdir)
-  expected_error_message <- "Not available: Year(s) 9999, 8888. Please check your spelling and try again!"
+  mysubset <- c("c20_1992", "c20_1994", "c30_1992", "c30_1994")
+  mybasevars <- c("c20", "c30")
+  myyears <- c(1992, 1994)
+  mytiles <- c("h02v02", "h04v02")
+  expected_bytes <- 107945857
 
   # Run:
-  expect_error(
-    get_landcover_variables(
-      separated = FALSE,
-      file_size_table = tab,
-      tempdir=tmpdir,
-      quiet=FALSE,
-      years=c(1992, 9999, 8888)),
-    expected_error_message, fixed=TRUE)
-})
-
-test_that("2.6.2 landcover, not all vars, not sep: Base vars not available!", {
-
-  # Prepare:
-  tab <- get_landcover_variable_table(tempdir=tmpdir)
-  expected_error_message <- "Not available: Base var(s) c99. Please check your spelling and try again!"
-
-  # Run:
-  expect_error(
-    get_landcover_variables(
-      separated = FALSE,
-      file_size_table = tab,
-      tempdir=tmpdir,
-      quiet=FALSE,
-      years=c(1992, 1994),
-      base_vars=c("c10", "c20", "c99")),
-    expected_error_message, fixed=TRUE)
-})
-
-test_that("2.6.3 landcover, not all vars, sep: Years not available!", {
-
-  # Prepare:
-  tab <- get_landcover_variable_table(tempdir=tmpdir)
-  expected_error_message <- "Not available: Year(s) 9999, 8888. Please check your spelling and try again!"
-
-  # Run:
-  expect_error(
-    get_landcover_variables(
-      separated = TRUE,
-      file_size_table = tab,
-      tempdir=tmpdir,
-      quiet=FALSE,
-      years=c(1992, 9999, 8888)
-    ),
-    expected_error_message, fixed=TRUE)
-})
-
-test_that("3.1 futureclimate table getter", {
-
-  # Prepare:
-
-  # Run:
-  tab <- get_future_climate_variable_table(tempdir=tmpdir)
+  skip_if(SKIP_FAILING_DOWNLOAD, 'This downloads data, so we skip it this time...')
+  vars <- get_landcover_variables(
+    tempdir=tmpdir,
+    quiet=FALSE,
+    base_vars=mybasevars,
+    years=myyears,
+    tile_ids=mytiles,
+    download=TRUE,
+    download_dir=download_dir,
+    file_format="zip",
+    delete_zips=FALSE)
 
   # Check:
-  expect_length(tab, 4)
-  expected_cols <- c("file_path", "file_id", "file_size", "file_name")
-  expect_equal(sort(names(tab)), sort(expected_cols))
-  expect_length(tab$file_name, 39672)
+  expect_equal(sort(names(vars)), sort(c("comment", "variable_names", "base_vars", "years", "tile_ids", "download_bytes")))
+  expect_equal(sort(vars$variable_names), sort(mysubset))
+  expect_equal(sort(vars$base_vars), sort(mybasevars))
+  expect_equal(sort(vars$years), sort(myyears))
+  expect_equal(sort(vars$tile_ids), sort(mytiles))
+  expect_equal(vars$download_bytes, expected_bytes)
+  # Check whether downloaded zips actually exist:
+  for (zipfilename in vars$downloaded) {
+    expect_true(file.exists(zipfilename))
+  }
+  expect_true(FALSE) # TODO: Check if the criteria are ok! When writing this test, the files to be downloaded were not on the server yet.
 })
 
-test_that("3.2.1 futureclimate, all vars, not sep", {
-
-  # Prepare:
-  tab <- get_future_climate_variable_table(tempdir=tmpdir)
+test_that("3.1 future climate: show all", {
 
   # Run:
   vars <- get_future_climate_variables(
-    separated = FALSE,
-    file_size_table = tab,
-    tempdir = tmpdir,
-    quiet = FALSE)
+    tempdir=tmpdir,
+    quiet=FALSE)
 
-  # Check:
-  expect_length(vars, 342)
-  some_examples <- c(
+  # Check: WIP
+  expect_equal(sort(names(vars)), sort(c("comment", "base_vars", "models", "scenarios", "time_periods", "versions", "variable_names")))
+  all_base_vars <- c(
+    "bio1",  "bio10", "bio11", "bio12", "bio13", "bio14", "bio15", "bio16", "bio17", "bio18",
+    "bio19", "bio2",  "bio3",  "bio4",  "bio5",  "bio6",  "bio7",  "bio8",  "bio9")
+  expect_equal(sort(vars$base_vars), all_base_vars)
+  expect_equal(sort(vars$models), c("ipsl-cm6a-lr", "mpi-esm1-2-hr", "ukesm1-0-ll"))
+  expect_equal(sort(vars$scenarios), c("ssp126", "ssp370", "ssp585"))
+  expect_equal(sort(vars$time_periods), c("2041-2070", "2071-2100"))
+  expect_equal(sort(vars$versions), c("V.2.1"))
+  expect_length(vars$variable_names, 342)
+  some_full_variables <- c(
     "bio5_2071-2100_mpi-esm1-2-hr_ssp370_V.2.1",
     "bio1_2041-2070_mpi-esm1-2-hr_ssp126_V.2.1",
     "bio9_2071-2100_ipsl-cm6a-lr_ssp370_V.2.1",
     "bio13_2041-2070_ukesm1-0-ll_ssp126_V.2.1")
-  expect_true(all(some_examples %in% vars))
+  expect_true(all(some_full_variables %in% vars$variable_names))
 })
 
-test_that("3.2.2 futureclimate, all vars, download size as message (slow)", {
+test_that("3.2.1 futureclimate: show subset (specified: subset)", {
 
   # Prepare:
-  tab <- get_future_climate_variable_table(tempdir=tmpdir)
-  expected_message <- "Download size: 342 variables, 2 tiles: 49.746345249 GB (49746345249 bytes)."
-  
-  # Run:
-  skip_if(SKIP_SLOW, 'Slow, so we skip it this time...')
-  expect_message(
-    vars <- get_future_climate_variables(
-      separated = FALSE,
-      file_size_table = tab,
-      tempdir = tmpdir,
-      quiet = TRUE,
-      tile_ids = c("h02v02", "h04v02")),
-    expected_message, fixed=TRUE)
-
-  # Check:
-  expect_length(vars, 342)
-  some_examples <- c(
-    "bio5_2071-2100_mpi-esm1-2-hr_ssp370_V.2.1",
-    "bio1_2041-2070_mpi-esm1-2-hr_ssp126_V.2.1",
-    "bio9_2071-2100_ipsl-cm6a-lr_ssp370_V.2.1",
-    "bio13_2041-2070_ukesm1-0-ll_ssp126_V.2.1")
-  expect_true(all(some_examples %in% vars))
-})
-
-test_that("3.3.1 futureclimate, all vars, sep", {
-
-  # Prepare:
-  tab <- get_future_climate_variable_table(tempdir=tmpdir)
+  mysubset <- c("bio1_2041-2070_ipsl-cm6a-lr_ssp126_V.2.1", "bio1_2071-2100_ipsl-cm6a-lr_ssp126_V.2.1")
 
   # Run:
   vars <- get_future_climate_variables(
-    separated = TRUE,
-    file_size_table = tab,
-    tempdir = tmpdir,
-    quiet = FALSE)
-
-  # Check:
-  expect_length(vars, 8)
-  expected_names <- c("base_vars", "time_periods", "scenarios", "models", "versions", "download_bytes", "comment", "complete_variable_names")
-  expect_equal(sort(names(vars)), sort(expected_names))
-  expect_length(vars$base_vars, 19)
-  expect_true(all(c("2041-2070", "2071-2100") %in% vars$time_periods))
-  expect_true(all(c("ssp126", "ssp370", "ssp585") %in% vars$scenarios))
-  expect_true(all(c("ipsl-cm6a-lr", "mpi-esm1-2-hr", "ukesm1-0-ll") %in% vars$models))
-  expect_equal(vars$versions, "V.2.1")
-})
-
-test_that("3.3.2 futureclimate, all vars, download size as number (sep only) (slow)", {
-
-  # Prepare:
-  tab <- get_future_climate_variable_table(tempdir=tmpdir)
-
-  # Run:
-  #skip_if(SKIP_SLOW, 'Slow, so we skip it this time...')
-  vars <- get_future_climate_variables(
-    tile_ids = c("h02v02", "h04v02"),
-    separated = TRUE,
-    file_size_table = tab,
-    tempdir = tmpdir,
-    quiet = FALSE
-  )
-
-  # Check:
-  expect_length(vars, 8)
-  expected_names <- c("base_vars", "time_periods", "scenarios", "models", "versions", "download_bytes", "comment", "complete_variable_names")
-  expect_equal(sort(names(vars)), sort(expected_names))
-  expect_length(vars$base_vars, 19)
-  expect_true(all(c("2041-2070", "2071-2100") %in% vars$time_periods))
-  expect_true(all(c("ssp126", "ssp370", "ssp585") %in% vars$scenarios))
-  expect_true(all(c("ipsl-cm6a-lr", "mpi-esm1-2-hr", "ukesm1-0-ll") %in% vars$models))
-  expect_equal(vars$versions, "V.2.1")
-  expect_equal(vars$download_bytes, 49746345249)
-})
-
-test_that("3.4.1 futureclimate, not all vars, not sep", {
-
-  # Prepare:
-  tab <- get_future_climate_variable_table(tempdir=tmpdir)
-
-  # Run:
-  vars <- get_future_climate_variables(
-    separated = FALSE,
-    file_size_table = tab,
-    tempdir = tmpdir,
-    quiet = FALSE,
-    models = c("ipsl-cm6a-lr"),
-    base_vars=c("bio1", "bio10"))
-
-  # Check:
-  expect_length(vars, 12)
-  all_expected <- c(
-    "bio1_2041-2070_ipsl-cm6a-lr_ssp126_V.2.1", "bio10_2041-2070_ipsl-cm6a-lr_ssp126_V.2.1",
-    "bio1_2071-2100_ipsl-cm6a-lr_ssp126_V.2.1", "bio10_2071-2100_ipsl-cm6a-lr_ssp126_V.2.1",
-    "bio1_2041-2070_ipsl-cm6a-lr_ssp370_V.2.1", "bio10_2041-2070_ipsl-cm6a-lr_ssp370_V.2.1",
-    "bio1_2071-2100_ipsl-cm6a-lr_ssp370_V.2.1", "bio10_2071-2100_ipsl-cm6a-lr_ssp370_V.2.1",
-    "bio1_2041-2070_ipsl-cm6a-lr_ssp585_V.2.1", "bio10_2041-2070_ipsl-cm6a-lr_ssp585_V.2.1",
-    "bio1_2071-2100_ipsl-cm6a-lr_ssp585_V.2.1", "bio10_2071-2100_ipsl-cm6a-lr_ssp585_V.2.1")
-  expect_equal(vars, all_expected)
-})
-
-test_that("3.4.2 futureclimate, not all vars, download size as message", {
-
-  # Prepare:
-  tab <- get_future_climate_variable_table(tempdir=tmpdir)
-  expected_message <- "Download size: 4 variables, 2 tiles: 0.513805694 GB (513805694 bytes)."
-  
-  # Run:
-  expect_message(
-    vars <- get_future_climate_variables(
-      separated = FALSE,
-      file_size_table = tab,
-      tempdir = tmpdir,
-      quiet = TRUE,
-      tile_ids = c("h02v02", "h04v02"),
-      base_vars = c("bio10", "bio1"),
-      models = c("ipsl-cm6a-lr"),
-      scenarios = c("ssp370")),
-    expected_message, fixed=TRUE)
-
-  # Check:
-  expect_length(vars, 4)
-  all_expected <- c(
-    "bio1_2041-2070_ipsl-cm6a-lr_ssp370_V.2.1", "bio10_2041-2070_ipsl-cm6a-lr_ssp370_V.2.1",
-    "bio1_2071-2100_ipsl-cm6a-lr_ssp370_V.2.1", "bio10_2071-2100_ipsl-cm6a-lr_ssp370_V.2.1")
-  expect_equal(vars, all_expected)
-})
-
-test_that("3.5.1 futureclimate, not all vars, sep", {
-
-  # Prepare:
-  tab <- get_future_climate_variable_table(tempdir=tmpdir)
-
-  # Run:
-  vars <- get_future_climate_variables(
-    separated = TRUE,
-    file_size_table = tab,
     tempdir=tmpdir,
     quiet=FALSE,
-    models=c("ipsl-cm6a-lr"),
-    base_vars=c("bio1", "bio10")
-  )
+    subset=mysubset)
 
   # Check:
-  expect_length(vars, 8)
-  expected_names <- c("base_vars", "time_periods", "scenarios", "models", "versions", "download_bytes", "comment", "complete_variable_names")
-  expect_equal(sort(names(vars)), sort(expected_names))
-  expect_equal(vars$base_vars, c("bio1", "bio10"))
-  expect_equal(vars$models, c("ipsl-cm6a-lr"))
-  expect_equal(vars$versions, "V.2.1")
-  expect_equal(vars$time_periods, c("2041-2070", "2071-2100"))
+  expect_equal(sort(names(vars)), sort(c("comment", "variable_names")))
+  expect_equal(sort(vars$variable_names), sort(mysubset))
 })
 
-test_that("3.5.2 futureclimate, not all vars, download size as number (sep only)", {
+test_that("3.2.2 futureclimate: show subset (specified: various components)", {
 
   # Prepare:
-  tab <- get_future_climate_variable_table(tempdir=tmpdir)
+  mysubset <- c("bio1_2041-2070_ipsl-cm6a-lr_ssp126_V.2.1", "bio1_2071-2100_ipsl-cm6a-lr_ssp126_V.2.1")
+  mybasevars <- c("bio1")
+  mytimeperiods <- c("2041-2070", "2071-2100")
+  mymodels <- c("ipsl-cm6a-lr")
+  myscenarios <- c("ssp126")
+  myversions <- c("V.2.1")
+  
+  # Run:
+  vars <- get_future_climate_variables(
+    tempdir=tmpdir,
+    quiet=FALSE,
+    base_vars=mybasevars,
+    models=mymodels,
+    scenarios=myscenarios,
+    versions=myversions)
+
+  # Check:
+  expect_equal(sort(names(vars)), sort(c("comment", "variable_names", "models", "scenarios", "versions", "time_periods", "base_vars")))
+  expect_equal(sort(vars$variable_names), mysubset)
+  expect_equal(sort(vars$models), mymodels)
+  expect_equal(sort(vars$scenarios), myscenarios)
+  expect_equal(sort(vars$versions), myversions)
+  expect_equal(sort(vars$base_vars), mybasevars)
+  expect_equal(sort(vars$time_periods), mytimeperiods)
+})
+
+test_that("3.3.1 futureclimate: show subset and download size (specified: subset)", {
+
+  # Prepare:
+  mysubset <- c("bio1_2041-2070_ipsl-cm6a-lr_ssp126_V.2.1", "bio1_2071-2100_ipsl-cm6a-lr_ssp126_V.2.1")
+  mytiles <- c("h02v02", "h04v02")
 
   # Run:
   vars <- get_future_climate_variables(
-    separated = TRUE,
-    file_size_table = tab,
-    tempdir = tmpdir,
-    quiet = FALSE,
-    models = c("ipsl-cm6a-lr"),
-    base_vars = c("bio1", "bio10"),
-    tile_ids = c("h02v02", "h04v02")
-  )
+    tempdir=tmpdir,
+    quiet=FALSE,
+    subset=mysubset,
+    tile_ids=mytiles)
 
   # Check:
-  expect_length(vars, 8)
-  expected_names <- c("base_vars", "time_periods", "scenarios", "models", "versions", "download_bytes", "comment", "complete_variable_names")
-  expect_equal(sort(names(vars)), sort(expected_names))
-  expect_equal(vars$base_vars, c("bio1", "bio10"))
-  expect_equal(vars$models, c("ipsl-cm6a-lr"))
-  expect_equal(vars$versions, "V.2.1")
-  expect_equal(vars$time_periods, c("2041-2070", "2071-2100"))
-  expect_equal(vars$download_bytes, 1540975863)
+  expect_equal(sort(names(vars)), sort(c("comment", "variable_names", "tile_ids", "download_bytes")))
+  expect_equal(sort(vars$variable_names), mysubset)
+  expect_equal(sort(vars$tile_ids), mytiles)
+  expect_equal(vars$download_bytes, 250104945)
 })
 
-test_that("3.6.1 futureclimate: Model not available", {
+test_that("3.3.2 futureclimate: show subset and download size (specified: various components)", {
 
   # Prepare:
-  tab <- get_future_climate_variable_table(tempdir=tmpdir)
+  mysubset <- c("bio1_2041-2070_ipsl-cm6a-lr_ssp126_V.2.1", "bio1_2071-2100_ipsl-cm6a-lr_ssp126_V.2.1")
+  mybasevars <- c("bio1")
+  mytimeperiods <- c("2041-2070", "2071-2100")
+  mymodels <- c("ipsl-cm6a-lr")
+  myscenarios <- c("ssp126")
+  myversions <- c("V.2.1")
+  mytiles <- c("h02v02", "h04v02")
+
+  # Run:
+  vars <- get_future_climate_variables(
+    tempdir=tmpdir,
+    quiet=FALSE,
+    base_vars=mybasevars,
+    models=mymodels,
+    scenarios=myscenarios,
+    versions=myversions,
+    tile_ids=mytiles)
+
+  # Check:
+  all_colnames <- c("comment", "variable_names", "models", "scenarios", "versions", "time_periods", "base_vars", "tile_ids", "download_bytes")
+  expect_equal(sort(names(vars)), sort(all_colnames))
+  expect_equal(sort(vars$variable_names), mysubset)
+  expect_equal(sort(vars$models), mymodels)
+  expect_equal(sort(vars$scenarios), myscenarios)
+  expect_equal(sort(vars$versions), myversions)
+  expect_equal(sort(vars$base_vars), mybasevars)
+  expect_equal(sort(vars$time_periods), mytimeperiods)
+  expect_equal(vars$download_bytes, 250104945)
+})
+
+test_that("3.4.1 futureclimate: show subset and download size, then download (specified: subset)", {
+
+  # Prepare:
+  mytiles <- c("h02v02")
+  mysubset <- c("bio1_2041-2070_ipsl-cm6a-lr_ssp126_V.2.1", "bio1_2071-2100_ipsl-cm6a-lr_ssp126_V.2.1")
+  expected_bytes <- 68103362
+
+  # Run:
+  skip_if(SKIP_DOWNLOAD, 'This downloads data, so we skip it this time...')
+  vars <- get_future_climate_variables(
+    tempdir=tmpdir,
+    quiet=FALSE,
+    subset=mysubset,
+    tile_ids=mytiles,
+    download=TRUE,
+    download_dir=download_dir,
+    file_format="zip",
+    delete_zips=FALSE)
+
+  # Check:
+  expect_equal(sort(names(vars)), sort(c("comment", "variable_names", "download_bytes", "tile_ids", "downloaded")))
+  expect_equal(sort(vars$variable_names), sort(mysubset))
+  expect_equal(vars$download_bytes, expected_bytes)
+  expect_equal(sort(vars$tile_ids), sort(mytiles))
+  # Check whether downloaded zips actually exist:
+  for (zipfilename in vars$downloaded) {
+    expect_true(file.exists(zipfilename))
+  }
+})
+
+test_that("3.4.2 futureclimate: show subset and download size, then download (specified: various components)", {
+
+  # Prepare:
+  mytiles <- c("h02v02")
+  mysubset <- c("bio1_2041-2070_ipsl-cm6a-lr_ssp126_V.2.1", "bio1_2071-2100_ipsl-cm6a-lr_ssp126_V.2.1")
+  mybasevars <- c("bio1")
+  mytimeperiods <- c("2041-2070", "2071-2100")
+  mymodels <- c("ipsl-cm6a-lr")
+  myscenarios <- c("ssp126")
+  myversions <- c("V.2.1")
+  expected_bytes <- 68103362
+
+  # Run:
+  skip_if(SKIP_DOWNLOAD, 'This downloads data, so we skip it this time...')
+  vars <- get_future_climate_variables(
+    tempdir=tmpdir,
+    quiet=FALSE,
+    base_vars=mybasevars,
+    models=mymodels,
+    scenarios=myscenarios,
+    versions=myversions,
+    time_periods=mytimeperiods,
+    tile_ids=mytiles,
+    download=TRUE,
+    download_dir=download_dir,
+    file_format="zip",
+    delete_zips=FALSE)
+
+  # Check:
+  expected_cols <- c("comment", "variable_names", "download_bytes", "tile_ids", "downloaded", "versions", "models", "scenarios", "base_vars", "time_periods") 
+  expect_equal(sort(names(vars)), sort(expected_cols))
+  expect_equal(sort(vars$variable_names), sort(mysubset))
+  expect_equal(vars$download_bytes, expected_bytes)
+  expect_equal(sort(vars$tile_ids), sort(mytiles))
+  # Check whether downloaded zips actually exist:
+  for (zipfilename in vars$downloaded) {
+    expect_true(file.exists(zipfilename))
+  }
+})
+
+test_that("3.5.1 futureclimate: failure: model not available", {
+
+  # Prepare:
   expected_error_message <- "Not available: Model(s) xyz. Please check your spelling and try again!"
+  mysubset <- c("bio1_2041-2070_ipsl-cm6a-lr_ssp126_V.2.1", "bio1_2071-2100_ipsl-cm6a-lr_ssp126_V.2.1")
+  mybasevars <- c("bio1")
+  mytimeperiods <- c("2041-2070", "2071-2100")
+  mymodels <- c("ipsl-cm6a-lr")
+  myscenarios <- c("ssp126")
+  myversions <- c("V.2.1")
+  mytiles <- c("h02v02", "h04v02")
 
   # Run:
   expect_error(
-    get_future_climate_variables(
-      separated = FALSE,
-      file_size_table = tab,
-      tempdir = tmpdir,
-      quiet = FALSE,
+    vars <- get_future_climate_variables(
+      tempdir=tmpdir,
+      quiet=FALSE,
+      base_vars=mybasevars,
       models=c("ipsl-cm6a-lr", "xyz"),
-      base_vars=c("bio1", "bio10")),
+      scenarios=myscenarios,
+      versions=myversions,
+      tile_ids=mytiles),
     expected_error_message, fixed=TRUE
   )
 })
 
-test_that("3.6.2 futureclimate: Scenario not available", {
+test_that("3.5.2 futureclimate: failure: scenarios not available", {
 
   # Prepare:
-  tab <- get_future_climate_variable_table(tempdir=tmpdir)
-  expected_error_message <- "Not available: Scenario(s) xyz. Please check your spelling and try again!"
+  expected_error_message <- "Not available: Scenario(s) xyz, abc. Please check your spelling and try again!"
+  mysubset <- c("bio1_2041-2070_ipsl-cm6a-lr_ssp126_V.2.1", "bio1_2071-2100_ipsl-cm6a-lr_ssp126_V.2.1")
+  mybasevars <- c("bio1")
+  mytimeperiods <- c("2041-2070", "2071-2100")
+  mymodels <- c("ipsl-cm6a-lr")
+  myscenarios <- c("ssp126")
+  myversions <- c("V.2.1")
+  mytiles <- c("h02v02", "h04v02")
 
   # Run:
   expect_error(
-    get_future_climate_variables(
-      separated = FALSE,
-      file_size_table = tab,
+    vars <- get_future_climate_variables(
       tempdir=tmpdir,
       quiet=FALSE,
-      scenarios=c("ssp585", "xyz"),
-      base_vars=c("bio1", "bio10")),
-    expected_error_message, fixed=TRUE)
+      base_vars=mybasevars,
+      models=mymodels,
+      scenarios=c("ssp126", "xyz", "abc"),
+      versions=myversions,
+      tile_ids=mytiles),
+    expected_error_message, fixed=TRUE
+  )
 })
 
-test_that("3.6.3 futureclimate: Version not available", {
+test_that("3.5.3 futureclimate: failure: version not available", {
 
   # Prepare:
-  tab <- get_future_climate_variable_table(tempdir=tmpdir)
   expected_error_message <- "Not available: Version(s) xyz. Please check your spelling and try again!"
+  mysubset <- c("bio1_2041-2070_ipsl-cm6a-lr_ssp126_V.2.1", "bio1_2071-2100_ipsl-cm6a-lr_ssp126_V.2.1")
+  mybasevars <- c("bio1")
+  mytimeperiods <- c("2041-2070", "2071-2100")
+  mymodels <- c("ipsl-cm6a-lr")
+  myscenarios <- c("ssp126")
+  myversions <- c("V.2.1")
+  mytiles <- c("h02v02", "h04v02")
 
   # Run:
   expect_error(
-    get_future_climate_variables(
-      separated = FALSE,
-      file_size_table = tab,
+    vars <- get_future_climate_variables(
       tempdir=tmpdir,
       quiet=FALSE,
+      base_vars=mybasevars,
+      models=mymodels,
+      scenarios=myscenarios,
       versions=c("V.2.1", "xyz"),
-      base_vars=c("bio1", "bio10")),
-    expected_error_message, fixed=TRUE)
-})
-
-test_that("3.6.4 futureclimate: Base var not available", {
-
-  # Prepare:
-  tab <- get_future_climate_variable_table(tempdir=tmpdir)
-  expected_error_message <- "Not available: Base var(s) bio999. Please check your spelling and try again!"
-
-  # Run:
-  expect_error(
-    get_future_climate_variables(
-      separated = FALSE,
-      file_size_table = tab,
-      tempdir=tmpdir,
-      quiet=FALSE,
-      scenarios=c("ssp585"),
-      base_vars=c("bio1", "bio10", "bio999")),
-    expected_error_message, fixed=TRUE)
-})
-
-test_that("4.1 presentclimate table getter", {
-
-  # Prepare:
-
-  # Run:
-  tab <- get_present_climate_variable_table(tempdir=tmpdir)
-
-  # Check:
-  expect_length(tab, 4)
-  expected_cols <- c("file_path", "file_id", "file_size", "file_name")
-  expect_equal(sort(names(tab)), sort(expected_cols))
-  expect_length(tab$file_name, 2204)
-})
-
-test_that("4.2 presentclimate", {
-
-  # Prepare:
-  tab <- get_present_climate_variable_table(tempdir=tmpdir)
-
-  # Run:
-  vars <- get_present_climate_variables(
-    file_size_table = tab,
-    tempdir = tmpdir,
-    quiet = FALSE)
-
-  # Check:
-  all_expected = c("bio1",  "bio10", "bio11", "bio12", "bio13",
-                   "bio14", "bio15", "bio16", "bio17", "bio18",
-                   "bio19", "bio2",  "bio3",  "bio4",  "bio5",
-                   "bio6",  "bio7",  "bio8",  "bio9")
-  expect_equal(sort(vars), sort(all_expected))
-})
-
-test_that("4.3.1 presentclimate: download size as message", {
-
-  # Prepare:
-  tab <- get_present_climate_variable_table(tempdir=tmpdir)
-  expected_message <- "Download size: 19 variables, 2 tiles: 3.457746309 GB (3457746309 bytes)."
-
-  # Run:
-  expect_message(
-    vars <- get_present_climate_variables(
-      file_size_table = tab,
-      tempdir=tmpdir,
-      quiet=TRUE,
-      tile_ids=c("h02v02", "h04v02")),
-    expected_message, fixed=TRUE)
-
-  # Check:
-  all_expected = c("bio1",  "bio10", "bio11", "bio12", "bio13",
-                   "bio14", "bio15", "bio16", "bio17", "bio18",
-                   "bio19", "bio2",  "bio3",  "bio4",  "bio5",
-                   "bio6",  "bio7",  "bio8",  "bio9")
-  expect_equal(sort(vars), sort(all_expected))
-})
-
-test_that("4.2.2 presentclimate: download size as number (sep only)", {
-
-  # Prepare:
-  tab <- get_present_climate_variable_table(tempdir=tmpdir)
-
-  # Run:
-  vars <- get_present_climate_variables(
-    file_size_table = tab,
-    tempdir=tmpdir,
-    quiet=TRUE,
-    tile_ids=c("h02v02", "h04v02"),
-    separated = TRUE)
-  
-  # Check:
-  all_expected = c("bio1",  "bio10", "bio11", "bio12", "bio13",
-                   "bio14", "bio15", "bio16", "bio17", "bio18",
-                   "bio19", "bio2",  "bio3",  "bio4",  "bio5",
-                   "bio6",  "bio7",  "bio8",  "bio9")
-  expect_equal(sort(vars$complete_variable_names), sort(all_expected))
-  expect_equal(vars$download_bytes, 3457746309)
-})
-
-test_that("5.1 hydro90m table getter", {
-
-  # Prepare:
-
-  # Run:
-  tab <- get_hydro90m_variable_table(tempdir=tmpdir)
-
-  # Check:
-  expect_length(tab, 4)
-  expected_cols <- c("file_path", "file_id", "file_size", "file_name")
-  expect_equal(sort(names(tab)), sort(expected_cols))
-  expect_length(tab$file_name, 5684)
-})
-
-test_that("5.2 hydro90m", {
-
-  # Prepare:
-  tab <- get_hydrography90m_variable_table(tempdir=tmpdir)
-
-  # Run:
-  vars <- get_hydrography90m_variables(
-    file_size_table = tab,
-    tempdir=tmpdir,
-    quiet=FALSE)
-
-  # Check:
-  all_expected = c(
-    "channel_curv_cel", "channel_dist_dw_seg", "channel_dist_up_cel",
-    "channel_dist_up_seg", "channel_elv_dw_cel", "channel_elv_dw_seg",
-    "channel_elv_up_cel", "channel_elv_up_seg", "channel_grad_dw_seg",
-    "channel_grad_up_cel", "channel_grad_up_seg", "connections", "cti",
-    "cum_length", "elev_drop", "flow", "flow_accum", "flow_pos", "flow1k",
-    "gradient", "length", "out_dist", "out_drop", "outlet_diff_dw_basin",
-    "outlet_diff_dw_scatch", "outlet_dist_dw_basin", "outlet_dist_dw_scatch",
-    "outlet_elev", "sinusoid", "slope_curv_max_dw_cel", "slope_curv_min_dw_cel",
-    "slope_elv_dw_cel", "slope_grad_dw_cel", "source_elev", "spi", "sti",
-    "stream_diff_dw_near", "stream_diff_up_farth", "stream_diff_up_near",
-    "stream_dist_dw_near", "stream_dist_proximity", "stream_dist_up_farth",
-    "stream_dist_up_near", "stream_hack", "stream_horton", "stream_shreve",
-    "stream_strahler", "stream_topo", "stright")
-  expect_equal(sort(vars), sort(all_expected))
-})
-
-test_that("5.3 hydro90m: download size as message", {
-
-  # Prepare:
-  tab <- get_hydrography90m_variable_table(tempdir=tmpdir)
-
-  # Run:
-  expected_message <- "Download size: 49 variables, 2 tiles: 12.629606053 GB (12629606053 bytes)."
-  expect_message(
-    vars <- get_hydrography90m_variables(
-        file_size_table = tab,
-        tempdir=tmpdir,
-        quiet=TRUE,
-        tile_ids= c("h02v02", "h04v02")),
-    expected_message, fixed=TRUE
-  )
-
-  # Check:
-  all_expected = c(
-    "channel_curv_cel", "channel_dist_dw_seg", "channel_dist_up_cel",
-    "channel_dist_up_seg", "channel_elv_dw_cel", "channel_elv_dw_seg",
-    "channel_elv_up_cel", "channel_elv_up_seg", "channel_grad_dw_seg",
-    "channel_grad_up_cel", "channel_grad_up_seg", "connections", "cti",
-    "cum_length", "elev_drop", "flow", "flow_accum", "flow_pos", "flow1k",
-    "gradient", "length", "out_dist", "out_drop", "outlet_diff_dw_basin",
-    "outlet_diff_dw_scatch", "outlet_dist_dw_basin", "outlet_dist_dw_scatch",
-    "outlet_elev", "sinusoid", "slope_curv_max_dw_cel", "slope_curv_min_dw_cel",
-    "slope_elv_dw_cel", "slope_grad_dw_cel", "source_elev", "spi", "sti",
-    "stream_diff_dw_near", "stream_diff_up_farth", "stream_diff_up_near",
-    "stream_dist_dw_near", "stream_dist_proximity", "stream_dist_up_farth",
-    "stream_dist_up_near", "stream_hack", "stream_horton", "stream_shreve",
-    "stream_strahler", "stream_topo", "stright")
-  expect_equal(sort(vars), sort(all_expected))
-})
-
-test_that("5.4 hydro90m: download size as number (sep only)", {
-
-  # Prepare:
-  tab <- get_hydrography90m_variable_table(tempdir=tmpdir)
-
-  # Run:
-  vars <- get_hydrography90m_variables(
-    file_size_table = tab,
-    tempdir=tmpdir,
-    quiet=TRUE,
-    tile_ids= c("h02v02", "h04v02"),
-    separated=TRUE)
-
-  # Check:
-  all_expected = c(
-    "channel_curv_cel", "channel_dist_dw_seg", "channel_dist_up_cel",
-    "channel_dist_up_seg", "channel_elv_dw_cel", "channel_elv_dw_seg",
-    "channel_elv_up_cel", "channel_elv_up_seg", "channel_grad_dw_seg",
-    "channel_grad_up_cel", "channel_grad_up_seg", "connections", "cti",
-    "cum_length", "elev_drop", "flow", "flow_accum", "flow_pos", "flow1k",
-    "gradient", "length", "out_dist", "out_drop", "outlet_diff_dw_basin",
-    "outlet_diff_dw_scatch", "outlet_dist_dw_basin", "outlet_dist_dw_scatch",
-    "outlet_elev", "sinusoid", "slope_curv_max_dw_cel", "slope_curv_min_dw_cel",
-    "slope_elv_dw_cel", "slope_grad_dw_cel", "source_elev", "spi", "sti",
-    "stream_diff_dw_near", "stream_diff_up_farth", "stream_diff_up_near",
-    "stream_dist_dw_near", "stream_dist_proximity", "stream_dist_up_farth",
-    "stream_dist_up_near", "stream_hack", "stream_horton", "stream_shreve",
-    "stream_strahler", "stream_topo", "stright")
-  expect_equal(sort(vars$complete_variable_names), sort(all_expected))
-  expect_equal(vars$download_bytes, 12629606053)
-})
-
-test_that("6.1 soil table getter", {
-
-  # Prepare:
-
-  # Run:
-  tab <- get_soil_variable_table(tempdir=tmpdir)
-
-  # Check:
-  expect_length(tab, 4)
-  expected_cols <- c("file_path", "file_id", "file_size", "file_name")
-  expect_equal(sort(names(tab)), sort(expected_cols))
-  expect_length(tab$file_name, 1856)
-})
-
-test_that("6.2 soil", {
-
-  # Prepare:
-  tab <- get_soil_variable_table(tempdir=tmpdir)
-
-  # Run:
-  vars <- get_soil_variables(
-    file_size_table = tab,
-    tempdir=tmpdir,
-    quiet=FALSE)
-
-  # Check:
-  all_expected = c(
-    "acdwrb", "awcts", "bdricm", "bdrlog", "bldfie", "cecsol", "clyppt", "crfvol",
-    "histpr", "orcdrc", "phihox", "slgwrb", "sltppt", "sndppt", "texmht", "wwp")
-  expect_equal(sort(vars), sort(all_expected))
-})
-
-test_that("6.3 soil: download size as message", {
-
-  # Prepare:
-  tab <- get_soil_variable_table(tempdir=tmpdir)
-  expected_message <- "Download size: 16 variables, 2 tiles: 2.469417656 GB (2469417656 bytes)."
-
-  # Run:
-  expect_message(
-    vars <- get_soil_variables(
-      file_size_table = tab,
-      tempdir=tmpdir,
-      quiet=TRUE,
-      tile_ids=c("h02v02", "h04v02")),
-    expected_message, fixed=TRUE)
-
-  # Check:
-  all_expected = c(
-    "acdwrb", "awcts", "bdricm", "bdrlog", "bldfie", "cecsol", "clyppt", "crfvol",
-    "histpr", "orcdrc", "phihox", "slgwrb", "sltppt", "sndppt", "texmht", "wwp")
-  expect_equal(sort(vars), sort(all_expected))
-})
-
-test_that("6.4 soil: download size as number (sep only)", {
-
-  # Prepare:
-  tab <- get_soil_variable_table(tempdir=tmpdir)
-
-  # Run:
-  vars <- get_soil_variables(
-    file_size_table = tab,
-    tempdir=tmpdir,
-    quiet=TRUE,
-    tile_ids=c("h02v02", "h04v02"),
-    separated=TRUE)
-  
-  # Check:
-  all_expected = c(
-    "acdwrb", "awcts", "bdricm", "bdrlog", "bldfie", "cecsol", "clyppt", "crfvol",
-    "histpr", "orcdrc", "phihox", "slgwrb", "sltppt", "sndppt", "texmht", "wwp")
-  expect_equal(sort(vars$complete_variable_names), sort(all_expected))
-  expect_equal(vars$download_bytes, 2469417656)
-})
-
-test_that("6.5 soil: download size failure", {
-
-  # Prepare:
-  tab <- get_soil_variable_table(tempdir=tmpdir)
-  expected_error_message <- "Not available: Tile id(s) h99v99. Please check your spelling and try again!"
-
-  # Run:
-  expect_error(
-    get_soil_variables(
-      file_size_table = tab,
-      tempdir=tmpdir,
-      quiet=FALSE,
-      tile_ids=c("h99v99")),
-    expected_error_message, fixed=TRUE)
-})
-
-test_that("7.1: download size", {
-
-  # Prepare:
-  tab <- get_soil_variable_table(tempdir=tmpdir)
-
-  # Run:
-  bytes <- download_size(
-    c("h02v02", "h04v02"),
-    c("acdwrb", "awcts", "bdricm", "bdrlog"),
-    tab,
-    quiet = FALSE,
-    ignore_missing = FALSE)
-
-  # Check:
-  expect_equal(bytes, 575879821)
-})
-
-test_that("7.2: download size: failure", {
-
-  # Prepare:
-  tab <- get_soil_variable_table(tempdir=tmpdir)
-  expected_error_message <- "Not available: Tile id(s) h99v99. Please check your spelling and try again!"
-
-  # Run:
-  expect_error(
-    download_size(
-    c("h02v02", "h04v02", "h99v99"),
-    c("acdwrb", "awcts", "bdricm", "bdrlog"),
-    tab,
-    quiet = FALSE,
-    ignore_missing = FALSE),
+      tile_ids=mytiles),
     expected_error_message, fixed=TRUE
   )
 })
+
+test_that("3.5.4 futureclimate: failure: base_var not available", {
+
+  # Prepare:
+  expected_error_message <- "Not available: Base var(s) xyz, abc, def. Please check your spelling and try again!"
+  mysubset <- c("bio1_2041-2070_ipsl-cm6a-lr_ssp126_V.2.1", "bio1_2071-2100_ipsl-cm6a-lr_ssp126_V.2.1")
+  mybasevars <- c("bio1")
+  mytimeperiods <- c("2041-2070", "2071-2100")
+  mymodels <- c("ipsl-cm6a-lr")
+  myscenarios <- c("ssp126")
+  myversions <- c("V.2.1")
+  mytiles <- c("h02v02", "h04v02")
+
+  # Run:
+  expect_error(
+    vars <- get_future_climate_variables(
+      tempdir=tmpdir,
+      quiet=FALSE,
+      base_vars=c("bio1", "xyz", "abc", "def"),
+      models=mymodels,
+      scenarios=myscenarios,
+      versions=myversions,
+      tile_ids=mytiles),
+    expected_error_message, fixed=TRUE
+  )
+})
+
+test_that("4.1 presentclimate: show all", {
+
+  # Run:
+  vars <- get_present_climate_variables(
+    tempdir=tmpdir,
+    quiet=FALSE)
+
+  # Check:
+  all_clim_vars <- c(
+    "bio1",  "bio10", "bio11", "bio12", "bio13", "bio14", "bio15", "bio16", "bio17", "bio18",
+    "bio19", "bio2",  "bio3",  "bio4",  "bio5",  "bio6",  "bio7",  "bio8",  "bio9")
+  expect_equal(sort(names(vars)), sort(c("comment", "variable_names")))
+  expect_equal(sort(vars$variable_names), all_clim_vars)
+})
+
+test_that("4.2 presentclimate: show subset (specified: subset)", {
+
+  # Prepare:
+  mysubset <- c("bio1",  "bio10")
+
+  # Run:
+  vars <- get_present_climate_variables(
+    tempdir=tmpdir,
+    quiet=FALSE,
+    subset=mysubset)
+
+  # Check:
+  expect_equal(sort(names(vars)), sort(c("comment", "variable_names")))
+  expect_equal(sort(vars$variable_names), mysubset)
+})
+
+test_that("4.3 presentclimate: show subset and download size (specified: subset)", {
+
+  # Prepare:
+  mysubset <- c("bio1",  "bio10")
+  mytiles <- c("h02v02", "h04v02")
+  expected_bytes <- 335702566
+
+  # Run:
+  vars <- get_present_climate_variables(
+    tempdir=tmpdir,
+    quiet=FALSE,
+    subset=mysubset,
+    tile_ids=mytiles)
+
+  # Check:
+  expect_equal(sort(names(vars)), sort(c("comment", "variable_names", "tile_ids", "download_bytes")))
+  expect_equal(sort(vars$variable_names), mysubset)
+  expect_equal(sort(vars$tile_ids), mytiles)
+  expect_equal(vars$download_bytes, expected_bytes)
+})
+
+test_that("4.4 presentclimate: show subset and download size, then download (specified: subset)", {
+
+  # Prepare:
+  mysubset <- c("bio1",  "bio10")
+  mytiles <- c("h02v02", "h04v02")
+  expected_bytes <- 335702566
+
+  # Run:
+  skip_if(SKIP_FAILING_DOWNLOAD, 'This downloads data, so we skip it this time...')
+  vars <- get_present_climate_variables(
+    tempdir=tmpdir,
+    quiet=FALSE,
+    subset=mysubset,
+    tile_ids=mytiles,
+    download=TRUE,
+    download_dir=download_dir,
+    file_format="zip",
+    delete_zips=FALSE)
+
+  # Check:
+  expect_equal(sort(names(vars)), sort(c("comment", "variable_names", "tile_ids", "download_bytes", "downloaded")))
+  expect_equal(sort(vars$variable_names), mysubset)
+  expect_equal(sort(vars$tile_ids), mytiles)
+  expect_equal(vars$download_bytes, expected_bytes)
+  # Check whether downloaded zips actually exist:
+  for (zipfilename in vars$downloaded) {
+    expect_true(file.exists(zipfilename))
+  }
+  expect_true(FALSE) # TODO: Check if the criteria are ok! When writing this test, the files to be downloaded were not on the server yet.
+})
+
+test_that("4.5 presentclimate: failure: variable not available", {
+
+  # Prepare:
+  expected_error_message <- "Not available: Variable(s) xyz. Please check your spelling and try again!"
+  mysubset <- c("bio1", "bio10")
+  mytiles <- c("h02v02", "h04v02")
+
+  # Run:
+  expect_error(
+    vars <- get_present_climate_variables(
+      tempdir=tmpdir,
+      quiet=FALSE,
+      subset=c("bio1", "bio10", "xyz"),
+      tile_ids=mytiles),
+    expected_error_message, fixed=TRUE
+  )
+})
+
+test_that("5.1 soil: show all", {
+
+  # Run:
+  vars <- get_soil_variables(
+    tempdir=tmpdir,
+    quiet=FALSE)
+
+  # Check:
+  expect_equal(sort(names(vars)), sort(c("comment", "variable_names")))
+  all_soils <- c(
+    "acdwrb", "awcts", "bdricm", "bdrlog", "bldfie", "cecsol", "clyppt", "crfvol",
+    "histpr", "orcdrc", "phihox", "slgwrb", "sltppt", "sndppt", "texmht", "wwp")
+  expect_equal(sort(vars$variable_names), all_soils)
+})
+
+test_that("5.2 soil: show subset (specified: subset)", {
+
+  # Prepare:
+  mysubset <- c("awcts", "wwp")
+
+  # Run:
+  vars <- get_soil_variables(
+    tempdir=tmpdir,
+    quiet=FALSE,
+    subset=mysubset)
+
+  # Check:
+  expect_equal(sort(names(vars)), sort(c("comment", "variable_names")))
+  expect_equal(sort(vars$variable_names), mysubset)
+})
+
+test_that("5.3 soil: show subset and download size (specified: subset)", {
+
+  # Prepare:
+  mysubset <- c("awcts", "wwp")
+  mytiles <- c("h02v02", "h04v02")
+  expected_bytes <- 310093648
+
+  # Run:
+  vars <- get_soil_variables(
+    tempdir=tmpdir,
+    quiet=FALSE,
+    subset=mysubset,
+    tile_ids=mytiles)
+
+  # Check:
+  expect_equal(sort(names(vars)), sort(c("comment", "variable_names", "tile_ids", "download_bytes")))
+  expect_equal(sort(vars$variable_names), mysubset)
+  expect_equal(sort(vars$tile_ids), mytiles)
+  expect_equal(vars$download_bytes, expected_bytes)
+})
+
+test_that("5.4 soil: show subset and download size, then download (specified: subset)", {
+
+  # Prepare:
+  mysubset <- c("awcts", "wwp")
+  mytiles <- c("h02v02", "h04v02")
+  expected_bytes <- 310093648
+
+  # Run:
+  skip_if(SKIP_FAILING_DOWNLOAD, 'This downloads data, so we skip it this time...')
+  vars <- get_soil_variables(
+    tempdir=tmpdir,
+    quiet=FALSE,
+    subset=mysubset,
+    tile_ids=mytiles,
+    download=TRUE,
+    download_dir=download_dir,
+    file_format="zip",
+    delete_zips=FALSE)
+
+  # Check:
+  expect_equal(sort(names(vars)), sort(c("comment", "variable_names", "tile_ids", "download_bytes", "downloaded")))
+  expect_equal(sort(vars$variable_names), mysubset)
+  expect_equal(sort(vars$tile_ids), mytiles)
+  expect_equal(vars$download_bytes, expected_bytes)
+  # Check whether downloaded zips actually exist:
+  for (zipfilename in vars$downloaded) {
+    expect_true(file.exists(zipfilename))
+  }
+  expect_true(FALSE) # TODO: Check if the criteria are ok! When writing this test, the files to be downloaded were not on the server yet.
+})
+
+test_that("5.5 soil: failure: variable not available", {
+
+  # Prepare:
+  expected_error_message <- "Not available: Variable(s) xyz. Please check your spelling and try again!"
+  mysubset <- c("awcts", "wwp")
+  mytiles <- c("h02v02", "h04v02")
+
+  # Run:
+  expect_error(
+    vars <- get_soil_variables(
+      tempdir=tmpdir,
+      quiet=FALSE,
+      subset=c("awcts", "wwp", "xyz"),
+      tile_ids=mytiles),
+    expected_error_message, fixed=TRUE
+  )
+})
+
+test_that("6.1 hydro90m: show all", {
+
+  # Run:
+  vars <- get_hydrography90m_variables(
+    tempdir=tmpdir,
+    quiet=FALSE)
+
+  # Check:
+  expect_equal(sort(names(vars)), sort(c("comment", "variable_names")))
+  all_hy90m_vars <- c(
+    "channel_curv_cel", "channel_dist_dw_seg", "channel_dist_up_cel",
+    "channel_dist_up_seg", "channel_elv_dw_cel", "channel_elv_dw_seg",
+    "channel_elv_up_cel", "channel_elv_up_seg", "channel_grad_dw_seg",
+    "channel_grad_up_cel", "channel_grad_up_seg", "connections", "cti",
+    "cum_length", "elev_drop", "flow", "flow_accum", "flow_pos", "flow1k",
+    "gradient", "length", "out_dist", "out_drop", "outlet_diff_dw_basin",
+    "outlet_diff_dw_scatch", "outlet_dist_dw_basin", "outlet_dist_dw_scatch",
+    "outlet_elev", "sinusoid", "slope_curv_max_dw_cel", "slope_curv_min_dw_cel",
+    "slope_elv_dw_cel", "slope_grad_dw_cel", "source_elev", "spi", "sti",
+    "stream_diff_dw_near", "stream_diff_up_farth", "stream_diff_up_near",
+    "stream_dist_dw_near", "stream_dist_proximity", "stream_dist_up_farth",
+    "stream_dist_up_near", "stream_hack", "stream_horton", "stream_shreve",
+    "stream_strahler", "stream_topo", "stright")
+  expect_equal(sort(vars$variable_names), all_hy90m_vars)
+})
+
+test_that("6.2 hydro90m: show subset (specified: subset)", {
+
+  # Prepare:
+  mysubset <- c("flow_accum", "spi")
+
+  # Run:
+  vars <- get_hydrography90m_variables(
+    tempdir=tmpdir,
+    quiet=FALSE,
+    subset=mysubset)
+
+  # Check:
+  expect_equal(sort(names(vars)), sort(c("comment", "variable_names")))
+  expect_equal(sort(vars$variable_names), mysubset)
+})
+
+test_that("6.3 hydro90m: show subset and download size (specified: subset)", {
+
+  # Prepare:
+  mysubset <- c("flow_accum", "spi")
+  mytiles <- c("h02v02", "h04v02")
+  expected_bytes <- 242013279
+
+  # Run:
+  vars <- get_hydrography90m_variables(
+    tempdir=tmpdir,
+    quiet=FALSE,
+    subset=mysubset,
+    tile_ids=mytiles)
+
+  # Check:
+  expect_equal(sort(names(vars)), sort(c("comment", "variable_names", "tile_ids", "download_bytes")))
+  expect_equal(sort(vars$variable_names), mysubset)
+  expect_equal(sort(vars$tile_ids), mytiles)
+  expect_equal(vars$download_bytes, expected_bytes)
+})
+
+test_that("6.4 hydro90m: show subset and download size, then download (specified: subset)", {
+
+  # Prepare:
+  mysubset <- c("flow_accum", "spi")
+  mytiles <- c("h02v02", "h04v02")
+  expected_bytes <- 242013279
+
+  # Run:
+  skip_if(SKIP_FAILING_DOWNLOAD, 'This downloads data, so we skip it this time...')
+  vars <- get_soil_variables(
+    tempdir=tmpdir,
+    quiet=FALSE,
+    subset=mysubset,
+    tile_ids=mytiles,
+    download=TRUE,
+    download_dir=download_dir,
+    file_format="zip",
+    delete_zips=FALSE)
+
+  # Check:
+  expect_equal(sort(names(vars)), sort(c("comment", "variable_names", "tile_ids", "download_bytes", "downloaded")))
+  expect_equal(sort(vars$variable_names), mysubset)
+  expect_equal(sort(vars$tile_ids), mytiles)
+  expect_equal(vars$download_bytes, expected_bytes)
+  # Check whether downloaded zips actually exist:
+  for (zipfilename in vars$downloaded) {
+    expect_true(file.exists(zipfilename))
+  }
+  expect_true(FALSE) # TODO: Check if the criteria are ok! When writing this test, the files to be downloaded were not on the server yet.
+})
+
+test_that("6.5 hydro90m: failure: variable not available", {
+
+  # Prepare:
+  expected_error_message <- "Not available: Variable(s) xyz. Please check your spelling and try again!"
+  mysubset <- c("flow_accum", "spi")
+  mytiles <- c("h02v02", "h04v02")
+
+  # Run:
+  expect_error(
+    vars <- get_hydrography90m_variables(
+      tempdir=tmpdir,
+      quiet=FALSE,
+      subset=c("flow_accum", "spi", "xyz"),
+      tile_ids=mytiles),
+    expected_error_message, fixed=TRUE
+  )
+})
+
+
