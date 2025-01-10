@@ -271,7 +271,7 @@ test_that("1.3.3: helpers: download zip, unzip to txt (do delete)", {
 test_that("2.1 landcover: show all", {
 
   # Run:
-  vars <- get_landcover_variables(
+  vars <- download_landcover_tables(
     tempdir=tmpdir,
     quiet=FALSE)
 
@@ -290,7 +290,7 @@ test_that("2.2.1 landcover: show subset (specified: subset)", {
   mysubset <- c("c20_1992", "c20_1994", "c30_1992", "c30_1994")
 
   # Run:
-  vars <- get_landcover_variables(
+  vars <- download_landcover_tables(
     tempdir=tmpdir,
     quiet=FALSE,
     subset=mysubset)
@@ -310,7 +310,7 @@ test_that("2.2.2 landcover: show subset (specified: base_vars and years)", {
   myyears <- c(1992, 1994)
   
   # Run:
-  vars <- get_landcover_variables(
+  vars <- download_landcover_tables(
     tempdir=tmpdir,
     quiet=FALSE,
     base_vars=mybasevars,
@@ -332,7 +332,7 @@ test_that("2.3.1 landcover: show subset and download_size (specified: subset)", 
   expected_bytes <- 107945857
   
   # Run:
-  vars <- get_landcover_variables(
+  vars <- download_landcover_tables(
     tempdir=tmpdir,
     quiet=FALSE,
     subset=mysubset,
@@ -356,7 +356,7 @@ test_that("2.3.2 landcover: show subset and download_size (specified: base_vars 
   expected_bytes <- 107945857
 
   # Run:
-  vars <- get_landcover_variables(
+  vars <- download_landcover_tables(
     tempdir=tmpdir,
     quiet=FALSE,
     base_vars=mybasevars,
@@ -382,7 +382,7 @@ test_that("2.4.1 landcover: show subset and download size, then download (specif
 
   # Run:
   skip_if(SKIP_FAILING_DOWNLOAD, 'This downloads data, so we skip it this time...')
-  vars <- get_landcover_variables(
+  vars <- download_landcover_tables(
     tempdir=tmpdir,
     quiet=FALSE,
     subset=mysubset,
@@ -416,7 +416,7 @@ test_that("2.4.2 landcover: show subset and download size, then download (specif
 
   # Run:
   skip_if(SKIP_FAILING_DOWNLOAD, 'This downloads data, so we skip it this time...')
-  vars <- get_landcover_variables(
+  vars <- download_landcover_tables(
     tempdir=tmpdir,
     quiet=FALSE,
     base_vars=mybasevars,
@@ -445,7 +445,7 @@ test_that("2.4.2 landcover: show subset and download size, then download (specif
 test_that("3.1 future climate: show all", {
 
   # Run:
-  vars <- get_future_climate_variables(
+  vars <- download_future_climate_tables(
     tempdir=tmpdir,
     quiet=FALSE)
 
@@ -475,7 +475,7 @@ test_that("3.2.1 futureclimate: show subset (specified: subset)", {
   mysubset <- c("bio1_2041-2070_ipsl-cm6a-lr_ssp126_V.2.1", "bio1_2071-2100_ipsl-cm6a-lr_ssp126_V.2.1")
 
   # Run:
-  vars <- get_future_climate_variables(
+  vars <- download_future_climate_tables(
     tempdir=tmpdir,
     quiet=FALSE,
     subset=mysubset)
@@ -497,7 +497,7 @@ test_that("3.2.2 futureclimate: show subset (specified: various components)", {
   myversions <- c("V.2.1")
   
   # Run:
-  vars <- get_future_climate_variables(
+  vars <- download_future_climate_tables(
     tempdir=tmpdir,
     quiet=FALSE,
     base_vars=mybasevars,
@@ -523,7 +523,7 @@ test_that("3.3.1 futureclimate: show subset and download size (specified: subset
   mytiles <- c("h02v02", "h04v02")
 
   # Run:
-  vars <- get_future_climate_variables(
+  vars <- download_future_climate_tables(
     tempdir=tmpdir,
     quiet=FALSE,
     subset=mysubset,
@@ -549,7 +549,7 @@ test_that("3.3.2 futureclimate: show subset and download size (specified: variou
   mytiles <- c("h02v02", "h04v02")
 
   # Run:
-  vars <- get_future_climate_variables(
+  vars <- download_future_climate_tables(
     tempdir=tmpdir,
     quiet=FALSE,
     base_vars=mybasevars,
@@ -580,7 +580,7 @@ test_that("3.4.1 futureclimate: show subset and download size, then download (sp
 
   # Run:
   skip_if(SKIP_DOWNLOAD, 'This downloads data, so we skip it this time...')
-  vars <- get_future_climate_variables(
+  vars <- download_future_climate_tables(
     tempdir=tmpdir,
     quiet=FALSE,
     subset=mysubset,
@@ -616,7 +616,7 @@ test_that("3.4.2 futureclimate: show subset and download size, then download (sp
 
   # Run:
   skip_if(SKIP_DOWNLOAD, 'This downloads data, so we skip it this time...')
-  vars <- get_future_climate_variables(
+  vars <- download_future_climate_tables(
     tempdir=tmpdir,
     quiet=FALSE,
     base_vars=mybasevars,
@@ -657,7 +657,7 @@ test_that("3.5.1 futureclimate: failure: model not available", {
 
   # Run:
   expect_error(
-    vars <- get_future_climate_variables(
+    vars <- download_future_climate_tables(
       tempdir=tmpdir,
       quiet=FALSE,
       base_vars=mybasevars,
@@ -683,7 +683,7 @@ test_that("3.5.2 futureclimate: failure: scenarios not available", {
 
   # Run:
   expect_error(
-    vars <- get_future_climate_variables(
+    vars <- download_future_climate_tables(
       tempdir=tmpdir,
       quiet=FALSE,
       base_vars=mybasevars,
@@ -709,7 +709,7 @@ test_that("3.5.3 futureclimate: failure: version not available", {
 
   # Run:
   expect_error(
-    vars <- get_future_climate_variables(
+    vars <- download_future_climate_tables(
       tempdir=tmpdir,
       quiet=FALSE,
       base_vars=mybasevars,
@@ -735,7 +735,7 @@ test_that("3.5.4 futureclimate: failure: base_var not available", {
 
   # Run:
   expect_error(
-    vars <- get_future_climate_variables(
+    vars <- download_future_climate_tables(
       tempdir=tmpdir,
       quiet=FALSE,
       base_vars=c("bio1", "xyz", "abc", "def"),
@@ -750,7 +750,7 @@ test_that("3.5.4 futureclimate: failure: base_var not available", {
 test_that("4.1 presentclimate: show all", {
 
   # Run:
-  vars <- get_present_climate_variables(
+  vars <- download_present_climate_tables(
     tempdir=tmpdir,
     quiet=FALSE)
 
@@ -769,7 +769,7 @@ test_that("4.2 presentclimate: show subset (specified: subset)", {
   mysubset <- c("bio1",  "bio10")
 
   # Run:
-  vars <- get_present_climate_variables(
+  vars <- download_present_climate_tables(
     tempdir=tmpdir,
     quiet=FALSE,
     subset=mysubset)
@@ -788,7 +788,7 @@ test_that("4.3 presentclimate: show subset and download size (specified: subset)
   expected_bytes <- 335702566
 
   # Run:
-  vars <- get_present_climate_variables(
+  vars <- download_present_climate_tables(
     tempdir=tmpdir,
     quiet=FALSE,
     subset=mysubset,
@@ -811,7 +811,7 @@ test_that("4.4 presentclimate: show subset and download size, then download (spe
 
   # Run:
   skip_if(SKIP_FAILING_DOWNLOAD, 'This downloads data, so we skip it this time...')
-  vars <- get_present_climate_variables(
+  vars <- download_present_climate_tables(
     tempdir=tmpdir,
     quiet=FALSE,
     subset=mysubset,
@@ -843,7 +843,7 @@ test_that("4.5 presentclimate: failure: variable not available", {
 
   # Run:
   expect_error(
-    vars <- get_present_climate_variables(
+    vars <- download_present_climate_tables(
       tempdir=tmpdir,
       quiet=FALSE,
       subset=c("bio1", "bio10", "xyz"),
@@ -855,7 +855,7 @@ test_that("4.5 presentclimate: failure: variable not available", {
 test_that("5.1 soil: show all", {
 
   # Run:
-  vars <- get_soil_variables(
+  vars <- download_soil_tables(
     tempdir=tmpdir,
     quiet=FALSE)
 
@@ -874,7 +874,7 @@ test_that("5.2 soil: show subset (specified: subset)", {
   mysubset <- c("awcts", "wwp")
 
   # Run:
-  vars <- get_soil_variables(
+  vars <- download_soil_tables(
     tempdir=tmpdir,
     quiet=FALSE,
     subset=mysubset)
@@ -893,7 +893,7 @@ test_that("5.3 soil: show subset and download size (specified: subset)", {
   expected_bytes <- 310093648
 
   # Run:
-  vars <- get_soil_variables(
+  vars <- download_soil_tables(
     tempdir=tmpdir,
     quiet=FALSE,
     subset=mysubset,
@@ -916,7 +916,7 @@ test_that("5.4 soil: show subset and download size, then download (specified: su
 
   # Run:
   skip_if(SKIP_FAILING_DOWNLOAD, 'This downloads data, so we skip it this time...')
-  vars <- get_soil_variables(
+  vars <- download_soil_tables(
     tempdir=tmpdir,
     quiet=FALSE,
     subset=mysubset,
@@ -948,7 +948,7 @@ test_that("5.5 soil: failure: variable not available", {
 
   # Run:
   expect_error(
-    vars <- get_soil_variables(
+    vars <- download_soil_tables(
       tempdir=tmpdir,
       quiet=FALSE,
       subset=c("awcts", "wwp", "xyz"),
@@ -960,7 +960,7 @@ test_that("5.5 soil: failure: variable not available", {
 test_that("6.1 hydro90m: show all", {
 
   # Run:
-  vars <- get_hydrography90m_variables(
+  vars <- download_hydrography90m_tables(
     tempdir=tmpdir,
     quiet=FALSE)
 
@@ -990,7 +990,7 @@ test_that("6.2 hydro90m: show subset (specified: subset)", {
   mysubset <- c("flow_accum", "spi")
 
   # Run:
-  vars <- get_hydrography90m_variables(
+  vars <- download_hydrography90m_tables(
     tempdir=tmpdir,
     quiet=FALSE,
     subset=mysubset)
@@ -1009,7 +1009,7 @@ test_that("6.3 hydro90m: show subset and download size (specified: subset)", {
   expected_bytes <- 242013279
 
   # Run:
-  vars <- get_hydrography90m_variables(
+  vars <- download_hydrography90m_tables(
     tempdir=tmpdir,
     quiet=FALSE,
     subset=mysubset,
@@ -1032,7 +1032,7 @@ test_that("6.4 hydro90m: show subset and download size, then download (specified
 
   # Run:
   skip_if(SKIP_FAILING_DOWNLOAD, 'This downloads data, so we skip it this time...')
-  vars <- get_soil_variables(
+  vars <- download_soil_tables(
     tempdir=tmpdir,
     quiet=FALSE,
     subset=mysubset,
@@ -1064,7 +1064,7 @@ test_that("6.5 hydro90m: failure: variable not available", {
 
   # Run:
   expect_error(
-    vars <- get_hydrography90m_variables(
+    vars <- download_hydrography90m_tables(
       tempdir=tmpdir,
       quiet=FALSE,
       subset=c("flow_accum", "spi", "xyz"),

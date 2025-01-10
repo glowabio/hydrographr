@@ -74,7 +74,7 @@
 ### Variable getters ###
 ########################
 
-get_future_climate_variables <- function(tempdir = NULL, 
+download_future_climate_tables <- function(tempdir = NULL, 
                                          quiet = FALSE, subset = NULL,
                                          base_vars = NULL, time_periods = NULL, 
                                          scenarios = NULL, models = NULL,
@@ -339,7 +339,7 @@ get_future_climate_variables <- function(tempdir = NULL,
   return(variables)
 }
 
-get_landcover_variables <- function(subset = NULL, years = NULL, base_vars = NULL, quiet = FALSE,
+download_landcover_tables <- function(subset = NULL, years = NULL, base_vars = NULL, quiet = FALSE,
                                     tempdir = NULL, ignore_missing = FALSE, tile_ids = NULL,
                                     download = FALSE, download_dir = ".",
                                file_format = "txt", delete_zips = TRUE) {
@@ -512,13 +512,13 @@ get_landcover_variables <- function(subset = NULL, years = NULL, base_vars = NUL
   return(variables)
 }
 
-get_soil_variables <- function(subset = NULL, tile_ids = NULL,
+download_soil_tables <- function(subset = NULL, tile_ids = NULL,
                                download = FALSE, download_dir = ".",
                                ignore_missing = FALSE, quiet = NULL,
                                tempdir = NULL, delete_zips = TRUE,
                                file_format = "txt") {
 
-  return(get_simple_variables(
+  return(download_simple_tables(
     "env90m_soil_paths_file_sizes.txt",
     "soilgrids250m_v2_0",
     subset, tile_ids, download, download_dir, ignore_missing,
@@ -526,13 +526,13 @@ get_soil_variables <- function(subset = NULL, tile_ids = NULL,
   ))
 }
 
-get_present_climate_variables <- function(subset = NULL, tile_ids = NULL,
+download_present_climate_tables <- function(subset = NULL, tile_ids = NULL,
                                           download = FALSE, download_dir = ".",
                                           ignore_missing = FALSE, quiet = NULL,
                                           tempdir = NULL, delete_zips = TRUE,
                                           file_format = "txt") {
 
-  return(get_simple_variables(
+  return(download_simple_tables(
     "env90m_presentclimate_paths_file_sizes.txt",
     "chelsa_bioclim_v2_1",
     subset, tile_ids, download, download_dir, ignore_missing,
@@ -540,13 +540,13 @@ get_present_climate_variables <- function(subset = NULL, tile_ids = NULL,
   ))
 }
 
-get_hydrography90m_variables <- function(subset = NULL, tile_ids = NULL,
+download_hydrography90m_tables <- function(subset = NULL, tile_ids = NULL,
                                          download = FALSE, download_dir = ".",
                                          ignore_missing = FALSE, quiet = NULL,
                                          tempdir = NULL, delete_zips = TRUE,
                                          file_format = "txt") {
 
-  return(get_simple_variables(
+  return(download_simple_tables(
     "env90m_hydro_paths_file_sizes.txt",
     "hydrography90m_v1_0", 
     subset, tile_ids, download, download_dir, ignore_missing,
@@ -554,7 +554,7 @@ get_hydrography90m_variables <- function(subset = NULL, tile_ids = NULL,
   ))
 }
 
-get_simple_variables <- function(table_file_name, dataset_name,
+download_simple_tables <- function(table_file_name, dataset_name,
                                  subset, tile_ids,
                                  download, download_dir,
                                  ignore_missing, quiet,
