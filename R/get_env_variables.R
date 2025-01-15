@@ -81,6 +81,11 @@ download_future_climate_tables <- function(tempdir = NULL,
                                          versions = NULL, ignore_missing = FALSE, # TODO check defaults
                                          tile_ids = NULL, download = FALSE, download_dir = ".", delete_zips = TRUE, file_format = "txt") {
 
+
+  #########################################
+  ### Extract info from file size table ###
+  #########################################
+
   # Use file_size_table from tempdir or download it:
   file_name <- "env90m_futureclimate_paths_file_sizes.txt"
   file_size_table <- get_file_size_table(file_name, tempdir)
@@ -90,27 +95,18 @@ download_future_climate_tables <- function(tempdir = NULL,
   # <base_var>_<time_period>_<model>_<scenario>_<version>_<tile_id>.zip
   # "bio9_2071-2100_ukesm1-0-ll_ssp585_V.2.1_h32v00.zip"
 
-  # Extract all variable names from filenames:
+  # Extract all formats from file size table:
   regex_format <- ".[a-z]+$"
   #all_formats <- unique(stringr::str_extract(file_size_table$file_name, regex_format))
   #all_formats <- unique(sub("^.", "", all_formats))
   filenames_without_format <- unique(sub(regex_format, "", file_size_table$file_name))
+
+  # Extract all tiles from file size table:
   regex_tile <- "_h[0-9]+v[0-9]+$"
-  #all_tiles <- unique(stringr::str_extract(filenames_without_format, regex_tile))
-  #all_tiles <- unique(sub("^_", "", all_tiles))
+  all_tiles <- unique(stringr::str_extract(filenames_without_format, regex_tile))
+  all_tiles <- unique(sub("^_", "", all_tiles))
   filenames_without_tile <- unique(sub(regex_tile, "", filenames_without_format))
   all_varnames <- filenames_without_tile
-
-  # Should we return everything, or restrict by scenario/model/time period?
-  if (is.null(subset) && is.null(time_periods) && is.null(scenarios) && is.null(models) && is.null(base_vars) && is.null(versions)) {
-    return_all <- TRUE
-  } else {
-    return_all <- FALSE
-  }
-
-  ###########################################
-  ## Split variable names into components ###
-  ###########################################
 
   # Extract version from end of string 
   regex_version <- "_[^_]+$"  
@@ -141,28 +137,101 @@ download_future_climate_tables <- function(tempdir = NULL,
   all_base_vars <- unique(stringr::str_extract(file_size_table$file_name, regex_base))
   all_base_vars <- sub("_$", "", all_base_vars)
 
+  ############################################
+  ### Does user want all variables / tiles ###
+  ### or did they specify a subset?        ###
+  ############################################
+
+  # Should we return everything, or restrict by scenario/model/time period?
+  if (is.null(subset) && is.null(time_periods) && is.null(scenarios) && is.null(models) && is.null(base_vars) && is.null(versions)) {
+    return_all_vars <- TRUE
+  } else if (length(subset) == 1 && subset == "ALL") {
+    return_all_vars <- TRUE
+  } else if (length(time_periods) == 1 && time_periods == "ALL" &&
+             length(scenarios) == 1    && scenarios  == "ALL" &&
+             length(models) == 1       && models  == "ALL" &&
+             length(base_vars) == 1    && base_vars == "ALL" &&
+             length(versions) == 1     && versions == "ALL") {
+    return_all_vars <- TRUE
+  } else {
+    return_all_vars <- FALSE
+  }
+
+  # Same for tiles
+  if (length(tile_ids) == 1 && tile_ids == "ALL") {
+    tile_ids <- all_tiles
+    return_all_tiles <- TRUE
+  } else {
+    return_all_tiles <- FALSE
+  }
+
+  #####################################
+  ### Return/download all variables ###
+  ### (no subset specified)         ###
+  #####################################
+
   # If user did not specify a subset, return all variable names
   # as a list of splitted components:
-  if (return_all) {
+  if (return_all_vars) {
+
+    # Assemble the object to be returned:
     variables <- list(
-      comment = "All available variables for this dataset.",
-      dataset_name = "chelsa_bioclim_v2_1",
+      variable_names = sort(all_varnames),
       base_vars = sort(all_base_vars),
       models = sort(all_models),
       scenarios = sort(all_scenarios),
       time_periods = sort(all_periods),
       versions = sort(all_versions),
-      variable_names = sort(all_varnames)
+      comment = "All available variables for this dataset.",
+      dataset_name = "chelsa_bioclim_v2_1"
     )
+
+    # Compute download size, if desired tiles are specified:
+    if (! (is.null(tile_ids))) {
+      download_bytes <- compute_download_size(
+        tile_ids, all_varnames, file_size_table, quiet)
+      message(paste0("Info: Download size: ",
+        length(all_varnames), " variables, ",
+        length(tile_ids), " tiles: ",
+        download_bytes/1000000000, " GB (", download_bytes, " bytes)."))
+      variables$download_bytes=download_bytes
+      variables$tile_ids=tile_ids
+    }
+
+    # Does the user want to download all variables, or just see them?
+    if (download) {
+
+      # Without knowing which tiles, user cannot download:
+      if (is.null(tile_ids)) {
+        msg <- "To download data, please specify parameter 'tile_ids'."
+        variables$note = msg
+        warning(msg)
+
+      # If tiles were specified, we can download:
+      } else {
+        message("\nStarting download of ", download_bytes/1000000000, " GB...")
+        outcome <- do_download(all_varnames, tile_ids, file_size_table,
+            download_dir = download_dir, file_format = file_format,
+            quiet = quiet, delete_zips = delete_zips)
+        variables <- c(variables, outcome)
+      }
+
+    # User does not want to download all variables, just see them:
+    } else {
+      msg = "To download this data, specify parameter 'tile_ids', and add 'download=TRUE'."
+      message(msg)
+      variables$note = msg
+    }
+
     return(variables)
   }
 
   # If user specified a subset, continue with those specified variables that
   # are available:
 
-  ############################################
-  ## Restrict to user-requested components ###
-  ############################################
+  ########################################
+  ## Restrict to user-requested subset ###
+  ########################################
 
   # If the user specified a subset of complete variable names, use it:
   if (!(is.null(subset))){
@@ -176,14 +245,15 @@ download_future_climate_tables <- function(tempdir = NULL,
       variable_names = sort(varnames_to_be_returned)
     )
 
+  # If the user specified subsets of components (e.g. models, scenarios, ...)
   } else {
 
     # Restrict scenarios to what the user requested:
-    if (is.null(models)) {
-      # If user did not request scenarios years, return all available scenarios:
+    if (is.null(models) || (length(models) == 1 && models == "ALL")) {
+      # If user did not request scenarios models, return all available models:
       models_to_be_returned <- all_models
     } else {
-      # If user requested specific scenarios, return requested available scenarios:
+      # If user requested specific models, return requested available models:
       models_to_be_returned <- models[models %in% all_models]
       # If some models are not available, warn or stop:
       if (!(all(models %in% all_models))) {
@@ -198,8 +268,8 @@ download_future_climate_tables <- function(tempdir = NULL,
     }
 
     # Restrict scenarios to what the user requested:
-    if (is.null(scenarios)) {
-      # If user did not request specific years, return all available years:
+    if (is.null(scenarios) || (length(scenarios) == 1 && scenarios == "ALL")) {
+      # If user did not request specific scenarios, return all available scenarios:
       returned_scenarios <- all_scenarios
     } else {
       # If user requested specific scenarios, return requested available scenarios:
@@ -218,11 +288,11 @@ download_future_climate_tables <- function(tempdir = NULL,
     }
 
     # Restrict time periods to what the user requested:
-    if (is.null(time_periods)) {
+    if (is.null(time_periods) || (length(time_periods) == 1 && time_periods == "ALL")) {
       # If user did not request specific time periods, return all available:
       returned_time_periods <- all_periods
     } else {
-      # If user requested specific time periods, return requested available years:
+      # If user requested specific time periods, return requested available time_periods:
       returned_time_periods <- time_periods[time_periods %in% all_periods]
 
       # If some timeperiods are not available, warn or stop:
@@ -238,11 +308,11 @@ download_future_climate_tables <- function(tempdir = NULL,
     }
 
     # Restrict versions to what the user requested:
-    if (is.null(versions)) {
+    if (is.null(versions) || (length(versions) == 1 && versions == "ALL")) {
       # If user did not request specific versions, return all available:
       returned_versions <- all_versions
     } else {
-      # If user requested specific years, return requested available years:
+      # If user requested specific versions, return requested available version:
       returned_versions <- versions[versions %in% all_versions]
       # If some versions are not available, warn or stop:
       if (!(all(versions %in% all_versions))) {
@@ -257,7 +327,7 @@ download_future_climate_tables <- function(tempdir = NULL,
     }
 
     # Restrict base vars to what the user requested:
-    if (is.null(base_vars)) {
+    if (is.null(base_vars) || (length(base_vars) == 1 && base_vars == "ALL")) {
       # If user did not request specific base vars, return all available:
       base_vars_to_be_returned <- all_base_vars
     } else {
@@ -277,7 +347,7 @@ download_future_climate_tables <- function(tempdir = NULL,
 
     # Combine those subsets of years or base vars to a subset of
     # complete variable names
-    # TODO: This causes warning "longer object length is not a multiple of shorter object length"
+    # TODO: This may cause warning "longer object length is not a multiple of shorter object length"
     subset <- levels(interaction(
       base_vars_to_be_returned,
       returned_time_periods,
@@ -292,14 +362,14 @@ download_future_climate_tables <- function(tempdir = NULL,
 
     # Construct the list to be returned to the user
     variables <- list(
-      comment = "Subset of variables for this dataset.",
-      dataset_name = "chelsa_bioclim_v2_1",
       variable_names = sort(varnames_to_be_returned),
       time_periods = sort(returned_time_periods),
       scenarios = sort(returned_scenarios),
       models = sort(models_to_be_returned),
       base_vars = sort(base_vars_to_be_returned),
-      versions = sort(returned_versions)
+      versions = sort(returned_versions),
+      comment = "Subset of variables for this dataset.",
+      dataset_name = "chelsa_bioclim_v2_1"
     )
   }
 
@@ -310,6 +380,7 @@ download_future_climate_tables <- function(tempdir = NULL,
     if (ignore_missing) {
       message(paste0(err_msg, " Will be ignored...")) # shown right away
       warning(paste0(err_msg, " Was ignored...")) # shown at the end
+      variables$not_available = not_available
     } else {
       stop(paste0(err_msg, '. Please check your spelling and try again!'))
     }
@@ -318,7 +389,7 @@ download_future_climate_tables <- function(tempdir = NULL,
   # Compute download size, if tile_ids is specified:
   if (!(is.null(tile_ids))) {
     download_bytes <- compute_download_size(tile_ids, varnames_to_be_returned, file_size_table, quiet)
-    message(paste0("Download size: ",
+    message(paste0("Info: Download size: ",
       length(varnames_to_be_returned), " variables, ",
       length(tile_ids), " tiles: ",
       download_bytes/1000000000, " GB (", download_bytes, " bytes)."))
@@ -328,23 +399,47 @@ download_future_climate_tables <- function(tempdir = NULL,
 
   # Download the data if requested:
   if (download) {
-    if (is.null(tile_ids)) message('In order to download, please provide tile_ids.')
-    outcome <- do_download(varnames_to_be_returned, tile_ids, file_size_table,
-        download_dir = download_dir, file_format = file_format,
-        quiet = quiet, delete_zips = delete_zips)
-    variables <- c(variables, outcome)
+    if (is.null(tile_ids)) {
+      msg = "To download this data, specify parameter 'tile_ids'."
+      variables$note = msg
+      warning(msg)
+    } else {
+      message("\nStarting download of ", download_bytes/1000000000, " GB...")
+      outcome <- do_download(varnames_to_be_returned, tile_ids, file_size_table,
+          download_dir = download_dir, file_format = file_format,
+          quiet = quiet, delete_zips = delete_zips)
+      variables <- c(variables, outcome)
+    }
+  } else {
+    msg = "To download this data, specify which tiles, and add 'download=TRUE'."
+    variables$note = msg
+    message(msg)
   }
 
   # Return the list
   return(variables)
 }
 
-download_landcover_tables <- function(subset = NULL, years = NULL, base_vars = NULL, quiet = FALSE,
-                                    tempdir = NULL, ignore_missing = FALSE, tile_ids = NULL,
-                                    download = FALSE, download_dir = ".",
-                               file_format = "txt", delete_zips = TRUE) {
 
-  # Use file_size_table from tempdir or download it:
+
+
+
+
+
+
+
+
+
+
+download_landcover_tables <- function(subset = NULL, years = NULL, base_vars = NULL, quiet = FALSE,
+                                     tempdir = NULL, ignore_missing = FALSE, tile_ids = NULL,
+                                     download = FALSE, download_dir = ".",
+                                     file_format = "txt", delete_zips = TRUE) {
+
+  #########################################
+  ### Extract info from file size table ###
+  #########################################
+
   file_name <- "env90m_landcover_paths_file_sizes.txt"
   file_size_table <- get_file_size_table(file_name, tempdir)
 
@@ -353,21 +448,10 @@ download_landcover_tables <- function(subset = NULL, years = NULL, base_vars = N
   # <c00>_<year>_<tile_id>.zip
   # "c20_1992_h32v00.zip"
 
-  # Extract all landcover (starting with cxx_xxxx_) from filenames:
+  # Extract all landcover (starting with cxx_xxxx) from filenames:
   regex <- "^c[0-9]+_[0-9]+"
   all_varnames <- unique(stringr::str_extract(file_size_table$file_name, regex))
   all_varnames <- all_varnames[!is.na(all_varnames)]
-
-  # Should we return everything, or restrict by scenario/model/time period?
-  if (is.null(years) && is.null(base_vars) && is.null(subset)) {
-    return_all <- TRUE
-  } else {
-    return_all <- FALSE
-  }
-
-  ###########################################
-  ## Split variable names into components ###
-  ###########################################
 
   # Extract years from landcover:
   all_years <- unique(sub("^c[0-9]+_", "", all_varnames))
@@ -380,25 +464,108 @@ download_landcover_tables <- function(subset = NULL, years = NULL, base_vars = N
   all_base_vars <- all_base_vars[!is.na(all_base_vars)]
   #print(paste(all_base_vars, collapse='+'))
 
+  # Extract all formats from file size table:
+  regex_format <- ".[a-z]+$"
+  #all_formats <- unique(stringr::str_extract(file_size_table$file_name, regex_format))
+  #all_formats <- unique(sub("^.", "", all_formats))
+  filenames_without_format <- unique(sub(regex_format, "", file_size_table$file_name))
+
+  # Extract all tiles from file size table:
+  regex_tile <- "_h[0-9]+v[0-9]+$"
+  all_tiles <- unique(stringr::str_extract(filenames_without_format, regex_tile))
+  all_tiles <- unique(sub("^_", "", all_tiles))
+
+
+  ############################################
+  ### Does user want all variables / tiles ###
+  ### or did they specify a subset?        ###
+  ############################################
+
+  # Should we return everything, or restrict by scenario/model/time period?
+  if (is.null(years) && is.null(base_vars) && is.null(subset)) {
+    return_all_vars <- TRUE
+  } else if (length(subset) == 1 && subset == "ALL") {
+    return_all_vars <- TRUE
+  } else if (length(years) == 1     && years == "ALL" &&
+             length(base_vars) == 1 && base_vars == "ALL") {
+    return_all_vars <- TRUE
+  } else {
+    return_all_vars <- FALSE
+  }
+
+  # Same for tiles
+  if (length(tile_ids) == 1 && tile_ids == "ALL") {
+    tile_ids <- all_tiles
+    return_all_tiles <- TRUE
+  } else {
+    return_all_tiles <- FALSE
+  }
+
+  #####################################
+  ### Return/download all variables ###
+  ### (no subset specified)         ###
+  #####################################
+
   # If user did not specify a subset, return all variable names
   # as a list of splitted components:
-  if (return_all) {
+  if (return_all_vars) {
+
+    # Assemble the object to be returned:
     variables <- list(
-      comment = "All available variables for this dataset.",
-      dataset_name = "esa_cci_landcover_v2_1_1",
       base_vars = sort(all_base_vars),
       years = sort(all_years),
-      variable_names = sort(all_varnames)
+      variable_names = sort(all_varnames),
+      comment = "All available variables for this dataset.",
+      dataset_name = "esa_cci_landcover_v2_1_1"
     )
+
+    # Compute download size, if desired tiles are specified:
+    if (! (is.null(tile_ids))) {
+      download_bytes <- compute_download_size(
+        tile_ids, all_varnames, file_size_table, quiet)
+      message(paste0("Info: Download size: ",
+        length(all_varnames), " variables, ",
+        length(tile_ids), " tiles: ",
+        download_bytes/1000000000, " GB (", download_bytes, " bytes)."))
+      variables$download_bytes=download_bytes
+      variables$tile_ids=tile_ids
+    }
+
+    # Does the user want to download all variables, or just see them?
+    if (download) {
+
+      # Without knowing which tiles, user cannot download:
+      if (is.null(tile_ids)) {
+        msg <- "To download data, please specify parameter 'tile_ids'."
+        variables$note = msg
+        warning(msg)
+
+      # If tiles were specified, we can download:
+      } else {
+        message("\nStarting download of ", download_bytes/1000000000, " GB...")
+        outcome <- do_download(all_varnames, tile_ids, file_size_table,
+            download_dir = download_dir, file_format = file_format,
+            quiet = quiet, delete_zips = delete_zips)
+        variables <- c(variables, outcome)
+      }
+
+    # User does not want to download all variables, just see them:
+    } else {
+      msg = "To download this data, specify parameter 'tile_ids', and add 'download=TRUE'."
+      message(msg)
+      variables$note = msg
+    }
+
     return(variables)
+
   }
 
   # If user specified a subset, continue with those specified variables that
   # are available:
 
-  ############################################
-  ## Restrict to user-requested components ###
-  ############################################
+  ########################################
+  ## Restrict to user-requested subset ###
+  ########################################
 
   # If the user specified a subset of complete variable names, use it:
   if (!(is.null(subset))){
@@ -415,8 +582,10 @@ download_landcover_tables <- function(subset = NULL, years = NULL, base_vars = N
   } else {
 
     # Restrict years to what the user requested:
-    if (is.null(years)) {
+    if (is.null(years) || (length(years) == 1 && years == "ALL")) {
       # If user did not request specific years, return all available years:
+      # TODO: Something around here (?) causes Warning message: In ans * length(l) + if1 :
+      # longer object length is not a multiple of shorter object length
       years_to_be_returned <- all_years
     } else {
       # If user requested specific years, return requested available years:
@@ -434,7 +603,7 @@ download_landcover_tables <- function(subset = NULL, years = NULL, base_vars = N
     }
 
     # Restrict base_vars to what the user requested:
-    if (is.null(base_vars)) {
+    if (is.null(base_vars) || (length(base_vars) == 1 && base_vars == "ALL")) {
       # If user did not request specific base_vars, return all available base_vars:
       base_vars_to_be_returned <- all_base_vars
     } else {
@@ -455,23 +624,26 @@ download_landcover_tables <- function(subset = NULL, years = NULL, base_vars = N
 
     # Combine those subsets of years or base vars to a subset of
     # complete variable names
-    # TODO: This causes warning "longer object length is not a multiple of shorter object length"
-    subset <- levels(interaction(
-      base_vars_to_be_returned,
-      years_to_be_returned,
-      sep="_"
-    ))
+    subset <- c()
+    for (base_var in base_vars_to_be_returned) {
+      for (year in years_to_be_returned) {
+        subset <- c(subset, paste0(base_var, "_", year))
+      }
+    }
+    # Note: Those nested for loops may not be the best way to do it.
+    # I tried levels(interaction(basevars, years, sep="_")), but it caused a warning:
+    # "longer object length is not a multiple of shorter object length"
 
     # Only continue with those that are available:
     varnames_to_be_returned <- subset[subset %in% all_varnames]
 
     # Construct the list to be returned to the user
     variables <- list(
-      comment = "Subset of variables for this dataset.",
-      dataset_name = "esa_cci_landcover_v2_1_1",
       variable_names = sort(varnames_to_be_returned),
       base_vars = sort(base_vars_to_be_returned),
-      years = sort(years_to_be_returned)
+      years = sort(years_to_be_returned),
+      comment = "Subset of variables for this dataset.",
+      dataset_name = "esa_cci_landcover_v2_1_1"
     )
   }
 
@@ -482,6 +654,7 @@ download_landcover_tables <- function(subset = NULL, years = NULL, base_vars = N
     if (ignore_missing) {
       message(paste0(err_msg, " Will be ignored...")) # shown right away
       warning(paste0(err_msg, " Was ignored...")) # shown at the end
+      variables$not_available = not_available
     } else {
       stop(paste0(err_msg, '. Please check your spelling and try again!'))
     }
@@ -490,7 +663,7 @@ download_landcover_tables <- function(subset = NULL, years = NULL, base_vars = N
   # Compute download size, if tile_ids is specified:
   if (!(is.null(tile_ids))) {
     download_bytes <- compute_download_size(tile_ids, varnames_to_be_returned, file_size_table, quiet)
-    message(paste0("Download size: ",
+    message(paste0("Info: Download size: ",
       length(varnames_to_be_returned), " variables, ",
       length(tile_ids), " tiles: ",
       download_bytes/1000000000, " GB (", download_bytes, " bytes)."))
@@ -500,12 +673,20 @@ download_landcover_tables <- function(subset = NULL, years = NULL, base_vars = N
 
   # Download the data if requested:
   if (download) {
-    if (is.null(tile_ids)) message('In order to download, please provide tile_ids.')
+    if (is.null(tile_ids)) {
+      msg = "To download this data, specify parameter 'tile_ids'."
+      variables$note = msg
+      warning(msg)
+    }
+    message("\nStarting download of ", download_bytes/1000000000, " GB...")
     outcome <- do_download(varnames_to_be_returned, tile_ids, file_size_table,
         download_dir = download_dir, file_format = file_format,
         quiet = quiet, delete_zips = delete_zips)
     variables <- c(variables, outcome)
-
+  } else {
+    msg = "To download this data, specify which tiles, and add 'download=TRUE'."
+    variables$note = msg
+    message(msg)
   }
 
   # Return the list
@@ -562,24 +743,102 @@ download_simple_tables <- function(table_file_name, dataset_name,
                                  file_format) {
 
 
+  #########################################
+  ### Extract info from file size table ###
+  #########################################
+
   # Use file_size_table from tempdir or download it:
   file_size_table <- get_file_size_table(table_file_name, tempdir)
 
-  # Get all variable name from the table:
+  # Get all variable names from the table:
   all_varnames <- unique(sub("_[^_]+$", "", file_size_table$file_name))
 
+  # Get all tiles from the table:
+  regex_format <- ".[a-z]+$"
+  filenames_without_format <- unique(sub(regex_format, "", file_size_table$file_name))
+  regex_tile <- "_h[0-9]+v[0-9]+$"
+  all_tiles <- unique(stringr::str_extract(filenames_without_format, regex_tile))
+  all_tiles <- unique(sub("^_", "", all_tiles))
+
+  ############################################
+  ### Does user want all variables / tiles ###
+  ### or did they specify a subset?        ###
+  ############################################
+  
   # If user did not specify a subset, return all variable names:
-  if (is.null(subset)){
+  if (is.null(subset) || (length(subset) == 1 && subset=="ALL")) {
+    return_all_vars <- TRUE
+  } else {
+    return_all_vars <- FALSE
+  }
+
+  # Same for tiles
+  if (length(tile_ids) == 1 && tile_ids == "ALL") {
+    tile_ids <- all_tiles
+    return_all_tiles <- TRUE
+  } else {
+    return_all_tiles <- FALSE
+  }
+
+  #####################################
+  ### Return/download all variables ###
+  ### (no subset specified)         ###
+  #####################################
+
+  if (return_all_vars) {
     variables <- list(
       comment = "All available variables for this dataset.",
       dataset_name = dataset_name,
       variable_names = sort(all_varnames)
     )
+
+    # Compute download size, if desired tiles are specified:
+    if (! (is.null(tile_ids))) {
+      download_bytes <- compute_download_size(
+        tile_ids, all_varnames, file_size_table, quiet)
+      message(paste0("Info: Download size: ",
+        length(all_varnames), " variables, ",
+        length(tile_ids), " tiles: ",
+        download_bytes/1000000000, " GB (", download_bytes, " bytes)."))
+      variables$download_bytes=download_bytes
+      variables$tile_ids=tile_ids
+    }
+
+    # Does the user want to download all variables, or just see them?
+    if (download) {
+
+      # Without knowing which tiles, user cannot download:
+      if (is.null(tile_ids)) {
+        msg <- "To download data, please specify parameter 'tile_ids'."
+        variables$note = msg
+        warning(msg)
+
+      # If tiles were specified, we can download:
+      } else {
+        message("\nStarting download of ", download_bytes/1000000000, " GB...")
+        outcome <- do_download(all_varnames, tile_ids, file_size_table,
+            download_dir = download_dir, file_format = file_format,
+            quiet = quiet, delete_zips = delete_zips)
+        variables <- c(variables, outcome)
+      }
+
+    # User does not want to download all variables, just see them:
+    } else {
+      msg = "To download this data, specify parameter 'tile_ids', and add 'download=TRUE'."
+      message(msg)
+      variables$note = msg
+    }
+
     return(variables)
   }
 
   # If user specified a subset, continue with those specified variables that
   # are available:
+
+  ########################################
+  ## Restrict to user-requested subset ###
+  ########################################
+
   varnames_to_be_returned <- subset[subset %in% all_varnames]
 
   # If any are not available, warn or stop:
@@ -605,7 +864,7 @@ download_simple_tables <- function(table_file_name, dataset_name,
   # Compute download size, if tile_ids is specified:
   if (!(is.null(tile_ids))) {
     download_bytes <- compute_download_size(tile_ids, varnames_to_be_returned, file_size_table, quiet)
-    message(paste0("Download size: ",
+    message(paste0("Info: Download size: ",
       length(varnames_to_be_returned), " variables, ",
       length(tile_ids), " tiles: ",
       download_bytes/1000000000, " GB (", download_bytes, " bytes)."))
@@ -615,11 +874,19 @@ download_simple_tables <- function(table_file_name, dataset_name,
 
   # Download the data if requested:
   if (download) {
-    if (is.null(tile_ids)) message('In order to download, please provide tile_ids.')
+    if (is.null(tile_ids)) {
+      message('In order to download, please provide tile_ids.')
+      note = "To download this data, specify which tiles, and add 'download=TRUE'."
+      variables$note = note
+    }
+    message("\nStarting download of ", download_bytes/1000000000, " GB...")
     outcome <- do_download(varnames_to_be_returned, tile_ids, file_size_table,
         download_dir = download_dir, file_format = file_format,
         quiet = quiet, delete_zips = delete_zips)
     variables <- c(variables, outcome)
+  } else {
+    note = "To download this data, specify which tiles, and add 'download=TRUE'."
+    variables$note = note
   }
 
   # Return the list
@@ -643,7 +910,7 @@ get_file_size_table <- function(file_name, tempdir = NULL) {
   # if it doesn't exist in the tempdir()
   file_local <- paste0(tempdir, "/", file_name)
   if (!file.exists(file_local)) {
-    message('Downloading futureclimate90m_paths_file_sizes.txt...')
+    message(paste('Downloading ', file_name,'...'))
     url <- "https://public.igb-berlin.de/index.php/s/zw56kEd25NsQqcQ/download?path=%2FREADME/"
     download.file(paste0(url, file_name), destfile = file_local, mode = "wb")
   }
@@ -709,7 +976,7 @@ compute_download_size <- function(tile_ids, all_varnames, file_size_table, quiet
     }
 
     # Download size for one variable:
-    if (!quiet) message(paste0("Variable '", ivar, "' (", j," tiles): ", byte_sum_one_var/1000000, " MB (", byte_sum_one_var, " bytes)."))
+    if (!quiet) message(paste0("Info: Variable '", ivar, "' (", j," tiles): ", byte_sum_one_var/1000000, " MB (", byte_sum_one_var, " bytes)."))
 
     # Sum up for all variables:
     download_bytes <- download_bytes + byte_sum_one_var
@@ -731,14 +998,14 @@ do_download <- function(variable_names, tile_ids, file_size_table, download_dir 
   # Check availability of IGB server by downloading README
   tryCatch(
     {
-      igb_readme = paste0(igb_path, "README/README.txt")
+      igb_readme = paste0(igb_path, "README/accessibility_check.txt")
       download.file(igb_readme, destfile = paste0(download_dir, "/README.txt"), mode = "wb")
     },
     warning = function(c) {
-      message(paste0('Error: Could not download README.txt from ', igb_readme, ', maybe the server is down.'))
+      message(paste0('Error: Could not download from ', igb_readme, ', maybe the server is down.'))
     },
     error = function(c) {
-      message(paste0('Error: Could not download README.txt from ', igb_readme, ', maybe the server is down.'))
+      message(paste0('Error: Could not download from ', igb_readme, ', maybe the server is down.'))
     }
   )
 
