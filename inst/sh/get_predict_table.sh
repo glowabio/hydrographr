@@ -48,20 +48,10 @@ export tiles
 
 #  path to environmental tables for each tile
 export ENVTB=$4
-#export ENVTB=/data/marquez/vignette/env_tables
-
-#        cp /mnt/shared/EnvTablesTiles/LandCover/c10/h18v02_c10_2020.zip \
-#            /data/marquez/vignette/env_tables
 
 # file with the list of subcatchments IDs
 export SUBCIDS=$5
 #export SUBCIDS=/data/marquez/vignette/out/subc_IDs.txt
-
-#library(terra)
-#library(raster)
-#r = raster("/mnt/shared/sosw/tmp/danube_subcatchments.tif")
-#u = terra::unique(r)
-#write.table(u, file="/data/marquez/vignette/out/subc_IDs.txt", col.names=FALSE, row.names=FALSE)
 
 # output file
 export OUTFILE=$6
@@ -80,14 +70,15 @@ export NCORES=$8
 ##### ANALYSIS
 
 ##################
-# Move through each tiles and extract the subcatchment of interests for
+# Move through each tile and extract the subcatchment of interests for
 # all variables
 
 subsetTB(){
     TL=$1  # tile
     k=$2   # variable
+    TB=$(find $ENVTB -name "${k}_${TL}.txt")
     awk 'NR==FNR {a[$1]; next} FNR==1 || $1 in a' \
-     $SUBCIDS $ENVTB/${k}_${TL}.txt \
+     $SUBCIDS $TB \
      | awk 'NR > 1 {for(i=1; i<=NF; i++) $i+=0}1' CONVFMT="%.3f" \
      >  $TMP/ENV_${TL}_${k}.txt
 }
@@ -148,7 +139,7 @@ sort -g $TMP/aggreg_${X}_tmp1.txt > $TMP/aggreg_${X}.txt
 read -a header < $TMP/aggreg_${X}.txt
 
 declare -a elem=()
-for e in mean min maxsd range
+for e in mean min max sd range
 do
     [[ ${header[@]} =~ $e ]] && elem+=1 || elem+=0
 done

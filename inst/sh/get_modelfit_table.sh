@@ -66,7 +66,7 @@ awk -F, 'NR==FNR {a[$1]; next} FNR==1 ||  $1 in a' \
 # join tables
 paste -d"," \
     <(sort -t, -g -k1 $TMP/tmp1.csv) \
-    <(sort -t, -g -k1 $TMP/tmp2.csv) | head \
+    <(sort -t, -g -k1 $TMP/tmp2.csv) \
     | cut -d"," --complement -f 3 \
     > $TMP/pa_env_tmp.csv
 

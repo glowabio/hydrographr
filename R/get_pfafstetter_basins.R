@@ -74,7 +74,7 @@
 #' # a random ID, i.e. it does not need to be the real outlet of the basin.
 #' g_subset <- get_catchment_graph(g = my_graph,
 #'                          subc_id = "513867227",
-#'                          outlet = FALSE,
+#'                          use_outlet = FALSE,
 #'                          mode = "in",
 #'                          as_graph = TRUE)
 #'
