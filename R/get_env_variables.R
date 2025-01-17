@@ -1,47 +1,70 @@
-#' @title Get available variables
+#' @title Download Environment90m tables
 #'
-#' @description The function downloads data of the Environment90m
-#' dataset, which is split into 20°x20° tiles. If a tile ID is specified, then
-#' the selected layers (variable) will be downloaded. 
+#' @description
+#' The various `download_something_tables()` functions allow to retrieve
+#' the Environment90m variable names and download data of the
+#' Environment90m datasets, which are split into 20°x20° tiles.
+#'
+#' If the functions are called without arguments (i.e. without specifying
+#' variable names and tiles), the available variable names are returned.
+#' 
+#' If a subset of variables and tile IDs are specified, the download size of
+#' the resulting download will be computed.
+#' 
+#' If a subset of variables and tile IDs are specified, and `download` is set
+#' to `TRUE`, the requested tables will be downloaded and either left as
+#' zipped files or unzipped to text files.
+#' 
 #' Multiple regular tiles, e.g. belonging to regional units, can be
-#' downloaded in a single request. The tile or regional unit IDs can be
-#' obtained using the functions "get_tile_id" and "get_regional_unit_id",
-#' respectively.
-#' The files will be stored locally in a folder architecture, similar as in the
-#' data repository, available at
-#' \url{https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4?path=%2F}.
+#' downloaded in a single request. The tile IDs can be obtained using the
+#' function [get_tile_id()].
 #'
-#' @param variable character vector of variable names. See Details for all the
-#' variable names.
-#' @param years character vector of years. Only valid for ESA Land Cover variables,
-#' ignored otherwise.
-#' @param file_format character. Format of the requested file. "zip" and "txt"
-#' are supported. Default is "txt", which means that the zip files are unzipped
-#' after downloading. Note that this will take more space on disk than zips.
-#' @param tile_id character vector. The IDs of the requested tiles.
-#' @param download_dir character. The directory where the files will be
-#' downloaded. Default is the working directory.
-#' @param delete_zips boolean If FALSE, the downloaded zip files are not deleted
-#' after unzipping. Defaults to TRUE. This is ignored if you request file format zip.
-#' @param ignore_missing boolean What to do if some of the variables are not available,
-#' which is most frequently caused by a typo the variable name. If TRUE, the missing or
-#' misspelled ones are ignored while the others are downloaded. If FALSE, the function
-#' will fail to allow the user to check the variable names and their spelling. Defaults
-#' to FALSE.
-#' @param tempdir character Optional (rarely needed): Pass a directory to be used as
-#' temporary directory. If not provided, the result of a call to tempdir() is used.
-#' @importFrom tidyr separate
-#' @importFrom stringr str_split_fixed str_extract
+#'
+#' @param subset Vector of the variable names that should be downloaded (or
+#'  string "ALL" for all available variables).
+#' @param tile_ids Vector containing all tile ids of the tiles (e.g. "h10v04")
+#'  that should be downloaded, or whose download availability and size should
+#'  be checked(or string "ALL" for all available tiles). 
+#' @param download logical. If TRUE, and if `tile_ids` is specified, the files
+#'  will be downloaded from the IGB server. If FALSE, and if `tile_ids` is
+#'  specified, the download size will be computed. If FALSE, and if `tile_ids`
+#'  is NULL, the variable names will be returned to the user. 
+#' @param download_dir Directory where the downloads should be stored.
+#'  Defaults to the current working directory ".". Ignored if `download=FALSE`.
+#' @param file_format File format of the tables, either "txt" or "zip". If
+#'  "txt", then the zipped tables are unzipped. If "zip", the downloaded
+#'  zipped files are left as they are. Default is "txt", which means that the
+#'  zip files are unzipped after downloading. Note that this will take more
+#'  space on disk than zips.
+#' @param delete_zips logical. boolean If `FALSE`, the downloaded zip files are
+#'  not deleted after unzipping. Defaults to TRUE. This is ignored if you
+#'  request file format zip.
+#' @param ignore_missing logical. What to do if some of the requested variables
+#'  and/or tile_ids are not available, which is most frequently caused by a
+#'  typo the variable name. If TRUE, the missing or misspelled ones are
+#'  ignored while the others are downloaded (and a warning is given out).
+#'  If FALSE, the function will fail to allow the user to check the variable
+#'  names and their spelling. Defaults to FALSE.
+#' @param tempdir Optional (rarely needed). Path to the directory where to
+#'  store/look for the temporary various file size tables for the various
+#'  Environment90m datasets, which are required and downloaded by the
+#'  functions. If not passed, defaults to the output of [base::tempdir()].
+#' @param quiet logical. If FALSE, informative messages will be printed.
+#'   Default is FALSE.
+#' @returns A named list of:
+#' * variable names,
+#' * components of variable names (if applies),
+#' * the dataset name,
+#' * the requested tile_ids (if applies),
+#' * the download size (if `tile_id` is specified),
+#' * the path where downloaded files are stored to (if `download=TRUE`),
+#' * etc.
+#' @seealso [download_tiles()] for downloading spatial layers (raster, vector)
+#'   of the original Hydrography90m dataset, split to the same tiles.
+#'
+#'
+#' @importFrom stringr str_extract
 #' @importFrom data.table fread
-#' @export
-#'
-#' @author Merret Buurman
-#'
-#' @references Amatulli G., Garcia Marquez J., Sethi T., Kiesel J.,
-#' Grigoropoulou A., Üblacker M., Shen L. & Domisch S. (2022-08-09 )
-#' Hydrography90m: A new high-resolution global hydrographic dataset.
-#' IGB Leibniz-Institute of Freshwater Ecology and Inland Fisheries.
-#' dataset. \url{https://doi.org/10.18728/igb-fred-762.1}
 #'
 #' @details
 #' In the following table you can find all the variables included in the
@@ -50,37 +73,263 @@
 #' Likewise, the column "File format" contains the input that should be given to
 #' the "file_format" parameter.
 #'
-#' For more details and visualisations of the spatial layers (e.g. the available
-#' tiles), please refer to
+#' The Environment90m dataset comprises data from the landcover dataset
+#' ESA Land Cover (esa_cci_landcover_v2_1_1), CHELSA v2.1 (chelsa_bioclim_v2_1),
+#' SOILGRIDS (soilgrids250m_v2_0) and Hydrography90m (hydrography90m_v1_0).
+#'
+#' For visualisations the available tiles, and for details on the variables of
+#' the Hydrography90m dataset, please refer to
 #' \url{https://hydrography.org/hydrography90m/hydrography90m_layers/}.
+#'
 #' For details on the bioclimatic variables, especially for details of the scale
 #' and unit of the values, please refer to
 #' \url{http://chelsa-climate.org/}.
+#'
 #' For details on the ESA Land Cover variables, please refer to
 #' \url{https://www.climatologylab.org/terraclimate.html}. Please note that some
-#' values in this dataset are aggregated from similar classes (see table below,
-#' see Environment90m publication).
+#' values in this dataset are aggregated from similar classes (see 
+#' Environment90m publication).
+#'
 #' For details on the Soil data, please refer to
 #' \url{https://soilgrids.org}.
 #'
-#' TODO: The CHELSA units also have scale and offset! Explain them here?
-#' TODO: The ESA LandCover data are aggregated. Document!
+#' @author Merret Buurman
+#'
+#' @references Garcia Marquez J., Amatulli, G., Grigoropoulou, A.,
+#' Schürz, M., Tomiczek, T., Buurman, M., and Domisch, S.:
+#' Global datasets of aggregated environmental variables at the
+#' sub-catchment scale for freshwater biodiversity modeling, in prep.
+#' Please contact the authors for more up-to-date citation info.
+#'
+#' @name download-env-functions
+NULL
 
 
 
+#' @describeIn download-env-functions Download tables for the 
+#'  soilgrids250m_v2_0 dataset
+#' @examples
+#' 
+#' ### Soil: soilgrids250m_v2_0 ###
+#' # Show all available soil variable names:
+#' download_soil_tables()
+#' 
+#' # Compute download size of all soil variables, for one tile:
+#' download_soil_tables(
+#'   subset = "ALL",
+#'   tile_ids = c("h00v04"),
+#'   download = FALSE)
+#'
+#' # Download one soil variable (Clay content), for two tiles:
+#' download_soil_tables(
+#'   subset = c("clyppt"),
+#'   tile_ids = c("h00v04", "h10v04"),
+#'   download = TRUE,
+#'   download_dir = ".",
+#'   file_format = "zip")
+#'
+#' # Download one soil variable (Clay content), for one tile,
+#' # unzip, and delete the zips:
+#' download_soil_tables(
+#'   subset = c("clyppt"),
+#'   tile_ids = c("h00v04"),
+#'   download = TRUE,
+#'   download_dir = ".",
+#'   file_format = "txt",
+#'   delete_zips = TRUE) 
+#' 
+#' @export
+download_soil_tables <- function(subset = NULL,
+                                 tile_ids = NULL,
+                                 download = FALSE,
+                                 download_dir = ".",
+                                 file_format = "txt",
+                                 delete_zips = TRUE,
+                                 ignore_missing = FALSE,
+                                 tempdir = NULL,
+                                 quiet = NULL) {
+
+  return(download_simple_tables(
+    "soilgrids250m_v2_0",
+    "env90m_soil_paths_file_sizes.txt",
+    subset, tile_ids, ignore_missing, download, download_dir,
+    file_format, delete_zips, tempdir, quiet
+  ))
+}
 
 
-########################
-### Variable getters ###
-########################
+#' @describeIn download-env-functions Download tables for the 
+#'  hydrography90m_v1_0 dataset.
+#' @examples
+#' 
+#' ### Hydrography90m: hydrography90m_v1_0 ###
+#' # Show all available hy90m variable names
+#' download_hydrography90m_tables()
+#' 
+#' # Compute download size of all hy90m variables, for one tile:
+#' download_hydrography90m_tables(
+#'   subset = "ALL",
+#'   tile_ids = c("h00v04"),
+#'   download = FALSE)
+#'
+#' # Download one hy90m variable (Strahler’s stream order), for two tiles:
+#' download_hydrography90m_tables(
+#'   subset = c("stream_strahler"),
+#'   tile_ids = c("h00v04", "h10v04"),
+#'   download = TRUE,
+#'   download_dir = ".",
+#'   file_format = "zip")
+#'
+#' # Download one hy90m variable (Strahler’s stream order), for one tile,
+#' # unzip, and delete the zips:
+#' download_hydrography90m_tables(
+#'   subset = c("stream_strahler"),
+#'   tile_ids = c("h00v04"),
+#'   download = TRUE,
+#'   download_dir = ".",
+#'   file_format = "txt",
+#'   delete_zips = TRUE) 
+#' 
+#' @export
+download_hydrography90m_tables <- function(subset = NULL,
+                                           tile_ids = NULL,
+                                           download = FALSE,
+                                           download_dir = ".",
+                                           file_format = "txt",
+                                           delete_zips = TRUE,
+                                           ignore_missing = FALSE,
+                                           tempdir = NULL,
+                                           quiet = NULL) {
 
-download_future_climate_tables <- function(tempdir = NULL, 
-                                         quiet = FALSE, subset = NULL,
-                                         base_vars = NULL, time_periods = NULL, 
-                                         scenarios = NULL, models = NULL,
-                                         versions = NULL, ignore_missing = FALSE, # TODO check defaults
-                                         tile_ids = NULL, download = FALSE, download_dir = ".", delete_zips = TRUE, file_format = "txt") {
+  return(download_simple_tables(
+    "hydrography90m_v1_0", 
+    "env90m_hydro_paths_file_sizes.txt",
+    subset, tile_ids, ignore_missing, download, download_dir,
+    file_format, delete_zips, tempdir, quiet
+  ))
+}
 
+
+#' @describeIn download-env-functions Download tables for the
+#'  chelsa_bioclim_v2_1 dataset (bioclimatic variables, except for future
+#'  simulations)
+#' @examples
+#' 
+#' ### Bioclimatic Variables: chelsa_bioclim_v2_1 ###
+#' ### (excluding future simulations)             ###
+#' # Show all available bioclim variable names
+#' # (excluding future simulations):
+#' download_present_climate_tables()
+#' 
+#' # Compute download size of all bioclim variables, for one tile:
+#' download_present_climate_tables(
+#'   subset = "ALL",
+#'   tile_ids = c("h00v04"),
+#'   download = FALSE)
+#'
+#' # Download one bioclim variable (Annual mean temperature), for two tiles:
+#' download_present_climate_tables(
+#'   subset = c("bio1"),
+#'   tile_ids = c("h00v04", "h10v04"),
+#'   download = TRUE,
+#'   download_dir = ".",
+#'   file_format = "zip")
+#'
+#' # Download one bioclim variable (Annual mean temperature), for one tile,
+#' # unzip, and delete the zips:
+#' download_present_climate_tables(
+#'   subset = c("bio1"),
+#'   tile_ids = c("h00v04"),
+#'   download = TRUE,
+#'   download_dir = ".",
+#'   file_format = "txt",
+#'   delete_zips = TRUE) 
+#' 
+#' @export
+download_present_climate_tables <- function(subset = NULL,
+                                            tile_ids = NULL,
+                                            download = FALSE,
+                                            download_dir = ".",
+                                            file_format = "txt",
+                                            delete_zips = TRUE,
+                                            ignore_missing = FALSE,
+                                            tempdir = NULL,
+                                            quiet = NULL) {
+
+  return(download_simple_tables(
+    "chelsa_bioclim_v2_1",
+    "env90m_presentclimate_paths_file_sizes.txt",
+    subset, tile_ids, ignore_missing, download, download_dir,
+    file_format, delete_zips, tempdir, quiet
+  ))
+}
+
+
+#' @describeIn download-env-functions Download tables for the
+#'  chelsa_bioclim_v2_1 dataset (bioclimatic variables, future simulations only)
+#'
+#' @param base_vars (Only in `download_future_climate_tables()` and
+#'  `download_landcover_tables()`) Vector of the desired base variables, e.g.
+#'  the landcover variable "c20_1992" can be expressed as base variable "c20"
+#'  and year "1992".
+#' @param time_periods (Only in `download_future_climate_...`) Vector of the
+#'  desired time periods (leave `NULL` or specify `"ALL"` for all available
+#'  time periods).
+#' @param models (Only in `download_future_climate_...`) Vector of the desired
+#'  models (leave `NULL` or specify `"ALL"` for all available models).
+#' @param scenarios (Only in `download_future_climate_...`) Vector of the
+#'  desired scenarios (leave `NULL` or specify `"ALL"` for all available
+#'  scenarios).
+#' @param versions (Only in `download_future_climate_...`) Vector of the
+#'  desired versions (leave `NULL` or specify `"ALL"` for all available
+#'  versions). As of January 2025, the only available version is "V.2.1".
+#' 
+#' @examples
+#'
+#' ### Bioclimatic Variables: chelsa_bioclim_v2_1 ###
+#' ### (future simulations)                       ###    
+#' # Show all available future bioclim variable names
+#' download_future_climate_tables()
+#' 
+#' # Compute download size of all variables, for one tile:
+#' download_future_climate_tables(
+#'   subset = "ALL",
+#'   tile_ids = c("h00v04"),
+#'   download = FALSE)
+#'
+#' # Download one hy90m variable (Annual mean temperature), for two tiles:
+#' download_future_climate_tables(
+#'   subset = c("bio1"),
+#'   tile_ids = c("h00v04", "h10v04"),
+#'   download = TRUE,
+#'   download_dir = ".",
+#'   file_format = "zip")
+#'
+#' # Download one hy90m variable (Annual mean temperature), for one tile,
+#' # unzip, and delete the zips:
+#' download_future_climate_tables(
+#'   subset = c("bio1"),
+#'   tile_ids = c("h00v04"),
+#'   download = TRUE,
+#'   download_dir = ".",
+#'   file_format = "txt",
+#'   delete_zips = TRUE) 
+#' 
+#' @export
+download_future_climate_tables <- function(base_vars = NULL,
+                                           time_periods = NULL,
+                                           models = NULL,
+                                           scenarios = NULL,
+                                           versions = NULL,
+                                           subset = NULL,
+                                           tile_ids = NULL,
+                                           download = FALSE,
+                                           download_dir = ".",
+                                           file_format = "txt",
+                                           delete_zips = TRUE,
+                                           ignore_missing = FALSE,
+                                           tempdir = NULL,
+                                           quiet = NULL) {
 
   #########################################
   ### Extract info from file size table ###
@@ -189,7 +438,7 @@ download_future_climate_tables <- function(tempdir = NULL,
     # Compute download size, if desired tiles are specified:
     if (! (is.null(tile_ids))) {
       download_bytes <- compute_download_size(
-        tile_ids, all_varnames, file_size_table, quiet)
+        all_varnames, tile_ids, file_size_table, quiet)
       message(paste0("Info: Download size: ",
         length(all_varnames), " variables, ",
         length(tile_ids), " tiles: ",
@@ -210,7 +459,7 @@ download_future_climate_tables <- function(tempdir = NULL,
       # If tiles were specified, we can download:
       } else {
         message("\nStarting download of ", download_bytes/1000000000, " GB...")
-        outcome <- do_download(all_varnames, tile_ids, file_size_table,
+        outcome <- do_env90m_download(all_varnames, tile_ids, file_size_table,
             download_dir = download_dir, file_format = file_format,
             quiet = quiet, delete_zips = delete_zips)
         variables <- c(variables, outcome)
@@ -388,7 +637,7 @@ download_future_climate_tables <- function(tempdir = NULL,
 
   # Compute download size, if tile_ids is specified:
   if (!(is.null(tile_ids))) {
-    download_bytes <- compute_download_size(tile_ids, varnames_to_be_returned, file_size_table, quiet)
+    download_bytes <- compute_download_size(varnames_to_be_returned, tile_ids, file_size_table, quiet)
     message(paste0("Info: Download size: ",
       length(varnames_to_be_returned), " variables, ",
       length(tile_ids), " tiles: ",
@@ -405,7 +654,7 @@ download_future_climate_tables <- function(tempdir = NULL,
       warning(msg)
     } else {
       message("\nStarting download of ", download_bytes/1000000000, " GB...")
-      outcome <- do_download(varnames_to_be_returned, tile_ids, file_size_table,
+      outcome <- do_env90m_download(varnames_to_be_returned, tile_ids, file_size_table,
           download_dir = download_dir, file_format = file_format,
           quiet = quiet, delete_zips = delete_zips)
       variables <- c(variables, outcome)
@@ -421,20 +670,50 @@ download_future_climate_tables <- function(tempdir = NULL,
 }
 
 
-
-
-
-
-
-
-
-
-
-
-download_landcover_tables <- function(subset = NULL, years = NULL, base_vars = NULL, quiet = FALSE,
-                                     tempdir = NULL, ignore_missing = FALSE, tile_ids = NULL,
-                                     download = FALSE, download_dir = ".",
-                                     file_format = "txt", delete_zips = TRUE) {
+#' @describeIn download-env-functions Download tables for the 
+#'  esa_cci_landcover_v2_1_1 dataset
+#' 
+#' @param base_vars (Only in `download_future_climate_tables()` and
+#'  `download_landcover_tables()`) Vector of the desired base variables, e.g.
+#'  the landcover variable "c20_1992" can be expressed as base variable "c20"
+#'  and year "1992".
+#' @param years (Only in `download_landcover_...`) Vector of the desired years
+#'  (leave `NULL` or specify `"ALL"` for all available years).
+#' @examples
+#'
+#' ### Landcover: esa_cci_landcover_v2_1_1 ###
+#' # Show all available landcover variable names:
+#' download_landcover_tables()
+#'
+#' # Compute download size of two landcover base variables (Cropland, rainfed,
+#' # and Grassland) and two years, for all tiles:
+#'   vars <- download_landcover_tables(
+#'     base_vars=c("c10", "c130"),
+#'     years=c(1992, 1993),
+#'     tile_ids="ALL")
+#' 
+#' # Download two base variables and one year, for two tiles:
+#'   vars <- download_landcover_tables(
+#'     base_vars=c("c10", "c130"),
+#'     years=c(1992),
+#'     tile_ids=c("h00v04", "h10v04"),
+#'     download=TRUE,
+#'     download_dir="/tmp",
+#'     file_format="zip",
+#'     delete_zips=FALSE)
+#' 
+#' @export
+download_landcover_tables <- function(base_vars = NULL,
+                                      years = NULL,
+                                      subset = NULL,
+                                      tile_ids = NULL,
+                                      download = FALSE,
+                                      download_dir = ".",
+                                      file_format = "txt",
+                                      delete_zips = TRUE,
+                                      ignore_missing = FALSE,
+                                      tempdir = NULL,
+                                      quiet = FALSE) {
 
   #########################################
   ### Extract info from file size table ###
@@ -522,7 +801,7 @@ download_landcover_tables <- function(subset = NULL, years = NULL, base_vars = N
     # Compute download size, if desired tiles are specified:
     if (! (is.null(tile_ids))) {
       download_bytes <- compute_download_size(
-        tile_ids, all_varnames, file_size_table, quiet)
+        all_varnames, tile_ids, file_size_table, quiet)
       message(paste0("Info: Download size: ",
         length(all_varnames), " variables, ",
         length(tile_ids), " tiles: ",
@@ -543,7 +822,7 @@ download_landcover_tables <- function(subset = NULL, years = NULL, base_vars = N
       # If tiles were specified, we can download:
       } else {
         message("\nStarting download of ", download_bytes/1000000000, " GB...")
-        outcome <- do_download(all_varnames, tile_ids, file_size_table,
+        outcome <- do_env90m_download(all_varnames, tile_ids, file_size_table,
             download_dir = download_dir, file_format = file_format,
             quiet = quiet, delete_zips = delete_zips)
         variables <- c(variables, outcome)
@@ -662,7 +941,7 @@ download_landcover_tables <- function(subset = NULL, years = NULL, base_vars = N
 
   # Compute download size, if tile_ids is specified:
   if (!(is.null(tile_ids))) {
-    download_bytes <- compute_download_size(tile_ids, varnames_to_be_returned, file_size_table, quiet)
+    download_bytes <- compute_download_size(varnames_to_be_returned, tile_ids, file_size_table, quiet)
     message(paste0("Info: Download size: ",
       length(varnames_to_be_returned), " variables, ",
       length(tile_ids), " tiles: ",
@@ -679,7 +958,7 @@ download_landcover_tables <- function(subset = NULL, years = NULL, base_vars = N
       warning(msg)
     }
     message("\nStarting download of ", download_bytes/1000000000, " GB...")
-    outcome <- do_download(varnames_to_be_returned, tile_ids, file_size_table,
+    outcome <- do_env90m_download(varnames_to_be_returned, tile_ids, file_size_table,
         download_dir = download_dir, file_format = file_format,
         quiet = quiet, delete_zips = delete_zips)
     variables <- c(variables, outcome)
@@ -693,54 +972,69 @@ download_landcover_tables <- function(subset = NULL, years = NULL, base_vars = N
   return(variables)
 }
 
-download_soil_tables <- function(subset = NULL, tile_ids = NULL,
-                               download = FALSE, download_dir = ".",
-                               ignore_missing = FALSE, quiet = NULL,
-                               tempdir = NULL, delete_zips = TRUE,
-                               file_format = "txt") {
 
-  return(download_simple_tables(
-    "env90m_soil_paths_file_sizes.txt",
-    "soilgrids250m_v2_0",
-    subset, tile_ids, download, download_dir, ignore_missing,
-    quiet, tempdir, delete_zips, file_format
-  ))
-}
-
-download_present_climate_tables <- function(subset = NULL, tile_ids = NULL,
-                                          download = FALSE, download_dir = ".",
-                                          ignore_missing = FALSE, quiet = NULL,
-                                          tempdir = NULL, delete_zips = TRUE,
-                                          file_format = "txt") {
-
-  return(download_simple_tables(
-    "env90m_presentclimate_paths_file_sizes.txt",
-    "chelsa_bioclim_v2_1",
-    subset, tile_ids, download, download_dir, ignore_missing,
-    quiet, tempdir, delete_zips, file_format
-  ))
-}
-
-download_hydrography90m_tables <- function(subset = NULL, tile_ids = NULL,
-                                         download = FALSE, download_dir = ".",
-                                         ignore_missing = FALSE, quiet = NULL,
-                                         tempdir = NULL, delete_zips = TRUE,
-                                         file_format = "txt") {
-
-  return(download_simple_tables(
-    "env90m_hydro_paths_file_sizes.txt",
-    "hydrography90m_v1_0", 
-    subset, tile_ids, download, download_dir, ignore_missing,
-    quiet, tempdir, delete_zips, file_format
-  ))
-}
-
-download_simple_tables <- function(table_file_name, dataset_name,
-                                 subset, tile_ids,
-                                 download, download_dir,
-                                 ignore_missing, quiet,
-                                 tempdir, delete_zips,
-                                 file_format) {
+#' @title Download generic Env90m tables
+#' 
+#' @description
+#' Download ... for all Environment90m datasets which have simple variable
+#' names, not combined variable names that can be split into various components
+#' (e.g. model, scenario, ... like in the Future Climate case).
+#' 
+#' @param dataset_name String. Name of the dataset. Will be returned to the
+#'  user in the result.
+#' @param table_file_name String. Name of the table that should be downloaded.
+#'  Each Environment90m dataset has one file size table. 
+#' @param subset Vector of the variable names that should be downloaded (or
+#' string "ALL" for all available variables).  
+#' @param tile_ids Vector containing all tile ids of the tiles (e.g. "h10v04")
+#'  whose size should be computed and whose availability should be checked.
+#' @param ignore_missing logical. If TRUE, a warning is given out for missing
+#'  tiles. If FALSE, the function stops with an error. Defaults to FALSE.
+#' @param quiet logical. If FALSE, informative messages will be printed.
+#'   Default is FALSE.
+#' @param download logical. If TRUE, and if `tile_ids` is specified, the files
+#'  will be downloaded from the server. If FALSE, and if `tile_ids` is
+#'  specified, the download size will be computed. If FALSE, and if `tile_ids`
+#'  is NULL, the variable names will be returned to the user. 
+#' @param download_dir Directory where the downloads should be stored. Defaults
+#'  to the current working directory ".".
+#' @param file_format File format of the tables, either "txt" or "zip". If
+#'  "txt", then the zipped tables are unzipped. If "zip", the downloaded zipped
+#'  files are left as they are. Defaults to "txt".
+#' @param delete_zips logical. If TRUE, zip files will be deleted after
+#'  unzipping. Only works when file_format is "txt".
+#' @param tempdir String. Path to the directory where to store/look for the
+#'  file size table.
+#' @returns Data frame that contains file name, size in bytes and file path
+#'  (on the server) for all files (data tables) of one specific
+#'  Environment90m dataset (e.g. landcover, soil).
+#' @examples
+#'  download_simple_tables <- function(
+#'    "soilgrids250m_v2_0",
+#'    "env90m_soil_paths_file_sizes.txt",,
+#'    c("clyppt"), # this is one soil variable name
+#'    "ALL", # all tiles
+#'   FALSE, # ignore_missing?
+#'   TRUE, # download?
+#'   "./downloads",
+#'   "txt",
+#'   TRUE, # delete_zips?
+#'   "/tmp", # temp dir
+#'   FALSE) # quiet?
+#' 
+#' @noRd
+download_simple_tables <- function(
+  dataset_name,
+  table_file_name,
+  subset,
+  tile_ids,
+  ignore_missing,
+  download,
+  download_dir,
+  file_format,
+  delete_zips,
+  tempdir,
+  quiet) {
 
 
   #########################################
@@ -795,7 +1089,7 @@ download_simple_tables <- function(table_file_name, dataset_name,
     # Compute download size, if desired tiles are specified:
     if (! (is.null(tile_ids))) {
       download_bytes <- compute_download_size(
-        tile_ids, all_varnames, file_size_table, quiet)
+        all_varnames, tile_ids, file_size_table, quiet)
       message(paste0("Info: Download size: ",
         length(all_varnames), " variables, ",
         length(tile_ids), " tiles: ",
@@ -816,7 +1110,7 @@ download_simple_tables <- function(table_file_name, dataset_name,
       # If tiles were specified, we can download:
       } else {
         message("\nStarting download of ", download_bytes/1000000000, " GB...")
-        outcome <- do_download(all_varnames, tile_ids, file_size_table,
+        outcome <- do_env90m_download(all_varnames, tile_ids, file_size_table,
             download_dir = download_dir, file_format = file_format,
             quiet = quiet, delete_zips = delete_zips)
         variables <- c(variables, outcome)
@@ -853,7 +1147,6 @@ download_simple_tables <- function(table_file_name, dataset_name,
     }
   }
 
-
   # Construct the list to be returned to the user
   variables <- list(
     comment = "Subset of variables for this dataset.",
@@ -863,7 +1156,7 @@ download_simple_tables <- function(table_file_name, dataset_name,
 
   # Compute download size, if tile_ids is specified:
   if (!(is.null(tile_ids))) {
-    download_bytes <- compute_download_size(tile_ids, varnames_to_be_returned, file_size_table, quiet)
+    download_bytes <- compute_download_size(varnames_to_be_returned, tile_ids, file_size_table, quiet)
     message(paste0("Info: Download size: ",
       length(varnames_to_be_returned), " variables, ",
       length(tile_ids), " tiles: ",
@@ -880,7 +1173,7 @@ download_simple_tables <- function(table_file_name, dataset_name,
       variables$note = note
     }
     message("\nStarting download of ", download_bytes/1000000000, " GB...")
-    outcome <- do_download(varnames_to_be_returned, tile_ids, file_size_table,
+    outcome <- do_env90m_download(varnames_to_be_returned, tile_ids, file_size_table,
         download_dir = download_dir, file_format = file_format,
         quiet = quiet, delete_zips = delete_zips)
     variables <- c(variables, outcome)
@@ -899,6 +1192,25 @@ download_simple_tables <- function(table_file_name, dataset_name,
 ### Helpers ###
 ###############
 
+
+#' @title Get table of file names, sizes and paths
+#' 
+#' @description Download and loads the specified file size table from the
+#'  server, or reuse existing table if found in the temp directory.
+#' 
+#' @param file_name String. Name of the table that should be downloaded.
+#'  Each Environment90m dataset has one file size table. 
+#' @param tempdir String. Path to the directory where to store/look for the
+#'  file size table. If not passed, defaults to the output of [base::tempdir()].
+#' @returns Data frame that contains file name, size in bytes and file path
+#'  (on the server) for all files (data tables) of one specific
+#'  Environment90m dataset (e.g. landcover, soil).
+#' @examples
+#' # Download and load the file size table for the landcover dataset:
+#' file_size_table <- get_file_size_table(
+#'   file_name = "env90m_landcover_paths_file_sizes.txt")
+#' 
+#' @noRd
 get_file_size_table <- function(file_name, tempdir = NULL) {
 
   # Define tempdir:
@@ -922,7 +1234,50 @@ get_file_size_table <- function(file_name, tempdir = NULL) {
   return (file_size_table)
 }
 
-compute_download_size <- function(tile_ids, all_varnames, file_size_table, quiet = FALSE, ignore_missing = FALSE) {
+
+#' @title Compute download size and check specified tile ids.
+#' 
+#' @description
+#' Compute the download size by adding up the file sizes in bytes listed in
+#' the file size table for each file that corresponds to the specified set of
+#' tile ids and variable names. While going through the files, the
+#' availability is also checked.
+#' 
+#' @param variable_names Vector containing all variable names whose size
+#'  should be computed, e.g. c("c20_1992", "c20_1993")
+#' @param tile_ids Vector containing all tile ids of the tiles (e.g. "h10v04")
+#'   whose size should be computed and whose availability should be checked.
+#' @param file_size_table Data frame that contains file name, size and file
+#'  path (on the server) for all files (data tables) for a specific 
+#'  Environment90m dataset. Used for extracting variable names, tile ids,
+#'  computing download size and finding the file on the server. No default.
+#' @param ignore_missing logical. If TRUE, a warning is given out for missing
+#'  tiles. If FALSE, the function stops with an error. Defaults to FALSE.
+#' @param quiet logical. If FALSE, informative messages will be printed.
+#'   Default is FALSE.
+#' @returns Size in bytes of the specified variables and tiles on disk (zipped).
+#' @seealso [check_tiles_filesize()] which is used by this function.
+#' @examples
+#' 
+#' # First, download and load the required file size table:
+#' file_size_table <- get_file_size_table(
+#'   file_name = "env90m_landcover_paths_file_sizes.txt")
+#'
+#' # Then, compute the download size for all variables and for two tiles:
+#' bytes <- compute_download_size(
+#'   "ALL",
+#'   c("h10v04", "h00v04"),
+#'   file_size_table,
+#'   quiet = FALSE,
+#'   ignore_missing = FALSE
+#' )
+#' 
+#' @noRd
+compute_download_size <- function(varnames,
+                                  tile_ids,
+                                  file_size_table,
+                                  ignore_missing = FALSE,
+                                  quiet = FALSE) {
 
   # Get the valid tile ids and files names
   all_tile_ids <- unique(stringr::str_extract(file_size_table$file_path, "h[0-9]+v[0-9]+"))
@@ -945,7 +1300,7 @@ compute_download_size <- function(tile_ids, all_varnames, file_size_table, quiet
   download_bytes <- 0
   i <- 0
 
-  for (ivar in all_varnames) {
+  for (ivar in varnames) {
     i <- i+1
     j <- 0
     byte_sum_one_var <- 0
@@ -958,7 +1313,7 @@ compute_download_size <- function(tile_ids, all_varnames, file_size_table, quiet
         variable = ivar,
         file_format = "zip",
         tile_id = itile,
-        h90m_varnames = all_varnames,
+        h90m_varnames = varnames, # TODO we pass the required ones, not ALL
         h90m_tile_id = all_tile_ids,
         h90m_file_names = all_file_names,
         file_size_table = file_size_table
@@ -987,7 +1342,54 @@ compute_download_size <- function(tile_ids, all_varnames, file_size_table, quiet
   return(download_bytes)
 }
 
-do_download <- function(variable_names, tile_ids, file_size_table, download_dir = ".", file_format = "txt", quiet = FALSE, delete_zips = TRUE) {
+
+
+#' @title Download Environment90m tables
+#' 
+#' @description
+#' Download zipped tables of the Environment90m dataset from the IGB server,
+#' unzip them (if requested) and delete the zipfiles (if requested).
+#' 
+#' For info about the dataset, the variables and the tile names, please refer
+#' the Environment90m publication.
+#' 
+#' @param variable_names Vector containing all variable names that should be
+#'  downloaded, e.g. c("c20_1992", "c20_1993").
+#' @param tile_ids Vector containing all tile ids of the tiles (e.g. "h10v04")
+#'  whose data should be downloaded.
+#' @param file_size_table Data frame that contains file name, size and file
+#'  path (on the server) for all files (data tables) for a specific
+#'  Environment90m dataset. Used for extracting variable names, tile ids,
+#'  computing download size and finding the file on the server. No default.
+#' @param download_dir Directory where the downloads should be stored.
+#'  Defaults to the current working directory ".".
+#' @param file_format File format of the tables, either "txt" or "zip". If
+#'  "txt", then the zipped tables are unzipped. If "zip", the downloaded
+#'  zipped files are left as they are. Defaults to "txt".
+#' @param delete_zips logical. If TRUE, zip files will be deleted after
+#'  unzipping. Only works when file_format is "txt".
+#' @param quiet logical. If FALSE, informative messages will be printed.
+#'   Default is FALSE.
+#' @returns A named list with an item named "downlaoded", containing a vector
+#'  of the paths of the downloaded files.
+#' @seealso [download_tiles_base()] which is used by this function.
+#' @examples
+#' # First, download and load the required file size table:
+#' file_size_table <- get_file_size_table(
+#'   file_name = "env90m_landcover_paths_file_sizes.txt")
+#' 
+#' # Then, download tables for one tile (h10v04),
+#' # for two variables (c100_1992, c100_1993).
+#' result <- do_download(
+#'     c("c100_1992", "c100_1993"),
+#'     c("h10v04"),
+#'     file_size_table,
+#'     file_format = "zip",
+#'     delete_zips = FALSE,
+#'     quiet = FALSE)
+#' 
+#' @noRd
+do_env90m_download <- function(variable_names, tile_ids, file_size_table, download_dir = ".", file_format = "txt", quiet = FALSE, delete_zips = TRUE) {
 
   # Set timeout option for download to 4 hours (14400 seconds)
   options(timeout=14400)

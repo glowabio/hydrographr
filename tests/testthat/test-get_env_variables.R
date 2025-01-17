@@ -49,8 +49,8 @@ test_that(testname, {
   
   # Run:
   bytes <- compute_download_size(
-    c("h10v04", "h00v04"),
     c("c100_1992", "c100_1993"),
+    c("h10v04", "h00v04"),
     file_size_table,
     quiet = FALSE,
     ignore_missing = FALSE
@@ -72,8 +72,8 @@ test_that(testname, {
   # Run and check whether error happens:
   expect_error(
     bytes <- compute_download_size(
-      c("h02v02", "h04v02", "h99v99"),
       c("c100_1992", "c100_1993"),
+      c("h02v02", "h04v02", "h99v99"),
       file_size_table,
       quiet = FALSE,
       ignore_missing = FALSE
@@ -92,7 +92,7 @@ test_that(testname, {
 
   # Run:
   skip_if_offline("public.igb-berlin.de") # downloads 8.5 KB (or only 316 bytes), no need to skip
-  result <- do_download(
+  result <- do_env90m_download(
     c("c100_1992", "c100_1993"),
     c("h10v04"),
     file_size_table,
@@ -124,7 +124,7 @@ test_that(testname, {
 
   # Run:
   skip_if_offline("public.igb-berlin.de")
-  result <- do_download(
+  result <- do_env90m_download(
     c("c100_1992", "c100_1993"),
     c("h10v04"),
     file_size_table,
@@ -165,7 +165,7 @@ test_that(testname, {
 
   # Run:
   skip_if_offline("public.igb-berlin.de")
-  result <- do_download(
+  result <- do_env90m_download(
     c("c100_1992", "c100_1993"),
     c("h10v04"),
     file_size_table,
@@ -327,7 +327,7 @@ test_that(testname, {
 })
 
 
-testname = "2.3.2 landcover: test passing subset=ALL (by computing download size)"
+testname = "2.3.2 landcover: show download size (test passing subset=ALL)"
 print(paste("TEST: ", testname))
 test_that(testname, {
 
@@ -345,7 +345,7 @@ test_that(testname, {
 })
 
 
-testname = "2.3.3 landcover: test passing tile_ids=ALL (by computing download size)"
+testname = "2.3.3 landcover: show download size (test passing tile_ids=ALL)"
 print(paste("TEST: ", testname))
 test_that(testname, {
 
@@ -600,7 +600,7 @@ test_that(testname, {
 })
 
 
-testname = "3.3.2 futureclimate: test passing subset=ALL (by computing download size)"
+testname = "3.3.2 futureclimate: show download size (test passing subset=ALL)"
 print(paste("TEST: ", testname))
 test_that(testname, {
 
@@ -617,7 +617,7 @@ test_that(testname, {
 })
 
 
-testname = "3.3.3 futureclimate: test passing tile_ids=ALL (by computing download size)"
+testname = "3.3.3 futureclimate: show download size (test passing tile_ids=ALL)"
 print(paste("TEST: ", testname))
 test_that(testname, {
 
@@ -851,7 +851,7 @@ test_that(testname, {
 })
 
 
-testname = "4.3.2 presentclimate (or other simple tables): test passing subset=ALL (by computing download size)"
+testname = "4.3.2 presentclimate (or other simple tables): show download size (test passing subset=ALL)"
 print(paste("TEST: ", testname))
 test_that(testname, {
 
@@ -868,7 +868,7 @@ test_that(testname, {
 })
 
 
-testname = "4.3.3 presentclimate (or other simple tables): test passing tile_ids=ALL (by computing download size)"
+testname = "4.3.3 presentclimate (or other simple tables): show download size (test passing tile_ids=ALL)"
 print(paste("TEST: ", testname))
 test_that(testname, {
 
