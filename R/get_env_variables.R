@@ -1467,7 +1467,8 @@ do_env90m_download <- function(variable_names, tile_ids, file_size_table, downlo
 
   cat("Please cite the Environment90m publication:\n
       Garcia Marquez, J., Amatulli, G., Grigoropoulou, A.,
-      Schürz, M., Tomiczek, T., Buurman, M., and Domisch, S.:
+      Schürz, M., Tomiczek, T., Buurman, M., Bremerich, V.,
+      Bego, K. and Domisch, S.:
       Global datasets of aggregated environmental variables at the
       sub-catchment scale for freshwater biodiversity modeling, in prep.
       Please contact the authors for more up-to-date citation info.\n")
