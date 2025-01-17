@@ -1,9 +1,10 @@
 
-###############################################
-### Testing the get_env_variables functions ###
-###############################################
+####################################################
+### Testing the download_env90m_tables functions ###
+####################################################
 
-print('TESTING GET ENV VARIABLES')
+print("_______________________________")
+print("Testing: download_env90m_tables")
 
 
 #########################
@@ -11,16 +12,16 @@ print('TESTING GET ENV VARIABLES')
 #########################
 
 # Where to store and download files:
-if (is.null(tmpdir)){
+if (! exists("tmpdir")){
   tmpdir <- tempdir()
 }
-#tmpdir <- "/tmp"
-download_dir <- "/tmp"
+if (! exists("download_dir")){
+  download_dir <- tempdir()
+}
 
 # Get which tests to skip:
 SKIP_DOWNLOAD <- Sys.getenv("SKIP_DOWNLOAD") == "TRUE" # empty string / FALSE if not set
 SKIP_HUGE_DOWNLOAD <- Sys.getenv("SKIP_HUGE_DOWNLOAD") == "TRUE" || SKIP_DOWNLOAD
-SKIP_FAILING_DOWNLOAD <- Sys.getenv("SKIP_FAILING_DOWNLOAD") == "TRUE" # empty string / FALSE if not set
 
 #############
 ### Tests ###

@@ -64,7 +64,7 @@ URL: https://glowabio.github.io/hydrographr/
 BugReports: https://github.com/glowabio/hydrographr/issues
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 Imports:
     processx (>= 3.7.0),
     data.table (>= 1.14.2),
@@ -90,6 +90,7 @@ Imports:
 Collate:
     'check_tiles_filesize.R'
     'crop_to_extent.R'
+    'download_env90m_tables.R'
     'download_test_data.R'
     'download_tiles.R'
     'download_tiles_base.R'
