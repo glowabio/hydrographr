@@ -985,7 +985,7 @@ test_that(testname, {
 })
 
 
-testname = "5.1 soil: show variable names (all)"
+testname = "5 soil: show variable names (all)"
 print(paste("TEST: ", testname))
 test_that(testname, {
   # Note: All other soil download functionality is tested by testing the present climate
@@ -1005,7 +1005,7 @@ test_that(testname, {
 })
 
 
-testname = "6.1 hydro90m: show variable names (all)"
+testname = "6 hydro90m: show variable names (all)"
 print(paste("TEST: ", testname))
 test_that(testname, {
   # Note: All other hydro90m download functionality is tested by testing the present climate
@@ -1031,5 +1031,56 @@ test_that(testname, {
     "stream_hack", "stream_horton", "stream_scheidegger", "stream_shreve", "stream_strahler",
     "stream_topo", "stream_topo_dim", "stright")
   expect_equal(sort(vars$variable_names), sort(all_hy90m_vars))
+})
+
+
+testname = "7 cgiar: show variable names (all)"
+print(paste("TEST: ", testname))
+test_that(testname, {
+  # Note: All other cgiar download functionality is tested by testing the present climate
+  # download functionality - they all use the same download_simple_tables function!
+
+  # Run twice, should yield the same result!
+  vars <- download_cgiar_tables(quiet=FALSE)
+  vars2 <- download_cgiar_tables(quiet=FALSE, subset="ALL")
+
+  # Check:
+  expect_equal(vars, vars2)
+  expect_equal(vars$dataset_name, "cgiar_csi_v3")
+  expect_equal(sort(vars$variable_names), c("garid", "gevapt"))
+})
+
+
+testname = "8 flo1k: show variable names (all)"
+print(paste("TEST: ", testname))
+test_that(testname, {
+  # Note: All other flo1k download functionality is tested by testing the present climate
+  # download functionality - they all use the same download_simple_tables function!
+
+  # Run twice, should yield the same result!
+  vars <- download_flo1k_tables(quiet=FALSE)
+  vars2 <- download_flo1k_tables(quiet=FALSE, subset="ALL")
+
+  # Check:
+  expect_equal(vars, vars2)
+  expect_equal(vars$dataset_name, "flo1k_v1_0")
+  expect_equal(sort(vars$variable_names), c("flo1k"))
+})
+
+
+testname = "9 merit_dem: show variable names (all)"
+print(paste("TEST: ", testname))
+test_that(testname, {
+  # Note: All other merit_dem download functionality is tested by testing the present climate
+  # download functionality - they all use the same download_simple_tables function!
+
+  # Run twice, should yield the same result!
+  vars <- download_merit_dem_tables(quiet=FALSE)
+  vars2 <- download_merit_dem_tables(quiet=FALSE, subset="ALL")
+
+  # Check:
+  expect_equal(vars, vars2)
+  expect_equal(vars$dataset_name, "merit_dem_v1_0_3")
+  expect_equal(sort(vars$variable_names), c("elev"))
 })
 

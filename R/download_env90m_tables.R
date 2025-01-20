@@ -158,6 +158,168 @@ download_soil_tables <- function(subset = NULL,
 }
 
 
+
+#' @describeIn download-env90m-tables Download tables for the
+#'  flo1k_v1_0 dataset
+#' @examples
+#'
+#' ### Flow (mean): flo1k_v1_0 ###
+#' # Show all available flo1k variable names:
+#' download_flo1k_tables()
+#'
+#' # Compute download size of the only flo1k_v1_0 variable (mean flow),
+#' # for one tile:
+#' download_flo1k_tables(
+#'   subset = "ALL",
+#'   tile_ids = c("h00v04"),
+#'   download = FALSE)
+#'
+#' # Download the only flo1k_v1_0 variable (flo1k), for two tiles:
+#' download_soil_tables(
+#'   subset = c("flo1k"),
+#'   tile_ids = c("h00v04", "h10v04"),
+#'   download = TRUE,
+#'   download_dir = ".",
+#'   file_format = "zip")
+#'
+#' # Download the only flo1k_v1_0 variable (flo1k), for one tile:
+#' # unzip, and delete the zips:
+#' download_soil_tables(
+#'   subset = c("flo1k"),
+#'   tile_ids = c("h00v04"),
+#'   download = TRUE,
+#'   download_dir = ".",
+#'   file_format = "txt",
+#'   delete_zips = TRUE)
+#'
+#' @export
+download_flo1k_tables <- function(subset = NULL,
+                                  tile_ids = NULL,
+                                  download = FALSE,
+                                  download_dir = ".",
+                                  file_format = "txt",
+                                  delete_zips = TRUE,
+                                  ignore_missing = FALSE,
+                                  tempdir = NULL,
+                                  quiet = NULL) {
+
+  return(download_simple_tables(
+    "flo1k_v1_0",
+    "env90m_flo1k_paths_file_sizes.txt",
+    subset, tile_ids, ignore_missing, download, download_dir,
+    file_format, delete_zips, tempdir, quiet
+  ))
+}
+
+
+
+#' @describeIn download-env90m-tables Download tables for the
+#'  cgiar_csi_v3 dataset.
+#' @examples
+#'
+#' ### CGIAR CSI (TODO description): cgiar_csi_v3 ###
+#' # Show all available cgiar variable names
+#' download_cgiar_tables()
+#'
+#' # Compute download size of all cgiar variables, for one tile:
+#' download_cgiar_tables(
+#'   subset = "ALL",
+#'   tile_ids = c("h00v04"),
+#'   download = FALSE)
+#'
+#' # Download one cgiar variable (Global Aridity Index), for two tiles:
+#' download_cgiar_tables(
+#'   subset = c("garid"),
+#'   tile_ids = c("h00v04", "h10v04"),
+#'   download = TRUE,
+#'   download_dir = ".",
+#'   file_format = "zip")
+#'
+#' # Download two cgiar variables (Global Aridity Index, Potential
+#' # Evapotranspiration), for one tile, unzip, and delete the zips:
+#' download_cgiar_tables(
+#'   subset = c("garid", "gevapt"),
+#'   tile_ids = c("h00v04"),
+#'   download = TRUE,
+#'   download_dir = ".",
+#'   file_format = "txt",
+#'   delete_zips = TRUE)
+#'
+#' @export
+download_cgiar_tables <- function(subset = NULL,
+                                  tile_ids = NULL,
+                                  download = FALSE,
+                                  download_dir = ".",
+                                  file_format = "txt",
+                                  delete_zips = TRUE,
+                                  ignore_missing = FALSE,
+                                  tempdir = NULL,
+                                  quiet = NULL) {
+
+  return(download_simple_tables(
+    "cgiar_csi_v3",
+    "env90m_cgiar_paths_file_sizes.txt",
+    subset, tile_ids, ignore_missing, download, download_dir,
+    file_format, delete_zips, tempdir, quiet
+  ))
+}
+
+
+#' @describeIn download-env90m-tables Download tables for the
+#'  merit_dem_v1_0_3 dataset.
+#' @examples
+#'
+#' ### Digital Elevation Model: merit_dem_v1_0_3 ###
+#' # (Multi-Error-Removed Improved-Terrain Digital Elevation Model)
+#' # Show all available merit_dem_v1_0_3 variable names
+#' download_merit_dem_tables()
+#'
+#' # Compute download size of the only merit_dem_v1_0_3 variable
+#' # (Mean elevation), for one tile:
+#' download_merit_dem_tables(
+#'   subset = "ALL",
+#'   tile_ids = c("h00v04"),
+#'   download = FALSE)
+#'
+#' # Download the only merit_dem_v1_0_3 variable (Mean elevation), for two tiles:
+#' download_merit_dem_tables(
+#'   subset = c("elev"), # or "ALL"
+#'   tile_ids = c("h00v04", "h10v04"),
+#'   download = TRUE,
+#'   download_dir = ".",
+#'   file_format = "zip")
+#'
+#' # Download the only merit_dem_v1_0_3 variable (Mean elevation), for one tiles:
+#' # unzip, and delete the zips:
+#' download_merit_dem_tables(
+#'   subset = c("elev""),
+#'   tile_ids = c("h00v04"),
+#'   download = TRUE,
+#'   download_dir = ".",
+#'   file_format = "txt",
+#'   delete_zips = TRUE)
+#'
+#' @export
+download_merit_dem_tables <- function(subset = NULL,
+                                      tile_ids = NULL,
+                                      download = FALSE,
+                                      download_dir = ".",
+                                      file_format = "txt",
+                                      delete_zips = TRUE,
+                                      ignore_missing = FALSE,
+                                      tempdir = NULL,
+                                      quiet = NULL) {
+
+  return(download_simple_tables(
+    "merit_dem_v1_0_3",
+    "env90m_merit_dem_paths_file_sizes.txt",
+    subset, tile_ids, ignore_missing, download, download_dir,
+    file_format, delete_zips, tempdir, quiet
+  ))
+}
+
+
+
 #' @describeIn download-env90m-tables Download tables for the 
 #'  hydrography90m_v1_0 dataset.
 #' @examples
