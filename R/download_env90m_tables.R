@@ -5,14 +5,16 @@
 #' the Environment90m variable names and download data of the
 #' Environment90m datasets, which are split into 20°x20° tiles.
 #'
-#' If the functions are called without arguments (i.e. without specifying
+#' There are basically 3 usages:
+#'
+#' (1) If the functions are called without arguments (i.e. without specifying
 #' variable names and tiles), the available variable names are returned.
 #' 
-#' If a subset of variables and tile IDs are specified, the download size of
-#' the resulting download will be computed.
+#' (2) If a subset of variables and tile IDs are specified, the download size
+#' of the resulting download will be computed.
 #' 
-#' If a subset of variables and tile IDs are specified, and `download` is set
-#' to `TRUE`, the requested tables will be downloaded and either left as
+#' (3) If a subset of variables and tile IDs are specified, and `download` is
+#' set to `TRUE`, the requested tables will be downloaded and either left as
 #' zipped files or unzipped to text files.
 #' 
 #' Multiple regular tiles, e.g. belonging to regional units, can be
