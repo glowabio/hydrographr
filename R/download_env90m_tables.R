@@ -150,7 +150,7 @@ download_soil_tables <- function(subset = NULL,
                                  delete_zips = TRUE,
                                  ignore_missing = FALSE,
                                  tempdir = NULL,
-                                 quiet = NULL) {
+                                 quiet = FALSE) {
 
   return(download_simple_tables(
     "soilgrids250m_v2_0",
@@ -203,7 +203,7 @@ download_flo1k_tables <- function(subset = NULL,
                                   delete_zips = TRUE,
                                   ignore_missing = FALSE,
                                   tempdir = NULL,
-                                  quiet = NULL) {
+                                  quiet = FALSE) {
 
   return(download_simple_tables(
     "flo1k_v1_0",
@@ -255,7 +255,7 @@ download_cgiar_tables <- function(subset = NULL,
                                   delete_zips = TRUE,
                                   ignore_missing = FALSE,
                                   tempdir = NULL,
-                                  quiet = NULL) {
+                                  quiet = FALSE) {
 
   return(download_simple_tables(
     "cgiar_csi_v3",
@@ -311,7 +311,7 @@ download_merit_dem_tables <- function(subset = NULL,
                                       delete_zips = TRUE,
                                       ignore_missing = FALSE,
                                       tempdir = NULL,
-                                      quiet = NULL) {
+                                      quiet = FALSE) {
 
   return(download_simple_tables(
     "merit_dem_v1_0_3",
@@ -364,7 +364,7 @@ download_hydrography90m_tables <- function(subset = NULL,
                                            delete_zips = TRUE,
                                            ignore_missing = FALSE,
                                            tempdir = NULL,
-                                           quiet = NULL) {
+                                           quiet = FALSE) {
 
   return(download_simple_tables(
     "hydrography90m_v1_0", 
@@ -419,7 +419,7 @@ download_present_climate_tables <- function(subset = NULL,
                                             delete_zips = TRUE,
                                             ignore_missing = FALSE,
                                             tempdir = NULL,
-                                            quiet = NULL) {
+                                            quiet = FALSE) {
 
   return(download_simple_tables(
     "chelsa_bioclim_v2_1",
@@ -494,7 +494,7 @@ download_future_climate_tables <- function(base_vars = NULL,
                                            delete_zips = TRUE,
                                            ignore_missing = FALSE,
                                            tempdir = NULL,
-                                           quiet = NULL) {
+                                           quiet = FALSE) {
 
   #########################################
   ### Extract info from file size table ###
@@ -502,7 +502,7 @@ download_future_climate_tables <- function(base_vars = NULL,
 
   # Use file_size_table from tempdir or download it:
   file_name <- "env90m_futureclimate_paths_file_sizes.txt"
-  file_size_table <- get_file_size_table(file_name, tempdir)
+  file_size_table <- get_file_size_table(file_name, tempdir, quiet)
 
   # Info:
   # Future climate variables look like this:
@@ -885,7 +885,7 @@ download_landcover_tables <- function(base_vars = NULL,
   #########################################
 
   file_name <- "env90m_landcover_paths_file_sizes.txt"
-  file_size_table <- get_file_size_table(file_name, tempdir)
+  file_size_table <- get_file_size_table(file_name, tempdir, quiet)
 
   # Info:
   # Landcover variables look like this:
@@ -1207,7 +1207,7 @@ download_simple_tables <- function(
   #########################################
 
   # Use file_size_table from tempdir or download it:
-  file_size_table <- get_file_size_table(table_file_name, tempdir)
+  file_size_table <- get_file_size_table(table_file_name, tempdir, quiet)
 
   # Get all variable names from the table:
   all_varnames <- unique(sub("_[^_]+$", "", file_size_table$file_name))
@@ -1370,13 +1370,15 @@ download_simple_tables <- function(
 #' @returns Data frame that contains file name, size in bytes and file path
 #'  (on the server) for all files (data tables) of one specific
 #'  Environment90m dataset (e.g. landcover, soil).
+#' @param quiet logical. If FALSE, informative messages will be printed.
+#'   Default is FALSE.
 #' @examples
 #' # Download and load the file size table for the landcover dataset:
 #' file_size_table <- get_file_size_table(
 #'   file_name = "env90m_landcover_paths_file_sizes.txt")
 #' 
 #' @noRd
-get_file_size_table <- function(file_name, tempdir = NULL) {
+get_file_size_table <- function(file_name, tempdir = NULL, quiet = FALSE) {
 
   # Define tempdir:
   if (is.null(tempdir)) {
@@ -1387,9 +1389,10 @@ get_file_size_table <- function(file_name, tempdir = NULL) {
   # if it doesn't exist in the tempdir()
   file_local <- paste0(tempdir, "/", file_name)
   if (!file.exists(file_local)) {
-    message(paste('Downloading ', file_name,'...'))
+    if (!(quiet)) message(paste('Downloading ', file_name,'...'))
     url <- "https://public.igb-berlin.de/index.php/s/zw56kEd25NsQqcQ/download?path=%2FREADME/"
-    download.file(paste0(url, file_name), destfile = file_local, mode = "wb")
+    download.file(paste0(url, file_name), destfile = file_local, mode = "wb",
+      quiet = quiet)
   }
 
   # Import lookup table with the size of each file
@@ -1566,7 +1569,8 @@ do_env90m_download <- function(variable_names, tile_ids, file_size_table, downlo
   tryCatch(
     {
       igb_readme = paste0(igb_path, "README/accessibility_check.txt")
-      download.file(igb_readme, destfile = paste0(download_dir, "/README.txt"), mode = "wb")
+      download.file(igb_readme, destfile = paste0(download_dir, "/README.txt"),
+        mode = "wb", quiet = quiet)
     },
     warning = function(c) {
       message(paste0('Error: Could not download from ', igb_readme, ', maybe the server is down.'))
@@ -1603,22 +1607,22 @@ do_env90m_download <- function(variable_names, tile_ids, file_size_table, downlo
       all_downloaded_zips <- c(all_downloaded_zips, downloaded_path)
     }
   }
-  message(paste('Downloaded zip files:', paste(all_downloaded_zips, collapse=', ')))
+  if (!(quiet)) message(paste('Downloaded zip files:', paste(all_downloaded_zips, collapse=', ')))
   result <- list(downloaded=all_downloaded_zips)
 
   # Unzip and delete zipfiles, if requested...
   # TODO: This could start to run in parallel, maybe?
   if (file_format == "txt") {
     if (delete_zips) {
-      message("Unzipping and deleting zipfiles...")
+      if (!(quiet)) message("Unzipping and deleting zipfiles...")
     } else {
-      message("Unzipping...")
+      if (!(quiet)) message("Unzipping...")
     }
     all_destdirs <- c()
     all_deleted <- c()
     for (zipfile in all_downloaded_zips) {
       destdir <- dirname(zipfile)
-      message("Unzipping file ", zipfile, "...")
+      if (!(quiet)) message("Unzipping file ", zipfile, "...")
       utils::unzip(zipfile, exdir = destdir)
       all_destdirs <- c(all_destdirs, destdir)
       if (delete_zips) {

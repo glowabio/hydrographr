@@ -3,8 +3,10 @@
 ### Testing the download_env90m_tables functions ###
 ####################################################
 
-print("_______________________________")
-print("Testing: download_env90m_tables")
+tests_quiet=TRUE
+
+if (!(tests_quiet)) print("_______________________________")
+if (!(tests_quiet)) print("Testing: download_env90m_tables")
 
 
 #########################
@@ -28,11 +30,13 @@ SKIP_HUGE_DOWNLOAD <- Sys.getenv("SKIP_HUGE_DOWNLOAD") == "TRUE" || SKIP_DOWNLOA
 #############
 
 testname = "1.1 helpers: table getter"
-print(paste("TEST: ", testname))
+if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Run:
-  tab <- get_file_size_table(file_name = "env90m_presentclimate_paths_file_sizes.txt") 
+  tab <- get_file_size_table(
+    file_name = "env90m_presentclimate_paths_file_sizes.txt",
+    quiet = quiet) 
 
   # Check whether the specified table was loaded
   # and has the expected columns, number of rows, ...
@@ -42,18 +46,20 @@ test_that(testname, {
 
 
 testname = "1.2.1: helpers: compute download size"
-print(paste("TEST: ", testname))
+if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Prepare:
-  file_size_table <- get_file_size_table(file_name = "env90m_landcover_paths_file_sizes.txt")
+  file_size_table <- get_file_size_table(
+    file_name = "env90m_landcover_paths_file_sizes.txt",
+    quiet = quiet)
   
   # Run:
   bytes <- compute_download_size(
     c("c100_1992", "c100_1993"),
     c("h10v04", "h00v04"),
     file_size_table,
-    quiet = FALSE,
+    quiet=FALSE,
     ignore_missing = FALSE
   )
 
@@ -63,12 +69,14 @@ test_that(testname, {
 
 
 testname = "1.2.2: helpers: compute download size: failure, wrong tile"
-print(paste("TEST: ", testname))
+if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Prepare:
   expected_error_message <- "Not available: Tile id(s) h99v99. Please check your spelling and try again!"
-  file_size_table <- get_file_size_table(file_name = "env90m_landcover_paths_file_sizes.txt")
+  file_size_table <- get_file_size_table(
+    file_name = "env90m_landcover_paths_file_sizes.txt"
+    quiet = quiet)
 
   # Run and check whether error happens:
   expect_error(
@@ -76,7 +84,7 @@ test_that(testname, {
       c("c100_1992", "c100_1993"),
       c("h02v02", "h04v02", "h99v99"),
       file_size_table,
-      quiet = FALSE,
+      quiet=FALSE,
       ignore_missing = FALSE
     ),
     expected_error_message, fixed=TRUE
@@ -85,11 +93,13 @@ test_that(testname, {
 
 
 testname = "1.3.1: helpers: download zips (not delete)"
-print(paste("TEST: ", testname))
+if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Prepare:
-  file_size_table <- get_file_size_table(file_name = "env90m_landcover_paths_file_sizes.txt")
+  file_size_table <- get_file_size_table(
+    file_name = "env90m_landcover_paths_file_sizes.txt",
+    quiet = quiet)
 
   # Run:
   skip_if_offline("public.igb-berlin.de") # downloads 8.5 KB (or only 316 bytes), no need to skip
@@ -99,7 +109,7 @@ test_that(testname, {
     file_size_table,
     download_dir = ".",
     file_format = "zip",
-    quiet = FALSE,
+    quiet=FALSE,
     delete_zips = FALSE)
 
   # Check whether zips exist:
@@ -117,11 +127,13 @@ test_that(testname, {
 
 
 testname = "1.3.2: helpers: download zip, unzip to txt (not delete)"
-print(paste("TEST: ", testname))
+if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Prepare:
-  file_size_table <- get_file_size_table(file_name = "env90m_landcover_paths_file_sizes.txt")
+  file_size_table <- get_file_size_table(
+    file_name = "env90m_landcover_paths_file_sizes.txt",
+    quiet = quiet)
 
   # Run:
   skip_if_offline("public.igb-berlin.de")
@@ -131,7 +143,7 @@ test_that(testname, {
     file_size_table,
     download_dir = ".",
     file_format = "txt",
-    quiet = FALSE,
+    quiet=FALSE,
     delete_zips = FALSE)
 
   # Check whether zips and txts exist:
@@ -158,11 +170,13 @@ test_that(testname, {
 
 
 testname = "1.3.3: helpers: download zip, unzip to txt (do delete)"
-print(paste("TEST: ", testname))
+if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Prepare:
-  file_size_table <- get_file_size_table(file_name = "env90m_landcover_paths_file_sizes.txt")
+  file_size_table <- get_file_size_table(
+    file_name = "env90m_landcover_paths_file_sizes.txt",
+    quiet = quiet)
 
   # Run:
   skip_if_offline("public.igb-berlin.de")
@@ -172,7 +186,7 @@ test_that(testname, {
     file_size_table,
     download_dir = ".",
     file_format = "txt",
-    quiet = FALSE,
+    quiet=FALSE,
     delete_zips = TRUE)
 
   # Check whether txts exist and zips don't:
@@ -200,7 +214,7 @@ test_that(testname, {
 
 
 testname = "2.1 landcover: show variable names (all)"
-print(paste("TEST: ", testname))
+if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Run three times, each should yield the same result!
@@ -229,7 +243,7 @@ test_that(testname, {
 
 
 testname = "2.2.1 landcover: show variable names (of a subset, specified: subset)"
-print(paste("TEST: ", testname))
+if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Prepare:
@@ -247,7 +261,7 @@ test_that(testname, {
 
 
 testname = "2.2.2 landcover: show variable names (of a subset, specified: base_vars and years)"
-print(paste("TEST: ", testname))
+if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Prepare:
@@ -269,7 +283,7 @@ test_that(testname, {
 
 
 testname = "2.2.3 landcover: show variable names (test passing years=ALL)"
-print(paste("TEST: ", testname))
+if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Run:
@@ -299,7 +313,7 @@ test_that(testname, {
 
 
 testname = "2.3.1 landcover: show download_size (specified: subset / various components)"
-print(paste("TEST: ", testname))
+if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Prepare:
@@ -329,7 +343,7 @@ test_that(testname, {
 
 
 testname = "2.3.2 landcover: show download size (test passing subset=ALL)"
-print(paste("TEST: ", testname))
+if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Run:
@@ -347,7 +361,7 @@ test_that(testname, {
 
 
 testname = "2.3.3 landcover: show download size (test passing tile_ids=ALL)"
-print(paste("TEST: ", testname))
+if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Run:
@@ -364,7 +378,7 @@ test_that(testname, {
 
 
 testname = "2.4.1 landcover: download subset"
-print(paste("TEST: ", testname))
+if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Run:
@@ -390,7 +404,7 @@ test_that(testname, {
 
 
 testname = "2.4.2 landcover: download all variables (for one tile)"
-print(paste("TEST: ", testname))
+if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Run:
@@ -418,7 +432,7 @@ test_that(testname, {
 
 
 testname = "2.4.3 landcover: download all tiles (for one variables)"
-print(paste("TEST: ", testname))
+if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Run:
@@ -446,7 +460,7 @@ test_that(testname, {
 
 
 testname = "2.5.1 landcover: failure: year not available"
-print(paste("TEST: ", testname))
+if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Prepare:
@@ -465,7 +479,7 @@ test_that(testname, {
 
 
 testname = "3.1 future climate: show variable names (all)"
-print(paste("TEST: ", testname))
+if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Run three times, each should yield the same result!
@@ -508,7 +522,7 @@ test_that(testname, {
 
 
 testname = "3.2.1 futureclimate: show variable names (of a subset, specified: subset)"
-print(paste("TEST: ", testname))
+if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Prepare:
@@ -526,7 +540,7 @@ test_that(testname, {
 
 
 testname = "3.2.2 futureclimate: show variable names (of a subset, specified: various components)"
-print(paste("TEST: ", testname))
+if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Prepare:
@@ -569,7 +583,7 @@ test_that(testname, {
 
 
 testname = "3.3.1 futureclimate: show download size (specified: subset / various components)"
-print(paste("TEST: ", testname))
+if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Prepare:
@@ -602,7 +616,7 @@ test_that(testname, {
 
 
 testname = "3.3.2 futureclimate: show download size (test passing subset=ALL)"
-print(paste("TEST: ", testname))
+if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Run:
@@ -619,7 +633,7 @@ test_that(testname, {
 
 
 testname = "3.3.3 futureclimate: show download size (test passing tile_ids=ALL)"
-print(paste("TEST: ", testname))
+if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Run:
@@ -636,7 +650,7 @@ test_that(testname, {
 
 
 testname = "3.4.1 futureclimate: download subset"
-print(paste("TEST: ", testname))
+if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Run:
@@ -662,7 +676,7 @@ test_that(testname, {
 
 
 testname = "3.4.2 futureclimate: download all variables (for one tile)"
-print(paste("TEST: ", testname))
+if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Run:
@@ -685,7 +699,7 @@ test_that(testname, {
 
 
 testname = "3.4.3 futureclimate: download all tiles (for one variable)"
-print(paste("TEST: ", testname))
+if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Run:
@@ -708,7 +722,7 @@ test_that(testname, {
 
 
 testname = "3.5.1 futureclimate: failure: model not available"
-print(paste("TEST: ", testname))
+if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Prepare:
@@ -730,7 +744,7 @@ test_that(testname, {
 
 
 testname = "3.5.2 futureclimate: failure: scenarios not available"
-print(paste("TEST: ", testname))
+if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Prepare:
@@ -752,7 +766,7 @@ test_that(testname, {
 
 
 testname = "3.5.3 futureclimate: failure: version not available"
-print(paste("TEST: ", testname))
+if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Prepare:
@@ -774,7 +788,7 @@ test_that(testname, {
 
 
 testname = "3.5.4 futureclimate: failure: base_var not available"
-print(paste("TEST: ", testname))
+if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Prepare:
@@ -803,7 +817,7 @@ test_that(testname, {
 
 
 testname = "4.1 presentclimate: show variable names (all)"
-print(paste("TEST: ", testname))
+if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Run twice, should yield the same result!
@@ -821,7 +835,7 @@ test_that(testname, {
 
 
 testname = "4.2 presentclimate (or other simple tables): show variable names (of a subset)"
-print(paste("TEST: ", testname))
+if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Run:
@@ -836,7 +850,7 @@ test_that(testname, {
 
 
 testname = "4.3.1 presentclimate (or other simple tables): show download size (specified: subset)"
-print(paste("TEST: ", testname))
+if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Run:
@@ -853,7 +867,7 @@ test_that(testname, {
 
 
 testname = "4.3.2 presentclimate (or other simple tables): show download size (test passing subset=ALL)"
-print(paste("TEST: ", testname))
+if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Run:
@@ -870,7 +884,7 @@ test_that(testname, {
 
 
 testname = "4.3.3 presentclimate (or other simple tables): show download size (test passing tile_ids=ALL)"
-print(paste("TEST: ", testname))
+if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Run:
@@ -887,7 +901,7 @@ test_that(testname, {
 
 
 testname = "4.4.1 presentclimate (or other simple tables): download subset"
-print(paste("TEST: ", testname))
+if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Run:
@@ -912,7 +926,7 @@ test_that(testname, {
 
 
 testname = "4.4.2 presentclimate (or other simple tables): download all variables (for one tile)"
-print(paste("TEST: ", testname))
+if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Run:
@@ -939,7 +953,7 @@ test_that(testname, {
 
 
 testname = "4.4.3 presentclimate (or other simple tables): download all tiles (for one variable)"
-print(paste("TEST: ", testname))
+if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Run:
@@ -966,7 +980,7 @@ test_that(testname, {
 
 
 testname = "4.5 presentclimate (or other simple tables): failure: variable not available"
-print(paste("TEST: ", testname))
+if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Prepare:
@@ -986,7 +1000,7 @@ test_that(testname, {
 
 
 testname = "5 soil: show variable names (all)"
-print(paste("TEST: ", testname))
+if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
   # Note: All other soil download functionality is tested by testing the present climate
   # download functionality - they all use the same download_simple_tables function!
@@ -1006,7 +1020,7 @@ test_that(testname, {
 
 
 testname = "6 hydro90m: show variable names (all)"
-print(paste("TEST: ", testname))
+if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
   # Note: All other hydro90m download functionality is tested by testing the present climate
   # download functionality - they all use the same download_simple_tables function!
@@ -1035,7 +1049,7 @@ test_that(testname, {
 
 
 testname = "7 cgiar: show variable names (all)"
-print(paste("TEST: ", testname))
+if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
   # Note: All other cgiar download functionality is tested by testing the present climate
   # download functionality - they all use the same download_simple_tables function!
@@ -1052,7 +1066,7 @@ test_that(testname, {
 
 
 testname = "8 flo1k: show variable names (all)"
-print(paste("TEST: ", testname))
+if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
   # Note: All other flo1k download functionality is tested by testing the present climate
   # download functionality - they all use the same download_simple_tables function!
@@ -1069,7 +1083,7 @@ test_that(testname, {
 
 
 testname = "9 merit_dem: show variable names (all)"
-print(paste("TEST: ", testname))
+if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
   # Note: All other merit_dem download functionality is tested by testing the present climate
   # download functionality - they all use the same download_simple_tables function!
