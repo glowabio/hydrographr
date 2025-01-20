@@ -75,7 +75,7 @@ test_that(testname, {
   # Prepare:
   expected_error_message <- "Not available: Tile id(s) h99v99. Please check your spelling and try again!"
   file_size_table <- get_file_size_table(
-    file_name = "env90m_landcover_paths_file_sizes.txt"
+    file_name = "env90m_landcover_paths_file_sizes.txt",
     quiet = quiet)
 
   # Run and check whether error happens:
@@ -107,7 +107,7 @@ test_that(testname, {
     c("c100_1992", "c100_1993"),
     c("h10v04"),
     file_size_table,
-    download_dir = ".",
+    download_dir=download_dir,
     file_format = "zip",
     quiet=FALSE,
     delete_zips = FALSE)
@@ -141,7 +141,7 @@ test_that(testname, {
     c("c100_1992", "c100_1993"),
     c("h10v04"),
     file_size_table,
-    download_dir = ".",
+    download_dir=download_dir,
     file_format = "txt",
     quiet=FALSE,
     delete_zips = FALSE)
@@ -184,7 +184,7 @@ test_that(testname, {
     c("c100_1992", "c100_1993"),
     c("h10v04"),
     file_size_table,
-    download_dir = ".",
+    download_dir=download_dir,
     file_format = "txt",
     quiet=FALSE,
     delete_zips = TRUE)
