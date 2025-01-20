@@ -612,12 +612,12 @@ download_future_climate_tables <- function(base_vars = NULL,
       variables$tile_ids=tile_ids
     }
 
-    # Does the user want to download all variables, or just see them?
+    # Does the user want to download all fut.clim. variables, or just see them?
     if (download) {
 
       # Without knowing which tiles, user cannot download:
       if (is.null(tile_ids)) {
-        msg <- "To download data, please specify parameter 'tile_ids'."
+        msg <- "To download, please specify parameter 'tile_ids'."
         variables$note = msg
         warning(msg) # warning, because user obviously wanted to download...
 
@@ -633,9 +633,15 @@ download_future_climate_tables <- function(base_vars = NULL,
 
     # User does not want to download all fut.clim. variables, just see them:
     } else {
-      msg = "To download this data, specify parameter 'tile_ids', and add 'download=TRUE'."
-      message(msg)
-      variables$note = msg
+      if (is.null(tile_ids)) {
+        msg <- "To download, please specify parameter 'tile_ids', and add 'download=TRUE'."
+        if (!(quiet)) message(msg)
+        variables$note = msg
+      } else {
+        msg <- "To download, please specify 'download=TRUE'."
+        if (!(quiet)) message(msg)
+        variables$note = msg
+      }
     }
 
     return(variables)
@@ -815,7 +821,7 @@ download_future_climate_tables <- function(base_vars = NULL,
   # Download the future climate data if requested:
   if (download) {
     if (is.null(tile_ids)) {
-      msg = "To download this data, specify parameter 'tile_ids'."
+      msg <- "To download, please specify parameter 'tile_ids'."
       variables$note = msg
       warning(msg) # warning, because user obviously wanted to download...
     } else {
@@ -827,9 +833,15 @@ download_future_climate_tables <- function(base_vars = NULL,
       variables <- c(variables, outcome)
     }
   } else {
-    msg = "To download this data, specify which tiles, and add 'download=TRUE'."
-    variables$note = msg
-    message(msg)
+    if (is.null(tile_ids)){
+      msg <- "To download, please specify parameter 'tile_ids', and add 'download=TRUE'."
+      variables$note = msg
+      if (!(quiet)) message(msg)
+    } else {
+      msg <- "To download, please specify 'download=TRUE'."
+      variables$note = msg
+      if (!(quiet)) message(msg)
+    }
   }
 
   # Return the list
@@ -982,7 +994,7 @@ download_landcover_tables <- function(base_vars = NULL,
 
       # Without knowing which tiles, user cannot download:
       if (is.null(tile_ids)) {
-        msg <- "To download data, please specify parameter 'tile_ids'."
+        msg <- "To download, please specify parameter 'tile_ids'."
         variables$note = msg
         warning(msg) # warning, because user obviously wanted to download...
 
@@ -998,9 +1010,15 @@ download_landcover_tables <- function(base_vars = NULL,
 
     # User does not want to download all variables, just see them:
     } else {
-      msg = "To download this data, specify parameter 'tile_ids', and add 'download=TRUE'."
-      message(msg)
-      variables$note = msg
+      if (is.null(tile_ids)){
+        msg <- "To download, please specify parameter 'tile_ids', and add 'download=TRUE'."
+        if (!(quiet)) message(msg)
+        variables$note = msg
+      } else {
+        msg <- "To download, please specify 'download=TRUE'."
+        if (!(quiet)) message(msg)
+        variables$note = msg
+      }
     }
 
     return(variables)
@@ -1120,7 +1138,7 @@ download_landcover_tables <- function(base_vars = NULL,
   # Download the landcover data if requested:
   if (download) {
     if (is.null(tile_ids)) {
-      msg = "To download this data, specify parameter 'tile_ids'."
+      msg <- "To download, please specify parameter 'tile_ids'."
       variables$note = msg
       warning(msg) # warning, because user obviously wanted to download...
     }
@@ -1131,9 +1149,15 @@ download_landcover_tables <- function(base_vars = NULL,
         quiet = quiet, delete_zips = delete_zips)
     variables <- c(variables, outcome)
   } else {
-    msg = "To download this data, specify which tiles, and add 'download=TRUE'."
-    variables$note = msg
-    message(msg)
+    if (is.null(tile_ids)){
+      msg <- "To download, please specify parameter 'tile_ids', and add 'download=TRUE'."
+      variables$note = msg
+      if (!(quiet)) message(msg)
+    } else {
+      msg <- "To download, please specify 'download=TRUE'."
+      variables$note = msg
+      if (!(quiet)) message(msg)
+    }
   }
 
   # Return the list
@@ -1258,7 +1282,7 @@ download_simple_tables <- function(
     if (! (is.null(tile_ids))) {
       download_bytes <- compute_download_size(
         all_varnames, tile_ids, file_size_table, quiet)
-      message(paste0("Info: Download size: ",
+      if (!(quiet)) message(paste0("Info: Download size: ",
         length(all_varnames), " variables, ",
         length(tile_ids), " tiles: ",
         download_bytes/1000000000, " GB (", download_bytes, " bytes)."))
@@ -1271,7 +1295,7 @@ download_simple_tables <- function(
 
       # Without knowing which tiles, user cannot download:
       if (is.null(tile_ids)) {
-        msg <- "To download data, please specify parameter 'tile_ids'."
+        msg <- "To download, please specify parameter 'tile_ids'."
         variables$note = msg
         warning(msg) # warning, because user obviously wanted to download...
 
@@ -1287,9 +1311,15 @@ download_simple_tables <- function(
 
     # User does not want to download all variables, just see them:
     } else {
-      msg = "To download this data, specify parameter 'tile_ids', and add 'download=TRUE'."
-      message(msg)
-      variables$note = msg
+      if (is.null(tile_ids)) {
+        msg <- "To download, please specify parameter 'tile_ids', and add 'download=TRUE'."
+        variables$note = msg
+        if (!(quiet)) message(msg)
+      } else {
+        msg <- "To download, please specify 'download=TRUE'."
+        variables$note = msg
+        if (!(quiet)) message(msg)
+      }
     }
 
     return(variables)
@@ -1326,7 +1356,7 @@ download_simple_tables <- function(
   # Compute download size, if tile_ids is specified:
   if (!(is.null(tile_ids))) {
     download_bytes <- compute_download_size(varnames_to_be_returned, tile_ids, file_size_table, quiet)
-    message(paste0("Info: Download size: ",
+    if (!(quiet)) message(paste0("Info: Download size: ",
       length(varnames_to_be_returned), " variables, ",
       length(tile_ids), " tiles: ",
       download_bytes/1000000000, " GB (", download_bytes, " bytes)."))
@@ -1337,8 +1367,8 @@ download_simple_tables <- function(
   # Download the data if requested:
   if (download) {
     if (is.null(tile_ids)) {
-      message('In order to download, please provide tile_ids.')
-      note = "To download this data, specify which tiles, and add 'download=TRUE'."
+      msg <- "To download, please specify parameter 'tile_ids'."
+      warning(msg) # warning, because user obviously wanted to download...
       variables$note = note
     }
     # Note: The following message is never quiet!
@@ -1348,8 +1378,16 @@ download_simple_tables <- function(
         quiet = quiet, delete_zips = delete_zips)
     variables <- c(variables, outcome)
   } else {
-    note = "To download this data, specify which tiles, and add 'download=TRUE'."
-    variables$note = note
+    if (is.null(tile_ids)){
+      msg <- "To download, please specify parameter 'tile_ids', and add 'download=TRUE'."
+      variables$note = msg
+      if (!(quiet)) message(msg)
+    } else {
+      msg <- "To download, please specify 'download=TRUE'."
+      variables$note = msg
+      if (!(quiet)) message(msg)
+    }
+
   }
 
   # Return the list
