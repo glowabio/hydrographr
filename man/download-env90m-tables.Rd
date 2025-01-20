@@ -237,30 +237,30 @@ For details on the Soil data, please refer to
 }
 \section{Functions}{
 \itemize{
-\item \code{download_soil_tables()}: Download tables for the 
-soilgrids250m_v2_0 dataset
+\item \code{download_soil_tables()}: Download SOILGRIDS tables
+(soilgrids250m_v2_0)
 
-\item \code{download_flo1k_tables()}: Download tables for the
-flo1k_v1_0 dataset
+\item \code{download_flo1k_tables()}: Download flow tables (flo1k_v1_0)
 
-\item \code{download_cgiar_tables()}: Download tables for the
-cgiar_csi_v3 dataset.
+\item \code{download_cgiar_tables()}: Download CGIAR-CSI tables (cgiar_csi_v3)
 
-\item \code{download_merit_dem_tables()}: Download tables for the
-merit_dem_v1_0_3 dataset.
+\item \code{download_merit_dem_tables()}: Download MERIT-DEM tables
+(Multi-Error-Removed Improved-Terrain Digital Elevation Model,
+merit_dem_v1_0_3)
 
-\item \code{download_hydrography90m_tables()}: Download tables for the 
-hydrography90m_v1_0 dataset.
+\item \code{download_hydrography90m_tables()}: Download Hydrography90m tables
+(hydrography90m_v1_0)
 
-\item \code{download_present_climate_tables()}: Download tables for the
-chelsa_bioclim_v2_1 dataset (bioclimatic variables, except for future
-simulations)
+\item \code{download_present_climate_tables()}: Download CHELSA bioclimatic variables tables,
+except for future simulations (Climatologies at high resolution for the
+earth’s land surface areas, chelsa_bioclim_v2_1)
 
-\item \code{download_future_climate_tables()}: Download tables for the
-chelsa_bioclim_v2_1 dataset (bioclimatic variables, future simulations only)
+\item \code{download_future_climate_tables()}: Download CHELSA bioclimatic variables tables,
+future simulations only (Climatologies at high resolution for the
+earth’s land surface areas, chelsa_bioclim_v2_1)
 
-\item \code{download_landcover_tables()}: Download tables for the 
-esa_cci_landcover_v2_1_1 dataset
+\item \code{download_landcover_tables()}: Download ESA Land Cover tables
+(esa_cci_landcover_v2_1_1)
 
 }}
 \examples{

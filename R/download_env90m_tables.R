@@ -107,8 +107,8 @@ NULL
 
 
 
-#' @describeIn download-env90m-tables Download tables for the 
-#'  soilgrids250m_v2_0 dataset
+#' @describeIn download-env90m-tables Download SOILGRIDS tables
+#'  (soilgrids250m_v2_0)
 #' @examples
 #' 
 #' ### Soil: soilgrids250m_v2_0 ###
@@ -160,8 +160,7 @@ download_soil_tables <- function(subset = NULL,
 
 
 
-#' @describeIn download-env90m-tables Download tables for the
-#'  flo1k_v1_0 dataset
+#' @describeIn download-env90m-tables Download flow tables (flo1k_v1_0)
 #' @examples
 #'
 #' ### Flow (mean): flo1k_v1_0 ###
@@ -214,8 +213,7 @@ download_flo1k_tables <- function(subset = NULL,
 
 
 
-#' @describeIn download-env90m-tables Download tables for the
-#'  cgiar_csi_v3 dataset.
+#' @describeIn download-env90m-tables Download CGIAR-CSI tables (cgiar_csi_v3)
 #' @examples
 #'
 #' ### CGIAR CSI dataset: cgiar_csi_v3 ###
@@ -266,8 +264,9 @@ download_cgiar_tables <- function(subset = NULL,
 }
 
 
-#' @describeIn download-env90m-tables Download tables for the
-#'  merit_dem_v1_0_3 dataset.
+#' @describeIn download-env90m-tables Download MERIT-DEM tables
+#'  (Multi-Error-Removed Improved-Terrain Digital Elevation Model,
+#'  merit_dem_v1_0_3)
 #' @examples
 #'
 #' ### Digital Elevation Model: merit_dem_v1_0_3 ###
@@ -322,8 +321,8 @@ download_merit_dem_tables <- function(subset = NULL,
 
 
 
-#' @describeIn download-env90m-tables Download tables for the 
-#'  hydrography90m_v1_0 dataset.
+#' @describeIn download-env90m-tables Download Hydrography90m tables
+#'  (hydrography90m_v1_0)
 #' @examples
 #' 
 #' ### Hydrography90m: hydrography90m_v1_0 ###
@@ -374,9 +373,9 @@ download_hydrography90m_tables <- function(subset = NULL,
 }
 
 
-#' @describeIn download-env90m-tables Download tables for the
-#'  chelsa_bioclim_v2_1 dataset (bioclimatic variables, except for future
-#'  simulations)
+#' @describeIn download-env90m-tables Download CHELSA bioclimatic variables tables,
+#'  except for future simulations (Climatologies at high resolution for the
+#'  earth’s land surface areas, chelsa_bioclim_v2_1)
 #' @examples
 #' 
 #' ### Bioclimatic Variables: chelsa_bioclim_v2_1 ###
@@ -429,9 +428,9 @@ download_present_climate_tables <- function(subset = NULL,
 }
 
 
-#' @describeIn download-env90m-tables Download tables for the
-#'  chelsa_bioclim_v2_1 dataset (bioclimatic variables, future simulations only)
-#'
+#' @describeIn download-env90m-tables Download CHELSA bioclimatic variables tables,
+#'  future simulations only (Climatologies at high resolution for the
+#'  earth’s land surface areas, chelsa_bioclim_v2_1)
 #' @param base_vars (Only in `download_future_climate_tables()` and
 #'  `download_landcover_tables()`) Vector of the desired base variables, e.g.
 #'  the landcover variable "c20_1992" can be expressed as base variable "c20"
@@ -834,8 +833,8 @@ download_future_climate_tables <- function(base_vars = NULL,
 }
 
 
-#' @describeIn download-env90m-tables Download tables for the 
-#'  esa_cci_landcover_v2_1_1 dataset
+#' @describeIn download-env90m-tables Download ESA Land Cover tables
+#'  (esa_cci_landcover_v2_1_1)
 #' 
 #' @param base_vars (Only in `download_future_climate_tables()` and
 #'  `download_landcover_tables()`) Vector of the desired base variables, e.g.
