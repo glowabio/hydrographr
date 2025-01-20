@@ -619,10 +619,11 @@ download_future_climate_tables <- function(base_vars = NULL,
       if (is.null(tile_ids)) {
         msg <- "To download data, please specify parameter 'tile_ids'."
         variables$note = msg
-        warning(msg)
+        warning(msg) # warning, because user obviously wanted to download...
 
       # If tiles were specified, we can download:
       } else {
+        # Note: The following message is never quiet!
         message("\nStarting download of ", download_bytes/1000000000, " GB...")
         outcome <- do_env90m_download(all_varnames, tile_ids, file_size_table,
             download_dir = download_dir, file_format = file_format,
@@ -630,7 +631,7 @@ download_future_climate_tables <- function(base_vars = NULL,
         variables <- c(variables, outcome)
       }
 
-    # User does not want to download all variables, just see them:
+    # User does not want to download all fut.clim. variables, just see them:
     } else {
       msg = "To download this data, specify parameter 'tile_ids', and add 'download=TRUE'."
       message(msg)
@@ -811,13 +812,14 @@ download_future_climate_tables <- function(base_vars = NULL,
     variables$tile_ids=tile_ids
   }
 
-  # Download the data if requested:
+  # Download the future climate data if requested:
   if (download) {
     if (is.null(tile_ids)) {
       msg = "To download this data, specify parameter 'tile_ids'."
       variables$note = msg
-      warning(msg)
+      warning(msg) # warning, because user obviously wanted to download...
     } else {
+      # Note: The following message is never quiet!
       message("\nStarting download of ", download_bytes/1000000000, " GB...")
       outcome <- do_env90m_download(varnames_to_be_returned, tile_ids, file_size_table,
           download_dir = download_dir, file_format = file_format,
@@ -975,17 +977,18 @@ download_landcover_tables <- function(base_vars = NULL,
       variables$tile_ids=tile_ids
     }
 
-    # Does the user want to download all variables, or just see them?
+    # Does the user want to download all landcover variables, or just see them?
     if (download) {
 
       # Without knowing which tiles, user cannot download:
       if (is.null(tile_ids)) {
         msg <- "To download data, please specify parameter 'tile_ids'."
         variables$note = msg
-        warning(msg)
+        warning(msg) # warning, because user obviously wanted to download...
 
       # If tiles were specified, we can download:
       } else {
+        # Note: The following message is never quiet!
         message("\nStarting download of ", download_bytes/1000000000, " GB...")
         outcome <- do_env90m_download(all_varnames, tile_ids, file_size_table,
             download_dir = download_dir, file_format = file_format,
@@ -1001,7 +1004,6 @@ download_landcover_tables <- function(base_vars = NULL,
     }
 
     return(variables)
-
   }
 
   # If user specified a subset, continue with those specified variables that
@@ -1115,13 +1117,14 @@ download_landcover_tables <- function(base_vars = NULL,
     variables$tile_ids=tile_ids
   }
 
-  # Download the data if requested:
+  # Download the landcover data if requested:
   if (download) {
     if (is.null(tile_ids)) {
       msg = "To download this data, specify parameter 'tile_ids'."
       variables$note = msg
-      warning(msg)
+      warning(msg) # warning, because user obviously wanted to download...
     }
+    # Note: The following message is never quiet!
     message("\nStarting download of ", download_bytes/1000000000, " GB...")
     outcome <- do_env90m_download(varnames_to_be_returned, tile_ids, file_size_table,
         download_dir = download_dir, file_format = file_format,
@@ -1270,10 +1273,11 @@ download_simple_tables <- function(
       if (is.null(tile_ids)) {
         msg <- "To download data, please specify parameter 'tile_ids'."
         variables$note = msg
-        warning(msg)
+        warning(msg) # warning, because user obviously wanted to download...
 
       # If tiles were specified, we can download:
       } else {
+        # Note: The following message is never quiet!
         message("\nStarting download of ", download_bytes/1000000000, " GB...")
         outcome <- do_env90m_download(all_varnames, tile_ids, file_size_table,
             download_dir = download_dir, file_format = file_format,
@@ -1337,6 +1341,7 @@ download_simple_tables <- function(
       note = "To download this data, specify which tiles, and add 'download=TRUE'."
       variables$note = note
     }
+    # Note: The following message is never quiet!
     message("\nStarting download of ", download_bytes/1000000000, " GB...")
     outcome <- do_env90m_download(varnames_to_be_returned, tile_ids, file_size_table,
         download_dir = download_dir, file_format = file_format,
@@ -1574,9 +1579,11 @@ do_env90m_download <- function(variable_names, tile_ids, file_size_table, downlo
     },
     warning = function(c) {
       message(paste0('Error: Could not download from ', igb_readme, ', maybe the server is down.'))
+      # TODO: Do we have to use warning() here?
     },
     error = function(c) {
       message(paste0('Error: Could not download from ', igb_readme, ', maybe the server is down.'))
+      # TODO: Do we have to use error() here?
     }
   )
 
