@@ -35,8 +35,8 @@ test_that(testname, {
 
   # Run:
   tab <- get_file_size_table(
-    file_name = "env90m_presentclimate_paths_file_sizes.txt",
-    quiet = quiet) 
+    file_name="env90m_presentclimate_paths_file_sizes.txt",
+    quiet=quiet)
 
   # Check whether the specified table was loaded
   # and has the expected columns, number of rows, ...
@@ -51,8 +51,8 @@ test_that(testname, {
 
   # Prepare:
   file_size_table <- get_file_size_table(
-    file_name = "env90m_landcover_paths_file_sizes.txt",
-    quiet = quiet)
+    file_name="env90m_landcover_paths_file_sizes.txt",
+    quiet=quiet)
   
   # Run:
   bytes <- compute_download_size(
@@ -60,7 +60,7 @@ test_that(testname, {
     c("h10v04", "h00v04"),
     file_size_table,
     quiet=FALSE,
-    ignore_missing = FALSE
+    ignore_missing=FALSE
   )
 
   # Check whether the correct download size is computed:
@@ -75,8 +75,8 @@ test_that(testname, {
   # Prepare:
   expected_error_message <- "Not available: Tile id(s) h99v99. Please check your spelling and try again!"
   file_size_table <- get_file_size_table(
-    file_name = "env90m_landcover_paths_file_sizes.txt",
-    quiet = quiet)
+    file_name="env90m_landcover_paths_file_sizes.txt",
+    quiet=quiet)
 
   # Run and check whether error happens:
   expect_error(
@@ -85,7 +85,7 @@ test_that(testname, {
       c("h02v02", "h04v02", "h99v99"),
       file_size_table,
       quiet=FALSE,
-      ignore_missing = FALSE
+      ignore_missing=FALSE
     ),
     expected_error_message, fixed=TRUE
   )
@@ -98,8 +98,8 @@ test_that(testname, {
 
   # Prepare:
   file_size_table <- get_file_size_table(
-    file_name = "env90m_landcover_paths_file_sizes.txt",
-    quiet = quiet)
+    file_name="env90m_landcover_paths_file_sizes.txt",
+    quiet=quiet)
 
   # Run:
   skip_if_offline("public.igb-berlin.de") # downloads 8.5 KB (or only 316 bytes), no need to skip
@@ -108,9 +108,9 @@ test_that(testname, {
     c("h10v04"),
     file_size_table,
     download_dir=download_dir,
-    file_format = "zip",
+    file_format="zip",
     quiet=FALSE,
-    delete_zips = FALSE)
+    delete_zips=FALSE)
 
   # Check whether zips exist:
   expected_zips <- c(
@@ -132,8 +132,8 @@ test_that(testname, {
 
   # Prepare:
   file_size_table <- get_file_size_table(
-    file_name = "env90m_landcover_paths_file_sizes.txt",
-    quiet = quiet)
+    file_name="env90m_landcover_paths_file_sizes.txt",
+    quiet=quiet)
 
   # Run:
   skip_if_offline("public.igb-berlin.de")
@@ -142,9 +142,9 @@ test_that(testname, {
     c("h10v04"),
     file_size_table,
     download_dir=download_dir,
-    file_format = "txt",
+    file_format="txt",
     quiet=FALSE,
-    delete_zips = FALSE)
+    delete_zips=FALSE)
 
   # Check whether zips and txts exist:
   expected_zips <- c(
@@ -175,8 +175,8 @@ test_that(testname, {
 
   # Prepare:
   file_size_table <- get_file_size_table(
-    file_name = "env90m_landcover_paths_file_sizes.txt",
-    quiet = quiet)
+    file_name="env90m_landcover_paths_file_sizes.txt",
+    quiet=quiet)
 
   # Run:
   skip_if_offline("public.igb-berlin.de")
@@ -185,9 +185,9 @@ test_that(testname, {
     c("h10v04"),
     file_size_table,
     download_dir=download_dir,
-    file_format = "txt",
+    file_format="txt",
     quiet=FALSE,
-    delete_zips = TRUE)
+    delete_zips=TRUE)
 
   # Check whether txts exist and zips don't:
   expected_zips <- c(
@@ -222,12 +222,12 @@ test_that(testname, {
     quiet=FALSE)
 
   vars2 <- download_landcover_tables(
-    subset = "ALL",
+    subset="ALL",
     quiet=FALSE)
 
   vars3 <- download_landcover_tables(
-    base_vars = "ALL",
-    years = "ALL",
+    base_vars="ALL",
+    years="ALL",
     quiet=FALSE)
 
   # Check that both ways of requesting all variables return the same results,
