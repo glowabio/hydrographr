@@ -615,6 +615,15 @@ download_future_climate_tables <- function(base_vars = NULL,
     # Does the user want to download all fut.clim. variables, or just see them?
     if (download) {
 
+      # If the user did not specify a subset, we only allow downloading
+      # they explicitly say subset="ALL"
+      if (is.null(subset) && is.null(time_periods) && is.null(scenarios) && is.null(models) && is.null(base_vars) && is.null(versions)) {
+        msg <- "You did not provide any subset. If you are sure that you want ALL variables, please specify subset='ALL'!"
+        variables$note <- msg
+        warning(msg)
+        return(variables)
+      }
+
       # Without knowing which tiles, user cannot download:
       if (is.null(tile_ids)) {
         msg <- "To download, please specify parameter 'tile_ids'."
@@ -992,6 +1001,15 @@ download_landcover_tables <- function(base_vars = NULL,
     # Does the user want to download all landcover variables, or just see them?
     if (download) {
 
+      # If the user did not specify a subset, we only allow downloading
+      # they explicitly say subset="ALL"
+      if (is.null(years) && is.null(base_vars) && is.null(subset)) {
+        msg <- "You did not provide any subset. If you are sure that you want ALL variables, please specify subset='ALL'!"
+        variables$note <- msg
+        warning(msg)
+        return(variables)
+      }
+
       # Without knowing which tiles, user cannot download:
       if (is.null(tile_ids)) {
         msg <- "To download, please specify parameter 'tile_ids'."
@@ -1292,6 +1310,15 @@ download_simple_tables <- function(
 
     # Does the user want to download all variables, or just see them?
     if (download) {
+
+      # If the user did not specify a subset, we only allow downloading
+      # they explicitly say subset="ALL"
+      if (is.null(subset)) {
+        msg <- "You did not provide any subset. If you are sure that you want ALL variables, please specify subset='ALL'!"
+        variables$note <- msg
+        warning(msg)
+        return(variables)
+      }
 
       # Without knowing which tiles, user cannot download:
       if (is.null(tile_ids)) {

@@ -477,6 +477,23 @@ test_that(testname, {
   )
 })
 
+testname = "2.5.2 landcover: warning: no subset passed"
+if (!(tests_quiet)) print(paste("TEST: ", testname))
+test_that(testname, {
+
+  # Prepare:
+  expected_error_message <- "You did not provide any subset. If you are sure that you want ALL variables, please specify subset='ALL'!"
+
+  # Run:
+  expect_warning(
+    vars <- download_landcover_tables(
+      tile_ids=c("h02v02", "h04v02"),
+      download=TRUE,
+      quiet=FALSE),
+    expected_error_message, fixed=TRUE
+  )
+})
+
 
 testname = "3.1 future climate: show variable names (all)"
 if (!(tests_quiet)) print(paste("TEST: ", testname))
@@ -815,6 +832,24 @@ test_that(testname, {
   )
 })
 
+testname = "3.5.5 futureclimate: failure: no subset passed"
+if (!(tests_quiet)) print(paste("TEST: ", testname))
+test_that(testname, {
+
+  # Prepare:
+  expected_error_message <- "You did not provide any subset. If you are sure that you want ALL variables, please specify subset='ALL'!"
+
+  # Run:
+  expect_warning(
+    vars <- download_future_climate_tables(
+      tile_ids=c("h02v02", "h04v02"),
+      download=TRUE,
+      tempdir=tmpdir,
+      quiet=FALSE),
+    expected_error_message, fixed=TRUE
+  )
+})
+
 
 testname = "4.1 presentclimate: show variable names (all)"
 if (!(tests_quiet)) print(paste("TEST: ", testname))
@@ -979,7 +1014,7 @@ test_that(testname, {
 })
 
 
-testname = "4.5 presentclimate (or other simple tables): failure: variable not available"
+testname = "4.5.1 presentclimate (or other simple tables): failure: variable not available"
 if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
@@ -993,6 +1028,23 @@ test_that(testname, {
     vars <- download_present_climate_tables(
       subset=c("bio1", "bio10", "xyz"),
       tile_ids=c("h02v02", "h04v02"),
+      quiet=FALSE),
+    expected_error_message, fixed=TRUE
+  )
+})
+
+testname = "4.5.2 presentclimate (or other simple tables): failure: no subset provided"
+if (!(tests_quiet)) print(paste("TEST: ", testname))
+test_that(testname, {
+
+  # Prepare:
+  expected_error_message <- "You did not provide any subset. If you are sure that you want ALL variables, please specify subset='ALL'!"
+
+  # Run:
+  expect_warning(
+    vars <- download_present_climate_tables(
+      tile_ids=c("h02v02", "h04v02"),
+      download=TRUE,
       quiet=FALSE),
     expected_error_message, fixed=TRUE
   )
