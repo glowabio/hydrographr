@@ -96,7 +96,8 @@
 #' @author Merret Buurman
 #'
 #' @references Garcia Marquez J., Amatulli, G., Grigoropoulou, A.,
-#' Schürz, M., Tomiczek, T., Buurman, M., and Domisch, S.:
+#' Schürz, M., Tomiczek, T., Buurman, M., Bremerich, V.,
+#' Bego, K. and Domisch, S.:
 #' Global datasets of aggregated environmental variables at the
 #' sub-catchment scale for freshwater biodiversity modeling, in prep.
 #' Please contact the authors for more up-to-date citation info.
@@ -217,7 +218,7 @@ download_flo1k_tables <- function(subset = NULL,
 #'  cgiar_csi_v3 dataset.
 #' @examples
 #'
-#' ### CGIAR CSI (TODO description): cgiar_csi_v3 ###
+#' ### CGIAR CSI dataset: cgiar_csi_v3 ###
 #' # Show all available cgiar variable names
 #' download_cgiar_tables()
 #'
@@ -281,7 +282,8 @@ download_cgiar_tables <- function(subset = NULL,
 #'   tile_ids = c("h00v04"),
 #'   download = FALSE)
 #'
-#' # Download the only merit_dem_v1_0_3 variable (Mean elevation), for two tiles:
+#' # Download the only merit_dem_v1_0_3 variable (mean elevation),
+#' # for two tiles:
 #' download_merit_dem_tables(
 #'   subset = c("elev"), # or "ALL"
 #'   tile_ids = c("h00v04", "h10v04"),
@@ -289,10 +291,10 @@ download_cgiar_tables <- function(subset = NULL,
 #'   download_dir = ".",
 #'   file_format = "zip")
 #'
-#' # Download the only merit_dem_v1_0_3 variable (Mean elevation), for one tiles:
-#' # unzip, and delete the zips:
+#' # Download the only merit_dem_v1_0_3 variable (mean elevation),
+#' # for one tile, unzip, and delete the zips:
 #' download_merit_dem_tables(
-#'   subset = c("elev""),
+#'   subset = c("elev"),
 #'   tile_ids = c("h00v04"),
 #'   download = TRUE,
 #'   download_dir = ".",

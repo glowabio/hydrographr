@@ -3,6 +3,9 @@
 \name{download-env90m-tables}
 \alias{download-env90m-tables}
 \alias{download_soil_tables}
+\alias{download_flo1k_tables}
+\alias{download_cgiar_tables}
+\alias{download_merit_dem_tables}
 \alias{download_hydrography90m_tables}
 \alias{download_present_climate_tables}
 \alias{download_future_climate_tables}
@@ -10,6 +13,42 @@
 \title{Download Environment90m tables}
 \usage{
 download_soil_tables(
+  subset = NULL,
+  tile_ids = NULL,
+  download = FALSE,
+  download_dir = ".",
+  file_format = "txt",
+  delete_zips = TRUE,
+  ignore_missing = FALSE,
+  tempdir = NULL,
+  quiet = NULL
+)
+
+download_flo1k_tables(
+  subset = NULL,
+  tile_ids = NULL,
+  download = FALSE,
+  download_dir = ".",
+  file_format = "txt",
+  delete_zips = TRUE,
+  ignore_missing = FALSE,
+  tempdir = NULL,
+  quiet = NULL
+)
+
+download_cgiar_tables(
+  subset = NULL,
+  tile_ids = NULL,
+  download = FALSE,
+  download_dir = ".",
+  file_format = "txt",
+  delete_zips = TRUE,
+  ignore_missing = FALSE,
+  tempdir = NULL,
+  quiet = NULL
+)
+
+download_merit_dem_tables(
   subset = NULL,
   tile_ids = NULL,
   download = FALSE,
@@ -201,6 +240,15 @@ For details on the Soil data, please refer to
 \item \code{download_soil_tables()}: Download tables for the 
 soilgrids250m_v2_0 dataset
 
+\item \code{download_flo1k_tables()}: Download tables for the
+flo1k_v1_0 dataset
+
+\item \code{download_cgiar_tables()}: Download tables for the
+cgiar_csi_v3 dataset.
+
+\item \code{download_merit_dem_tables()}: Download tables for the
+merit_dem_v1_0_3 dataset.
+
 \item \code{download_hydrography90m_tables()}: Download tables for the 
 hydrography90m_v1_0 dataset.
 
@@ -244,6 +292,97 @@ download_soil_tables(
   download_dir = ".",
   file_format = "txt",
   delete_zips = TRUE) 
+
+
+### Flow (mean): flo1k_v1_0 ###
+# Show all available flo1k variable names:
+download_flo1k_tables()
+
+# Compute download size of the only flo1k_v1_0 variable (mean flow),
+# for one tile:
+download_flo1k_tables(
+  subset = "ALL",
+  tile_ids = c("h00v04"),
+  download = FALSE)
+
+# Download the only flo1k_v1_0 variable (flo1k), for two tiles:
+download_soil_tables(
+  subset = c("flo1k"),
+  tile_ids = c("h00v04", "h10v04"),
+  download = TRUE,
+  download_dir = ".",
+  file_format = "zip")
+
+# Download the only flo1k_v1_0 variable (flo1k), for one tile:
+# unzip, and delete the zips:
+download_soil_tables(
+  subset = c("flo1k"),
+  tile_ids = c("h00v04"),
+  download = TRUE,
+  download_dir = ".",
+  file_format = "txt",
+  delete_zips = TRUE)
+
+
+### CGIAR CSI dataset: cgiar_csi_v3 ###
+# Show all available cgiar variable names
+download_cgiar_tables()
+
+# Compute download size of all cgiar variables, for one tile:
+download_cgiar_tables(
+  subset = "ALL",
+  tile_ids = c("h00v04"),
+  download = FALSE)
+
+# Download one cgiar variable (Global Aridity Index), for two tiles:
+download_cgiar_tables(
+  subset = c("garid"),
+  tile_ids = c("h00v04", "h10v04"),
+  download = TRUE,
+  download_dir = ".",
+  file_format = "zip")
+
+# Download two cgiar variables (Global Aridity Index, Potential
+# Evapotranspiration), for one tile, unzip, and delete the zips:
+download_cgiar_tables(
+  subset = c("garid", "gevapt"),
+  tile_ids = c("h00v04"),
+  download = TRUE,
+  download_dir = ".",
+  file_format = "txt",
+  delete_zips = TRUE)
+
+
+### Digital Elevation Model: merit_dem_v1_0_3 ###
+# (Multi-Error-Removed Improved-Terrain Digital Elevation Model)
+# Show all available merit_dem_v1_0_3 variable names
+download_merit_dem_tables()
+
+# Compute download size of the only merit_dem_v1_0_3 variable
+# (Mean elevation), for one tile:
+download_merit_dem_tables(
+  subset = "ALL",
+  tile_ids = c("h00v04"),
+  download = FALSE)
+
+# Download the only merit_dem_v1_0_3 variable (mean elevation),
+# for two tiles:
+download_merit_dem_tables(
+  subset = c("elev"), # or "ALL"
+  tile_ids = c("h00v04", "h10v04"),
+  download = TRUE,
+  download_dir = ".",
+  file_format = "zip")
+
+# Download the only merit_dem_v1_0_3 variable (mean elevation),
+# for one tile, unzip, and delete the zips:
+download_merit_dem_tables(
+  subset = c("elev"),
+  tile_ids = c("h00v04"),
+  download = TRUE,
+  download_dir = ".",
+  file_format = "txt",
+  delete_zips = TRUE)
 
 
 ### Hydrography90m: hydrography90m_v1_0 ###
@@ -360,7 +499,8 @@ download_landcover_tables()
 }
 \references{
 Garcia Marquez J., Amatulli, G., Grigoropoulou, A.,
-Schürz, M., Tomiczek, T., Buurman, M., and Domisch, S.:
+Schürz, M., Tomiczek, T., Buurman, M., Bremerich, V.,
+Bego, K. and Domisch, S.:
 Global datasets of aggregated environmental variables at the
 sub-catchment scale for freshwater biodiversity modeling, in prep.
 Please contact the authors for more up-to-date citation info.
