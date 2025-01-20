@@ -114,8 +114,8 @@ test_that(testname, {
 
   # Check whether zips exist:
   expected_zips <- c(
-    "./esa_cci_landcover_v2_1_1/c100/c100_1992_h10v04.zip",
-    "./esa_cci_landcover_v2_1_1/c100/c100_1993_h10v04.zip"
+    paste0(download_dir,"/esa_cci_landcover_v2_1_1/c100/c100_1992_h10v04.zip"),
+    paste0(download_dir,"/esa_cci_landcover_v2_1_1/c100/c100_1993_h10v04.zip")
   )
   # Check whether zips are reported:
   expect_equal(result$downloaded, expected_zips)
@@ -148,11 +148,11 @@ test_that(testname, {
 
   # Check whether zips and txts exist:
   expected_zips <- c(
-    "./esa_cci_landcover_v2_1_1/c100/c100_1992_h10v04.zip",
-    "./esa_cci_landcover_v2_1_1/c100/c100_1993_h10v04.zip"
+    paste0(download_dir,"/esa_cci_landcover_v2_1_1/c100/c100_1992_h10v04.zip"),
+    paste0(download_dir,"/esa_cci_landcover_v2_1_1/c100/c100_1993_h10v04.zip")
   )
   expected_unzipped <- c(
-    "./esa_cci_landcover_v2_1_1/c100"
+    paste0(download_dir,"/esa_cci_landcover_v2_1_1/c100")
   )
   # Check whether zips are reported:
   expect_equal(result$downloaded, expected_zips)
@@ -191,11 +191,11 @@ test_that(testname, {
 
   # Check whether txts exist and zips don't:
   expected_zips <- c(
-    "./esa_cci_landcover_v2_1_1/c100/c100_1992_h10v04.zip",
-    "./esa_cci_landcover_v2_1_1/c100/c100_1993_h10v04.zip"
+    paste0(download_dir,"/esa_cci_landcover_v2_1_1/c100/c100_1992_h10v04.zip"),
+    paste0(download_dir,"/esa_cci_landcover_v2_1_1/c100/c100_1993_h10v04.zip")
   )
   expected_unzipped <- c(
-    "./esa_cci_landcover_v2_1_1/c100"
+    paste0(download_dir,"/esa_cci_landcover_v2_1_1/c100")
   )
   # Check whether zips and their deletion are reported:
   expect_equal(result$downloaded, expected_zips)
