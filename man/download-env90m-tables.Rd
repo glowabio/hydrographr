@@ -21,7 +21,7 @@ download_soil_tables(
   delete_zips = TRUE,
   ignore_missing = FALSE,
   tempdir = NULL,
-  quiet = NULL
+  quiet = FALSE
 )
 
 download_flo1k_tables(
@@ -33,7 +33,7 @@ download_flo1k_tables(
   delete_zips = TRUE,
   ignore_missing = FALSE,
   tempdir = NULL,
-  quiet = NULL
+  quiet = FALSE
 )
 
 download_cgiar_tables(
@@ -45,7 +45,7 @@ download_cgiar_tables(
   delete_zips = TRUE,
   ignore_missing = FALSE,
   tempdir = NULL,
-  quiet = NULL
+  quiet = FALSE
 )
 
 download_merit_dem_tables(
@@ -57,7 +57,7 @@ download_merit_dem_tables(
   delete_zips = TRUE,
   ignore_missing = FALSE,
   tempdir = NULL,
-  quiet = NULL
+  quiet = FALSE
 )
 
 download_hydrography90m_tables(
@@ -69,7 +69,7 @@ download_hydrography90m_tables(
   delete_zips = TRUE,
   ignore_missing = FALSE,
   tempdir = NULL,
-  quiet = NULL
+  quiet = FALSE
 )
 
 download_present_climate_tables(
@@ -81,7 +81,7 @@ download_present_climate_tables(
   delete_zips = TRUE,
   ignore_missing = FALSE,
   tempdir = NULL,
-  quiet = NULL
+  quiet = FALSE
 )
 
 download_future_climate_tables(
@@ -98,7 +98,7 @@ download_future_climate_tables(
   delete_zips = TRUE,
   ignore_missing = FALSE,
   tempdir = NULL,
-  quiet = NULL
+  quiet = FALSE
 )
 
 download_landcover_tables(
