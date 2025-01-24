@@ -124,15 +124,18 @@ NULL
 #'   download = FALSE)
 #'
 #' # Download one soil variable (Clay content), for two tiles:
+#' \dontrun{
 #' download_soil_tables(
 #'   subset = c("clyppt"),
 #'   tile_ids = c("h00v04", "h10v04"),
 #'   download = TRUE,
 #'   download_dir = ".",
 #'   file_format = "zip")
+#' }
 #'
 #' # Download one soil variable (Clay content), for one tile,
 #' # unzip, and delete the zips:
+#' \dontrun{
 #' download_soil_tables(
 #'   subset = c("clyppt"),
 #'   tile_ids = c("h00v04"),
@@ -140,7 +143,8 @@ NULL
 #'   download_dir = ".",
 #'   file_format = "txt",
 #'   delete_zips = TRUE) 
-#' 
+#' }
+#'
 #' @export
 download_soil_tables <- function(subset = NULL,
                                  tile_ids = NULL,
@@ -171,21 +175,26 @@ download_soil_tables <- function(subset = NULL,
 #'
 #' # Compute download size of the only flo1k_v1_0 variable (mean flow),
 #' # for one tile:
+#' \dontrun{
 #' download_flo1k_tables(
 #'   subset = "ALL",
 #'   tile_ids = c("h00v04"),
 #'   download = FALSE)
+#' }
 #'
 #' # Download the only flo1k_v1_0 variable (flo1k), for two tiles:
+#' \dontrun{
 #' download_soil_tables(
 #'   subset = c("flo1k"),
 #'   tile_ids = c("h00v04", "h10v04"),
 #'   download = TRUE,
 #'   download_dir = ".",
 #'   file_format = "zip")
+#' }
 #'
 #' # Download the only flo1k_v1_0 variable (flo1k), for one tile,
 #' # unzip, and delete the zips:
+#' \dontrun{
 #' download_soil_tables(
 #'   subset = c("flo1k"),
 #'   tile_ids = c("h00v04"),
@@ -193,6 +202,7 @@ download_soil_tables <- function(subset = NULL,
 #'   download_dir = ".",
 #'   file_format = "txt",
 #'   delete_zips = TRUE)
+#' }
 #'
 #' @export
 download_flo1k_tables <- function(subset = NULL,
@@ -230,14 +240,17 @@ download_flo1k_tables <- function(subset = NULL,
 #'
 #' # Download one cgiar variable (Global Aridity Index), for two tiles:
 #' download_cgiar_tables(
+#' \dontrun{
 #'   subset = c("garid"),
 #'   tile_ids = c("h00v04", "h10v04"),
 #'   download = TRUE,
 #'   download_dir = ".",
 #'   file_format = "zip")
+#' }
 #'
 #' # Download two cgiar variables (Global Aridity Index, Potential
 #' # Evapotranspiration), for one tile, unzip, and delete the zips:
+#' \dontrun{
 #' download_cgiar_tables(
 #'   subset = c("garid", "gevapt"),
 #'   tile_ids = c("h00v04"),
@@ -245,6 +258,7 @@ download_flo1k_tables <- function(subset = NULL,
 #'   download_dir = ".",
 #'   file_format = "txt",
 #'   delete_zips = TRUE)
+#' }
 #'
 #' @export
 download_cgiar_tables <- function(subset = NULL,
@@ -285,15 +299,18 @@ download_cgiar_tables <- function(subset = NULL,
 #'
 #' # Download the only merit_dem_v1_0_3 variable (mean elevation),
 #' # for two tiles:
+#' \dontrun{
 #' download_merit_dem_tables(
 #'   subset = c("elev"), # or "ALL"
 #'   tile_ids = c("h00v04", "h10v04"),
 #'   download = TRUE,
 #'   download_dir = ".",
 #'   file_format = "zip")
+#' }
 #'
 #' # Download the only merit_dem_v1_0_3 variable (mean elevation),
 #' # for one tile, unzip, and delete the zips:
+#' \dontrun{
 #' download_merit_dem_tables(
 #'   subset = c("elev"),
 #'   tile_ids = c("h00v04"),
@@ -301,6 +318,7 @@ download_cgiar_tables <- function(subset = NULL,
 #'   download_dir = ".",
 #'   file_format = "txt",
 #'   delete_zips = TRUE)
+#' }
 #'
 #' @export
 download_merit_dem_tables <- function(subset = NULL,
@@ -338,15 +356,18 @@ download_merit_dem_tables <- function(subset = NULL,
 #'   download = FALSE)
 #'
 #' # Download one hy90m variable (Strahler’s stream order), for two tiles:
+#' \dontrun{
 #' download_hydrography90m_tables(
 #'   subset = c("stream_strahler"),
 #'   tile_ids = c("h00v04", "h10v04"),
 #'   download = TRUE,
 #'   download_dir = ".",
 #'   file_format = "zip")
+#' }
 #'
 #' # Download one hy90m variable (Strahler’s stream order), for one tile,
 #' # unzip, and delete the zips:
+#' \dontrun{
 #' download_hydrography90m_tables(
 #'   subset = c("stream_strahler"),
 #'   tile_ids = c("h00v04"),
@@ -354,7 +375,8 @@ download_merit_dem_tables <- function(subset = NULL,
 #'   download_dir = ".",
 #'   file_format = "txt",
 #'   delete_zips = TRUE) 
-#' 
+#' }
+#'
 #' @export
 download_hydrography90m_tables <- function(subset = NULL,
                                            tile_ids = NULL,
@@ -382,6 +404,7 @@ download_hydrography90m_tables <- function(subset = NULL,
 #' 
 #' ### Bioclimatic Variables: chelsa_bioclim_v2_1 ###
 #' ### (excluding future simulations)             ###
+#'
 #' # Show all available bioclim variable names
 #' # (excluding future simulations):
 #' download_present_climate_tables()
@@ -393,22 +416,26 @@ download_hydrography90m_tables <- function(subset = NULL,
 #'   download = FALSE)
 #'
 #' # Download one bioclim variable (Annual mean temperature), for two tiles:
+#' \dontrun{
 #' download_present_climate_tables(
 #'   subset = c("bio1"),
 #'   tile_ids = c("h00v04", "h10v04"),
 #'   download = TRUE,
 #'   download_dir = ".",
 #'   file_format = "zip")
+#' }
 #'
 #' # Download one bioclim variable (Annual mean temperature), for one tile,
 #' # unzip, and delete the zips:
+#' \dontrun{
 #' download_present_climate_tables(
 #'   subset = c("bio1"),
 #'   tile_ids = c("h00v04"),
 #'   download = TRUE,
 #'   download_dir = ".",
 #'   file_format = "txt",
-#'   delete_zips = TRUE) 
+#'   delete_zips = TRUE)
+#' }
 #' 
 #' @export
 download_present_climate_tables <- function(subset = NULL,
@@ -452,7 +479,7 @@ download_present_climate_tables <- function(subset = NULL,
 #' @examples
 #'
 #' ### Bioclimatic Variables: chelsa_bioclim_v2_1 ###
-#' ### (future simulations)                       ###    
+#' ### (future simulations)                       ###
 #' # Show all available future bioclim variable names
 #' download_future_climate_tables()
 #' 
@@ -463,15 +490,18 @@ download_present_climate_tables <- function(subset = NULL,
 #'   download = FALSE)
 #'
 #' # Download one hy90m variable (Annual mean temperature), for two tiles:
+#' \dontrun{
 #' download_future_climate_tables(
 #'   subset = c("bio1"),
 #'   tile_ids = c("h00v04", "h10v04"),
 #'   download = TRUE,
 #'   download_dir = ".",
 #'   file_format = "zip")
+#' }
 #'
 #' # Download one hy90m variable (Annual mean temperature), for one tile,
 #' # unzip, and delete the zips:
+#' \dontrun{
 #' download_future_climate_tables(
 #'   subset = c("bio1"),
 #'   tile_ids = c("h00v04"),
@@ -479,7 +509,8 @@ download_present_climate_tables <- function(subset = NULL,
 #'   download_dir = ".",
 #'   file_format = "txt",
 #'   delete_zips = TRUE) 
-#' 
+#' }
+#'
 #' @export
 download_future_climate_tables <- function(base_vars = NULL,
                                            time_periods = NULL,
@@ -881,6 +912,7 @@ download_future_climate_tables <- function(base_vars = NULL,
 #'     tile_ids="ALL")
 #' 
 #' # Download two base variables and one year, for two tiles:
+#' \dontrun{
 #'   vars <- download_landcover_tables(
 #'     base_vars=c("c10", "c130"),
 #'     years=c(1992),
@@ -889,7 +921,8 @@ download_future_climate_tables <- function(base_vars = NULL,
 #'     download_dir="/tmp",
 #'     file_format="zip",
 #'     delete_zips=FALSE)
-#' 
+#' }
+#'
 #' @export
 download_landcover_tables <- function(base_vars = NULL,
                                       years = NULL,
@@ -1219,6 +1252,7 @@ download_landcover_tables <- function(base_vars = NULL,
 #'  (on the server) for all files (data tables) of one specific
 #'  Environment90m dataset (e.g. landcover, soil).
 #' @examples
+#' \dontrun{
 #'  download_simple_tables(
 #'    "soilgrids250m_v2_0",
 #'    "env90m_soil_paths_file_sizes.txt",
@@ -1231,6 +1265,7 @@ download_landcover_tables <- function(base_vars = NULL,
 #'    TRUE, # delete_zips?
 #'    "/tmp", # temp dir
 #'    FALSE) # quiet?
+#' }
 #' 
 #' @noRd
 download_simple_tables <- function(
@@ -1444,9 +1479,11 @@ download_simple_tables <- function(
 #'   Default is FALSE.
 #' @examples
 #' # Download and load the file size table for the landcover dataset:
+#' \dontrun{
 #' file_size_table <- get_file_size_table(
 #'   file_name = "env90m_landcover_paths_file_sizes.txt")
-#' 
+#' }
+#'
 #' @noRd
 get_file_size_table <- function(file_name, tempdir = NULL, quiet = FALSE) {
 
@@ -1498,6 +1535,7 @@ get_file_size_table <- function(file_name, tempdir = NULL, quiet = FALSE) {
 #' @examples
 #' 
 #' # First, download and load the required file size table:
+#' \dontrun{
 #' file_size_table <- get_file_size_table(
 #'   file_name = "env90m_landcover_paths_file_sizes.txt")
 #'
@@ -1509,6 +1547,7 @@ get_file_size_table <- function(file_name, tempdir = NULL, quiet = FALSE) {
 #'   quiet = FALSE,
 #'   ignore_missing = FALSE
 #' )
+#' }
 #' 
 #' @noRd
 compute_download_size <- function(varnames,
@@ -1618,6 +1657,7 @@ compute_download_size <- function(varnames,
 #' 
 #' # Then, download tables for one tile (h10v04),
 #' # for two variables (c100_1992, c100_1993).
+#' #'\dontrun{
 #' result <- do_download(
 #'     c("c100_1992", "c100_1993"),
 #'     c("h10v04"),
@@ -1625,7 +1665,8 @@ compute_download_size <- function(varnames,
 #'     file_format = "zip",
 #'     delete_zips = FALSE,
 #'     quiet = FALSE)
-#' 
+#' }
+#'
 #' @noRd
 do_env90m_download <- function(variable_names, tile_ids, file_size_table, download_dir = ".", file_format = "txt", quiet = FALSE, delete_zips = TRUE) {
 
