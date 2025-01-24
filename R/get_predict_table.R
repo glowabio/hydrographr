@@ -83,6 +83,7 @@ get_predict_table <- function(variable,
                               quiet = TRUE) {
 
   # Check variable name is one of the accepted values
+  # TODO replace this list by call to function get_env_vars...
   accepted_vars <- c("bio1", "bio10", "bio11", "bio12", "bio13",
                      "bio14", "bio15", "bio16", "bio17", "bio18",
                      "bio19", "bio2", "bio3", "bio4", "bio5",
