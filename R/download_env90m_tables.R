@@ -184,7 +184,7 @@ download_soil_tables <- function(subset = NULL,
 #'   download_dir = ".",
 #'   file_format = "zip")
 #'
-#' # Download the only flo1k_v1_0 variable (flo1k), for one tile:
+#' # Download the only flo1k_v1_0 variable (flo1k), for one tile,
 #' # unzip, and delete the zips:
 #' download_soil_tables(
 #'   subset = c("flo1k"),
@@ -1219,18 +1219,18 @@ download_landcover_tables <- function(base_vars = NULL,
 #'  (on the server) for all files (data tables) of one specific
 #'  Environment90m dataset (e.g. landcover, soil).
 #' @examples
-#'  download_simple_tables <- function(
+#'  download_simple_tables(
 #'    "soilgrids250m_v2_0",
-#'    "env90m_soil_paths_file_sizes.txt",,
+#'    "env90m_soil_paths_file_sizes.txt",
 #'    c("clyppt"), # this is one soil variable name
 #'    "ALL", # all tiles
-#'   FALSE, # ignore_missing?
-#'   TRUE, # download?
-#'   "./downloads",
-#'   "txt",
-#'   TRUE, # delete_zips?
-#'   "/tmp", # temp dir
-#'   FALSE) # quiet?
+#'    FALSE, # ignore_missing?
+#'    TRUE, # download?
+#'    "./downloads",
+#'    "txt",
+#'    TRUE, # delete_zips?
+#'    "/tmp", # temp dir
+#'    FALSE) # quiet?
 #' 
 #' @noRd
 download_simple_tables <- function(
@@ -1639,7 +1639,7 @@ do_env90m_download <- function(variable_names, tile_ids, file_size_table, downlo
   tryCatch(
     {
       igb_readme = paste0(igb_path, "README/accessibility_check.txt")
-      download.file(igb_readme, destfile = paste0(download_dir, "/README.txt"),
+      download.file(igb_readme, destfile = paste0(download_dir, "/accessibility_check.txt"),
         mode = "wb", quiet = quiet)
     },
     warning = function(c) {
