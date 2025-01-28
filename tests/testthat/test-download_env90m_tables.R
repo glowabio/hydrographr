@@ -3,6 +3,7 @@
 ### Testing the download_env90m_tables functions ###
 ####################################################
 
+
 tests_quiet=TRUE
 
 if (!(tests_quiet)) print("_______________________________")
@@ -22,8 +23,8 @@ if (! exists("download_dir")){
 }
 
 # Get which tests to skip:
-SKIP_DOWNLOAD <- Sys.getenv("SKIP_DOWNLOAD") == "TRUE" # empty string / FALSE if not set
-SKIP_HUGE_DOWNLOAD <- Sys.getenv("SKIP_HUGE_DOWNLOAD") == "TRUE" || SKIP_DOWNLOAD
+R_SKIP_HUGE_DOWNLOAD <- !(Sys.getenv("R_SKIP_HUGE_DOWNLOAD") == "FALSE")
+R_SKIP_DOWNLOAD <- Sys.getenv("R_SKIP_DOWNLOAD") == "TRUE"
 
 #############
 ### Tests ###
@@ -36,7 +37,7 @@ test_that(testname, {
   # Run:
   tab <- get_file_size_table(
     file_name="env90m_presentclimate_paths_file_sizes.txt",
-    quiet=quiet)
+    quiet=tests_quiet)
 
   # Check whether the specified table was loaded
   # and has the expected columns, number of rows, ...
@@ -52,7 +53,7 @@ test_that(testname, {
   # Prepare:
   file_size_table <- get_file_size_table(
     file_name="env90m_landcover_paths_file_sizes.txt",
-    quiet=quiet)
+    quiet=tests_quiet)
   
   # Run:
   bytes <- compute_download_size(
@@ -76,7 +77,7 @@ test_that(testname, {
   expected_error_message <- "Not available: Tile id(s) h99v99. Please check your spelling and try again!"
   file_size_table <- get_file_size_table(
     file_name="env90m_landcover_paths_file_sizes.txt",
-    quiet=quiet)
+    quiet=tests_quiet)
 
   # Run and check whether error happens:
   expect_error(
@@ -99,7 +100,7 @@ test_that(testname, {
   # Prepare:
   file_size_table <- get_file_size_table(
     file_name="env90m_landcover_paths_file_sizes.txt",
-    quiet=quiet)
+    quiet=tests_quiet)
 
   # Run:
   skip_if_offline("public.igb-berlin.de") # downloads 8.5 KB (or only 316 bytes), no need to skip
@@ -133,7 +134,7 @@ test_that(testname, {
   # Prepare:
   file_size_table <- get_file_size_table(
     file_name="env90m_landcover_paths_file_sizes.txt",
-    quiet=quiet)
+    quiet=tests_quiet)
 
   # Run:
   skip_if_offline("public.igb-berlin.de")
@@ -176,7 +177,7 @@ test_that(testname, {
   # Prepare:
   file_size_table <- get_file_size_table(
     file_name="env90m_landcover_paths_file_sizes.txt",
-    quiet=quiet)
+    quiet=tests_quiet)
 
   # Run:
   skip_if_offline("public.igb-berlin.de")
@@ -382,7 +383,7 @@ if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Run:
-  skip_if(SKIP_DOWNLOAD, 'SKIP_DOWNLOAD: This test downloads 107.9 MB, so we skip it.')
+  skip_if(R_SKIP_DOWNLOAD, 'R_SKIP_DOWNLOAD: This test downloads 107.9 MB, so we skip it.')
   vars <- download_landcover_tables(
     subset=c("c20_1992", "c20_1994", "c30_1992", "c30_1994"),
     tile_ids=c("h02v02", "h04v02"),
@@ -408,7 +409,7 @@ if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Run:
-  skip_if(SKIP_HUGE_DOWNLOAD, 'SKIP_HUGE_DOWNLOAD: This test downloads 5.9 GB, so we skip it.')
+  skip_if(R_SKIP_HUGE_DOWNLOAD, 'R_SKIP_HUGE_DOWNLOAD: This test downloads 5.9 GB, so we skip it.')
   # Note: Test 2.3.2 (computing download size of subset=ALL) tests quite similar behaviour,
   # just without the actual download in the end.
   vars <- download_landcover_tables(
@@ -436,7 +437,7 @@ if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Run:
-  skip_if(SKIP_HUGE_DOWNLOAD, 'SKIP_HUGE_DOWNLOAD: This test downloads 1.7 GB, so we skip it.')
+  skip_if(R_SKIP_HUGE_DOWNLOAD, 'R_SKIP_HUGE_DOWNLOAD: This test downloads 1.7 GB, so we skip it.')
   # Note: Test 2.3.3 (computing download size of tile_ids=ALL) tests quite similar behaviour,
   # just without the actual download in the end.
   vars <- download_landcover_tables(
@@ -495,7 +496,7 @@ test_that(testname, {
 })
 
 
-testname = "3.1 future climate: show variable names (all)"
+testname = "3.1 futureclimate: show variable names (all)"
 if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
@@ -671,7 +672,7 @@ if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Run:
-  skip_if(SKIP_DOWNLOAD, 'SKIP_DOWNLOAD: This test downloads 68 MB, so we skip it.')
+  skip_if(R_SKIP_DOWNLOAD, 'R_SKIP_DOWNLOAD: This test downloads 68 MB, so we skip it.')
   vars <- download_future_climate_tables(
     tile_ids=c("h02v02"),
     subset=c("bio1_2041-2070_ipsl-cm6a-lr_ssp126_V.2.1", "bio1_2071-2100_ipsl-cm6a-lr_ssp126_V.2.1"),
@@ -697,7 +698,7 @@ if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Run:
-  skip_if(SKIP_HUGE_DOWNLOAD, "SKIP_HUGE_DOWNLOAD: This test download 12.9 GB, so we skip it.")
+  skip_if(R_SKIP_HUGE_DOWNLOAD, "R_SKIP_HUGE_DOWNLOAD: This test download 12.9 GB, so we skip it.")
   # Note: Test 3.3.2 (computing download size of subset=ALL) tests quite similar behaviour,
   # just without the actual download in the end.
   vars <- download_future_climate_tables(
@@ -720,7 +721,7 @@ if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Run:
-  skip_if(SKIP_HUGE_DOWNLOAD, "SKIP_HUGE_DOWNLOAD: This test download 10.5 GB, so we skip it.")
+  skip_if(R_SKIP_HUGE_DOWNLOAD, "R_SKIP_HUGE_DOWNLOAD: This test download 10.5 GB, so we skip it.")
   # Note: Test 3.3.3 (computing download size of tile_ids=ALL) tests quite similar behaviour,
   # just without the actual download in the end.
   vars <- download_future_climate_tables(
@@ -992,7 +993,7 @@ if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Run:
-  skip_if(SKIP_HUGE_DOWNLOAD, "SKIP_HUGE_DOWNLOAD: This test downloads 6.9 GB, so we skip.")
+  skip_if(R_SKIP_HUGE_DOWNLOAD, "R_SKIP_HUGE_DOWNLOAD: This test downloads 6.9 GB, so we skip.")
   # Note: Test 4.3.3 (computing download size of tile_ids=ALL) tests quite similar behaviour,
   # just without the actual download in the end.
   vars <- download_present_climate_tables(
