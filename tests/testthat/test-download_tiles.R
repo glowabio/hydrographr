@@ -42,7 +42,7 @@ if (! exists("download_dir")){
 testname = "1 - global"
 if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
-    skip_if(R_SKIP_HUGE_DOWNLOAD, 'R_SKIP_HUGE_DOWNLOAD: Downloading this is 7431.1 MB, so we skip it this time...')
+    skip_if(R_SKIP_HUGE_DOWNLOAD, 'R_SKIP_HUGE_DOWNLOAD: This test downloads 7.4 GB, so we skip it.')
 
     # Prepare:
     download_dir <- file.path(tmpdir, "test_download_tiles_1")

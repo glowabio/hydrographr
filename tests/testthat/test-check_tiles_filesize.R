@@ -20,6 +20,10 @@
 #########################
 
 tests_quiet=TRUE
+use_dummy_tables=TRUE
+# TODO: After testing, the dummy tables are in the temp dir and might
+# affect later function runs where the real tables are needed. Remove
+# them? Or put in separate test dir?
 
 # Where to store and download files:
 if (! exists("tmpdir")){
@@ -36,10 +40,15 @@ if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
     # Prepare:
-    # Get file size table from inst/test_data:
+    # Get file size table from inst/test_data, or from the server:
     fname <- 'hydrography90m_paths_file_sizes.txt'
-    file.copy(system.file(paste0("test_data/", fname), package="hydrographr"), tmpdir, overwrite=FALSE)
     file_size_file <- file.path(tmpdir, fname)
+    if (use_dummy_tables) {
+        file.copy(system.file(paste0("test_data/", fname), package="hydrographr"), tmpdir, overwrite=FALSE)
+    } else if (!(file.exists(file_size_file))) {
+        base_url <- "https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4/download?path=%2FREADME/"
+        download.file(paste0(base_url, fname), destfile = file_size_file, mode = "wb")
+    }
     file_size_table <- fread(file_size_file, sep = ";")
     file_size_table$file_name = basename(file_size_table$file_path)
     all_varnames <- sort(unique(sub("_[^_]+$", "", file_size_table$file_name)))
@@ -67,10 +76,15 @@ if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
     # Prepare:
-    # Get file size table from inst/test_data:
+    # Get file size table from inst/test_data, or from the server:
     fname <- 'hydrography90m_paths_file_sizes.txt'
-    file.copy(system.file(paste0("test_data/", fname), package="hydrographr"), tmpdir, overwrite=FALSE)
     file_size_file <- file.path(tmpdir, fname)
+    if (use_dummy_tables) {
+        file.copy(system.file(paste0("test_data/", fname), package="hydrographr"), tmpdir, overwrite=FALSE)
+    } else if (!(file.exists(file_size_file))) {
+        base_url <- "https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4/download?path=%2FREADME/"
+        download.file(paste0(base_url, fname), destfile = file_size_file, mode = "wb")
+    }
     file_size_table <- fread(file_size_file, sep = ";")
     file_size_table$file_name = basename(file_size_table$file_path)
     all_varnames <- sort(unique(sub("_[^_]+$", "", file_size_table$file_name)))
@@ -98,10 +112,15 @@ if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
     # Prepare:
-    # Get file size table from inst/test_data:
+    # Get file size table from inst/test_data, or from the server:
     fname <- 'hydrography90m_paths_file_sizes.txt'
-    file.copy(system.file(paste0("test_data/", fname), package="hydrographr"), tmpdir, overwrite=FALSE)
     file_size_file <- file.path(tmpdir, fname)
+    if (use_dummy_tables) {
+        file.copy(system.file(paste0("test_data/", fname), package="hydrographr"), tmpdir, overwrite=FALSE)
+    } else if (!(file.exists(file_size_file))) {
+        base_url <- "https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4/download?path=%2FREADME/"
+        download.file(paste0(base_url, fname), destfile = file_size_file, mode = "wb")
+    }
     file_size_table <- fread(file_size_file, sep = ";")
     file_size_table$file_name = basename(file_size_table$file_path)
     all_varnames <- sort(unique(sub("_[^_]+$", "", file_size_table$file_name)))
@@ -129,10 +148,15 @@ if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
     # Prepare:
-    # Get file size table from inst/test_data:
+    # Get file size table from inst/test_data, or from the server:
     fname <- 'hydrography90m_paths_file_sizes.txt'
-    file.copy(system.file(paste0("test_data/", fname), package="hydrographr"), tmpdir, overwrite=FALSE)
     file_size_file <- file.path(tmpdir, fname)
+    if (use_dummy_tables) {
+        file.copy(system.file(paste0("test_data/", fname), package="hydrographr"), tmpdir, overwrite=FALSE)
+    } else if (!(file.exists(file_size_file))) {
+        base_url <- "https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4/download?path=%2FREADME/"
+        download.file(paste0(base_url, fname), destfile = file_size_file, mode = "wb")
+    }
     file_size_table <- fread(file_size_file, sep = ";")
     file_size_table$file_name = basename(file_size_table$file_path)
     all_varnames <- sort(unique(sub("_[^_]+$", "", file_size_table$file_name)))
@@ -160,10 +184,15 @@ if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
     # Prepare:
-    # Get file size table from inst/test_data:
+    # Get file size table from inst/test_data, or from the server:
     fname <- 'hydrography90m_paths_file_sizes.txt'
-    file.copy(system.file(paste0("test_data/", fname), package="hydrographr"), tmpdir, overwrite=FALSE)
     file_size_file <- file.path(tmpdir, fname)
+    if (use_dummy_tables) {
+        file.copy(system.file(paste0("test_data/", fname), package="hydrographr"), tmpdir, overwrite=FALSE)
+    } else if (!(file.exists(file_size_file))) {
+        base_url <- "https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4/download?path=%2FREADME/"
+        download.file(paste0(base_url, fname), destfile = file_size_file, mode = "wb")
+    }
     file_size_table <- fread(file_size_file, sep = ";")
     file_size_table$file_name = basename(file_size_table$file_path)
     all_varnames <- sort(unique(sub("_[^_]+$", "", file_size_table$file_name)))
@@ -192,10 +221,15 @@ if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
     # Prepare:
-    # Get file size table from inst/test_data:
+    # Get file size table from inst/test_data, or from the server:
     fname <- 'hydrography90m_paths_file_sizes.txt'
-    file.copy(system.file(paste0("test_data/", fname), package="hydrographr"), tmpdir, overwrite=FALSE)
     file_size_file <- file.path(tmpdir, fname)
+    if (use_dummy_tables) {
+        file.copy(system.file(paste0("test_data/", fname), package="hydrographr"), tmpdir, overwrite=FALSE)
+    } else if (!(file.exists(file_size_file))) {
+        base_url <- "https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4/download?path=%2FREADME/"
+        download.file(paste0(base_url, fname), destfile = file_size_file, mode = "wb")
+    }
     file_size_table <- fread(file_size_file, sep = ";")
     file_size_table$file_name = basename(file_size_table$file_path)
     all_varnames <- sort(unique(sub("_[^_]+$", "", file_size_table$file_name)))
@@ -223,10 +257,15 @@ if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
     # Prepare:
-    # Get file size table from inst/test_data:
+    # Get file size table from inst/test_data, or from the server:
     fname <- 'hydrography90m_paths_file_sizes.txt'
-    file.copy(system.file(paste0("test_data/", fname), package="hydrographr"), tmpdir, overwrite=FALSE)
     file_size_file <- file.path(tmpdir, fname)
+    if (use_dummy_tables) {
+        file.copy(system.file(paste0("test_data/", fname), package="hydrographr"), tmpdir, overwrite=FALSE)
+    } else if (!(file.exists(file_size_file))) {
+        base_url <- "https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4/download?path=%2FREADME/"
+        download.file(paste0(base_url, fname), destfile = file_size_file, mode = "wb")
+    }
     file_size_table <- fread(file_size_file, sep = ";")
     file_size_table$file_name = basename(file_size_table$file_path)
     all_varnames <- sort(unique(sub("_[^_]+$", "", file_size_table$file_name)))
@@ -258,10 +297,15 @@ test_that(testname, {
     # before even checking whether 140 exists (hint: it doesn't...)
 
     # Prepare:
-    # Get file size table from inst/test_data:
+    # Get file size table from inst/test_data, or from the server:
     fname <- 'hydrography90m_paths_file_sizes.txt'
-    file.copy(system.file(paste0("test_data/", fname), package="hydrographr"), tmpdir, overwrite=FALSE)
     file_size_file <- file.path(tmpdir, fname)
+    if (use_dummy_tables) {
+        file.copy(system.file(paste0("test_data/", fname), package="hydrographr"), tmpdir, overwrite=FALSE)
+    } else if (!(file.exists(file_size_file))) {
+        base_url <- "https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4/download?path=%2FREADME/"
+        download.file(paste0(base_url, fname), destfile = file_size_file, mode = "wb")
+    }
     file_size_table <- fread(file_size_file, sep = ";")
     file_size_table$file_name = basename(file_size_table$file_path)
     all_varnames <- sort(unique(sub("_[^_]+$", "", file_size_table$file_name)))
@@ -289,10 +333,15 @@ if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
     # Prepare:
-    # Get file size table from inst/test_data:
+    # Get file size table from inst/test_data, or from the server:
     fname <- 'hydrography90m_paths_file_sizes.txt'
-    file.copy(system.file(paste0("test_data/", fname), package="hydrographr"), tmpdir, overwrite=FALSE)
     file_size_file <- file.path(tmpdir, fname)
+    if (use_dummy_tables) {
+        file.copy(system.file(paste0("test_data/", fname), package="hydrographr"), tmpdir, overwrite=FALSE)
+    } else if (!(file.exists(file_size_file))) {
+        base_url <- "https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4/download?path=%2FREADME/"
+        download.file(paste0(base_url, fname), destfile = file_size_file, mode = "wb")
+    }
     file_size_table <- fread(file_size_file, sep = ";")
     file_size_table$file_name = basename(file_size_table$file_path)
     all_varnames <- sort(unique(sub("_[^_]+$", "", file_size_table$file_name)))
@@ -321,10 +370,15 @@ if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
     # Prepare:
-    # Get file size table from inst/test_data:
+    # Get file size table from inst/test_data, or from the server:
     fname <- 'hydrography90m_paths_file_sizes.txt'
-    file.copy(system.file(paste0("test_data/", fname), package="hydrographr"), tmpdir, overwrite=FALSE)
     file_size_file <- file.path(tmpdir, fname)
+    if (use_dummy_tables) {
+        file.copy(system.file(paste0("test_data/", fname), package="hydrographr"), tmpdir, overwrite=FALSE)
+    } else if (!(file.exists(file_size_file))) {
+        base_url <- "https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4/download?path=%2FREADME/"
+        download.file(paste0(base_url, fname), destfile = file_size_file, mode = "wb")
+    }
     file_size_table <- fread(file_size_file, sep = ";")
     file_size_table$file_name = basename(file_size_table$file_path)
     all_varnames <- sort(unique(sub("_[^_]+$", "", file_size_table$file_name)))
@@ -350,10 +404,15 @@ if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
     # Prepare:
-    # Get file size table from inst/test_data:
+    # Get file size table from inst/test_data, or from the server:
     fname <- 'hydrography90m_paths_file_sizes.txt'
-    file.copy(system.file(paste0("test_data/", fname), package="hydrographr"), tmpdir, overwrite=FALSE)
     file_size_file <- file.path(tmpdir, fname)
+    if (use_dummy_tables) {
+        file.copy(system.file(paste0("test_data/", fname), package="hydrographr"), tmpdir, overwrite=FALSE)
+    } else if (!(file.exists(file_size_file))) {
+        base_url <- "https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4/download?path=%2FREADME/"
+        download.file(paste0(base_url, fname), destfile = file_size_file, mode = "wb")
+    }
     file_size_table <- fread(file_size_file, sep = ";")
     file_size_table$file_name = basename(file_size_table$file_path)
     all_varnames <- sort(unique(sub("_[^_]+$", "", file_size_table$file_name)))
@@ -381,12 +440,17 @@ if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
 
-
     # Prepare:
-    # Get file size table from inst/test_data:
+    # Get file size table from inst/test_data, or from the server:
     fname <- 'env90m_observedclimate_paths_file_sizes.txt'
-    file.copy(system.file(paste0("test_data/", fname), package="hydrographr"), tmpdir, overwrite=FALSE)
     file_size_file <- file.path(tmpdir, fname)
+    if (use_dummy_tables) {
+        file.copy(system.file(paste0("test_data/", fname), package="hydrographr"), tmpdir, overwrite=FALSE)
+    } else if (!(file.exists(file_size_file))) {
+        base_url <- "https://public.igb-berlin.de/index.php/s/zw56kEd25NsQqcQ/download?path=%2FREADME/"
+        # Note: base_url not the same as for hydrography90m!
+        download.file(paste0(base_url, fname), destfile = file_size_file, mode = "wb")
+    }
     file_size_table <- fread(file_size_file, sep = ";")
     file_size_table$file_name = basename(file_size_table$file_path)
     all_varnames <- sort(unique(sub("_[^_]+$", "", file_size_table$file_name)))
@@ -414,10 +478,16 @@ if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
     # Prepare:
-    # Get file size table from inst/test_data:
+    # Get file size table from inst/test_data, or from the server:
     fname <- 'env90m_projectedclimate_paths_file_sizes.txt'
-    file.copy(system.file(paste0("test_data/", fname), package="hydrographr"), tmpdir, overwrite=FALSE)
     file_size_file <- file.path(tmpdir, fname)
+    if (use_dummy_tables) {
+        file.copy(system.file(paste0("test_data/", fname), package="hydrographr"), tmpdir, overwrite=FALSE)
+    } else if (!(file.exists(file_size_file))) {
+        base_url <- "https://public.igb-berlin.de/index.php/s/zw56kEd25NsQqcQ/download?path=%2FREADME/"
+        # Note: base_url not the same as for hydrography90m!
+        download.file(paste0(base_url, fname), destfile = file_size_file, mode = "wb")
+    }
     file_size_table <- fread(file_size_file, sep = ";")
     file_size_table$file_name = basename(file_size_table$file_path)
     all_varnames <- sort(unique(sub("_[^_]+$", "", file_size_table$file_name)))
