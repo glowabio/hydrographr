@@ -83,35 +83,27 @@ get_predict_table <- function(variable,
                               quiet = TRUE) {
 
   # Check variable name is one of the accepted values
-  # TODO replace this list by call to function get_env_vars...
-  accepted_vars <- c("bio1", "bio10", "bio11", "bio12", "bio13",
-                     "bio14", "bio15", "bio16", "bio17", "bio18",
-                     "bio19", "bio2", "bio3", "bio4", "bio5",
-                     "bio6", "bio7", "bio8", "bio9", "c100",
-                     "c10", "c20", "c30", "c40", "c50",
-                     "c60", "c70", "c80", "c90", "c110", "c120", "c130",
-                     "c140", "c150", "c160", "c170", "c180", "c190", "c200",
-                     "c210", "c220", "chancurv","chandistdwseg",
-                     "chandistupcel", "chandistupseg","chanelvdwcel",
-                     "chanelvdwseg", "chanelvupcel","chanelvupseg",
-                     "changraddwseg", "changradupcel","changradupseg", "elev",
-                     "flow", "flowpos","gradient", "length", "out",
-                     "outdiffdwbasin","outdiffdwscatch", "outdistdwbasin",
-                     "outdistdwscatch","outlet", "slopdiff", "slopgrad", "soil",
-                     "source","strdiffdwnear", "strdiffupfarth", "strdiffupnear",
-                     "strdistdwnear", "strdistprox", "strdistupfarth",
-                     "strdistupnear", "stright", "changradupcel",
-                     "changradupseg", "elev_drop", "flow_accum", "gradient",
-                     "length", "out_dist", "out_drop", "outdiffdwbasin",
-                     "outlet_elev", "soil_ACDWRB", "soil_AWCtS", "soil_BDRICM",
-                     "soil_BDRLOG", "soil_BLDFIE", "soil_CECSOL", "soil_CLYPPT",
-                     "soil_CRFVOL", "soil_HISTPR", "soil_ORCDRC", "soil_PHIHOX",
-                     "soil_SLGWRB", "soil_SLTPPT", "soil_SNDPPT", "soil_TEXMHT",
-                     "soil_WWP", "source_elev", "strdistprox")
+  message("Checking the variable names against the list(s) of allowed variable names...")
+  message(paste("Downloading the list(s) of allowed variable names,",
+    "unless they were already downloaded to your temp directory..."))
+  # TODO: This download is potentially noisy. Make it (possibly) quiet? Really quiet?
+  accepted_vars <- c(
+    download_observed_climate_tables(download=FALSE, quiet=TRUE)$variable_names,
+    download_projected_climate_tables(download=FALSE, quiet=TRUE)$variable_names,
+    download_hydrography90m_tables(download=FALSE, quiet=TRUE)$variable_names,
+    download_soil_tables(download=FALSE, quiet=TRUE)$variable_names,
+    download_landcover_tables(download=FALSE, quiet=TRUE)$variable_names,
+    download_flo1k_tables(download=FALSE, quiet=TRUE)$variable_names,
+    download_cgiar_tables(download=FALSE, quiet=TRUE)$variable_names,
+    download_merit_dem_tables(download=FALSE, quiet=TRUE)$variable_names
+  )
+
   #Check if one of the arguments is missing
   if (missing(variable))
     stop(paste0('Variable is missing. Please provide at least the name of one variable.
-    Possible names are:  ', paste0(accepted_vars, collapse=", ")))
+      You may use any of the >1000', length(accepted_vars), ' variables of the Environment90m',
+      ' dataset, which you can view using e.g. download_soil_tables(). Please check',
+      ' ?download_env90m_tables for more details.'))
 
   if (missing(tile_id))
     stop("Please provide at least one tile ID")
