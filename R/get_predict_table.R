@@ -28,6 +28,8 @@
 #' If FALSE, the table is only stored on disk. Default is TRUE.
 #' @param quiet logical. If FALSE, the standard output will be printed.
 #' Default is TRUE.
+#' @param tempdir String. Path to the directory where to store/look for the
+#'  file size table. If not passed, defaults to the output of [base::tempdir()].
 #' @importFrom processx run
 #' @importFrom stringi stri_rand_strings
 #' @importFrom stringi stri_rand_strings
@@ -80,8 +82,13 @@ get_predict_table <- function(variable,
                               out_file_path,
                               n_cores = NULL,
                               read = TRUE,
-                              quiet = TRUE) {
+                              quiet = TRUE,
+                              tempdir = NULL) {
 
+  # Define tempdir:
+  if (is.null(tempdir)) {
+    tempdir <- tempdir()
+  }
 
   #Check if one of the arguments is missing
   if (missing(variable))
@@ -134,14 +141,14 @@ get_predict_table <- function(variable,
     "unless they were already downloaded to your temp directory..."))
   # TODO: This download is potentially noisy. Make it (possibly) quiet? Really quiet?
   accepted_vars <- c(
-    download_observed_climate_tables(download=FALSE, quiet=TRUE)$variable_names,
-    download_projected_climate_tables(download=FALSE, quiet=TRUE)$variable_names,
-    download_hydrography90m_tables(download=FALSE, quiet=TRUE)$variable_names,
-    download_soil_tables(download=FALSE, quiet=TRUE)$variable_names,
-    download_landcover_tables(download=FALSE, quiet=TRUE)$variable_names,
-    download_flo1k_tables(download=FALSE, quiet=TRUE)$variable_names,
-    download_cgiar_tables(download=FALSE, quiet=TRUE)$variable_names,
-    download_merit_dem_tables(download=FALSE, quiet=TRUE)$variable_names
+    download_observed_climate_tables(download=FALSE, quiet=TRUE, tempdir=tempdir)$variable_names,
+    download_projected_climate_tables(download=FALSE, quiet=TRUE, tempdir=tempdir)$variable_names,
+    download_hydrography90m_tables(download=FALSE, quiet=TRUE, tempdir=tempdir)$variable_names,
+    download_soil_tables(download=FALSE, quiet=TRUE, tempdir=tempdir)$variable_names,
+    download_landcover_tables(download=FALSE, quiet=TRUE, tempdir=tempdir)$variable_names,
+    download_flo1k_tables(download=FALSE, quiet=TRUE, tempdir=tempdir)$variable_names,
+    download_cgiar_tables(download=FALSE, quiet=TRUE, tempdir=tempdir)$variable_names,
+    download_merit_dem_tables(download=FALSE, quiet=TRUE, tempdir=tempdir)$variable_names
   )
   if (any(!variable %in% accepted_vars)) {
     which_invalid <- variable[!variable %in% accepted_vars]
@@ -161,6 +168,7 @@ get_predict_table <- function(variable,
   tmp <- paste0("/tmp_", rand_string)
 
   # Path to the tmp directory
+  # TODO: Should we do this in the tempdir?
   tmp_dir <- paste0(getwd(), tmp)
 
   # Create temporary output directory
