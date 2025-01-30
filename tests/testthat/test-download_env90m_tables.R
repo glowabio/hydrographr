@@ -698,7 +698,7 @@ if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Run:
-  skip_if(R_SKIP_HUGE_DOWNLOAD, "R_SKIP_HUGE_DOWNLOAD: This test download 12.9 GB, so we skip it.")
+  skip_if(R_SKIP_HUGE_DOWNLOAD, "R_SKIP_HUGE_DOWNLOAD: This test downloads 12.9 GB, so we skip it.")
   # Note: Test 3.3.2 (computing download size of subset=ALL) tests quite similar behaviour,
   # just without the actual download in the end.
   vars <- download_projected_climate_tables(
@@ -721,7 +721,7 @@ if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Run:
-  skip_if(R_SKIP_HUGE_DOWNLOAD, "R_SKIP_HUGE_DOWNLOAD: This test download 10.5 GB, so we skip it.")
+  skip_if(R_SKIP_HUGE_DOWNLOAD, "R_SKIP_HUGE_DOWNLOAD: This test downloads 10.5 GB, so we skip it.")
   # Note: Test 3.3.3 (computing download size of tile_ids=ALL) tests quite similar behaviour,
   # just without the actual download in the end.
   vars <- download_projected_climate_tables(
