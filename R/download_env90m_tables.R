@@ -104,12 +104,12 @@
 #' sub-catchment scale for freshwater biodiversity modeling, in prep.
 #' Please contact the authors for more up-to-date citation info.
 #'
-#' @name download-env90m-tables
+#' @name download_env90m_tables
 NULL
 
 
 
-#' @describeIn download-env90m-tables Download SOILGRIDS tables
+#' @describeIn download_env90m_tables Download SOILGRIDS tables
 #'  (soilgrids250m_v2_0)
 #' @examples
 #' 
@@ -166,7 +166,7 @@ download_soil_tables <- function(subset = NULL,
 
 
 
-#' @describeIn download-env90m-tables Download flow tables (flo1k_v1_0)
+#' @describeIn download_env90m_tables Download flow tables (flo1k_v1_0)
 #' @examples
 #'
 #' ### Flow (mean): flo1k_v1_0 ###
@@ -225,7 +225,7 @@ download_flo1k_tables <- function(subset = NULL,
 
 
 
-#' @describeIn download-env90m-tables Download CGIAR-CSI tables (cgiar_csi_v3)
+#' @describeIn download_env90m_tables Download CGIAR-CSI tables (cgiar_csi_v3)
 #' @examples
 #'
 #' ### CGIAR CSI dataset: cgiar_csi_v3 ###
@@ -280,7 +280,7 @@ download_cgiar_tables <- function(subset = NULL,
 }
 
 
-#' @describeIn download-env90m-tables Download MERIT-DEM tables
+#' @describeIn download_env90m_tables Download MERIT-DEM tables
 #'  (Multi-Error-Removed Improved-Terrain Digital Elevation Model,
 #'  merit_dem_v1_0_3)
 #' @examples
@@ -341,7 +341,7 @@ download_merit_dem_tables <- function(subset = NULL,
 
 
 
-#' @describeIn download-env90m-tables Download Hydrography90m tables
+#' @describeIn download_env90m_tables Download Hydrography90m tables
 #'  (hydrography90m_v1_0)
 #' @examples
 #' 
@@ -397,7 +397,7 @@ download_hydrography90m_tables <- function(subset = NULL,
 }
 
 
-#' @describeIn download-env90m-tables Download CHELSA bioclimatic variables
+#' @describeIn download_env90m_tables Download CHELSA bioclimatic variables
 #'  tables, except for projections (Climatologies at high resolution for the
 #'  earth’s land surface areas, chelsa_bioclim_v2_1)
 #'
@@ -456,7 +456,7 @@ download_observed_climate_tables <- function(subset = NULL,
 }
 
 
-#' @describeIn download-env90m-tables Download CHELSA bioclimatic variables,
+#' @describeIn download_env90m_tables Download CHELSA bioclimatic variables,
 #'  tables, projections only (Climatologies at high resolution for the
 #'  earth’s land surface areas, chelsa_bioclim_v2_1)
 #' @param base_vars (Only in `download_projected_climate_tables()` and
@@ -888,7 +888,7 @@ download_projected_climate_tables <- function(base_vars = NULL,
 }
 
 
-#' @describeIn download-env90m-tables Download ESA Land Cover tables
+#' @describeIn download_env90m_tables Download ESA Land Cover tables
 #'  (esa_cci_landcover_v2_1_1)
 #' 
 #' @param base_vars (Only in `download_projected_climate_tables()` and
