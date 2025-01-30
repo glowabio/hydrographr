@@ -143,11 +143,15 @@ get_predict_table <- function(variable,
     download_cgiar_tables(download=FALSE, quiet=TRUE)$variable_names,
     download_merit_dem_tables(download=FALSE, quiet=TRUE)$variable_names
   )
-  if (any(!variable %in% accepted_vars))
-    stop(paste0("Please provide a valid variable name.
-      You may use any of the >1000 variables of the Environment90m dataset,",
+  if (any(!variable %in% accepted_vars)) {
+    which_invalid <- variable[!variable %in% accepted_vars]
+    stop(paste0("These variables are not valid: ",
+      paste0(which_invalid, collapse=", "),
+      ". Please provide a valid variable name.",
+      "\nYou may use any of the >1000 variables of the Environment90m dataset,",
       " which you can view using e.g. download_soil_tables(). Please check",
       " ?download_env90m_tables for more details."))
+  }
 
   # Check operating system
   sys_os <- get_os()
