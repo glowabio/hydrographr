@@ -82,27 +82,12 @@ get_predict_table <- function(variable,
                               read = TRUE,
                               quiet = TRUE) {
 
-  # Check variable name is one of the accepted values
-  message("Checking the variable names against the list(s) of allowed variable names...")
-  message(paste("Downloading the list(s) of allowed variable names,",
-    "unless they were already downloaded to your temp directory..."))
-  # TODO: This download is potentially noisy. Make it (possibly) quiet? Really quiet?
-  accepted_vars <- c(
-    download_observed_climate_tables(download=FALSE, quiet=TRUE)$variable_names,
-    download_projected_climate_tables(download=FALSE, quiet=TRUE)$variable_names,
-    download_hydrography90m_tables(download=FALSE, quiet=TRUE)$variable_names,
-    download_soil_tables(download=FALSE, quiet=TRUE)$variable_names,
-    download_landcover_tables(download=FALSE, quiet=TRUE)$variable_names,
-    download_flo1k_tables(download=FALSE, quiet=TRUE)$variable_names,
-    download_cgiar_tables(download=FALSE, quiet=TRUE)$variable_names,
-    download_merit_dem_tables(download=FALSE, quiet=TRUE)$variable_names
-  )
 
   #Check if one of the arguments is missing
   if (missing(variable))
     stop(paste0('Variable is missing. Please provide at least the name of one variable.
-      You may use any of the >1000', length(accepted_vars), ' variables of the Environment90m',
-      ' dataset, which you can view using e.g. download_soil_tables(). Please check',
+      You may use any of the >1000 variables of the Environment90m dataset,',
+      ' which you can view using e.g. download_soil_tables(). Please check',
       ' ?download_env90m_tables for more details.'))
 
   if (missing(tile_id))
@@ -122,16 +107,12 @@ get_predict_table <- function(variable,
   if (!file.exists(input_var_path))
     stop(paste0("Path: ", input_var_path, " does not exist."))
 
-  if (any(!variable %in% accepted_vars))
-    stop("Please provide a valid variable name")
-
   # Check if statistics name provided is one of the accepted values
   if (any(!(statistics %in% "ALL"))) {
     if (any(!(statistics %in% c("sd", "mean", "range"))))
       stop("Please provide a valid statistics name. Possible values are
              sd, mean, range or ALL")
   }
-
 
   # Check if n_cores is numeric
   if (!is.numeric(n_cores))
@@ -144,6 +125,29 @@ get_predict_table <- function(variable,
   # Check if read is logical
   if (!is.logical(read))
     stop("read: Has to be TRUE or FALSE.")
+
+  # Now do the longer check, which needs to download some files first (unless they are
+  # already present in temp):
+  # Check variable name is one of the accepted values
+  message("Checking the variable names against the list(s) of allowed variable names...")
+  message(paste("Downloading the list(s) of allowed variable names,",
+    "unless they were already downloaded to your temp directory..."))
+  # TODO: This download is potentially noisy. Make it (possibly) quiet? Really quiet?
+  accepted_vars <- c(
+    download_observed_climate_tables(download=FALSE, quiet=TRUE)$variable_names,
+    download_projected_climate_tables(download=FALSE, quiet=TRUE)$variable_names,
+    download_hydrography90m_tables(download=FALSE, quiet=TRUE)$variable_names,
+    download_soil_tables(download=FALSE, quiet=TRUE)$variable_names,
+    download_landcover_tables(download=FALSE, quiet=TRUE)$variable_names,
+    download_flo1k_tables(download=FALSE, quiet=TRUE)$variable_names,
+    download_cgiar_tables(download=FALSE, quiet=TRUE)$variable_names,
+    download_merit_dem_tables(download=FALSE, quiet=TRUE)$variable_names
+  )
+  if (any(!variable %in% accepted_vars))
+    stop(paste0("Please provide a valid variable name.
+      You may use any of the >1000 variables of the Environment90m dataset,",
+      " which you can view using e.g. download_soil_tables(). Please check",
+      " ?download_env90m_tables for more details."))
 
   # Check operating system
   sys_os <- get_os()
