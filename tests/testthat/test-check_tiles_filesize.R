@@ -21,9 +21,6 @@
 
 tests_quiet=TRUE
 
-# NOT COMMIT:
-tests_quiet=FALSE
-
 # Where to store and download files:
 if (! exists("tmpdir")){
   tmpdir <- tempdir()

@@ -91,17 +91,17 @@ get_predict_table <- function(variable,
       ' ?download_env90m_tables for more details.'))
 
   if (missing(tile_id))
-    stop("Please provide at least one tile ID")
+    stop("Please provide at least one tile ID (parameter \"tile_id\").")
 
   if (missing(input_var_path))
     stop("Please provide a path to the table with environmental variables for
-    the entire tiles")
+    the entire tiles (parameter \"input_var_path\").")
 
   if (missing(subcatch_id))
-    stop("Please provide at least one subcatchment ID")
+    stop("Please provide at least one subcatchment ID (parameter \"subcatch_id\").")
 
   if (missing(out_file_path))
-    stop("Please provide a path to the output file")
+    stop("Please provide a path to the output file (parameter \"out_file_path\").")
 
   # Check if paths exists
   if (!file.exists(input_var_path))
