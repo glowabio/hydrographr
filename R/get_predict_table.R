@@ -200,7 +200,7 @@ get_predict_table <- function(variable,
                            out_file_path,
                            tmp_dir,
                            n_cores),
-                  echo = FALSE)
+                  echo = !quiet)
   } else {
     # Check if WSL and Ubuntu are installed
     check_wsl()
