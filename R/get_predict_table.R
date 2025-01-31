@@ -4,17 +4,9 @@
 #' an specific subset of subcatchments.
 #'
 #' @param variable character vector of variable names. Possible values are:
-#' c("bio1", "bio10", "bio11", "bio12", "bio13","bio14", "bio15", "bio16",
-#'  "bio17", "bio18","bio19", "bio2", "bio3", "bio4", "bio5","bio6", "bio7",
-#'  "bio8", "bio9", "c100", "c10", "c20", "c30", "c40", "c50","c60", "c70",
-#'  "c80", "c90", "chancurv","chandistdwseg", "chandistupcel", "chandistupseg",
-#'  "chanelvdwcel", "chanelvdwseg", "chanelvupcel","chanelvupseg",
-#'  "changraddwseg", "changradupcel", "changradupseg", "elev", "flow",
-#'  "flowpos", "gradient", "length", "out", "outdiffdwbasin", "outdiffdwscatch",
-#'  "outdistdwbasin", "outdistdwscatch", "outlet", "slopdiff", "slopgrad",
-#'  "soil", "source", "strdiffdwnear", "strdiffupfarth", "strdiffupnear",
-#'  "strdistdwnear", "strdistprox", "strdistupfarth", "strdistupnear",
-#'  "stright").
+#'  all variables in the Env90m dataset, which can bew viewed by calling
+#'  'download_<datasetname>_tables()'. For more details, see
+#'  '?download_env90m_tables'.
 #' @param statistics character vector of statistics names. Possible values are
 #' "sd", "mean", "range" or "ALL". Default "ALL".
 #' @param tile_id character. The IDs of the tiles of interest.
@@ -136,8 +128,8 @@ get_predict_table <- function(variable,
   # Now do the longer check, which needs to download some files first (unless they are
   # already present in temp):
   # Check variable name is one of the accepted values
-  message("Checking the variable names against the list(s) of allowed variable names...")
-  message(paste("Downloading the list(s) of allowed variable names,",
+  #if (!quiet) message("Checking the variable names against the list(s) of allowed variable names...")
+  if (!quiet) message(paste("Downloading the list(s) of allowed variable names,",
     "unless they were already downloaded to your temp directory..."))
   # TODO: This download is potentially noisy. Make it (possibly) quiet? Really quiet?
   accepted_vars <- c(
@@ -172,6 +164,7 @@ get_predict_table <- function(variable,
   tmp_dir <- paste0(getwd(), tmp)
 
   # Create temporary output directory
+  #if (!quiet) message("Creating temp directory for GRASS: ", tmp_dir)
   dir.create(tmp_dir, showWarnings = FALSE)
 
   # Format variable, statistics and tile_id vectors so they can be read in bash
@@ -181,7 +174,7 @@ get_predict_table <- function(variable,
 
   # Make bash scripts executable
   make_sh_exec()
-
+  if (!quiet) message("Running bash script...")
   if (sys_os == "linux" || sys_os == "osx") {
     # Call external bash script
     processx::run(system.file("sh", "get_predict_table.sh",
@@ -221,12 +214,14 @@ get_predict_table <- function(variable,
                            wsl_sh_file))
 
   }
+  if (!quiet) message("Running bash script: Done.")
+
 
   # Delete temporary output directory
   unlink(tmp_dir, recursive = TRUE)
 
   if (read == TRUE) {
-    # Read predict table
+    if (!quiet) message("Reading result table from ", out_file_path)
     predict_table <- fread(out_file_path)
     return(predict_table)
   }
