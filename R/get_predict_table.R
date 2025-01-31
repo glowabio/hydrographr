@@ -106,6 +106,19 @@ get_predict_table <- function(variable,
   if (!file.exists(input_var_path))
     stop(paste0("Path: ", input_var_path, " does not exist."))
 
+  # Check if input tables exist:
+  # This only works if the files have this name pattern!
+  for (ivar in variable) {
+    for (itile in tile_id) {
+      ipath <- file.path(input_var_path, paste0(ivar, "_", itile, ".txt"))
+      if (file.exists(ipath)) {
+        if (!quiet) message("Input table exists: ", ipath)
+      } else {
+        stop(paste0("Input table: does not exist: ", ipath))
+      }
+    }
+  }
+
   # Check if statistics name provided is one of the accepted values
   if (any(!(statistics %in% "ALL"))) {
     if (any(!(statistics %in% c("sd", "mean", "range"))))
