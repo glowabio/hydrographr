@@ -1731,19 +1731,23 @@ do_env90m_download <- function(variable_names, tile_ids, file_size_table, downlo
     } else {
       if (!(quiet)) message("Unzipping...")
     }
-    all_destdirs <- c()
+    all_extracted_filepaths <- c()
     all_deleted <- c()
     for (zipfile in all_downloaded_zips) {
       destdir <- dirname(zipfile)
       if (!(quiet)) message("Unzipping file ", zipfile, "...")
+      # With list=TRUE only lists the filenames, which we want to pass back to the user:
+      extracted_files <- utils::unzip(zipfile, exdir = destdir, list=TRUE)
+      extracted_file_paths <- file.path(destdir, extracted_files$Name)
+      # Now unzip for real:
       utils::unzip(zipfile, exdir = destdir)
-      all_destdirs <- c(all_destdirs, destdir)
+      all_extracted_filepaths <- c(all_extracted_filepaths, extracted_file_paths)
       if (delete_zips) {
         file.remove(zipfile)
         all_deleted <- c(all_deleted, zipfile)
       }
     }
-    result$unzipped <- unique(all_destdirs)
+    result$unzipped <- unique(all_extracted_filepaths)
     result$deleted <- all_deleted
   }
 
