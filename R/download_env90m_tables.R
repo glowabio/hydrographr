@@ -333,7 +333,7 @@ download_merit_dem_tables <- function(subset = NULL,
 
   return(download_simple_tables(
     "merit_dem_v1_0_3",
-    "env90m_merit_dem_paths_file_sizes.txt",
+    "env90m_meritdem_paths_file_sizes.txt",
     subset, tile_ids, ignore_missing, download, download_dir,
     file_format, delete_zips, tempdir, quiet
   ))
