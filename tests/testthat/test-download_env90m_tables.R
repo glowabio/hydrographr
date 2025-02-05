@@ -36,7 +36,7 @@ test_that(testname, {
 
   # Run:
   tab <- get_file_size_table(
-    file_name="env90m_presentclimate_paths_file_sizes.txt",
+    file_name="env90m_observedclimate_paths_file_sizes.txt",
     quiet=tests_quiet)
 
   # Check whether the specified table was loaded
@@ -153,7 +153,8 @@ test_that(testname, {
     paste0(download_dir,"/esa_cci_landcover_v2_1_1/c100/c100_1993_h10v04.zip")
   )
   expected_unzipped <- c(
-    paste0(download_dir,"/esa_cci_landcover_v2_1_1/c100")
+    paste0(download_dir,"/esa_cci_landcover_v2_1_1/c100/c100_1992_h10v04.txt"),
+    paste0(download_dir,"/esa_cci_landcover_v2_1_1/c100/c100_1993_h10v04.txt")
   )
   # Check whether zips are reported:
   expect_equal(result$downloaded, expected_zips)
@@ -196,7 +197,8 @@ test_that(testname, {
     paste0(download_dir,"/esa_cci_landcover_v2_1_1/c100/c100_1993_h10v04.zip")
   )
   expected_unzipped <- c(
-    paste0(download_dir,"/esa_cci_landcover_v2_1_1/c100")
+    paste0(download_dir,"/esa_cci_landcover_v2_1_1/c100/c100_1992_h10v04.txt"),
+    paste0(download_dir,"/esa_cci_landcover_v2_1_1/c100/c100_1993_h10v04.txt")
   )
   # Check whether zips and their deletion are reported:
   expect_equal(result$downloaded, expected_zips)
@@ -496,19 +498,19 @@ test_that(testname, {
 })
 
 
-testname = "3.1 futureclimate: show variable names (all)"
+testname = "3.1 projectedclimate: show variable names (all)"
 if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Run three times, each should yield the same result!
-  vars <- download_future_climate_tables(
+  vars <- download_projected_climate_tables(
     quiet=FALSE)
 
-  vars2 <- download_future_climate_tables(
+  vars2 <- download_projected_climate_tables(
     quiet=FALSE,
     subset="ALL")
 
-  vars3 <- download_future_climate_tables(
+  vars3 <- download_projected_climate_tables(
     quiet=FALSE,
     time_periods="ALL",
     scenarios="ALL",
@@ -539,7 +541,7 @@ test_that(testname, {
 })
 
 
-testname = "3.2.1 futureclimate: show variable names (of a subset, specified: subset)"
+testname = "3.2.1 projectedclimate: show variable names (of a subset, specified: subset)"
 if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
@@ -547,7 +549,7 @@ test_that(testname, {
   mysubset <- c("bio1_2041-2070_ipsl-cm6a-lr_ssp126_V.2.1", "bio1_2071-2100_ipsl-cm6a-lr_ssp126_V.2.1")
 
   # Run:
-  vars <- download_future_climate_tables(
+  vars <- download_projected_climate_tables(
     quiet=FALSE,
     subset=mysubset)
 
@@ -557,7 +559,7 @@ test_that(testname, {
 })
 
 
-testname = "3.2.2 futureclimate: show variable names (of a subset, specified: various components)"
+testname = "3.2.2 projectedclimate: show variable names (of a subset, specified: various components)"
 if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
@@ -569,7 +571,7 @@ test_that(testname, {
   myversions <- c("V.2.1")
   
   # Run:
-  vars <- download_future_climate_tables(
+  vars <- download_projected_climate_tables(
     quiet=FALSE,
     base_vars=mybasevars,
     models=mymodels,
@@ -579,7 +581,7 @@ test_that(testname, {
 
   # Run another time, this time, two components are specified "ALL",
   # which should lead to the same result!
-  vars2 <- download_future_climate_tables(
+  vars2 <- download_projected_climate_tables(
     quiet=FALSE,
     base_vars=mybasevars,
     models=mymodels,
@@ -600,7 +602,7 @@ test_that(testname, {
 })
 
 
-testname = "3.3.1 futureclimate: show download size (specified: subset / various components)"
+testname = "3.3.1 projectedclimate: show download size (specified: subset / various components)"
 if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
@@ -608,13 +610,13 @@ test_that(testname, {
   mytiles <- c("h02v02", "h04v02")
 
   # Run:
-  vars <- download_future_climate_tables(
+  vars <- download_projected_climate_tables(
     quiet=FALSE,
     tile_ids=mytiles,
     subset=c("bio1_2041-2070_ipsl-cm6a-lr_ssp126_V.2.1", "bio1_2071-2100_ipsl-cm6a-lr_ssp126_V.2.1"))
 
   # Run (same subset, specified using separate base_vars and years)
-  vars2 <- download_future_climate_tables(
+  vars2 <- download_projected_climate_tables(
     quiet=FALSE,
     tile_ids=mytiles,
     base_vars=c("bio1"),
@@ -633,12 +635,12 @@ test_that(testname, {
 })
 
 
-testname = "3.3.2 futureclimate: show download size (test passing subset=ALL)"
+testname = "3.3.2 projectedclimate: show download size (test passing subset=ALL)"
 if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Run:
-  vars <- download_future_climate_tables(
+  vars <- download_projected_climate_tables(
     subset="ALL",
     tile_ids=c("h02v02"),
     quiet=FALSE)
@@ -650,12 +652,12 @@ test_that(testname, {
 })
 
 
-testname = "3.3.3 futureclimate: show download size (test passing tile_ids=ALL)"
+testname = "3.3.3 projectedclimate: show download size (test passing tile_ids=ALL)"
 if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Run:
-  vars <- download_future_climate_tables(
+  vars <- download_projected_climate_tables(
     subset=c("bio1_2041-2070_ipsl-cm6a-lr_ssp126_V.2.1"),
     tile_ids="ALL",
     quiet=FALSE)
@@ -667,13 +669,13 @@ test_that(testname, {
 })
 
 
-testname = "3.4.1 futureclimate: download subset"
+testname = "3.4.1 projectedclimate: download subset"
 if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Run:
   skip_if(R_SKIP_DOWNLOAD, 'R_SKIP_DOWNLOAD: This test downloads 68 MB, so we skip it.')
-  vars <- download_future_climate_tables(
+  vars <- download_projected_climate_tables(
     tile_ids=c("h02v02"),
     subset=c("bio1_2041-2070_ipsl-cm6a-lr_ssp126_V.2.1", "bio1_2071-2100_ipsl-cm6a-lr_ssp126_V.2.1"),
     download=TRUE,
@@ -693,7 +695,7 @@ test_that(testname, {
 })
 
 
-testname = "3.4.2 futureclimate: download all variables (for one tile)"
+testname = "3.4.2 projectedclimate: download all variables (for one tile)"
 if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
@@ -701,7 +703,7 @@ test_that(testname, {
   skip_if(R_SKIP_HUGE_DOWNLOAD, "R_SKIP_HUGE_DOWNLOAD: This test download 12.9 GB, so we skip it.")
   # Note: Test 3.3.2 (computing download size of subset=ALL) tests quite similar behaviour,
   # just without the actual download in the end.
-  vars <- download_future_climate_tables(
+  vars <- download_projected_climate_tables(
     subset="ALL",
     tile_ids=c("h10v04"),
     download=TRUE,
@@ -716,7 +718,7 @@ test_that(testname, {
 })
 
 
-testname = "3.4.3 futureclimate: download all tiles (for one variable)"
+testname = "3.4.3 projectedclimate: download all tiles (for one variable)"
 if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
@@ -724,7 +726,7 @@ test_that(testname, {
   skip_if(R_SKIP_HUGE_DOWNLOAD, "R_SKIP_HUGE_DOWNLOAD: This test download 10.5 GB, so we skip it.")
   # Note: Test 3.3.3 (computing download size of tile_ids=ALL) tests quite similar behaviour,
   # just without the actual download in the end.
-  vars <- download_future_climate_tables(
+  vars <- download_projected_climate_tables(
     subset=c("bio1_2041-2070_ipsl-cm6a-lr_ssp126_V.2.1", "bio1_2071-2100_ipsl-cm6a-lr_ssp126_V.2.1"),
     tile_ids="ALL",
     download=TRUE,
@@ -739,7 +741,7 @@ test_that(testname, {
 })
 
 
-testname = "3.5.1 futureclimate: failure: model not available"
+testname = "3.5.1 projectedclimate: failure: model not available"
 if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
@@ -748,7 +750,7 @@ test_that(testname, {
 
   # Run:
   expect_error(
-    vars <- download_future_climate_tables(
+    vars <- download_projected_climate_tables(
       models=c("ipsl-cm6a-lr", "xyz"),
       base_vars=c("bio1"),
       time_periods=c("2041-2070", "2071-2100"),
@@ -761,7 +763,7 @@ test_that(testname, {
 })
 
 
-testname = "3.5.2 futureclimate: failure: scenarios not available"
+testname = "3.5.2 projectedclimate: failure: scenarios not available"
 if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
@@ -770,7 +772,7 @@ test_that(testname, {
 
   # Run:
   expect_error(
-    vars <- download_future_climate_tables(
+    vars <- download_projected_climate_tables(
       scenarios=c("ssp126", "xyz", "abc"),
       base_vars=c("bio1"),
       models=c("ipsl-cm6a-lr"),
@@ -783,7 +785,7 @@ test_that(testname, {
 })
 
 
-testname = "3.5.3 futureclimate: failure: version not available"
+testname = "3.5.3 projectedclimate: failure: version not available"
 if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
@@ -792,7 +794,7 @@ test_that(testname, {
 
   # Run:
   expect_error(
-    vars <- download_future_climate_tables(
+    vars <- download_projected_climate_tables(
       versions=c("V.2.1", "xyz"),
       base_vars=c("bio1"),
       models=c("ipsl-cm6a-lr"),
@@ -805,7 +807,7 @@ test_that(testname, {
 })
 
 
-testname = "3.5.4 futureclimate: failure: base_var not available"
+testname = "3.5.4 projectedclimate: failure: base_var not available"
 if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
@@ -821,7 +823,7 @@ test_that(testname, {
 
   # Run:
   expect_error(
-    vars <- download_future_climate_tables(
+    vars <- download_projected_climate_tables(
       tempdir=tmpdir,
       quiet=FALSE,
       base_vars=c("bio1", "xyz", "abc", "def"),
@@ -833,7 +835,7 @@ test_that(testname, {
   )
 })
 
-testname = "3.5.5 futureclimate: failure: no subset passed"
+testname = "3.5.5 projectedclimate: failure: no subset passed"
 if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
@@ -842,7 +844,7 @@ test_that(testname, {
 
   # Run:
   expect_warning(
-    vars <- download_future_climate_tables(
+    vars <- download_projected_climate_tables(
       tile_ids=c("h02v02", "h04v02"),
       download=TRUE,
       tempdir=tmpdir,
@@ -852,13 +854,13 @@ test_that(testname, {
 })
 
 
-testname = "4.1 presentclimate: show variable names (all)"
+testname = "4.1 observedclimate: show variable names (all)"
 if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Run twice, should yield the same result!
-  vars <- download_present_climate_tables(quiet=FALSE)
-  vars2 <- download_present_climate_tables(quiet=FALSE, subset="ALL")
+  vars <- download_observed_climate_tables(quiet=FALSE)
+  vars2 <- download_observed_climate_tables(quiet=FALSE, subset="ALL")
 
   # Check that the correct variable names are listed:
   expect_equal(vars, vars2)
@@ -870,12 +872,12 @@ test_that(testname, {
 })
 
 
-testname = "4.2 presentclimate (or other simple tables): show variable names (of a subset)"
+testname = "4.2 observedclimate (or other simple tables): show variable names (of a subset)"
 if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Run:
-  vars <- download_present_climate_tables(
+  vars <- download_observed_climate_tables(
     subset=c("bio1",  "bio10"),
     quiet=FALSE)
 
@@ -885,12 +887,12 @@ test_that(testname, {
 })
 
 
-testname = "4.3.1 presentclimate (or other simple tables): show download size (specified: subset)"
+testname = "4.3.1 observedclimate (or other simple tables): show download size (specified: subset)"
 if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Run:
-  vars <- download_present_climate_tables(
+  vars <- download_observed_climate_tables(
     subset=c("bio10", "bio13"),
     tile_ids=c("h00v04", "h10v04"),
     quiet=FALSE)
@@ -902,12 +904,12 @@ test_that(testname, {
 })
 
 
-testname = "4.3.2 presentclimate (or other simple tables): show download size (test passing subset=ALL)"
+testname = "4.3.2 observedclimate (or other simple tables): show download size (test passing subset=ALL)"
 if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Run:
-  vars <- download_present_climate_tables(
+  vars <- download_observed_climate_tables(
     subset="ALL",
     tile_ids=c("h10v04"),
     download=FALSE,
@@ -919,12 +921,12 @@ test_that(testname, {
 })
 
 
-testname = "4.3.3 presentclimate (or other simple tables): show download size (test passing tile_ids=ALL)"
+testname = "4.3.3 observedclimate (or other simple tables): show download size (test passing tile_ids=ALL)"
 if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Run:
-  vars <- download_present_climate_tables(
+  vars <- download_observed_climate_tables(
     subset=c("bio5"),
     tile_ids="ALL",
     download=FALSE,
@@ -936,13 +938,13 @@ test_that(testname, {
 })
 
 
-testname = "4.4.1 presentclimate (or other simple tables): download subset"
+testname = "4.4.1 observedclimate (or other simple tables): download subset"
 if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
   # Run:
   skip_if_offline("public.igb-berlin.de")
-  vars <- download_present_climate_tables(
+  vars <- download_observed_climate_tables(
     subset=c("bio10", "bio13"),
     tile_ids=c("h00v04", "h10v04"),
     download=TRUE,
@@ -961,7 +963,7 @@ test_that(testname, {
 })
 
 
-testname = "4.4.2 presentclimate (or other simple tables): download all variables (for one tile)"
+testname = "4.4.2 observedclimate (or other simple tables): download all variables (for one tile)"
 if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
@@ -969,7 +971,7 @@ test_that(testname, {
   skip_if_offline("public.igb-berlin.de")
   # Note: Test 4.3.2 (computing download size of subset=ALL) tests quite similar behaviour,
   # just without the actual download in the end.
-  vars <- download_present_climate_tables(
+  vars <- download_observed_climate_tables(
     subset="ALL",
     tile_ids=c("h10v04"),
     download=TRUE,
@@ -988,7 +990,7 @@ test_that(testname, {
 })
 
 
-testname = "4.4.3 presentclimate (or other simple tables): download all tiles (for one variable)"
+testname = "4.4.3 observedclimate (or other simple tables): download all tiles (for one variable)"
 if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
@@ -996,7 +998,7 @@ test_that(testname, {
   skip_if(R_SKIP_HUGE_DOWNLOAD, "R_SKIP_HUGE_DOWNLOAD: This test downloads 6.9 GB, so we skip.")
   # Note: Test 4.3.3 (computing download size of tile_ids=ALL) tests quite similar behaviour,
   # just without the actual download in the end.
-  vars <- download_present_climate_tables(
+  vars <- download_observed_climate_tables(
     subset=c("bio5"),
     tile_ids="ALL",
     download=TRUE,
@@ -1015,7 +1017,7 @@ test_that(testname, {
 })
 
 
-testname = "4.5.1 presentclimate (or other simple tables): failure: variable not available"
+testname = "4.5.1 observedclimate (or other simple tables): failure: variable not available"
 if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
@@ -1026,7 +1028,7 @@ test_that(testname, {
 
   # Run:
   expect_error(
-    vars <- download_present_climate_tables(
+    vars <- download_observed_climate_tables(
       subset=c("bio1", "bio10", "xyz"),
       tile_ids=c("h02v02", "h04v02"),
       quiet=FALSE),
@@ -1034,7 +1036,7 @@ test_that(testname, {
   )
 })
 
-testname = "4.5.2 presentclimate (or other simple tables): failure: no subset provided"
+testname = "4.5.2 observedclimate (or other simple tables): failure: no subset provided"
 if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
 
@@ -1043,7 +1045,7 @@ test_that(testname, {
 
   # Run:
   expect_warning(
-    vars <- download_present_climate_tables(
+    vars <- download_observed_climate_tables(
       tile_ids=c("h02v02", "h04v02"),
       download=TRUE,
       quiet=FALSE),
@@ -1055,7 +1057,7 @@ test_that(testname, {
 testname = "5 soil: show variable names (all)"
 if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
-  # Note: All other soil download functionality is tested by testing the present climate
+  # Note: All other soil download functionality is tested by testing the observed climate
   # download functionality - they all use the same download_simple_tables function!
 
   # Run twice, should yield the same result!
@@ -1075,7 +1077,7 @@ test_that(testname, {
 testname = "6 hydro90m: show variable names (all)"
 if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
-  # Note: All other hydro90m download functionality is tested by testing the present climate
+  # Note: All other hydro90m download functionality is tested by testing the observed climate
   # download functionality - they all use the same download_simple_tables function!
 
   # Run twice, should yield the same result!
@@ -1104,7 +1106,7 @@ test_that(testname, {
 testname = "7 cgiar: show variable names (all)"
 if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
-  # Note: All other cgiar download functionality is tested by testing the present climate
+  # Note: All other cgiar download functionality is tested by testing the observed climate
   # download functionality - they all use the same download_simple_tables function!
 
   # Run twice, should yield the same result!
@@ -1121,7 +1123,7 @@ test_that(testname, {
 testname = "8 flo1k: show variable names (all)"
 if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
-  # Note: All other flo1k download functionality is tested by testing the present climate
+  # Note: All other flo1k download functionality is tested by testing the observed climate
   # download functionality - they all use the same download_simple_tables function!
 
   # Run twice, should yield the same result!
@@ -1138,7 +1140,7 @@ test_that(testname, {
 testname = "9 merit_dem: show variable names (all)"
 if (!(tests_quiet)) print(paste("TEST: ", testname))
 test_that(testname, {
-  # Note: All other merit_dem download functionality is tested by testing the present climate
+  # Note: All other merit_dem download functionality is tested by testing the observed climate
   # download functionality - they all use the same download_simple_tables function!
 
   # Run twice, should yield the same result!

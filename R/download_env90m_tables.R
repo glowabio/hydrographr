@@ -104,12 +104,12 @@
 #' sub-catchment scale for freshwater biodiversity modeling, in prep.
 #' Please contact the authors for more up-to-date citation info.
 #'
-#' @name download-env90m-tables
+#' @name download_env90m_tables
 NULL
 
 
 
-#' @describeIn download-env90m-tables Download SOILGRIDS tables
+#' @describeIn download_env90m_tables Download SOILGRIDS tables
 #'  (soilgrids250m_v2_0)
 #' @examples
 #' 
@@ -166,7 +166,7 @@ download_soil_tables <- function(subset = NULL,
 
 
 
-#' @describeIn download-env90m-tables Download flow tables (flo1k_v1_0)
+#' @describeIn download_env90m_tables Download flow tables (flo1k_v1_0)
 #' @examples
 #'
 #' ### Flow (mean): flo1k_v1_0 ###
@@ -225,7 +225,7 @@ download_flo1k_tables <- function(subset = NULL,
 
 
 
-#' @describeIn download-env90m-tables Download CGIAR-CSI tables (cgiar_csi_v3)
+#' @describeIn download_env90m_tables Download CGIAR-CSI tables (cgiar_csi_v3)
 #' @examples
 #'
 #' ### CGIAR CSI dataset: cgiar_csi_v3 ###
@@ -280,7 +280,7 @@ download_cgiar_tables <- function(subset = NULL,
 }
 
 
-#' @describeIn download-env90m-tables Download MERIT-DEM tables
+#' @describeIn download_env90m_tables Download MERIT-DEM tables
 #'  (Multi-Error-Removed Improved-Terrain Digital Elevation Model,
 #'  merit_dem_v1_0_3)
 #' @examples
@@ -333,7 +333,7 @@ download_merit_dem_tables <- function(subset = NULL,
 
   return(download_simple_tables(
     "merit_dem_v1_0_3",
-    "env90m_merit_dem_paths_file_sizes.txt",
+    "env90m_meritdem_paths_file_sizes.txt",
     subset, tile_ids, ignore_missing, download, download_dir,
     file_format, delete_zips, tempdir, quiet
   ))
@@ -341,7 +341,7 @@ download_merit_dem_tables <- function(subset = NULL,
 
 
 
-#' @describeIn download-env90m-tables Download Hydrography90m tables
+#' @describeIn download_env90m_tables Download Hydrography90m tables
 #'  (hydrography90m_v1_0)
 #' @examples
 #' 
@@ -397,27 +397,26 @@ download_hydrography90m_tables <- function(subset = NULL,
 }
 
 
-#' @describeIn download-env90m-tables Download CHELSA bioclimatic variables tables,
-#'  except for future simulations (Climatologies at high resolution for the
+#' @describeIn download_env90m_tables Download CHELSA bioclimatic variables
+#'  tables, except for projections (Climatologies at high resolution for the
 #'  earth’s land surface areas, chelsa_bioclim_v2_1)
-#' @examples
-#' 
-#' ### Bioclimatic Variables: chelsa_bioclim_v2_1 ###
-#' ### (excluding future simulations)             ###
 #'
+#' @examples
+#' ### Bioclimatic Variables: chelsa_bioclim_v2_1 ###
+#' ### (excluding projections)                    ###
 #' # Show all available bioclim variable names
-#' # (excluding future simulations):
-#' download_present_climate_tables()
+#' # (excluding projections):
+#' download_observed_climate_tables()
 #' 
 #' # Compute download size of all bioclim variables, for one tile:
-#' download_present_climate_tables(
+#' download_observed_climate_tables(
 #'   subset = "ALL",
 #'   tile_ids = c("h00v04"),
 #'   download = FALSE)
 #'
 #' # Download one bioclim variable (Annual mean temperature), for two tiles:
 #' \dontrun{
-#' download_present_climate_tables(
+#' download_observed_climate_tables(
 #'   subset = c("bio1"),
 #'   tile_ids = c("h00v04", "h10v04"),
 #'   download = TRUE,
@@ -428,7 +427,7 @@ download_hydrography90m_tables <- function(subset = NULL,
 #' # Download one bioclim variable (Annual mean temperature), for one tile,
 #' # unzip, and delete the zips:
 #' \dontrun{
-#' download_present_climate_tables(
+#' download_observed_climate_tables(
 #'   subset = c("bio1"),
 #'   tile_ids = c("h00v04"),
 #'   download = TRUE,
@@ -438,60 +437,60 @@ download_hydrography90m_tables <- function(subset = NULL,
 #' }
 #' 
 #' @export
-download_present_climate_tables <- function(subset = NULL,
-                                            tile_ids = NULL,
-                                            download = FALSE,
-                                            download_dir = ".",
-                                            file_format = "txt",
-                                            delete_zips = TRUE,
-                                            ignore_missing = FALSE,
-                                            tempdir = NULL,
-                                            quiet = FALSE) {
+download_observed_climate_tables <- function(subset = NULL,
+                                             tile_ids = NULL,
+                                             download = FALSE,
+                                             download_dir = ".",
+                                             file_format = "txt",
+                                             delete_zips = TRUE,
+                                             ignore_missing = FALSE,
+                                             tempdir = NULL,
+                                             quiet = FALSE) {
 
   return(download_simple_tables(
     "chelsa_bioclim_v2_1",
-    "env90m_presentclimate_paths_file_sizes.txt",
+    "env90m_observedclimate_paths_file_sizes.txt",
     subset, tile_ids, ignore_missing, download, download_dir,
     file_format, delete_zips, tempdir, quiet
   ))
 }
 
 
-#' @describeIn download-env90m-tables Download CHELSA bioclimatic variables tables,
-#'  future simulations only (Climatologies at high resolution for the
+#' @describeIn download_env90m_tables Download CHELSA bioclimatic variables,
+#'  tables, projections only (Climatologies at high resolution for the
 #'  earth’s land surface areas, chelsa_bioclim_v2_1)
-#' @param base_vars (Only in `download_future_climate_tables()` and
+#' @param base_vars (Only in `download_projected_climate_tables()` and
 #'  `download_landcover_tables()`) Vector of the desired base variables, e.g.
 #'  the landcover variable "c20_1992" can be expressed as base variable "c20"
 #'  and year "1992".
-#' @param time_periods (Only in `download_future_climate_...`) Vector of the
+#' @param time_periods (Only in `download_projected_climate_...`) Vector of the
 #'  desired time periods (leave `NULL` or specify `"ALL"` for all available
 #'  time periods).
-#' @param models (Only in `download_future_climate_...`) Vector of the desired
+#' @param models (Only in `download_projected_climate_...`) Vector of the desired
 #'  models (leave `NULL` or specify `"ALL"` for all available models).
-#' @param scenarios (Only in `download_future_climate_...`) Vector of the
+#' @param scenarios (Only in `download_projected_climate_...`) Vector of the
 #'  desired scenarios (leave `NULL` or specify `"ALL"` for all available
 #'  scenarios).
-#' @param versions (Only in `download_future_climate_...`) Vector of the
+#' @param versions (Only in `download_projected_climate_...`) Vector of the
 #'  desired versions (leave `NULL` or specify `"ALL"` for all available
 #'  versions). As of January 2025, the only available version is "V.2.1".
 #' 
 #' @examples
 #'
 #' ### Bioclimatic Variables: chelsa_bioclim_v2_1 ###
-#' ### (future simulations)                       ###
-#' # Show all available future bioclim variable names
-#' download_future_climate_tables()
+#' ### (projections only)                         ###
+#' # Show all available projected bioclim variable names
+#' download_projected_climate_tables()
 #' 
 #' # Compute download size of all variables, for one tile:
-#' download_future_climate_tables(
+#' download_projected_climate_tables(
 #'   subset = "ALL",
 #'   tile_ids = c("h00v04"),
 #'   download = FALSE)
 #'
-#' # Download one hy90m variable (Annual mean temperature), for two tiles:
+#' # Download one variable (Annual mean temperature), for two tiles:
 #' \dontrun{
-#' download_future_climate_tables(
+#' download_projected_climate_tables(
 #'   subset = c("bio1"),
 #'   tile_ids = c("h00v04", "h10v04"),
 #'   download = TRUE,
@@ -499,10 +498,10 @@ download_present_climate_tables <- function(subset = NULL,
 #'   file_format = "zip")
 #' }
 #'
-#' # Download one hy90m variable (Annual mean temperature), for one tile,
+#' # Download one variable (Annual mean temperature), for one tile,
 #' # unzip, and delete the zips:
 #' \dontrun{
-#' download_future_climate_tables(
+#' download_projected_climate_tables(
 #'   subset = c("bio1"),
 #'   tile_ids = c("h00v04"),
 #'   download = TRUE,
@@ -512,27 +511,27 @@ download_present_climate_tables <- function(subset = NULL,
 #' }
 #'
 #' @export
-download_future_climate_tables <- function(base_vars = NULL,
-                                           time_periods = NULL,
-                                           models = NULL,
-                                           scenarios = NULL,
-                                           versions = NULL,
-                                           subset = NULL,
-                                           tile_ids = NULL,
-                                           download = FALSE,
-                                           download_dir = ".",
-                                           file_format = "txt",
-                                           delete_zips = TRUE,
-                                           ignore_missing = FALSE,
-                                           tempdir = NULL,
-                                           quiet = FALSE) {
+download_projected_climate_tables <- function(base_vars = NULL,
+                                              time_periods = NULL,
+                                              models = NULL,
+                                              scenarios = NULL,
+                                              versions = NULL,
+                                              subset = NULL,
+                                              tile_ids = NULL,
+                                              download = FALSE,
+                                              download_dir = ".",
+                                              file_format = "txt",
+                                              delete_zips = TRUE,
+                                              ignore_missing = FALSE,
+                                              tempdir = NULL,
+                                              quiet = FALSE) {
 
   #########################################
   ### Extract info from file size table ###
   #########################################
 
   # Use file_size_table from tempdir or download it:
-  file_name <- "env90m_futureclimate_paths_file_sizes.txt"
+  file_name <- "env90m_projectedclimate_paths_file_sizes.txt"
   file_size_table <- get_file_size_table(file_name, tempdir, quiet)
 
   # Info:
@@ -858,7 +857,7 @@ download_future_climate_tables <- function(base_vars = NULL,
     variables$tile_ids=tile_ids
   }
 
-  # Download the future climate data if requested:
+  # Download the projected climate data if requested:
   if (download) {
     if (is.null(tile_ids)) {
       msg <- "To download, please specify parameter 'tile_ids'."
@@ -889,10 +888,10 @@ download_future_climate_tables <- function(base_vars = NULL,
 }
 
 
-#' @describeIn download-env90m-tables Download ESA Land Cover tables
+#' @describeIn download_env90m_tables Download ESA Land Cover tables
 #'  (esa_cci_landcover_v2_1_1)
 #' 
-#' @param base_vars (Only in `download_future_climate_tables()` and
+#' @param base_vars (Only in `download_projected_climate_tables()` and
 #'  `download_landcover_tables()`) Vector of the desired base variables, e.g.
 #'  the landcover variable "c20_1992" can be expressed as base variable "c20"
 #'  and year "1992".
@@ -1731,19 +1730,23 @@ do_env90m_download <- function(variable_names, tile_ids, file_size_table, downlo
     } else {
       if (!(quiet)) message("Unzipping...")
     }
-    all_destdirs <- c()
+    all_extracted_filepaths <- c()
     all_deleted <- c()
     for (zipfile in all_downloaded_zips) {
       destdir <- dirname(zipfile)
       if (!(quiet)) message("Unzipping file ", zipfile, "...")
+      # With list=TRUE only lists the filenames, which we want to pass back to the user:
+      extracted_files <- utils::unzip(zipfile, exdir = destdir, list=TRUE)
+      extracted_file_paths <- file.path(destdir, extracted_files$Name)
+      # Now unzip for real:
       utils::unzip(zipfile, exdir = destdir)
-      all_destdirs <- c(all_destdirs, destdir)
+      all_extracted_filepaths <- c(all_extracted_filepaths, extracted_file_paths)
       if (delete_zips) {
         file.remove(zipfile)
         all_deleted <- c(all_deleted, zipfile)
       }
     }
-    result$unzipped <- unique(all_destdirs)
+    result$unzipped <- unique(all_extracted_filepaths)
     result$deleted <- all_deleted
   }
 
