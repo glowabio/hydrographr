@@ -156,9 +156,19 @@ download_soil_tables <- function(subset = NULL,
                                  tempdir = NULL,
                                  quiet = FALSE) {
 
+  citation <- paste0(
+    "      Hengl, T., Mendes de Jesus, J., Heuvelink, G. B. M.,\n",
+    "      Ruiperez Gonzalez, M., Kilibarda, M., Blagotić, A., Shangguan, W.,\n",
+    "      Wright, M. N., Geng, X., Bauer-Marschallinger, B., Guevara, M. A.,\n",
+    "      Vargas, R., MacMillan, R. A., Batjes, N. H., Leenaars, J. G. B.,\n",
+    "      Ribeiro, E., Wheeler, I., Mantel, S., and Kempen, B.:\n",
+    "      SoilGrids250m: Global gridded soil information based on machine learning,\n",
+    "      PLOS ONE, 12, e0169 748, https://doi.org/10.1371/journal.pone.0169748, 2017")
+
   return(download_simple_tables(
     "soilgrids250m_v2_0",
     "env90m_soil_paths_file_sizes.txt",
+    citation,
     subset, tile_ids, ignore_missing, download, download_dir,
     file_format, delete_zips, tempdir, quiet
   ))
@@ -215,9 +225,17 @@ download_flo1k_tables <- function(subset = NULL,
                                   tempdir = NULL,
                                   quiet = FALSE) {
 
+  citation <- paste0(
+    "      Barbarossa, V., Huijbregts, M. A. J., Beusen, A. H. W.,\n",
+    "      Beck, H. E., King, H., and Schipper, A. M.: FLO1K, global maps of mean,\n",
+    "      maximum and minimum annual streamflow at 1 km resolution from 1960\n",
+    "      through 2015, Scientific Data, 5, 180 052,\n",
+    "      https://doi.org/10.1038/sdata.2018.52, 2018.")
+
   return(download_simple_tables(
     "flo1k_v1_0",
     "env90m_flo1k_paths_file_sizes.txt",
+    citation,
     subset, tile_ids, ignore_missing, download, download_dir,
     file_format, delete_zips, tempdir, quiet
   ))
@@ -239,8 +257,8 @@ download_flo1k_tables <- function(subset = NULL,
 #'   download = FALSE)
 #'
 #' # Download one cgiar variable (Global Aridity Index), for two tiles:
-#' download_cgiar_tables(
 #' \dontrun{
+#' download_cgiar_tables(
 #'   subset = c("garid"),
 #'   tile_ids = c("h00v04", "h10v04"),
 #'   download = TRUE,
@@ -271,9 +289,19 @@ download_cgiar_tables <- function(subset = NULL,
                                   tempdir = NULL,
                                   quiet = FALSE) {
 
+  citation <- paste0(
+    "      Zomer, R. J. and Trabucco, A.: Version 3 of the “Global Aridity Index\n",
+    "      and Potential Evapotranspiration (ET0 ) Database”: Estimation of\n",
+    "      Penman-Monteith Reference Evapotranspiration. Available online from\n",
+    "      the CGIAR-CSI GeoPortal at:\n",
+    "      https://cgiarcsi.community/2019/0124/global-aridity-index-and-potential-evapotranspiration-climate-database-v3/,\n",
+    "      Tech. rep., CGIAR-CSI,\n",
+    "      https://cgiarcsi.community/2019/01/24/global-aridity-index-and-potential-evapotranspiration-climate-database-v3, 2022.")
+
   return(download_simple_tables(
     "cgiar_csi_v3",
     "env90m_cgiar_paths_file_sizes.txt",
+    citation,
     subset, tile_ids, ignore_missing, download, download_dir,
     file_format, delete_zips, tempdir, quiet
   ))
@@ -331,9 +359,17 @@ download_merit_dem_tables <- function(subset = NULL,
                                       tempdir = NULL,
                                       quiet = FALSE) {
 
+  citation <- paste0(
+    "      Yamazaki, D., Ikeshima, D., Tawatari, R., Yamaguchi, T., O’Loughlin,\n",
+    "      F., Neal, J. C., Sampson, C. C., Kanae, S., and Bates, P. D.:\n",
+    "      A high-accuracy map of global terrain elevations: Accurate Global\n",
+    "      Terrain Elevation map, Geophysical Research Letters, 44,\n",
+    "      5844–5853,275, https://doi.org/10.1002/2017GL072874, 2017")
+
   return(download_simple_tables(
     "merit_dem_v1_0_3",
     "env90m_meritdem_paths_file_sizes.txt",
+    citation,
     subset, tile_ids, ignore_missing, download, download_dir,
     file_format, delete_zips, tempdir, quiet
   ))
@@ -388,9 +424,16 @@ download_hydrography90m_tables <- function(subset = NULL,
                                            tempdir = NULL,
                                            quiet = FALSE) {
 
+  citation <- paste0(
+    "      Amatulli, G., Garcia Marquez, J., Sethi, T., Kiesel, J., Grigoropoulou, A.,\n",
+    "      Üblacker, M. M., Shen, L. Q., and Domisch, S.: Hydrography90m: a new\n",
+    "      high-resolution global hydrographic dataset, Earth Syst. Sci. Data, 14,\n",
+    "      4525–4550, https://doi.org/10.5194/essd-14-4525-2022, 2022.")
+
   return(download_simple_tables(
     "hydrography90m_v1_0", 
     "env90m_hydro_paths_file_sizes.txt",
+    citation,
     subset, tile_ids, ignore_missing, download, download_dir,
     file_format, delete_zips, tempdir, quiet
   ))
@@ -447,9 +490,16 @@ download_observed_climate_tables <- function(subset = NULL,
                                              tempdir = NULL,
                                              quiet = FALSE) {
 
+  citation <- paste0(
+    "      Karger, D. N., Conrad, O., Böhner, J., Kawohl, T., Kreft, H.,\n",
+    "      Soria-Auza, R. W., Zimmermann, N. E., Linder, H. P., and Kessler, M.:\n",
+    "      Climatologies at high resolution for the earth’s land surface areas,\n",
+    "      Scientific Data, 4, 170 122, https://doi.org/10.1038/sdata.2017.122, 2017")
+
   return(download_simple_tables(
     "chelsa_bioclim_v2_1",
     "env90m_observedclimate_paths_file_sizes.txt",
+    citation,
     subset, tile_ids, ignore_missing, download, download_dir,
     file_format, delete_zips, tempdir, quiet
   ))
@@ -488,7 +538,7 @@ download_observed_climate_tables <- function(subset = NULL,
 #'   tile_ids = c("h00v04"),
 #'   download = FALSE)
 #'
-#' # Download one variable (Annual mean temperature), for two tiles:
+#' # Download one hy90m variable (Annual mean temperature), for two tiles:
 #' \dontrun{
 #' download_projected_climate_tables(
 #'   subset = c("bio1"),
@@ -498,11 +548,11 @@ download_observed_climate_tables <- function(subset = NULL,
 #'   file_format = "zip")
 #' }
 #'
-#' # Download one variable (Annual mean temperature), for one tile,
+#' # Download one hy90m variable (Annual mean temperature), for one tile,
 #' # unzip, and delete the zips:
 #' \dontrun{
 #' download_projected_climate_tables(
-#'   subset = c("bio1"),
+#'   subset = c("bio1_2071-2100_ukesm1-0-ll_ssp585_V.2.1"),
 #'   tile_ids = c("h00v04"),
 #'   download = TRUE,
 #'   download_dir = ".",
@@ -526,6 +576,12 @@ download_projected_climate_tables <- function(base_vars = NULL,
                                               tempdir = NULL,
                                               quiet = FALSE) {
 
+  citation <- paste0(
+    "      Karger, D. N., Conrad, O., Böhner, J., Kawohl, T., Kreft, H.,\n",
+    "      Soria-Auza, R. W., Zimmermann, N. E., Linder, H. P., and Kessler, M.:\n",
+    "      Climatologies at high resolution for the earth’s land surface areas,\n",
+    "      Scientific Data, 4, 170 122, https://doi.org/10.1038/sdata.2017.122, 2017")
+
   #########################################
   ### Extract info from file size table ###
   #########################################
@@ -535,7 +591,7 @@ download_projected_climate_tables <- function(base_vars = NULL,
   file_size_table <- get_file_size_table(file_name, tempdir, quiet)
 
   # Info:
-  # Future climate variables look like this:
+  # projected climate variables look like this:
   # <base_var>_<time_period>_<model>_<scenario>_<version>_<tile_id>.zip
   # "bio9_2071-2100_ukesm1-0-ll_ssp585_V.2.1_h32v00.zip"
 
@@ -666,7 +722,7 @@ download_projected_climate_tables <- function(base_vars = NULL,
         message("\nStarting download of ", download_bytes/1000000000, " GB...")
         outcome <- do_env90m_download(all_varnames, tile_ids, file_size_table,
             download_dir = download_dir, file_format = file_format,
-            quiet = quiet, delete_zips = delete_zips)
+            quiet = quiet, delete_zips = delete_zips, citation = citation)
         variables <- c(variables, outcome)
       }
 
@@ -868,7 +924,7 @@ download_projected_climate_tables <- function(base_vars = NULL,
       message("\nStarting download of ", download_bytes/1000000000, " GB...")
       outcome <- do_env90m_download(varnames_to_be_returned, tile_ids, file_size_table,
           download_dir = download_dir, file_format = file_format,
-          quiet = quiet, delete_zips = delete_zips)
+          quiet = quiet, delete_zips = delete_zips, citation = citation)
       variables <- c(variables, outcome)
     }
   } else {
@@ -934,6 +990,12 @@ download_landcover_tables <- function(base_vars = NULL,
                                       ignore_missing = FALSE,
                                       tempdir = NULL,
                                       quiet = FALSE) {
+
+  citation <- paste0(
+    "      ESA: Land Cover CCI Product User Guide Version 2.\n",
+    "      Tech. Rep. Available at:\n",
+    "      maps.elie.ucl.ac.be/CCI/viewer/download/ESACCI-LC-Ph2-225PUGv2_2.0.pdf,\n",
+    "      Tech. rep., European Space Agency, 2017")
 
   #########################################
   ### Extract info from file size table ###
@@ -1054,7 +1116,7 @@ download_landcover_tables <- function(base_vars = NULL,
         message("\nStarting download of ", download_bytes/1000000000, " GB...")
         outcome <- do_env90m_download(all_varnames, tile_ids, file_size_table,
             download_dir = download_dir, file_format = file_format,
-            quiet = quiet, delete_zips = delete_zips)
+            quiet = quiet, delete_zips = delete_zips, citation = citation)
         variables <- c(variables, outcome)
       }
 
@@ -1196,7 +1258,7 @@ download_landcover_tables <- function(base_vars = NULL,
     message("\nStarting download of ", download_bytes/1000000000, " GB...")
     outcome <- do_env90m_download(varnames_to_be_returned, tile_ids, file_size_table,
         download_dir = download_dir, file_format = file_format,
-        quiet = quiet, delete_zips = delete_zips)
+        quiet = quiet, delete_zips = delete_zips, citation = citation)
     variables <- c(variables, outcome)
   } else {
     if (is.null(tile_ids)){
@@ -1220,12 +1282,14 @@ download_landcover_tables <- function(base_vars = NULL,
 #' @description
 #' Download ... for all Environment90m datasets which have simple variable
 #' names, not combined variable names that can be split into various components
-#' (e.g. model, scenario, ... like in the Future Climate case).
+#' (e.g. model, scenario, ... like in the projected climate case).
 #' 
 #' @param dataset_name String. Name of the dataset. Will be returned to the
 #'  user in the result.
 #' @param table_file_name String. Name of the table that should be downloaded.
 #'  Each Environment90m dataset has one file size table. 
+#' @param citation String. How to cite the original dataset. Will be displayed
+#'  at the end, to kindly ask users to cite it.
 #' @param subset Vector of the variable names that should be downloaded (or
 #' string "ALL" for all available variables).  
 #' @param tile_ids Vector containing all tile ids of the tiles (e.g. "h10v04")
@@ -1270,6 +1334,7 @@ download_landcover_tables <- function(base_vars = NULL,
 download_simple_tables <- function(
   dataset_name,
   table_file_name,
+  citation,
   subset,
   tile_ids,
   ignore_missing,
@@ -1366,7 +1431,7 @@ download_simple_tables <- function(
         message("\nStarting download of ", download_bytes/1000000000, " GB...")
         outcome <- do_env90m_download(all_varnames, tile_ids, file_size_table,
             download_dir = download_dir, file_format = file_format,
-            quiet = quiet, delete_zips = delete_zips)
+            quiet = quiet, delete_zips = delete_zips, citation = citation)
         variables <- c(variables, outcome)
       }
 
@@ -1436,7 +1501,7 @@ download_simple_tables <- function(
     message("\nStarting download of ", download_bytes/1000000000, " GB...")
     outcome <- do_env90m_download(varnames_to_be_returned, tile_ids, file_size_table,
         download_dir = download_dir, file_format = file_format,
-        quiet = quiet, delete_zips = delete_zips)
+        quiet = quiet, delete_zips = delete_zips, citation = citation)
     variables <- c(variables, outcome)
   } else {
     if (is.null(tile_ids)){
@@ -1667,7 +1732,7 @@ compute_download_size <- function(varnames,
 #' }
 #'
 #' @noRd
-do_env90m_download <- function(variable_names, tile_ids, file_size_table, download_dir = ".", file_format = "txt", quiet = FALSE, delete_zips = TRUE) {
+do_env90m_download <- function(variable_names, tile_ids, file_size_table, download_dir = ".", file_format = "txt", quiet = FALSE, delete_zips = TRUE, citation = NULL) {
 
   # Set timeout option for download to 4 hours (14400 seconds)
   options(timeout=14400)
@@ -1750,13 +1815,14 @@ do_env90m_download <- function(variable_names, tile_ids, file_size_table, downlo
     result$deleted <- all_deleted
   }
 
-  cat("Please cite the Environment90m publication:\n
+  cat("\nPlease cite the Environment90m publication:
       Garcia Marquez, J., Amatulli, G., Grigoropoulou, A.,
       Schürz, M., Tomiczek, T., Buurman, M., Bremerich, V.,
       Bego, K. and Domisch, S.:
       Global datasets of aggregated environmental variables at the
       sub-catchment scale for freshwater biodiversity modeling, in prep.
       Please contact the authors for more up-to-date citation info.\n")
+  cat(paste0("\nPlease also cite the original dataset:\n", citation, "\n\n"))
 
   return(result)
 }
