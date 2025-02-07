@@ -32,6 +32,7 @@
 VAR=( $(echo $1 | tr "/" "\n") )
 [[ "${#VAR[@]}" -eq 1 ]] && var=($(echo $1)) || var=("${VAR[@]}")
 export var
+echo "bash: Variables: "$var
 
 # select summary statistics
 # ALL
@@ -39,31 +40,38 @@ export var
 ss=( $(echo $2 | tr "/" "\n") )
 [[ "${#ss[@]}" -eq 1 ]] && SS=($(echo $2)) || SS=("${ss[@]}")
 export SS
+echo "bash: Summary stats: "$SS
 
 # tiles of interest
 #export tiles=( h18v02 h18v04 h20v02 h20v04 )
 TT=($(echo "$3" | tr "/" "\n"))
 [[ "${#TT[@]}" -eq 1 ]] && tiles=($(echo $3)) || tiles=("${TT[@]}")
 export tiles
+echo "bash: Tiles: "$tiles
 
-#  path to environmental tables for each tile
+# path to environmental tables for each tile
 export ENVTB=$4
+#echo "bash: Directory for input files: "$ENVTB
 
 # file with the list of subcatchments IDs
 export SUBCIDS=$5
 #export SUBCIDS=/data/marquez/vignette/out/subc_IDs.txt
+#echo "bash: Table containing subcatchment ids: "$SUBCIDS
 
 # output file
 export OUTFILE=$6
 #export OUTFILE=/data/marquez/vignette/out/projectionTB2.csv
+#echo "bash: Result will be written to: "$OUTFILE
 
 # folder to store temporal files: this folder is defined within the R function
 export TMP=$7
 #export TMP=/data/marquez/vignette/out
+#echo "bash: Temp directory: "$TMP
 
 # number of cores to run the extraction of information (rows) from tile tables
 # (n.tiles * n.variables)
 export NCORES=$8
+#echo "bash: Num cores for parallel computing: "$NCORES
 #export NCORES=16
 
 
@@ -84,16 +92,20 @@ subsetTB(){
 }
 
 export -f subsetTB
-parallel -j $NCORES subsetTB ::: ${tiles[@]} ::: ${var[@]}
 
+echo "bash: Running in parallel: Treating tiles and variables. This will write tables 'ENV_...txt' into "$TMP
+parallel -j $NCORES subsetTB ::: ${tiles[@]} ::: ${var[@]}
+echo "bash: Running in parallel: Done."
 
 ##################
 #   Subset the tables if user is only interested in few statistics (e.g., mean)
 
 if [[ "${SS[@]}" != 'ALL' ]]    # run only if user do not select ALL
 then
+    echo "bash: Iterating over ENV_..."
     for TB in $(find $TMP -name "ENV_*.txt")
     do
+        echo "bash: Iteration: "$TB
         NR=$(awk 'NR == 1 {print NF}' $TB)
         [[ "$NR" != 6 ]] && continue
 
@@ -119,7 +131,9 @@ then
         > $TMP/ENV_${RAND_STRING}.txt
 
         mv $TMP/ENV_${RAND_STRING}.txt $TB
+        #echo "bash: Moved: "$TMP/ENV_${RAND_STRING}.txt" to "$TB
     done
+    echo "bash: Iterating: Done."
 fi
 
 
@@ -154,6 +168,7 @@ if [[ "${elem[@]}" -gt 0 ]]; then
     mv $TMP/aggreg_${X}_tmp2.txt $TMP/aggreg_${X}.txt
 fi
 
+# Comment this to keep temp files:
 rm $TMP/aggreg_${X}_tmp*.txt
 
 ' _
@@ -197,13 +212,11 @@ fi
 
 
 #########################
-# remove temporal files
+# remove temporal files (comment this to keep temp files):
 rm $TMP/aggreg*
 rm $TMP/ENV*
 rm $TMP/all_var_trim.csv
 rm $TMP/all_var_full.txt
-
-
 
 exit
 

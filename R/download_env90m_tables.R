@@ -538,7 +538,7 @@ download_observed_climate_tables <- function(subset = NULL,
 #'   tile_ids = c("h00v04"),
 #'   download = FALSE)
 #'
-#' # Download one hy90m variable (Annual mean temperature), for two tiles:
+#' # Download one variable (Annual mean temperature), for two tiles:
 #' \dontrun{
 #' download_projected_climate_tables(
 #'   subset = c("bio1"),
@@ -548,7 +548,7 @@ download_observed_climate_tables <- function(subset = NULL,
 #'   file_format = "zip")
 #' }
 #'
-#' # Download one hy90m variable (Annual mean temperature), for one tile,
+#' # Download one variable (Annual mean temperature), for one tile,
 #' # unzip, and delete the zips:
 #' \dontrun{
 #' download_projected_climate_tables(
