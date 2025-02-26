@@ -171,7 +171,16 @@ get_predict_table <- function(variable,
       if (filename %in% basename(list.files(input_var_path, recursive=TRUE))) {
         #if (!quiet) message("INFO: Input table exists: ", filename)
       } else {
-        stop("Input table does not exist: ", filename, " (in subdirectory of: ", input_var_path, ")")
+        # Check for zips?
+        if (paste0(ivar, "_", itile, ".zip") %in%
+            basename(list.files(input_var_path, recursive=TRUE))) {
+          stop("Input table does not exist: ", filename,
+             " (in subdirectory of: ", input_var_path, ")\n  But we found ",
+             paste0(ivar, "_", itile, ".zip"), ", maybe you forgot to unzip?")
+        } else {
+          stop("Input table does not exist: ", filename,
+             " (in subdirectory of: ", input_var_path, ")")
+        }
       }
       # The following loop is not necessary. It finds the path of each file,
       # which is not required but just nice, for the user's convenience:
