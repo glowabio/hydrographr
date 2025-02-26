@@ -22,6 +22,8 @@
 #' Default is TRUE.
 #' @param tempdir String. Path to the directory where to store/look for the
 #'  file size table. If not passed, defaults to the output of [base::tempdir()].
+#' @param overwrite logical. If TRUE, the output file will be overwritten if it.
+#' already exists. Useful for repeated testing. Default is FALSE.
 #' @importFrom processx run
 #' @importFrom stringi stri_rand_strings
 #' @importFrom stringi stri_rand_strings
@@ -75,7 +77,8 @@ get_predict_table <- function(variable,
                               n_cores = NULL,
                               read = TRUE,
                               quiet = TRUE,
-                              tempdir = NULL) {
+                              tempdir = NULL,
+                              overwrite = FALSE) {
 
   # Define tempdir:
   if (is.null(tempdir)) {
@@ -118,10 +121,16 @@ get_predict_table <- function(variable,
       # It is a not a file, but a directory!
       stop("Please provide a path to an output file. You passed a path to a directory: ",
         out_file_path)
-    } else {
-      # It is a file, and it exists! # TODO: Should we stop?
-      message("INFO: Result will overwrite existing file: ", out_file_path)
-      warning("Result will overwrite existing file: ", out_file_path)
+    }
+
+    # It is a file, and it exists already!
+    else {
+      if (overwrite) {
+        message("INFO: Result will overwrite existing file: ", out_file_path)
+      } else {
+        stop("Output file already exists (cannot overwrite): ", out_file_path,
+             "\n  (if you want to overwrite, set \"overwrite=TRUE\").")
+      }
     }
   }
 
