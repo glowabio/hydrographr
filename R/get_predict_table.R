@@ -186,10 +186,11 @@ get_predict_table <- function(variable,
   }
 
   # Check if statistics name provided is one of the accepted values
-  accepted_stats = c("ALL","sd", "mean", "range")
-  if (any(!(statistics %in% accepted_stats))) {
-    stop("Please provide a valid statistics name. Possible values are: ",
-         paste0(accepted_stats, collapse=", "), ".")
+  if (any(!(statistics %in% "ALL"))) {
+    if (any(!(statistics %in% c("sd", "mean", "range")))) {
+      stop("Please provide a valid statistics name. Possible values are:",
+             " sd, mean, range or ALL")
+    }
   }
 
   # Check if n_cores is numeric
