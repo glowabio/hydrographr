@@ -10,11 +10,12 @@
 #' @param statistics character vector of statistics names. Possible values are
 #' "sd", "mean", "range" or "ALL". Default "ALL".
 #' @param tile_id character. The IDs of the tiles of interest.
-#' @param input_var_path path to table with environmental variables for entire
-#' tiles.
+#' @param input_var_path path to directory that contains table with
+#'  environmental variables for entire tiles. Tables may be in subdirectories
+#'  of the provided directory.
 #' @param subcatch_id path to a text file with subcatchment ids, or numeric
 #'  vector containing subcatchment ids.
-#' @param out_file_path character. The path to the output file.
+#' @param out_file_path character. The path to the output file to be created.
 #' @param n_cores numeric. Number of cores used for parallelization.
 #' @param read logical. If TRUE, the table with environmental variables gets
 #' read into R.
@@ -88,30 +89,31 @@ get_predict_table <- function(variable,
 
   #Check if one of the arguments is missing
   if (missing(variable))
-    stop(paste0('Variable is missing. Please provide at least the name of one variable.
-      You may use any of the >1000 variables of the Environment90m dataset,',
+    stop('Variable is missing. Please provide at least the name of one variable.',
+      '\n  You may use any of the >1000 variables of the Environment90m dataset,',
       ' which you can view using e.g. download_soil_tables(). Please check',
-      ' ?download_env90m_tables for more details.'))
+      ' ?download_env90m_tables for more details.')
 
   if (missing(tile_id))
     stop("Please provide at least one tile ID (parameter \"tile_id\").")
 
   if (missing(input_var_path))
-    stop("Please provide a path to the table with environmental variables for
-    the entire tiles (parameter \"input_var_path\").")
+    stop("Please provide a path to the directories containing the tables",
+         " with environmental variables for the entire tiles",
+         " (parameter \"input_var_path\").")
 
   if (missing(subcatch_id))
-    stop("Please provide at least one subcatchment ID or a path to a file
-     containing subcatchment IDs (parameter \"subcatch_id\").")
+    stop("Please provide at least one subcatchment ID or a path to a file",
+     " containing subcatchment IDs (parameter \"subcatch_id\").")
 
   if(is.numeric(subcatch_id)) {
     if (!quiet)
       message("INFO: You provided ", length(subcatch_id), " subcatchment IDs: ",
               paste(subcatch_id[1:3], collapse=", "), ", etc.")
   } else {
-    if (!quiet) message(paste0("INFO: You provided the path to a table containing subcatchment IDs."))
+    if (!quiet) message("INFO: You provided a path to a table containing subcatchment IDs.")
     if (!file.exists(subcatch_id))
-      stop(paste0("Path: ", subcatch_id, " does not exist."))
+      stop("File: ", subcatch_id, " does not exist (should contain subcatchment ids).")
   }
 
   if (missing(out_file_path))
@@ -161,10 +163,14 @@ get_predict_table <- function(variable,
 
   # Check if paths exists
   if (!file.exists(input_var_path))
-    stop(paste0("Path: ", input_var_path, " does not exist."))
+    stop("Path: ", input_var_path, " does not exist (should contain the input tables).")
 
   # Check if input tables exist somewhere in a subdir of input_var_path:
-  # This only works if the files have this name pattern!
+  # This only works if the files have this name pattern: bio1_h18v04.txt
+  # Example: Providing "./my_inputs" also find the files here:
+  # ./my_inputs/chelsa_bioclim_v2_1/1981-2010_observed/bio1/bio1_h18v04.txt
+  # ./my_inputs/soilgrids250m_v2_0/clyppt/clyppt_h18v04.txt
+  # etc.
   for (ivar in variable) {
     for (itile in tile_id) {
       filename <- paste0(ivar, "_", itile, ".txt")
