@@ -12,7 +12,8 @@
 #' @param tile_id character. The IDs of the tiles of interest.
 #' @param input_var_path path to table with environmental variables for entire
 #' tiles.
-#' @param subcatch_id path to a text file with subcatchments ids.
+#' @param subcatch_id path to a text file with subcatchment ids, or numeric
+#'  vector containing subcatchment ids.
 #' @param out_file_path character. The path to the output file.
 #' @param n_cores numeric. Number of cores used for parallelization.
 #' @param read logical. If TRUE, the table with environmental variables gets
@@ -104,8 +105,9 @@ get_predict_table <- function(variable,
      containing subcatchment IDs (parameter \"subcatch_id\").")
 
   if(is.numeric(subcatch_id)) {
-    stop("You provided subcatchment IDs, but you should provide a path",
-      " to a file containing subcatchment IDs!")
+    if (!quiet)
+      message("INFO: You provided ", length(subcatch_id), " subcatchment IDs: ",
+              paste(subcatch_id[1:3], collapse=", "), ", etc.")
   } else {
     if (!quiet) message(paste0("INFO: You provided the path to a table containing subcatchment IDs."))
     if (!file.exists(subcatch_id))
@@ -233,15 +235,27 @@ get_predict_table <- function(variable,
 
   # Create random string to attach to the tmp folder
   rand_string <- stri_rand_strings(n = 1, length = 8, pattern = "[A-Za-z0-9]")
-  tmp <- paste0("/tmp_", rand_string)
 
   # Path to the tmp directory
   # TODO: Should we do this in the tempdir?
-  tmp_dir <- paste0(getwd(), tmp)
+  tmp_dir <- file.path(getwd(), paste0("tmp_", rand_string))
+  if (!quiet) message(paste0("INFO: Temp dir for this task: ", tmp_dir))
 
   # Create temporary output directory
   #if (!quiet) message("Creating temp directory for GRASS: ", tmp_dir)
   dir.create(tmp_dir, showWarnings = FALSE)
+
+  # If user provided subcatchmend ids, write them to a file that the bash file can use:
+  if(is.numeric(subcatch_id)) {
+    file_subcids <- paste0("subc_ids_", rand_string, ".txt")
+    full_path_subcids <- file.path(tmp_dir, file_subcids)
+    if (!quiet) message("INFO: Writing subcatchment IDs provided by user",
+                        " to text file: ", file_subcids)
+    fileConn<-file(full_path_subcids)
+    writeLines(as.character(subcatch_id), fileConn)
+    close(fileConn)
+    subcatch_id = full_path_subcids
+  }
 
   # Format variable, statistics and tile_id vectors so they can be read in bash
   variable <- paste(variable, collapse = "/")
