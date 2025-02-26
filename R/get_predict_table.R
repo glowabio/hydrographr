@@ -112,9 +112,18 @@ get_predict_table <- function(variable,
     for (itile in tile_id) {
       filename <- paste0(ivar, "_", itile, ".txt")
       if (filename %in% basename(list.files(input_var_path, recursive=TRUE))) {
-        if (!quiet) message("INFO: Input table exists: ", filename)
+        #if (!quiet) message("INFO: Input table exists: ", filename)
       } else {
         stop("Input table does not exist: ", filename, " (in subdirectory of: ", input_var_path, ")")
+      }
+      # The following loop is not necessary. It finds the path of each file,
+      # which is not required but just nice, for the user's convenience:
+      for (somepath in list.files(input_var_path, recursive=TRUE)) {
+        somename <- basename(somepath)
+        if (somename==filename) {
+          if (!quiet) message("INFO: Input table exists: ", filename,
+                              " (here: ", file.path(input_var_path, somepath), ")")
+        }
       }
     }
   }
