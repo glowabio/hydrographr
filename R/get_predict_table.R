@@ -97,7 +97,8 @@ get_predict_table <- function(variable,
     the entire tiles (parameter \"input_var_path\").")
 
   if (missing(subcatch_id))
-    stop("Please provide at least one subcatchment ID (parameter \"subcatch_id\").")
+    stop("Please provide the path to a file
+     containing subcatchment IDs (parameter \"subcatch_id\").")
 
   if (missing(out_file_path))
     stop("Please provide a path to the output file (parameter \"out_file_path\").")
