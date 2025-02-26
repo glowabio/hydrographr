@@ -101,7 +101,7 @@ get_predict_table <- function(variable,
     the entire tiles (parameter \"input_var_path\").")
 
   if (missing(subcatch_id))
-    stop("Please provide the path to a file
+    stop("Please provide at least one subcatchment ID or a path to a file
      containing subcatchment IDs (parameter \"subcatch_id\").")
 
   if(is.numeric(subcatch_id)) {
@@ -119,8 +119,9 @@ get_predict_table <- function(variable,
 
   # If the result file already exists, stop or warn user:
   if (file.exists(out_file_path)) {
+
+    # It is a not a file, but a directory!
     if (dir.exists(out_file_path)) {
-      # It is a not a file, but a directory!
       stop("Please provide a path to an output file. You passed a path to a directory: ",
         out_file_path)
     }
@@ -137,7 +138,7 @@ get_predict_table <- function(variable,
   }
 
   # If the result file does not exist, check whether it can be created
-  # (to prevent errors later)
+  # (to prevent errors later):
   if (!file.exists(out_file_path)) {
 
     # Trying to write to a file that ends in a slash causes an error in the bash script:
@@ -185,10 +186,10 @@ get_predict_table <- function(variable,
   }
 
   # Check if statistics name provided is one of the accepted values
-  if (any(!(statistics %in% "ALL"))) {
-    if (any(!(statistics %in% c("sd", "mean", "range"))))
-      stop("Please provide a valid statistics name. Possible values are
-             sd, mean, range or ALL")
+  accepted_stats = c("ALL","sd", "mean", "range")
+  if (any(!(statistics %in% accepted_stats))) {
+    stop("Please provide a valid statistics name. Possible values are: ",
+         paste0(accepted_stats, collapse=", "), ".")
   }
 
   # Check if n_cores is numeric
@@ -207,8 +208,8 @@ get_predict_table <- function(variable,
   # already present in temp):
   # Check variable name is one of the accepted values
   #if (!quiet) message("Checking the variable names against the list(s) of allowed variable names...")
-  if (!quiet) message(paste("Downloading the list(s) of allowed variable names,",
-    "unless they were already downloaded to your temp directory..."))
+  if (!quiet) message("INFO: Downloading the list(s) of allowed variable names,",
+                      "unless they were already downloaded to your temp directory...")
   # TODO: This download is potentially noisy. Make it (possibly) quiet? Really quiet?
   accepted_vars <- c(
     download_observed_climate_tables(download=FALSE, quiet=TRUE, tempdir=tempdir)$variable_names,
@@ -264,7 +265,7 @@ get_predict_table <- function(variable,
 
   # Make bash scripts executable
   make_sh_exec()
-  if (!quiet) message("Running bash script...")
+  if (!quiet) message("INFO: Running bash script...")
   if (sys_os == "linux" || sys_os == "osx") {
     # Call external bash script
     processx::run(system.file("sh", "get_predict_table.sh",
@@ -304,14 +305,14 @@ get_predict_table <- function(variable,
                            wsl_sh_file))
 
   }
-  if (!quiet) message("Running bash script: Done.")
+  if (!quiet) message("INFO: Running bash script: Done.")
 
 
   # Delete temporary output directory
   unlink(tmp_dir, recursive = TRUE)
 
   if (read == TRUE) {
-    if (!quiet) message("Reading result table from ", out_file_path)
+    if (!quiet) message("INFO: Reading result table from ", out_file_path)
     predict_table <- fread(out_file_path)
     return(predict_table)
   }
