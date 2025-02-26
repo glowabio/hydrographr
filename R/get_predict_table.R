@@ -100,6 +100,9 @@ get_predict_table <- function(variable,
     stop("Please provide the path to a file
      containing subcatchment IDs (parameter \"subcatch_id\").")
 
+  if (!file.exists(subcatch_id))
+      stop(paste0("Path: ", subcatch_id, " does not exist."))
+
   if (missing(out_file_path))
     stop("Please provide a path to the output file (parameter \"out_file_path\").")
 
