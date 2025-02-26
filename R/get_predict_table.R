@@ -106,15 +106,15 @@ get_predict_table <- function(variable,
   if (!file.exists(input_var_path))
     stop(paste0("Path: ", input_var_path, " does not exist."))
 
-  # Check if input tables exist:
+  # Check if input tables exist somewhere in a subdir of input_var_path:
   # This only works if the files have this name pattern!
   for (ivar in variable) {
     for (itile in tile_id) {
-      ipath <- file.path(input_var_path, paste0(ivar, "_", itile, ".txt"))
-      if (file.exists(ipath)) {
-        if (!quiet) message("Input table exists: ", ipath)
+      filename <- paste0(ivar, "_", itile, ".txt")
+      if (filename %in% basename(list.files(input_var_path, recursive=TRUE))) {
+        if (!quiet) message("INFO: Input table exists: ", filename)
       } else {
-        stop(paste0("Input table: does not exist: ", ipath))
+        stop("Input table does not exist: ", filename, " (in subdirectory of: ", input_var_path, ")")
       }
     }
   }
