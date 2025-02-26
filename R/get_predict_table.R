@@ -112,6 +112,41 @@ get_predict_table <- function(variable,
   if (missing(out_file_path))
     stop("Please provide a path to the output file (parameter \"out_file_path\").")
 
+  # If the result file already exists, stop or warn user:
+  if (file.exists(out_file_path)) {
+    if (dir.exists(out_file_path)) {
+      # It is a not a file, but a directory!
+      stop("Please provide a path to an output file. You passed a path to a directory: ",
+        out_file_path)
+    } else {
+      # It is a file, and it exists! # TODO: Should we stop?
+      message("INFO: Result will overwrite existing file: ", out_file_path)
+      warning("Result will overwrite existing file: ", out_file_path)
+    }
+  }
+
+  # If the result file does not exist, check whether it can be created
+  # (to prevent errors later)
+  if (!file.exists(out_file_path)) {
+
+    # Trying to write to a file that ends in a slash causes an error in the bash script:
+    # "cp: cannot create regular file './testfile/': Not a directory"
+    if (endsWith(out_file_path, "/")) {
+      stop("Please provide a path to an output file. You passed a path to a directory: ",
+        out_file_path)
+    }
+
+    # The directory in which we want to write the output has to exist:
+    if (dir.exists(dirname(out_file_path))) {
+      if (!quiet) message("INFO: Output will be written to ", out_file_path)
+    } else {
+      stop("Cannot create output file \"", basename(out_file_path), "\".",
+           " We can only write output to an existing directory.",
+           " Directory does not exist: ", dirname(out_file_path)
+      )
+    }
+  }
+
   # Check if paths exists
   if (!file.exists(input_var_path))
     stop(paste0("Path: ", input_var_path, " does not exist."))
