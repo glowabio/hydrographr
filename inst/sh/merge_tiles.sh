@@ -53,12 +53,12 @@ then
         grep 'Geometry Column' | awk -F' ' '{print $4}')
     export FID=$(ogrinfo -al -so $out/merge_${outname_base}.gpkg | \
         grep 'FID Column' | awk -F' ' '{print $4}')
-    export ATTR=$(ogrinfo -al -so $out/merge_${outname_base}.gpkg | \
-        awk 'FNR >=38 {print $1}' | tr ":" ",")
-    ogr2ogr  -nlt PROMOTE_TO_MULTI -dialect sqlite \
-        -sql "SELECT $FID $ATTR ST_Union($GEOM) AS geom, \
-        $colname FROM merged GROUP BY $colname" \
-        -makeValid $out/${outname} $out/merge_${outname_base}.gpkg
+   export ATTR=$(ogrinfo -al -so $out/merge_${outname_base}.gpkg | \
+    awk 'FNR >=39 {print $1}' | tr ":" "," | sed 's/,$//g' )
+   ogr2ogr -f GPKG -nlt PROMOTE_TO_MULTI -dialect sqlite \
+  -sql "SELECT $colname, ST_Union(ST_MakeValid($GEOM)) AS geom FROM merged GROUP BY $colname" \
+  $out/${outname} $out/merge_${outname_base}.gpkg
+
     rm $out/merge_${outname_base}.vrt $out/merge_${outname_base}.gpkg
 fi
 
