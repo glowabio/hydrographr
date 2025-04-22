@@ -55,9 +55,23 @@ then
         grep 'FID Column' | awk -F' ' '{print $4}')
    export ATTR=$(ogrinfo -al -so $out/merge_${outname_base}.gpkg | \
     awk 'FNR >=39 {print $1}' | tr ":" "," | sed 's/,$//g' )
-   ogr2ogr -f GPKG -nlt PROMOTE_TO_MULTI -dialect sqlite \
-  -sql "SELECT $colname, ST_Union(ST_MakeValid($GEOM)) AS geom FROM merged GROUP BY $colname" \
-  $out/${outname} $out/merge_${outname_base}.gpkg
+    # including all attributes of input files in the merged file:
+    # Build SQL fragment with GROUP_CONCAT() for all attributes except $colname
+    ATTR_SQL=""
+    for a in $ATTR; do
+      if [[ "$a" != "$colname" ]]; then
+        ATTR_SQL="$ATTR_SQL, GROUP_CONCAT(DISTINCT $a) AS $a"
+      fi
+    done
+    ogr2ogr -f GPKG -nlt PROMOTE_TO_MULTI -dialect sqlite \
+      -sql "SELECT $colname $ATTR_SQL, ST_Union(ST_MakeValid($GEOM)) \
+      AS geom FROM merged GROUP BY $colname" \
+      $out/${outname} $out/merge_${outname_base}.gpkg
+
+    # including only column name and id:
+  #  ogr2ogr -f GPKG -nlt PROMOTE_TO_MULTI -dialect sqlite \
+  # -sql "SELECT $colname, ST_Union(ST_MakeValid($GEOM)) AS geom FROM merged GROUP BY $colname" \
+  # $out/${outname} $out/merge_${outname_base}.gpkg
 
     rm $out/merge_${outname_base}.vrt $out/merge_${outname_base}.gpkg
 fi
