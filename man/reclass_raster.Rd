@@ -7,9 +7,10 @@
 reclass_raster(
   data,
   rast_val,
-  new_val,
+  new_val = FALSE,
   raster_layer,
   recl_layer,
+  reclass_value = FALSE,
   no_data = -9999,
   type = "Int32",
   compression = "low",
@@ -30,6 +31,10 @@ which need to be integer values. In case of floating point values, consider
 multiplying the values e.g. by 1000 to keep three decimals.}
 
 \item{raster_layer}{Full path to the input raster .tif layer.}
+
+\item{reclass_value}{integer. Value to reclassify the entire raster.
+Default is FALSE. Note in case reclass_value is provided, new_val parameter
+needs to be empty, otherwise the raster is reclassified based on the new_val column.}
 
 \item{recl_layer}{character. Full path of the output .tif layer, i.e., the
 reclassified raster file.}
@@ -74,10 +79,8 @@ my_directory <- tempdir()
 download_test_data(my_directory)
 
 # Read the stream order for each sub-catchment as a data.table
-my_dt <- read_geopackage(gpkg= paste0(my_directory,
-                                         "/hydrography90m_test_data",
-                                         "/order_vect_59.gpkg"),
-                         import_as = "data.table")
+# my_dt <- read_geopackage(paste0(my_directory, "/order_vect_59.gpkg"),
+type = "net", as_dt = T)
 
 
 # Select the stream segment ID and and the Strahler stream order
@@ -97,10 +100,15 @@ str_ord_rast <- reclass_raster(data = str_ord,
                                raster_layer = stream_raster,
                                recl_layer = recl_raster)
 
+str_ord_rast <- reclass_raster(data = str_ord$stream,
+                               reclass_value = 1,
+                               rast_val = "stream",
+                               raster_layer = stream_raster,
+                               recl_layer = recl_raster)
 }
 \references{
 https://grass.osgeo.org/grass82/manuals/r.reclass.html
 }
 \author{
-Marlene Schürz
+Marlene Schürz, Thomas Tomiczek
 }
