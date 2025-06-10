@@ -32,6 +32,12 @@ To learn more about the WSL check out the [Microsoft documentation](https://lear
 
 ## Installation of the Windows Subsystem for Linux with Ubuntu
 
+
+###Option 1. Install Windows Subsystem for Linux through the Microsoft Store (preferable)
+Visit the Windows store, search for Ubuntu, install it from there and then restart.
+(More information about installation: https://aka.ms/wslstore)
+
+### Option 2. Install Windows Subsystem for Linux through the command line
 Open the Windows Command Prompt (cmd.exe) in administrator mode by clicking the Start button and typing "cmd" into the search bar.Then right-click "Command Prompt" and select "Run as Administrator" or highlight the result with the arrow keys and press `Ctrl+Shift+Enter` to open the command prompt with administrative privileges.
 
 Enter `wsl --install` to enable the features necessary to run WSL and also directly install the Ubuntu distribution of Linux, which is the default option in WSL.
@@ -57,7 +63,6 @@ wsl --install -d Ubuntu
 
 After the installation is complete, restart your machine. Then open the "Start" menu and click on "Ubuntu" to open the Ubuntu console.
 
-> Please note that if Ubuntu did not get installed automatically, you can alternatively visit the Windows store (https://aka.ms/wslstore), search for Ubuntu, install it from there and then restart.
 
 The first time you open Ubuntu via the "Start" menu you will be prompted to create a **username** and **password** for the Linux distribution. This will be the default user account and administrator for Ubuntu. For the purpose of this guideline we will use  `hydrographr`, but you can pick any name you want.
 
@@ -162,6 +167,9 @@ GNU parallel is a shell tool for executing jobs in parallel on multiple cores. F
 ```{bash, eval=FALSE}
 # Download the latest version of GNU parallel 
 wget http://ftp.gnu.org/gnu/parallel/parallel-latest.tar.bz2
+
+# Install the software that unzips the .tar file
+sudo apt-get install bzip2
 
 # Unzip the the .tar file and create a new folder parallel-yyyymmdd
 sudo tar xjf parallel-latest.tar.bz2
