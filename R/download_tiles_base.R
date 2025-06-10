@@ -10,7 +10,7 @@
 #' Default is FALSE.
 #' @param download_dir character. The directory where the files will be
 #' downloaded. Default is the working directory.
-#' @param file_size_table_sep data.frame. Lookup table including file names
+#' @param file_size_table data.frame. Lookup table including file names
 #' and sizes (inherited by 'download_tiles()').
 #' @param server_url character. url to the the home download folder
 #' in either Nimbus or GDrive (inherited by 'download_tiles()').
@@ -20,63 +20,73 @@
 download_tiles_base <- function(variable, file_format = "tif",
                                 tile_id = NULL,
                                 global = FALSE, download_dir = ".",
-                                file_size_table_sep = NULL,
+                                file_size_table = NULL,
                                 server_url = NULL) {
 
-  # Get the name of the file
-  varname <- ifelse(global == TRUE, paste0(variable, "_ovr.", file_format),
+  # Get the file_name, e.g. "stream_dist_up_farth_h00v02.tif"
+  file_name <- ifelse(global == TRUE, paste0(variable, "_ovr.", file_format),
                     paste0(variable, "_", tile_id, ".", file_format))
 
-  # Find grass module to build the download link
-  # and to create the download destination folder
-  grass_module <- file_size_table_sep[file_size_table_sep$varname_tile == varname,]$grass_module
+  # Get file path with parent folder structure, incl. file name
+  # e.g. "r.stream.distance/stream_dist_up_farth_tiles20d/stream_dist_up_farth_h00v02.tif"
+  row_selector <- file_size_table$file_name == file_name
+  file_path <- file_size_table[row_selector,]$file_path
 
-  # Find folder name to build the download link
-  # and to create the download destination folder
-  foldername <- file_size_table_sep[file_size_table_sep$varname_tile == varname,]$foldername
-
-  # Get file path with parent folder structure
-  file_path <- str_c(file_size_table_sep %>%
-    filter(varname_tile == varname) %>%
-    select(grass_module, foldername, varname_tile), collapse = "/")
+  if (!(any(row_selector))){
+    message('Skipping file "', file_name, '" (not found)...')
+    warning('Problem: Did not find any file "', file_name, '" in the list of files - are you sure it is a valid file?')
+    return()
+  }
 
   # Get parent folder structure to reproduce it in the download path
-  folder_structure <- str_c(file_size_table_sep %>%
-                              filter(varname_tile == varname) %>%
-                              select(grass_module, foldername),
-                              collapse = "/")
+  # e.g. "r.stream.distance/stream_dist_up_farth_tiles20d"
+  folder_structure <- dirname(file_path)
 
   # Create download directories
   dir.create(paste0(download_dir, "/", folder_structure),
              showWarnings = FALSE, recursive = TRUE)
 
-  # General path to the download folder in Nimbus
-  nimbus_path <- "https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4/download?path=%2F"
-  # General path to the download folder in GDrive
-  gdrive_path <- "https://drive.google.com/uc?export=download&id="
+  destfile <- paste0(download_dir, "/", file_path)
 
-  # Download from Nimbus
-  if (server_url == nimbus_path && varname != "cti_ovr.tif") {
+  # Always download cti_ovr.tif from GDrive:
+  if (file_name == "cti_ovr.tif") {
 
-    print(varname)
-    download.file(paste0(nimbus_path, gsub("/", "%2F", file_path)),
-                  destfile = paste0(download_dir, "/", file_path), mode = "wb")
-
-  }
-
-  # Download from GDrive
-  if (server_url == gdrive_path || varname == "cti_ovr.tif") {
+    # Inform user why Nimbus is not used:
+    if (grepl("public.igb-berlin.de", server_url, fixed=TRUE)) {
+      message(paste('Downloading', file_name, 'from GDrive instead of IGB because it does not exist on IGB servers.')) # TODO
+    }
 
     # Get GDrive file id from the lookup table
-    file_id <- file_size_table_sep[file_size_table_sep$varname_tile == varname, ]$file_id
-    print(varname)
+    file_id <- file_size_table[row_selector, ]$file_id
 
     # The addition of &confirm=t in the download link
     # skips the virus scan of the gdrive
+    gdrive_path <- "https://drive.google.com/uc?export=download&id="
     download.file(paste0(gdrive_path, file_id, "&confirm=t"),
-                  destfile = paste0(download_dir, "/", file_path), mode = "wb")
+                  destfile = destfile, mode = "wb")
 
+
+  # Download from Nimbus
+  } else if (grepl("public.igb-berlin.de", server_url, fixed=TRUE)) {
+
+    download.file(paste0(server_url, gsub("/", "%2F", file_path)),
+                  destfile = destfile, mode = "wb")
+
+
+  # Download from GDrive
+  } else if (grepl("drive.google.com", server_url, fixed=TRUE)) {
+
+    # Get GDrive file id from the lookup table
+    file_id <- file_size_table[row_selector, ]$file_id
+
+    # The addition of &confirm=t in the download link
+    # skips the virus scan of the gdrive
+    download.file(paste0(server_url, file_id, "&confirm=t"),
+                  destfile = destfile, mode = "wb")
+
+  } else {
+    warning("Unrecognized download URL, cannot download:", server_url)
   }
 
-
+  return(destfile)
 }

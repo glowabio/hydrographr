@@ -286,7 +286,7 @@ get_distance <- function(data, lon, lat, id, stream_layer = NULL,
     wsl_dist_tmp_dir <- fix_path(dist_tmp_dir)
     wsl_ids_tmp_path <- fix_path(ids_tmp_path)
     wsl_stream_layer <- fix_path(stream_layer)
-    wsl_basin_layer <- fix_path(basin_layer)
+    # wsl_basin_layer <- fix_path(basin_layer)
     wsl_dist_eucl_tmp_path <- fix_path(dist_eucl_tmp_path)
     wsl_dist_net_tmp_path <- fix_path(dist_net_tmp_path)
     wsl_sh_file <- fix_path(system.file("sh", "get_distance.sh",

@@ -80,6 +80,8 @@ This function can be used to obtain the neighbour stream segments /
 sub-catchments for spatially explicit models or for spatial prioritization
 analyses (e.g. Marxan/Gurobi). By selecting a wider radius, the spatial
 dependency of the neighbouring segments / sub-catchments can be increased.
+See also \code{\link{get_all_upstream_distances()}} which creates the input
+for addressing the longitudinal connectivity for the spatial prioritization.
 }
 \examples{
 # Download test data into the temporary R folder
@@ -95,7 +97,7 @@ my_graph <- read_geopackage(gpkg= paste0(my_directory,
 
 # Subset the graph and get a smaller catchment
 my_graph <- get_catchment_graph(g = my_graph, subc_id = 513866048, mode = "in",
-                                outlet = FALSE, as_graph = TRUE, n_cores = 1)
+                                use_outlet = FALSE, as_graph = TRUE, n_cores = 1)
 
 
 # Get a vector of all segment IDs
@@ -138,7 +140,9 @@ InterJournal, Complex Systems 1695. 2006. \url{https://igraph.org}
 }
 \seealso{
 \code{\link{read_geopackage()}} and \code{\link{get_catchment_graph.()}} to
-create the input graph.
+create the input graph. The function \code{\link{get_all_upstream_distances()}}
+can be be used to obtain the network distance for all upstream subc_id (useful
+as an input for a subsequent spatial prioritization analysis).
 }
 \author{
 Sami Domisch

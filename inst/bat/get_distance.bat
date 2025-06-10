@@ -6,7 +6,7 @@ shift
 set b=%9
 set WSLENV=%a% %b%
 shift
-set SHDIR=%9
+set SHDIR=%b%
 
 wsl dos2unix %DATA%
 wsl dos2unix %SHDIR%
