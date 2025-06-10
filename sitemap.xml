@@ -1,138 +1,54 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>/404.html</loc>
-  </url>
-  <url>
-    <loc>/LICENSE-text.html</loc>
-  </url>
-  <url>
-    <loc>/articles/benchmark.html</loc>
-  </url>
-  <url>
-    <loc>/articles/case_study_brazil.html</loc>
-  </url>
-  <url>
-    <loc>/articles/case_study_cuba.html</loc>
-  </url>
-  <url>
-    <loc>/articles/case_study_germany.html</loc>
-  </url>
-  <url>
-    <loc>/articles/example_other_stream_networks.html</loc>
-  </url>
-  <url>
-    <loc>/articles/hydrographr.html</loc>
-  </url>
-  <url>
-    <loc>/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>/articles/linux_system_setup.html</loc>
-  </url>
-  <url>
-    <loc>/articles/macos_system_setup.html</loc>
-  </url>
-  <url>
-    <loc>/articles/windows_system_setup.html</loc>
-  </url>
-  <url>
-    <loc>/authors.html</loc>
-  </url>
-  <url>
-    <loc>/index.html</loc>
-  </url>
-  <url>
-    <loc>/reference/check_tiles_filesize.html</loc>
-  </url>
-  <url>
-    <loc>/reference/check_wsl.html</loc>
-  </url>
-  <url>
-    <loc>/reference/crop_to_extent.html</loc>
-  </url>
-  <url>
-    <loc>/reference/download_test_data.html</loc>
-  </url>
-  <url>
-    <loc>/reference/download_tiles.html</loc>
-  </url>
-  <url>
-    <loc>/reference/download_tiles_base.html</loc>
-  </url>
-  <url>
-    <loc>/reference/extract_from_gpkg.html</loc>
-  </url>
-  <url>
-    <loc>/reference/extract_ids.html</loc>
-  </url>
-  <url>
-    <loc>/reference/extract_zonal_stat.html</loc>
-  </url>
-  <url>
-    <loc>/reference/figures/germany_map.html</loc>
-  </url>
-  <url>
-    <loc>/reference/fix_path.html</loc>
-  </url>
-  <url>
-    <loc>/reference/get_catchment_graph.html</loc>
-  </url>
-  <url>
-    <loc>/reference/get_centrality.html</loc>
-  </url>
-  <url>
-    <loc>/reference/get_distance.html</loc>
-  </url>
-  <url>
-    <loc>/reference/get_distance_graph.html</loc>
-  </url>
-  <url>
-    <loc>/reference/get_distance_parallel.html</loc>
-  </url>
-  <url>
-    <loc>/reference/get_os.html</loc>
-  </url>
-  <url>
-    <loc>/reference/get_pfafstetter_basins.html</loc>
-  </url>
-  <url>
-    <loc>/reference/get_regional_unit_id.html</loc>
-  </url>
-  <url>
-    <loc>/reference/get_segment_neighbours.html</loc>
-  </url>
-  <url>
-    <loc>/reference/get_tile_id.html</loc>
-  </url>
-  <url>
-    <loc>/reference/get_upstream_catchment.html</loc>
-  </url>
-  <url>
-    <loc>/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>/reference/make_sh_exec.html</loc>
-  </url>
-  <url>
-    <loc>/reference/merge_tiles.html</loc>
-  </url>
-  <url>
-    <loc>/reference/read_geopackage.html</loc>
-  </url>
-  <url>
-    <loc>/reference/reclass_raster.html</loc>
-  </url>
-  <url>
-    <loc>/reference/report_no_data.html</loc>
-  </url>
-  <url>
-    <loc>/reference/set_no_data.html</loc>
-  </url>
-  <url>
-    <loc>/reference/snap_to_network.html</loc>
-  </url>
-  <url>
-    <loc>/reference/snap_to_subc_segment.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>/404.html</loc></url>
+<url><loc>/LICENSE-text.html</loc></url>
+<url><loc>/articles/benchmark.html</loc></url>
+<url><loc>/articles/case_study_brazil.html</loc></url>
+<url><loc>/articles/case_study_cuba.html</loc></url>
+<url><loc>/articles/case_study_germany.html</loc></url>
+<url><loc>/articles/example_other_stream_networks.html</loc></url>
+<url><loc>/articles/hydrographr.html</loc></url>
+<url><loc>/articles/index.html</loc></url>
+<url><loc>/articles/linux_system_setup.html</loc></url>
+<url><loc>/articles/macos_system_setup.html</loc></url>
+<url><loc>/articles/windows_system_setup.html</loc></url>
+<url><loc>/authors.html</loc></url>
+<url><loc>/index.html</loc></url>
+<url><loc>/reference/check_tiles_filesize.html</loc></url>
+<url><loc>/reference/check_wsl.html</loc></url>
+<url><loc>/reference/crop_to_extent.html</loc></url>
+<url><loc>/reference/download_env90m_tables.html</loc></url>
+<url><loc>/reference/download_test_data.html</loc></url>
+<url><loc>/reference/download_tiles.html</loc></url>
+<url><loc>/reference/download_tiles_base.html</loc></url>
+<url><loc>/reference/extract_from_gpkg.html</loc></url>
+<url><loc>/reference/extract_ids.html</loc></url>
+<url><loc>/reference/extract_zonal_stat.html</loc></url>
+<url><loc>/reference/figures/germany_map.html</loc></url>
+<url><loc>/reference/fix_path.html</loc></url>
+<url><loc>/reference/get_all_upstream_distances.html</loc></url>
+<url><loc>/reference/get_catchment_graph.html</loc></url>
+<url><loc>/reference/get_centrality.html</loc></url>
+<url><loc>/reference/get_distance.html</loc></url>
+<url><loc>/reference/get_distance_graph.html</loc></url>
+<url><loc>/reference/get_distance_parallel.html</loc></url>
+<url><loc>/reference/get_modelfit_table.html</loc></url>
+<url><loc>/reference/get_os.html</loc></url>
+<url><loc>/reference/get_pfafstetter_basins.html</loc></url>
+<url><loc>/reference/get_predict_table.html</loc></url>
+<url><loc>/reference/get_regional_unit_id.html</loc></url>
+<url><loc>/reference/get_segment_neighbours.html</loc></url>
+<url><loc>/reference/get_tile_id.html</loc></url>
+<url><loc>/reference/get_upstream_catchment.html</loc></url>
+<url><loc>/reference/get_upstream_variable.html</loc></url>
+<url><loc>/reference/index.html</loc></url>
+<url><loc>/reference/make_sh_exec.html</loc></url>
+<url><loc>/reference/merge_tiles.html</loc></url>
+<url><loc>/reference/read_geopackage.html</loc></url>
+<url><loc>/reference/reclass_raster.html</loc></url>
+<url><loc>/reference/report_no_data.html</loc></url>
+<url><loc>/reference/set_no_data.html</loc></url>
+<url><loc>/reference/snap_to_network.html</loc></url>
+<url><loc>/reference/snap_to_subc_segment.html</loc></url>
+<url><loc>/reference/split_table.html</loc></url>
 </urlset>
+
