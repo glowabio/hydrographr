@@ -347,8 +347,8 @@ download_cgiar_tables(
   download = FALSE)
 
 # Download one cgiar variable (Global Aridity Index), for two tiles:
-download_cgiar_tables(
 \dontrun{
+download_cgiar_tables(
   subset = c("garid"),
   tile_ids = c("h00v04", "h10v04"),
   download = TRUE,
@@ -497,7 +497,7 @@ download_projected_climate_tables(
 # unzip, and delete the zips:
 \dontrun{
 download_projected_climate_tables(
-  subset = c("bio1"),
+  subset = c("bio1_2071-2100_ukesm1-0-ll_ssp585_V.2.1"),
   tile_ids = c("h00v04"),
   download = TRUE,
   download_dir = ".",
