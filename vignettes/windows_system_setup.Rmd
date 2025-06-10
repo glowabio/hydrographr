@@ -33,7 +33,7 @@ To learn more about the WSL check out the [Microsoft documentation](https://lear
 ## Installation of the Windows Subsystem for Linux with Ubuntu
 
 
-###Option 1. Install Windows Subsystem for Linux through the Microsoft Store (preferable)
+### Option 1. Install Windows Subsystem for Linux through the Microsoft Store (preferable)
 Visit the Windows store, search for Ubuntu, install it from there and then restart.
 (More information about installation: https://aka.ms/wslstore)
 
