@@ -194,7 +194,7 @@ download_soil_tables <- function(subset = NULL,
 #'
 #' # Download the only flo1k_v1_0 variable (flo1k), for two tiles:
 #' \dontrun{
-#' download_soil_tables(
+#' download_flo1k_tables(
 #'   subset = c("flo1k"),
 #'   tile_ids = c("h00v04", "h10v04"),
 #'   download = TRUE,
@@ -205,7 +205,7 @@ download_soil_tables <- function(subset = NULL,
 #' # Download the only flo1k_v1_0 variable (flo1k), for one tile,
 #' # unzip, and delete the zips:
 #' \dontrun{
-#' download_soil_tables(
+#' download_flo1k_tables(
 #'   subset = c("flo1k"),
 #'   tile_ids = c("h00v04"),
 #'   download = TRUE,
@@ -460,7 +460,7 @@ download_hydrography90m_tables <- function(subset = NULL,
 #' # Download one bioclim variable (Annual mean temperature), for two tiles:
 #' \dontrun{
 #' download_observed_climate_tables(
-#'   subset = c("bio1"),
+#'   subset = c("bio01_1981-2010_observed"),
 #'   tile_ids = c("h00v04", "h10v04"),
 #'   download = TRUE,
 #'   download_dir = ".",
@@ -471,7 +471,7 @@ download_hydrography90m_tables <- function(subset = NULL,
 #' # unzip, and delete the zips:
 #' \dontrun{
 #' download_observed_climate_tables(
-#'   subset = c("bio1"),
+#'   subset = c("bio01_1981-2010_observed"),
 #'   tile_ids = c("h00v04"),
 #'   download = TRUE,
 #'   download_dir = ".",
@@ -541,7 +541,7 @@ download_observed_climate_tables <- function(subset = NULL,
 #' # Download one variable (Annual mean temperature), for two tiles:
 #' \dontrun{
 #' download_projected_climate_tables(
-#'   subset = c("bio1"),
+#'   subset = c("bio01"),
 #'   tile_ids = c("h00v04", "h10v04"),
 #'   download = TRUE,
 #'   download_dir = ".",
@@ -552,7 +552,7 @@ download_observed_climate_tables <- function(subset = NULL,
 #' # unzip, and delete the zips:
 #' \dontrun{
 #' download_projected_climate_tables(
-#'   subset = c("bio1_2071-2100_ukesm1-0-ll_ssp585_V.2.1"),
+#'   subset = c("bio01_2071-2100_ukesm1-0-ll_ssp585_v2_1"),
 #'   tile_ids = c("h00v04"),
 #'   download = TRUE,
 #'   download_dir = ".",
