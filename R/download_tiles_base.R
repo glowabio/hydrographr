@@ -31,6 +31,7 @@ download_tiles_base <- function(variable, file_format = "tif",
   # e.g. "r.stream.distance/stream_dist_up_farth_tiles20d/stream_dist_up_farth_h00v02.tif"
   row_selector <- file_size_table$file_name == file_name
   file_path <- file_size_table[row_selector,]$file_path
+  if (length(file_path)>1) stop(paste0("Found several file paths (expected one): ", paste(file_path, collapse=", ")))
 
   if (!(any(row_selector))){
     message('Skipping file "', file_name, '" (not found)...')
