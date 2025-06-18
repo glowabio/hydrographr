@@ -1,6 +1,6 @@
 ---
 title: "Case study - Danube basin"
-subtitle: "Retriving and processing the environmen90m dataset for Species Distribution Modelling"
+subtitle: "Retrieving and processing the Environment90m dataset for Species Distribution Modelling"
 author: ""
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
@@ -42,7 +42,7 @@ library(leafem)
 library(htmlwidgets)
 library(here)
 
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, fig.align = "center")
 ```
 
 ## Introduction
@@ -52,7 +52,7 @@ R package to download and process the Hydrography90m [@amatulli2022hydrography90
 [@garcia2025environment90m] datasets with the aim of preparing and processing the data needed to run a species distribution model to predict the habitat suitability of a fish species in the Danube basin.
 
 <!-- ![](../man/figures/danube_workflow3.png) -->
-```{r danube-workflow, fig.cap = "Figure 1. Schematic workflow", echo = F}
+```{r danube-workflow, fig.cap = "Figure 1. Schematic workflow", echo = F, out.width='200%'}
 knitr::include_graphics(here( "man", "figures", "danube_workflow3.png"))
 
 ```
@@ -149,7 +149,7 @@ bbcor <- as.data.frame(st_coordinates(dan))
 ```
 
 
-```{r tiles-danube, fig.cap = "Figure 2. Tiles overlapping with the Danube basin", echo = F}
+```{r tiles-danube, fig.cap = "Figure 2. Tiles overlapping with the Danube basin", echo = F, out.width='80%'}
 knitr::include_graphics(here( "man", "figures", "tilesDanube.png"))
 
 ```
@@ -409,7 +409,7 @@ m
 ```
 
 
-```{r danube-map, fig.cap = "Figure 3. Species occurrences in the Danube basin", echo = F}
+```{r danube-map, fig.cap = "Figure 3. Species occurrences in the Danube basin", echo = F, out.width='80%'}
 knitr::include_graphics(here( "man", "figures", "danube_map.png"))
 
 ```
@@ -586,7 +586,9 @@ p <- leaflet() %>% addTiles() %>%
 saveWidget(p, file=paste0(wdir, "/prediction_map.html"))
 p
 ```
-```{r danube-prediction, fig.cap = "Figure 4. Habitat suitability map of the species in the Danube basin", echo = F}
+```{r danube-prediction, fig.cap = "Figure 4. Habitat suitability map of the species in the Danube basin", echo = F, out.width='80%'}
 knitr::include_graphics(here( "man", "figures", "danube_prediction_map.png"))
 
 ```
+
+### References
