@@ -93,12 +93,12 @@ Figure 1. Schematic workflow
 </div>
 <p>The Environment90m dataset consists of tables with summary
 information of several environmental factors, for each of the 7 million
-subcatchments available in the Hydrography90m dataset. In comparison to
+sub-catchments available in the Hydrography90m dataset. In comparison to
 the previous version of hydrographr, where the user needed to download
 raster files and run the calculations of the summary statistics for the
 environmental layers of interest, the new functions allow the user to
 directly download the environmental data that has been already
-summarised for each subcatchment.</p>
+summarised for each sub-catchment.</p>
 <p>The study area is the Danube basin but we will be using a bounding
 box around the basin as a geographic reference to subset and crop the
 data and finally project the current habitat suitability of a species.
@@ -170,13 +170,14 @@ Figure 2. Tiles overlapping with the Danube basin
 <!-- ![Figure 1. Tiles overlapping with the Danube basin](../man/figures/tilesDanube.png) -->
 </div>
 <div class="section level2">
-<h2 id="subcatchments-in-the-danube-basin">Subcatchments in the Danube basin<a class="anchor" aria-label="anchor" href="#subcatchments-in-the-danube-basin"></a>
+<h2 id="sub-catchments-in-the-danube-basin">Sub-catchments in the Danube basin<a class="anchor" aria-label="anchor" href="#sub-catchments-in-the-danube-basin"></a>
 </h2>
-<p>The units of analysis for this exercise are the single subcatchments,
-meaning that the final habitat suitability values will be assigned to
-each of the subcatchments. Therefore, one of the key layers for the
-analysis is the raster of subcatchments for the study area.</p>
-<p>Here are the steps to prepare the subcatchment raster file for the
+<p>The units of analysis for this exercise are the single
+sub-catchments, meaning that the final habitat suitability values will
+be assigned to each of the sub-catchments. Therefore, one of the key
+layers for the analysis is the raster of sub-catchments for the study
+area.</p>
+<p>Here are the steps to prepare the sub-catchment raster file for the
 Danube basin:</p>
 <ol style="list-style-type: decimal">
 <li>identify the rectangular tiles that overlap with the Danube basin.
@@ -187,7 +188,7 @@ overlaps with four tiles</li>
 <code class="sourceCode R"><span><span class="va">tile_id</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"h18v02"</span>, <span class="st">"h18v04"</span>, <span class="st">"h20v02"</span>, <span class="st">"h20v04"</span><span class="op">)</span></span>
 <span><span class="va">tile_id</span></span></code></pre></div>
 <ol start="2" style="list-style-type: decimal">
-<li>download the raster files of subcatchments for the four tiles</li>
+<li>download the raster files of sub-catchments for the four tiles</li>
 </ol>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/download_tiles.html">download_tiles</a></span><span class="op">(</span>variable <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sub_catchment"</span><span class="op">)</span>, tile_id <span class="op">=</span> <span class="va">tile_id</span>, file_format <span class="op">=</span> <span class="st">"tif"</span>,</span>
@@ -217,7 +218,7 @@ loop:</li>
 <span>  <span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <ol start="4" style="list-style-type: decimal">
-<li>now we can merge the four cropped files to obtain the subcatchment
+<li>now we can merge the four cropped files to obtain the sub-catchment
 raster file for the Danube basin</li>
 </ol>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
@@ -235,8 +236,8 @@ and folders we don’t need anymore.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.remove</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">wdir</span>, pattern <span class="op">=</span> <span class="st">"_crop.tif"</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co"># remove folder</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="st">"r.watershed"</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<p>Using the subcatchment raster file for the Danube basin we will
-create a new file containing a list with all subcatchments IDs. This
+<p>Using the sub-catchment raster file for the Danube basin we will
+create a new file containing a list with all sub-catchments IDs. This
 list of IDs will be our reference file to extract the information from
 the environmental tables during the next steps. We will create the file
 using the function <em>extract_ids</em>.</p>
@@ -248,8 +249,8 @@ using the function <em>extract_ids</em>.</p>
 <span><span class="co"># save the object to a file</span></span>
 <span><span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/fwrite.html" class="external-link">fwrite</a></span><span class="op">(</span><span class="va">subc_ids</span>, file<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"subc_ids.txt"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>As you can see, the file consists of one column with all the
-subcatchment IDs. In the Danube basin there are around 4,3 million
-subcatchments!</p>
+sub-catchment IDs. In the Danube basin there are around 4,3 million
+sub-catchments!</p>
 </div>
 <div class="section level2">
 <h2 id="environmental-information">Environmental information<a class="anchor" aria-label="anchor" href="#environmental-information"></a>
@@ -305,14 +306,14 @@ segments.</p>
 <p>The tables have been downloaded to a new folder which has been named
 according to each dataset and automatically unzipped. By taking a look
 at any of the tables with climate information we can see that for every
-subcatchment different statistics (i.e., minimum, maximum, mean,
+sub-catchment different statistics (i.e., minimum, maximum, mean,
 standard deviation, range) are available and that the format is columns
 separated by space.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># read first 10 rows without reading the table into R</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.html" class="external-link">system</a></span><span class="op">(</span> <span class="st">"head chelsa_bioclim_v2_1/1981-2010_observed/bio01/bio01_1981-2010_observed_h18v02.txt "</span><span class="op">)</span></span></code></pre></div>
 <ul>
-<li>Land cover: forest proportion per subcatchment for the year
+<li>Land cover: forest proportion per sub-catchment for the year
 2020</li>
 </ul>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
@@ -330,7 +331,7 @@ separated by space.</p>
 <span><span class="op">)</span></span></code></pre></div>
 <p>The land cover tables, unlike the climate tables, only have one
 column containing the proportion of the specific land cover category in
-each subcatchment.</p>
+each sub-catchment.</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># read first 10 rows without reading the table into R</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.html" class="external-link">system</a></span><span class="op">(</span><span class="st">" head esa_cci_landcover_v2_1_1/c60/c60_2020_h18v02.txt"</span><span class="op">)</span></span></code></pre></div>
@@ -352,8 +353,8 @@ segment</li>
 <span><span class="op">)</span></span></code></pre></div>
 <p>We have downloaded approximately 14 GB of information. The tables at
 this point consist of the environmental information for the selected
-variables for all subcatchments in each of the four complete tiles. But
-we are only interested in the information of those subcatchments within
+variables for all sub-catchments in each of the four complete tiles. But
+we are only interested in the information of those sub-catchments within
 our bounding box. To achieve this filtering and join all environmental
 variables in one single table we will use the function
 <em>get_predict_table</em> in the next step.</p>
@@ -362,15 +363,15 @@ variables in one single table we will use the function
 <h2 id="prediction-table">Prediction table<a class="anchor" aria-label="anchor" href="#prediction-table"></a>
 </h2>
 <p>The prediction table contains the values of environmental variables
-for all subcatchments of interest. It is called “prediction table”
+for all sub-catchments of interest. It is called “prediction table”
 because it will be used as the reference table to predict the model’s
 output using any of the <em>predict</em> functions in R. For example, we
-will predict the habitat suitability values to all subcatchments in this
-table at the end of the exercise.</p>
+will predict the habitat suitability values to all sub-catchments in
+this table at the end of the exercise.</p>
 <p>The <em>get_predict_table</em> function will join all environmental
-variables based on the subcatchments of interest; in our case, the
-subcatchment IDs available in the <em>subc_id</em> object (which we have
-previously saved in the file <em>subc_ids.txt</em>).</p>
+variables based on the sub-catchments of interest; in our case, the
+sub-catchment IDs available in the <em>subc_id</em> object (which we
+have previously saved in the file <em>subc_ids.txt</em>).</p>
 <p>The function can be run in parallel, with parallelisation occurring
 at the level of the variable. Since we are using 6 variables in this
 example, we can utilise 6 cores. To check the number of available cores
@@ -395,7 +396,7 @@ created as an R object. The table is automatically created on disk by
 the function but the default parameter is FALSE because in some cases
 the table could be very large and there is no need to load it into the R
 workspace. In our example the table is 311 MB in size!</p>
-<p>You can double check that all the subcatchments are included in the
+<p>You can double check that all the sub-catchments are included in the
 table and all the environmental parameters of interest are attached.</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">tb</span><span class="op">)</span></span>
@@ -417,7 +418,9 @@ and save some disk space.</p>
 <p>We collected and filtered occurrence records for the fish species
 <em>Zingel streber</em> from the GBIF repository. The final table
 consists of three columns: species name, longitude and latitude
-coordinates. The file can be downloaded following the next line:</p>
+coordinates. The original data can be found <a href="https://www.gbif.org/occurrence/download/0028469-231002084531237" class="external-link">here</a>
+<span class="citation">(<a href="#ref-gbifdata">GBIF.Org User,
+2023</a>)</span>.</p>
 <p>Read the file into the R session and have a look at it</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">spdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/fread.html" class="external-link">fread</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"hydrography90m_test_data/hydrographr_data/Zingel_streber.csv"</span><span class="op">)</span>, sep <span class="op">=</span> <span class="st">","</span><span class="op">)</span></span>
@@ -460,7 +463,7 @@ Figure 3. Species occurrences in the Danube basin
 <h2 id="model-table">Model Table<a class="anchor" aria-label="anchor" href="#model-table"></a>
 </h2>
 <p>The next step is to prepare the so called <em>model fit table</em>.In
-this table, we link the subcatchments containing species occurrence
+this table, we link the sub-catchments containing species occurrence
 points with the environmental data previously compiled in the “predict
 table”. For this purpose we use the function <code>get_model_fit</code>.
 If we have many species of interest we can run this function in a for
@@ -483,10 +486,10 @@ number of pseudoabsences.</p>
 <span>  read <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">spptb</span><span class="op">)</span></span></code></pre></div>
-<p>The new table consists of the subcatchment IDs, a new column
+<p>The new table consists of the sub-catchment IDs, a new column
 indicating if the species is present (1) or absent (0) in the
-subcatchment and the values of all environmental variables in the
-subcatchment. In this case we created 5000 pseudo-absences.</p>
+sub-catchment and the values of all environmental variables in the
+sub-catchment. In this case we created 5000 pseudo-absences.</p>
 </div>
 <div class="section level2">
 <h2 id="application-of-a-species-distribution-model">Application of a Species Distribution Model<a class="anchor" aria-label="anchor" href="#application-of-a-species-distribution-model"></a>
@@ -537,7 +540,7 @@ new files with names starting with the prefix ‘predTB’.</p>
 <span><span class="va">n_splits</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span>pattern <span class="op">=</span> <span class="st">"predTB*"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>Now we can run the predictions for each subset table. We will store
 the results of the 9 predictions in a list object. At the same time we
-will store the subcatchment IDs of each table in a different list
+will store the sub-catchment IDs of each table in a different list
 object.</p>
 <div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># create the output list</span></span>
@@ -572,28 +575,28 @@ column. Let’s take a look at the first rows of the prediction in the
 first table:</p>
 <div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rspatial.github.io/terra/reference/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">pred_list</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
-<p>We can now combine all predictions and subcatchment IDs.</p>
+<p>We can now combine all predictions and sub-catchment IDs.</p>
 <div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># combine all predictions</span></span>
 <span><span class="va">pred_all</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/rbindlist.html" class="external-link">rbindlist</a></span><span class="op">(</span><span class="va">pred_list</span><span class="op">)</span></span>
-<span><span class="co"># combine all subcatchments</span></span>
+<span><span class="co"># combine all sub-catchments</span></span>
 <span><span class="va">subc_all</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/rbindlist.html" class="external-link">rbindlist</a></span><span class="op">(</span><span class="va">subc_list</span><span class="op">)</span></span></code></pre></div>
 <p>Our final goal is to visualize the probability of occurrence -or
 habitat suitability- of the fish species on a map of the Danube basin.
 In order to transfer the prediction values into the map we will use the
-function ‘reclass_raster’ to reclassify the subcatchment raster values
+function ‘reclass_raster’ to reclassify the sub-catchment raster values
 with the prediction values. For this we need to first create a
-reclassification rule data frame associating the subcatchment IDs with
-the prediction values in each subcatchment. Importantly, the prediction
+reclassification rule data frame associating the sub-catchment IDs with
+the prediction values in each sub-catchment. Importantly, the prediction
 values need to be presented as integers, so we will multiply the
 probability values by 100.</p>
 <div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># multiply the probability values by 100</span></span>
 <span><span class="va">pred_all</span><span class="op">$</span><span class="va">prob_1_int</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/math-generics.html" class="external-link">round</a></span><span class="op">(</span><span class="va">pred_all</span><span class="op">$</span><span class="va">prob_1</span>, <span class="fl">2</span><span class="op">)</span> <span class="op">*</span> <span class="fl">100</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co">## merge the subcatchment IDs and the prediction values</span></span>
+<span><span class="co">## merge the sub-catchment IDs and the prediction values</span></span>
 <span><span class="va">reclassTB</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">subc_all</span>, <span class="va">pred_all</span><span class="op">[</span>,<span class="fl">3</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
-<p>We can now reclassify the subcatchment raster</p>
+<p>We can now reclassify the sub-catchment raster</p>
 <div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/reclass_raster.html">reclass_raster</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">reclassTB</span>,</span>
@@ -650,6 +653,10 @@ Bremerich, V., Torres-Cambas, Y., … Domisch, S. (2025).
 <em>Environment90m: Globally standardized environmental variables for
 spatial freshwater biodiversity science at high spatial resolution</em>
 [Manuscript in preparation].
+</div>
+<div id="ref-gbifdata" class="csl-entry">
+GBIF.Org User. (2023). <em>Occurrence download</em>. The Global
+Biodiversity Information Facility. <a href="https://doi.org/10.15468/DL.QC7E3S" class="external-link">https://doi.org/10.15468/DL.QC7E3S</a>
 </div>
 </div>
 </div>
