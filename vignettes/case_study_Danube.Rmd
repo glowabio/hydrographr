@@ -124,7 +124,7 @@ download_test_data(download_dir = "data_danube")
 
 ## Area of interest
 
-The area of interest is the Danube basin (Figure \@ref(fig:tiles-danube)). We will use as a reference the polygon of the basin that we downloaded previously. We will also specify a set coordinates to define a bounding box around the basin (see table below and red rectangle in Figure \@ref(fig:tiles-danube)). This bounding box will be useful as a reference for visualization purposes and to restrict the spatial extent and information requirements of the analysis.
+The area of interest is the Danube basin (Figure 2). We will use as a reference the polygon of the basin that we downloaded previously. We will also specify a set coordinates to define a bounding box around the basin (see table below and red rectangle in Figure 2). This bounding box will be useful as a reference for visualization purposes and to restrict the spatial extent and information requirements of the analysis.
 
 Corner Coordinates (WGS84, EPSG:4326):
 
