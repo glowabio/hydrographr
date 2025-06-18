@@ -57,7 +57,7 @@ R package to download and process the Hydrography90m [@amatulli2022hydrography90
 ```
 
 
-The Environment90m dataset consists of tables with summary information of several environmental factors, for each of the 7 million subcatchments available in the Hydrography90m dataset. In comparison to the previous version of hydrographr, where the user needed to download raster files and run the calculations of the summary statistics for the environmental layers of interest, the new functions allow the user to directly download the environmental data that has been already summarised for each subcatchment.
+The Environment90m dataset consists of tables with summary information of several environmental factors, for each of the 7 million sub-catchments available in the Hydrography90m dataset. In comparison to the previous version of hydrographr, where the user needed to download raster files and run the calculations of the summary statistics for the environmental layers of interest, the new functions allow the user to directly download the environmental data that has been already summarised for each sub-catchment.
 
 The study area is the Danube basin but we will be using a bounding box around 
 the basin as a geographic reference to subset and crop the data and finally project the current
@@ -155,11 +155,11 @@ knitr::include_graphics(here( "man", "figures", "tilesDanube.png"))
 
 <!-- ![Figure 1. Tiles overlapping with the Danube basin](../man/figures/tilesDanube.png) -->
 
-## Subcatchments in the Danube basin
+## Sub-catchments in the Danube basin
 
-The units of analysis for this exercise are the single subcatchments, meaning that the final habitat suitability values will be assigned to each of the subcatchments. Therefore, one of the key layers for the analysis is the raster of subcatchments for the study area. 
+The units of analysis for this exercise are the single sub-catchments, meaning that the final habitat suitability values will be assigned to each of the sub-catchments. Therefore, one of the key layers for the analysis is the raster of sub-catchments for the study area. 
 
-Here are the steps to prepare the subcatchment raster file for the Danube basin:
+Here are the steps to prepare the sub-catchment raster file for the Danube basin:
 
 1. identify the rectangular tiles that overlap with the Danube basin. By looking at Figure \@ref(fig:tiles-danube), we see that the study area overlaps with four tiles
 
@@ -168,7 +168,7 @@ tile_id <- c("h18v02", "h18v04", "h20v02", "h20v04")
 tile_id
 ```
 
-2. download the raster files of subcatchments for the four tiles
+2. download the raster files of sub-catchments for the four tiles
 
 ```{r, eval = FALSE}
 download_tiles(variable = c("sub_catchment"), tile_id = tile_id, file_format = "tif",
@@ -197,7 +197,7 @@ for (ifile in raster_files) {
 }
 ```
 
-4. now we can merge the four cropped files to obtain the subcatchment raster file for the Danube basin
+4. now we can merge the four cropped files to obtain the sub-catchment raster file for the Danube basin
 
 ```{r, eval = FALSE}
   merge_tiles(tile_dir = wdir,
@@ -219,7 +219,7 @@ file.remove(list.files(wdir, pattern = "_crop.tif", full.names = TRUE))
 unlink("r.watershed", recursive = TRUE)
 ```
 
-Using the subcatchment raster file for the Danube basin we will create a new file containing a list with all subcatchments IDs. This list of IDs will be our reference file to extract the information from the environmental tables during the next steps. We will create the file using the function *extract_ids*.
+Using the sub-catchment raster file for the Danube basin we will create a new file containing a list with all sub-catchments IDs. This list of IDs will be our reference file to extract the information from the environmental tables during the next steps. We will create the file using the function *extract_ids*.
 
 ```{r, eval = FALSE}
 subc_ids <- extract_ids(subc_layer = file.path(wdir, "subcatchments.tif"))
@@ -230,7 +230,7 @@ dim(subc_ids)
 fwrite(subc_ids, file=file.path(wdir, "subc_ids.txt"))
 ```
 
-As you can see, the file consists of one column with all the subcatchment IDs. In the Danube basin there are around 4,3 million subcatchments!
+As you can see, the file consists of one column with all the sub-catchment IDs. In the Danube basin there are around 4,3 million sub-catchments!
 
 ## Environmental information
 
@@ -261,7 +261,7 @@ download_observed_climate_tables(
 )
 ```
 
-The tables have been downloaded to a new folder which has been named according to each dataset and automatically unzipped. By taking a look at any of the tables with climate information we can see that for every subcatchment different statistics (i.e., minimum, maximum, mean, standard deviation, range) are available and that the format is columns separated by space.
+The tables have been downloaded to a new folder which has been named according to each dataset and automatically unzipped. By taking a look at any of the tables with climate information we can see that for every sub-catchment different statistics (i.e., minimum, maximum, mean, standard deviation, range) are available and that the format is columns separated by space.
 
 
 
@@ -270,7 +270,7 @@ The tables have been downloaded to a new folder which has been named according t
 system( "head chelsa_bioclim_v2_1/1981-2010_observed/bio01/bio01_1981-2010_observed_h18v02.txt ")
 ```
 
-- Land cover: forest proportion per subcatchment for the year 2020
+- Land cover: forest proportion per sub-catchment for the year 2020
 
 ```{r, eval = FALSE}
 download_landcover_tables(
@@ -287,7 +287,7 @@ download_landcover_tables(
 )
 ```
 
-The land cover tables, unlike the climate tables, only have one column containing the proportion of the specific land cover category in each subcatchment.
+The land cover tables, unlike the climate tables, only have one column containing the proportion of the specific land cover category in each sub-catchment.
 
 
 
@@ -313,13 +313,13 @@ download_hydrography90m_tables(
 )
 ```
 
-We have downloaded approximately 14 GB of information. The tables at this point consist of the environmental information for the selected variables for all subcatchments in each of the four complete tiles. But we are only interested in the information of those subcatchments within our bounding box. To achieve this filtering and join all environmental variables in one single table we will use the function *get_predict_table* in the next step. 
+We have downloaded approximately 14 GB of information. The tables at this point consist of the environmental information for the selected variables for all sub-catchments in each of the four complete tiles. But we are only interested in the information of those sub-catchments within our bounding box. To achieve this filtering and join all environmental variables in one single table we will use the function *get_predict_table* in the next step. 
 
 ## Prediction table
 
-The prediction table contains the values of environmental variables for all subcatchments of interest. It is called "prediction table" because it will be used as the reference table to predict the model's output using any of the *predict* functions in R. For example, we will predict the habitat suitability values to all subcatchments in this table at the end of the exercise.
+The prediction table contains the values of environmental variables for all sub-catchments of interest. It is called "prediction table" because it will be used as the reference table to predict the model's output using any of the *predict* functions in R. For example, we will predict the habitat suitability values to all sub-catchments in this table at the end of the exercise.
 
-The *get_predict_table* function will join all environmental variables based on the subcatchments of interest; in our case, the subcatchment IDs available in the *subc_id* object (which we have previously saved in the file *subc_ids.txt*).
+The *get_predict_table* function will join all environmental variables based on the sub-catchments of interest; in our case, the sub-catchment IDs available in the *subc_id* object (which we have previously saved in the file *subc_ids.txt*).
 
 The function can be run in parallel, with parallelisation occurring at the level of the variable. Since we are using 6 variables in this example, we can utilise 6 cores. To check the number of available cores on your system, you can use the following line:
 
@@ -343,7 +343,7 @@ tb <- get_predict_table(variable = c("bio01_1981-2010_observed", "bio02_1981-201
 
 Note that we specify the parameter read=TRUE, so that the table is created as an R object. The table is automatically created on disk by the function but the default parameter is FALSE because in some cases the table could be very large and there is no need to load it into the R workspace. In our example the table is 311 MB in size!
 
-You can double check that all the subcatchments are included in the table and all
+You can double check that all the sub-catchments are included in the table and all
 the environmental parameters of interest are attached.
 
 ```{r, eval = F}
@@ -363,7 +363,7 @@ unlink("hydrography90m_v1_0", recursive = TRUE)
 
 ## Species data
 
-We collected and filtered occurrence records for the fish species *Zingel streber* from the GBIF repository. The final table consists of three columns: species name, longitude and latitude coordinates. The file can be downloaded following the next line:
+We collected and filtered occurrence records for the fish species *Zingel streber* from the GBIF repository. The final table consists of three columns: species name, longitude and latitude coordinates. The original data can be found [here](https://www.gbif.org/occurrence/download/0028469-231002084531237) [@gbifdata].
 
 Read the file into the R session and have a look at it
 
@@ -422,7 +422,7 @@ knitr::include_graphics(here( "man", "figures", "danube_map.png"))
 
 ## Model Table
 
-The next step is to prepare the so called *model fit table*.In this table, we link the subcatchments containing species occurrence points with the environmental data previously compiled in the "predict table". For this purpose we use the function `get_model_fit`. If we have many species of interest we can run this function in a for loop to create the model fit table for each species separately. 
+The next step is to prepare the so called *model fit table*.In this table, we link the sub-catchments containing species occurrence points with the environmental data previously compiled in the "predict table". For this purpose we use the function `get_model_fit`. If we have many species of interest we can run this function in a for loop to create the model fit table for each species separately. 
 
 Most of the algorithms available to run SDMs need presence and absence data. In the lack of absence data, pseudoabsence points can be generated in different ways. The function `get_model_fit` provides this functionality and by default creates randomly a specified number of pseudoabsences.
 
@@ -442,7 +442,7 @@ spptb <- get_modelfit_table(
 head(spptb)
 ```
 
-The new table consists of the subcatchment IDs, a new column indicating if the species is present (1) or absent (0) in the subcatchment and the values of all environmental variables in the subcatchment. In this case we created 5000 pseudo-absences.
+The new table consists of the sub-catchment IDs, a new column indicating if the species is present (1) or absent (0) in the sub-catchment and the values of all environmental variables in the sub-catchment. In this case we created 5000 pseudo-absences.
 
 ## Application of a Species Distribution Model
 
@@ -487,7 +487,7 @@ list.files(pattern = "predTB*")
 n_splits <- length(list.files(pattern = "predTB*"))
 ```
 
-Now we can run the predictions for each subset table.  We will store the results of the 9 predictions in a list object. At the same time we will store the subcatchment IDs of each table in a different list object.
+Now we can run the predictions for each subset table.  We will store the results of the 9 predictions in a list object. At the same time we will store the sub-catchment IDs of each table in a different list object.
 
 ```{r,eval=F}
 # create the output list
@@ -523,29 +523,29 @@ The predictions consist of data frames with two columns. The first column is the
 head(pred_list[[1]])
 ```
 
-We can now combine all predictions and subcatchment IDs.
+We can now combine all predictions and sub-catchment IDs.
 
 ```{r,eval=F}
 # combine all predictions
 pred_all <- rbindlist(pred_list)
-# combine all subcatchments
+# combine all sub-catchments
 subc_all <- rbindlist(subc_list)
 
 ```
 
-Our final goal is to visualize the probability of occurrence -or habitat suitability- of the fish species on a map of the Danube basin. In order to transfer the prediction values into the map we will use the function 'reclass_raster' to reclassify the subcatchment raster values with the prediction values. For this we need to first create a reclassification rule data frame associating the subcatchment IDs with the prediction values in each subcatchment. Importantly, the prediction values need to be presented as integers, so we will multiply the probability values by 100.
+Our final goal is to visualize the probability of occurrence -or habitat suitability- of the fish species on a map of the Danube basin. In order to transfer the prediction values into the map we will use the function 'reclass_raster' to reclassify the sub-catchment raster values with the prediction values. For this we need to first create a reclassification rule data frame associating the sub-catchment IDs with the prediction values in each sub-catchment. Importantly, the prediction values need to be presented as integers, so we will multiply the probability values by 100.
 
 ```{r,eval=F}
 
 # multiply the probability values by 100
 pred_all$prob_1_int <- as.integer(round(pred_all$prob_1, 2) * 100)
 
-## merge the subcatchment IDs and the prediction values
+## merge the sub-catchment IDs and the prediction values
 reclassTB <- cbind(subc_all, pred_all[,3])
 
 ```
 
-We can now reclassify the subcatchment raster
+We can now reclassify the sub-catchment raster
 
 ```{r, eval = FALSE}
 reclass_raster(
