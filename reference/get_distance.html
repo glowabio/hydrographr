@@ -28,6 +28,7 @@ snap_to_network() or snap_to_subc_segment()."></head><body>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/benchmark.html">Function benchmarks</a></li>
     <li><a class="dropdown-item" href="../articles/case_study_brazil.html">Case study - São Francisco drainage basin</a></li>
     <li><a class="dropdown-item" href="../articles/case_study_cuba.html">Case study - Cuba</a></li>
+    <li><a class="dropdown-item" href="../articles/case_study_Danube.html">Case study - Danube basin</a></li>
     <li><a class="dropdown-item" href="../articles/case_study_germany.html">Case study - Germany</a></li>
     <li><a class="dropdown-item" href="../articles/example_other_stream_networks.html">Usage of hydrographr with other stream networks</a></li>
     <li><a class="dropdown-item" href="../articles/linux_system_setup.html">Setting up the package requirements on Linux</a></li>
@@ -196,7 +197,7 @@ network in more than two basins in parallel.</p></li>
 <span>                                            stream_layer <span class="op">=</span> <span class="va">stream_vect</span>,</span>
 <span>                                            n_cores <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="co"># Show head of output table</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">snapped_coordinates</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rspatial.github.io/terra/reference/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">snapped_coordinates</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Get the euclidean distance and the distance along the network between all</span></span>
 <span><span class="co"># pairs of points</span></span>

@@ -46,6 +46,7 @@ with extract_zonal_stat().'></head><body>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/benchmark.html">Function benchmarks</a></li>
     <li><a class="dropdown-item" href="../articles/case_study_brazil.html">Case study - São Francisco drainage basin</a></li>
     <li><a class="dropdown-item" href="../articles/case_study_cuba.html">Case study - Cuba</a></li>
+    <li><a class="dropdown-item" href="../articles/case_study_Danube.html">Case study - Danube basin</a></li>
     <li><a class="dropdown-item" href="../articles/case_study_germany.html">Case study - Germany</a></li>
     <li><a class="dropdown-item" href="../articles/example_other_stream_networks.html">Usage of hydrographr with other stream networks</a></li>
     <li><a class="dropdown-item" href="../articles/linux_system_setup.html">Setting up the package requirements on Linux</a></li>
@@ -278,7 +279,7 @@ a specified neighbourhood.</p></div>
 <span><span class="va">recl_raster</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">my_directory</span>, <span class="st">"/upstream_sum.tif"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">## Set columns as integer</span></span>
-<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="va">result</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span> <span class="op">:=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">.SD</span>, <span class="va">as.integer</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="va">result</span><span class="op">[</span>, <span class="fu"><a href="https://rspatial.github.io/terra/reference/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span> <span class="op">:=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">.SD</span>, <span class="va">as.integer</span><span class="op">)</span><span class="op">]</span></span>
 <span></span>
 <span><span class="co">### Create raster - select the "to" column which represents the unique subc_id</span></span>
 <span><span class="va">r</span> <span class="op">&lt;-</span> <span class="fu"><a href="reclass_raster.html">reclass_raster</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">result</span>,</span>

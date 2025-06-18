@@ -2,6 +2,7 @@
 <url><loc>/404.html</loc></url>
 <url><loc>/LICENSE-text.html</loc></url>
 <url><loc>/articles/benchmark.html</loc></url>
+<url><loc>/articles/case_study_Danube.html</loc></url>
 <url><loc>/articles/case_study_brazil.html</loc></url>
 <url><loc>/articles/case_study_cuba.html</loc></url>
 <url><loc>/articles/case_study_germany.html</loc></url>
@@ -23,6 +24,7 @@
 <url><loc>/reference/extract_from_gpkg.html</loc></url>
 <url><loc>/reference/extract_ids.html</loc></url>
 <url><loc>/reference/extract_zonal_stat.html</loc></url>
+<url><loc>/reference/figures/danube_map.html</loc></url>
 <url><loc>/reference/figures/germany_map.html</loc></url>
 <url><loc>/reference/fix_path.html</loc></url>
 <url><loc>/reference/get_all_upstream_distances.html</loc></url>
