@@ -51,10 +51,9 @@ The following workflow uses the new functionalities of the hydrographr
 R package to download and process the Hydrography90m [@amatulli2022hydrography90m] and the Environment90m
 [@garcia2025environment90m] datasets with the aim of preparing and processing the data needed to run a species distribution model to predict the habitat suitability of a fish species in the Danube basin.
 
-<!-- ![](../man/figures/danube_workflow3.png) -->
-```{r danube-workflow, fig.cap = "Figure 1. Schematic workflow", echo = F, out.width='200%'}
-knitr::include_graphics(here( "man", "figures", "danube_workflow3.png"))
 
+```{r danube-workflow, fig.cap = "Figure 1. Schematic workflow", echo = F, out.width='200%'}
+ knitr::include_graphics(here( "man", "figures", "danube_workflow3.png"))
 ```
 
 
