@@ -161,7 +161,7 @@ The units of analysis for this exercise are the single sub-catchments, meaning t
 
 Here are the steps to prepare the sub-catchment raster file for the Danube basin:
 
-1. identify the rectangular tiles that overlap with the Danube basin. By looking at Figure \@ref(fig:tiles-danube), we see that the study area overlaps with four tiles
+1. identify the rectangular tiles that overlap with the Danube basin. By looking at Figure 2, we see that the study area overlaps with four tiles
 
 ```{r, eval = FALSE}
 tile_id <- c("h18v02", "h18v04", "h20v02", "h20v04")
