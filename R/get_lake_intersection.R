@@ -1,4 +1,4 @@
-#' @title Get intersection points between Hydrography 90m river network and lake shapefiles
+#' @title Get intersection points between Hydrography90m stream network and lake shapefiles
 #'
 #' @description Add describtion text here
 #'
@@ -22,8 +22,6 @@
 #' add a reference were to check the necessary tif files for lake analysis
 #' @param flow character. Full path to Hydrography 90m flow accumulation tif file
 #' @param glbasins character. Full path to Hydrography 90m basin tif file
-#' @param glcompunits character. Full path to Hydrography 90m computational units
-#' @param cubasins character. Full path to Hydrography 90m computational basin units
 #' @param lake_dat character. Full path of the output.csv table,
 #' i.e., the lake intersection table.
 #' @param n_cores interger. Number of cores used in parallelzation
@@ -48,7 +46,7 @@
 #'
 #' @examples
 #' # add example here
-#' # Download hydrolakes shape files from their website and test with
+#' # Download HydroLAKES shapefiles from their website and test with
 #' hydrolakes.sh instead I always transformed it before to lake.gpkg
 #' # write the script to run in paralell using ncores
 
@@ -153,7 +151,7 @@ writeLines(mspa_content, paste0(edge,"input/", "mspa-parameters.txt"))
     # Call the external .sh script extract_ids() containing the gdal function
     processx::run(system.file("sh", "get_lake_intersection.sh", package = "hydrographr"),
                   args = c(ids_tmp_path, lake_id, lakes, lake_name, buffer,
-                           edge, stream, flow, glbasins, glcompunits, cubasins,
+                           edge, stream, flow, glbasins,
                            tempdir(), lake_dat, n_cores),
                   echo = !quiet)
 

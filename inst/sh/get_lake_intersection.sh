@@ -18,11 +18,9 @@ export GWB=$6 # full path to GWB MSPA analysis tool
 export STREAM=$7 # full path to stream.tif file
 export FLOW=$8 # full path to flow.tif file
 export GLBASINS=$9 # full path to global file of basins
-export GLCOMPUNITS=${10} # full path global basin of computational units
-export CUBASINS=${11} # full path to basins in each computational unit
-export TMPDIR=${12}
-export OUTDIR=${13}
-export NCORES=${14}
+export TMPDIR=${10}
+export OUTDIR=${11}
+export NCORES=${12}
 
 
 # if gpkg geo data base do get SHP_NAME for HydroLAKES SHP_NAME is HydroLAKES_polys_v10
@@ -172,9 +170,9 @@ gdal_translate \
 ### how does the user get the $GLBASINS .tif file? download it before through download function croping allbasin.tif to the extent of interest? ###
 
 # crop compunit raster file to the lake extention
-gdal_translate \
-    -projwin $( pkinfo -i $TMPDIR/lake_${LK}.tif -bb | grep -Eo '[+-]?[0-9]+([.][0-9]+)?' ) \
-    -co COMPRESS=LZW -co ZLEVEL=9 $GLCOMPUNITS $TMPDIR/extentCU_${LK}.tif
+# gdal_translate \
+  #  -projwin $( pkinfo -i $TMPDIR/lake_${LK}.tif -bb | grep -Eo '[+-]?[0-9]+([.][0-9]+)?' ) \
+  # -co COMPRESS=LZW -co ZLEVEL=9 $GLCOMPUNITS $TMPDIR/extentCU_${LK}.tif
 
 ### how does the user get the $GLCOMPUNITS .tif file? download it before through download function? ###
 
@@ -193,14 +191,14 @@ echo "$LK $(pkstat -i $TMPDIR/maskLB_${LK}.tif -hist \
 
 # mask the compunit raster to the lake boundaries to identify the compUnit IDs
 # that fully overlap with lake
-pksetmask -i $TMPDIR/extentCU_${LK}.tif \
-    -m $TMPDIR/lake_${LK}.tif -msknodata 0 -nodata 0 \
-    -o $TMPDIR/maskCU_${LK}.tif -co COMPRESS=LZW -co ZLEVEL=9
+# pksetmask -i $TMPDIR/extentCU_${LK}.tif \
+  #  -m $TMPDIR/lake_${LK}.tif -msknodata 0 -nodata 0 \
+  # -o $TMPDIR/maskCU_${LK}.tif -co COMPRESS=LZW -co ZLEVEL=9
 
 # identify CompUnit IDs
-echo "$LK $(pkstat -i $TMPDIR/maskCU_${LK}.tif -hist \
-    | awk '$2 > 0 && $1 > 0 {print $1}' | sed -z 's/\n/ /g')" \
-    > $TMPDIR/ref_CompUnitIDs_${LK}.txt
+# echo "$LK $(pkstat -i $TMPDIR/maskCU_${LK}.tif -hist \
+  #  | awk '$2 > 0 && $1 > 0 {print $1}' | sed -z 's/\n/ /g')" \
+  # > $TMPDIR/ref_CompUnitIDs_${LK}.txt
 
 # remove tmp files
 rm $TMPDIR/maskCU_${LK}.tif $TMPDIR/maskLB_${LK}.tif \
@@ -208,15 +206,15 @@ $TMPDIR/extentCU_${LK}.tif $TMPDIR/extentLB_${LK}.tif \
 $TMPDIR/lake_${LK}rm.tif $TMPDIR/lake_${LK}cp.tif
 
     # get the IDs of the COmpUnits
-    CUID=($(cut -d" " -f2- $TMPDIR/ref_CompUnitIDs_${LK}.txt))
+    CUID=($(cut -d" " -f2- $TMPDIR/ref_lbasinIDs_${LK}.txt))
 
     # Join Computational Units as VRT
     # create file with list of files to join
-    for i in ${CUID[@]}; do find $CUBASINS -name "lbasin_${i}_msk.tif"; done \
-        > $TMPDIR/my_list_${LK}.txt
+    # for i in ${CUID[@]}; do find $GLBASINS -name "lbasin_${i}_msk.tif"; done \
+      #  > $TMPDIR/my_list_${LK}.txt
     # create the vrt
-    gdalbuildvrt $TMPDIR/CompUnits_${LK}.vrt \
-        -input_file_list $TMPDIR/my_list_${LK}.txt
+    # gdalbuildvrt $TMPDIR/CompUnits_${LK}.vrt \
+      # -input_file_list $TMPDIR/my_list_${LK}.txt
 
     rm $TMPDIR/my_list_${LK}.txt
 
@@ -225,7 +223,7 @@ $TMPDIR/lake_${LK}rm.tif $TMPDIR/lake_${LK}cp.tif
 
    # reclassify raster with lbasins of interest (1) else is (0)
     # identify max value (lbasin ID)
-    MAX=$(gdalinfo -mm $TMPDIR/CompUnits_${LK}.vrt | grep Computed \
+    MAX=$(gdalinfo -mm $GLBASINS | grep Computed \
         | awk -F, '{print $2}')
     # create classification table
     col1=($(seq 0 ${MAX%.*}))
@@ -237,7 +235,7 @@ $TMPDIR/lake_${LK}rm.tif $TMPDIR/lake_${LK}cp.tif
         > $TMPDIR/reclass_code_${LK}.txt
 
     # run reclassification
-    pkreclass -i $TMPDIR/CompUnits_${LK}.vrt \
+    pkreclass -i $GLBASINS \
         -o $TMPDIR/lbasin_reclass_${LK}.vrt \
         --code $TMPDIR/reclass_code_${LK}.txt
 
