@@ -170,28 +170,43 @@ saveWidget(spdata_plot, file=paste0(here(), "man/figures/germany_map.html"))
 
 #### 1. Hydrography90m
 
-In order to integrate lakes into the Hydrography90m, we need to download the following global GEO.tiff files:
-1. stream network
-1. flow accumulation
-1. flow direction
-1. overview basin computational units  
-1. basin files
-1. basin computational units
+In order to integrate lakes into the Hydrography90m, we need to download the following GEO.tiff files (in brackets the variable and folder name to download):
+1. basin files ("basin")
+2. stream network ("segment")
+3. flow accumulation ("accumulation")
+4. flow direction
 
+First, we identify the tile ID covering our species data. In our case it is a single tile. Note that tiles of basins are cut and unlike regional units (see also get_regional_unit) do not always contain full basins. We therefore advise to check visually if lakes are located in a basin not fully covered by a basin tile.
 
 ```{r, eval = FALSE}
-# Extend timeout to 1000s to allow uninterrupted downloading
-options(timeout = 1000)
-# create a fred data list for download or separate download function for the package
-# for each tif file:
-download.file("https://fred.igb-berlin.de/data/file_download/",
-              destfile = paste0(wdir, "/data/tif_files.tif"), mode = "wb")
+# get tile ID for Germany
+tile_id <- get_tile_id(data = spdata,
+                       lon = "longitude", 
+                       lat = "latitude")
 
 ```
 
+Secondly, we select and download all relevant hydrological variables necessary to intersect lakes and stream network and delineate lake catchments.
+
+```{r, eval = FALSE}
+# select the necessary hydrological variables for downloading
+vars_tif <- c("basin", "segment", "accumulation", "direction")
+# Extend timeout to 1000s to allow uninterrupted downloading
+options(timeout = 1000)
+
+# Download the tif.files of the selceted variables
+download_tiles(variable = vars_tif,
+               tile_id = tile_id,
+               file_format = "tif",
+               download_dir = "data")
+
+```
+
+Note that the files have been downloaded to a new folder (i.e., “r.watershed”).
+
 #### 2. HydroLAKES
 
-Secondly, for the lake data we use the geo-spatial information from the HydroLAKES global lake data set and more specifically their lake polygons. You can either download the lake data stored in shapefiles or in the geodatabase format, both work with the hydrographr package lake functions.
+For the lake data we use the geo-spatial information from the HydroLAKES global lake data set and more specifically their lake polygons. You can either download the lake data stored in shapefiles or in the geodatabase format, both work with the hydrographr package lake functions.
 For more information on the data set you can have a look [here](https://www.hydrosheds.org/products/hydrolakes)
 
 ```{r, eval = FALSE}
@@ -246,7 +261,8 @@ b) The algorithms of this software are
    of Binary Patterns. Pattern Recognition Letters,
    https://doi.org/10.1016/j.patrec.2008.10.015
 
-### Lake analysis
+#### Lake analysis
+### Lake ID identification
 
 Let's start the lake analysis by identifying all HydroLAKES which are spatially overlapping with our species data and extract the corresponding lake IDs.
 We can do that in two ways:
@@ -280,6 +296,55 @@ extract_lake_ids(spdata,
                  lake_shape = paste0(wdir, "/data/HydroLAKES_polys_v10_shp/HydroLAKES_polys_v10.shp"),
                  lake_id_table = paste0(wdir, "/data/lakes_vignette/"))
 ```
+
+### Stream network and lake intersection
+Now we can overlay our stream segments with the lake shapefile. In that way we identify per lake all intersection points between stream network and lake.
+
+
+```{r, eval = FALSE}
+
+get_lake_intersection(data = lake_ids,
+                      lakes = paste0(wdir, "/data/HydroLAKES_polys_v10_shp/HydroLAKES_polys_v10.shp"),
+                      lake_name =,
+                      buffer = TRUE,
+                      edge = GWB,
+                      stream = paste0(wdir, "/data/r.watershed/segment/"),
+                      flow =,
+                      glbasin =,
+                      lake_dat =,
+                      n_cores = 5,
+                      quiet = FALSE)
+
+```
+
+### Lake catchment delineation
+
+Having identified the lake intersection points enables us to delineate for each intersection point the corresponding upstream catchment area. Doing this for the lake outlet (i.e the intersection point with the highest flow accumulation value) gives us the entire lake catchment area. To do this we apply the `get_lake_catchment` function:
+
+```{r, eval = FALSE}
+get_lake_catchment()
+
+```
+
+With the delineated lake catchments and having identified the Hydrography90m unique stream segments IDs intersecting with lakes lets us use hydrographr R functions for additional analysis.
+
+#### Environment90m data integration
+We can now integrate the Environment90m dataset [cite Environment90m paper], which include over 50 variables related to topography, hydrology and climate data aggregated to the subcatchment level of the Hydrograpyh90m stream network and apply them to [see also https://hydrography.org/environment90m] our newly delineated lake catchments. 
+
+### Land cover per lake catchment
+For instance, we can download the land cover data to create time series representing the land cover change in the lake catchments.
+
+```{r, eval = FALSE}
+
+```
+
+Add histogram
+
+#### Distances between lakes
+```{r, eval = FALSE}
+
+```
+
 
 #### 2. Elevation - MERIT-HYDRO
 
