@@ -609,7 +609,7 @@ download_projected_climate_tables <- function(base_vars = NULL,
   all_varnames <- filenames_without_tile
 
   # Extract version from end of string 
-  regex_version <- "_[^_]+$"  
+  regex_version <- "_v[^_]+_[^_]+$"
   all_versions <- unique(stringr::str_extract(filenames_without_tile, regex_version))
   all_versions <- sub("^_", "", all_versions)
   filenames_without_version <- unique(sub(regex_version, "", filenames_without_tile))
