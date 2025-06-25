@@ -5,7 +5,7 @@
 #' Handles both single-point and multi-point inputs.
 #' Multi-point inputs should be provided via a CSV URL.
 #'
-#' @family pygeoapi
+#' @family ocgapi
 #' @param df A data frame with one site location.
 #' Must include latitude and longitude columns.
 #' Required if `csv_url` is not provided.

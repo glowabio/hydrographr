@@ -3,7 +3,7 @@
 #' Sends a request to the GeoFRESH API to snap a set of site coordinates to the nearest flowline
 #' in the river network. Returns both the snapped and original coordinates.
 #'
-#' @family pygeoapi
+#' @family ocgapi
 #' @param csv_url A URL to a CSV file hosted online. The CSV must contain latitude, longitude, and site ID columns.
 #' @param colname_lat Name of the latitude column in the CSV. Default is "latitude".
 #' @param colname_lon Name of the longitude column in the CSV. Default is "longitude".

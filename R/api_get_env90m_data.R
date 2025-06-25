@@ -4,7 +4,7 @@
 #' environmental zonal statistics of the variables included in the
 #' Environment90m dataset (Marquez et al., 2025, in prep.).
 #'
-#' @family pygeoapi
+#' @family ocgapi
 #' @param subc_ids A numeric vector of unique subcatchment IDs.
 #' @param variables A character vector of variable names to retrieve
 #'   (e.g., `"bio5"`, `"slope_grad_dw_cel"`).

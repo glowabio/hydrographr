@@ -5,7 +5,7 @@
 #' [get_snapped_points()] function. Returns a long-format data frame where each row represents an
 #' upstream subcatchment associated with a given site.
 #'
-#' @family pygeoapi
+#' @family ocgapi
 #' @param df A data frame containing snapped site coordinates, including latitude, longitude, and a site ID column.
 #' @param colname_lat Name of the latitude column. Default is `"latitude"`.
 #' @param colname_lon Name of the longitude column. Default is `"longitude"`.
