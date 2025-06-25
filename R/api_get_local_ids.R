@@ -85,9 +85,9 @@ api_get_local_ids <- function(df = NULL, csv_url = NULL,
     # Send POST request
     response <- httr::POST(
       url = process_url,
-      body = toJSON(body, auto_unbox = TRUE),
+      body = jsonlite::toJSON(body, auto_unbox = TRUE),
       encode = "json",
-      add_headers("Content-Type" = "application/json")
+      httr::add_headers("Content-Type" = "application/json")
     )
 
     if (status_code(response) != 200) {
@@ -100,9 +100,9 @@ api_get_local_ids <- function(df = NULL, csv_url = NULL,
     # Convert JSON result to a dataframe and merge with input
     result_df <- df %>%
       mutate(
-        reg_id = result_json$region_id,
-        basin_id = result_json$basin_id,
-        subc_id = result_json$subc_id
+        reg_id = result_json$ids$reg_id,
+        basin_id = result_json$ids$basin_id,
+        subc_id = result_json$ids$subc_id
       )
 
     return(result_df)
