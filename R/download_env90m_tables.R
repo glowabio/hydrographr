@@ -1575,7 +1575,7 @@ get_file_size_table <- function(file_name, tempdir = NULL, quiet = FALSE) {
   file_local <- paste0(tempdir, "/", file_name)
   if (!file.exists(file_local)) {
     if (!(quiet)) message(paste('Downloading ', file_name,'...'))
-    url <- "https://public.igb-berlin.de/index.php/s/zw56kEd25NsQqcQ/download?path=%2FREADME/"
+    url <- "https://public.igb-berlin.de/index.php/s/zw56kEd25NsQqcQ/download?path=%2F_file_lists/"
     download.file(paste0(url, file_name), destfile = file_local, mode = "wb",
       quiet = quiet)
   }
@@ -1757,8 +1757,8 @@ do_env90m_download <- function(variable_names, tile_ids, file_size_table, downlo
   # Check availability of IGB server by downloading README
   tryCatch(
     {
-      igb_readme = paste0(igb_path, "README/accessibility_check.txt")
-      download.file(igb_readme, destfile = paste0(download_dir, "/accessibility_check.txt"),
+      igb_readme = paste0(igb_path, "Readme.md")
+      download.file(igb_readme, destfile = paste0(download_dir, "/Readme_env90m.md"),
         mode = "wb", quiet = quiet)
     },
     warning = function(c) {
