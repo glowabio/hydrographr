@@ -53,6 +53,8 @@ library(mapview)
 library(here)
 library(sf)
 library(tidyr)
+library(readr)
+library(tibble)
 ```
 
 Load required libraries
@@ -69,6 +71,7 @@ library(leaflet)
 library(leafem)
 library(sf)
 library(tidyr)
+library(readr)
 ```
 
 Define working directory
@@ -172,11 +175,12 @@ saveWidget(spdata_plot, file=paste0(here(), "man/figures/germany_map.html"))
 
 In order to integrate lakes into the Hydrography90m, we need to download the following GEO.tiff files (in brackets the variable and folder name to download):
 1. basin files ("basin")
-2. stream network ("segment")
-3. flow accumulation ("accumulation")
-4. flow direction
+2. sub-catchment files ("SUb_catchment)
+3. stream network ("segment")
+4. flow accumulation ("accumulation")
+5. flow direction
 
-First, we identify the tile ID covering our species data. In our case it is a single tile. Note that tiles of basins are cut and unlike regional units (see also get_regional_unit) do not always contain full basins. We therefore advise to check visually if lakes are located in a basin not fully covered by a basin tile.
+First, we identify the tile ID covering our species data. In our case that are three tiles (h16v02; h18v00; h18v02).
 
 ```{r, eval = FALSE}
 # get tile ID for Germany
@@ -186,11 +190,11 @@ tile_id <- get_tile_id(data = spdata,
 
 ```
 
-Secondly, we select and download all relevant hydrological variables necessary to intersect lakes and stream network and delineate lake catchments.
+Secondly, we select and download all relevant hydrological variables necessary to intersect lakes and stream network and to delineate lake catchments.
 
 ```{r, eval = FALSE}
 # select the necessary hydrological variables for downloading
-vars_tif <- c("basin", "segment", "accumulation", "direction")
+vars_tif <- c("basin", "sub_catchment", "segment", "accumulation", "direction")
 # Extend timeout to 1000s to allow uninterrupted downloading
 options(timeout = 1000)
 
@@ -198,11 +202,45 @@ options(timeout = 1000)
 download_tiles(variable = vars_tif,
                tile_id = tile_id,
                file_format = "tif",
-               download_dir = "data")
+               download_dir = paste0(wdir, "data"))
 
 ```
 
 Note that the files have been downloaded to a new folder (i.e., “r.watershed”).
+
+Now we can merge the three tile files to obtain the sub-catchment raster file for the lakes in Germany
+```{r, eval = FALSE} 
+
+for (var in vars_tif) {
+  # Define the folder for the current variable
+  var_dir <- paste0(wdir, "data/r.watershed/", var, "_tiles20d/")
+  
+  # Build path to .tif file names for each variable and tile ids
+  tile_files <- paste0(var, "_", tile_id, ".tif")
+  
+  # List only the matching .tif files in that folder
+  tile_names <- list.files(var_dir, pattern = "\\.tif$", full.names = FALSE)
+  tile_names <- tile_names[tile_names %in% tile_files]
+  
+  # Run the merge function
+  merge_tiles(
+    tile_dir = var_dir,
+    tile_names = tile_names,
+    out_dir = paste0(wdir, "data/"),
+    file_name = paste0(var, ".tif"),
+    read = FALSE,
+    bigtiff = TRUE
+  )
+}
+
+```
+
+It is always good practice to clean disk space by removing the files and folders we don’t need anymore.
+```{r, eval = FALSE}
+# remove folder
+unlink("r.watershed", recursive = TRUE)
+
+```
 
 #### 2. HydroLAKES
 
@@ -322,7 +360,13 @@ get_lake_intersection(data = lake_ids,
 Having identified the lake intersection points enables us to delineate for each intersection point the corresponding upstream catchment area. Doing this for the lake outlet (i.e the intersection point with the highest flow accumulation value) gives us the entire lake catchment area. To do this we apply the `get_lake_catchment` function:
 
 ```{r, eval = FALSE}
-get_lake_catchment()
+get_lake_catchment(data = data,
+                               top = 1,
+                               direction = paste0(wdir, "/data/r.watershed/direction/"),
+                               catch = "/data/ttomiczek/hydrographr/lakes_vignette/intersection_tables/",
+                               lake_id = "lake_ID",
+                               n_cores = 5)
+}
 
 ```
 
@@ -332,389 +376,218 @@ With the delineated lake catchments and having identified the Hydrography90m uni
 We can now integrate the Environment90m dataset [cite Environment90m paper], which include over 50 variables related to topography, hydrology and climate data aggregated to the subcatchment level of the Hydrograpyh90m stream network and apply them to [see also https://hydrography.org/environment90m] our newly delineated lake catchments. 
 
 ### Land cover per lake catchment
-For instance, we can download the land cover data to create time series representing the land cover change in the lake catchments.
+For instance, we can download the land cover data to create time series representing the land cover change within a lake catchments. Let`s look at how the percentage of rainfed cropland and decidous forest changed during the time period 1992 to 2020 at lake Rangsdorf (HydroLAKE ID 165245).
 
 ```{r, eval = FALSE}
+download_landcover_tables(
+  base_vars = c("c10", "c20"),
+  years = NULL,
+  tile_ids = tile_id,
+  download = TRUE,
+  download_dir = wdir,
+  file_format = "txt",
+  delete_zips = TRUE,
+  ignore_missing = FALSE,
+  tempdir = NULL,
+  quiet = FALSE
+)
+```
+
+First we identify all sub-catchments of the lake catchment using the `extract_ids` function:
+Note check again visually which basin.tif files are covered by the lake catchment, since it can span over multiple basin tiles. In our case the lake catchment is situated only in one tile (tile id h18v02).
+
+```{r, eval = FALSE}
+lake_catch <- terra::rast(paste0(wdir, "/lake_1330758/basin_lake_1330758_coord_1.tif"))
+sub_catch <- terra::rast(paste0(wdir, "/data/sub_catchment_h18v02.tif"))
+lake_catch_crop <- terra::crop(sub_catch, lake_catch)
+lake_catch_crop <- terra::mask(lake_catch_crop, lake_catch)
+
+terra::writeRaster(lake_catch_crop, paste0(wdir, "/data/lake_catch_crop.tif"), overwrite = TRUE)
+lake_catch_crop <- (paste0(wdir, "/data/lake_catch_crop.tif"))
+lake_catch_ids <- extract_ids(subc_layer = lake_catch_crop)
+
+fwrite(lake_catch_ids, paste0(wdir, '/data/subc_IDs.txt'))
 
 ```
+
+Now we subset the Environment90m land cover data by the sub_catchment ID and join the yearly data table to create a time series of land cover change.
+
+```{r, eval = FALSE}
+years <- 1992:2020
+tile_id <- "h18v02"
+# Initialize empty data.frames
+c10_long <- data.frame()
+c20_long <- data.frame()
+
+
+# Loop through each year and read + filter files
+for (year in years) {
+  
+  # File paths
+  path_c10 <- paste0(wdir, "esa_cci_landcover_v2_1_1/c10/c10_", year, "_", tile, ".txt")
+  path_c20 <- paste0(wdir, "esa_cci_landcover_v2_1_1/c20/c20_", year, "_", tile, ".txt")
+  
+  # Read and coerce types
+  c10_tmp <- read_table(path_c10, col_names = FALSE, col_types = cols()) %>%
+    rename(ID = X1, c10 = X2) %>%
+    mutate(
+      ID = as.numeric(as.character(ID)),  # robust ID coercion
+      c10 = as.numeric(c10),
+      year = year
+    ) %>%
+    filter(ID %in% lake_catch_ids)
+  
+  c20_tmp <- read_table(path_c20, col_names = FALSE, col_types = cols()) %>%
+    rename(ID = X1, c20 = X2) %>%
+    mutate(
+      ID = as.numeric(as.character(ID)),  # robust ID coercion
+      c20 = as.numeric(c20),
+      year = year
+    ) %>%
+    filter(ID %in% lake_catch_ids)
+  
+  # Append
+  c10_long <- bind_rows(c10_long, c10_tmp)
+  c20_long <- bind_rows(c20_long, c20_tmp)
+}
+
+# Final join
+joined_data <- left_join(c10_long, c20_long, by = c("ID", "year"))
+
+# Create name vectors
+c10_names <- paste0("c10_", years)
+c20_names <- paste0("c20_", years)
+
+var <- c(c10_names, c20_names)
+
+
+tb <- get_predict_table(variable = var,
+  statistics = c("mean"),
+  tile_id = tile_id,
+  input_var_path = paste0(wdir, "esa_cci_landcover_v2_1_1/"),
+  subcatch_id = file.path(wdir, "data/subc_ids.txt"),
+  out_file_path = paste0(wdir, "data/predictTB.csv"),
+  read = TRUE,
+  quiet = FALSE,
+  overwrite = TRUE,
+  n_cores = 1)
+
+fwrite(tb, paste0(wdir, '/data/land_cover_subc.txt'))
+
+
+```
+
+The landcover values show the percentage covered by the different land use categories.To show a change in land cover we will convert the percentage in the area they cover of any given sub-catchment. For this we will calculate the area of our sub-catchments.
+
+```{r, eval = FALSE}
+lakec_area <- terra::expanse(lake_catch_crop, unit="km", zones=lake_catch_crop)
+tb[, 2:59] <- tb[, 2:59] * lakec_area$area
+col_sums <- colSums(tb[, 2:59])
+
+# Convert named vector to data frame
+df <- enframe(col_sums, name = "id", value = "value")
+
+# Separate 'id' into 'variable' and 'year', remove "y" prefix from year
+df <- df %>%
+  separate(id, into = c("variable", "year"), sep = "_y") %>%
+  mutate(year = as.numeric(year))
+
+```
+
+Lets portrait the land cover time series within a simple histogram, showcasing the change over time in the rainfed and irrigated crop in the lake catchment. 
 
 Add histogram
-
-#### Distances between lakes
 ```{r, eval = FALSE}
-
+# Plot
+ggplot(df, aes(x = year, y = value, color = variable)) +
+  geom_line(size = 1.2) +
+  scale_color_manual(values = c("c10" = "blue", "c20" = "orange")) +
+  scale_x_continuous(
+    breaks = seq(min(df$year), max(df$year), by = 2)  # Every 2nd year
+  ) +
+  labs(x = "Year", y = "Land cover percentage", color = "Variable") +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
 ```
 
+Additionally to the environmental analysis we can look how lakes are positioned in the network. For instance we can calculate the distance between the Rangsdorfer lake and the Zeuthener lake (lake ID 165161). Do to this we need first to download and abstract the vector Hydrography90m stream network into a graph. 
 
-#### 2. Elevation - MERIT-HYDRO
-
-To download the elevation files of MERIT-HYDRO, we visit
-<https://hydro.iis.u-tokyo.ac.jp/~yamadai/MERIT_Hydro/> to define the
-tiles that need to be downloaded. We download the zipped tiles into a
-new directory called ***elv***, unzip the downloaded .tar file and keep
-only the tiles that we need
-
+#### Calculating distances between lakes
+### Download  the vector stream network geopackage
 ```{r, eval = FALSE}
-elv_dir <- paste0(wdir, "/data/elv") 
-dir.create(elv_dir)
+# Download the tif.files of the selceted variables
+download_tiles(variable = "order_vect_segment",
+               tile_id = tile_id,
+               file_format = "gpkg",
+               download_dir = paste0(wdir, "data"))
+
 ```
 
-#### 3. Climate - CHELSA Bioclim
-
-Finally, we will download three CHELSA present Bioclim variables. For a
-quick outlook on the bioclimatic variables you can have a look
-[here](https://chelsa-climate.org/bioclim/).
-
-```{r, eval = FALSE}
-# Create download directory
-dir.create(paste0(wdir, "/data/chelsa_bioclim"))
-```
-
-```{r, eval = FALSE}
-# Extend timeout to 1000s to allow uninterrupted downloading
-options(timeout = 1000)
-
-# Download
-# Present, 1981-2010
-download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio12_1981-2010_V.2.1.tif",
-destfile = "data/chelsa_bioclim/bio12_1981-2010.tif", mode = "wb")
-download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio15_1981-2010_V.2.1.tif",
-destfile = "data/chelsa_bioclim/bio15_1981-2010.tif", mode = "wb")
-download.file("https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/1981-2010/bio/CHELSA_bio1_1981-2010_V.2.1.tif",
-destfile = "data/chelsa_bioclim/bio1_1981-2010.tif", mode = "wb")
-```
-
-### Cropping the raster files
-
-After having downloaded all the layers, we need to crop them to the
-extent of our study area extended by 500 km, so that our basins are not
-split in half.
-
-```{r, include = FALSE}
-# Define and create a directory for the study area
-#study_area_dir <-  paste0(wdir, "/data/study_area")
-study_area_dir <- "/home/afroditi/Documents/PhD/external/fish_germany/data/study_area"
-
-if(!dir.exists(study_area_dir)) dir.create(study_area_dir)
-
-
-# Get the full paths of the raster tiles
-raster_tiles_watershed <- list.files(paste0(wdir, "/data/r.watershed"),
-                          pattern = ".tif", full.names = TRUE, recursive = TRUE)
-raster_tiles_dist <- list.files(paste0(wdir, "/data/r.stream.distance"),
-                          pattern = ".tif", full.names = TRUE, recursive = TRUE)
-raster_tiles_chan <- list.files(paste0(wdir, "/data/r.stream.channel"),
-                          pattern = ".tif", full.names = TRUE, recursive = TRUE)
-raster_tiles_ord <- list.files(paste0(wdir, "/data/r.stream.order"),
-                               pattern = ".tif", full.names = TRUE, recursive = TRUE)
-raster_tiles <- c(raster_tiles_watershed, raster_tiles_dist, 
-                  raster_tiles_chan, raster_tiles_ord)
-```
-
-Let's define the extent (bounding box) of the study area (xmin, ymin,
-xmax, ymax)
-
-```{r, include = FALSE}
-bb <- ext(vect(paste0(wdir, "/data/r.watershed/basin_tiles20d/basin_h18v02_filtered.gpkg")))
-```
-
-```{r, eval = F}
-bb <- c(0.256, 20, 45, 55.4325)
-```
-
-We then crop the raster tiles to the extent using the function
-*crop_to_extent()* in a loop
+Note that the data is stored in a separate folder called r.stream.order.
 
 ```{r, eval = FALSE}
-
-for(itile in raster_tiles) {
-
-  crop_to_extent(raster_layer = itile,
-                 bounding_box = bb,
-                 out_dir = study_area_dir,
-                 file_name =  paste0(str_remove(basename(itile), ".tif"),
-                                     "_crop.tif"),
-                 quiet = FALSE,
-                 compression = "high",
-                 bigtiff = TRUE,
-                 read = FALSE)
-}
-```
-
-### Filtering the sub-catchment and basin .gpkg files
-
-In case you don't work on a server, we suggest you to download the
-output files of this chunk from the following links and then copy them
-in the folder *`study_area_dir`*:
-
--   [order_vect_segment_h18v02_crop.gpkg](https://drive.google.com/file/d/14jh2zG7eqlS-KQZlZufLcZfPdEhRncd8/view?usp=drive_link)
-
--   [basin_h18v02_crop.gpkg](https://drive.google.com/file/d/1l9l7k3s9YIVkjhSoRqLVb8L2rGStSvz0/view?usp=drive_link)
-
-```{r, eval = FALSE}
-# !! Only run this chunk on a machine with more than 16 GB RAM, 
-# as the input files are really big !!
-
-# Load the cropped stream and basin raster layer of the study area.
-# The stream raster can be used interchangeably with the sub_catchment raster, 
-# because the stream IDs are the same as the sub-catchment IDs. 
-# Here we use the stream raster because it's smaller in size. 
-
-stream_layer <- rast(paste0(study_area_dir, "/segment_h18v02_crop.tif"))
-basin_layer <- rast(paste0(study_area_dir, "/basin_h18v02_crop.tif"))
-
-# Get all sub-catchment and basin IDs of the study area
-subc_ids <- terra::unique(stream_layer)
-basin_ids <- terra::unique(basin_layer)
-
-# Get the full path of the stream order segment GeoPackage tile
-order_tile <- list.files(wdir, pattern = "order.+_h[v0-8]+.gpkg$",
-                         full.names = TRUE, recursive = TRUE)
-basin_gpkg_tile <- list.files(wdir, pattern = "bas.+_h[v0-8]+.gpkg$",
-                              full.names = TRUE, recursive = TRUE)
-
-# Filter the sub-catchment IDs from the GeoPackage of the order_vector_segment
-# tiles (sub-catchment ID = stream ID)
-# Save the stream segments of the study area
-filtered_stream <- read_geopackage(order_tile,
-                                 import_as = "sf",
-                                 subc_id = subc_ids$segment_h18v02_crop,
-                                 name = "stream")
-
-sf::write_sf(filtered_stream, paste(study_area_dir,
-                              paste0(str_remove(basename(order_tile), ".gpkg"),
-                                         "_crop.gpkg"), sep="/"))
-
-filtered_bas <- read_geopackage(basin_gpkg_tile,
-                                 import_as = "sf",
-                                 subc_id = basin_ids$basin_h18v02_crop,
-                                 name = "ID")
-
-sf::write_sf(filtered_bas, paste(study_area_dir,
-                          paste0(str_remove(basename(basin_gpkg_tile), ".gpkg"),
-                                         "_crop.gpkg"), sep="/"))
-
-```
-
-### Merging the elevation tiles
-
-```{r, eval = FALSE}
-# These are the elevation tiles that include our study area
-elv_tiles <- c("n45e000_elv.tif", "n50e010_elv.tif", "n60e000_elv.tif",
-                "n45e005_elv.tif", "n50e015_elv.tif", "n60e005_elv.tif",
-                "n45e010_elv.tif", "n55e000_elv.tif", "n60e010_elv.tif",
-                "n45e015_elv.tif", "n55e005_elv.tif", "n60e015_elv.tif",
-                "n50e000_elv.tif", "n55e010_elv.tif", "n50e005_elv.tif",
-                "n55e015_elv.tif")
-
-merge_tiles(tile_dir = elv_dir, 
-            tile_names = elv_tiles,
-            out_dir = study_area_dir, 
-            file_name = "elv_study_area.tif",
-            compression = "high",
-            bigtiff = TRUE,
-            quiet = FALSE)
-
-
-# crop to our extent
-crop_to_extent(raster_layer = paste0(study_area_dir, "/elv_study_area.tif"),
-               bounding_box = bb,
-               out_dir = study_area_dir,
-               file_name =  "elv_study_area_crop.tif",
-               quiet = FALSE,
-               compression = "high", 
-               bigtiff = TRUE, 
-               read = FALSE)
-
-```
-
-Finally, we will crop the CHELSA Bioclim layers.
-
-We define the directory containing the layers to be cropped and we list
-their file names
-
-```{r, eval = FALSE}
-dir_chelsa <- paste0(wdir, "/data/chelsa_bioclim")
-files_chelsa <- list.files(dir_chelsa, pattern = ".tif", full.names = TRUE)
-```
-
-```{r, eval = FALSE}
-for(ifile in files_chelsa) {
-    crop_to_extent(
-      raster_layer = ifile,
-      bounding_box = bb,
-      out_dir = study_area_dir,
-      file_name = basename(ifile),
-      read = FALSE,
-      quiet = TRUE)
-}
-```
-
-### Extracting sub-catchment IDs
-
-Extract the IDs of the sub-catchments where the points are located. This
-step is crucial, as many of the functions that we will later use require
-a vector of sub-catchment IDs as input. Note that the function
-*extract_ids()* can be used to extract the values at specific points of
-any raster file provided to the argument *subc_layer*. It can be safely
-used to query very large raster files, as these are not loaded into R.
-
-```{r, eval = TRUE}
-spdata_ids <- extract_ids(data = spdata,
-  id = "gbifID",
-  lon = "longitude", lat = "latitude",
-  basin_layer = paste0(study_area_dir, "/basin_h18v02_crop.tif"),
-  subc_layer = paste0(study_area_dir, "/sub_catchment_h18v02_crop.tif"))
-```
-
-```{r, echo = FALSE}
-knitr::kable(head(spdata_ids),
-             caption = "The species data have now their corresponding sub-catchment ids")
-```
-
-```{r, echo = FALSE}
-# # write points as gpkg
-# spdata_vect <- vect(spdata_ids, geom=c("longitude", "latitude"))
-# writeVector(spdata_vect, paste0(wdir, "/data/spdata.gpkg"), overwrite=T)
-```
-
-### Snapping points to the network
-
-Before we can calculate the distance along the stream network between
-species occurrences, we need to snap the coordinates of the sites to the
-stream network. Recorded coordinates of point locations usually do not
-exactly overlap with the digital stream network and, therefore, need to
-be slightly corrected.
-
-The hydrographr package offers two different snapping functions,
-`snap_to_network` and `snap_to_subc_segment`. The first function uses a
-defined distance radius and a flow accumulation threshold, while the
-second function snaps the point to the stream segment of the
-sub-catchment the point was originally located in.
-
-For this case study we will use the function `snap_to_network` to be
-able to define a certain flow accumulation threshold and ensure that the
-fish occurrences will not be snapped to a headwater stream (first order
-stream) if there is also a higher order stream next to it.
-
-![](../man/figures/snapping.png)
-
-```{r, eval = FALSE}
-# Define full paths of raster layers
-stream_rast <- paste0(study_area_dir, "/segment_h18v02_crop.tif")
-flow_rast <- paste0(study_area_dir, "/accumulation_h18v02_crop.tif")
-```
-
-```{r, eval = FALSE}
-# We need to shorten the gbifIDs because they are too long for GRASS-GIS
-# We will delete the first 2 characters ("40") from all IDs
-spdata_ids$gbifID_tmp <- str_replace(spdata_ids$gbifID, "40", "")
-```
-
-The function is implemented in a for-loop that starts searching for
-streams with a very high flow accumulation of 400,000 km² in a very
-short distance and then slowly decreases the flow accumulation to 100
-km². If there are still sites left which were not snapped to a stream
-segment, the distance will increase from 10 up to 30 cells.
-
-```{r, eval = FALSE}
-# Define thresholds for the flow accumulation of the stream segment, where
-# the point location should be snapped to
-accu_threshold <- c(400000, 300000, 100000, 50000, 10000, 5000, 1000, 500, 100) 
-# Define the distance radius
-dist_radius <- c(10, 20, 30)
-
-# Create a temporary data.table
-point_locations_tmp <- spdata_ids
-
-# Note: The for loop takes about 9 minutes
-first <- TRUE
-for (idist in dist_radius) {
-    
-   # If the distance increases to 20 cells only a flow accumulation of 100 km²
-   # will be used
-   if (idist == 20) {
-    # Set accu_threshold to 100
-    accu_threshold <- c(100)
-   }
+# define the path to the vector stream network data
+var_dir <- paste0(wdir, "data/r.stream.order/", "order_vect", "_tiles20d/")
   
-
-  for (iaccu in accu_threshold) {
-    # Snap point locations to the stream network
-    point_locations_snapped_tmp <- snap_to_network(data = point_locations_tmp,
-                                    id = "gbifID",
-                                    lon = "longitude", lat = "latitude",
-                                    stream_layer = stream_rast,
-                                    accu_layer = flow_rast,
-                                    method = "accumulation",
-                                    distance = idist,
-                                    accumulation = iaccu,
-                                    quiet = FALSE)
-
-    
-    # Keep point location with NAs for the next loop
-    point_locations_tmp <- point_locations_snapped_tmp %>% 
-      filter(is.na(subc_id_snap_accu))
+# Build path to .tif file names for each variable and tile ids
+tile_files <- paste0("order_vect_segment", "_", tile_id, ".gpkg")
   
-  if (first == TRUE) {
-    # Keep the point locations with the new coordinates and remove rows with NA
-    point_locations_snapped <- point_locations_snapped_tmp %>% 
-    filter(!is.na(subc_id_snap_accu))
-    first <- FALSE
-  } else {
-    # Bind the new data.frame to the data.frame of the loop before
-    # and remove the NA
-    point_locations_snapped <- point_locations_snapped %>% 
-      bind_rows(point_locations_snapped_tmp) %>% 
-      filter(!is.na(subc_id_snap_accu))
-    
-  }
+# List only the matching .tif files in that folder
+tile_names <- list.files(var_dir, pattern = "\\.gpkg$", full.names = FALSE)
+tile_names <- tile_names[tile_names %in% tile_files]
   
-  }
-    
-}
+# Run the merge function
+merge_tiles(
+  tile_dir = var_dir,
+  tile_names = tile_names,
+  out_dir = paste0(wdir, "data/r.stream.order"),
+  file_name = paste0("order_vect_merge", ".gpkg"),
+  read = FALSE,
+  bigtiff = TRUE,
+  quiet = FALSE
+  )
+
+
 ```
-
-We can write out the result of the snapping
-
-```{r, eval=F}
-fwrite(point_locations_snapped, paste0(wdir, "/data/spdata_snapped.csv"), sep = ",", 
-                      row.names = FALSE, quote = FALSE)
-```
-
-```{r, echo = F}
-point_locations_snapped <- fread(paste0(wdir, "/data/spdata_snapped.csv"), sep = ",") %>% 
-  head()
-```
-
-```{r, eval = F}
-head(point_locations_snapped)
-```
-
-```{r, echo = FALSE}
-knitr::kable(head(point_locations_snapped),
-      caption = "The species data have been attributed new coordinates and in 
-      some cases a new sub-catchment id (\"subc_id_snap_accu\")")
-```
-
-### Calculating distances between points
-
-We will calculate the distance between all point locations. The
-following chunks are computationally heavy, so we suggest to run them on
-a server.
+To calculate the distance between lakes we first represent the vector stream network in a graph.
 
 ```{r, eval = FALSE}
-# Load as graph
-stream_graph <- read_geopackage(
-  gpkg = paste0(study_area_dir, "/order_vect_segment_h18v02_crop.gpkg"),
-  import_as = "graph")
+my_graph <- read_geopackage(gpkg = paste0(wdir,
+                                          "data/r.stream.order",
+                                          "/order_vect_tiles20d/order_vect_segment_h18v02.gpkg"),
+                            import_as = "graph")
 
-# Get the network distance (in meters) between all input pairs.
-# We provide the subcatchment ids of the snapped points to the argument "subc_id"
-subc_distances <- get_distance_graph(stream_graph,
-                            subc_id = point_locations_snapped$subc_id_snap_accu,
-                            variable = "length",
-                            distance_m = TRUE)
+my_graph <- read_geopackage(gpkg = paste0(wdir,
+                                          "/data/r.stream.order",
+                                          "/order_vect_merge.gpkg"),
+                            import_as = "graph")
+
+```
+
+Now we extract the stream segment ID of the lake outlets. Between the two lakes of interest we will calculate the distance in m.
+
+```{r, eval = FALSE}
+
+lake_165245_intersect <- fread(paste0(wdir, "data/intersection_tables/lake_165245/coord_lake_165245.txt"))
+head(lake_165245_intersect)
+
+lake_165161_intersect <- fread(paste0(wdir, "data/intersection_tables/lake_165245/coord_lake_165161.txt"))
+head(lake_165161_intersect)
+
+```
+In both tables the first row represents the lake outlet (having the highest flow accumulation value). We can now calculate the distance between the two outlets using the sub-catchment ID of the first row found in the column subc_id. That are for the Rangsdorfer lake subc_id 39089860 and for the Zeuthener lake subc_id 39220004. They correspond to the unique sub-catchment and stream segment ID of the Hydrography90m stream network.
+
+```{r, eval = FALSE}
+
+subc_id <- as.numeric(c("39089860", "39220004"))
+
+subc_distances <- get_distance_graph(my_graph,
+                                      subc_id = subc_id,
+                                      variable = "length",
+                                      distance_m = TRUE,
+                                      )
 
 ```
 
@@ -731,268 +604,5 @@ subc_distances <- fread(paste0(wdir, "/data/subc_distances.csv")) %>% head()
 head(subc_distances)
 ```
 
-```{r, echo =F}
-kbl(subc_distances)
-```
-
-### Obtaining network centrality indices
-
-We will now calculate centrality indices using the directed stream
-network graph and the function `get_centrality` We want to consider only
-the upstream connected segments, so we set `mode = "in".`
-
-The following chunks are computationally heavy, so we suggest to run
-them on a server.
-
-```{r, eval = F}
-centrality <- get_centrality(stream_graph, index = "all", mode = "in")
-```
-
-```{r, echo = F}
-centrality <- fread(paste0(wdir, "/data/subc_centrality.csv"), sep = ",", quote = F)
-```
-
-We can reclassify the stream segment and sub-catchment raster layers
-based on the centrality value of each stream, using the function
-`reclass_raster`. Essentially, we will create two new raster files, in
-which each stream pixel will have a centrality value, instead of the
-unique ID of the stream or sub-catchment.
-
-```{r, eval = F}
-
-# This data.frame includes some NAs in some of the columns, because some centrality metrics by default cannot be defined for some the subcatchments. We have to discard subcatchments with NAs before reclassifying.
-centrality <- drop_na(centrality)
-
-# Then we convert the values in the centrality data.frame into integers
-centrality <- centrality %>% mutate_if(is.numeric, as.integer)
-
-reclass_raster(data = centrality, 
-                            rast_val = "subc_id", 
-                            new_val = "betweeness", 
-                            raster_layer = paste0(study_area_dir, "/segment_h18v02_crop.tif"), 
-                            recl_layer = paste0(study_area_dir,"/segment_h18v02_betweeness_all.tif"), 
-                            read = F)
-
-reclass_raster(data = centrality, 
-               rast_val = "subc_id", 
-               new_val = "degree", 
-               raster_layer = paste0(study_area_dir, "/sub_catchment_h18v02_crop.tif"),
-               recl_layer = paste0(study_area_dir,"/sub_catchment_h18v02_degree_all.tif"), 
-               read = F)
-
-reclass_raster(data = centrality, 
-               rast_val = "subc_id", 
-               new_val = "betweeness", 
-               raster_layer = paste0(study_area_dir, "/sub_catchment_h18v02_crop.tif"),
-               recl_layer = paste0(study_area_dir,"/sub_catchment_h18v02_betweeness_all.tif"), 
-               read = F)
-
-reclass_raster(data = centrality, rast_val = "subc_id", 
-               new_val = "farness", 
-               raster_layer = paste0(study_area_dir, "/sub_catchment_h18v02_crop.tif"),
-               recl_layer = paste0(study_area_dir,"/sub_catchment_h18v02_farness_all.tif"), 
-               read = F)
-
-reclass_raster(data = centrality, 
-               rast_val = "subc_id", 
-               new_val = "eccentricity", 
-               raster_layer = paste0(study_area_dir, "/sub_catchment_h18v02_crop.tif"),
-               recl_layer = paste0(study_area_dir,"/sub_catchment_h18v02_eccentricity_all.tif"), 
-               read = F)
-
-```
-
-Here's what the new segment and sub-catchment layers look like on QGIS.
-Yellow sub-catchments have the highest values, whereas dark blue have
-the lowest values for the different metrics.
-
-The node **betweenness** is (roughly) defined by the number of geodesics
-(shortest paths) going through a node:
-
-![](../man/figures/betweenness.png)
-
-The **degree** of a node is the number of its adjacent edges:
-
-![](../man/figures/degree.png){width="800"}
-
-**Farness** centrality is the sum of the length of the shortest paths
-between the node and all other nodes. It is the reciprocal of closeness
-(Altermatt, 2013):
-
-![](../man/figures/farness.png){width="800"}
-
-The **eccentricity** of a node is its shortest path distance from the
-farthest other node in the graph (West,
-1996):![eccentricity](../man/figures/eccentricity.png){width="800"}
-
-We can add the centrality metrics' values to the table of our points,
-using the sub-catchment id:
-
-```{r, eval = F}
-point_locations_snapped <- left_join(point_locations_snapped, centrality, 
-                          by = c('subc_id_snap_accu'= 'subc_id'))
-head(point_locations_snapped)
-```
-
-```{r, echo = F}
-
-point_locations_snapped <- fread(paste0(wdir, "/data/spdata_centrality.csv")) %>% 
-  head()
-```
-
-```{r, echo = F}
-kbl(point_locations_snapped)
-```
-
-Bonus! If we want to include the centrality indices to the stream
-network .gpkg, we can import the .gpkg and merge it with the centrality
-table
-
-```{r, eval = F}
-# Load stream network .gpkg as vector
-stream_vect <- read_geopackage(paste0(study_area_dir, "/order_vect_segment_h18v02_crop.gpkg"),
-                               import_as = "SpatVect")
-
-# Merge the centrality table with the vector
-stream_vect <- terra::merge(stream_vect, spdata_centr, 
-                        by.x = c('stream'), by.y="subc_id")
-
-# Write out the stream gpkg including the centrality indices
-writeVector(stream_vect, paste0(study_area_dir, "/order_vect_segment_centr.gpkg"))
-```
-
-### Extracting zonal statistics of topographic variables
-
-We will calculate the zonal statistics of the Hydrography90m,
-MERIT-HYDRO DEM and the CHELSA Bioclim variables for the sub-catchments
-of our species points. Caution, don't increase the number of cores to
-more than 3 as this can cause memory problems. However, this highly
-depends to the number of sub-catchments as well. We recommend to test
-the function with different parameters to find out what works best for
-your case.
-
-Let's first define the input `var_layers` for the `extract_zonal_stat`
-function
-
-```{r, eval = F}
-list.files(study_area_dir)
-var_layers <- c("bio1_1981-2010.tif", "bio12_1981-2010.tif",
-                "bio15_1981-2010.tif", "elv_study_area_crop.tif",
-                "outlet_dist_dw_basin_h18v02_crop.tif")
-```
-
-A good practice before aggregating the variables is to check their
-NoData values:
-
-```{r, eval = FALSE}
-report_no_data(data_dir = study_area_dir, var_layer = var_layers)
-```
-
-```{r, eval = F}
-#                                 Raster                  NoData
-# 1                   bio1_1981-2010.tif                  -99999
-# 2                  bio15_1981-2010.tif 3.40282346600000016e+38
-# 3 outlet_dist_dw_basin_h18v02_crop.tif                   -9999
-# 4                  bio12_1981-2010.tif                  -99999
-# 5              elv_study_area_crop.tif                   -9999
-```
-
-```{r, eval = FALSE}
-# Run the function that returns the zonal statistics.
-# We provide the subcatchment ids of the fish points to the argument 'subc_id'.
-stats_table_zon <- extract_zonal_stat(
-                    data_dir = study_area_dir,
-                    subc_layer = paste0(study_area_dir, "/sub_catchment_h18v02_crop.tif"),
-                    subc_id = point_locations_snapped$subc_id_snap_accu,
-                    var_layer = var_layers,
-                    out_dir = paste0(wdir, "/data"),
-                    file_name = "zonal_stats.csv",
-                    n_cores = 3)
-```
-
-The function also reports the NoData values that are used in the
-calculation of the zonal statistics of each variable.
-
-We will keep only the mean and sd of each variable of the stats_table:
-
-```{r, eval = F}
-stats_table_zon <- stats_table_zon %>%
-  dplyr::select(contains("subc") |  ends_with("_mean") | ends_with("_sd")) %>%
-  rename('subcatchment_id' = 'subc_id')
-
-```
-
-The values in some of the original raster files were scaled, so we need
-to re-scale them before proceeding to any analyses.
-
-We define the following functions:
-
-```{r, eval = F}
-clim_scale <- function(x, na.rm = F) (x * 0.1)
-offset <- function(x, na.rm = F) (x - 273.15)
-```
-
-... and apply them to rescale the values
-
-```{r, eval = F}
-stats_table_zon <- stats_table_zon  %>%
-  mutate(across(starts_with("bio"), clim_scale))  %>%
-  mutate(across(matches("bio1_.*_mean"), offset))
-```
-
-```{r, eval = F, echo = F}
-fwrite(stats_table_zon, paste0(wdir, "/data/zonal_stats.csv"), 
-       sep =",", quote=F, row.names=F)
-```
-
-```{r, eval=F}
-head(stats_table_zon)
-```
-
-```{r, echo = F}
-stats_table_zon <- fread(paste0(wdir, "/data/zonal_stats.csv")) %>% head()
-kbl(stats_table_zon) %>% 
-  kable_styling(bootstrap_options = "striped", 
-                full_width = F, position = "left") %>%
-  scroll_box(width = "500px", height = "200px")
-
-
-```
-
-### Putting together the final table
-
-We will now perform some left joins to match the zonal statistics table
-with the original species data.
-
-```{r, eval = F}
-data_fin <- left_join(point_locations_snapped, stats_table_zon, 
-          by = c('subc_id_snap_accu'= 'subcatchment_id'))
-
-data_fin$gbifID <- as.character(data_fin$gbifID)
-data_fin <- left_join(spdata_ids, data_fin)
-
-# Convert the gbifIDs back to the original values
-data_fin$gbifID <- str_c("40", data_fin$gbifID)
-spdata$gbifID <- as.character(spdata$gbifID)
-
-data_fin <- left_join(spdata, data_fin)
-```
-
-```{r, eval=F, echo=F}
-fwrite(data_fin, paste0(wdir, "/data/data_final.csv"), 
-       sep = ",", quote = F, row.names = F)
-```
-
-```{r, eval = F}
-head(data_fin)
-```
-
-```{r, echo = F}
-data_fin <- fread(paste0(wdir, "/data/data_final.csv")) %>% head()
-kbl(data_fin) %>% 
-  kable_styling(bootstrap_options = "striped", 
-                full_width = F, position = "left") %>%
-  scroll_box(width = "500px", height = "200px")
-```
 
 ### References
