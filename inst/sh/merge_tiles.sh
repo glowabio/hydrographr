@@ -63,10 +63,11 @@ then
         ATTR_SQL="$ATTR_SQL, GROUP_CONCAT(DISTINCT $a) AS $a"
       fi
     done
-    ogr2ogr -f GPKG -nlt PROMOTE_TO_MULTI -dialect sqlite \
-      -sql "SELECT $colname $ATTR_SQL, ST_Union(ST_MakeValid($GEOM)) \
-      AS geom FROM merged GROUP BY $colname" \
-      $out/${outname} $out/merge_${outname_base}.gpkg
+      ogr2ogr -f GPKG -nlt PROMOTE_TO_MULTI -dialect sqlite \
+  -sql "SELECT $colname $ATTR_SQL, ST_Union(ST_Buffer(ST_MakeValid($GEOM), 0))
+  AS geom FROM merged GROUP BY $colname" \
+  "$out/${outname}" "$out/merge_${outname_base}.gpkg"
+
 
     # including only column name and id:
   #  ogr2ogr -f GPKG -nlt PROMOTE_TO_MULTI -dialect sqlite \
