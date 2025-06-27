@@ -8,13 +8,13 @@ extract_lake_ids(
   data,
   lon,
   lat,
-  bbox = FALSE,
+  lake_shape,
   var_name = "Hylak_id",
   xmin = NULL,
   ymin = NULL,
   xmax = NULL,
   ymax = NULL,
-  lake_shape,
+  bbox = FALSE,
   lake_id_table,
   quiet = TRUE
 )
@@ -28,7 +28,8 @@ occurrences}
 
 \item{lat}{character. The name of the column with the latitude coordinates.}
 
-\item{bbox}{logical. if TRUE, then all lake ids within the bounding box are returned, note that either bounding box values can be supplied thorugh xmin, ymin, xmax and ymax values or when left empty (NULL) bounding box is calculated from min max values of the longitude and latitude values provided in the occurrence table; if FALSE lake ids in which point occurrences are located are returned, default is FALSE}
+\item{lake_shape}{Full path to lake shape files; i.e. HydroLAKES shapefiles;
+when NULL a lake raster file needs to be provided}
 
 \item{var_name}{character. Name of the shapefile ID column, i.e. "Hylak_id"
 for HydroLAKES; default is "Hylak_id"}
@@ -41,14 +42,21 @@ for HydroLAKES; default is "Hylak_id"}
 
 \item{ymax}{integer. bounding box coordinate upper left corner in WGS84; if NULL see parameter bbox}
 
-\item{lake_shape}{Full path to lake shape files; i.e. HydroLAKES shapefiles; when NULL a lake raster file needs to be provided}
+\item{bbox}{logical. if TRUE, then all lake ids within the bounding box are
+returned, note that either bounding box values can be supplied thorugh xmin,
+ymin, xmax and ymax values or when left empty (NULL) bounding box is
+calculated from min max values of the longitude and latitude values provided
+in the occurrence table; if FALSE lake ids in which point occurrences are
+located are returned, default is FALSE}
 
 \item{lake_id_table}{character. Full path of the output lake id table}
 
 \item{quiet}{logical. If FALSE, the standard output will be printed.
 Default is TRUE.}
 
-\item{lake_raster}{Full path to lake raster file; note this option only works with bbox = FALSE and will result in the raster extraction at point occurrence locations; when NULL lake ids are extracted from lake shape file; default is NULL}
+\item{lake_raster}{Full path to lake raster file; note this option only works
+with bbox = FALSE and will result in the raster extraction at point occurrence locations;
+when NULL lake ids are extracted from lake shape file; default is NULL}
 
 \item{read}{logical. If TRUE, then the model .csv table
 gets read into R as data.table and data.frame.
@@ -61,7 +69,27 @@ of point occurrences or falling within a bounding box
  Any thing the user needs to notice? add Note
 }
 \examples{
-# Download hydrolakes shape files from their website and test with hydrolakes.sh instead I always transformed it before to lake.gpkg
+# Download hydrolakes shape files from their website and test with hydrolakes.shp instead I always transformed it before to lake.gpkg
+#' # Download test data into the temporary R folder
+# or define a different directory
+my_directory <- tempdir()
+download_test_data(my_directory)
+
+#' Example 1: Extracts HydroLAKE IDs for points located within a lake
+
+# Load occurrence data
+
+
+
+extract_lake_ids(data,
+                 lon = "longitude",
+                 lat = "latitude",
+                 lake_shape = "/data/ttomiczek/lakes_out_inlet_basins/lakes.gpkg",
+                 lake_id_table = "/data/ttomiczek/hydrographr/hydrography90m_test_data/test_lake_intersect/",
+                 quiet = FALSE)
+
+
+
 
 }
 \references{

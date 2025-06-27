@@ -10,17 +10,23 @@
 #' occurrences
 #' @param lon character. The name of the column with the longitude coordinates.
 #' @param lat character. The name of the column with the latitude coordinates.
+#' @param bbox logical. if TRUE, then all lake ids within the bounding box are
+#' returned, note that either bounding box values can be supplied thorugh xmin,
+#' ymin, xmax and ymax values or when left empty (NULL) bounding box is
+#' calculated from min max values of the longitude and latitude values provided
+#' in the occurrence table; if FALSE lake ids in which point occurrences are
+#' located are returned, default is FALSE
 #' @param xmin integer. bounding box coordinate check what is lower left corner in WGS84; if NULL see parameter bbox
 #' @param ymin integer. bounding box coordinate check what is lower right corner in WGS84; if NULL see parameter bbox
 #' @param xmax integer. bounding box coordinate upper right corner in WGS84; if NULL see parameter bbox
 #' @param ymax integer. bounding box coordinate upper left corner in WGS84; if NULL see parameter bbox
-#' for HydroLAKES; default is "Hylak_id"
-#' @param lake_shape Full path to lake shape files; i.e. HydroLAKES shapefiles; when NULL a lake raster file needs to be provided
 #' @param var_name character. Name of the shapefile ID column, i.e. "Hylak_id"
 #' for HydroLAKES; default is "Hylak_id"
-#' @param bbox logical. if TRUE, then all lake ids within the bounding box (xmin, ymin, xmax and ymax) are returned,
-#' if TRUE and no xmin, ymin, xmax and ymax values are provided then the bounding box is the spatial extent min max values of the longitude and latitude values provided in the species occurrence table;
-#' if FALSE lake ids in which point occurrences are located are returned, default is FALSE
+#' @param lake_shape Full path to lake shape files; i.e. HydroLAKES shapefiles;
+#' when NULL a lake raster file needs to be provided
+#' @param lake_raster Full path to lake raster file; note this option only works
+#' with bbox = FALSE and will result in the raster extraction at point occurrence locations;
+#' when NULL lake ids are extracted from lake shape file; default is NULL
 #' @param lake_id_table character. Full path of the output lake id table
 #' @param read logical. If TRUE, then the model .csv table
 #' gets read into R as data.table and data.frame.
@@ -42,11 +48,56 @@
 #'
 #' @examples
 #' # Download hydrolakes shape files from their website and test with hydrolakes.shp instead I always transformed it before to lake.gpkg
+#' #' # Download test data into the temporary R folder
+#' # or define a different directory
+#' my_directory <- tempdir()
+#' download_test_data(my_directory)
+#'
+#' #' Example 1: Extracts HydroLAKE IDs for points located within a lake
+#'
+#' # Load occurrence data
+#'
+# species_occurrence <- read.table(paste0(my_directory,
+#                                      "/hydrography90m_test_data",
+#                                      "/spdata_1264942.txt"),
+#                                       header = TRUE)
+#'
+#'
+#' extract_lake_ids(data,
+#'                  lon = "longitude",
+#'                  lat = "latitude",
+#'                  lake_shape = "/data/ttomiczek/lakes_out_inlet_basins/lakes.gpkg",
+#'                  lake_id_table = "/data/ttomiczek/hydrographr/hydrography90m_test_data/test_lake_intersect/",
+#'                  quiet = FALSE)
+#'
+# extract_lake_ids(data = species_occurrence,
+#                  lon = "longitude",
+#                  lat = "latitude",
+#                  var_name = "lake_id",
+#                  lake_shape = paste0(my_directory, "lakes_corsica.shp"),
+#                  lake_id_table = paste0(my_directory, "ghosts/"),
+#                  quiet = FALSE)
+#'
+# extract_lake_ids(data = species_occurrence,
+#                  lon = "longitude",
+#                  lat = "latitude",
+#                  xmin = 9.498263,
+#                  ymin = 44.21651,
+#                  xmax = 29.71806,
+#                  ymax = 50.25584,
+#                  var_name = "lake_id",
+#                  lake_shape = paste0(my_directory, "lakes_corsica.shp"),
+#                  bbox = TRUE,
+#                  lake_id_table = paste0(my_directory, "ghosts/"),
+#                  quiet = FALSE)
 
-extract_lake_ids <- function(data, lon, lat, xmin = NULL, ymin = NULL,
-                             xmax = NULL, ymax = NULL,
-                             lake_shape, var_name = "Hylak_id", bbox = FALSE,
-                             lake_id_table, quiet = TRUE) {
+#'
+#'
+
+extract_lake_ids <- function(data, lon, lat, lake_shape,
+                             var_name = "Hylak_id", xmin = NULL,
+                             ymin = NULL, xmax = NULL, ymax = NULL,
+                             bbox = FALSE, lake_id_table, quiet = TRUE) {
 
   # Check if input data is of type data.frame,
   # data.table or tibble
@@ -75,26 +126,34 @@ extract_lake_ids <- function(data, lon, lat, xmin = NULL, ymin = NULL,
   if (!is.logical(quiet))
     stop("quiet: Has to be TRUE or FALSE.")
 
-  if (!is.null(xmax) && !is.null(xmin) && !is.null(ymax) && !is.null(ymin) && isTRUE(bbox)) {
 
-  bbox <- 1
 
-  } else if (isTRUE(bbox)) {
-
-  bbox <- 1
-
-  longi <- data$lon
-  lati <- data$lat
-
-  xmax <- max(longi)
-  xmin <- min(longi)
-  ymax <- max(lati)
-  ymin <- min(lati)
-
+  # if ((is.null(xmax) || is.null(xmin) || is.null(ymax) || is.null(ymin)) && isTRUE(bbox)) {}
+  if (!is.null(xmax) && !is.null(xmin) && !is.null(ymax) && !is.null(ymin)
+             && isTRUE(bbox)) {
+            xmax <- xmax
+            xmin <- xmin
+            ymax <- ymax
+            ymin <- ymin
+  #
+  #            rand_string <- stri_rand_strings(n = 1, length = 8, pattern = "[A-Za-z0-9]")
+  #            # Select columns with lon/lat coordinates
+  #            # check again extract_ids R script to create coord and coord_tmp_path
+  #            # Select columns with lon/lat coordinates
+  #            # columns <- c(lon, lat)
+  #            # coord <- as.data.table(data)[, ..columns]
+  #            # Remove duplicated rows across entire data frame
+  #            coord <- data.table(data)
+  #            coord <- coord[!duplicated(coord), ]
+  #            # Export taxon occurrence points
+  #            coord_tmp_path <- paste0(tempdir(), "/coordinates_", rand_string, ".txt")
+  #            ## Note:Only export lon/lat column
+  #            fwrite(coord, coord_tmp_path, col.names = TRUE,
+  #                   row.names = FALSE, quote = FALSE, sep = " ")
+  #   # write a warning that all xy max min variables need to be supplied
   } else {
-
-  bbox <- 0
-
+  # need to test whether the min max values of points are still
+  # included in lakes when they overlap with a HydroLAKE
   longi <- data$lon
   lati <- data$lat
 
@@ -102,21 +161,37 @@ extract_lake_ids <- function(data, lon, lat, xmin = NULL, ymin = NULL,
   xmin <- min(longi)
   ymax <- max(lati)
   ymin <- min(lati)
+
   }
 
+  longi <- data$lon
+  lati <- data$lat
+  ### be sure to convert csv files into txt files for the sh script to work! ###
+
+  # Create random string to attach to the file name of the temporary
+  # points_dataset.txt and ids.txt file
   rand_string <- stri_rand_strings(n = 1, length = 8, pattern = "[A-Za-z0-9]")
-
+  # Select columns with lon/lat coordinates
+  # check again extract_ids R script to create coord and coord_tmp_path
+  # Select columns with lon/lat coordinates
   # columns <- c(lon, lat)
-  coord <- as.data.table(data)
+  # coord <- as.data.table(data)[, ..columns]
   # Remove duplicated rows across entire data frame
+  coord <- data.table(longitude = longi, latitude = lati)
   coord <- coord[!duplicated(coord), ]
-
-  # coord <- data.table(longitude = longi, latitude = lati)
-  # coord <- coord[!duplicated(coord), ]
   # Export taxon occurrence points
   coord_tmp_path <- paste0(tempdir(), "/coordinates_", rand_string, ".txt")
   ## Note:Only export lon/lat column
   fwrite(coord, coord_tmp_path, col.names = TRUE,
+         row.names = FALSE, quote = FALSE, sep = " ")
+
+  bbox_coord <- data.frame(
+    extent = c("xmin", "ymin", "xmax", "ymax"),
+    value = c(xmin, ymin, xmax, ymax)
+  )
+
+  bbox_coord_tmp_path <- paste0(tempdir(), "/bbox_coordinates_", rand_string, ".txt")
+  fwrite(bbox_coord, bbox_coord_tmp_path, col.names = TRUE,
          row.names = FALSE, quote = FALSE, sep = " ")
 
   # Check operating system
@@ -127,39 +202,53 @@ extract_lake_ids <- function(data, lon, lat, xmin = NULL, ymin = NULL,
 
   if (sys_os == "linux" || sys_os == "osx") {
 
+    # Convert null arguments to 0 so that bash can evaluate the variables
+    # check how this is handled in shell script
+    # lake_raster <- ifelse(is.null(lake_raster), 0, lake_raster)
+
     # Call the external .sh script extract_ids() containing the gdal function
     processx::run(system.file("sh", "extract_lake_ids.sh", package = "hydrographr"),
-                  args = c(lake_shape, xmin, ymin, xmax, ymax, tempdir(), var_name, lon, lat,
-                           coord_tmp_path, bbox, lake_id_table),
-                           echo = !quiet)
+                  args = c(coord_tmp_path, lon, lat, lake_shape, bbox_coord_tmp_path,
+                           var_name, bbox, tempdir()), lake_id_table,
+                  echo = !quiet)
 
   } else {
     # Check if WSL and Ubuntu is installed
     check_wsl()
     # Change path for WSL
+    wsl_coord_tmp_path <- fix_path(coord_tmp_path)
     wsl_lake_shape <- ifelse(is.null(lake_shape), 0, fix_path(lake_shape))
+    wsl_bbox_coord_tmp_path <- fix_path(bbox_coord_tmp_path)
     wsl_tmp_path <- fix_path(tempdir())
+    wsl_lake_id_table <- fix_path(lake_id_table)
     wsl_sh_file <- fix_path(
       system.file("sh", "extract_lake_ids.sh",
                   package = "hydrographr"))
 
     processx::run(system.file("bat", "extract_lake_ids.bat",
                               package = "hydrographr"),
-                  args = c(wsl_lake_shape, xmin,
-                           ymin, xmax, ymax, wsl_tmp_path,
+                  args = c(wsl_coord_tmp_path, lon, lat, wsl_lake_shape,
+                           wsl_bbox_coord_tmp_path,
+                           var_name, bbox, wsl_tmp_path, wsl_lake_id_table,
                            wsl_sh_file, echo = !quiet))
 
   }
+  # Read in the file containing the ids setting fill=TRUE, for the case that
+  # some coordinates were in null cells so they did not get an ID
+  # lake_ids <- fread(paste0(lake_id_table/),
+                  #  keepLeadingZeros = TRUE, header = TRUE, sep = " ",
+                  #  fill = TRUE)
+ # tmp_lake_id <- fread(paste0(tempdir(), "\lake_id.txt"))
+ # fwrite(tmp_lake_id, lake_id_table, col.names = TRUE,
+ #        row.names = FALSE, quote = FALSE, sep = " ")
+ # rm(tmp_lake_id)
 
-  file_path <- paste0(lake_id_table, "/lake_ids", ".txt")
-
-  print(file_path)
-
-  lake_ids <- fread(file_path,
-                   keepLeadingZeros = TRUE, header = TRUE, sep = " ",
-                   fill = TRUE)
+  # Remove all files in the tmp folder
+  file.remove(coord_tmp_path, bbox_coord_tmp_path)
 
   # Return data frame
-  ## check fread data_table e.g. lake_ids <- fread(OUTDIR/lake_rand_string)
-  return(lake_ids)
+  ## check fread data_table e.g.
+  lake_ids <- fread(paste0(lake_id_table, "/lake_id.txt"))
+  # return(lake_ids)
+
 }
