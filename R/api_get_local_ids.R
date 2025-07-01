@@ -139,7 +139,7 @@ api_get_local_ids <- function(df = NULL, csv_url = NULL,
   # Send the POST request
   response <- httr::POST(
     url = process_url,
-    body = toJSON(body, auto_unbox = TRUE),
+    body = jsonlite::toJSON(body, auto_unbox = TRUE),
     encode = "json",
     add_headers("Content-Type" = "application/json", "Prefer" = "respond-async")
   )
