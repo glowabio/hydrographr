@@ -55,9 +55,9 @@ head(upstream_df)
 
 }
 \seealso{
-Other pygeoapi: 
+Other ocgapi: 
 \code{\link{api_get_env90m_data}()},
 \code{\link{api_get_local_ids}()},
 \code{\link{api_get_snapped_points}()}
 }
-\concept{pygeoapi}
+\concept{ocgapi}

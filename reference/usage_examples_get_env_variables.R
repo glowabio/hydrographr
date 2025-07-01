@@ -9,7 +9,7 @@
 
 # For each dataset, there is a "download_xxx_tables()" function,
 # with which you can do several things:
-# 
+#
 # (1) Ask for all variables: It will display all variables in a list, also split by model, scenario etc.
 #     Specify a subset by specifying components such as model, scenario etc. or by passing selected variable names: It will check whether they exist and return only the existing ones
 # (2) Specify a subset and tile_ids: It will compute the download size
@@ -20,7 +20,7 @@
 
 ######################
 ### future climate ###
-######################
+#####################
 
 # (1) Ask for all variables
 download_future_climate_tables()

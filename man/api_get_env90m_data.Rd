@@ -49,9 +49,9 @@ env_df <- get_env90m_data(subc_ids = subc_ids, variables = vars)
 
 }
 \seealso{
-Other pygeoapi: 
+Other ocgapi: 
 \code{\link{api_get_local_ids}()},
 \code{\link{api_get_snapped_points}()},
 \code{\link{api_get_upstream_subcids}()}
 }
-\concept{pygeoapi}
+\concept{ocgapi}

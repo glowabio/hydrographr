@@ -45,9 +45,9 @@ process_url = "http://localhost:5000/processes/get-snapped-points/execution")
 
 }
 \seealso{
-Other pygeoapi: 
+Other ocgapi: 
 \code{\link{api_get_env90m_data}()},
 \code{\link{api_get_local_ids}()},
 \code{\link{api_get_upstream_subcids}()}
 }
-\concept{pygeoapi}
+\concept{ocgapi}
