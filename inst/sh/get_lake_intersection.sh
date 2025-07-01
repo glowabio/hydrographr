@@ -144,12 +144,19 @@ gdal_rasterize -a_srs EPSG:4326  -at -a diss -l $pn \
 export TMPDIR=$TMPDIR
 export LK=$LK
 
-grass -f --text --tmp-location $TMPDIR/lake_${LK}cp.tif <<EOF
-    r.external -o input=$TMPDIR/lake_${LK}cp.tif  output=out
-    g.region zoom=out
+# grass -f --text --tmp-location $TMPDIR/lake_${LK}cp.tif <<EOF
+#     r.external -o input=$TMPDIR/lake_${LK}cp.tif  output=out
+#     g.region zoom=out
+#     r.out.gdal -cm input=out out=$TMPDIR/lake_${LK}rm.tif \
+#     format=GTiff type=Byte createopt="COMPRESS=DEFLATE" nodata=0 --overwrite
+# EOF
+# Maybe try out this code if lake_{$LK}cp.tif does not exist
+grass --tmp-project $TMPDIR/lake_${LK}cp.tif --exec bash -c "
+    r.external -o input=$TMPDIR/lake_${LK}cp.tif output=out &&
+    g.region zoom=out &&
     r.out.gdal -cm input=out out=$TMPDIR/lake_${LK}rm.tif \
-    format=GTiff type=Byte createopt="COMPRESS=DEFLATE" nodata=0 --overwrite
-EOF
+        format=GTiff type=Byte createopt='COMPRESS=DEFLATE' nodata=0 --overwrite
+"
 
 xmin=$(pkinfo -i $TMPDIR/lake_${LK}rm.tif -te | awk '{print $2-0.001666667}')
 ymin=$(pkinfo -i $TMPDIR/lake_${LK}rm.tif -te | awk '{print $3-0.001666667}')
@@ -201,9 +208,9 @@ echo "$LK $(pkstat -i $TMPDIR/maskLB_${LK}.tif -hist \
   # > $TMPDIR/ref_CompUnitIDs_${LK}.txt
 
 # remove tmp files
-rm $TMPDIR/maskCU_${LK}.tif $TMPDIR/maskLB_${LK}.tif \
-$TMPDIR/extentCU_${LK}.tif $TMPDIR/extentLB_${LK}.tif \
-$TMPDIR/lake_${LK}rm.tif $TMPDIR/lake_${LK}cp.tif
+# rm $TMPDIR/maskCU_${LK}.tif $TMPDIR/maskLB_${LK}.tif \
+# $TMPDIR/extentCU_${LK}.tif $TMPDIR/extentLB_${LK}.tif \
+# $TMPDIR/lake_${LK}rm.tif $TMPDIR/lake_${LK}cp.tif
 
     # get the IDs of the COmpUnits
     CUID=($(cut -d" " -f2- $TMPDIR/ref_lbasinIDs_${LK}.txt))
@@ -243,14 +250,24 @@ $TMPDIR/lake_${LK}rm.tif $TMPDIR/lake_${LK}cp.tif
 
 # export LK=$LK
 
-grass -f --text --tmp-location $TMPDIR/lbasin_reclass_${LK}.vrt <<EOF_SCRIPT
-    r.external -o input=$TMPDIR/lbasin_reclass_${LK}.vrt output=out
-    g.region zoom=out
-    g.region -p
-    r.out.gdal input=out out=${TMPDIR}/ALLbasins_${LK}.tif format=GTiff type=Byte createopt="COMPRESS=DEFLATE,BIGTIFF=YES" --overwrite
-    region_info=\$(g.region -w | awk -F '[=,]' '{print \$2,\$3,\$4,\$5}')
-    echo "\$LK \$region_info" > $TMPDIR/lakes_ref_extent_${LK}.txt
-EOF_SCRIPT
+# grass -f --text --tmp-location $TMPDIR/lbasin_reclass_${LK}.vrt <<EOF_SCRIPT
+#     r.external -o input=$TMPDIR/lbasin_reclass_${LK}.vrt output=out
+#     g.region zoom=out
+#     g.region -p
+#     r.out.gdal input=out out=${TMPDIR}/ALLbasins_${LK}.tif format=GTiff type=Byte createopt="COMPRESS=DEFLATE,BIGTIFF=YES" --overwrite
+#     region_info=\$(g.region -w | awk -F '[=,]' '{print \$2,\$3,\$4,\$5}')
+#     echo "\$LK \$region_info" > $TMPDIR/lakes_ref_extent_${LK}.txt
+# EOF_SCRIPT
+
+grass --tmp-project $TMPDIR/lbasin_reclass_${LK}.vrt --exec bash -c "
+    r.external -o input=$TMPDIR/lbasin_reclass_${LK}.vrt output=out &&
+    g.region zoom=out &&
+    g.region -p &&
+    r.out.gdal input=out out=${TMPDIR}/ALLbasins_${LK}.tif \
+        format=GTiff type=Byte createopt='COMPRESS=DEFLATE,BIGTIFF=YES' --overwrite &&
+    region_info=\$(g.region -w | awk -F '[=,]' '{print \$2,\$3,\$4,\$5}') &&
+    echo \"${LK} \$region_info\" > $TMPDIR/lakes_ref_extent_${LK}.txt
+"
 
 # extention to consider for upstream creation
 export EXT=$(awk '{print $2, $3, $4, $5}' $TMPDIR/lakes_ref_extent_${LK}.txt)
@@ -266,9 +283,11 @@ pkreclass -co COMPRESS=LZW -co ZLEVEL=9 -ot Byte -of GTiff \
         -c 1 -r 2 -c 0 -r 1
 
 echo "START MSPA"
+# make sure $GWB/output is empty to work
+rm -rf $GWB/output/*
 cp $TMPDIR/lakes_ref_extent_${LK}.txt $OUTDIR/lakes_ref_extent_${LK}.txt
 # create mspa-parameters.txt before in R (check if its always the same structure)
-# cp $TMPDIR/mspa-parameters.txt $GWB/input # this file needs to be created in R!
+cp $TMPDIR/mspa-parameters.txt "$GWB/input" # this file needs to be created in R!
 # cat $GWB/input/mspa-parameters.txt
 GWB_MSPA -i=$GWB/input -o=$GWB/output
 cp $GWB/output/lake_${LK}_mspa/lake_${LK}_8_1_0_1.tif $TMPDIR
@@ -304,27 +323,41 @@ gdal_translate -co COMPRESS=LZW -co ZLEVEL=9 \
     $FLOW $TMPDIR/flow_${LK}.tif
 
 # rm $TMPDIR/mspa_${LK}.tif
-cp $TMPDIR/mspa_${LK}_l.tif $TMPDIR/mspa_${LK}.tif
+# cp $TMPDIR/mspa_${LK}_l.tif $TMPDIR/mspa_${LK}.tif
 # rm $TMPDIR/mspa_${LK}_l.tif
 # rm $GWB/input/lake_${LK}.tif
 
 
-grass  -f --text --tmp-location $TMPDIR/overlapping_${LK}.tif <<EOF
-r.external -o input=$TMPDIR/overlapping_${LK}.tif  output=out
-r.external -o input=$TMPDIR/flow_${LK}.tif output=flow
-r.neighbors input=flow output=flow_max method=maximum
-r.neighbors input=flow output=flow_ave method=average
+# grass  -f --text --tmp-location $TMPDIR/overlapping_${LK}.tif <<EOF
+# r.external -o input=$TMPDIR/overlapping_${LK}.tif  output=out
+# r.external -o input=$TMPDIR/flow_${LK}.tif output=flow
+# r.neighbors input=flow output=flow_max method=maximum
+# r.neighbors input=flow output=flow_ave method=average
+#
+# r.mapcalc --o "flowInt = if(isnull(out), null() , flow)"
+# r.mapcalc --o "flowMax = if(isnull(out), null() , flow_max)"
+# r.mapcalc --o "flowAve = if(isnull(out), null() , flow_ave)"
+#
+# r.out.xyz --overwrite input=out output=$TMPDIR/coord_lake_${LK}.txt separator=space
+# r.out.xyz --overwrite input=flowInt output=$TMPDIR/coord_flowInt_${LK}.txt separator=space
+# r.out.xyz --overwrite input=flowMax output=$TMPDIR/coord_flowMax_${LK}.txt separator=space
+# r.out.xyz --overwrite input=flowAve output=$TMPDIR/coord_flowAve_${LK}.txt separator=space
+# EOF
+grass --tmp-project "$TMPDIR/overlapping_${LK}.tif" --exec bash -c "
+    r.external -o input='$TMPDIR/overlapping_${LK}.tif' output=out
+    r.external -o input='$TMPDIR/flow_${LK}.tif' output=flow
+    r.neighbors input=flow output=flow_max method=maximum
+    r.neighbors input=flow output=flow_ave method=average
 
-r.mapcalc --o "flowInt = if(isnull(out), null() , flow)"
-r.mapcalc --o "flowMax = if(isnull(out), null() , flow_max)"
-r.mapcalc --o "flowAve = if(isnull(out), null() , flow_ave)"
+    r.mapcalc --o 'flowInt = if(isnull(out), null(), flow)'
+    r.mapcalc --o 'flowMax = if(isnull(out), null(), flow_max)'
+    r.mapcalc --o 'flowAve = if(isnull(out), null(), flow_ave)'
 
-r.out.xyz --overwrite input=out output=$TMPDIR/coord_lake_${LK}.txt separator=space
-r.out.xyz --overwrite input=flowInt output=$TMPDIR/coord_flowInt_${LK}.txt separator=space
-r.out.xyz --overwrite input=flowMax output=$TMPDIR/coord_flowMax_${LK}.txt separator=space
-r.out.xyz --overwrite input=flowAve output=$TMPDIR/coord_flowAve_${LK}.txt separator=space
-EOF
-
+    r.out.xyz --overwrite input=out      output='$TMPDIR/coord_lake_${LK}.txt'     separator=space
+    r.out.xyz --overwrite input=flowInt  output='$TMPDIR/coord_flowInt_${LK}.txt'  separator=space
+    r.out.xyz --overwrite input=flowMax  output='$TMPDIR/coord_flowMax_${LK}.txt'  separator=space
+    r.out.xyz --overwrite input=flowAve  output='$TMPDIR/coord_flowAve_${LK}.txt'  separator=space
+"
 paste -d " " <(seq 1 $(wc -l < $TMPDIR/coord_lake_${LK}.txt))  \
     $TMPDIR/coord_lake_${LK}.txt \
     <(awk '{printf "%.3f\n", $3}' $TMPDIR/coord_flowInt_${LK}.txt)   \
@@ -409,9 +442,9 @@ rm $TMPDIR/lbasin_reclass_${LK}.vrt
 rm $TMPDIR/coord_lake_${LK}*
 rm $TMPDIR/buffer_${LK}*
 rm $TMPDIR/flow_${LK}.tif
-rm $TMPDIR/overlapping_${LK}.tif
+# rm $TMPDIR/overlapping_${LK}.tif
 rm $TMPDIR/CompUnits_${LK}.vrt
-# rm $TMPDIR/mspa_reclass_code.txt
+rm $TMPDIR/mspa_reclass_code.txt
 rm $TMPDIR/mspa_${LK}*
 rm $TMPDIR/lake_${LK}*
 rm $TMPDIR/stream_${LK}.tif

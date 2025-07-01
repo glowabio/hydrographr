@@ -24,7 +24,7 @@
 #' @param glbasins character. Full path to Hydrography 90m basin tif file
 #' @param lake_dat character. Full path of the output.csv table,
 #' i.e., the lake intersection table.
-#' @param n_cores interger. Number of cores used in parallelzation
+#' @param n_cores interger. Number of cores used in parallelzation, Default is one.
 #' @param read logical. If TRUE, then the model .csv table
 #' gets read into R as data.table and data.frame.
 #' if FALSE, the table is only stored on disk. Default is FALSE.
@@ -45,20 +45,81 @@
 #'
 #'
 #' @examples
-#' # add example here
-#' # Download HydroLAKES shapefiles from their website and test with
-#' hydrolakes.sh instead I always transformed it before to lake.gpkg
-#' # write the script to run in paralell using ncores
+#' # Download test data into the temporary R folder
+#' # or define a different directory
+#' my_directory <- tempdir()
+#' download_test_data(my_directory)
+#'
+#' # Get the lake intersection table for all lakes in the test data
+#' # Note: For this we need the lake IDs (i.e. HydroLake ID), extracted from the
+#' # extract_lake_ids.R function; see also help(extract_lake_ids)
+#'
+#'
+# data <- fread(paste0(my_directory,
+#                         "/hydrography90m_test_data",
+#                         "/lake_id.txt"),
+#                         header = TRUE)
+# lake_id <- "lake_id"
+# lakes <- (paste0(my_directory,
+#                      "/hydrography90m_test_data",
+#                      "/lakes_corsica.shp"))
+# # To run the function we need to have installed GuidosToolbox Workbench MSPA tool
+# # see also (https://forest.jrc.ec.europa.eu/en/activities/lpa/gtb/) and (cite lake vignette)
+# edge <- (paste0(my_directory,
+#                      "/GWB"))
+# stream <- (paste0(my_directory,
+#                      "/hydrography90m_test_data",
+#                      "/stream_1264942.tif"))
+# flow <- (paste0(my_directory,
+#                      "/hydrography90m_test_data",
+#                      "/flow_1264942.tif"))
+#
+# glbasins <- (paste0(my_directory,
+#                      "/hydrography90m_test_data",
+#                      "/basin_1264942.tif"))
+#
+# lake_dat <- (paste0(my_directory,
+#                      "/hydrography90m_test_data"))
+#
+# lake_intersect_table <- get_lake_intersection(data, lake_id = "lake_id",
+#                                   lakes, lake_name = "lake_id", buffer = TRUE, edge,
+#                                   stream, flow, glbasins, lake_dat, n_cores = 1, quiet = FALSE)
+
 
 get_lake_intersection <- function(data, lake_id = "HydroLAKES_polys_v10", lakes,
                                   lake_name, buffer = TRUE, edge, stream, flow,
-                                  glbasins, glcompunits, cubasins, lake_dat,
-                                  n_cores, quiet = TRUE) {
+                                  glbasins, lake_dat,
+                                  n_cores = 1, quiet = TRUE) {
 
   # Check if input data is of type data.frame,
   # data.table or tibble
   if (!is(data, "data.frame"))
     stop("data: Has to be of class 'data.frame'.")
+
+  # Check if paths exists
+  if (!file.exists(lakes))
+    stop(paste0("Please provide the path to lake geo-spatial files"))
+
+
+  # Check if paths exists
+  if (is.null(edge))
+    stop(paste0("Please provide the path to GuidosToolbox Workbench MSPA tool"))
+
+  # Check if paths exists
+  if (!file.exists(stream))
+    stop(paste0("Please provide the path to the stream raster file"))
+
+  # Check if paths exists
+  if (!file.exists(flow))
+    stop(paste0("Please provide the path to the flow raster file"))
+
+  # Check if paths exists
+  if (!file.exists(glbasins))
+    stop(paste0("Please provide the path to the basin raster file"))
+
+  # Check if paths exists
+  if (!file.exists(lake_dat))
+    stop(paste0("Please provide the output path to store intersection tables"))
 
   # Check if quiet is logical
   if (!is.logical(quiet))
@@ -98,8 +159,8 @@ mspa_content <- ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 0
 ****************************************************************************"
 
-# writeLines(mspa_content, paste0(tempdir(), "/mspa-parameters.txt"))
-writeLines(mspa_content, paste0(edge,"input/", "mspa-parameters.txt"))
+writeLines(mspa_content, paste0(tempdir(), "/mspa-parameters.txt"))
+# writeLines(mspa_content, paste0(edge,"input/", "mspa-parameters.txt"))
 
   values <- rep(0, 256) # Create a vector of 256 zeros
 
@@ -159,21 +220,24 @@ writeLines(mspa_content, paste0(edge,"input/", "mspa-parameters.txt"))
     # Check if WSL and Ubuntu is installed
     check_wsl()
     # Change path for WSL
-    wsl_coord_tmp_path <- fix_path(coord_tmp_path)
-    wsl_subc_layer <- ifelse(is.null(subc_layer), 0,
-                             fix_path(subc_layer))
-    wsl_bas_path <- ifelse(is.null(basin_layer), 0, fix_path(basin_layer))
-    wsl_tmp_path <- fix_path(tempdir())
     wsl_ids_tmp_path <- fix_path(ids_tmp_path)
+    wsl_lakes_path <- fix_path(lakes)
+  # wsl_edge_path <- fix_path(edge)
+    wsl_stream_path <- fix_path(stream)
+    wsl_flow_path <- fix_path(flow)
+    wsl_glbasins_path <- fix_path(glbasins)
+    wsl_tmp_path <- fix_path(tempdir())
+    wsl_lake_dat_path <- fix_path(lake_dat)
     wsl_sh_file <- fix_path(
-      system.file("sh", "extract_ids.sh",
+      system.file("sh", "get_lake_intersection.sh",
                   package = "hydrographr"))
 
-    processx::run(system.file("bat", "extract_ids.bat",
+    processx::run(system.file("bat", "get_lake_intersection.bat",
                               package = "hydrographr"),
-                  args = c(wsl_coord_tmp_path, lon, lat, wsl_subc_layer,
-                           wsl_bas_path, wsl_tmp_path, wsl_ids_tmp_path,
-                           wsl_sh_file, echo = !quiet))
+                  args = c(wsl_ids_tmp_path, lake_id, wsl_lakes_path, lake_name,
+                           buffer, edge, wsl_stream_path, wsl_flow_path,
+                           wsl_glbasins_path, wsl_tmp_path, wsl_lake_dat_path,
+                           n_cores, wsl_sh_file, echo = !quiet))
 
   }
   # Read in the file containing the ids setting fill=TRUE, for the case that

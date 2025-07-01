@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_lake_intersection.R
 \name{get_lake_intersection}
 \alias{get_lake_intersection}
-\title{Get intersection points between Hydrography 90m river network and lake shapefiles}
+\title{Get intersection points between Hydrography90m stream network and lake shapefiles}
 \usage{
 get_lake_intersection(
   data,
@@ -14,9 +14,8 @@ get_lake_intersection(
   stream,
   flow,
   glbasins,
-  glcompunits,
-  cubasins,
   lake_dat,
+  n_cores = 1,
   quiet = TRUE
 )
 }
@@ -28,10 +27,14 @@ the lake ids, i.e. HydroLAKES ids.}
 
 \item{lakes}{character. Full path to lake geo-spatial files; i.e. HydroLAKES shapefiles.}
 
-\item{lake_name}{character. The name of the attribute table column in the geo-spatial files containing the lake ids; i.e. "HydroLAKES_polys_v10" for HydroLAKES shapefiles.}
+\item{lake_name}{character. The name of the attribute table column in
+the geo-spatial files containing the lake ids; i.e. "HydroLAKES_polys_v10"
+for HydroLAKES shapefiles.}
 
-\item{buffer}{character. users can either set buffer to TRUE, FALSE or provide buffer size in meters;
-if TRUE a predefined buffer is used where the size of the buffer depends on the lake size; if FALSE no buffer is applied; Default is TRUE}
+\item{buffer}{character. users can either set buffer to TRUE, FALSE or provide
+buffer size in meters;
+if TRUE a predefined buffer is used where the size of the buffer depends on
+the lake size; if FALSE no buffer is applied; Default is TRUE}
 
 \item{edge}{character. Full path to GuidosToolbox Workbench MSPA tool
 see also (https://forest.jrc.ec.europa.eu/en/activities/lpa/gtb/)
@@ -44,12 +47,10 @@ add a reference were to check the necessary tif files for lake analysis}
 
 \item{glbasins}{character. Full path to Hydrography 90m basin tif file}
 
-\item{glcompunits}{character. Full path to Hydrography 90m computational units}
-
-\item{cubasins}{character. Full path to Hydrography 90m computational basin units}
-
 \item{lake_dat}{character. Full path of the output.csv table,
 i.e., the lake intersection table.}
+
+\item{n_cores}{interger. Number of cores used in parallelzation, Default is one.}
 
 \item{quiet}{logical. If FALSE, the standard output will be printed.
 Default is TRUE.}
@@ -64,9 +65,16 @@ Add describtion text here
  Any thing the user needs to notice? add Note
 }
 \examples{
-# add example here
-# Download hydrolakes shape files from their website and test with hydrolakes.sh instead I always transformed it before to lake.gpkg
-# write the script to run in paralell using ncores
+# Download test data into the temporary R folder
+# or define a different directory
+my_directory <- tempdir()
+download_test_data(my_directory)
+
+# Get the lake intersection table for all lakes in the test data
+# Note: For this we need the lake IDs (i.e. HydroLake ID), extracted from the
+# extract_lake_ids.R function; see also help(extract_lake_ids)
+
+
 }
 \references{
 add reference manual html here
