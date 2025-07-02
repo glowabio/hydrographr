@@ -50,6 +50,46 @@ export NCORES=$6
 # cut -f1 -d"," $OUTDIR/coord_lake_${LK}.txt | sort -n | tail -1 > $OUTDIR/coord_lake_${LK}_t.txt
 # or use the option MAXACCU=$(awk '{print $6}' $DATACOORD | sort -g | tail -1)
 
+# export LK=$(awk -v colname="$LAKEID" '
+# NR == 1 {
+#     # Locate the position of the "outlet_ID" column in the header row
+#     for (i = 1; i <= NF; i++) {
+#         if ($i == colname) {
+#             outlet_col = i
+#             break
+#         }
+#     }
+#     next
+# }
+# NR == 2 && outlet_col {
+#     # Print the value in the "outlet_ID" column for the first data row
+#     print $outlet_col
+# }' "$DATA")
+
+# export LK=$(awk -v col="$LAKEID" '
+# NR == 1 {
+#   for (i=1; i<=NF; i++) if ($i == col) { colnum = i; break }
+#   next
+# }
+# NR == 2 {
+#   print $colnum
+#   exit
+# }
+# ' "$DATA")
+
+# read LK <<< $(awk -v lake="$LAKEID" '
+# NR == 1 {
+#     for (i = 1; i <= NF; i++) {
+#         if ($i == lake) lake_col = i
+#     }
+#     next
+# }
+# NR == 2 {
+#     print $lake_col
+# }' "$DATA")
+#
+# echo "Lake ID: $LK"
+
 export LK=$(awk -v colname=$LAKEID '
 NR == 1 {
     # Locate the position of the "outlet_ID" column in the header row
@@ -104,31 +144,86 @@ gdalwarp  -co COMPRESS=LZW -co ZLEVEL=9 -te $EXT \
 
 # LK=$LK
 
-grass  -f --text --tmp-location $TMPDIR/lake_${LK}_NA.tif <<EOF_SCRIPT
+# grass  -f --text --tmp-location $TMPDIR/lake_${LK}_NA.tif <<EOF_SCRIPT
+#
+# # read binary lake layer with same extent as direction
+# r.external --o input=$TMPDIR/lake_${LK}_NA.tif  output=lake
+#
+# #  read direction map
+# r.external --o -a input=$TMPDIR/dir_${LK}_NA.tif output=dir
+#
+# BasinCalc(){
+#
+# export COD=\${1}
+#
+# ## calculate the sub-basin
+# r.water.outlet --overwrite input=dir output=bf_\${COD} \
+# coordinates=\$(cat \$DATACOORD | awk -v coord=\${COD} 'BEGIN{OFS=",";} \$1==coord {print \$3,\$4}')
+# ##  Export the basin as tif file
+# r.out.gdal --o -f -c -m  createopt="COMPRESS=DEFLATE,ZLEVEL=9" \
+# type=Byte  format=GTiff nodata=0 \
+# input=bf_\${COD} output=$OUTDIR/basin_lake_${LK}_coord_\${COD}.tif
+#
+# }
+#
+# export -f BasinCalc
+# awk '{print \$1}' \$DATACOORD | parallel -j $NCORES BasinCalc
+# EOF_SCRIPT
 
-# read binary lake layer with same extent as direction
-r.external --o input=$TMPDIR/lake_${LK}_NA.tif  output=lake
+# grass  --tmp-project $TMPDIR/lake_${LK}_NA.tif --exec bash -c "
+# # read binary lake layer with same extent as direction
+# r.external --o input=$TMPDIR/lake_${LK}_NA.tif  output=lake
+#
+# #  read direction map
+# r.external --o -a input=$TMPDIR/dir_${LK}_NA.tif output=dir
+#
+# BasinCalc(){
+#
+# export COD=\${1}
+#
+# ## calculate the sub-basin
+# r.water.outlet --overwrite input=dir output=bf_\${COD} \
+# coordinates=\$(cat \$DATACOORD | awk -v coord=\${COD} 'BEGIN{OFS=",";} \$1==coord {print \$3,\$4}')
+# ##  Export the basin as tif file
+# r.out.gdal --o -f -c -m  createopt="COMPRESS=DEFLATE,ZLEVEL=9" \
+# type=Byte  format=GTiff nodata=0 \
+# input=bf_\${COD} output=$OUTDIR/basin_lake_${LK}_coord_\${COD}.tif
+#
+# }
+#
+# export -f BasinCalc
+# awk '{print \$1}' \$DATACOORD | parallel -j $NCORES BasinCalc
+# "
 
-#  read direction map
-r.external --o -a input=$TMPDIR/dir_${LK}_NA.tif output=dir
+grass --tmp-project $TMPDIR/lake_${LK}_NA.tif --exec bash -c "
+# Read binary lake layer with same extent as direction
+r.external --overwrite input=$TMPDIR/lake_${LK}_NA.tif output=lake
 
-BasinCalc(){
+# Read direction map
+r.external --overwrite -a input=$TMPDIR/dir_${LK}_NA.tif output=dir
 
-export COD=\${1}
+# Define function to calculate sub-basin
+BasinCalc() {
+    export COD=\"\$1\"
 
-## calculate the sub-basin
-r.water.outlet --overwrite input=dir output=bf_\${COD} \
-coordinates=\$(cat \$DATACOORD | awk -v coord=\${COD} 'BEGIN{OFS=",";} \$1==coord {print \$3,\$4}')
-##  Export the basin as tif file
-r.out.gdal --o -f -c -m  createopt="COMPRESS=DEFLATE,ZLEVEL=9" \
-type=Byte  format=GTiff nodata=0 \
-input=bf_\${COD} output=$OUTDIR/basin_lake_${LK}_coord_\${COD}.tif
+    # Get coordinates from data file
+    coords=\$(awk -v coord=\"\$COD\" 'BEGIN {OFS=\",\"} \$1 == coord {print \$3, \$4}' \"\$DATACOORD\")
 
+    # Calculate the sub-basin
+    r.water.outlet --overwrite input=dir output=bf_\${COD} coordinates=\${coords}
+
+    # Export the basin as GeoTIFF
+    r.out.gdal --overwrite -f -c -m \
+        createopt=\"COMPRESS=DEFLATE,ZLEVEL=9\" \
+        type=Byte format=GTiff nodata=0 \
+        input=bf_\${COD} output=$OUTDIR/basin_lake_${LK}_coord_\${COD}.tif
 }
 
 export -f BasinCalc
-awk '{print \$1}' \$DATACOORD | parallel -j $NCORES BasinCalc
-EOF_SCRIPT
+
+# Run BasinCalc in parallel for each coordinate ID
+awk '{print \$1}' \"\$DATACOORD\" | parallel -j $NCORES BasinCalc
+"
 
 COD=$(cat $DATACOORD | awk '{print $1}' $DATACOORD)
 

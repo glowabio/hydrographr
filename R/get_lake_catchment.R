@@ -5,18 +5,20 @@
 #'  Any thing the user needs to notice? add Note
 #'
 #' @param data a data.frame or data.table that contains the columns regarding
-#' the intersection ids; (i.e., output of get_lake_intersection)
+#' the stream segment ids of the intersection points between lake and stream network;
+#' (i.e., output of get_lake_intersection)
 #' @param flow character. The name of the flow accumulation column used for sorting the intersection table;
 #' i.e. either flow_accu (flow accumulation value at intersection point pixel),
 #' flow_accu_max (maximum flow accumulation value of 3 x 3 neighboring pixels),
-#' @param lake_id character. The name of the column containing lake ids; (i.e., output "lake_ID" of get_lake_intersection)
+#' @param lake_id character. The name of the column containing lake ids;
+#' (i.e., output "lake_ID" of get_lake_intersection)
 #' flow_accu_mean (mean flow accumulation value of 3 x 3 neighboring pixels). Default is flow_accu_mean
 #' @param top integer. Number of intersection points used for lake catchment calculations;
 #' e.g. top=1 equals first row of intersection table and lake outlet;
 #' top=20 equals first 20 rows of intersection table; Default is all.
 #' @param direction character. Full path to Hydrography 90m flow direction tif file
 #' @param catch character. Full path to output catchment tif files
-#' @param n_cores integer. Number of cores used in parallelsation
+#' @param n_cores integer. Number of cores used in parallelsation; Default is one.
 #' @param read logical. If TRUE, then the model .csv table
 #' gets read into R as data.table and data.frame.
 #' if FALSE, the table is only stored on disk. Default is FALSE.
@@ -28,6 +30,10 @@
 #' @importFrom processx run
 #' @export
 #'
+#' @note
+#' For the function to work we need the output of the function get_lake_intersection
+#' that are the lake_reference.txt and intersection table (i.e. coord_lake.txt)
+#'
 #' @author Jaime Garcia Marquez, Thomas Tomiczek
 #'
 #' @references
@@ -37,13 +43,30 @@
 #'
 #'
 #' @examples
-#' # add example here
-#' # Download hydrolakes shape files from their website and test with hydrolakes.sh instead I always transformed it before to lake.gpkg
-#' # write the script to run in paralell using ncores
+#' # Download test data into the temporary R folder
+#' # or define a different directory
+#' my_directory <- tempdir()
+#' download_test_data(my_directory)
+#'
+#' data <- fread(paste0(my_directory,
+#'                        "/hydrography90m_test_data",
+#'                        "/coord_lake_1.txt"),
+#'                       header = TRUE)
+#'
+#' direction <- (paste0(my_directory,
+#'                     "/hydrography90m_test_data",
+#'                   "/direction_1264942.tif"))
+#'
+#' catch <- (paste0(my_directory,
+#'                    "/hydrography90m_test_data/"))
+#'
+#' get_lake_catchment(data, direction = direction, catch = catch)
+
+
 
 get_lake_catchment <- function(data, flow = "flow_accu_mean",
-                                  lake_id = "lake_ID", top = "all", direction, catch,
-                                  n_cores, quiet = TRUE) {
+                                  lake_id = "lake_ID", outlet_id = "outlet_ID", top = "all", direction, catch,
+                                  n_cores = 1, quiet = TRUE) {
 
   # Check if input data is of type data.frame,
   # data.table or tibble
@@ -95,21 +118,18 @@ get_lake_catchment <- function(data, flow = "flow_accu_mean",
     # Check if WSL and Ubuntu is installed
     check_wsl()
     # Change path for WSL
-    wsl_coord_tmp_path <- fix_path(coord_tmp_path)
-    wsl_subc_layer <- ifelse(is.null(subc_layer), 0,
-                             fix_path(subc_layer))
-    wsl_bas_path <- ifelse(is.null(basin_layer), 0, fix_path(basin_layer))
+    wsl_lak_tmp_path <- fix_path(lak_tmp_path)
+    wsl_direction <- fix_path(direction)
     wsl_tmp_path <- fix_path(tempdir())
-    wsl_ids_tmp_path <- fix_path(ids_tmp_path)
+    wsl_catch <- fix_path(catch)
     wsl_sh_file <- fix_path(
-      system.file("sh", "extract_ids.sh",
+      system.file("sh", "get_lake_catchment.sh",
                   package = "hydrographr"))
 
-    processx::run(system.file("bat", "extract_ids.bat",
+    processx::run(system.file("bat", "get_lake_catchment.bat",
                               package = "hydrographr"),
-                  args = c(wsl_coord_tmp_path, lon, lat, wsl_subc_layer,
-                           wsl_bas_path, wsl_tmp_path, wsl_ids_tmp_path,
-                           wsl_sh_file, echo = !quiet))
+                  args = c(wsl_lak_tmp_path, lake_id, wsl_direction, wsl_tmp_path,
+                           wsl_catch, n_cores, wsl_sh_file, echo = !quiet))
 
   }
   # Read in the file containing the ids setting fill=TRUE, for the case that

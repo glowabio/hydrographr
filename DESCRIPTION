@@ -64,7 +64,7 @@ URL: https://glowabio.github.io/hydrographr/
 BugReports: https://github.com/glowabio/hydrographr/issues
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 Imports:
     processx (>= 3.7.0),
     data.table (>= 1.14.2),
@@ -104,6 +104,7 @@ Collate:
     'get_distance.R'
     'get_distance_parallel.R'
     'get_distance_graph.R'
+    'get_lake_catchment.R'
     'get_modelfit_table.R'
     'get_pfafstetter_basins.R'
     'get_predict_table.R'
