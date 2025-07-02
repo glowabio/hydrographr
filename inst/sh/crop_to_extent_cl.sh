@@ -2,9 +2,9 @@
 
 # Crop raster file to a certain extent
 
-export RINPUT=$1
-export VECTOR=$2
-export ROUTPUT=$3
+export RINPUT="$1"
+export VECTOR="$2"
+export ROUTPUT="$3"
 
 # Defines the compression type
 export compression=$4
@@ -21,9 +21,9 @@ export bigtiff=$6
 
 # get the layer name in the VECTOR file
 
-LAYER=$(ogrinfo -so -al $VECTOR | grep "Layer name:" | awk '{print $3}')
+LAYER=$(ogrinfo -so -al "$VECTOR" | grep "Layer name:" | awk '{print $3}')
 
 # crop
-gdalwarp -cutline  $VECTOR  -cl $LAYER -crop_to_cutline $RINPUT \
+gdalwarp -cutline  "$VECTOR"  -cl "$LAYER" -crop_to_cutline "$RINPUT" \
          -co COMPRESS=$compression -co ZLEVEL=$level -co BIGTIFF=$bigtiff\
-         $ROUTPUT -overwrite
+         "$ROUTPUT" -overwrite
