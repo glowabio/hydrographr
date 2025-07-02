@@ -1,0 +1,189 @@
+---
+title: "Case study - Vjosa basin"
+subtitle: "Testing the pygeoapi processes"
+author: ""
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Case study - Vjosa basin}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+# bibliography: bib/references_vjosa.bib
+link-citations: yes
+linkcolor: blue
+csl: apa-6th-edition.csl
+bib-latex-options: "style=apa, sorting=nyt, backend=biber, maxcitenames=2, useprefix, doi=true, isbn=false, uniquename=false"
+# nocite: '@*'
+editor_options:
+  markdown:
+    wrap: 72
+
+---
+
+```{r, include = FALSE, eval = FALSE}
+# writes out the references for all packages
+knitr::write_bib(file = 'packages.bib')
+```
+
+
+```{r setup, include=FALSE}
+# Load libraries
+library(hydrographr)
+library(sf)
+library(data.table)
+library(dplyr)
+library(terra)
+library(here)
+
+knitr::opts_chunk$set(echo = TRUE, fig.align = "center")
+```
+
+## Introduction
+Testing the functions that call the pygeoapi processes
+
+## Setting the scene
+
+Load all libraries required for the analysis:
+
+```{r, eval=FALSE}
+library(hydrographr)
+library(sf)
+library(data.table)
+library(dplyr)
+library(terra)
+```
+
+```{r, include=FALSE}
+# Set working directory and global options
+wdir <- here("vignettes", "data_vjosa")
+options(scipen = 999)
+```
+
+## Get the regional unit, basin and subcatchment ID of points
+```{r}
+# Define pygeoapi process URL for multi-point processing
+get_local_ids_multi_url <- "https://aqua.igb-berlin.de/pygeoapi-dev/processes/get-local-ids-plural/execution"
+
+
+```
+
+
+```{r, eval = FALSE}
+# Get dam ids
+csv_url_dam <- "https://nimbus.igb-berlin.de/index.php/s/TpkCwdxr4GGGQw6/download/dams_sarantaporos.csv"
+
+dams_ids <- api_get_local_ids(csv_url = csv_url_dam,
+                colname_lat = "latitude",
+                colname_lon = "longitude",
+                colname_site_id = "site_id", 
+                process_url = get_local_ids_url)
+head(dams_ids)
+```
+```{r, eval = FALSE}
+
+# Get species ids
+csv_spdata_url <- "https://nimbus.igb-berlin.de/index.php/s/7HAGnDfcz3TPRCb/download/spdata_barbus.csv"
+
+spdata_ids <- api_get_local_ids(csv_url = csv_spdata_url,
+                colname_lat = "latitude", colname_lon = "longitude",
+                colname_site_id = "site_id", 
+                process_url = get_local_ids_multi_url)
+# head(spdata_ids)
+<!-- ``` -->
+
+
+
+
+## Snap points to the stream network
+We will snap the points to the stream of the subcatchment where they are located
+```{r, eval = FALSE}
+# Define pygeoapi process URL 
+get_snapped_points_url <- "https://aqua.igb-berlin.de/pygeoapi-dev/processes/get-snapped-points-plural/execution"
+```
+
+```{r, eval = FALSE}
+# snap species points to the stream network
+species_snap <- api_get_snapped_points(csv_spdata_url,
+                               # colname_lat = "latitude",
+                               colname_lon = "longitude",
+                               colname_site_id = "site_id",
+                               process_url = get_snapped_points_url)
+head(species_snap)
+```
+
+```{r, eval = FALSE}
+# snap dam points to the stream network
+dams_snap <- api_get_snapped_points(csv_url_dam, 
+                               colname_lat = "latitude",
+                               colname_lon = "longitude",
+                               colname_site_id = "site_id",
+                               process_url = get_snapped_points_url)
+
+```
+
+
+
+```{r}
+#with one point
+get_local_ids_url <- "https://aqua.igb-berlin.de/pygeoapi-dev/processes/get-local-ids/execution"
+
+one_point_df <- slice(species_snap,1) %>% 
+  select(site_id, longitude_snapped, latitude_snapped)
+
+api_get_local_ids(df = one_point_df,
+                colname_lat = "latitude_snapped",
+                colname_lon = "longitude_snapped",
+                colname_site_id = "site_id", 
+                process_url = get_local_ids_url)
+```
+
+
+
+
+## Get all upstream subcatchment IDs for every point
+
+```{r}
+# Define pygeoapi process URL 
+get_upstream_ids_url <- "https://aqua.igb-berlin.de/pygeoapi-dev/processes/get-upstream-subcids/execution"
+```
+
+```{r, eval = FALSE}
+# For species points
+upstr_ids_spdata <- api_get_upstream_subcids(species_snap, 
+                        colname_lat = "latitude_snapped", 
+                        colname_lon = "longitude_snapped",
+                        process_url = get_upstream_ids_url) %>%
+                        as.data.table()
+
+# For dam points
+upstr_ids_dams <- api_get_upstream_subcids(dams_snap, 
+                        colname_lat = "latitude_snapped", 
+                        colname_lon = "longitude_snapped",
+                        process_url = get_upstream_ids_url) %>%
+                        as.data.table()
+head(upstr_ids_dams)
+```
+## Get environmental data for all subcatchments in the study area
+
+```{r}
+# Define pygeoapi process URL 
+get_env90m_url <- "https://aqua.igb-berlin.de/pygeoapi-dev/processes/get-env90m/execution"
+```
+
+
+
+```{r, eval = FALSE}
+env_data_basin <- api_get_env90m_data(
+  subc_ids = head(spdata_ids$subc_id),
+  variables = c("bio10", "sltppt", "slope_elv_dw_cel"),
+  chunk_size = 3000,
+  process_url = get_env90m_url
+)
+
+# Select only the mean of every variable
+predtb <- env_data_basin %>% 
+  select("subc_id", contains("mean")) 
+
+```
+
+
