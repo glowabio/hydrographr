@@ -34,9 +34,11 @@ when NULL a lake raster file needs to be provided}
 \item{var_name}{character. Name of the shapefile ID column, i.e. "Hylak_id"
 for HydroLAKES; default is "Hylak_id"}
 
-\item{xmin}{integer. bounding box coordinate check what is lower left corner in WGS84; if NULL see parameter bbox}
+\item{xmin}{integer. bounding box coordinate check what is lower left corner in WGS84;
+if NULL see parameter bbox}
 
-\item{ymin}{integer. bounding box coordinate check what is lower right corner in WGS84; if NULL see parameter bbox}
+\item{ymin}{integer. bounding box coordinate check what is lower right corner in WGS84;
+if NULL see parameter bbox}
 
 \item{xmax}{integer. bounding box coordinate upper right corner in WGS84; if NULL see parameter bbox}
 
@@ -65,8 +67,6 @@ if FALSE, the table is only stored on disk. Default is FALSE.}
 \description{
 Extract lake ids either at the location
 of point occurrences or falling within a bounding box
-
- Any thing the user needs to notice? add Note
 }
 \examples{
 # Download hydrolakes shape files from their website and test with hydrolakes.shp instead I always transformed it before to lake.gpkg
@@ -79,15 +79,38 @@ download_test_data(my_directory)
 
 # Load occurrence data
 
+species_occurrence <- read.table(paste0(my_directory,
+                                     "/hydrography90m_test_data",
+                                     "/spdata_1264942.txt"),
+                                     header = TRUE)
 
 
-extract_lake_ids(data,
+extract_lake_ids(data = species_occurrence,
                  lon = "longitude",
                  lat = "latitude",
-                 lake_shape = "/data/ttomiczek/lakes_out_inlet_basins/lakes.gpkg",
-                 lake_id_table = "/data/ttomiczek/hydrographr/hydrography90m_test_data/test_lake_intersect/",
+                 lake_shape = paste0(my_directory, "lakes_corsica.shp"),
+                 lake_id_table = output_folder,
                  quiet = FALSE)
 
+                lon = "longitude",
+                lat = "latitude",
+                var_name = "lake_id",
+                lake_shape = paste0(my_directory, "lakes_corsica.shp"),
+                lake_id_table = output_folder,
+                quiet = FALSE)
+
+extract_lake_ids(data = species_occurrence,
+                 lon = "longitude",
+                 lat = "latitude",
+                 xmin = 9.498263,
+                 ymin = 44.21651,
+                 xmax = 29.71806,
+                 ymax = 50.25584,
+                 var_name = "lake_id",
+                 lake_shape = paste0(my_directory, "lakes_corsica.shp"),
+                 bbox = TRUE,
+                 lake_id_table = output_folder,
+                 quiet = FALSE)
 
 
 

@@ -58,10 +58,10 @@
 #'
 #' # Load occurrence data
 #'
-# species_occurrence <- read.table(paste0(my_directory,
-#                                      "/hydrography90m_test_data",
-#                                      "/spdata_1264942.txt"),
-#                                       header = TRUE)
+#' species_occurrence <- read.table(paste0(my_directory,
+#'                                      "/hydrography90m_test_data",
+#'                                      "/spdata_1264942.txt"),
+#'                                      header = TRUE)
 #'
 #'
 #' extract_lake_ids(data = species_occurrence,
@@ -91,9 +91,6 @@
 #'                  bbox = TRUE,
 #'                  lake_id_table = output_folder,
 #'                  quiet = FALSE)
-#'
-#'
-#'
 
 extract_lake_ids <- function(data, lon, lat, lake_shape,
                              var_name = "Hylak_id", xmin = NULL,

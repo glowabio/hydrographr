@@ -31,10 +31,20 @@ echo "$VAR_ID" > $TMPDIR/lake_id.txt
 # | grep -v '^0$' >> $TMPDIR/lake_id.txt # add instead of Hylak_id [VAR_ID] where the user defines the name of the attribute ID column
 
 # this works
-ogrinfo $LAKE_SHAPE -al -spat $xmin $ymin $xmax $ymax \
-| grep $VAR_ID \
-| grep -Eo '[+-]?([1-9][0-9]*([.][0-9]+)?|[0][.][0-9]+)' \
-| grep -v '^0\.0$' >> $TMPDIR/lake_id.txt
+# ogrinfo $LAKE_SHAPE -al -spat $xmin $ymin $xmax $ymax \
+# | grep $VAR_ID \
+# | grep -Eo '[+-]?([1-9][0-9]*([.][0-9]+)?|[0][.][0-9]+)' \
+# | grep -v '^0\.0$' >> $TMPDIR/lake_id.txt
+
+ogr2ogr -f CSV $TMPDIR/lake_subset.csv $LAKE_SHAPE \
+    -spat $xmin $ymin $xmax $ymax \
+    -select Hylak_id
+
+tail -n +2 $TMPDIR/lake_subset.csv | cut -d',' -f1 >> $TMPDIR/lake_id.txt
+
+# sed -i "1i$VAR_ID" $TMPDIR/lake_id.txt
+
+rm $TMPDIR/lake_subset.csv
 
 # tail -n +2 $TMPDIR/lake_id_${RAND_STRING}.txt
 
