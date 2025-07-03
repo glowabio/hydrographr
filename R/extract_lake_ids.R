@@ -64,7 +64,7 @@
 #                                       header = TRUE)
 #'
 #'
-#' extract_lake_ids(data,
+#' extract_lake_ids(data = species_occurrence,
 #'                  lon = "longitude",
 #'                  lat = "latitude",
 #'                  lake_shape = paste0(my_directory, "lakes_corsica.shp"),
