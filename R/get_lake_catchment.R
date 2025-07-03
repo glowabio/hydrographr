@@ -1,4 +1,4 @@
-#' @title Get lake catchments based on intersection points between stream network and lake
+#' @title Get lake catchments based on intersection points between stream network and lakes
 #'
 #' @description Add describtion text here
 #'
@@ -13,11 +13,11 @@
 #' @param lake_id character. The name of the column containing lake ids;
 #' (i.e., output "lake_ID" of get_lake_intersection)
 #' flow_accu_mean (mean flow accumulation value of 3 x 3 neighboring pixels). Default is flow_accu_mean
-#' @param top integer. Number of intersection points used for lake catchment calculations;
-#' e.g. top=1 equals first row of intersection table and lake outlet;
-#' top=20 equals first 20 rows of intersection table; Default is all.
+#' @param n integer. Number of intersection points used for lake catchment delineation;
+#' e.g. n=1 equals first row of intersection table and lake outlet;
+#' n=20 equals first 20 rows of intersection table; Default is all.
 #' @param direction character. Full path to Hydrography 90m flow direction tif file
-#' @param catch character. Full path to output catchment tif files
+#' @param lake_basin character. Full path to output catchment tif files
 #' @param n_cores integer. Number of cores used in parallelsation; Default is one.
 #' @param read logical. If TRUE, then the model .csv table
 #' gets read into R as data.table and data.frame.
@@ -60,12 +60,12 @@
 #' catch <- (paste0(my_directory,
 #'                    "/hydrography90m_test_data/"))
 #'
-#' get_lake_catchment(data, direction = direction, catch = catch)
+#' get_lake_catchment(data, direction = direction, lake_basin = catch)
 
 
 
 get_lake_catchment <- function(data, flow = "flow_accu_mean",
-                                  lake_id = "lake_ID", outlet_id = "outlet_ID", top = "all", direction, catch,
+                                  lake_id = "lake_ID", outlet_id = "outlet_ID", n = "all", direction, lake_basin,
                                   n_cores = 1, quiet = TRUE) {
 
   # Check if input data is of type data.frame,
@@ -84,11 +84,11 @@ get_lake_catchment <- function(data, flow = "flow_accu_mean",
   #  sort intersection table
   lake_dat <- lake_dat[order(-get(flow))]
 
-  if (top == "all") {
+  if (n == "all") {
   lake_dat <- lake_dat
   } else {
-  # select the top 15 % or all intersection points
-  lake_dat <- lake_dat[1:top, ]
+  # select the n number or all intersection points
+  lake_dat <- lake_dat[1:n, ]
   }
 
   # Create random string
@@ -111,7 +111,7 @@ get_lake_catchment <- function(data, flow = "flow_accu_mean",
 
     # Call the external .sh script extract_ids() containing the gdal function
     processx::run(system.file("sh", "get_lake_catchment.sh", package = "hydrographr"),
-                  args = c(lak_tmp_path, lake_id, direction, tempdir(), catch, n_cores),
+                  args = c(lak_tmp_path, lake_id, direction, tempdir(), lake_basin, n_cores),
                   echo = !quiet)
 
   } else {
@@ -121,7 +121,7 @@ get_lake_catchment <- function(data, flow = "flow_accu_mean",
     wsl_lak_tmp_path <- fix_path(lak_tmp_path)
     wsl_direction <- fix_path(direction)
     wsl_tmp_path <- fix_path(tempdir())
-    wsl_catch <- fix_path(catch)
+    wsl_lake_basin <- fix_path(lake_basin)
     wsl_sh_file <- fix_path(
       system.file("sh", "get_lake_catchment.sh",
                   package = "hydrographr"))
@@ -129,7 +129,7 @@ get_lake_catchment <- function(data, flow = "flow_accu_mean",
     processx::run(system.file("bat", "get_lake_catchment.bat",
                               package = "hydrographr"),
                   args = c(wsl_lak_tmp_path, lake_id, wsl_direction, wsl_tmp_path,
-                           wsl_catch, n_cores, wsl_sh_file, echo = !quiet))
+                           wsl_lake_basin, n_cores, wsl_sh_file, echo = !quiet))
 
   }
   # Read in the file containing the ids setting fill=TRUE, for the case that
