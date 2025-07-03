@@ -3,7 +3,6 @@
 #' @description Extract lake ids either at the location
 #' of point occurrences or falling within a bounding box
 #'
-#'  Any thing the user needs to notice? add Note
 #'
 #' @param data a data.frame or data.table that contains the columns
 #' the longitude / latitude coordinates in WGS84, i.e. of species point
@@ -16,8 +15,10 @@
 #' calculated from min max values of the longitude and latitude values provided
 #' in the occurrence table; if FALSE lake ids in which point occurrences are
 #' located are returned, default is FALSE
-#' @param xmin integer. bounding box coordinate check what is lower left corner in WGS84; if NULL see parameter bbox
-#' @param ymin integer. bounding box coordinate check what is lower right corner in WGS84; if NULL see parameter bbox
+#' @param xmin integer. bounding box coordinate check what is lower left corner in WGS84;
+#' if NULL see parameter bbox
+#' @param ymin integer. bounding box coordinate check what is lower right corner in WGS84;
+#' if NULL see parameter bbox
 #' @param xmax integer. bounding box coordinate upper right corner in WGS84; if NULL see parameter bbox
 #' @param ymax integer. bounding box coordinate upper left corner in WGS84; if NULL see parameter bbox
 #' @param var_name character. Name of the shapefile ID column, i.e. "Hylak_id"
@@ -66,31 +67,31 @@
 #' extract_lake_ids(data,
 #'                  lon = "longitude",
 #'                  lat = "latitude",
-#'                  lake_shape = "/data/ttomiczek/lakes_out_inlet_basins/lakes.gpkg",
-#'                  lake_id_table = "/data/ttomiczek/hydrographr/hydrography90m_test_data/test_lake_intersect/",
+#'                  lake_shape = paste0(my_directory, "lakes_corsica.shp"),
+#'                  lake_id_table = output_folder,
 #'                  quiet = FALSE)
 #'
 # extract_lake_ids(data = species_occurrence,
-#                  lon = "longitude",
-#                  lat = "latitude",
-#                  var_name = "lake_id",
-#                  lake_shape = paste0(my_directory, "lakes_corsica.shp"),
-#                  lake_id_table = paste0(my_directory, "ghosts/"),
-#                  quiet = FALSE)
+#'                 lon = "longitude",
+#'                 lat = "latitude",
+#'                 var_name = "lake_id",
+#'                 lake_shape = paste0(my_directory, "lakes_corsica.shp"),
+#'                 lake_id_table = output_folder,
+#'                 quiet = FALSE)
 #'
-# extract_lake_ids(data = species_occurrence,
-#                  lon = "longitude",
-#                  lat = "latitude",
-#                  xmin = 9.498263,
-#                  ymin = 44.21651,
-#                  xmax = 29.71806,
-#                  ymax = 50.25584,
-#                  var_name = "lake_id",
-#                  lake_shape = paste0(my_directory, "lakes_corsica.shp"),
-#                  bbox = TRUE,
-#                  lake_id_table = paste0(my_directory, "ghosts/"),
-#                  quiet = FALSE)
-
+#' extract_lake_ids(data = species_occurrence,
+#'                  lon = "longitude",
+#'                  lat = "latitude",
+#'                  xmin = 9.498263,
+#'                  ymin = 44.21651,
+#'                  xmax = 29.71806,
+#'                  ymax = 50.25584,
+#'                  var_name = "lake_id",
+#'                  lake_shape = paste0(my_directory, "lakes_corsica.shp"),
+#'                  bbox = TRUE,
+#'                  lake_id_table = output_folder,
+#'                  quiet = FALSE)
+#'
 #'
 #'
 
