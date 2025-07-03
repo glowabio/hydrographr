@@ -65,8 +65,8 @@
 
 
 get_lake_catchment <- function(data, flow = "flow_accu_mean",
-                                  lake_id = "lake_ID", outlet_id = "outlet_ID", n = "all", direction, lake_basin,
-                                  n_cores = 1, quiet = TRUE) {
+                                  lake_id = "lake_ID", n = "all", direction,
+                                  lake_basin, n_cores = 1, quiet = TRUE) {
 
   # Check if input data is of type data.frame,
   # data.table or tibble
