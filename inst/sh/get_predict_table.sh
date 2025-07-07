@@ -50,23 +50,23 @@ export tiles
 echo "bash: Tiles: "$tiles
 
 # path to environmental tables for each tile
-export ENVTB=$4
+export ENVTB="$4"
 #echo "bash: Directory for input files: "$ENVTB
 
 # file with the list of subcatchments IDs
-export SUBCIDS=$5
+export SUBCIDS="$5"
 #export SUBCIDS=/data/marquez/vignette/out/subc_IDs.txt
-#echo "bash: Table containing subcatchment ids: "$SUBCIDS
+#echo "bash: Table containing subcatchment ids: ""$SUBCIDS"
 
 # output file
-export OUTFILE=$6
+export OUTFILE="$6"
 #export OUTFILE=/data/marquez/vignette/out/projectionTB2.csv
-#echo "bash: Result will be written to: "$OUTFILE
+#echo "bash: Result will be written to: "$OUTFILE"
 
 # folder to store temporal files: this folder is defined within the R function
-export TMP=$7
+export TMP="$7"
 #export TMP=/data/marquez/vignette/out
-#echo "bash: Temp directory: "$TMP
+#echo "bash: Temp directory: ""$TMP"
 
 # number of cores to run the extraction of information (rows) from tile tables
 # (n.tiles * n.variables)
@@ -84,16 +84,16 @@ export NCORES=$8
 subsetTB(){
     TL=$1  # tile
     k=$2   # variable
-    TB=$(find $ENVTB -name "${k}_${TL}.txt")
+    TB=$(find "$ENVTB" -name "${k}_${TL}.txt")
     awk 'NR==FNR {a[$1]; next} FNR==1 || $1 in a' \
-     $SUBCIDS $TB \
+     "$SUBCIDS" $TB \
      | awk 'NR > 1 {for(i=1; i<=NF; i++) $i+=0}1' CONVFMT="%.3f" \
-     >  $TMP/ENV_${TL}_${k}.txt
+     >  "$TMP"/ENV_${TL}_${k}.txt
 }
 
 export -f subsetTB
 
-echo "bash: Running in parallel: Treating tiles and variables. This will write tables 'ENV_...txt' into "$TMP
+echo "bash: Running in parallel: Treating tiles and variables. This will write tables 'ENV_...txt' into "$TMP"
 parallel -j $NCORES subsetTB ::: ${tiles[@]} ::: ${var[@]}
 echo "bash: Running in parallel: Done."
 
@@ -103,7 +103,7 @@ echo "bash: Running in parallel: Done."
 if [[ "${SS[@]}" != 'ALL' ]]    # run only if user do not select ALL
 then
     echo "bash: Iterating over ENV_..."
-    for TB in $(find $TMP -name "ENV_*.txt")
+    for TB in $(find "$TMP" -name "ENV_*.txt")
     do
         echo "bash: Iteration: "$TB
         NR=$(awk 'NR == 1 {print NF}' $TB)
@@ -128,10 +128,10 @@ then
         printf -v joined '%s,' "${arr[@]}"
 
         cut -d" " -f $(echo "1,${joined%,}") $TB \
-        > $TMP/ENV_${RAND_STRING}.txt
+        > "$TMP"/ENV_${RAND_STRING}.txt
 
-        mv $TMP/ENV_${RAND_STRING}.txt $TB
-        #echo "bash: Moved: "$TMP/ENV_${RAND_STRING}.txt" to "$TB
+        mv "$TMP"/ENV_${RAND_STRING}.txt $TB
+        #echo "bash: Moved: "$TMP"/ENV_${RAND_STRING}.txt" to "$TB
     done
     echo "bash: Iterating: Done."
 fi
@@ -143,14 +143,14 @@ echo ${var[@]} | xargs -n 1 -P $NCORES bash -c $'
 
 X=$1
 
-listf=( $(find $TMP -name "ENV_*_${X}.txt")  )
+listf=( $(find "$TMP" -name "ENV_*_${X}.txt")  )
 
-cat ${listf[@]} > $TMP/aggreg_${X}.txt
-awk \'FNR == 1; FNR > 1 && /^[0-9]/\' $TMP/aggreg_${X}.txt \
-    > $TMP/aggreg_${X}_tmp1.txt
-sort -g $TMP/aggreg_${X}_tmp1.txt > $TMP/aggreg_${X}.txt
+cat ${listf[@]} > "$TMP"/aggreg_${X}.txt
+awk \'FNR == 1; FNR > 1 && /^[0-9]/\' "$TMP"/aggreg_${X}.txt \
+    > "$TMP"/aggreg_${X}_tmp1.txt
+sort -g "$TMP"/aggreg_${X}_tmp1.txt > "$TMP"/aggreg_${X}.txt
 
-read -a header < $TMP/aggreg_${X}.txt
+read -a header < "$TMP"/aggreg_${X}.txt
 
 declare -a elem=()
 for e in mean min max sd range
@@ -163,24 +163,24 @@ if [[ "${elem[@]}" -gt 0 ]]; then
 
     nof=( ${header[@]:1} )
     allh=( ${header[0]} $(echo "${nof[@]/#/${X}_}") )
-    echo ${allh[@]} > $TMP/aggreg_${X}_tmp2.txt
-    awk \'NR>1\' $TMP/aggreg_${X}.txt  >> $TMP/aggreg_${X}_tmp2.txt
-    mv $TMP/aggreg_${X}_tmp2.txt $TMP/aggreg_${X}.txt
+    echo ${allh[@]} > "$TMP"/aggreg_${X}_tmp2.txt
+    awk \'NR>1\' "$TMP"/aggreg_${X}.txt  >> "$TMP"/aggreg_${X}_tmp2.txt
+    mv "$TMP"/aggreg_${X}_tmp2.txt "$TMP"/aggreg_${X}.txt
 fi
 
 # Comment this to keep temp files:
-rm $TMP/aggreg_${X}_tmp*.txt
+rm "$TMP"/aggreg_${X}_tmp*.txt
 
 ' _
 
 
 #################
 ## join all the environmental variables together
-paste -d" " $(find $TMP/aggreg_*.txt) > $TMP/all_var_full.txt
+paste -d" " $(find "$TMP"/aggreg_*.txt) > "$TMP"/all_var_full.txt
 
 ## the previous line creates repetition of the subcID column
 ## Chunk to delete the subCid column
-read -a header < $TMP/all_var_full.txt  # read first line into array "header"
+read -a header < "$TMP"/all_var_full.txt  # read first line into array "header"
 declare -a arr=() # array to store the position in which the subCid columns are
 
 for i in ${!header[@]}               # iterate through array indexes
@@ -196,27 +196,27 @@ then
     printf -v joined '%s,' "${arr[@]:1}"  # remove from array the first column
 
 ##  remove subcID columns (except column 1) and make the table comma separated
-    cut -d" " --complement -f $(echo "${joined%,}") $TMP/all_var_full.txt \
-    | tr -s ' ' ',' > $TMP/all_var_trim.csv
+    cut -d" " --complement -f $(echo "${joined%,}") "$TMP"/all_var_full.txt \
+    | tr -s ' ' ',' > "$TMP"/all_var_trim.csv
 
 ##  remove duplicates and create final output table
-    [[ "${#tiles[@]}" -gt 1  ]] && awk -F, '!a[$0]++'  $TMP/all_var_trim.csv > $OUTFILE || cp $TMP/all_var_trim.csv $OUTFILE
+    [[ "${#tiles[@]}" -gt 1  ]] && awk -F, '!a[$0]++'  "$TMP"/all_var_trim.csv > "$OUTFILE" || cp "$TMP"/all_var_trim.csv "$OUTFILE"
 
 else
 
-    cat $TMP/all_var_full.txt |  tr -s ' ' ',' > $TMP/all_var_trim.csv
+    cat "$TMP"/all_var_full.txt |  tr -s ' ' ',' > "$TMP"/all_var_trim.csv
 ##  remove duplicates and create final output table
-    [[ "${#tiles[@]}" -gt 1  ]] && awk -F, '!a[$0]++'  $TMP/all_var_trim.csv > $OUTFILE || cp $TMP/all_var_trim.csv $OUTFILE
+    [[ "${#tiles[@]}" -gt 1  ]] && awk -F, '!a[$0]++'  "$TMP"/all_var_trim.csv > "$OUTFILE" || cp "$TMP"/all_var_trim.csv "$OUTFILE"
 
 fi
 
 
 #########################
 # remove temporal files (comment this to keep temp files):
-rm $TMP/aggreg*
-rm $TMP/ENV*
-rm $TMP/all_var_trim.csv
-rm $TMP/all_var_full.txt
+rm "$TMP"/aggreg*
+rm "$TMP"/ENV*
+rm "$TMP"/all_var_trim.csv
+rm "$TMP"/all_var_full.txt
 
 exit
 
