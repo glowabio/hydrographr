@@ -1,10 +1,10 @@
 #! /bin/bash
 
 # path to temporary destination folder
-export OUTDIR=$1
+export OUTDIR="$1"
 
 # full name of input table. Must be a .csv file
-export DATA=$2
+export DATA="$2"
 
 # names of lon and lat coordinates and basinID column
 export LON=$3
@@ -15,16 +15,16 @@ export LAT=$4
 export BAS_COL=$5
 
 # full path to stream network .gpkg file
-export STREAM=$6
+export STREAM="$6"
 
 # full path of basin .tif file
-export BASIN=$7
+export BASIN="$7"
 
 # full path to the euclidean distances output file
-export DIST_EUCL=$8
+export DIST_EUCL="$8"
 
 # full path to the network distances output file
-export DIST_NET=$9
+export DIST_NET="$9"
 
 # number of cores if running in parallel
 export PAR=${10}
@@ -50,7 +50,7 @@ then
   grass  -f --gtext --tmp-location  EPSG:4326 <<'EOF'
 
   #  import points
-  v.in.ascii --o in=$DATA out=allpoints separator=comma cat=1 x=2 y=3 skip=1
+  v.in.ascii --o in="$DATA" out=allpoints separator=comma cat=1 x=2 y=3 skip=1
 
   #  Calculate distance, results are given in meters
   v.distance -pas from=allpoints to=allpoints upload=dist separator=comma \
@@ -67,7 +67,7 @@ then
 # array of all ids from basins in the input data
 export basinID=($(awk -F, -v basin_col="$BAS_COL" '
 NR == 1 { for (i=1; i<=NF; i++) {f[$i] = i} }
- NR > 1 {print $(f[basin_col])}' $DATA | sort | uniq))
+ NR > 1 {print $(f[basin_col])}' "$DATA" | sort | uniq))
 
 
 
@@ -80,12 +80,12 @@ DistCalc(){
   export ID=$1
 
   # create table to store output of distance algorithms
-  echo "from_$SITE,to_$SITE,dist" > $OUTDIR/dist_net/dist_net_${ID}.csv
+  echo "from_$SITE,to_$SITE,dist" > "$OUTDIR"/dist_net/dist_net_${ID}.csv
 
-  grass -f --gtext --tmp-location  $BASIN <<'EOF'
+  grass -f --gtext --tmp-location  "$BASIN" <<'EOF'
 
     # Points available in each basin - filter by basin iD
-    awk -F, -v ID=${ID} '{if($4==ID) {print}}' $DATA | v.in.ascii --o \
+    awk -F, -v ID=${ID} '{if($4==ID) {print}}' "$DATA" | v.in.ascii --o \
         in=- out=data_points separator=comma cat=1 x=2 y=3 skip=1
 
     RANGE=$(v.db.select -c data_points col=$SITE)
@@ -93,10 +93,10 @@ DistCalc(){
     # calculation for all points using the streams (as the fish swims)
 
     # get layer name
-    export LAYER_NAME=$(ogrinfo -al -so $STREAM | grep "Layer name:" | awk '{print $3}')
+    export LAYER_NAME=$(ogrinfo -al -so "$STREAM" | grep "Layer name:" | awk '{print $3}')
 
     # read the stream network .gpkg file
-    v.in.ogr  --o input=$STREAM \
+    v.in.ogr  --o input="$STREAM" \
         layer=$LAYER_NAME output=stream type=line key=stream
 
     # Connect points to streams
@@ -111,7 +111,7 @@ DistCalc(){
     # add results to table
     v.report -c map=dist_all_${ID} layer=1 option=length units=meters  \
        | awk -F',' 'BEGIN{OFS=",";} {gsub(/[|]/, ","); print $2, $3, $5}' \
-       >> $OUTDIR/dist_net/dist_net_${ID}.csv
+       >> "$OUTDIR"/dist_net/dist_net_${ID}.csv
 
 EOF
 
@@ -125,13 +125,13 @@ parallel -j $PAR --delay 5 DistCalc ::: ${basinID[@]}
     if [ "${#basinID[@]}" -eq 1 ]
     then
 
-      mv $OUTDIR/dist_net/dist_net_${basinID}.csv $DIST_NET
+      mv "$OUTDIR"/dist_net/dist_net_${basinID}.csv $DIST_NET
 
     else
     echo "from_$SITE,to_$SITE,dist" > $DIST_NET
-    for FILE in $(find $OUTDIR/dist_net/ -name 'dist_net_*')
+    for FILE in $(find "$OUTDIR"/dist_net/ -name 'dist_net_*')
     do
-        awk 'FNR > 1' $FILE >> $DIST_NET
+        awk 'FNR > 1' "$FILE" >> $DIST_NET
     done
     fi
 
