@@ -141,10 +141,10 @@ api_get_local_ids <- function(df = NULL, csv_url = NULL,
     url = process_url,
     body = jsonlite::toJSON(body, auto_unbox = TRUE),
     encode = "json",
-    add_headers("Content-Type" = "application/json", "Prefer" = "respond-async")
+    httr::add_headers("Content-Type" = "application/json", "Prefer" = "respond-async")
   )
 
-  if (status_code(response) != 201) {
+  if (httr::status_code(response) != 201) {
     stop("Failed to submit request. HTTP Status: ", status_code(response))
   }
 
@@ -157,7 +157,7 @@ api_get_local_ids <- function(df = NULL, csv_url = NULL,
     Sys.sleep(5)  # Wait 5 seconds before polling
 
     status_response <- httr::GET(location_url)
-    status_json <- content(status_response, "parsed")
+    status_json <- httr::content(status_response, "parsed")
 
     status <- status_json$status
     message(paste("Job status:", status))
