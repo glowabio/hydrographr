@@ -76,7 +76,7 @@ dams_ids <- api_get_local_ids(csv_url = csv_url_dam,
                 colname_lat = "latitude",
                 colname_lon = "longitude",
                 colname_site_id = "site_id", 
-                process_url = get_local_ids_url)
+                process_url = get_local_ids_multi_url)
 head(dams_ids)
 ```
 ```{r, eval = FALSE}
