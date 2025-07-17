@@ -7,9 +7,12 @@
 reclass_raster(
   data,
   rast_val,
-  new_val,
+  new_val = FALSE,
   raster_layer,
   recl_layer,
+  reclass_value = FALSE,
+  remaining = NULL,
+  remaining_value = -9999,
   no_data = -9999,
   type = "Int32",
   compression = "low",
@@ -33,6 +36,16 @@ multiplying the values e.g. by 1000 to keep three decimals.}
 
 \item{recl_layer}{character. Full path of the output .tif layer, i.e., the
 reclassified raster file.}
+
+\item{reclass_value}{integer. Value to reclassify the entire raster.
+Default is FALSE. Note that in case reclass_value and new_val
+is provided the raster is reclassified on reclass_value.
+#' @param remaining character. How to treat raster values not listed in the reclassification table:
+ `"same"` retains their original values (equivalent to `* = *` in GRASS),
+ `"value"` assigns a fixed value (`remaining_value`), and
+ `NULL` (default) does nothing.}
+
+\item{remaining_value}{numeric. Value to assign if `remaining = "value"`. Default is -9999.}
 
 \item{no_data}{numeric. The no_data value of the new .tif layer.
 Default is -9999.}
@@ -74,10 +87,8 @@ my_directory <- tempdir()
 download_test_data(my_directory)
 
 # Read the stream order for each sub-catchment as a data.table
-my_dt <- read_geopackage(gpkg= paste0(my_directory,
-                                         "/hydrography90m_test_data",
-                                         "/order_vect_59.gpkg"),
-                         import_as = "data.table")
+# my_dt <- read_geopackage(paste0(my_directory, "/order_vect_59.gpkg"),
+type = "net", as_dt = T)
 
 
 # Select the stream segment ID and and the Strahler stream order
@@ -97,10 +108,15 @@ str_ord_rast <- reclass_raster(data = str_ord,
                                raster_layer = stream_raster,
                                recl_layer = recl_raster)
 
+str_ord_rast <- reclass_raster(data = str_ord$stream,
+                               reclass_value = 1,
+                               rast_val = "stream",
+                               raster_layer = stream_raster,
+                               recl_layer = recl_raster)
 }
 \references{
 https://grass.osgeo.org/grass82/manuals/r.reclass.html
 }
 \author{
-Marlene Schürz
+Marlene Schürz, Thomas Tomiczek, Afroditi Grigoropoulou
 }
