@@ -107,7 +107,7 @@ str_ord_rast <- reclass_raster(data = str_ord,
                                raster_layer = stream_raster,
                                recl_layer = recl_raster)
 
-Reclassify the raster to obtain a mask, where every value is converted to '1'
+# Reclassify the raster to obtain a mask, where every value is converted to '1'
 mask_rast <- reclass_raster(data = NULL,
                            rast_val = NULL,
                            new_val = NULL,
@@ -117,8 +117,8 @@ mask_rast <- reclass_raster(data = NULL,
                            recl_layer = recl_raster)
 
 
-Reclassify the raster to only a subset of the Strahler stream order values,
-while maintaining the rest of the values unchanged
+# Reclassify the raster to only a subset of the Strahler stream order values,
+# while maintaining the rest of the values unchanged
 mask_rast <- reclass_raster(data = str_ord[1:1000,],
                            rast_val = stream,
                            new_val = strahler,
