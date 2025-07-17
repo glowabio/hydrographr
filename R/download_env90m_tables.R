@@ -977,14 +977,14 @@ download_projected_climate_tables <- function(base_vars = NULL,
 #' # Compute download size of two landcover base variables (Cropland, rainfed,
 #' # and Grassland) and two years, for all tiles:
 #'   vars <- download_landcover_tables(
-#'     base_vars=c("c10", "c130"),
+#'     base_vars=c("c10", "c200"),
 #'     years=c(1992, 1993),
 #'     tile_ids="ALL")
 #'
 #' # Download two base variables and one year, for two tiles:
 #' \dontrun{
 #'   vars <- download_landcover_tables(
-#'     base_vars=c("c10", "c130"),
+#'     base_vars=c("c10", "c200"),
 #'     years=c(1992),
 #'     tile_ids=c("h00v04", "h10v04"),
 #'     download=TRUE,
