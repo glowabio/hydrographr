@@ -16,6 +16,11 @@
 #' @param new_val character. The name of the column with the new raster values,
 #' which need to be integer values. In case of floating point values, consider
 #' multiplying the values e.g. by 1000 to keep three decimals.
+#' @param remaining character. How to treat raster values not listed in the reclassification table:
+#'  `"same"` retains their original values (equivalent to `* = *` in GRASS),
+#'  `"value"` assigns a fixed value (`remaining_value`), and
+#'  `NULL` (default) does nothing.
+#' @param remaining_value numeric. Value to assign if `remaining = "value"`. Default is -9999.
 #' @param raster_layer Full path to the input raster .tif layer.
 #' @param recl_layer character. Full path of the output .tif layer, i.e., the
 #' reclassified raster file.
@@ -43,7 +48,7 @@
 #' @importFrom terra rast
 #' @export
 #'
-#' @author Marlene Schürz
+#' @author Marlene Schürz, Afroditi Grigoropoulou
 #'
 #' @references
 #' https://grass.osgeo.org/grass82/manuals/r.reclass.html
