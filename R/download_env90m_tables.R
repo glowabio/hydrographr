@@ -394,7 +394,7 @@ download_merit_dem_tables <- function(subset = NULL,
 #' # Download one hy90m variable (Strahler’s stream order), for two tiles:
 #' \dontrun{
 #' vars <- download_hydrography90m_tables(
-#'   subset = c("stream_strahler"),
+#'   subset = c("order_strahler"),
 #'   tile_ids = c("h00v04", "h10v04"),
 #'   download = TRUE,
 #'   download_dir = ".",
@@ -405,7 +405,7 @@ download_merit_dem_tables <- function(subset = NULL,
 #' # unzip, and delete the zips:
 #' \dontrun{
 #' vars <- download_hydrography90m_tables(
-#'   subset = c("stream_strahler"),
+#'   subset = c("order_strahler"),
 #'   tile_ids = c("h00v04"),
 #'   download = TRUE,
 #'   download_dir = ".",
