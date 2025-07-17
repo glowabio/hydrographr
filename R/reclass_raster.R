@@ -81,7 +81,9 @@
 #'
 
 
-reclass_raster <- function(data, rast_val, new_val, raster_layer,
+reclass_raster <- function(data, rast_val, new_val, remaining = NULL,
+                           remaining_value = -9999,
+                           raster_layer,
                            recl_layer,
                            no_data = -9999, type = "Int32",
                            compression = "low", bigtiff = TRUE,
@@ -107,18 +109,20 @@ reclass_raster <- function(data, rast_val, new_val, raster_layer,
   if (is.null(data[[rast_val]]))
     stop(paste0("rast_val: Column name '", rast_val,
     "' does not exist."))
-  if (is.null(data[[new_val]]))
-    stop(paste0("new_val: Column name '", new_val,
-    "' does not exist."))
+  if(!is.null(new_val))
+    if (is.null(data[[new_val]]))
+      stop(paste0("new_val: Column name '", new_val,
+      "' does not exist."))
 
   # Check if values of the rast_val/new_val columns are numeric
   if (!is.integer(data[[rast_val]]))
     stop(
       paste0("rast_val: Values of column ", rast_val,
       " have to be integers."))
-  if (!is.integer(data[[new_val]]))
-    stop(paste0("new_val: Values of column ", new_val,
-    " have to be integers."))
+  if(!is.null(new_val))
+    if (!is.integer(data[[new_val]]))
+      stop(paste0("new_val: Values of column ", new_val,
+      " have to be integers."))
 
   # Check if raster_layer is defined
   if (missing(raster_layer))
@@ -185,6 +189,17 @@ reclass_raster <- function(data, rast_val, new_val, raster_layer,
   rules <- data.table(old = data[[rast_val]],
                       equal = "=",
                       new = data[[new_val]])
+
+  # Add the remaining values to the rules file
+  if (!is.null(remaining)) {
+    if (remaining == "same") {
+      rules <- rbind(rules, data.table(old = "*", equal = "=", new = "*"))
+    } else if (remaining == "value") {
+      rules <- rbind(rules, data.table(old = "*", equal = "=", new = remaining_value))
+    } else {
+      stop("remaining: must be one of 'same', 'value', or NULL.")
+    }
+  }
   # Create random string to attach to the file name of the temporary
   # rules .txt file
   rand_string <- stri_rand_strings(n = 1, length = 8, pattern = "[A-Za-z0-9]")
