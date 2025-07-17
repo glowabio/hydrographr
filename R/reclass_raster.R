@@ -17,8 +17,13 @@
 #' which need to be integer values. In case of floating point values, consider
 #' multiplying the values e.g. by 1000 to keep three decimals.
 #' @param reclass_value integer. Value to reclassify the entire raster.
-#' Default is FALSE. Note that in case reclass_value and new_val 
+#' Default is FALSE. Note that in case reclass_value and new_val
 #' is provided the raster is reclassified on reclass_value.
+#' #' @param remaining character. How to treat raster values not listed in the reclassification table:
+#'  `"same"` retains their original values (equivalent to `* = *` in GRASS),
+#'  `"value"` assigns a fixed value (`remaining_value`), and
+#'  `NULL` (default) does nothing.
+#' @param remaining_value numeric. Value to assign if `remaining = "value"`. Default is -9999.
 #' @param raster_layer Full path to the input raster .tif layer.
 #' @param recl_layer character. Full path of the output .tif layer, i.e., the
 #' reclassified raster file.
@@ -46,7 +51,7 @@
 #' @importFrom terra rast
 #' @export
 #'
-#' @author Marlene Schürz, Thomas Tomiczek
+#' @author Marlene Schürz, Thomas Tomiczek, Afroditi Grigoropoulou
 #'
 #' @references
 #' https://grass.osgeo.org/grass82/manuals/r.reclass.html
@@ -89,6 +94,7 @@
 
 reclass_raster <- function(data, rast_val, new_val = FALSE, raster_layer,
                            recl_layer, reclass_value = FALSE,
+                           remaining = NULL, remaining_value = -9999,
                            no_data = -9999, type = "Int32",
                            compression = "low", bigtiff = TRUE,
                            read = FALSE, quiet = TRUE) {
@@ -212,7 +218,7 @@ reclass_raster <- function(data, rast_val, new_val = FALSE, raster_layer,
     indx_miss_raster <- which(rast_dat[[1]] %in% data[[rast_val]])
     # Get missing raster values
     miss_raster <- rast_dat[-c(indx_miss_raster),]
-    print(paste0("These values of the raster were not found in the data table:", 
+    print(paste0("These values of the raster were not found in the data table:",
                  paste(miss_raster, collapse = ", ")))
     # Write all values found in raster tif file and input data table as data frame
     same_val1 <- as.data.frame(rast_dat[c(indx_miss_raster),])
@@ -224,7 +230,7 @@ reclass_raster <- function(data, rast_val, new_val = FALSE, raster_layer,
     miss_rast_val <- data[-c(indx_miss_rast_val),]
     # Get only missing raster input data values to throw out message
     missing_rast_values <- data[-c(indx_miss_rast_val),1]
-    print(paste0("These raster values of the data table were not found in the raster:", 
+    print(paste0("These raster values of the data table were not found in the raster:",
                  paste(missing_rast_values, collapse = ", ")))
     # Write all values found in input data table and raster file as data frame
     same_val2 <- data[c(indx_miss_raster),]
@@ -256,6 +262,17 @@ reclass_raster <- function(data, rast_val, new_val = FALSE, raster_layer,
     rules <- data.table::data.table(old = data[[rast_val]],
                                     equal = "=",
                                     new = data[[new_val]])
+
+    if (!is.null(remaining)) {
+      if (remaining == "same") {
+        rules <- rbind(rules, data.table(old = "*", equal = "=", new = "*"))
+      } else if (remaining == "value") {
+        rules <- rbind(rules, data.table(old = "*", equal = "=", new = remaining_value))
+      } else {
+        stop("remaining: must be one of 'same', 'value', or NULL.")
+      }
+    }
+
     }
   }
 
