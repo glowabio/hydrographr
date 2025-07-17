@@ -11,7 +11,7 @@ get_os <- function() {
   sysinf <- Sys.info()
 
   if (!is.null(sysinf)) {
-    os <- sysinf["sysname"]
+    os <- sysinf[["sysname"]]
     if (os == "Darwin") {
       os <- "osx"
     }
@@ -85,6 +85,6 @@ fix_path <- function(path) {
     stri_replace_all_fixed(., "\\", "/") %>%
     stri_replace_first_fixed(., drive, mnt) %>%
     stri_replace_first_fixed(., "Program Files (x86)", "PROGRA~2") %>%
-    stri_replace_first_fixed(., "Program Files", "PROGRA~1") 
+    stri_replace_first_fixed(., "Program Files", "PROGRA~1")
 
 }
