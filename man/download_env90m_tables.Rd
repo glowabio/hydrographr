@@ -495,7 +495,7 @@ vars <- download_projected_climate_tables(
 
 # Download one variable for two tiles, by specifying each part of
 # the variable separately (e.g. scenario, model, time period, ...):
-#' \dontrun{
+\dontrun{
 vars <- download_projected_climate_tables(
   base_vars = c("bio01"),
   time_periods = c("2071-2100"),
