@@ -1760,7 +1760,7 @@ do_env90m_download <- function(variable_names, tile_ids, file_size_table, downlo
     {
       igb_readme = paste0(igb_path, "Readme.md")
       download.file(igb_readme, destfile = paste0(download_dir, "/Readme_env90m.md"),
-                    mode = "wb", quiet = quiet)
+        mode = "wb", quiet = quiet)
     },
     warning = function(c) {
       message(paste0('Error: Could not download from ', igb_readme, ', maybe the server is down.'))
