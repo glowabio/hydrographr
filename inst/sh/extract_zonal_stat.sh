@@ -1,12 +1,11 @@
 #!/bin/bash
 
 export DATADIR=$1
-declare -a SUBC_IDS=($(echo $2 | tr "/" "\n"))
-export SUBC_LAYER=$3
-declare VARS=($(echo $4 | tr "/" "\n"))
-export CALC_ALL=$5
-export NCORES=$6
-export RSTRING=$7
+export SUBC_LAYER=$2
+declare VARS=($(echo $3 | tr "/" "\n"))
+export CALC_ALL=$4
+export NCORES=$5
+export RSTRING=$6
 
 export TMPTAX=$DATADIR/tmp_${RSTRING}
 export OUTDIR=$DATADIR/tmp_${RSTRING}/r_univar
@@ -18,7 +17,7 @@ extract_zonal_stat(){
 
     export VARNAME=$(basename $VAR .tif)
 
-grass -f --text --tmp-location $SUBC_LAYER   <<'EOF'
+grass -f --gtext --tmp-location $SUBC_LAYER   <<'EOF'
 
 
     # Read in subcatchment raster
@@ -35,21 +34,22 @@ grass -f --text --tmp-location $SUBC_LAYER   <<'EOF'
 
     fi
 
-    # Calculate the statistics of the given variable for each microbasin and save in a temporary .csv file
+    # Calculate the statistics of the given variable for each subcatchment and save in a temporary .csv file
     # Read in variable raster
     r.external  input=$DATADIR/$VAR  output=$VARNAME --overwrite  --qq
 
     # Add header to the output .csv file
-    echo "subc_id,${VARNAME}_min,${VARNAME}_max,${VARNAME}_range,${VARNAME}_mean,${VARNAME}_sd" \
+    echo "subc_id,${VARNAME}_data_cells,${VARNAME}_nodata_cells,${VARNAME}_min,${VARNAME}_max,${VARNAME}_range,${VARNAME}_mean,${VARNAME}_mean_abs,${VARNAME}_sd,${VARNAME}_var,${VARNAME}_cv,${VARNAME}_sum,${VARNAME}_sum_abs"\
         > $OUTDIR/stats_${VARNAME}_tmp.csv
     # Calculate zonal statistics and append to the output .csv
-    r.univar --qq -t --o map=$VARNAME zones=subc  separator=comma |  awk -F, 'BEGIN{OFS=",";} NR>1 {print $1, $5, $6, $7, $8, $10}'  \
+    r.univar --qq -t --o map=$VARNAME zones=subc  separator=comma |  awk -F, 'BEGIN{OFS=",";} NR>1 {print $1, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14}'  \
         >> $OUTDIR/stats_${VARNAME}_tmp.csv
 
 EOF
 
 # Sort variables to later join them in R
-sort -k 1n $OUTDIR/stats_${VARNAME}_tmp.csv > $OUTDIR/stats_${VARNAME}.csv  && rm -f  $OUTDIR/stats_${VARNAME}_tmp.csv
+LC_ALL=C sort -k 1n -t',' $OUTDIR/stats_${VARNAME}_tmp.csv > $OUTDIR/stats_${VARNAME}.csv  && rm -f  $OUTDIR/stats_${VARNAME}_tmp.csv
+
 
 }
 

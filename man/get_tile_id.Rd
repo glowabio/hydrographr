@@ -2,24 +2,27 @@
 % Please edit documentation in R/get_tile_id.R
 \name{get_tile_id}
 \alias{get_tile_id}
-\title{Get the Hydrography90m regular tile ID}
+\title{Get the Hydrography90m 20°x20° tile ID}
 \usage{
 get_tile_id(data, lon, lat)
 }
 \arguments{
-\item{data}{a data.frame or data.table with lat/lon coordinates in WGS84.}
+\item{data}{a data.frame or data.table that contains the columns regarding
+the longitude / latitude coordinates in WGS84.}
 
 \item{lon}{character. The name of the column with the longitude coordinates.}
 
 \item{lat}{character. The name of the column with the latitude coordinates.}
 }
 \description{
-Identifies the ids of the tiles within the Hydrography90m data
-in which the given points are located. The IDs are required to then download
-the data using download_tiles(). Input is a point data frame.
+Identifies the 20°x20° tile IDs of the Hydrography90m
+data in which the input points are located. The IDs can then be used to
+download the data using \code{\link{download_tiles()}}. The input is a data
+frame with point coordinates. For orientation, please also see the tiles at
+the \url{https://hydrography.org/hydrography90m/hydrography90m_layers}
 }
 \examples{
-# Download test data into temporary R folder
+# Download test data into the temporary R folder
 # or define a different directory
 my_directory <- tempdir()
 download_test_data(my_directory)

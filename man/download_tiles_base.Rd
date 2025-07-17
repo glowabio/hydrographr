@@ -13,7 +13,7 @@ download_tiles_base(
   tile_id = NULL,
   global = FALSE,
   download_dir = ".",
-  file_size_table_sep = NULL,
+  file_size_table = NULL,
   server_url = NULL
 )
 }
@@ -30,7 +30,7 @@ Default is FALSE.}
 \item{download_dir}{character. The directory where the files will be
 downloaded. Default is the working directory.}
 
-\item{file_size_table_sep}{data.frame. Lookup table including file names
+\item{file_size_table}{data.frame. Lookup table including file names
 and sizes (inherited by 'download_tiles()').}
 
 \item{server_url}{character. url to the the home download folder

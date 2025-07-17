@@ -16,6 +16,11 @@ export OUT=$6
 # number of cores to use if in parallel
 export PAR=$7
 
+export COMPRESSION=$8
+
+export LEVEL=$9
+
+export BTIFF=${10}
 
 
 ###############################################################################
@@ -29,7 +34,7 @@ export coord=$(awk -v micid=${S} -v occname=${ID} -v lon=$LON -v lat=$LAT \
     BEGIN{OFS=",";} $(f[occname])==micid {print $(f[lon]),$(f[lat])}' $DATA)
 
 
-grass -f --text --tmp-location  $DIRE <<'EOF'
+grass -f --gtext --tmp-location  $DIRE <<'EOF'
 
 #  read direction map
 r.external --o input=$DIRE output=dir
@@ -42,7 +47,7 @@ r.water.outlet --overwrite input=dir output=bf_${S} \
 g.region -a --o zoom=bf_${S}
 
 #  Export the basin as tif file
-r.out.gdal --o -f -c -m  createopt="COMPRESS=DEFLATE,ZLEVEL=9" \
+r.out.gdal --o -f -c -m  createopt="COMPRESS=$COMPRESSION,ZLEVEL=$LEVEL,BIGTIFF=$BTIFF" \
     type=Int32  format=GTiff nodata=0 \
     input=bf_${S} output=$OUT/upstream_basin_${S}.tif
 

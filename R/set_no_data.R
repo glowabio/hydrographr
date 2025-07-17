@@ -9,15 +9,21 @@
 #' e.g. c("sti_h16v02.tif", "slope_grad_dw_cel_h00v00.tif").
 #' The original files will be overwritten.
 #' @param no_data numeric. The desired NoData value.
+#' @param quiet logical. If FALSE, the standard output will be printed.
+#' Default is TRUE.
 #'
 #' @importFrom processx run
 #' @importFrom stringr str_split
 #' @export
 #'
-#' @author Afroditi Grigoropoulou, Maria M. Üblacker
+#' @author Afroditi Grigoropoulou, Marlene Schürz
 #'
-#'@examples
-#' # Download test data into temporary R folder
+#' @references
+#' \url{https://gdal.org/programs/gdal_edit.html}
+#'
+#' @examples
+#' # Download test data into the temporary R folder
+#' # or define a different directory
 #' my_directory <- tempdir()
 #' download_test_data(my_directory)
 #'
@@ -27,7 +33,7 @@
 #'             no_data = -9999)
 #'
 
-set_no_data <- function(data_dir, var_layer, no_data) {
+set_no_data <- function(data_dir, var_layer, no_data, quiet = TRUE) {
 
   # Check if path exists
   if (!dir.exists(data_dir))
@@ -42,18 +48,18 @@ set_no_data <- function(data_dir, var_layer, no_data) {
     stop("no_data: Value has to be numeric.")
 
   # Check operating system
-  system <- get_os()
+   sys_os  <- get_os()
 
   # Make bash scripts executable
   make_sh_exec()
 
-  if (system == "linux" || system == "osx") {
+  if (sys_os  == "linux" ||  sys_os  == "osx") {
   # Call the external .sh script set_no_data.sh
   # containing the gdal function
   output <- processx::run(system.file("sh", "set_no_data.sh",
                              package = "hydrographr"),
                  args = c(data_dir, var_layer, no_data),
-                 echo = FALSE)$stdout
+                 echo = !quiet)$stdout
   } else {
     # Check if WSL and Ubuntu are installed
     check_wsl()
@@ -68,7 +74,7 @@ set_no_data <- function(data_dir, var_layer, no_data) {
                                         package = "hydrographr"),
                             args = c(wsl_data_dir, var_layer, no_data,
                                      wsl_sh_file),
-                            echo = FALSE)$stdout
+                            echo = !quiet)$stdout
   }
   # Format output message
   output <- str_split(output, "\n")[[1]][1]

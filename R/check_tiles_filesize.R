@@ -10,27 +10,29 @@
 #' files available for download, (inherited by 'download_tiles()').
 #' @param h90m_tile_id character vector. The valid IDs of the hydrography90m.
 #' regular tiles available for download (inherited by 'download_tiles()').
-#' @param h90m_file_formats character vector. The valid file types of the files
-#' available for download (inherited by 'download_tiles()').
-#' @param file_size_table_sep data.frame. Lookup table including file names
+#' @param h90m_file_names character vector. The names of the files available
+#' for download. Used to verify whether the requested format is valid 
+#' (inherited by 'download_tiles()').
+#' @param file_size_table data.frame. Lookup table including file names
 #' and sizes (inherited by 'download_tiles()').
 #'
-#' @importFrom stringr str_split_fixed
+#' @importFrom stringr str_split_i
 #' @keywords internal
 #'
 
 
 
 check_tiles_filesize <- function(variable, file_format = "tif",
-                                 tile_id = NULL, reg_unit_id = NULL,
+                                 tile_id = NULL,
                                  global = FALSE, h90m_varnames, h90m_tile_id,
-                                 h90m_file_formats, file_size_table_sep) {
+                                 h90m_file_names, file_size_table) {
 
   # Check if the given variable name is valid
   match.arg(variable, choices = h90m_varnames)
 
   # Check that the requested file_format is a tif or gpkg
-  match.arg(file_format, choices = c("tif", "gpkg"))
+  # Added "zip" for env data!
+  match.arg(file_format, choices = c("tif", "gpkg", "zip"))
 
   # Regional unit case
 
@@ -38,6 +40,7 @@ check_tiles_filesize <- function(variable, file_format = "tif",
     match.arg(file_format, choices = "tif")
 
   } else if (global == FALSE) {
+    # TODO: Can we use elif (variable == "regional_unit") here?
     # Regional unit case, test reg_unit ids
     if (variable == "regional_unit") {
 
@@ -54,21 +57,28 @@ check_tiles_filesize <- function(variable, file_format = "tif",
 
 
   # Get the name of the file
-  varname <- ifelse(global == TRUE, paste0(variable, "_ovr.", file_format),
+  filename <- ifelse(global == TRUE, paste0(variable, "_ovr.", file_format),
                     paste0(variable, "_", tile_id, ".", file_format))
 
   # Find valid file_formats for the requested variable
-  # to check that the requested file_format exists
+  # to check that the requested file_format exists.
+  # Important: Do not just split at the dot, as in the future climate
+  # variables, we have files like this:
+  #   bio18_2071-2100_mpi-esm1-2-hr_ssp585_V.2.1_h04v00.zip
+  #   bio18_2071-2100_ukesm1-0-ll_ssp370_V.2.1_h20v00.zip
+  #   bio18_2071-2100_ipsl-cm6a-lr_ssp585_V.2.1_h16v10.zip
+  index_filenames <- grep(paste0(variable, "_"), h90m_file_names)
   valid_file_format_var <- unique(
-    str_split_fixed(
-      h90m_file_formats[grep(paste0(variable, "_"), h90m_file_formats)],
-      "\\.", 2)[, 2])
+    stringr::str_split_i(
+      h90m_file_names[index_filenames],
+      "\\.",   # regex: split at dot!
+       -1))    # take first piece from right hand side
 
   # Check that the requested file_format is among the valid ones
   match.arg(file_format, choices = valid_file_format_var)
 
   # Grep the filesize of the requested file from the lookup table
-  file_size <- file_size_table_sep[varname_tile == varname, ]$file_size
+  file_size <- file_size_table[file_size_table$file_name == filename, ]$file_size
 
   file_size
 }

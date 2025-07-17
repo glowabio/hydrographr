@@ -4,39 +4,65 @@
 \alias{merge_tiles}
 \title{Merge raster or vector objects}
 \usage{
-merge_tiles(tile_dir, out_dir, read_raster = TRUE, read_vector = FALSE)
+merge_tiles(
+  tile_dir,
+  tile_names,
+  out_dir,
+  file_name,
+  name = "stream",
+  compression = "low",
+  bigtiff = TRUE,
+  read = FALSE,
+  quiet = TRUE
+)
 }
 \arguments{
-\item{tile_dir}{character. The directory containing only the raster or
+\item{tile_dir}{character. The directory containing the raster or
 spatial vectors tiles, which should be merged.}
+
+\item{tile_names}{character. The names of the files to be merged,
+including the file extension (.tif or .gpkg).}
 
 \item{out_dir}{character. The directory where the output will be stored.}
 
-\item{read_raster}{logical. If TRUE, the merged raster .tif layer gets read
-into R. If FALSE, the layer is only stored on disk. Default is TRUE.}
+\item{file_name}{character. Name of the merged output file, including the
+file extension (.tif or .gpkg).}
 
-\item{read_vector}{logical. If TRUE, the merged spatial vector gets read
-into R. In this case, read_raster needs to be set to FALSE.
-If FALSE, the vector is only stored on disk. Default is FALSE.}
+\item{name}{character. The attribute table column name of the stream segment
+("stream"), sub-catchment ("ID"), basin ("ID") or outlet ("ID") column which
+is used for merging GeoPackages. Default is "stream".}
+
+\item{compression}{character. Compression of the written output file.
+Compression levels can be defined as "none", "low", or "high". Default is
+"low", referring to compression type "DEFLATE" and compression level 2.
+"high" refers to compression level 9.}
+
+\item{bigtiff}{logical. Define whether the output file is expected to be a
+BIGTIFF (file size larger than 4 GB). If FALSE and size > 4GB no file will be
+written. Default is TRUE.}
+
+\item{read}{logical. If TRUE, the merged layer gets read
+into R. If FALSE, the layer is only stored on disk. Default is FALSE.}
+
+\item{quiet}{logical. If FALSE, the standard output will be printed.
+Default is TRUE.}
 }
 \value{
-A .tif raster file or spatial vector object that is always written
-to disk, and optionally loaded into R.
+A .tif raster file or .gpkg spatial vector object that is always
+written to disk, and optionally loaded into R.
 }
 \description{
 Merge multiple raster or spatial vector objects from disk
 to form a new raster or spatial vector object with a larger spatial extent.
-A directory with at least a raster .tif or spatial vector geopackage file
-must be provided.
-If read_raster = TRUE (default), the outputs are a .tif
-(saved under out_dir) and a SpatRaster (terra package) object, otherwise if
-read_raster = FALSE, the .tif file is the only output. If read_vector = TRUE,
-the outputs are a .gpkg (saved under out_dir) and a SpatVector
-(terra package) object, otherwise if read_vector = FALSE (default), the .gpkg
-file is the only output.
+A directory with at least two raster .tif or spatial vector geopackage files
+should be provided.
+Depending on the input, the output is a .tif or a .gpkg file (saved under
+out_dir). If read = TRUE, the output is read into R as a SpatRaster
+(terra package) object in case of .tif files, or as a SpatVector
+(terra package) object in case of .gpkg files.
 }
 \examples{
-# Download tiles into temporary R folder
+# Download tiles into the temporary R folder
 # or define a different directory
 my_directory <- tempdir()
 download_tiles(variable = "basin",
@@ -48,12 +74,16 @@ download_tiles(variable = "basin",
 tiles_folder <- paste0(my_directory, "/r.watershed/basin_tiles20d")
 # Define output folder
 output_folder <- paste0(my_directory, "/merged_tiles")
-# Creat ouput folder if it doesn't exist
+# Create output folder if it doesn't exist
 if(!dir.exists(output_folder)) dir.create(output_folder)
+
 
 # Merge tiles
 merged_tiles <- merge_tiles(tile_dir = tiles_folder,
-                            out_dir = output_folder)
+                            tile_names = c("basin_h22v08.tif", "basin_h22v10.tif"),
+                            out_dir = output_folder,
+                            file_name = "basin_merged.tif",
+                            read = TRUE)
 
 }
 \references{
@@ -66,5 +96,5 @@ merged_tiles <- merge_tiles(tile_dir = tiles_folder,
 \url{https://gdal.org/programs/ogr2ogr.html}
 }
 \author{
-Thomas Tomiczek
+Thomas Tomiczek, Jaime Garcia Marquez, Afroditi Grigoropoulou
 }

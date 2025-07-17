@@ -19,7 +19,7 @@ extract_from_gpkg(){
 
   export VARNAME=$(basename $VAR .gpkg)
 
-  grass -f --text --tmp-location $SUBC_LAYER   <<'EOF'
+  grass -f --gtext --tmp-location $SUBC_LAYER   <<'EOF'
 
   export LAYER_NAME=$(ogrinfo -al -so $DATADIR/$VAR | grep "Layer name:" | awk '{print $3}')
   VARNAME=$(basename $VAR .gpkg)
