@@ -279,7 +279,7 @@ download_soil_tables(
 
 # Download one soil variable (Clay content), for two tiles:
 \dontrun{
-download_soil_tables(
+vars <- download_soil_tables(
   subset = c("clyppt"),
   tile_ids = c("h00v04", "h10v04"),
   download = TRUE,
@@ -290,7 +290,7 @@ download_soil_tables(
 # Download one soil variable (Clay content), for one tile,
 # unzip, and delete the zips:
 \dontrun{
-download_soil_tables(
+vars <- download_soil_tables(
   subset = c("clyppt"),
   tile_ids = c("h00v04"),
   download = TRUE,
@@ -315,7 +315,7 @@ download_flo1k_tables(
 
 # Download the only flo1k_v1_0 variable (flo1k), for two tiles:
 \dontrun{
-download_soil_tables(
+vars <- download_flo1k_tables(
   subset = c("flo1k"),
   tile_ids = c("h00v04", "h10v04"),
   download = TRUE,
@@ -326,7 +326,7 @@ download_soil_tables(
 # Download the only flo1k_v1_0 variable (flo1k), for one tile,
 # unzip, and delete the zips:
 \dontrun{
-download_soil_tables(
+vars <- download_flo1k_tables(
   subset = c("flo1k"),
   tile_ids = c("h00v04"),
   download = TRUE,
@@ -348,7 +348,7 @@ download_cgiar_tables(
 
 # Download one cgiar variable (Global Aridity Index), for two tiles:
 \dontrun{
-download_cgiar_tables(
+vars <- download_cgiar_tables(
   subset = c("garid"),
   tile_ids = c("h00v04", "h10v04"),
   download = TRUE,
@@ -359,7 +359,7 @@ download_cgiar_tables(
 # Download two cgiar variables (Global Aridity Index, Potential
 # Evapotranspiration), for one tile, unzip, and delete the zips:
 \dontrun{
-download_cgiar_tables(
+vars <- download_cgiar_tables(
   subset = c("garid", "gevapt"),
   tile_ids = c("h00v04"),
   download = TRUE,
@@ -384,7 +384,7 @@ download_merit_dem_tables(
 # Download the only merit_dem_v1_0_3 variable (mean elevation),
 # for two tiles:
 \dontrun{
-download_merit_dem_tables(
+vars <- download_merit_dem_tables(
   subset = c("elev"), # or "ALL"
   tile_ids = c("h00v04", "h10v04"),
   download = TRUE,
@@ -395,7 +395,7 @@ download_merit_dem_tables(
 # Download the only merit_dem_v1_0_3 variable (mean elevation),
 # for one tile, unzip, and delete the zips:
 \dontrun{
-download_merit_dem_tables(
+vars <- download_merit_dem_tables(
   subset = c("elev"),
   tile_ids = c("h00v04"),
   download = TRUE,
@@ -417,7 +417,7 @@ download_hydrography90m_tables(
 
 # Download one hy90m variable (Strahler’s stream order), for two tiles:
 \dontrun{
-download_hydrography90m_tables(
+vars <- download_hydrography90m_tables(
   subset = c("stream_strahler"),
   tile_ids = c("h00v04", "h10v04"),
   download = TRUE,
@@ -428,7 +428,7 @@ download_hydrography90m_tables(
 # Download one hy90m variable (Strahler’s stream order), for one tile,
 # unzip, and delete the zips:
 \dontrun{
-download_hydrography90m_tables(
+vars <- download_hydrography90m_tables(
   subset = c("stream_strahler"),
   tile_ids = c("h00v04"),
   download = TRUE,
@@ -451,8 +451,8 @@ download_observed_climate_tables(
 
 # Download one bioclim variable (Annual mean temperature), for two tiles:
 \dontrun{
-download_observed_climate_tables(
-  subset = c("bio1"),
+vars <- download_observed_climate_tables(
+  subset = c("bio01_1981-2010_observed"),
   tile_ids = c("h00v04", "h10v04"),
   download = TRUE,
   download_dir = ".",
@@ -462,47 +462,13 @@ download_observed_climate_tables(
 # Download one bioclim variable (Annual mean temperature), for one tile,
 # unzip, and delete the zips:
 \dontrun{
-download_observed_climate_tables(
-  subset = c("bio1"),
+vars <- download_observed_climate_tables(
+  subset = c("bio01_1981-2010_observed"),
   tile_ids = c("h00v04"),
   download = TRUE,
   download_dir = ".",
   file_format = "txt",
   delete_zips = TRUE)
-}
-
-
-### Bioclimatic Variables: chelsa_bioclim_v2_1 ###
-### (projections only)                         ###
-# Show all available projected bioclim variable names
-download_projected_climate_tables()
-
-# Compute download size of all variables, for one tile:
-download_projected_climate_tables(
-  subset = "ALL",
-  tile_ids = c("h00v04"),
-  download = FALSE)
-
-# Download one variable (Annual mean temperature), for two tiles:
-\dontrun{
-download_projected_climate_tables(
-  subset = c("bio1"),
-  tile_ids = c("h00v04", "h10v04"),
-  download = TRUE,
-  download_dir = ".",
-  file_format = "zip")
-}
-
-# Download one variable (Annual mean temperature), for one tile,
-# unzip, and delete the zips:
-\dontrun{
-download_projected_climate_tables(
-  subset = c("bio1_2071-2100_ukesm1-0-ll_ssp585_V.2.1"),
-  tile_ids = c("h00v04"),
-  download = TRUE,
-  download_dir = ".",
-  file_format = "txt",
-  delete_zips = TRUE) 
 }
 
 

@@ -5,9 +5,11 @@
 \title{Reclassify a raster layer}
 \usage{
 reclass_raster(
-  data,
-  rast_val,
-  new_val,
+  data = NULL,
+  rast_val = NULL,
+  new_val = NULL,
+  remaining = NULL,
+  remaining_value = -9999,
   raster_layer,
   recl_layer,
   no_data = -9999,
@@ -28,6 +30,14 @@ values.}
 \item{new_val}{character. The name of the column with the new raster values,
 which need to be integer values. In case of floating point values, consider
 multiplying the values e.g. by 1000 to keep three decimals.}
+
+\item{remaining}{character. How to treat raster values not listed in the reclassification table:
+`"same"` retains their original values (equivalent to `* = *` in GRASS),
+`"value"` assigns a fixed value (`remaining_value`), and
+`NULL` (default) does nothing.
+When `remaining = "same"`, `remaining_value` is overlooked.}
+
+\item{remaining_value}{numeric. Value to assign if `remaining = "value"`. Default is -9999.}
 
 \item{raster_layer}{Full path to the input raster .tif layer.}
 
@@ -97,10 +107,32 @@ str_ord_rast <- reclass_raster(data = str_ord,
                                raster_layer = stream_raster,
                                recl_layer = recl_raster)
 
+Reclassify the raster to obtain a mask, where every value is converted to '1'
+mask_rast <- reclass_raster(data = NULL,
+                           rast_val = NULL,
+                           new_val = NULL,
+                           remaining = "value",
+                           remaining_value = 1,
+                           raster_layer = stream_raster,
+                           recl_layer = recl_raster)
+
+
+Reclassify the raster to only a subset of the Strahler stream order values,
+while maintaining the rest of the values unchanged
+mask_rast <- reclass_raster(data = str_ord[1:1000,],
+                           rast_val = stream,
+                           new_val = strahler,
+                           remaining = "same",
+                           remaining_value = NULL,
+                           raster_layer = stream_raster,
+                           recl_layer = recl_raster)
+
+
+
 }
 \references{
 https://grass.osgeo.org/grass82/manuals/r.reclass.html
 }
 \author{
-Marlene Schürz
+Marlene Schürz, Afroditi Grigoropoulou
 }
