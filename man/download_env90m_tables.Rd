@@ -231,7 +231,7 @@ and unit of the values, please refer to
 
 For details on the ESA Land Cover variables, please refer to
 \url{https://www.climatologylab.org/terraclimate.html}. Please note that some
-values in this dataset are aggregated from similar classes (see 
+values in this dataset are aggregated from similar classes (see
 Environment90m publication).
 
 For details on the Soil data, please refer to
@@ -296,7 +296,7 @@ vars <- download_soil_tables(
   download = TRUE,
   download_dir = ".",
   file_format = "txt",
-  delete_zips = TRUE) 
+  delete_zips = TRUE)
 }
 
 
@@ -434,7 +434,7 @@ vars <- download_hydrography90m_tables(
   download = TRUE,
   download_dir = ".",
   file_format = "txt",
-  delete_zips = TRUE) 
+  delete_zips = TRUE)
 }
 
 ### Bioclimatic Variables: chelsa_bioclim_v2_1 ###
@@ -483,17 +483,32 @@ download_projected_climate_tables(
   tile_ids = c("h00v04"),
   download = FALSE)
 
-# Download one variable (Annual mean temperature), for two tiles:
+# Download one variable for two tiles:
 \dontrun{
 vars <- download_projected_climate_tables(
-  subset = c("bio01"),
+  subset = c("bio01_2071-2100_ukesm1-0-ll_ssp585_v2_1"),
   tile_ids = c("h00v04", "h10v04"),
   download = TRUE,
   download_dir = ".",
   file_format = "zip")
 }
 
-# Download one variable (Annual mean temperature), for one tile,
+# Download one variable for two tiles, by specifying each part of
+# the variable separately (e.g. scenario, model, time period, ...):
+#' \dontrun{
+vars <- download_projected_climate_tables(
+  base_vars = c("bio01"),
+  time_periods = c("2071-2100"),
+  models=c("ukesm1-0-ll"),
+  scenarios=c("ssp585"),
+  version=c("v2_1"),
+  tile_ids = c("h00v04", "h10v04"),
+  download = TRUE,
+  download_dir = ".",
+  file_format = "zip")
+}
+
+# Download one variable for one tile,
 # unzip, and delete the zips:
 \dontrun{
 vars <- download_projected_climate_tables(
@@ -502,7 +517,7 @@ vars <- download_projected_climate_tables(
   download = TRUE,
   download_dir = ".",
   file_format = "txt",
-  delete_zips = TRUE) 
+  delete_zips = TRUE)
 }
 
 
