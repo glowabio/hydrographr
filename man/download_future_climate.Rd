@@ -11,6 +11,7 @@ download_future_climate(
   scenario = NULL,
   model = NULL,
   tile_id = NULL,
+  version = "V.2.1",
   download_dir = ".",
   delete_zips = TRUE
 )
@@ -34,6 +35,8 @@ Details for all the scenario names. No default, has to be provided.}
 provided.}
 
 \item{tile_id}{character vector. The IDs of the requested tiles.}
+
+\item{version}{string. e.g. "V.2.1". Defaults to "V.2.1".}
 
 \item{download_dir}{character. The directory where the files will be
 downloaded. Default is the working directory.}
@@ -98,6 +101,8 @@ TODO: The CHELSA units also have scale and offset! Explain them here?\tabular{ll
 | mpi-esm1-2-hr  | TODO: Model description  |
 | psl-cm6a-lr    | TODO: Model description  |
 | ukesm1-0-ll    | TODO: MOdel description  |
+
+TODO: Also add something on versions!
 }
 \note{
 If there is an error during the download of a file
@@ -122,7 +127,7 @@ variable = c("bio1", "bio2", "bio3", "bio4", "bio5", "bio6", "bio7", "bio8",
              "bio16", "bio17", "bio18", "bio19")
 scenario = c("ssp370", "ssp585")
 model = c("ipsl-cm6a-lr", "mpi-esm1-2-hr", "ukesm1-0-ll")
-               time_period = time_period,
+time_period = c("2071-2100")
 download_future_climate(variable = variable, file_format = "zip",
                scenario = scenario, model = model,
                time_period = time_period,

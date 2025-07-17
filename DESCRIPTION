@@ -1,13 +1,8 @@
 Package: hydrographr
 Type: Package
 Title: Scalable Hydrographic Data Processing in R
-<<<<<<< HEAD
-Date: 2023
-Version: 1.0.15
-=======
 Date: 2024
 Version: 1.2.0
->>>>>>> 51c1714db6631f1198315012d2bd5ab6cf66e1aa
 Authors@R:
     c(person("Marlene", "Schürz",
              email = "marlene.schuerz@igb-berlin.de",
@@ -32,12 +27,9 @@ Authors@R:
              role = c("aut")),
       person("Vanessa", "Bremerich",
              email = "vanessa.bremerich@igb-berlin.de",
-<<<<<<< HEAD
-=======
              role = c("aut")),
       person("Merret", "Buurman",
              email = "merret.buurman@igb-berlin.de",
->>>>>>> 51c1714db6631f1198315012d2bd5ab6cf66e1aa
              role = c("aut")),
       person("Giuseppe", "Amatulli",
              email = "giuseppe.amatulli@gmail.com",
@@ -45,13 +37,9 @@ Authors@R:
       person("Sami", "Domisch",
              email = "sami.domisch@igb-berlin.de",
              role = c("aut")))
-<<<<<<< HEAD
-Maintainer: Marlene Schürz <marlene.schuerz@igb-berlin.de> and 
-=======
 Maintainer: Thomas Tomiczek <thomas.tomiczek@igb-berlin.de>,
     Merret Buurman <merret.buurman@igb-berlin.de>,
     Marlene Schürz <marlene.schuerz@igb-berlin.de> and
->>>>>>> 51c1714db6631f1198315012d2bd5ab6cf66e1aa
     Afroditi Grigoropoulou <afroditi.grigoropoulou@igb-berlin.de>
 Description: Scalable hydrographic geospatial data processing tools using 
     open-source command-line utilities. The package provides functions to 
@@ -68,23 +56,15 @@ Description: Scalable hydrographic geospatial data processing tools using
     workflows. Please see the installation guide of the additional software 
     at https://glowabio.github.io/hydrographr/articles/hydrographr.html. 
     Windows users need to to first activate the Windows Subsystem for Linux 
-<<<<<<< HEAD
-    (WSL) feature.
-=======
     (WSL) feature. Instructions on how to use hydrographr with other, finer 
     resolution stream networks, can be found at 
     https://glowabio.github.io/hydrographr/articles/example_other_stream_networks.html 
->>>>>>> 51c1714db6631f1198315012d2bd5ab6cf66e1aa
 License: GPL-3
 URL: https://glowabio.github.io/hydrographr/
 BugReports: https://github.com/glowabio/hydrographr/issues
 Encoding: UTF-8
 LazyData: true
-<<<<<<< HEAD
-RoxygenNote: 7.2.3
-=======
-RoxygenNote: 7.3.1
->>>>>>> 51c1714db6631f1198315012d2bd5ab6cf66e1aa
+RoxygenNote: 7.3.2
 Imports:
     processx (>= 3.7.0),
     data.table (>= 1.14.2),
@@ -112,21 +92,12 @@ Collate:
     'crop_to_extent.R'
     'download_test_data.R'
     'download_tiles.R'
-<<<<<<< HEAD
-=======
     'download_env.R'
     'download_future_climate.R'
->>>>>>> 51c1714db6631f1198315012d2bd5ab6cf66e1aa
     'download_tiles_base.R'
     'extract_from_gpkg.R'
     'extract_ids.R'
     'extract_zonal_stat.R'
-<<<<<<< HEAD
-    'get_catchment_graph.R'
-    'get_distance.R'
-    'get_distance_graph.R'
-    'get_pfafstetter_basins.R'
-=======
     'get_all_upstream_distances.R'
     'get_catchment_graph.R'
     'get_centrality.R'
@@ -136,15 +107,11 @@ Collate:
     'get_modelfit_table.R'
     'get_pfafstetter_basins.R'
     'get_predict_table.R'
->>>>>>> 51c1714db6631f1198315012d2bd5ab6cf66e1aa
     'get_regional_unit_id.R'
     'get_segment_neighbours.R'
     'get_tile_id.R'
     'get_upstream_catchment.R'
-<<<<<<< HEAD
-=======
     'get_upstream_variable.R'
->>>>>>> 51c1714db6631f1198315012d2bd5ab6cf66e1aa
     'utils.R'
     'merge_tile.R'
     'read_geopackage.R'
@@ -153,7 +120,4 @@ Collate:
     'set_no_data.R'
     'snap_to_network.R'
     'snap_to_subc_segment.R'
-<<<<<<< HEAD
-=======
     'split_table.R'
->>>>>>> 51c1714db6631f1198315012d2bd5ab6cf66e1aa

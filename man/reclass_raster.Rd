@@ -11,6 +11,8 @@ reclass_raster(
   raster_layer,
   recl_layer,
   reclass_value = FALSE,
+  remaining = NULL,
+  remaining_value = -9999,
   no_data = -9999,
   type = "Int32",
   compression = "low",
@@ -32,12 +34,18 @@ multiplying the values e.g. by 1000 to keep three decimals.}
 
 \item{raster_layer}{Full path to the input raster .tif layer.}
 
-\item{reclass_value}{integer. Value to reclassify the entire raster.
-Default is FALSE. Note in case reclass_value is provided, new_val parameter
-needs to be empty, otherwise the raster is reclassified based on the new_val column.}
-
 \item{recl_layer}{character. Full path of the output .tif layer, i.e., the
 reclassified raster file.}
+
+\item{reclass_value}{integer. Value to reclassify the entire raster.
+Default is FALSE. Note that in case reclass_value and new_val
+is provided the raster is reclassified on reclass_value.
+#' @param remaining character. How to treat raster values not listed in the reclassification table:
+ `"same"` retains their original values (equivalent to `* = *` in GRASS),
+ `"value"` assigns a fixed value (`remaining_value`), and
+ `NULL` (default) does nothing.}
+
+\item{remaining_value}{numeric. Value to assign if `remaining = "value"`. Default is -9999.}
 
 \item{no_data}{numeric. The no_data value of the new .tif layer.
 Default is -9999.}
@@ -110,5 +118,5 @@ str_ord_rast <- reclass_raster(data = str_ord$stream,
 https://grass.osgeo.org/grass82/manuals/r.reclass.html
 }
 \author{
-Marlene Schürz, Thomas Tomiczek
+Marlene Schürz, Thomas Tomiczek, Afroditi Grigoropoulou
 }

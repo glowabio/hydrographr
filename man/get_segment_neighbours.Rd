@@ -97,7 +97,7 @@ my_graph <- read_geopackage(gpkg= paste0(my_directory,
 
 # Subset the graph and get a smaller catchment
 my_graph <- get_catchment_graph(g = my_graph, subc_id = 513866048, mode = "in",
-                                outlet = FALSE, as_graph = TRUE, n_cores = 1)
+                                use_outlet = FALSE, as_graph = TRUE, n_cores = 1)
 
 
 # Get a vector of all segment IDs
