@@ -87,13 +87,14 @@ Imports:
     igraph (>= 1.3.5),
     magrittr (>= 2.0.3),
     methods (>= 4.3.0)
+Suggests:
+    testthat
 Collate:
     'check_tiles_filesize.R'
     'crop_to_extent.R'
+    'download_env90m_tables.R'
     'download_test_data.R'
     'download_tiles.R'
-    'download_env.R'
-    'download_future_climate.R'
     'download_tiles_base.R'
     'extract_from_gpkg.R'
     'extract_ids.R'

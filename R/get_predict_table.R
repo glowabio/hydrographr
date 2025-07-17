@@ -4,30 +4,28 @@
 #' an specific subset of subcatchments.
 #'
 #' @param variable character vector of variable names. Possible values are:
-#' c("bio1", "bio10", "bio11", "bio12", "bio13","bio14", "bio15", "bio16",
-#'  "bio17", "bio18","bio19", "bio2", "bio3", "bio4", "bio5","bio6", "bio7",
-#'  "bio8", "bio9", "c100", "c10", "c20", "c30", "c40", "c50","c60", "c70",
-#'  "c80", "c90", "chancurv","chandistdwseg", "chandistupcel", "chandistupseg",
-#'  "chanelvdwcel", "chanelvdwseg", "chanelvupcel","chanelvupseg",
-#'  "changraddwseg", "changradupcel", "changradupseg", "elev", "flow",
-#'  "flowpos", "gradient", "length", "out", "outdiffdwbasin", "outdiffdwscatch",
-#'  "outdistdwbasin", "outdistdwscatch", "outlet", "slopdiff", "slopgrad",
-#'  "soil", "source", "strdiffdwnear", "strdiffupfarth", "strdiffupnear",
-#'  "strdistdwnear", "strdistprox", "strdistupfarth", "strdistupnear",
-#'  "stright").
+#'  all variables in the Env90m dataset, which can bew viewed by calling
+#'  'download_<datasetname>_tables()'. For more details, see
+#'  '?download_env90m_tables'.
 #' @param statistics character vector of statistics names. Possible values are
 #' "sd", "mean", "range" or "ALL". Default "ALL".
 #' @param tile_id character. The IDs of the tiles of interest.
-#' @param input_var_path path to table with environmental variables for entire
-#' tiles.
-#' @param subcatch_id path to a text file with subcatchments ids.
-#' @param out_file_path character. The path to the output file.
+#' @param input_var_path path to directory that contains table with
+#'  environmental variables for entire tiles. Tables may be in subdirectories
+#'  of the provided directory.
+#' @param subcatch_id path to a text file with subcatchment ids, or numeric
+#'  vector containing subcatchment ids.
+#' @param out_file_path character. The path to the output file to be created.
 #' @param n_cores numeric. Number of cores used for parallelization.
 #' @param read logical. If TRUE, the table with environmental variables gets
 #' read into R.
 #' If FALSE, the table is only stored on disk. Default is TRUE.
 #' @param quiet logical. If FALSE, the standard output will be printed.
 #' Default is TRUE.
+#' @param tempdir String. Path to the directory where to store/look for the
+#'  file size table. If not passed, defaults to the output of [base::tempdir()].
+#' @param overwrite logical. If TRUE, the output file will be overwritten if it.
+#' already exists. Useful for repeated testing. Default is FALSE.
 #' @importFrom processx run
 #' @importFrom stringi stri_rand_strings
 #' @importFrom stringi stri_rand_strings
@@ -80,65 +78,135 @@ get_predict_table <- function(variable,
                               out_file_path,
                               n_cores = NULL,
                               read = TRUE,
-                              quiet = TRUE) {
+                              quiet = TRUE,
+                              tempdir = NULL,
+                              overwrite = FALSE) {
 
-  # Check variable name is one of the accepted values
-  accepted_vars <- c("bio1", "bio10", "bio11", "bio12", "bio13",
-                     "bio14", "bio15", "bio16", "bio17", "bio18",
-                     "bio19", "bio2", "bio3", "bio4", "bio5",
-                     "bio6", "bio7", "bio8", "bio9", "c100",
-                     "c10", "c20", "c30", "c40", "c50",
-                     "c60", "c70", "c80", "c90", "c110", "c120", "c130",
-                     "c140", "c150", "c160", "c170", "c180", "c190", "c200",
-                     "c210", "c220", "chancurv","chandistdwseg",
-                     "chandistupcel", "chandistupseg","chanelvdwcel",
-                     "chanelvdwseg", "chanelvupcel","chanelvupseg",
-                     "changraddwseg", "changradupcel","changradupseg", "elev",
-                     "flow", "flowpos","gradient", "length", "out",
-                     "outdiffdwbasin","outdiffdwscatch", "outdistdwbasin",
-                     "outdistdwscatch","outlet", "slopdiff", "slopgrad", "soil",
-                     "source","strdiffdwnear", "strdiffupfarth", "strdiffupnear",
-                     "strdistdwnear", "strdistprox", "strdistupfarth",
-                     "strdistupnear", "stright", "changradupcel",
-                     "changradupseg", "elev_drop", "flow_accum", "gradient",
-                     "length", "out_dist", "out_drop", "outdiffdwbasin",
-                     "outlet_elev", "soil_ACDWRB", "soil_AWCtS", "soil_BDRICM",
-                     "soil_BDRLOG", "soil_BLDFIE", "soil_CECSOL", "soil_CLYPPT",
-                     "soil_CRFVOL", "soil_HISTPR", "soil_ORCDRC", "soil_PHIHOX",
-                     "soil_SLGWRB", "soil_SLTPPT", "soil_SNDPPT", "soil_TEXMHT",
-                     "soil_WWP", "source_elev", "strdistprox")
+  # Define tempdir:
+  if (is.null(tempdir)) {
+    tempdir <- tempdir()
+  }
+
   #Check if one of the arguments is missing
   if (missing(variable))
-    stop(paste0('Variable is missing. Please provide at least the name of one variable.
-    Possible names are:  ', paste0(accepted_vars, collapse=", ")))
+    stop('Variable is missing. Please provide at least the name of one variable.',
+      '\n  You may use any of the >1000 variables of the Environment90m dataset,',
+      ' which you can view using e.g. download_soil_tables(). Please check',
+      ' ?download_env90m_tables for more details.')
 
   if (missing(tile_id))
-    stop("Please provide at least one tile ID")
+    stop("Please provide at least one tile ID (parameter \"tile_id\").")
 
   if (missing(input_var_path))
-    stop("Please provide a path to the table with environmental variables for
-    the entire tiles")
+    stop("Please provide a path to the directories containing the tables",
+         " with environmental variables for the entire tiles",
+         " (parameter \"input_var_path\").")
 
   if (missing(subcatch_id))
-    stop("Please provide at least one subcatchment ID")
+    stop("Please provide at least one subcatchment ID or a path to a file",
+     " containing subcatchment IDs (parameter \"subcatch_id\").")
+
+  if(is.numeric(subcatch_id)) {
+    if (!quiet)
+      message("INFO: You provided ", length(subcatch_id), " subcatchment IDs: ",
+              paste(subcatch_id[1:3], collapse=", "), ", etc.")
+  } else {
+    if (!quiet) message("INFO: You provided a path to a table containing subcatchment IDs.")
+    if (!file.exists(subcatch_id))
+      stop("File: ", subcatch_id, " does not exist (should contain subcatchment ids).")
+  }
 
   if (missing(out_file_path))
-    stop("Please provide a path to the output file")
+    stop("Please provide a path to the output file (parameter \"out_file_path\").")
+
+  # If the result file already exists, stop or warn user:
+  if (file.exists(out_file_path)) {
+
+    # It is a not a file, but a directory!
+    if (dir.exists(out_file_path)) {
+      stop("Please provide a path to an output file. You passed a path to a directory: ",
+        out_file_path)
+    }
+
+    # It is a file, and it exists already!
+    else {
+      if (overwrite) {
+        message("INFO: Result will overwrite existing file: ", out_file_path)
+      } else {
+        stop("Output file already exists (cannot overwrite): ", out_file_path,
+             "\n  (if you want to overwrite, set \"overwrite=TRUE\").")
+      }
+    }
+  }
+
+  # If the result file does not exist, check whether it can be created
+  # (to prevent errors later):
+  if (!file.exists(out_file_path)) {
+
+    # Trying to write to a file that ends in a slash causes an error in the bash script:
+    # "cp: cannot create regular file './testfile/': Not a directory"
+    if (endsWith(out_file_path, "/")) {
+      stop("Please provide a path to an output file. You passed a path to a directory: ",
+        out_file_path)
+    }
+
+    # The directory in which we want to write the output has to exist:
+    if (dir.exists(dirname(out_file_path))) {
+      if (!quiet) message("INFO: Output will be written to ", out_file_path)
+    } else {
+      stop("Cannot create output file \"", basename(out_file_path), "\".",
+           " We can only write output to an existing directory.",
+           " Directory does not exist: ", dirname(out_file_path)
+      )
+    }
+  }
 
   # Check if paths exists
   if (!file.exists(input_var_path))
-    stop(paste0("Path: ", input_var_path, " does not exist."))
+    stop("Path: ", input_var_path, " does not exist (should contain the input tables).")
 
-  if (any(!variable %in% accepted_vars))
-    stop("Please provide a valid variable name")
+  # Check if input tables exist somewhere in a subdir of input_var_path:
+  # This only works if the files have this name pattern: bio1_h18v04.txt
+  # Example: Providing "./my_inputs" also find the files here:
+  # ./my_inputs/chelsa_bioclim_v2_1/1981-2010_observed/bio1/bio1_h18v04.txt
+  # ./my_inputs/soilgrids250m_v2_0/clyppt/clyppt_h18v04.txt
+  # etc.
+  for (ivar in variable) {
+    for (itile in tile_id) {
+      filename <- paste0(ivar, "_", itile, ".txt")
+      if (filename %in% basename(list.files(input_var_path, recursive=TRUE))) {
+        #if (!quiet) message("INFO: Input table exists: ", filename)
+      } else {
+        # Check for zips?
+        if (paste0(ivar, "_", itile, ".zip") %in%
+            basename(list.files(input_var_path, recursive=TRUE))) {
+          stop("Input table does not exist: ", filename,
+             " (in subdirectory of: ", input_var_path, ")\n  But we found ",
+             paste0(ivar, "_", itile, ".zip"), ", maybe you forgot to unzip?")
+        } else {
+          stop("Input table does not exist: ", filename,
+             " (in subdirectory of: ", input_var_path, ")")
+        }
+      }
+      # The following loop is not necessary. It finds the path of each file,
+      # which is not required but just nice, for the user's convenience:
+      for (somepath in list.files(input_var_path, recursive=TRUE)) {
+        somename <- basename(somepath)
+        if (somename==filename) {
+          if (!quiet) message("INFO: Input table exists: ", filename,
+                              " (here: ", file.path(input_var_path, somepath), ")")
+        }
+      }
+    }
+  }
 
   # Check if statistics name provided is one of the accepted values
   if (any(!(statistics %in% "ALL"))) {
-    if (any(!(statistics %in% c("sd", "mean", "range"))))
-      stop("Please provide a valid statistics name. Possible values are
-             sd, mean, range or ALL")
+    if (any(!(statistics %in% c("sd", "mean", "range")))) {
+      stop("Please provide a valid statistics name. Possible values are:",
+             " sd, mean, range or ALL")
+    }
   }
-
 
   # Check if n_cores is numeric
   if (!is.numeric(n_cores))
@@ -152,18 +220,59 @@ get_predict_table <- function(variable,
   if (!is.logical(read))
     stop("read: Has to be TRUE or FALSE.")
 
+  # Now do the longer check, which needs to download some files first (unless they are
+  # already present in temp):
+  # Check variable name is one of the accepted values
+  #if (!quiet) message("Checking the variable names against the list(s) of allowed variable names...")
+  if (!quiet) message("INFO: Downloading the list(s) of allowed variable names,",
+                      "unless they were already downloaded to your temp directory...")
+  # TODO: This download is potentially noisy. Make it (possibly) quiet? Really quiet?
+  accepted_vars <- c(
+    download_observed_climate_tables(download=FALSE, quiet=TRUE, tempdir=tempdir)$variable_names,
+    download_projected_climate_tables(download=FALSE, quiet=TRUE, tempdir=tempdir)$variable_names,
+    download_hydrography90m_tables(download=FALSE, quiet=TRUE, tempdir=tempdir)$variable_names,
+    download_soil_tables(download=FALSE, quiet=TRUE, tempdir=tempdir)$variable_names,
+    download_landcover_tables(download=FALSE, quiet=TRUE, tempdir=tempdir)$variable_names,
+    download_flo1k_tables(download=FALSE, quiet=TRUE, tempdir=tempdir)$variable_names,
+    download_cgiar_tables(download=FALSE, quiet=TRUE, tempdir=tempdir)$variable_names,
+    download_merit_dem_tables(download=FALSE, quiet=TRUE, tempdir=tempdir)$variable_names
+  )
+  if (any(!variable %in% accepted_vars)) {
+    which_invalid <- variable[!variable %in% accepted_vars]
+    stop(paste0("These variables are not valid: ",
+      paste0(which_invalid, collapse=", "),
+      ". Please provide a valid variable name.",
+      "\nYou may use any of the >1000 variables of the Environment90m dataset,",
+      " which you can view using e.g. download_soil_tables(). Please check",
+      " ?download_env90m_tables for more details."))
+  }
+
   # Check operating system
   sys_os <- get_os()
 
   # Create random string to attach to the tmp folder
   rand_string <- stri_rand_strings(n = 1, length = 8, pattern = "[A-Za-z0-9]")
-  tmp <- paste0("/tmp_", rand_string)
 
   # Path to the tmp directory
-  tmp_dir <- paste0(getwd(), tmp)
+  # TODO: Should we do this in the tempdir?
+  tmp_dir <- file.path(getwd(), paste0("tmp_", rand_string))
+  if (!quiet) message(paste0("INFO: Temp dir for this task: ", tmp_dir))
 
   # Create temporary output directory
+  #if (!quiet) message("Creating temp directory for GRASS: ", tmp_dir)
   dir.create(tmp_dir, showWarnings = FALSE)
+
+  # If user provided subcatchmend ids, write them to a file that the bash file can use:
+  if(is.numeric(subcatch_id)) {
+    file_subcids <- paste0("subc_ids_", rand_string, ".txt")
+    full_path_subcids <- file.path(tmp_dir, file_subcids)
+    if (!quiet) message("INFO: Writing subcatchment IDs provided by user",
+                        " to text file: ", file_subcids)
+    fileConn<-file(full_path_subcids)
+    writeLines(as.character(subcatch_id), fileConn)
+    close(fileConn)
+    subcatch_id = full_path_subcids
+  }
 
   # Format variable, statistics and tile_id vectors so they can be read in bash
   variable <- paste(variable, collapse = "/")
@@ -172,7 +281,7 @@ get_predict_table <- function(variable,
 
   # Make bash scripts executable
   make_sh_exec()
-
+  if (!quiet) message("INFO: Running bash script...")
   if (sys_os == "linux" || sys_os == "osx") {
     # Call external bash script
     processx::run(system.file("sh", "get_predict_table.sh",
@@ -185,7 +294,7 @@ get_predict_table <- function(variable,
                            out_file_path,
                            tmp_dir,
                            n_cores),
-                  echo = FALSE)
+                  echo = !quiet)
   } else {
     # Check if WSL and Ubuntu are installed
     check_wsl()
@@ -212,12 +321,14 @@ get_predict_table <- function(variable,
                            wsl_sh_file))
 
   }
+  if (!quiet) message("INFO: Running bash script: Done.")
+
 
   # Delete temporary output directory
   unlink(tmp_dir, recursive = TRUE)
 
   if (read == TRUE) {
-    # Read predict table
+    if (!quiet) message("INFO: Reading result table from ", out_file_path)
     predict_table <- fread(out_file_path)
     return(predict_table)
   }

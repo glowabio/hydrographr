@@ -1,0 +1,4 @@
+file_path;file_id;file_size
+chelsa_bioclim_v2_1/1981-2010_observed/bio17/bio17_h10v04.zip;notneeded_legacy;161
+chelsa_bioclim_v2_1/1981-2010_observed/bio17/bio17_h10v06.zip;notneeded_legacy;110526834
+chelsa_bioclim_v2_1/1981-2010_observed/bio17/bio17_h10v08.zip;notneeded_legacy;404897845

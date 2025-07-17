@@ -1,0 +1,4 @@
+file_path;file_id;file_size
+chelsa_bioclim_v2_1/2071-2100_projected/bio11/bio11_2071-2100_ipsl-cm6a-lr_ssp370_V.2.1_h12v00.zip;notneeded_legacy;54529544
+chelsa_bioclim_v2_1/2071-2100_projected/bio11/bio11_2071-2100_ipsl-cm6a-lr_ssp370_V.2.1_h12v02.zip;notneeded_legacy;18035725
+chelsa_bioclim_v2_1/2071-2100_projected/bio11/bio11_2071-2100_ipsl-cm6a-lr_ssp370_V.2.1_h12v04.zip;notneeded_legacy;628
