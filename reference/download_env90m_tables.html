@@ -33,7 +33,7 @@ function [get_tile_id()]."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">hydrographr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -397,7 +397,7 @@ Please contact the authors for more up-to-date citation info.</p>
 <span>  download <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  download_dir <span class="op">=</span> <span class="st">"."</span>,</span>
 <span>  file_format <span class="op">=</span> <span class="st">"txt"</span>,</span>
-<span>  delete_zips <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> </span>
+<span>  delete_zips <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="op">}</span> <span class="co"># }</span></span>
 <span></span>
 <span></span>
@@ -519,7 +519,7 @@ Please contact the authors for more up-to-date citation info.</p>
 <span><span class="co"># Download one hy90m variable (Strahler’s stream order), for two tiles:</span></span>
 <span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span>
 <span><span class="va">vars</span> <span class="op">&lt;-</span> <span class="fu">download_hydrography90m_tables</span><span class="op">(</span></span>
-<span>  subset <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"stream_strahler"</span><span class="op">)</span>,</span>
+<span>  subset <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"order_strahler"</span><span class="op">)</span>,</span>
 <span>  tile_ids <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"h00v04"</span>, <span class="st">"h10v04"</span><span class="op">)</span>,</span>
 <span>  download <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  download_dir <span class="op">=</span> <span class="st">"."</span>,</span>
@@ -530,12 +530,12 @@ Please contact the authors for more up-to-date citation info.</p>
 <span><span class="co"># unzip, and delete the zips:</span></span>
 <span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span>
 <span><span class="va">vars</span> <span class="op">&lt;-</span> <span class="fu">download_hydrography90m_tables</span><span class="op">(</span></span>
-<span>  subset <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"stream_strahler"</span><span class="op">)</span>,</span>
+<span>  subset <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"order_strahler"</span><span class="op">)</span>,</span>
 <span>  tile_ids <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"h00v04"</span><span class="op">)</span>,</span>
 <span>  download <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  download_dir <span class="op">=</span> <span class="st">"."</span>,</span>
 <span>  file_format <span class="op">=</span> <span class="st">"txt"</span>,</span>
-<span>  delete_zips <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> </span>
+<span>  delete_zips <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="op">}</span> <span class="co"># }</span></span>
 <span></span>
 <span><span class="co">### Bioclimatic Variables: chelsa_bioclim_v2_1 ###</span></span>
@@ -584,17 +584,32 @@ Please contact the authors for more up-to-date citation info.</p>
 <span>  tile_ids <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"h00v04"</span><span class="op">)</span>,</span>
 <span>  download <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Download one variable (Annual mean temperature), for two tiles:</span></span>
+<span><span class="co"># Download one variable for two tiles:</span></span>
 <span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span>
 <span><span class="va">vars</span> <span class="op">&lt;-</span> <span class="fu">download_projected_climate_tables</span><span class="op">(</span></span>
-<span>  subset <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"bio01"</span><span class="op">)</span>,</span>
+<span>  subset <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"bio01_2071-2100_ukesm1-0-ll_ssp585_v2_1"</span><span class="op">)</span>,</span>
 <span>  tile_ids <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"h00v04"</span>, <span class="st">"h10v04"</span><span class="op">)</span>,</span>
 <span>  download <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  download_dir <span class="op">=</span> <span class="st">"."</span>,</span>
 <span>  file_format <span class="op">=</span> <span class="st">"zip"</span><span class="op">)</span></span>
 <span><span class="op">}</span> <span class="co"># }</span></span>
 <span></span>
-<span><span class="co"># Download one variable (Annual mean temperature), for one tile,</span></span>
+<span><span class="co"># Download one variable for two tiles, by specifying each part of</span></span>
+<span><span class="co"># the variable separately (e.g. scenario, model, time period, ...):</span></span>
+<span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span>
+<span><span class="va">vars</span> <span class="op">&lt;-</span> <span class="fu">download_projected_climate_tables</span><span class="op">(</span></span>
+<span>  base_vars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"bio01"</span><span class="op">)</span>,</span>
+<span>  time_periods <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2071-2100"</span><span class="op">)</span>,</span>
+<span>  models<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ukesm1-0-ll"</span><span class="op">)</span>,</span>
+<span>  scenarios<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ssp585"</span><span class="op">)</span>,</span>
+<span>  version<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"v2_1"</span><span class="op">)</span>,</span>
+<span>  tile_ids <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"h00v04"</span>, <span class="st">"h10v04"</span><span class="op">)</span>,</span>
+<span>  download <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  download_dir <span class="op">=</span> <span class="st">"."</span>,</span>
+<span>  file_format <span class="op">=</span> <span class="st">"zip"</span><span class="op">)</span></span>
+<span><span class="op">}</span> <span class="co"># }</span></span>
+<span></span>
+<span><span class="co"># Download one variable for one tile,</span></span>
 <span><span class="co"># unzip, and delete the zips:</span></span>
 <span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span>
 <span><span class="va">vars</span> <span class="op">&lt;-</span> <span class="fu">download_projected_climate_tables</span><span class="op">(</span></span>
@@ -603,7 +618,7 @@ Please contact the authors for more up-to-date citation info.</p>
 <span>  download <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  download_dir <span class="op">=</span> <span class="st">"."</span>,</span>
 <span>  file_format <span class="op">=</span> <span class="st">"txt"</span>,</span>
-<span>  delete_zips <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> </span>
+<span>  delete_zips <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="op">}</span> <span class="co"># }</span></span>
 <span></span>
 <span></span>
@@ -614,14 +629,14 @@ Please contact the authors for more up-to-date citation info.</p>
 <span><span class="co"># Compute download size of two landcover base variables (Cropland, rainfed,</span></span>
 <span><span class="co"># and Grassland) and two years, for all tiles:</span></span>
 <span>  <span class="va">vars</span> <span class="op">&lt;-</span> <span class="fu">download_landcover_tables</span><span class="op">(</span></span>
-<span>    base_vars<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"c10"</span>, <span class="st">"c130"</span><span class="op">)</span>,</span>
+<span>    base_vars<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"c10"</span>, <span class="st">"c200"</span><span class="op">)</span>,</span>
 <span>    years<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1992</span>, <span class="fl">1993</span><span class="op">)</span>,</span>
 <span>    tile_ids<span class="op">=</span><span class="st">"ALL"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Download two base variables and one year, for two tiles:</span></span>
 <span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span>
 <span>  <span class="va">vars</span> <span class="op">&lt;-</span> <span class="fu">download_landcover_tables</span><span class="op">(</span></span>
-<span>    base_vars<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"c10"</span>, <span class="st">"c130"</span><span class="op">)</span>,</span>
+<span>    base_vars<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"c10"</span>, <span class="st">"c200"</span><span class="op">)</span>,</span>
 <span>    years<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1992</span><span class="op">)</span>,</span>
 <span>    tile_ids<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"h00v04"</span>, <span class="st">"h10v04"</span><span class="op">)</span>,</span>
 <span>    download<span class="op">=</span><span class="cn">TRUE</span>,</span>
