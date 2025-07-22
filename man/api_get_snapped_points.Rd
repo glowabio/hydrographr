@@ -26,11 +26,16 @@ api_get_snapped_points(
   `"http://localhost:5000/processes/get-snapped-points/execution"`.}
 }
 \value{
-A data frame containing the snapped coordinates and additional snapping information.
+A list with two elements:
+\describe{
+  \item{data}{A `data.frame` containing the snapped coordinates and additional information.}
+  \item{href}{A `character` string with the URL of the output CSV.}
+}
 }
 \description{
 Sends a request to the GeoFRESH API to snap a set of site coordinates to the nearest flowline
-in the river network. Returns both the snapped and original coordinates.
+in the river network. Returns both the snapped and original coordinates, along with a link
+to download the results or to use it in another function of the family ocgapi.
 }
 \examples{
 \dontrun{
@@ -41,7 +46,15 @@ snapped_df <- get_snapped_points(csv_url = url,
  colname_lon = "longitude",
  colname_site_id = "site_id",
 process_url = "http://localhost:5000/processes/get-snapped-points/execution")
+
+
+#' head(result$data)
+cat("Download link:", result$href)
+
 }
+
+
+
 
 }
 \seealso{
