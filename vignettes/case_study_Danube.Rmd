@@ -118,7 +118,8 @@ options(scipen = 999)
 Let's download some data we have prepared beforehand, including the polygon of the Danube basin and the table with species occurrences.
 
 ```{r, eval=FALSE, include=TRUE }
-download_test_data(download_dir = "data_danube")
+# download_dir needs to be a full (not relative!) path
+download_test_data(download_dir = wdir)
 ```
 
 
