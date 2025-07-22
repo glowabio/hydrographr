@@ -142,7 +142,7 @@ Create a bounding box object with the coordinates
 ```{r}
 bbox <- c(8, 42, 30, 51)
 
-dan <- read_sf(file.path(wdir, "hydrography90m_test_data/hydrographr_data/DanubeMSK.gpkg"))
+dan <- read_sf(file.path(wdir, "hydrography90m_test_data/DanubeMSK.gpkg"))
 bbcor <- as.data.frame(st_coordinates(dan))
 # tile_id <- get_tile_id(data = bbcor, lon = "X", lat = "Y")
 ```
@@ -301,7 +301,7 @@ system(" head esa_cci_landcover_v2_1_1/c60/c60_2020_h18v02.txt")
 ```{r, eval = FALSE}
 
 download_hydrography90m_tables(
-  subset = c("flow", "length", "slope_grad_dw_cel"),
+  subset = c("accumulation", "length", "slope_grad_dw_cel"),
   tile_ids = tile_id,
   download = TRUE,
   download_dir = wdir,
@@ -330,7 +330,7 @@ parallel::detectCores()
 As a best practice, it is recommended to use at most the number of available cores minus one.
 
 ```{r, eval = FALSE}
-tb <- get_predict_table(variable = c("bio01_1981-2010_observed", "bio02_1981-2010_observed", "c60_2020", "flow", "length", "slope_grad_dw_cel"),
+tb <- get_predict_table(variable = c("bio01_1981-2010_observed", "bio02_1981-2010_observed", "c60_2020", "accumulation", "length", "slope_grad_dw_cel"),
   statistics = c("mean", "sd"),
   tile_id = tile_id,
   input_var_path = wdir,
