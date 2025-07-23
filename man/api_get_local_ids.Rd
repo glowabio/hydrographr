@@ -39,8 +39,11 @@ Must be specified explicitly, e.g.,
 `"http://localhost:5000/processes/get-local-ids/execution"`.}
 }
 \value{
-A data frame with subcatchment information
-(`reg_id`, `basin_id`, `subc_id`) joined to the input site data.
+A list with two elements:
+\describe{
+  \item{data}{A `data.frame` with regional unit, basin and subcatchment ids.}
+  \item{href}{A `character` string with the URL of the output CSV.}
+}
 }
 \description{
 Queries the GeoFRESH API to obtain regional unit, basin,
@@ -56,10 +59,10 @@ site_df <- data.frame(
   latitude = 52.45,
   longitude = 13.31
 )
-get_local_ids(df = site_df)
+api_get_local_ids(df = site_df)
 
 # Example for multi-point request using CSV URL
-get_local_ids(csv_url = "https://example.com/sites.csv")
+api_get_local_ids(csv_url = "https://example.com/sites.csv")
 }
 
 }

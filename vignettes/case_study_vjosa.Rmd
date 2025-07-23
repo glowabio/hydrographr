@@ -77,7 +77,11 @@ dams_ids <- api_get_local_ids(csv_url = csv_url_dam,
                 colname_lon = "longitude",
                 colname_site_id = "site_id", 
                 process_url = get_local_ids_multi_url)
-head(dams_ids)
+dams_ids
+
+# The result is a list containing the points with their ids as a dataframe, and
+# the url of the resulting table that can be used an an input for other api
+# functions
 ```
 ```{r, eval = FALSE}
 
@@ -88,10 +92,12 @@ spdata_ids <- api_get_local_ids(csv_url = csv_spdata_url,
                 colname_lat = "latitude", colname_lon = "longitude",
                 colname_site_id = "site_id", 
                 process_url = get_local_ids_multi_url)
-# head(spdata_ids)
-<!-- ``` -->
+spdata_ids
+```
 
-
+The result is a list containing the points with their ids as a dataframe, and 
+the url of the resulting table that can be used an an input for other api
+functions.
 
 
 ## Snap points to the stream network
@@ -103,12 +109,12 @@ get_snapped_points_url <- "https://aqua.igb-berlin.de/pygeoapi-dev/processes/get
 
 ```{r, eval = FALSE}
 # snap species points to the stream network
-species_snap <- api_get_snapped_points(csv_spdata_url,
-                               # colname_lat = "latitude",
+spdata_snap <- api_get_snapped_points(csv_spdata_url,
+                               colname_lat = "latitude",
                                colname_lon = "longitude",
                                colname_site_id = "site_id",
                                process_url = get_snapped_points_url)
-head(species_snap)
+head(spdata_snap)
 ```
 
 ```{r, eval = FALSE}
@@ -127,7 +133,7 @@ dams_snap <- api_get_snapped_points(csv_url_dam,
 #with one point
 get_local_ids_url <- "https://aqua.igb-berlin.de/pygeoapi-dev/processes/get-local-ids/execution"
 
-one_point_df <- slice(species_snap,1) %>% 
+one_point_df <- slice(spdata_snap$data,1) %>% 
   select(site_id, longitude_snapped, latitude_snapped)
 
 api_get_local_ids(df = one_point_df,
@@ -149,14 +155,14 @@ get_upstream_ids_url <- "https://aqua.igb-berlin.de/pygeoapi-dev/processes/get-u
 
 ```{r, eval = FALSE}
 # For species points
-upstr_ids_spdata <- api_get_upstream_subcids(species_snap, 
+upstr_ids_spdata <- api_get_upstream_subcids(spdata_snap$data, 
                         colname_lat = "latitude_snapped", 
                         colname_lon = "longitude_snapped",
                         process_url = get_upstream_ids_url) %>%
                         as.data.table()
 
 # For dam points
-upstr_ids_dams <- api_get_upstream_subcids(dams_snap, 
+upstr_ids_dams <- api_get_upstream_subcids(dams_snap$data, 
                         colname_lat = "latitude_snapped", 
                         colname_lon = "longitude_snapped",
                         process_url = get_upstream_ids_url) %>%
@@ -174,7 +180,7 @@ get_env90m_url <- "https://aqua.igb-berlin.de/pygeoapi-dev/processes/get-env90m/
 
 ```{r, eval = FALSE}
 env_data_basin <- api_get_env90m_data(
-  subc_ids = head(spdata_ids$subc_id),
+  subc_ids = head(spdata_snap$data$subc_id),
   variables = c("bio10", "sltppt", "slope_elv_dw_cel"),
   chunk_size = 3000,
   process_url = get_env90m_url

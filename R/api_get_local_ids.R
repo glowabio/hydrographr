@@ -22,8 +22,14 @@
 #' @param process_url URL of the pygeoapi process called by the function.
 #'   Must be specified explicitly, e.g.,
 #'   `"http://localhost:5000/processes/get-local-ids/execution"`.
-#' @return A data frame with subcatchment information
-#' (`reg_id`, `basin_id`, `subc_id`) joined to the input site data.
+#'
+#'
+#'
+#' @return A list with two elements:
+#' \describe{
+#'   \item{data}{A `data.frame` with regional unit, basin and subcatchment ids.}
+#'   \item{href}{A `character` string with the URL of the output CSV.}
+#' }
 #'
 #' @import httr
 #' @import jsonlite
@@ -37,10 +43,10 @@
 #'   latitude = 52.45,
 #'   longitude = 13.31
 #' )
-#' get_local_ids(df = site_df)
+#' api_get_local_ids(df = site_df)
 #'
 #' # Example for multi-point request using CSV URL
-#' get_local_ids(csv_url = "https://example.com/sites.csv")
+#' api_get_local_ids(csv_url = "https://example.com/sites.csv")
 #' }
 #'
 #' @export
@@ -192,12 +198,17 @@ api_get_local_ids <- function(df = NULL, csv_url = NULL,
 
   # Download CSV and return as dataframe
   df <- tryCatch({
-    read.table(csv_download_url, sep = ";", header = TRUE)
+    read.table(csv_download_url, sep = ",", header = TRUE)
   }, error = function(e) {
     stop("Error downloading CSV: ", e$message)
   })
 
-  return(df)
+  # Return both the data frame and the download link as a list
+  return(list(
+    data = df,
+    href = csv_download_url
+  ))
+
 }
 
 

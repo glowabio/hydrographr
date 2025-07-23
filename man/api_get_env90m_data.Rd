@@ -44,7 +44,7 @@ Environment90m dataset (Marquez et al., 2025, in prep.).
 \dontrun{
 subc_ids <- c(560230105, 560149764, 560251298)
 vars <- vars <- c("bio1", "flow", "cti")
-env_df <- get_env90m_data(subc_ids = subc_ids, variables = vars)
+env_df <- api_get_env90m_data(subc_ids = subc_ids, variables = vars)
 }
 
 }

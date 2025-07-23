@@ -41,7 +41,7 @@ to download the results or to use it in another function of the family ocgapi.
 \dontrun{
 # Example usage
 url <- "https://example.com/sites.csv"
-snapped_df <- get_snapped_points(csv_url = url,
+snapped_df <- api_get_snapped_points(csv_url = url,
  colname_lat = "latitude",
  colname_lon = "longitude",
  colname_site_id = "site_id",

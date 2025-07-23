@@ -34,7 +34,7 @@
 #' )
 #'
 #' # (Assumes these coordinates are already snapped using get_snapped_points())
-#' upstream_df <- get_upstream_subcids(df = df_sites)
+#' upstream_df <- api_get_upstream_subcids(df = df_sites)
 #' head(upstream_df)
 #' }
 #'
