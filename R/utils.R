@@ -88,3 +88,45 @@ fix_path <- function(path) {
     stri_replace_first_fixed(., "Program Files", "PROGRA~1")
 
 }
+
+
+
+# Extract information from snapping to Strahler order api function
+#'
+#' @param result API response of the api_get_snapped_points_strahler.R
+#' @import dplyr
+#' @keywords internal
+#'
+extract_snapping_info <- function(result) {
+  # Get before/after subcatchment IDs
+  subc_before <- result$subc_id_before_snapping
+  subc_after  <- result$subc_id_after_snapping
+
+  # Extract point feature (snapped point)
+  point_feature <- result$features[result$features$geometry.type == "Point", ]
+
+  if (nrow(point_feature) != 1) {
+    warning("Unexpected number of Point features; skipping.")
+    return(NULL)
+  }
+
+  # After snapping (geometry)
+  lon_after <- point_feature$geometry.coordinates[[1]][1]
+  lat_after <- point_feature$geometry.coordinates[[1]][2]
+
+  # Before snapping (properties)
+  lon_before <- point_feature$properties.lon_original
+  lat_before <- point_feature$properties.lat_original
+
+  tibble::tibble(
+    subc_id_before = subc_before,
+    subc_id_after  = subc_after,
+    lon_before = lon_before,
+    lat_before = lat_before,
+    lon_after  = lon_after,
+    lat_after  = lat_after
+  )
+}
+
+
+
