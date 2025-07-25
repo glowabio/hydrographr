@@ -103,7 +103,7 @@ extract_snapping_info <- function(result) {
   subc_after  <- result$subc_id_after_snapping
 
   # Extract point feature (snapped point)
-  point_feature <- result$features[result$features$geometry.type == "Point", ]
+  point_feature <- result$features[1,]
 
   if (nrow(point_feature) != 1) {
     warning("Unexpected number of Point features; skipping.")
@@ -111,12 +111,12 @@ extract_snapping_info <- function(result) {
   }
 
   # After snapping (geometry)
-  lon_after <- point_feature$geometry.coordinates[[1]][1]
-  lat_after <- point_feature$geometry.coordinates[[1]][2]
+  lon_after <- point_feature$geometry$coordinates[[1]][1]
+  lat_after <- point_feature$geometry$coordinates[[1]][2]
 
   # Before snapping (properties)
-  lon_before <- point_feature$properties.lon_original
-  lat_before <- point_feature$properties.lat_original
+  lon_before <- point_feature$properties$lon_original
+  lat_before <- point_feature$properties$lat_original
 
   tibble::tibble(
     subc_id_before = subc_before,
