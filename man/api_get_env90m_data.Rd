@@ -52,6 +52,7 @@ env_df <- api_get_env90m_data(subc_ids = subc_ids, variables = vars)
 Other ocgapi: 
 \code{\link{api_get_local_ids}()},
 \code{\link{api_get_snapped_points}()},
+\code{\link{api_get_snapped_points_strahler}()},
 \code{\link{api_get_upstream_subcids}()}
 }
 \concept{ocgapi}

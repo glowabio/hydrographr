@@ -58,6 +58,7 @@ head(upstream_df)
 Other ocgapi: 
 \code{\link{api_get_env90m_data}()},
 \code{\link{api_get_local_ids}()},
-\code{\link{api_get_snapped_points}()}
+\code{\link{api_get_snapped_points}()},
+\code{\link{api_get_snapped_points_strahler}()}
 }
 \concept{ocgapi}
