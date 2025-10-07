@@ -24,7 +24,7 @@ api_get_snapped_points_strahler <- function(df,
                                             colname_site_id = "site_id",
                                             strahler = 3,
                                             geometry_only = FALSE,
-                                            comment = NULL,
+                                            # comment = NULL,
                                             process_url = NULL) {
   if (is.null(process_url)) {
     stop("Please provide the URL of the pygeoapi process")
