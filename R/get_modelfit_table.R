@@ -68,7 +68,7 @@
 #'                                   mod_fit_table = model_fit)
 
 get_modelfit_table <- function(data, spec, lon, lat,
-                               pseudoabs = NULL, subc, predict_table,
+                               pseudoabs = 0, subc, predict_table,
                                mod_fit_table, read = TRUE, quiet = TRUE) {
 
   # Check if data.frame is defined
@@ -139,7 +139,6 @@ get_modelfit_table <- function(data, spec, lon, lat,
     wsl_coord_tmp_path <- fix_path(coord_tmp_path)
     wsl_subc <- fix_path(subc)
     wsl_predict_table <- fix_path(predict_table)
-    wsl_pseudoabs <- fix_path(pseudoabs)
     wsl_tmp_path <- fix_path(tempdir())
     wsl_mod_fit_table <- fix_path(mod_fit_table)
     wsl_sh_file <- fix_path(
@@ -149,7 +148,7 @@ get_modelfit_table <- function(data, spec, lon, lat,
     processx::run(system.file("bat", "get_modelfit_table.bat",
                               package = "hydrographr"),
                   args = c(wsl_coord_tmp_path, wsl_predict_table,
-                           wsl_subc, wsl_pseudoabs, wsl_tmp_path,
+                           wsl_subc, pseudoabs, wsl_tmp_path,
                            wsl_mod_fit_table, wsl_sh_file, echo = !quiet))
   }
 
