@@ -35,7 +35,7 @@
 #' @importFrom processx run
 #' @export
 #'
-#' #' @details
+#' @details
 #' For the extraction of a value at a given point location from the basin
 #' and/or sub-catchment raster layer of the Hydrography90m dataset, the GDAL
 #' function 'gdallocationinfo' is used. The point locations have to be defined
@@ -62,22 +62,26 @@
 #'                                      "/spdata_1264942.txt"),
 #'                                      header = TRUE)
 #'
-#'
+#' # extract lake IDs which intersect with species point occurrences
 #' extract_lake_ids(data = species_occurrence,
 #'                  lon = "longitude",
 #'                  lat = "latitude",
+#'                  var_name = "lake_id",
 #'                  lake_shape = paste0(my_directory, "lakes_corsica.shp"),
 #'                  lake_id_table = output_folder,
 #'                  quiet = FALSE)
 #'
-# extract_lake_ids(data = species_occurrence,
+#' # extract lake IDs from bounding box taken from species point occurrences
+#' extract_lake_ids(data = species_occurrence,
 #'                 lon = "longitude",
 #'                 lat = "latitude",
 #'                 var_name = "lake_id",
 #'                 lake_shape = paste0(my_directory, "lakes_corsica.shp"),
+#'                 bbox = TRUE,
 #'                 lake_id_table = output_folder,
 #'                 quiet = FALSE)
 #'
+#' # extract lake IDs from provided bounding box
 #' extract_lake_ids(data = species_occurrence,
 #'                  lon = "longitude",
 #'                  lat = "latitude",
@@ -111,6 +115,11 @@ extract_lake_ids <- function(data, lon, lat, lake_shape,
 
   # Check if paths exists
   for (path in c(lake_id_table)) {
+    if (!file.exists(path))
+      stop(paste0("File path: ", path, " does not exist."))
+  }
+
+  for (path in c(lake_shape)) {
     if (!file.exists(path))
       stop(paste0("File path: ", path, " does not exist."))
   }
