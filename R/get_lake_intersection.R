@@ -18,7 +18,6 @@
 #' the lake size; if FALSE no buffer is applied; Default is TRUE
 #' @param edge character. Full path to GuidosToolbox Workbench MSPA tool
 #' see also (https://forest.jrc.ec.europa.eu/en/activities/lpa/gtb/)
-#' (i.e., output of get_predict_table); see also help(get_predict_table)
 #' @param stream character. Full path to Hydrography90m stream network tif file
 #' add a reference were to check the necessary tif files for lake analysis
 #' @param flow character. Full path to Hydrography90m flow accumulation tif file
@@ -59,12 +58,13 @@
 #'
 #' lakes <- (paste0(my_directory,
 #'                     "/hydrography90m_test_data",
-#'                     "/lakes_corsica.shp"))
+#'                     "/hydrography90m_test_lakes.gpkg"))
 #'
 #' # To run the function we need to have installed GuidosToolbox Workbench MSPA tool
 #' # see also (https://forest.jrc.ec.europa.eu/en/activities/lpa/gtb/) and
-#' (https://glowabio.github.io/hydrographr/articles/case_study_lake_workflow.html)
-#' edge <- (paste0(my_directory,
+#' # (https://glowabio.github.io/hydrographr/articles/case_study_lake_workflow.html)
+#' # give full path virtual machine linux path
+#' edge <- (paste0(/home/USER/GWB_version/,
 #'                     "/GWB"))
 #'
 #' stream <- (paste0(my_directory,
