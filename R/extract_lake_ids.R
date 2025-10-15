@@ -67,7 +67,8 @@
 #'                  lon = "longitude",
 #'                  lat = "latitude",
 #'                  var_name = "lake_id",
-#'                  lake_shape = paste0(my_directory, "lakes_corsica.shp"),
+#'                  lake_shape = paste0(my_directory, "/hydrography90m_test_data",
+#'                                      "/hydrography90m_test_lakes.gpkg"),
 #'                  lake_id_table = output_folder,
 #'                  quiet = FALSE)
 #'
@@ -76,7 +77,8 @@
 #'                 lon = "longitude",
 #'                 lat = "latitude",
 #'                 var_name = "lake_id",
-#'                 lake_shape = paste0(my_directory, "lakes_corsica.shp"),
+#'                 lake_shape = paste0(my_directory, "/hydrography90m_test_data",
+#'                                     "/hydrography90m_test_lakes.gpkg"),
 #'                 bbox = TRUE,
 #'                 lake_id_table = output_folder,
 #'                 quiet = FALSE)
@@ -90,7 +92,8 @@
 #'                  xmax = 29.71806,
 #'                  ymax = 50.25584,
 #'                  var_name = "lake_id",
-#'                  lake_shape = paste0(my_directory, "lakes_corsica.shp"),
+#'                  lake_shape = paste0(my_directory, "/hydrography90m_test_data",
+#'                                      "/hydrography90m_test_lakes.gpkg"),
 #'                  bbox = TRUE,
 #'                  lake_id_table = output_folder,
 #'                  quiet = FALSE)
