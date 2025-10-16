@@ -46,8 +46,8 @@ split_table <- function(data, split = NULL, split_tbl_path,
 
   # Check if input data is of type data.frame,
   # data.table or tibble
-  if (!is(data, "data.frame"))
-    stop("data: Has to be of class 'data.frame'.")
+  # if (!is(data, "data.frame"))
+  #   stop("data: Has to be of class 'data.frame'.")
 
   # Check if value of split is numeric
   if (!is.numeric(split))
@@ -63,6 +63,10 @@ split_table <- function(data, split = NULL, split_tbl_path,
   # Check if quiet is logical
   if (!is.logical(quiet))
     stop("quiet: Has to be TRUE or FALSE.")
+
+  if (is.character(data) && file.exists(data)) {
+    data <- fread(data)
+    }
 
   rand_string <- stri_rand_strings(n = 1, length = 8, pattern = "[A-Za-z0-9]")
 
@@ -98,8 +102,8 @@ split_table <- function(data, split = NULL, split_tbl_path,
     processx::run(system.file("bat", "split_table.bat",
                               package = "hydrographr"),
                   args = c(wsl_table_tmp_path, wsl_split_tbl_path,
-                           wsl_split,
-                           wsl_sh_file, echo = !quiet))
+                           split, wsl_sh_file,
+                           echo = !quiet))
   }
 
   # Read stored data frames

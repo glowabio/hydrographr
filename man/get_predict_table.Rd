@@ -13,34 +13,30 @@ get_predict_table(
   out_file_path,
   n_cores = NULL,
   read = TRUE,
-  quiet = TRUE
+  quiet = TRUE,
+  tempdir = NULL,
+  overwrite = FALSE
 )
 }
 \arguments{
 \item{variable}{character vector of variable names. Possible values are:
-c("bio1", "bio10", "bio11", "bio12", "bio13","bio14", "bio15", "bio16",
-"bio17", "bio18","bio19", "bio2", "bio3", "bio4", "bio5","bio6", "bio7",
-"bio8", "bio9", "c100", "c10", "c20", "c30", "c40", "c50","c60", "c70",
-"c80", "c90", "chancurv","chandistdwseg", "chandistupcel", "chandistupseg",
-"chanelvdwcel", "chanelvdwseg", "chanelvupcel","chanelvupseg",
-"changraddwseg", "changradupcel", "changradupseg", "elev", "flow",
-"flowpos", "gradient", "length", "out", "outdiffdwbasin", "outdiffdwscatch",
-"outdistdwbasin", "outdistdwscatch", "outlet", "slopdiff", "slopgrad",
-"soil", "source", "strdiffdwnear", "strdiffupfarth", "strdiffupnear",
-"strdistdwnear", "strdistprox", "strdistupfarth", "strdistupnear",
-"stright").}
+all variables in the Env90m dataset, which can bew viewed by calling
+'download_\if{html}{\out{<datasetname>}}_tables()'. For more details, see
+'?download_env90m_tables'.}
 
 \item{statistics}{character vector of statistics names. Possible values are
 "sd", "mean", "range" or "ALL". Default "ALL".}
 
 \item{tile_id}{character. The IDs of the tiles of interest.}
 
-\item{input_var_path}{path to table with environmental variables for entire
-tiles.}
+\item{input_var_path}{path to directory that contains table with
+environmental variables for entire tiles. Tables may be in subdirectories
+of the provided directory.}
 
-\item{subcatch_id}{path to a text file with subcatchments ids.}
+\item{subcatch_id}{path to a text file with subcatchment ids, or numeric
+vector containing subcatchment ids.}
 
-\item{out_file_path}{character. The path to the output file.}
+\item{out_file_path}{character. The path to the output file to be created.}
 
 \item{n_cores}{numeric. Number of cores used for parallelization.}
 
@@ -50,6 +46,12 @@ If FALSE, the table is only stored on disk. Default is TRUE.}
 
 \item{quiet}{logical. If FALSE, the standard output will be printed.
 Default is TRUE.}
+
+\item{tempdir}{String. Path to the directory where to store/look for the
+file size table. If not passed, defaults to the output of \code{\link[base:tempfile]{base::tempdir()}}.}
+
+\item{overwrite}{logical. If TRUE, the output file will be overwritten if it.
+already exists. Useful for repeated testing. Default is FALSE.}
 }
 \value{
 The function returns a table with

@@ -23,6 +23,10 @@ download_tiles_base <- function(variable, file_format = "tif",
                                 file_size_table = NULL,
                                 server_url = NULL) {
 
+  if (!(dir.exists(download_dir))) {
+    stop(paste0("Directory ", download_dir, " does not exist, cannot download to there."))
+  }
+
   # Get the file_name, e.g. "stream_dist_up_farth_h00v02.tif"
   file_name <- ifelse(global == TRUE, paste0(variable, "_ovr.", file_format),
                     paste0(variable, "_", tile_id, ".", file_format))
@@ -31,6 +35,7 @@ download_tiles_base <- function(variable, file_format = "tif",
   # e.g. "r.stream.distance/stream_dist_up_farth_tiles20d/stream_dist_up_farth_h00v02.tif"
   row_selector <- file_size_table$file_name == file_name
   file_path <- file_size_table[row_selector,]$file_path
+  if (length(file_path)>1) stop(paste0("Found several file paths (expected one): ", paste(file_path, collapse=", ")))
 
   if (!(any(row_selector))){
     message('Skipping file "', file_name, '" (not found)...')

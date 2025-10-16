@@ -19,7 +19,7 @@ export SPP=$1
 
 # crear archivo solo con datos de la especie de interes
 #awk -F, -v SPP="Huso huso" 'BEGIN{OFS=",";} NR == 1 || $2 == SPP {print $2, $3, $4}' \
-#    /mnt/shared/sosw/sppTB/fish_danube.csv > /data/marquez/vignette/out/spp.csv 
+#    /mnt/shared/sosw/sppTB/fish_danube.csv > /data/marquez/vignette/out/spp.csv
 
 ## projection table created with function create_roi_table.sh
 export PTB=$2
@@ -55,32 +55,49 @@ C=$( awk -F, '{print NR}' $SPP | tail -n2 | head -n1 )
 # adicionar al archivo anterioir las columnas de subcatchment id
 # add new columns: subcatchment id and presence/absence column (add 1 presences)
 paste -d "," \
-    <(printf "%s\n" subcID $(awk -F, 'FNR > 1 {print $2, $3}' $SPP | gdallocationinfo -valonly -geoloc $SUBC)) \
-    <(printf "%s\n" PresAbs $(printf '1%.0s\n' $(eval "echo {1.."$(($C))"}") )) \
-    > $TMP/tmp1.csv
+  <(
+    printf "%s\n" subcID
+    awk -F, 'FNR > 1 {print $2, $3}' "$SPP" |
+    while read -r x y; do
+      val=$(gdallocationinfo -valonly -geoloc "$SUBC" "$x" "$y" | tr -d '[:space:]')
+      if [ -n "$val" ] && [ "$val" != "0" ] && [ "$val" != "nan" ] && [ "$val" != "NaN" ]; then
+        echo "$val"
+      fi
+    done
+  ) \
+  <(
+    printf "%s\n" PresAbs
+    awk -F, 'FNR > 1 {print $2, $3}' "$SPP" |
+    while read -r x y; do
+      val=$(gdallocationinfo -valonly -geoloc "$SUBC" "$x" "$y" | tr -d '[:space:]')
+      if [ -n "$val" ] && [ "$val" != "0" ] && [ "$val" != "nan" ] && [ "$val" != "NaN" ]; then
+        echo 1
+      fi
+    done
+  ) > "$TMP/tmp1.csv"
 
-# extract from projection table the environmental data for the presences 
+# extract from projection table the environmental data for the presences
 awk -F, 'NR==FNR {a[$1]; next} FNR==1 ||  $1 in a' \
     $TMP/tmp1.csv $PTB  >  $TMP/tmp2.csv
 
 # join tables
 paste -d"," \
     <(sort -t, -g -k1 $TMP/tmp1.csv) \
-    <(sort -t, -g -k1 $TMP/tmp2.csv) | head \
+    <(sort -t, -g -k1 $TMP/tmp2.csv) \
     | cut -d"," --complement -f 3 \
     > $TMP/pa_env_tmp.csv
 
 ## (Pseudo)absences
 
-if [[ "$ABS" -eq 0  ]]
-then 
+if [ "$ABS" -eq 0  ]
+then
     cp $TMP/pa_env_tmp.csv $OUTF
 else
 
     ####   Procedure by selecting random rows from predict_table $PTB
     shuf -n$ABS $PTB --output=$TMP/abs_tmp1.csv
 
-    #  number of rows in the absence table 
+    #  number of rows in the absence table
     A=$( wc -l < $TMP/abs_tmp1.csv )
 
     # create preliminary table with same format as tmp1
@@ -91,11 +108,11 @@ else
         > $TMP/abs_tmp2.csv
 
     ### Join presences and absences
-    cat $TMP/pa_env_tmp.csv $TMP/abs_tmp2.csv > $OUTF  
+    cat $TMP/pa_env_tmp.csv $TMP/abs_tmp2.csv > $OUTF
 fi
 
 ### remove temporal files
-rm $TMP/*tmp* 
+rm $TMP/*tmp*
 
 exit
 

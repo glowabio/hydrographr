@@ -3,24 +3,32 @@
 ### Testing the download_test_data() function ###
 #################################################
 
+tests_quiet=TRUE
+
+# Get which tests to skip:
+R_SKIP_HUGE_DOWNLOAD <- !(Sys.getenv("R_SKIP_HUGE_DOWNLOAD") == "FALSE")
+R_SKIP_DOWNLOAD <- Sys.getenv("R_SKIP_DOWNLOAD") == "TRUE"
+
 # Cases to be covered:
 # * Failing at IGB, downloading at GDrive
 
-#########################
-### Some preparations ###
-#########################
+# Where to store and download files:
+if (! exists("tmpdir")){
+  tmpdir <- tempdir()
+}
 
-# Temp dir for storing the results
-tmpdir <- tempdir()
-print(paste0('Tempdir: ', tmpdir))
+if (!(tests_quiet)) print("_______________________________")
+if (!(tests_quiet)) print("Testing: download_test_data")
 
 
 #############
 ### Tests ###
 #############
 
-# test 1
-test_that("test 1: download from IGB", {
+testname = "download from IGB works"
+if (!(tests_quiet)) print(paste("TEST: ", testname))
+test_that(testname, {
+    skip_if(R_SKIP_DOWNLOAD, 'R_SKIP_DOWNLOAD: This test downloads 36.4 MB, so we skip it.')
 
     # Prepare:
     download_dir = file.path(tmpdir, "test_download_test_data_1")

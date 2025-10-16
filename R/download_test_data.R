@@ -47,7 +47,7 @@ download_test_data <- function(download_dir = ".") {
 
   # Entire URL to download the zipped test data:
   gdrive_url <- paste0(gdrive_path, file_id, "&confirm=t")
-  igb_url <- "https://public.igb-berlin.de/index.php/s/9XGDD3EmHTs69g8/download"
+  igb_url <- "https://public.igb-berlin.de/index.php/s/QtRef2tMKrGePyf/download"
 
   # Local directory where to store it:
   where_to_store <- file.path(download_dir, "hydrography90m_test_data")

@@ -16,6 +16,12 @@
 #' @param new_val character. The name of the column with the new raster values,
 #' which need to be integer values. In case of floating point values, consider
 #' multiplying the values e.g. by 1000 to keep three decimals.
+#' @param remaining character. How to treat raster values not listed in the reclassification table:
+#'  `"same"` retains their original values (equivalent to `* = *` in GRASS),
+#'  `"value"` assigns a fixed value (`remaining_value`), and
+#'  `NULL` (default) does nothing.
+#'  When `remaining = "same"`, `remaining_value` is overlooked.
+#' @param remaining_value numeric. Value to assign if `remaining = "value"`. Default is -9999.
 #' @param raster_layer Full path to the input raster .tif layer.
 #' @param recl_layer character. Full path of the output .tif layer, i.e., the
 #' reclassified raster file.
@@ -43,7 +49,7 @@
 #' @importFrom terra rast
 #' @export
 #'
-#' @author Marlene Schürz
+#' @author Marlene Schürz, Afroditi Grigoropoulou
 #'
 #' @references
 #' https://grass.osgeo.org/grass82/manuals/r.reclass.html
@@ -79,10 +85,31 @@
 #'                                raster_layer = stream_raster,
 #'                                recl_layer = recl_raster)
 #'
-
-
-reclass_raster <- function(data, rast_val, new_val, raster_layer,
-                           recl_layer,
+#'# Reclassify the raster to obtain a mask, where every value is converted to '1'
+#' mask_rast <- reclass_raster(data = NULL,
+#'                            rast_val = NULL,
+#'                            new_val = NULL,
+#'                            remaining = "value",
+#'                            remaining_value = 1,
+#'                            raster_layer = stream_raster,
+#'                            recl_layer = recl_raster)
+#'
+#'
+#'# Reclassify the raster to only a subset of the Strahler stream order values,
+#'# while maintaining the rest of the values unchanged
+#' mask_rast <- reclass_raster(data = str_ord[1:1000,],
+#'                            rast_val = stream,
+#'                            new_val = strahler,
+#'                            remaining = "same",
+#'                            remaining_value = NULL,
+#'                            raster_layer = stream_raster,
+#'                            recl_layer = recl_raster)
+#'
+#'
+#'
+reclass_raster <- function(data = NULL, rast_val = NULL, new_val = NULL,
+                           remaining = NULL, remaining_value = -9999,
+                           raster_layer, recl_layer,
                            no_data = -9999, type = "Int32",
                            compression = "low", bigtiff = TRUE,
                            read = FALSE, quiet = TRUE) {
@@ -94,8 +121,9 @@ reclass_raster <- function(data, rast_val, new_val, raster_layer,
 
   # Check if input data is of type data.frame,
   # data.table or tibble
-  if (!is(data, "data.frame"))
-    stop("data: Has to be of class 'data.frame'.")
+  if(!is.null(data))
+    if (!is(data, "data.frame"))
+      stop("data: Has to be of class 'data.frame'.")
 
   # Check if rast_val and new_val is defined
   if (missing(rast_val))
@@ -104,22 +132,24 @@ reclass_raster <- function(data, rast_val, new_val, raster_layer,
     stop("new_val: Column name of new raster value is missing.")
 
   # Check if rast_val/new_val column names exist
-  if (is.null(data[[rast_val]]))
-    stop(paste0("rast_val: Column name '", rast_val,
-    "' does not exist."))
-  if (is.null(data[[new_val]]))
-    stop(paste0("new_val: Column name '", new_val,
-    "' does not exist."))
-
-  # Check if values of the rast_val/new_val columns are numeric
-  if (!is.integer(data[[rast_val]]))
-    stop(
-      paste0("rast_val: Values of column ", rast_val,
-      " have to be integers."))
-  if (!is.integer(data[[new_val]]))
-    stop(paste0("new_val: Values of column ", new_val,
-    " have to be integers."))
-
+  if(!is.null(data)) {
+    if (is.null(data[[rast_val]]))
+      stop(paste0("rast_val: Column name '", rast_val,
+      "' does not exist."))
+    if(!is.null(new_val))
+      if (is.null(data[[new_val]]))
+        stop(paste0("new_val: Column name '", new_val,
+        "' does not exist."))
+    # Check if values of the rast_val/new_val columns are numeric
+    if (!is.integer(data[[rast_val]]))
+      stop(
+        paste0("rast_val: Values of column ", rast_val,
+        " have to be integers."))
+    if(!is.null(new_val))
+      if (!is.integer(data[[new_val]]))
+        stop(paste0("new_val: Values of column ", new_val,
+        " have to be integers."))
+    }
   # Check if raster_layer is defined
   if (missing(raster_layer))
     stop("raster_layer: Path of the input raster layer is missing.")
@@ -182,9 +212,29 @@ reclass_raster <- function(data, rast_val, new_val, raster_layer,
   # The r.reclass function of GRASS GIS requires a text file
   # including the old and the new value with an = between
   # (e.g. 1 = 20)
-  rules <- data.table(old = data[[rast_val]],
-                      equal = "=",
-                      new = data[[new_val]])
+  # Create reclassification rules
+  if (!is.null(data) && !is.null(rast_val) && !is.null(new_val)) {
+    rules <- data.table(old = data[[rast_val]],
+                        equal = "=",
+                        new = data[[new_val]])
+  } else if (!is.null(remaining) && remaining == "value") {
+    # Only assign a single value to all raster cells
+    rules <- data.table(old = "*", equal = "=", new = remaining_value)
+  } else {
+    stop("Provide either a lookup table (data + rast_val + new_val) or set remaining = 'value' with remaining_value.")
+  }
+
+  # Add remaining handling
+  if (!is.null(remaining)) {
+    if (remaining == "same") {
+      rules <- rbind(rules, data.table(old = "*", equal = "=", new = "*"))
+    } else if (remaining == "value" && !(is.null(data) || is.null(rast_val) || is.null(new_val))) {
+      rules <- rbind(rules, data.table(old = "*", equal = "=", new = remaining_value))
+    } else if (!(remaining %in% c("same", "value"))) {
+      stop("remaining: must be one of 'same', 'value', or NULL.")
+    }
+  }
+
   # Create random string to attach to the file name of the temporary
   # rules .txt file
   rand_string <- stri_rand_strings(n = 1, length = 8, pattern = "[A-Za-z0-9]")
