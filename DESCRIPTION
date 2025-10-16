@@ -106,6 +106,7 @@ Collate:
     'get_distance.R'
     'get_distance_parallel.R'
     'get_distance_graph.R'
+    'get_lake_catchment.R'
     'get_modelfit_table.R'
     'get_pfafstetter_basins.R'
     'get_predict_table.R'
