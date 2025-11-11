@@ -87,8 +87,13 @@ subsetTB(){
     TB=$(find $ENVTB -name "${k}_${TL}.txt")
     awk 'NR==FNR {a[$1]; next} FNR==1 || $1 in a' \
      $SUBCIDS $TB \
-     | awk 'NR > 1 {for(i=1; i<=NF; i++) $i+=0}1' CONVFMT="%.3f" \
-     >  $TMP/ENV_${TL}_${k}.txt
+     | awk '{
+        for (i = 2; i <= NF; i++) {
+        if ($i ~ /[0-9]+\.[0-9]*/) {
+        $i = sprintf("%.2f", $i);
+        }
+        }
+        print; }' >  $TMP/ENV_${TL}_${k}.txt
 }
 
 export -f subsetTB
