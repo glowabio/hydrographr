@@ -199,7 +199,7 @@ extract_lake_ids <- function(data, lon, lat, lake_shape,
     # Call the external .sh script extract_ids() containing the gdal function
     processx::run(system.file("sh", "extract_lake_ids.sh", package = "hydrographr"),
                   args = c(coord_tmp_path, lon, lat, lake_shape, bbox_coord_tmp_path,
-                           var_name, bbox, tempdir()), lake_id_table,
+                           var_name, bbox, tempdir(), lake_id_table),
                   echo = !quiet)
 
   } else {

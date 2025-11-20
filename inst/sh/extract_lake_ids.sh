@@ -52,7 +52,10 @@ ogrinfo "$LAKE" -dialect SQLite -sql "UPDATE $pn SET diss = 1"
 
 # read in extent of lake.shp to be used in the rasterization
 export extent_line=$(ogrinfo -al -so "$LAKE" | grep "Extent:")
-read xmin ymin xmax ymax <<< "$(echo "$extent_line" | sed -E 's/.*\(([^,]+), ([^)]+)\) - \(([^,]+), ([^)]+)\).*/\1 \2 \3 \4/')"
+echo "$extent_line" |
+  sed -E 's/.*\(([^,]+), ([^)]+)\) - \(([^,]+), ([^)]+)\).*/\1 \2 \3 \4/' |
+  read xmin ymin xmax ymax
+# read xmin ymin xmax ymax <<< "$(echo "$extent_line" | sed -E 's/.*\(([^,]+), ([^)]+)\) - \(([^,]+), ([^)]+)\).*/\1 \2 \3 \4/')"
 
 export xmin
 export ymin
