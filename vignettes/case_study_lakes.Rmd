@@ -1,6 +1,6 @@
 ---
 title: "Case study - Lake Analysis"
-subtitle: "Integrating lakes into the Processing of spatial and species data into the network analyses for freshwater fish in Germany"
+subtitle: "Integrating lakes into the processing of spatial and species data for network analyses of freshwater fish in Germany"
 author: ""
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
@@ -512,7 +512,7 @@ ggplot(df, aes(x = year, y = value, color = variable)) +
   )
 ```
 
-Additionally to the environmental analysis we can look how lakes are positioned in the network. For instance we can calculate the distance between the Rangsdorfer lake and the Zeuthener lake (lake ID 165161). Do to this we need first to download and abstract the vector Hydrography90m stream network into a graph. 
+Additionally to the environmental analysis we can look at the position of lakes within the stream network. For instance we can calculate the distance between the Rangsdorfer lake and the Zeuthener lake (lake ID 165161). Do to this we first need to download vector data of the Hydrography90m stream network and abstract it into a graph. 
 
 #### Calculating distances between lakes
 ### Download  the vector stream network geopackage
