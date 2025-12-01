@@ -113,6 +113,7 @@ extract_snapping_info <- function(result) {
   # After snapping (geometry)
   lon_after <- point_feature$geometry$coordinates[[1]][1]
   lat_after <- point_feature$geometry$coordinates[[1]][2]
+  strahler = point_feature$properties$strahler
 
   # Before snapping (properties)
   lon_before <- point_feature$properties$lon_original
@@ -124,7 +125,8 @@ extract_snapping_info <- function(result) {
     lon_before = lon_before,
     lat_before = lat_before,
     lon_after  = lon_after,
-    lat_after  = lat_after
+    lat_after  = lat_after,
+    strahler = strahler
   )
 }
 
