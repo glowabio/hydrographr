@@ -17,18 +17,39 @@
 #' @import httr
 #' @import jsonlite
 #' @import dplyr
+#' @examples
+#' \dontrun{
+#' # Example usage
+#' url <- "https://example.com/sites.csv"
+#' df = data.frame(site_id = c(1,2),
+#'           longitude = c(21.02478, 20.89024),
+#'           latitude =  c(40.10572, 40.14585))
+snapped_df <- api_get_snapped_points_strahler(df = df,
+ colname_lat = "latitude",
+ colname_lon = "longitude",
+ colname_site_id = "site_id",
+ strahler = 4)
+
+#'
+#' #' head(result$data)
+#' cat("Download link:", result$href)
+#'
+#' }
+#'
+#'
 #' @export
+#' @author Afroditi Grigoropoulou, Merret Buurman
+#'
 api_get_snapped_points_strahler <- function(df,
                                             colname_lat = "latitude",
                                             colname_lon = "longitude",
                                             colname_site_id = "site_id",
-                                            strahler = 3,
+                                            strahler = NULL,
                                             geometry_only = FALSE,
-                                            # comment = NULL,
-                                            process_url = NULL) {
-  if (is.null(process_url)) {
-    stop("Please provide the URL of the pygeoapi process")
-  }
+                                            comment = NULL) {
+
+  process_url <-"https://aqua.igb-berlin.de/pygeoapi-dev/processes/get-snapped-points-strahler/execution"
+
 
   if (!all(c(colname_lat, colname_lon, colname_site_id) %in% names(df))) {
     stop("Missing required columns in the input data frame.")
