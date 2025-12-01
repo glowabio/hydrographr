@@ -12,10 +12,6 @@
 #'   metadata (can help with tracing requests on the server).
 #' @param chunk_size Integer. Maximum number of subcatchments to send per request
 #'   (default is 3000).
-#' @param process_url Character. The full URL of the pygeoapi process to call.
-#'   Must be specified explicitly, e.g.,
-#'   `"http://localhost:5000/processes/get-env90m/execution"`.
-#'
 #' @return A data frame with one row per subcatchment and columns for each
 #'   requested environmental variable, plus a `subc_id` column.
 #' @return A data frame containing zonal statistics (mean,min,max) of environmental variables
@@ -34,15 +30,15 @@
 #' }
 #'
 #' @export
+#'
+#' @author Afroditi Grigoropoulou, Merret Buurman
+#'
 api_get_env90m_data <- function(subc_ids, variables, comment = NULL,
-chunk_size = 3000, process_url = NULL) {
+chunk_size = 3000) {
 
 
-  # Ensure that the process url is provided
-  if (is.null(process_url)) {
-    stop("Please provide the URL of the pygeoapi process")
-  }
-
+  # Define process url
+  process_url <- "https://aqua.igb-berlin.de/pygeoapi/processes/get-local-subcids-plural/execution"
 
   subc_ids <- unique(subc_ids)
   n_chunks <- ceiling(length(subc_ids) / chunk_size)

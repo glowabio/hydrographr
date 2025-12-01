@@ -39,6 +39,8 @@
 #' }
 #'
 #' @export
+#' @author Afroditi Grigoropoulou, Merret Buurman
+#'
 api_get_upstream_subcids <- function(df,
                                  colname_lat = "latitude",
                                  colname_lon = "longitude",

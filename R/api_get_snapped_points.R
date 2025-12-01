@@ -9,9 +9,6 @@
 #' @param colname_lat Name of the latitude column in the CSV. Default is "latitude".
 #' @param colname_lon Name of the longitude column in the CSV. Default is "longitude".
 #' @param colname_site_id Name of the site ID column in the CSV. Default is "site_id".
-#' @param process_url URL of the pygeoapi process called by the function.
-#' #'   Must be specified explicitly, e.g.,
-#'   `"http://localhost:5000/processes/get-snapped-points/execution"`.
 #'
 #' @return A list with two elements:
 #' \describe{
@@ -30,8 +27,7 @@
 #' snapped_df <- api_get_snapped_points(csv_url = url,
 #'  colname_lat = "latitude",
 #'  colname_lon = "longitude",
-#'  colname_site_id = "site_id",
-#' process_url = "http://localhost:5000/processes/get-snapped-points/execution")
+#'  colname_site_id = "site_id")
 #'
 #'
 #' #' head(result$data)
@@ -46,17 +42,14 @@
 api_get_snapped_points <- function(csv_url,
                                    colname_lat = "latitude",
                                    colname_lon = "longitude",
-                                   colname_site_id = "site_id",
-                                   process_url = NULL) {
+                                   colname_site_id = "site_id") {
 
   if (is.null(csv_url)) {
     stop("A 'csv_url' must be provided.")
   }
 
-  # Ensure that the process url is provided
-  if (is.null(process_url)) {
-    stop("Please provide the URL of the pygeoapi process")
-  }
+  # Define process url
+  process_url <- "https://aqua.igb-berlin.de/pygeoapi/processes/get-snapped-points-plural/execution"
 
   message("Using CSV-based API...")
 
@@ -100,4 +93,3 @@ api_get_snapped_points <- function(csv_url,
     href = csv_download_url
   ))
 }
-
