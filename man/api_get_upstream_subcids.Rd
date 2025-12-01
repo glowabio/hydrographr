@@ -56,9 +56,14 @@ head(upstream_df)
 }
 \seealso{
 Other ocgapi: 
+\code{\link{api_get_basin_streamsegments}()},
 \code{\link{api_get_env90m_data}()},
 \code{\link{api_get_local_ids}()},
 \code{\link{api_get_snapped_points}()},
+\code{\link{api_get_snapped_points_df}()},
 \code{\link{api_get_snapped_points_strahler}()}
+}
+\author{
+Afroditi Grigoropoulou, Merret Buurman
 }
 \concept{ocgapi}

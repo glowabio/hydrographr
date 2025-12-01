@@ -9,10 +9,9 @@ api_get_snapped_points_strahler(
   colname_lat = "latitude",
   colname_lon = "longitude",
   colname_site_id = "site_id",
-  strahler = 3,
+  strahler = NULL,
   geometry_only = FALSE,
-  comment = NULL,
-  process_url = NULL
+  comment = NULL
 )
 }
 \arguments{
@@ -39,11 +38,36 @@ A data.frame with the snapped point data.
 Sends individual coordinate points to the GeoFRESH API to snap them
 to the nearest stream segment above a given Strahler order.
 }
+\examples{
+\dontrun{
+# Example usage
+url <- "https://example.com/sites.csv"
+df = data.frame(site_id = c(1,2),
+          longitude = c(21.02478, 20.89024),
+          latitude =  c(40.10572, 40.14585))
+ snapped_df <- api_get_snapped_points_strahler(df = df,
+  colname_lat = "latitude",
+  colname_lon = "longitude",
+  colname_site_id = "site_id",
+  strahler = 4)
+
+#' head(result$data)
+cat("Download link:", result$href)
+
+}
+
+
+}
 \seealso{
 Other ocgapi: 
+\code{\link{api_get_basin_streamsegments}()},
 \code{\link{api_get_env90m_data}()},
 \code{\link{api_get_local_ids}()},
 \code{\link{api_get_snapped_points}()},
+\code{\link{api_get_snapped_points_df}()},
 \code{\link{api_get_upstream_subcids}()}
+}
+\author{
+Afroditi Grigoropoulou, Merret Buurman
 }
 \concept{ocgapi}

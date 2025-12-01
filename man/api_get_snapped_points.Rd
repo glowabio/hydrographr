@@ -8,8 +8,7 @@ api_get_snapped_points(
   csv_url,
   colname_lat = "latitude",
   colname_lon = "longitude",
-  colname_site_id = "site_id",
-  process_url = NULL
+  colname_site_id = "site_id"
 )
 }
 \arguments{
@@ -20,10 +19,6 @@ api_get_snapped_points(
 \item{colname_lon}{Name of the longitude column in the CSV. Default is "longitude".}
 
 \item{colname_site_id}{Name of the site ID column in the CSV. Default is "site_id".}
-
-\item{process_url}{URL of the pygeoapi process called by the function.
-#'   Must be specified explicitly, e.g.,
-  `"http://localhost:5000/processes/get-snapped-points/execution"`.}
 }
 \value{
 A list with two elements:
@@ -44,8 +39,7 @@ url <- "https://example.com/sites.csv"
 snapped_df <- api_get_snapped_points(csv_url = url,
  colname_lat = "latitude",
  colname_lon = "longitude",
- colname_site_id = "site_id",
-process_url = "http://localhost:5000/processes/get-snapped-points/execution")
+ colname_site_id = "site_id")
 
 
 #' head(result$data)
@@ -59,8 +53,10 @@ cat("Download link:", result$href)
 }
 \seealso{
 Other ocgapi: 
+\code{\link{api_get_basin_streamsegments}()},
 \code{\link{api_get_env90m_data}()},
 \code{\link{api_get_local_ids}()},
+\code{\link{api_get_snapped_points_df}()},
 \code{\link{api_get_snapped_points_strahler}()},
 \code{\link{api_get_upstream_subcids}()}
 }

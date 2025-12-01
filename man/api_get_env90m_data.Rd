@@ -4,13 +4,7 @@
 \alias{api_get_env90m_data}
 \title{Retrieve 90m-Resolution Environmental Variables for Subcatchments}
 \usage{
-api_get_env90m_data(
-  subc_ids,
-  variables,
-  comment = NULL,
-  chunk_size = 3000,
-  process_url = NULL
-)
+api_get_env90m_data(subc_ids, variables, comment = NULL, chunk_size = 3000)
 }
 \arguments{
 \item{subc_ids}{A numeric vector of unique subcatchment IDs.}
@@ -23,10 +17,6 @@ metadata (can help with tracing requests on the server).}
 
 \item{chunk_size}{Integer. Maximum number of subcatchments to send per request
 (default is 3000).}
-
-\item{process_url}{Character. The full URL of the pygeoapi process to call.
-Must be specified explicitly, e.g.,
-`"http://localhost:5000/processes/get-env90m/execution"`.}
 }
 \value{
 A data frame with one row per subcatchment and columns for each
@@ -50,9 +40,14 @@ env_df <- api_get_env90m_data(subc_ids = subc_ids, variables = vars)
 }
 \seealso{
 Other ocgapi: 
+\code{\link{api_get_basin_streamsegments}()},
 \code{\link{api_get_local_ids}()},
 \code{\link{api_get_snapped_points}()},
+\code{\link{api_get_snapped_points_df}()},
 \code{\link{api_get_snapped_points_strahler}()},
 \code{\link{api_get_upstream_subcids}()}
+}
+\author{
+Afroditi Grigoropoulou, Merret Buurman
 }
 \concept{ocgapi}

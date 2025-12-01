@@ -5,43 +5,35 @@
 \title{Retrieve Local IDs for Sampling Sites}
 \usage{
 api_get_local_ids(
-  df = NULL,
-  csv_url = NULL,
+  csv_url,
   colname_lat = "latitude",
   colname_lon = "longitude",
   colname_site_id = "site_id",
-  comment = NULL,
-  process_url = NULL
+  colname_subc_id = NULL,
+  which_ids = "reg_id",
+  comment = NULL
 )
 }
 \arguments{
-\item{df}{A data frame with one site location.
-Must include latitude and longitude columns.
-Required if `csv_url` is not provided.}
+\item{csv_url}{URL to a CSV file hosted online.}
 
-\item{csv_url}{URL to a CSV file hosted online
-(required for more than one point).}
+\item{colname_lat}{Name of the latitude column in CSV file.}
 
-\item{colname_lat}{Name of the latitude column in `df` or CSV file.
-Default is "latitude".}
+\item{colname_lon}{Name of the longitude column in CSV file.}
 
-\item{colname_lon}{Name of the longitude column in `df` or CSV file.
-Default is "longitude".}
+\item{colname_site_id}{Name of the site ID column in CSV file.}
 
-\item{colname_site_id}{Name of the site ID column in `df` or CSV file.
-Default is "site_id".}
+\item{colname_subc_id}{Name of the subcatchment ID column in CSV file (optional).}
 
-\item{comment}{Optional comment string to include in the API request,
-useful for tracking jobs.}
+\item{which_ids}{Which ID type(s) to retrieve, e.g. `"reg_id"`, `"basin_id"`,
+`"subc_id"`.}
 
-\item{process_url}{URL of the pygeoapi process called by the function.
-Must be specified explicitly, e.g.,
-`"http://localhost:5000/processes/get-local-ids/execution"`.}
+\item{comment}{Optional comment string.}
 }
 \value{
 A list with two elements:
 \describe{
-  \item{data}{A `data.frame` with regional unit, basin and subcatchment ids.}
+  \item{data}{A `data.frame` with the retrieved IDs.}
   \item{href}{A `character` string with the URL of the output CSV.}
 }
 }
@@ -49,28 +41,17 @@ A list with two elements:
 Queries the GeoFRESH API to obtain regional unit, basin,
 and subcatchment IDs for a set of sampling locations.
 Handles both single-point and multi-point inputs.
-Multi-point inputs should be provided via a CSV URL.
-}
-\examples{
-\dontrun{
-# Example for single-point request
-site_df <- data.frame(
-  site_id = "s1",
-  latitude = 52.45,
-  longitude = 13.31
-)
-api_get_local_ids(df = site_df)
-
-# Example for multi-point request using CSV URL
-api_get_local_ids(csv_url = "https://example.com/sites.csv")
-}
-
 }
 \seealso{
 Other ocgapi: 
+\code{\link{api_get_basin_streamsegments}()},
 \code{\link{api_get_env90m_data}()},
 \code{\link{api_get_snapped_points}()},
+\code{\link{api_get_snapped_points_df}()},
 \code{\link{api_get_snapped_points_strahler}()},
 \code{\link{api_get_upstream_subcids}()}
+}
+\author{
+Afroditi Grigoropoulou, Merret Buurman
 }
 \concept{ocgapi}
