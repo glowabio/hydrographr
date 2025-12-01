@@ -24,11 +24,11 @@
 #' df = data.frame(site_id = c(1,2),
 #'           longitude = c(21.02478, 20.89024),
 #'           latitude =  c(40.10572, 40.14585))
-snapped_df <- api_get_snapped_points_strahler(df = df,
- colname_lat = "latitude",
- colname_lon = "longitude",
- colname_site_id = "site_id",
- strahler = 4)
+#'  snapped_df <- api_get_snapped_points_strahler(df = df,
+#'   colname_lat = "latitude",
+#'   colname_lon = "longitude",
+#'   colname_site_id = "site_id",
+#'   strahler = 4)
 
 #'
 #' #' head(result$data)
