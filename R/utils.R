@@ -89,14 +89,20 @@ fix_path <- function(path) {
 
 }
 
-
-
-# Extract information from snapping to Strahler order api function
+#' Extract snapping information from Strahler API response
+#'
+#' This helper function parses the API result returned by
+#' `api_get_snapped_points_strahler()` and extracts key information
+#' about the original and snapped coordinates, subcatchment IDs,
+#' and resulting Strahler order.
 #'
 #' @param result API response of the api_get_snapped_points_strahler.R
+#'
+#' @return A tibble containing original/snapped coordinates, subcatchment
+#'   IDs before and after snapping, and the Strahler order.
+#'
 #' @import dplyr
 #' @keywords internal
-#'
 extract_snapping_info <- function(result) {
   # Get before/after subcatchment IDs
   subc_before <- result$subc_id_before_snapping
@@ -113,7 +119,7 @@ extract_snapping_info <- function(result) {
   # After snapping (geometry)
   lon_after <- point_feature$geometry$coordinates[[1]][1]
   lat_after <- point_feature$geometry$coordinates[[1]][2]
-  strahler = point_feature$properties$strahler
+  strahler  <- point_feature$properties$strahler
 
   # Before snapping (properties)
   lon_before <- point_feature$properties$lon_original
@@ -129,6 +135,7 @@ extract_snapping_info <- function(result) {
     strahler = strahler
   )
 }
+
 
 
 
