@@ -4,7 +4,7 @@
 #' Iteratively snaps points to stream segments of decreasing Strahler order.
 #' After each snapping round, points whose snapping distance exceeds
 #' `distance_threshold` are passed to the next (finer) Strahler level.
-#'
+
 #' This "cascade snapping" approach improves snapping accuracy while preventing
 #' points from being snapped too far away from their original location.
 #'
