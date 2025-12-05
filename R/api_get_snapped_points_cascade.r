@@ -47,7 +47,7 @@
 #' @importFrom dplyr mutate left_join select filter
 #' @importFrom geosphere distHaversine
 #' @export
-snap_points_cascade <- function(df,
+api_get_snapped_points_cascade <- function(df,
                                 col_lat = "lat_before",
                                 col_lon = "lon_before",
                                 col_site = "site_id",
