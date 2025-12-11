@@ -6,7 +6,7 @@
 `hydrographr` provides a collection of `R` function wrappers for GDAL and GRASS-GIS functions to efficiently work with [Hydrography90m](https://essd.copernicus.org/articles/14/4525/2022/essd-14-4525-2022.html) and spatial biodiversity data. The easy-to-use functions process large raster and vector data directly on disk in parallel, such that the memory of R does not get overloaded. This allows creating scalable data processing and analysis workflows in R, even though the data is not processed directly in R.
 
 The package contains currently these functions: 
-<img src="man/figures/function_icons.png" align="left" />
+<img src="function_description_20251211.pdf" align="left" />
 
 We invite users to test the package and to provide feedback. Please notify us of any possible issues, bugs and feature requests under the [issues tab](https://github.com/glowabio/hydrographr/issues) on the top of this page.
 
