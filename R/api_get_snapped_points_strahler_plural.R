@@ -21,7 +21,7 @@
 #' @import jsonlite
 #' @import readr
 #' @export
-#' @author Afroditi Grigoropoulou
+#' @author Afroditi Grigoropoulou, Merret Buurman
 #'
 #' @examples
 #' \dontrun{
