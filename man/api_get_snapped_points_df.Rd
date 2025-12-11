@@ -55,11 +55,14 @@ cat("Download link:", result$href)
 }
 \seealso{
 Other ocgapi: 
+\code{\link{api_filter_by_attribute}()},
 \code{\link{api_get_basin_streamsegments}()},
 \code{\link{api_get_env90m_data}()},
 \code{\link{api_get_local_ids}()},
 \code{\link{api_get_snapped_points}()},
+\code{\link{api_get_snapped_points_cascade_plural}()},
 \code{\link{api_get_snapped_points_strahler}()},
+\code{\link{api_get_snapped_points_strahler_plural}()},
 \code{\link{api_get_upstream_subcids}()}
 }
 \concept{ocgapi}

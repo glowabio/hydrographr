@@ -80,7 +80,7 @@ api_get_snapped_points_cascade <- function(df,
 
     message("Snapping points to Strahler ", strahler, "...")
 
-    snapped <- api_get_snapped_points_strahler(
+    snapped <- api_get_snapped_points_strahler_plural(
       df = points_to_snap,
       colname_lat = "lat_before",
       colname_lon = "lon_before",
