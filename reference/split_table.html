@@ -11,7 +11,7 @@ Note that duplicated rows will be removed."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">hydrographr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -28,6 +28,7 @@ Note that duplicated rows will be removed."></head><body>
     <li><a class="dropdown-item" href="../articles/case_study_cuba.html">Case study - Cuba</a></li>
     <li><a class="dropdown-item" href="../articles/case_study_Danube.html">Case study - Danube basin</a></li>
     <li><a class="dropdown-item" href="../articles/case_study_germany.html">Case study - Germany</a></li>
+    <li><a class="dropdown-item" href="../articles/case_study_lakes.html">Case study - Lake Analysis</a></li>
     <li><a class="dropdown-item" href="../articles/example_other_stream_networks.html">Usage of hydrographr with other stream networks</a></li>
     <li><a class="dropdown-item" href="../articles/linux_system_setup.html">Setting up the package requirements on Linux</a></li>
     <li><a class="dropdown-item" href="../articles/macos_system_setup.html">Setting up the package requirements on MacOS</a></li>
@@ -101,7 +102,7 @@ Default is TRUE.</p></dd>
 <span><span class="co"># or with real data</span></span>
 <span><span class="va">my_directory</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="download_test_data.html">download_test_data</a></span><span class="op">(</span><span class="va">my_directory</span><span class="op">)</span></span>
-<span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu">fread</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">my_directory</span>, <span class="st">'/projectionTB.csv'</span><span class="op">)</span>, fill<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/fread.html" class="external-link">fread</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">my_directory</span>, <span class="st">'/projectionTB.csv'</span><span class="op">)</span>, fill<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Define full path to store split data tables</span></span>
 <span><span class="va">split_tbl_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">my_directory</span>,</span>

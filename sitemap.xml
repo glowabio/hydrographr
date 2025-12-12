@@ -6,6 +6,7 @@
 <url><loc>/articles/case_study_brazil.html</loc></url>
 <url><loc>/articles/case_study_cuba.html</loc></url>
 <url><loc>/articles/case_study_germany.html</loc></url>
+<url><loc>/articles/case_study_lakes.html</loc></url>
 <url><loc>/articles/example_other_stream_networks.html</loc></url>
 <url><loc>/articles/hydrographr.html</loc></url>
 <url><loc>/articles/index.html</loc></url>
@@ -23,9 +24,8 @@
 <url><loc>/reference/download_tiles_base.html</loc></url>
 <url><loc>/reference/extract_from_gpkg.html</loc></url>
 <url><loc>/reference/extract_ids.html</loc></url>
+<url><loc>/reference/extract_lake_ids.html</loc></url>
 <url><loc>/reference/extract_zonal_stat.html</loc></url>
-<url><loc>/reference/figures/danube_map.html</loc></url>
-<url><loc>/reference/figures/germany_map.html</loc></url>
 <url><loc>/reference/fix_path.html</loc></url>
 <url><loc>/reference/get_all_upstream_distances.html</loc></url>
 <url><loc>/reference/get_catchment_graph.html</loc></url>
@@ -33,6 +33,8 @@
 <url><loc>/reference/get_distance.html</loc></url>
 <url><loc>/reference/get_distance_graph.html</loc></url>
 <url><loc>/reference/get_distance_parallel.html</loc></url>
+<url><loc>/reference/get_lake_catchment.html</loc></url>
+<url><loc>/reference/get_lake_intersection.html</loc></url>
 <url><loc>/reference/get_modelfit_table.html</loc></url>
 <url><loc>/reference/get_os.html</loc></url>
 <url><loc>/reference/get_pfafstetter_basins.html</loc></url>

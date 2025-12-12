@@ -17,7 +17,7 @@ layer as the only input.'></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">hydrographr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -34,6 +34,7 @@ layer as the only input.'></head><body>
     <li><a class="dropdown-item" href="../articles/case_study_cuba.html">Case study - Cuba</a></li>
     <li><a class="dropdown-item" href="../articles/case_study_Danube.html">Case study - Danube basin</a></li>
     <li><a class="dropdown-item" href="../articles/case_study_germany.html">Case study - Germany</a></li>
+    <li><a class="dropdown-item" href="../articles/case_study_lakes.html">Case study - Lake Analysis</a></li>
     <li><a class="dropdown-item" href="../articles/example_other_stream_networks.html">Usage of hydrographr with other stream networks</a></li>
     <li><a class="dropdown-item" href="../articles/linux_system_setup.html">Setting up the package requirements on Linux</a></li>
     <li><a class="dropdown-item" href="../articles/macos_system_setup.html">Setting up the package requirements on MacOS</a></li>
@@ -175,7 +176,7 @@ terra::unique.</p>
 <span><span class="va">subc_raster</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">my_directory</span>,</span>
 <span><span class="st">"/hydrography90m_test_data/subcatchment_1264942.tif"</span><span class="op">)</span></span>
 <span><span class="va">hydrography90m_ids</span> <span class="op">&lt;-</span> <span class="fu">extract_ids</span><span class="op">(</span>subc_layer <span class="op">=</span> <span class="va">subc_raster</span><span class="op">)</span></span>
-<span><span class="fu">fwrite</span><span class="op">(</span><span class="va">hydrography90m_ids</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">my_directory</span>, <span class="st">'/subc_IDs.txt'</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/fwrite.html" class="external-link">fwrite</a></span><span class="op">(</span><span class="va">hydrography90m_ids</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">my_directory</span>, <span class="st">'/subc_IDs.txt'</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
