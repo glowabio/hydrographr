@@ -231,10 +231,11 @@ mspa_content <- ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
     processx::run(system.file("bat", "get_lake_intersection.bat",
                               package = "hydrographr"),
-                  args = c(wsl_ids_tmp_path, lake_id, wsl_lakes_path, lake_name,
-                           buffer, edge, wsl_stream_path, wsl_flow_path,
-                           wsl_basins_path, wsl_tmp_path, wsl_lake_dat_path,
-                           n_cores, wsl_sh_file, echo = !quiet))
+                  args = as.character(c(wsl_ids_tmp_path, lake_id, wsl_lakes_path, lake_name,
+                                        buffer, edge, wsl_stream_path, wsl_flow_path,
+                                        wsl_basins_path, wsl_tmp_path, wsl_lake_dat_path,
+                                        n_cores, wsl_sh_file)),
+                  echo = !quiet)
 
   }
   # Return message
