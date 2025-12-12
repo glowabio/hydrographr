@@ -232,8 +232,7 @@ extract_lake_ids <- function(data, lon, lat, lake_shape,
   # Read in file containing lake ids setting fill=TRUE, in case that
   # some coordinates are located in null cells and did not get an ID
   lake_ids <- fread(paste0(lake_id_table, "/lake_id.txt"),
-                    keepLeadingZeros = TRUE, header = TRUE, sep = " ",
-                    fill = TRUE)
+                    keepLeadingZeros = TRUE, header = TRUE, sep = ",")
   return(lake_ids)
 
 }

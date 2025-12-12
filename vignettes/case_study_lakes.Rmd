@@ -54,6 +54,7 @@ library(here)
 library(sf)
 library(tidyr)
 library(readr)
+library(ggplot2)
 library(tibble)
 ```
 
@@ -72,6 +73,7 @@ library(leafem)
 library(sf)
 library(tidyr)
 library(readr)
+library(ggplot2)
 ```
 
 Define working directory
@@ -121,13 +123,13 @@ spdata <- head(spdata)
 head(spdata)
 ```
 
-Let´s remove point occurrences without assigned species names from the data table
+<!-- Let´s remove point occurrences without assigned species names from the data table -->
 
-```{r, eval = FALSE}
-indx <- which(spdata$species == "")
-spdata <- spdata[-c(indx),]
+<!-- ```{r, eval = FALSE} -->
+<!-- indx <- which(spdata$species == "") -->
+<!-- spdata <- spdata[-c(indx),] -->
 
-```
+<!-- ``` -->
 
 ```{r, echo = F}
 kbl(head(spdata)) %>%
@@ -165,7 +167,7 @@ spdata_plot
 ```
 
 ```{r, echo = F, eval = F}
-saveWidget(spdata_plot, file=paste0(here(), "man/figures/germany_map.html"))
+saveWidget(spdata_plot, file=paste0(here(), "/man/figures/germany_map.html"))
 ```
 
 ![](../man/figures/germany_map.png){width="800"}
@@ -226,7 +228,7 @@ for (var in vars_tif) {
   merge_tiles(
     tile_dir = var_dir,
     tile_names = tile_names,
-    out_dir = paste0(wdir, "data/"),
+    out_dir = paste0(wdir, "/data/"),
     file_name = paste0(var, ".tif"),
     read = FALSE,
     bigtiff = TRUE
@@ -319,8 +321,9 @@ extract_lake_ids(spdata,
                  ymin = min(spdata$latitude),
                  xmax = max(spdata$longitude),
                  ymax = max(spdata$latitude),
+                 bbox = TRUE,
                  lake_shape = paste0(wdir, "/data/HydroLAKES_polys_v10_shp/HydroLAKES_polys_v10.shp"),
-                 lake_id_table = paste0(wdir, "/data/lakes_vignette/"))
+                 lake_id_table = paste0(wdir, "/data/"))
 ```
 
 This option leaves us with 3419 lakes, saved under the text file "lake_id.txt". Let's get more specific and only look at the lakes with species data within them.
@@ -332,41 +335,52 @@ extract_lake_ids(spdata,
                  lon = "longitude",
                  lat = "latitude",
                  lake_shape = paste0(wdir, "/data/HydroLAKES_polys_v10_shp/HydroLAKES_polys_v10.shp"),
-                 lake_id_table = paste0(wdir, "/data/lakes_vignette/"))
+                 lake_id_table = paste0(wdir, "/data/"))
 ```
 
 ### Stream network and lake intersection
-Now we can overlay our stream segments with the lake shapefile. In that way we identify per lake all intersection points between stream network and lake.
+Now we can overlay our stream segments with the lake shapefile. In that way we identify per lake all intersection points between stream network and lake. Note that this function is running in parallel and make sure to have enough free CPUs to run the function.
 
+Lets first load in our lake id table which we just created with the 2 step and the `extract_lake_ids` function and we filter for two lakes the Rangsdorfer lake (Hylak_id 165245) and the Zeuthener lake (Hylak_id 165161) in our dataset.
+
+```{r, eval = FALSE}
+
+lake_ids <- fread(paste0(wdir, "/data/lake_id.txt"))
+lake_ids <- lake_ids %>%
+  filter(Hylak_id %in% c(165245, 165161)) %>%
+  distinct(Hylak_id, .keep_all = TRUE)
+```
+
+Then we can run the `get_lake_intersection` function. Note that you need to specify the correct node to your GWB (GuidosToolbox Workbench) specified in the edge parameter.
 
 ```{r, eval = FALSE}
 
 get_lake_intersection(data = lake_ids,
                       lakes = paste0(wdir, "/data/HydroLAKES_polys_v10_shp/HydroLAKES_polys_v10.shp"),
-                      lake_name =,
+                      lake_id = "Hylak_id",
+                      lake_name = "HydroLAKES_polys_v10",
                       buffer = TRUE,
-                      edge = GWB,
-                      stream = paste0(wdir, "/data/r.watershed/segment/"),
-                      flow =,
-                      glbasin =,
-                      lake_dat =,
-                      n_cores = 5,
-                      quiet = FALSE)
+                      edge = "/home/USER/GWB_version/GWB",
+                      stream = paste0(wdir, "/data/segment.tif"),
+                      flow = paste0(wdir, "/data/accumulation.tif"),
+                      basins = paste0(wdir, "/data/basin.tif"),
+                      lake_dat = paste0(wdir, "/data/"),
+                      n_cores = 1)
 
 ```
 
 ### Lake catchment delineation
 
-Having identified the lake intersection points enables us to delineate for each intersection point the corresponding upstream catchment area. Doing this for the lake outlet (i.e the intersection point with the highest flow accumulation value) gives us the entire lake catchment area. To do this we apply the `get_lake_catchment` function:
+Having identified the lake intersection points enables us to delineate for each intersection point the corresponding upstream catchment area. Doing this for the lake outlet (i.e the intersection point with the highest flow accumulation value) gives us the entire lake catchment area. To do this we apply the `get_lake_catchment` function, specifying the outlet with n = 1 (default first row of the intersection table):
 
 ```{r, eval = FALSE}
-get_lake_catchment(data = data,
-                               top = 1,
-                               direction = paste0(wdir, "/data/r.watershed/direction/"),
-                               catch = "/data/ttomiczek/hydrographr/lakes_vignette/intersection_tables/",
+lake_165245 <- fread(paste0(wdir, "/data/coord_lake_165245.txt")) 
+get_lake_catchment(data = lake_165245,
+                               direction = paste0(wdir, "/data/direction.tif"),
+                               lake_basin = paste0(wdir, "/data/"),
                                lake_id = "lake_ID",
-                               n_cores = 5)
-}
+                               n = 1,
+                               n_cores = 1)
 
 ```
 
@@ -379,6 +393,7 @@ We can now integrate the Environment90m dataset [cite Environment90m paper], whi
 For instance, we can download the land cover data to create time series representing the land cover change within a lake catchments. Let`s look at how the percentage of rainfed cropland and decidous forest changed during the time period 1992 to 2020 at lake Rangsdorf (HydroLAKE ID 165245).
 
 ```{r, eval = FALSE}
+tile_id <- "h18v02"
 download_landcover_tables(
   base_vars = c("c10", "c20"),
   years = NULL,
@@ -397,8 +412,8 @@ First we identify all sub-catchments of the lake catchment using the `extract_id
 Note check again visually which basin.tif files are covered by the lake catchment, since it can span over multiple basin tiles. In our case the lake catchment is situated only in one tile (tile id h18v02).
 
 ```{r, eval = FALSE}
-lake_catch <- terra::rast(paste0(wdir, "/lake_1330758/basin_lake_1330758_coord_1.tif"))
-sub_catch <- terra::rast(paste0(wdir, "/data/sub_catchment_h18v02.tif"))
+lake_catch <- terra::rast(paste0(wdir, "/data/basin_lake_165245_coord_1.tif"))
+sub_catch <- terra::rast(paste0(wdir, "/data/sub_catchment.tif"))
 lake_catch_crop <- terra::crop(sub_catch, lake_catch)
 lake_catch_crop <- terra::mask(lake_catch_crop, lake_catch)
 
@@ -415,44 +430,6 @@ Now we subset the Environment90m land cover data by the sub_catchment ID and joi
 ```{r, eval = FALSE}
 years <- 1992:2020
 tile_id <- "h18v02"
-# Initialize empty data.frames
-c10_long <- data.frame()
-c20_long <- data.frame()
-
-
-# Loop through each year and read + filter files
-for (year in years) {
-  
-  # File paths
-  path_c10 <- paste0(wdir, "esa_cci_landcover_v2_1_1/c10/c10_", year, "_", tile, ".txt")
-  path_c20 <- paste0(wdir, "esa_cci_landcover_v2_1_1/c20/c20_", year, "_", tile, ".txt")
-  
-  # Read and coerce types
-  c10_tmp <- read_table(path_c10, col_names = FALSE, col_types = cols()) %>%
-    rename(ID = X1, c10 = X2) %>%
-    mutate(
-      ID = as.numeric(as.character(ID)),  # robust ID coercion
-      c10 = as.numeric(c10),
-      year = year
-    ) %>%
-    filter(ID %in% lake_catch_ids)
-  
-  c20_tmp <- read_table(path_c20, col_names = FALSE, col_types = cols()) %>%
-    rename(ID = X1, c20 = X2) %>%
-    mutate(
-      ID = as.numeric(as.character(ID)),  # robust ID coercion
-      c20 = as.numeric(c20),
-      year = year
-    ) %>%
-    filter(ID %in% lake_catch_ids)
-  
-  # Append
-  c10_long <- bind_rows(c10_long, c10_tmp)
-  c20_long <- bind_rows(c20_long, c20_tmp)
-}
-
-# Final join
-joined_data <- left_join(c10_long, c20_long, by = c("ID", "year"))
 
 # Create name vectors
 c10_names <- paste0("c10_", years)
@@ -464,9 +441,9 @@ var <- c(c10_names, c20_names)
 tb <- get_predict_table(variable = var,
   statistics = c("mean"),
   tile_id = tile_id,
-  input_var_path = paste0(wdir, "esa_cci_landcover_v2_1_1/"),
-  subcatch_id = file.path(wdir, "data/subc_ids.txt"),
-  out_file_path = paste0(wdir, "data/predictTB.csv"),
+  input_var_path = paste0(wdir, "/esa_cci_landcover_v2_1_1/"),
+  subcatch_id = file.path(wdir, "/data/subc_IDs.txt"),
+  out_file_path = paste0(wdir, "/data/predictTB.csv"),
   read = TRUE,
   quiet = FALSE,
   overwrite = TRUE,
@@ -480,6 +457,7 @@ fwrite(tb, paste0(wdir, '/data/land_cover_subc.txt'))
 The landcover values show the percentage covered by the different land use categories.To show a change in land cover we will convert the percentage in the area they cover of any given sub-catchment. For this we will calculate the area of our sub-catchments.
 
 ```{r, eval = FALSE}
+lake_catch_crop <- terra::rast(paste0(wdir, "/data/lake_catch_crop.tif"))
 lakec_area <- terra::expanse(lake_catch_crop, unit="km", zones=lake_catch_crop)
 tb[, 2:59] <- tb[, 2:59] * lakec_area$area
 col_sums <- colSums(tb[, 2:59])
@@ -521,36 +499,11 @@ Additionally to the environmental analysis we can look at the position of lakes 
 download_tiles(variable = "order_vect_segment",
                tile_id = tile_id,
                file_format = "gpkg",
-               download_dir = paste0(wdir, "data"))
+               download_dir = paste0(wdir, "/data/"))
 
 ```
 
 Note that the data is stored in a separate folder called r.stream.order.
-
-```{r, eval = FALSE}
-# define the path to the vector stream network data
-var_dir <- paste0(wdir, "data/r.stream.order/", "order_vect", "_tiles20d/")
-  
-# Build path to .tif file names for each variable and tile ids
-tile_files <- paste0("order_vect_segment", "_", tile_id, ".gpkg")
-  
-# List only the matching .tif files in that folder
-tile_names <- list.files(var_dir, pattern = "\\.gpkg$", full.names = FALSE)
-tile_names <- tile_names[tile_names %in% tile_files]
-  
-# Run the merge function
-merge_tiles(
-  tile_dir = var_dir,
-  tile_names = tile_names,
-  out_dir = paste0(wdir, "data/r.stream.order"),
-  file_name = paste0("order_vect_merge", ".gpkg"),
-  read = FALSE,
-  bigtiff = TRUE,
-  quiet = FALSE
-  )
-
-
-```
 To calculate the distance between lakes we first represent the vector stream network in a graph.
 
 ```{r, eval = FALSE}
@@ -566,43 +519,36 @@ my_graph <- read_geopackage(gpkg = paste0(wdir,
 
 ```
 
-Now we extract the stream segment ID of the lake outlets. Between the two lakes of interest we will calculate the distance in m.
+Now we extract the stream segment ID of the lake outlets. Between the two lakes of interest we will calculate the distance in meter.
 
 ```{r, eval = FALSE}
 
-lake_165245_intersect <- fread(paste0(wdir, "data/intersection_tables/lake_165245/coord_lake_165245.txt"))
+lake_165245_intersect <- fread(paste0(wdir, "/data/coord_lake_165245.txt"))
 head(lake_165245_intersect)
 
-lake_165161_intersect <- fread(paste0(wdir, "data/intersection_tables/lake_165245/coord_lake_165161.txt"))
+lake_165161_intersect <- fread(paste0(wdir, "/data/coord_lake_165161.txt"))
 head(lake_165161_intersect)
 
 ```
-In both tables the first row represents the lake outlet (having the highest flow accumulation value). We can now calculate the distance between the two outlets using the sub-catchment ID of the first row found in the column subc_id. That are for the Rangsdorfer lake subc_id 39089860 and for the Zeuthener lake subc_id 39220004. They correspond to the unique sub-catchment and stream segment ID of the Hydrography90m stream network.
+In both tables the first row represents the lake outlet (having the highest flow accumulation value). We can now calculate the distance between the two outlets using the sub-catchment ID of the first row found in the column subc_id. That are for the Rangsdorfer lake subc_id 507419535 and for the Zeuthener lake subc_id 507343759. They correspond to the unique sub-catchment and stream segment ID of the Hydrography90m stream network.
 
 ```{r, eval = FALSE}
 
-subc_id <- as.numeric(c("39089860", "39220004"))
+subc_id <- as.numeric(c("507419535", "507343759"))
 
 subc_distances <- get_distance_graph(my_graph,
                                       subc_id = subc_id,
                                       variable = "length",
                                       distance_m = TRUE,
                                       )
-
+head(subc_distances)
 ```
+
+The distance between the two lakes (from outlet to outlet) amounts to 31842.6 meter or 31.8 km.
 
 ```{r, echo = F, eval = FALSE}
 fwrite(subc_distances, 
         paste0(wdir, "/subc_distances.csv"), sep = ",", row.names = F, quote = F)
 ```
-
-```{r, echo = F}
-subc_distances <- fread(paste0(wdir, "/data/subc_distances.csv")) %>% head()
-```
-
-```{r, eval = F}
-head(subc_distances)
-```
-
 
 ### References

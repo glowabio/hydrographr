@@ -70,23 +70,17 @@ gdal_rasterize -a_srs "EPSG:4326" -at -a "$VAR_ID" -l "$pn" \
 LAKE_RAST=$TMPDIR/lake.tif
 export "LAKE_RAST"
 # add header
-echo "$VAR_ID" > $TMPDIR/lake_id.txt
-
+echo "Hylak_id" > "$TMPDIR/output.txt"
+# awk -F, -v LON=$LON -v LAT=$LAT '
+#   NR==1 { for (i=1; i<=NF; i++) { f[$i] = i } }
+#   NR>1  { print $(f[LON]), $(f[LAT]) }
+# ' "$DATA" | gdallocationinfo -valonly -geoloc "$LAKE_RAST" | awk '{ print (NF ? $0 : 0) }' >> "$TMPDIR/output.txt"
 awk -v LON=$LON -v LAT=$LAT '
-NR==1 {
-    for (i=1; i<=NF; i++) {
-        f[$i] = i
-    }
-}
-NR>1 {
-    print $(f[LON]), $(f[LAT])
-}' "$DATA" |
-while read lon lat; do
-    val=$(gdallocationinfo -valonly -geoloc "$LAKE_RAST" "$lon" "$lat")
-    echo "${val:-0}"   # if val is empty, print 0
-done >> "$TMPDIR/lake_id.txt"
-
-paste -d" " $DATA $TMPDIR/lake_id.txt > $OUTDIR/lake_id.txt
+  NR==1 { for (i=1; i<=NF; i++) { f[$i] = i } }
+  NR>1  { print $(f[LON]), $(f[LAT]) }
+' "$DATA" | gdallocationinfo -valonly -geoloc "$LAKE_RAST" | awk '{ print (NF ? $0 : 0) }'  >> "$TMPDIR/output.txt"
+# Merge original data with the new column
+paste -d, "$DATA" "$TMPDIR/output.txt" > "$OUTDIR/lake_id.txt"
 fi
 
 
