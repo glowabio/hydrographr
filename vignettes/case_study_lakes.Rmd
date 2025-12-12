@@ -95,7 +95,7 @@ dir.create("data")
 
 We first download the occurrence data with coordinates from GBIF
 
-```{r, eval = F}
+```{r, eval = T}
 # Once: Download species occurrence data based on the key of the dataset
 # and write out to working directory
 spdata_all <- occ_download_get(key="0004551-231002084531237",
@@ -105,7 +105,7 @@ fwrite(spdata_all, paste0(wdir, "/data/fish_germany_gbif.csv"),
     row.names = F, quote = F, sep = "\t")
 ```
 
-```{r}
+```{r, eval = T}
 # Import and clean the data
 spdata <- fread(paste0(wdir, "/data/fish_germany_gbif.csv"), sep = "\t") %>%
   select(gbifID, decimalLongitude, decimalLatitude, species, year) %>%
