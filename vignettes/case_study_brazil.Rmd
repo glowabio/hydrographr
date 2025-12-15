@@ -52,7 +52,7 @@ and get the up- and downstream stream segments from each point locations as a gr
 Afterwards, we will query the tables and evaluate the shortest distance to the 
 next dam as well as the number of dams. 
 
-![](../man/figures/workflow.png)
+![](../man/figures/workflow_case_study_brazil.png)
 
 Let's get started!
 
