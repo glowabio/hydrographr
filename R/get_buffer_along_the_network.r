@@ -2,34 +2,34 @@
 #'
 #' @description
 #' Given a stream network and starting points (either segment IDs or sf points),
-#' this function extracts the segments along the network within a specified 
-#' upstream and/or downstream distance (buffer). It handles points snapped to 
+#' this function extracts the segments along the network within a specified
+#' upstream and/or downstream distance (buffer). It handles points snapped to
 #' stream segments and can clip partial segments based on the start fraction.
 #'
-#' @param lines_sf An `sf` object representing the stream network. Must have 
-#'   columns `subc_id` (segment ID), `target` (downstream segment), `length` 
+#' @param lines_sf An `sf` object representing the stream network. Must have
+#'   columns `subc_id` (segment ID), `target` (downstream segment), `length`
 #'   (segment length), and LINESTRING geometry.
-#' @param target_ids Optional integer or character vector of segment IDs to start 
+#' @param target_ids Optional integer or character vector of segment IDs to start
 #'   the buffer from. Provide either `target_ids` OR `start_points`, not both.
-#' @param start_points Optional `sf` object of POINT geometries representing 
+#' @param start_points Optional `sf` object of POINT geometries representing
 #'   starting locations on the network. Provide either `target_ids` OR `start_points`.
-#' @param up_radius Numeric. Distance (in units of `lines_sf`) to trace upstream. 
+#' @param up_radius Numeric. Distance (in units of `lines_sf`) to trace upstream.
 #'   Default is 0 (no upstream buffer).
-#' @param down_radius Numeric. Distance (in units of `lines_sf`) to trace downstream. 
+#' @param down_radius Numeric. Distance (in units of `lines_sf`) to trace downstream.
 #'   Default is 0 (no downstream buffer).
 #'
-#' @return An `sf` object containing all segments within the requested upstream 
+#' @return An `sf` object containing all segments within the requested upstream
 #'   and downstream distances for each starting point. Additional columns:
-#'   - `point_id`: identifier of starting point  
-#'   - `target_segment`: ID of segment used as starting point  
-#'   - `start_fraction`: fraction along starting segment where the point lies  
-#'   - `direction`: "upstream" or "downstream"  
+#'   - `point_id`: identifier of starting point
+#'   - `target_segment`: ID of segment used as starting point
+#'   - `start_fraction`: fraction along starting segment where the point lies
+#'   - `direction`: "upstream" or "downstream"
 #'   - `search_distance`: the requested buffer distance
 #'
 #' @details
-#' - Supports both single segments (`target_ids`) or arbitrary points (`start_points`)  
-#' - Clips segments proportionally if the buffer does not reach the full segment length  
-#' - Handles branching upstream segments and avoids duplicate segments for the same point  
+#' - Supports both single segments (`target_ids`) or arbitrary points (`start_points`)
+#' - Clips segments proportionally if the buffer does not reach the full segment length
+#' - Handles branching upstream segments and avoids duplicate segments for the same point
 #' - Requires `sf`, `dplyr`, `purrr`, and `st_linesubstring` (from `lwgeom`)
 #'
 #' @export
@@ -101,8 +101,8 @@ get_buffer_along_the_network <- function(
     stop("No valid starting points could be determined")
 
   # ---- Helper functions for upstream/downstream traversal ----
-  traverse_downstream <- function(...) { /* your code */ }
-  traverse_upstream <- function(...) { /* your code */ }
+  # traverse_downstream <- function(...) { /* your code */ }
+  # traverse_upstream <- function(...) { /* your code */ }
 
   # ---- Process each starting point ----
   results <- list()
