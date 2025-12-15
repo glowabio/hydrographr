@@ -9,7 +9,10 @@
 #' @param csv_url Character. URL of the CSV file to filter.
 #' @param keep Named list. Each element name is a column in the CSV and each
 #'   element value is a vector of values to retain. Example:
-#'   `list(site_id = c("FP1", "FP10"))`.
+#'   `list(site_id = c("FP1", "FP10"))`. Optional if `conditions` is provided.
+#' @param conditions Named list. Each element name is a column in the CSV and each
+#'   element value is a character string with a filter expression using 'x' as
+#'   the variable. Example: `list(longitude = "x<21.0")`. Optional if `keep` is provided.
 #' @param comment Optional comment that will be stored in the API response.
 #'
 #' @return A character string with the `href` pointing to the filtered CSV.
@@ -17,18 +20,48 @@
 #'
 #' @examples
 #' \dontrun{
+#' # Filter by exact values
 #' api_filter_by_attribute(
 #'   csv_url = "https://aqua.igb-berlin.de/referencedata/aqua90m/spdata_species.csv",
 #'   keep = list(site_id = c("FP1", "FP2"))
 #' )
+#'
+#' # Filter by conditions
+#' api_filter_by_attribute(
+#'   csv_url = "https://aqua.igb-berlin.de/referencedata/aqua90m/spdata_barbus.csv",
+#'   conditions = list(longitude = "x<21.0")
+#' )
+#'
+#' # Combine both filters
+#' api_filter_by_attribute(
+#'   csv_url = "https://aqua.igb-berlin.de/referencedata/aqua90m/spdata_barbus.csv",
+#'   keep = list(site_id = c("FP1", "FP10", "FP20")),
+#'   conditions = list(longitude = "x<20.8")
+#' )
 #' }
-api_filter_by_attribute <- function(csv_url, keep, comment = NULL) {
+api_filter_by_attribute <- function(csv_url, keep = NULL, conditions = NULL, comment = NULL) {
+  # Validate that at least one filter is provided
+  if (is.null(keep) && is.null(conditions)) {
+    stop("At least one of 'keep' or 'conditions' must be provided.")
+  }
+
+  # Build the inputs list
+  inputs <- list(csv_url = csv_url)
+
+  if (!is.null(keep)) {
+    inputs$keep <- keep
+  }
+
+  if (!is.null(conditions)) {
+    inputs$conditions <- conditions
+  }
+
+  if (!is.null(comment)) {
+    inputs$comment <- comment
+  }
+
   body <- list(
-    inputs = list(
-      csv_url = csv_url,
-      keep = keep,
-      comment = comment
-    ),
+    inputs = inputs,
     outputs = list(
       transmissionMode = "reference"
     )
