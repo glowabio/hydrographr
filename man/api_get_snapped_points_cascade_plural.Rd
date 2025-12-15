@@ -25,20 +25,22 @@ api_get_snapped_points_cascade_plural(
 
 \item{strahler_seq}{Integer vector. Sequence of Strahler values (e.g. c(4,3,2)).}
 
-\item{distance_threshold}{Numeric. Maximum allowed snapping distance.}
+\item{distance_threshold}{Numeric. Maximum allowed snapping distance in meters.}
 
 \item{comment}{Optional comment for API logging.}
 }
 \value{
 A list containing:
   \item{snap_urls}{Character vector with the .csv URLs of the snapped points per round}
+  \item{filtered_within_urls}{Character vector with URLs of points within threshold per round}
   \item{snapped_points_df}{A data frame with the final snapped points}
 }
 \description{
 Performs iterative snapping across a sequence of Strahler orders.
-After each snapping round, distances are computed locally using Haversine formula.
-Sites exceeding the threshold are sent to pygeoapi `filter-by-attribute` for the
-next round. Successfully snapped sites are saved per iteration.
+After each snapping round, the API's distance column is used to filter sites.
+Sites within the threshold are collected, while sites exceeding the threshold
+are filtered and passed to the next Strahler level for re-snapping with their
+original coordinates.
 }
 \seealso{
 Other ocgapi: 

@@ -9,7 +9,8 @@ api_get_snapped_points_strahler_plural(
   colname_lon = "longitude",
   colname_lat = "latitude",
   colname_site_id = "site_id",
-  min_strahler = NULL
+  min_strahler = NULL,
+  add_distance = FALSE
 )
 }
 \arguments{
@@ -22,6 +23,9 @@ api_get_snapped_points_strahler_plural(
 \item{colname_site_id}{Name of the site ID column inside the CSV. Default: "site_id".}
 
 \item{min_strahler}{Minimum Strahler order to snap to (e.g., 5).}
+
+\item{add_distance}{Logical. If TRUE, includes a 'distance' column with the snapping
+distance in meters. Default: FALSE.}
 }
 \value{
 A list with:
@@ -39,7 +43,8 @@ stream segment above a given minimum Strahler order.
 \dontrun{
 result <- api_get_snapped_points_strahler_plural(
   csv_url = "https://aqua.igb-berlin.de/referencedata/aqua90m/spdata_barbus.csv",
-  min_strahler = 5
+  min_strahler = 5,
+  add_distance = TRUE
 )
 
 head(result$data)
@@ -59,6 +64,6 @@ Other ocgapi:
 \code{\link{api_get_upstream_subcids}()}
 }
 \author{
-Afroditi Grigoropoulou
+Afroditi Grigoropoulou, Merret Buurman
 }
 \concept{ocgapi}
