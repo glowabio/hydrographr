@@ -10,6 +10,8 @@
 #' @param colname_lat Name of the latitude column inside the CSV. Default: "latitude".
 #' @param colname_site_id Name of the site ID column inside the CSV. Default: "site_id".
 #' @param min_strahler Minimum Strahler order to snap to (e.g., 5).
+#' @param add_distance Logical. If TRUE, includes a 'distance' column with the snapping
+#'   distance in meters. Default: FALSE.
 #'
 #' @return A list with:
 #'   \describe{
@@ -27,7 +29,8 @@
 #' \dontrun{
 #' result <- api_get_snapped_points_strahler_plural(
 #'   csv_url = "https://aqua.igb-berlin.de/referencedata/aqua90m/spdata_barbus.csv",
-#'   min_strahler = 5
+#'   min_strahler = 5,
+#'   add_distance = TRUE
 #' )
 #'
 #' head(result$data)
@@ -38,16 +41,14 @@ api_get_snapped_points_strahler_plural <- function(
     colname_lon = "longitude",
     colname_lat = "latitude",
     colname_site_id = "site_id",
-    min_strahler = NULL
+    min_strahler = NULL,
+    add_distance = FALSE
 ) {
-
   if (is.null(min_strahler)) {
     stop("min_strahler must be provided.")
   }
 
-  process_url <-"https://aqua.igb-berlin.de/pygeoapi-dev/processes/get-snapped-points-strahler-plural/execution"
-
-
+  process_url <- "https://aqua.igb-berlin.de/pygeoapi-dev/processes/get-snapped-points-strahler-plural/execution"
 
   # Build POST body
   body <- list(
@@ -56,7 +57,8 @@ api_get_snapped_points_strahler_plural <- function(
       colname_lon = colname_lon,
       colname_lat = colname_lat,
       colname_site_id = colname_site_id,
-      min_strahler = min_strahler
+      min_strahler = min_strahler,
+      add_distance = add_distance
     ),
     outputs = list(
       transmissionMode = "reference"
@@ -72,7 +74,6 @@ api_get_snapped_points_strahler_plural <- function(
   )
 
   status <- httr::status_code(response)
-
   if (status != 200) {
     stop(sprintf("API request failed (HTTP %s): %s",
                  status,
