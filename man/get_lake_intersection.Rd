@@ -13,7 +13,7 @@ get_lake_intersection(
   edge,
   stream,
   flow,
-  glbasins,
+  basins,
   lake_dat,
   n_cores = 1,
   quiet = TRUE
@@ -21,7 +21,8 @@ get_lake_intersection(
 }
 \arguments{
 \item{data}{a data.frame or data.table that contains the columns regarding
-the lake ids, i.e. HydroLAKES ids.}
+the lake ids, i.e. HydroLAKES ids. (i.e., output of extract_lake_ids);
+see also help(extract_lake_ids)}
 
 \item{lake_id}{character. The name of the column containing lake ids.}
 
@@ -37,32 +38,27 @@ if TRUE a predefined buffer is used where the size of the buffer depends on
 the lake size; if FALSE no buffer is applied; Default is TRUE}
 
 \item{edge}{character. Full path to GuidosToolbox Workbench MSPA tool
-see also (https://forest.jrc.ec.europa.eu/en/activities/lpa/gtb/)
-(i.e., output of get_predict_table); see also help(get_predict_table)}
+see also (https://forest.jrc.ec.europa.eu/en/activities/lpa/gtb/)}
 
-\item{stream}{character. Full path to Hydrography 90m stream network tif file
+\item{stream}{character. Full path to Hydrography90m stream network tif file
 add a reference were to check the necessary tif files for lake analysis}
 
-\item{flow}{character. Full path to Hydrography 90m flow accumulation tif file}
+\item{flow}{character. Full path to Hydrography90m flow accumulation tif file}
 
-\item{glbasins}{character. Full path to Hydrography 90m basin tif file}
+\item{basins}{character. Full path to Hydrography90m basin tif file}
 
 \item{lake_dat}{character. Full path of the output.csv table,
 i.e., the lake intersection table.}
 
-\item{n_cores}{interger. Number of cores used in parallelzation, Default is one.}
+\item{n_cores}{interger. Number of cores used in parallelization, Default is one.}
 
 \item{quiet}{logical. If FALSE, the standard output will be printed.
 Default is TRUE.}
-
-\item{read}{logical. If TRUE, then the model .csv table
-gets read into R as data.table and data.frame.
-if FALSE, the table is only stored on disk. Default is FALSE.}
 }
 \description{
-Add describtion text here
-
- Any thing the user needs to notice? add Note
+The function identifies, for each lake ID, the intersection points
+between the stream network (i.e., Hydrography90m) and the corresponding
+lake's geospatial file (e.g., HydroLAKES shapefile).
 }
 \examples{
 # Download test data into the temporary R folder
@@ -70,16 +66,51 @@ Add describtion text here
 my_directory <- tempdir()
 download_test_data(my_directory)
 
-# Get the lake intersection table for all lakes in the test data
 # Note: For this we need the lake IDs (i.e. HydroLake ID), extracted from the
 # extract_lake_ids.R function; see also help(extract_lake_ids)
 
+data <- fread(paste0(my_directory,
+                         "/hydrography90m_test_data",
+                         "/lake_id.txt"),
+                         header = TRUE)
+lake_id <- "lake_id"
 
+lakes <- (paste0(my_directory,
+                    "/hydrography90m_test_data",
+                    "/hydrography90m_test_lakes.gpkg"))
+
+# To run the function we need to have installed GuidosToolbox Workbench MSPA tool
+# see also (https://forest.jrc.ec.europa.eu/en/activities/lpa/gtb/) and
+# (https://glowabio.github.io/hydrographr/articles/case_study_lake_workflow.html)
+# give full path virtual machine linux path
+edge <- (paste0(/home/USER/GWB_version/,
+                    "/GWB"))
+
+stream <- (paste0(my_directory,
+                    "/hydrography90m_test_data",
+                    "/stream_1264942.tif"))
+
+flow <- (paste0(my_directory,
+                    "/hydrography90m_test_data",
+                    "/flow_1264942.tif"))
+
+basins <- (paste0(my_directory,
+                    "/hydrography90m_test_data",
+                    "/basin_1264942.tif"))
+
+lake_dat <- (paste0(my_directory,
+                    "/hydrography90m_test_data"))
+
+lake_intersect_table <- get_lake_intersection(data, lake_id = "lake_id",
+                            lakes, lake_name = "lake_id", buffer = TRUE, edge,
+                            stream, flow, basins, lake_dat, n_cores = 1,
+                            quiet = FALSE)
 }
 \references{
-add reference manual html here
 https://grass.osgeo.org/grass82/manuals/
-add manual of the MSPA analysis tool here
+Soille P. and Vogt P. (2009). Morphological segmentation of binary patterns.
+Pattern Recognition Letters 30, 4:456-459, doi: 1.1016/j.patrec.2008.10.015
+\url{https://ies-ows.jrc.ec.europa.eu/gtb/GTB/MSPA_Guide.pdf}
 }
 \author{
 Jaime Garcia Marquez, Thomas Tomiczek

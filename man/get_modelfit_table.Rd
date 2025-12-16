@@ -10,7 +10,7 @@ get_modelfit_table(
   spec,
   lon,
   lat,
-  pseudoabs = NULL,
+  pseudoabs = 0,
   subc,
   predict_table,
   mod_fit_table,

@@ -2,16 +2,15 @@
 % Please edit documentation in R/get_lake_catchment.R
 \name{get_lake_catchment}
 \alias{get_lake_catchment}
-\title{Get lake catchments based on intersection points between stream network and lake}
+\title{Get lake catchments based on intersection points between stream network and lakes}
 \usage{
 get_lake_catchment(
   data,
   flow = "flow_accu_mean",
   lake_id = "lake_ID",
-  outlet_id = "outlet_ID",
-  top = "all",
+  n = "all",
   direction,
-  catch,
+  lake_basin,
   n_cores = 1,
   quiet = TRUE
 )
@@ -21,39 +20,38 @@ get_lake_catchment(
 the stream segment ids of the intersection points between lake and stream network;
 (i.e., output of get_lake_intersection)}
 
-\item{flow}{character. The name of the flow accumulation column used for sorting the intersection table;
+\item{flow}{character. The name of the flow accumulation column used for
+sorting the intersection table;
 i.e. either flow_accu (flow accumulation value at intersection point pixel),
 flow_accu_max (maximum flow accumulation value of 3 x 3 neighboring pixels),}
 
 \item{lake_id}{character. The name of the column containing lake ids;
 (i.e., output "lake_ID" of get_lake_intersection)
-flow_accu_mean (mean flow accumulation value of 3 x 3 neighboring pixels). Default is flow_accu_mean}
+flow_accu_mean (mean flow accumulation value of 3 x 3 neighboring pixels).
+Default is flow_accu_mean}
 
-\item{top}{integer. Number of intersection points used for lake catchment calculations;
-e.g. top=1 equals first row of intersection table and lake outlet;
-top=20 equals first 20 rows of intersection table; Default is all.}
+\item{n}{integer. Number of intersection points used for lake catchment delineation;
+e.g. n=1 equals first row of intersection table and lake outlet;
+n=20 equals first 20 rows of intersection table; Default is all.}
 
-\item{direction}{character. Full path to Hydrography 90m flow direction tif file}
+\item{direction}{character. Full path to Hydrography90m flow direction tif file}
 
-\item{catch}{character. Full path to output catchment tif files}
+\item{lake_basin}{character. Full path to output catchment tif files}
 
-\item{n_cores}{integer. Number of cores used in parallelsation; Default is one.}
+\item{n_cores}{integer. Number of cores used in parallelization; Default is one.}
 
 \item{quiet}{logical. If FALSE, the standard output will be printed.;
 Default is TRUE.}
-
-\item{read}{logical. If TRUE, then the model .csv table
-gets read into R as data.table and data.frame.
-if FALSE, the table is only stored on disk. Default is FALSE.}
 }
 \description{
-Add describtion text here
-
- Any thing the user needs to notice? add Note
+Delineate lake catchments in GeoTIFF format based on intersection points between
+stream network (i.e. Hydrography90m) and lake geospatial files (e.g. HydroLAKES).
+The function uses the lake intersection tables from get_lake_intersection.R as
+input data.
 }
 \note{
 For the function to work we need the output of the function get_lake_intersection
-that are the lake_reference.txt and intersection table (i.e. coord_lake.txt)
+that are the lake_reference{ID}.txt and intersection table (i.e. coord_lake{ID}.txt)
 }
 \examples{
 # Download test data into the temporary R folder
@@ -73,12 +71,11 @@ direction <- (paste0(my_directory,
 catch <- (paste0(my_directory,
                    "/hydrography90m_test_data/"))
 
-get_lake_catchment(data, direction = direction, catch = catch)
+get_lake_catchment(data, direction = direction, lake_basin = catch)
 }
 \references{
 add reference manual html here
 https://grass.osgeo.org/grass82/manuals/
-add manual of the MSPA analysis tool here
 }
 \author{
 Jaime Garcia Marquez, Thomas Tomiczek

@@ -101,6 +101,7 @@ Collate:
     'extract_lake_ids.R'
     'extract_zonal_stat.R'
     'get_all_upstream_distances.R'
+    'get_buffer_along_the_network.R'
     'get_catchment_graph.R'
     'get_centrality.R'
     'get_distance.R'
