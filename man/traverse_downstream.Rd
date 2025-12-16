@@ -2,26 +2,38 @@
 % Please edit documentation in R/utils.R
 \name{traverse_downstream}
 \alias{traverse_downstream}
-\title{Traverse downstream along a stream network from a given point}
+\title{Traverse downstream along a stream network}
 \usage{
-traverse_downstream(lines_sf, start_segment_id, start_fraction, X)
+traverse_downstream(lines_sf, segment_id, start_fraction, max_distance)
 }
 \arguments{
-\item{lines_sf}{sf object with columns `subc_id`, `target`, `length`, and LINESTRING geometry}
+\item{lines_sf}{An `sf` object representing the stream network with columns
+`subc_id`, `target`, and `length`.}
 
-\item{start_segment_id}{ID of the segment to start from}
+\item{segment_id}{Character or numeric. The starting segment ID.}
 
-\item{start_fraction}{Fraction along segment to start (0=start, 1=end)}
+\item{start_fraction}{Numeric between 0 and 1. The fractional position along
+the starting segment (0 = start of segment, 1 = end of segment).}
 
-\item{X}{Numeric. Distance to traverse downstream}
+\item{max_distance}{Numeric. Maximum distance to traverse downstream (in the
+same units as `length` column in `lines_sf`).}
 }
 \value{
-list with elements:
-  - `geoms`: list of LINESTRING geometries
-  - `data`: list of segment attributes with updated lengths
+A list of segment information, where each element contains:
+  \item{subc_id}{Segment ID}
+  \item{fraction_start}{Starting fraction along the segment}
+  \item{fraction_end}{Ending fraction along the segment}
+  \item{length_used}{Length of segment used in the traversal}
 }
 \description{
-Extracts all segments downstream of a starting point along a stream network
-up to a cumulative distance `X`. Handles partial segments.
+Starting from a given segment and position along that segment, this function
+traverses downstream along the network for a specified distance, collecting
+all segments (or partial segments) encountered.
+}
+\details{
+The function follows the network downstream (using the `target` column)
+until either the maximum distance is reached or there are no more downstream
+segments. Partial segments are included if the distance budget is exhausted
+partway through a segment.
 }
 \keyword{internal}

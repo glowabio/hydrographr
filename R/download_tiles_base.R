@@ -23,6 +23,10 @@ download_tiles_base <- function(variable, file_format = "tif",
                                 file_size_table = NULL,
                                 server_url = NULL) {
 
+  if (!(dir.exists(download_dir))) {
+    stop(paste0("Directory ", download_dir, " does not exist, cannot download to there."))
+  }
+
   # Get the file_name, e.g. "stream_dist_up_farth_h00v02.tif"
   file_name <- ifelse(global == TRUE, paste0(variable, "_ovr.", file_format),
                     paste0(variable, "_", tile_id, ".", file_format))

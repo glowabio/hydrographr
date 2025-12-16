@@ -63,7 +63,6 @@ Other ocgapi:
 \code{\link{api_get_snapped_points}()},
 \code{\link{api_get_snapped_points_cascade_plural}()},
 \code{\link{api_get_snapped_points_df}()},
-\code{\link{api_get_snapped_points_strahler}()},
 \code{\link{api_get_snapped_points_strahler_plural}()}
 }
 \author{

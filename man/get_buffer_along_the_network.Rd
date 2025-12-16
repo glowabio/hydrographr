@@ -39,13 +39,13 @@ Default is 0 (no upstream buffer).}
 Default is 0 (no downstream buffer).}
 }
 \value{
-An sf object containing all segments within requested distances.
-  Columns include:
+An `sf` object containing all segments within the requested upstream
+  and downstream distances for each starting point. Additional columns:
   - `point_id`: identifier of starting point
-  - `target_segment`: segment used as starting point
-  - `start_fraction`: fraction along starting segment
+  - `target_segment`: ID of segment used as starting point
+  - `start_fraction`: fraction along starting segment where the point lies
   - `direction`: "upstream" or "downstream"
-  - `search_distance`: requested buffer distance
+  - `search_distance`: the requested buffer distance
 
 An `sf` object containing all segments within the requested upstream
   and downstream distances for each starting point. Additional columns:
@@ -56,8 +56,10 @@ An `sf` object containing all segments within the requested upstream
   - `search_distance`: the requested buffer distance
 }
 \description{
-Extracts all segments along a stream network within specified upstream
-and/or downstream distances from either segment IDs or sf points.
+Given a stream network and starting points (either segment IDs or sf points),
+this function extracts the segments along the network within a specified
+upstream and/or downstream distance (buffer). It handles points snapped to
+stream segments and can clip partial segments based on the start fraction.
 
 Given a stream network and starting points (either segment IDs or sf points),
 this function extracts the segments along the network within a specified
@@ -65,6 +67,11 @@ upstream and/or downstream distance (buffer). It handles points snapped to
 stream segments and can clip partial segments based on the start fraction.
 }
 \details{
+- Supports both single segments (`target_ids`) or arbitrary points (`start_points`)
+- Clips segments proportionally if the buffer does not reach the full segment length
+- Handles branching upstream segments and avoids duplicate segments for the same point
+- Requires `sf`, `dplyr`, and helper functions `traverse_upstream()` and `traverse_downstream()`
+
 - Supports both single segments (`target_ids`) or arbitrary points (`start_points`)
 - Clips segments proportionally if the buffer does not reach the full segment length
 - Handles branching upstream segments and avoids duplicate segments for the same point

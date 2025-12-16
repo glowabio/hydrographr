@@ -2,26 +2,39 @@
 % Please edit documentation in R/utils.R
 \name{traverse_upstream}
 \alias{traverse_upstream}
-\title{Traverse upstream along a stream network from a given point}
+\title{Traverse upstream along a stream network}
 \usage{
-traverse_upstream(lines_sf, start_segment_id, start_fraction, X)
+traverse_upstream(lines_sf, segment_id, start_fraction, max_distance)
 }
 \arguments{
-\item{lines_sf}{sf object with columns `subc_id`, `target`, `length`, and LINESTRING geometry}
+\item{lines_sf}{An `sf` object representing the stream network with columns
+`subc_id`, `target`, and `length`.}
 
-\item{start_segment_id}{ID of the segment to start from}
+\item{segment_id}{Character or numeric. The starting segment ID.}
 
-\item{start_fraction}{Fraction along segment to start (0=start, 1=end)}
+\item{start_fraction}{Numeric between 0 and 1. The fractional position along
+the starting segment (0 = start of segment, 1 = end of segment).}
 
-\item{X}{Numeric. Distance to traverse upstream}
+\item{max_distance}{Numeric. Maximum distance to traverse upstream (in the
+same units as `length` column in `lines_sf`).}
 }
 \value{
-list with elements:
-  - `geoms`: list of LINESTRING geometries
-  - `data`: list of segment attributes with updated lengths
+A list of segment information, where each element contains:
+  \item{subc_id}{Segment ID}
+  \item{fraction_start}{Starting fraction along the segment}
+  \item{fraction_end}{Ending fraction along the segment}
+  \item{length_used}{Length of segment used in the traversal}
 }
 \description{
-Extracts all segments upstream of a starting point along a stream network
-up to a cumulative distance `X`. Handles branching and partial segments.
+Starting from a given segment and position along that segment, this function
+traverses upstream along the network for a specified distance, collecting
+all segments (or partial segments) encountered. Handles branching networks
+by exploring all upstream tributaries.
+}
+\details{
+The function explores upstream by finding all segments whose `target` points
+to the current segment. It uses a queue-based approach to handle multiple
+upstream branches, avoiding revisiting segments. Partial segments are included
+if the distance budget is exhausted partway through a segment.
 }
 \keyword{internal}
