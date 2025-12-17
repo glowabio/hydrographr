@@ -5,7 +5,7 @@ author: ""
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Case study - Danube basin}
+  %\VignetteIndexEntry{Case study - Danube Basin (Environment90m)}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 bibliography: bib/references_danube.bib
