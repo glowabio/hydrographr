@@ -97,7 +97,7 @@ dir.create("data")
 
 We first download the occurrence data with coordinates from GBIF
 
-```{r, eval = T}
+```{r, eval = F}
 # Once: Download species occurrence data based on the key of the dataset
 # and write out to working directory
 spdata_all <- occ_download_get(key="0004551-231002084531237",
@@ -171,6 +171,7 @@ saveWidget(spdata_plot, file=paste0(here(), "/man/figures/germany_map.html"))
 ```
 
 ![](../man/figures/germany_map.png){width="800"}
+
 ### Abiotic variables data
 
 #### 1. Hydrography90m
