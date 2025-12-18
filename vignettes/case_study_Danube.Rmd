@@ -11,7 +11,7 @@ vignette: >
 bibliography: bib/references_danube.bib
 link-citations: yes
 linkcolor: blue
-csl: apa-6th-edition.csl
+# csl: apa-6th-edition.csl
 bib-latex-options: "style=apa, sorting=nyt, backend=biber, maxcitenames=2, useprefix, doi=true, isbn=false, uniquename=false"
 # nocite: '@*'
 editor_options:
@@ -587,7 +587,7 @@ saveWidget(p, file=paste0(wdir, "/prediction_map.html"))
 p
 ```
 ```{r danube-prediction, fig.cap = "Figure 4. Habitat suitability map of the species in the Danube basin", echo = F, out.width='80%'}
-# knitr::include_graphics(here( "man", "figures", "danube_prediction_map.png"))
+knitr::include_graphics(here( "man", "figures", "danube_prediction_map.png"))
 
 ```
 
