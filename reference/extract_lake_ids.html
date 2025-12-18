@@ -24,7 +24,7 @@ of point occurrences or falling within a bounding box"></head><body>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/benchmark.html">Function benchmarks</a></li>
     <li><a class="dropdown-item" href="../articles/case_study_brazil.html">Case study - São Francisco drainage basin</a></li>
     <li><a class="dropdown-item" href="../articles/case_study_cuba.html">Case study - Cuba</a></li>
-    <li><a class="dropdown-item" href="../articles/case_study_Danube.html">Case study - Danube basin</a></li>
+    <li><a class="dropdown-item" href="../articles/case_study_Danube.html">Case study - Danube Basin (Environment90m)</a></li>
     <li><a class="dropdown-item" href="../articles/case_study_germany.html">Case study - Germany</a></li>
     <li><a class="dropdown-item" href="../articles/case_study_lakes.html">Case study - Lake Analysis</a></li>
     <li><a class="dropdown-item" href="../articles/example_other_stream_networks.html">Usage of hydrographr with other stream networks</a></li>
@@ -95,7 +95,7 @@ when NULL a lake raster file needs to be provided</p></dd>
 
 
 <dt id="arg-var-name">var_name<a class="anchor" aria-label="anchor" href="#arg-var-name"></a></dt>
-<dd><p>character. Name of the shapefile ID column, i.e. "Hylak_id"
+<dd><p>character. Name of the shape file ID column, i.e. "Hylak_id"
 for HydroLAKES; default is "Hylak_id"</p></dd>
 
 
@@ -110,11 +110,13 @@ if NULL see parameter bbox</p></dd>
 
 
 <dt id="arg-xmax">xmax<a class="anchor" aria-label="anchor" href="#arg-xmax"></a></dt>
-<dd><p>integer. bounding box coordinate upper right corner in WGS84; if NULL see parameter bbox</p></dd>
+<dd><p>integer. bounding box coordinate upper right corner in WGS84;
+if NULL see parameter bbox</p></dd>
 
 
 <dt id="arg-ymax">ymax<a class="anchor" aria-label="anchor" href="#arg-ymax"></a></dt>
-<dd><p>integer. bounding box coordinate upper left corner in WGS84; if NULL see parameter bbox</p></dd>
+<dd><p>integer. bounding box coordinate upper left corner in WGS84;
+if NULL see parameter bbox</p></dd>
 
 
 <dt id="arg-bbox">bbox<a class="anchor" aria-label="anchor" href="#arg-bbox"></a></dt>
@@ -134,23 +136,18 @@ located are returned, default is FALSE</p></dd>
 <dd><p>logical. If FALSE, the standard output will be printed.
 Default is TRUE.</p></dd>
 
-
-<dt id="arg-lake-raster">lake_raster<a class="anchor" aria-label="anchor" href="#arg-lake-raster"></a></dt>
-<dd><p>Full path to lake raster file; note this option only works
-with bbox = FALSE and will result in the raster extraction at point occurrence locations;
-when NULL lake ids are extracted from lake shape file; default is NULL</p></dd>
-
-
-<dt id="arg-read">read<a class="anchor" aria-label="anchor" href="#arg-read"></a></dt>
-<dd><p>logical. If TRUE, then the model .csv table
-gets read into R as data.table and data.frame.
-if FALSE, the table is only stored on disk. Default is FALSE.</p></dd>
-
 </dl></div>
     <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>For the extraction of a value at a given point location from the basin
+and/or sub-catchment raster layer of the Hydrography90m dataset, the GDAL
+function 'gdallocationinfo' is used. The point locations have to be defined
+by coordinates in the WGS84 reference system.</p>
+    </div>
+    <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
-    <p>add reference manual html here
-https://grass.osgeo.org/grass82/manuals/</p>
+    <p>https://grass.osgeo.org/grass82/manuals/
+<a href="https://gdal.org/programs/gdallocationinfo.html" class="external-link">https://gdal.org/programs/gdallocationinfo.html</a></p>
     </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
@@ -159,7 +156,55 @@ https://grass.osgeo.org/grass82/manuals/</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># Download test data into the temporary R folder</span></span>
+<span><span class="co"># or define a different directory</span></span>
+<span><span class="va">my_directory</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="download_test_data.html">download_test_data</a></span><span class="op">(</span><span class="va">my_directory</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Example 1: Extracts lake IDs for points located within a lake</span></span>
+<span></span>
+<span><span class="co"># Load occurrence data</span></span>
+<span></span>
+<span><span class="va">species_occurrence</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.table</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">my_directory</span>,</span>
+<span>                                     <span class="st">"/hydrography90m_test_data"</span>,</span>
+<span>                                     <span class="st">"/spdata_1264942.txt"</span><span class="op">)</span>,</span>
+<span>                                     header <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># extract lake IDs which intersect with species point occurrences</span></span>
+<span><span class="fu">extract_lake_ids</span><span class="op">(</span>data <span class="op">=</span> <span class="va">species_occurrence</span>,</span>
+<span>                 lon <span class="op">=</span> <span class="st">"longitude"</span>,</span>
+<span>                 lat <span class="op">=</span> <span class="st">"latitude"</span>,</span>
+<span>                 var_name <span class="op">=</span> <span class="st">"lake_id"</span>,</span>
+<span>                 lake_shape <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">my_directory</span>, <span class="st">"/hydrography90m_test_data"</span>,</span>
+<span>                                     <span class="st">"/hydrography90m_test_lakes.gpkg"</span><span class="op">)</span>,</span>
+<span>                 lake_id_table <span class="op">=</span> <span class="va">output_folder</span>,</span>
+<span>                 quiet <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># extract lake IDs from bounding box taken from species point occurrences</span></span>
+<span><span class="fu">extract_lake_ids</span><span class="op">(</span>data <span class="op">=</span> <span class="va">species_occurrence</span>,</span>
+<span>                lon <span class="op">=</span> <span class="st">"longitude"</span>,</span>
+<span>                lat <span class="op">=</span> <span class="st">"latitude"</span>,</span>
+<span>                var_name <span class="op">=</span> <span class="st">"lake_id"</span>,</span>
+<span>                lake_shape <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">my_directory</span>, <span class="st">"/hydrography90m_test_data"</span>,</span>
+<span>                                    <span class="st">"/hydrography90m_test_lakes.gpkg"</span><span class="op">)</span>,</span>
+<span>                bbox <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>                lake_id_table <span class="op">=</span> <span class="va">output_folder</span>,</span>
+<span>                quiet <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># extract lake IDs from provided bounding box</span></span>
+<span><span class="fu">extract_lake_ids</span><span class="op">(</span>data <span class="op">=</span> <span class="va">species_occurrence</span>,</span>
+<span>                 lon <span class="op">=</span> <span class="st">"longitude"</span>,</span>
+<span>                 lat <span class="op">=</span> <span class="st">"latitude"</span>,</span>
+<span>                 xmin <span class="op">=</span> <span class="fl">9.498263</span>,</span>
+<span>                 ymin <span class="op">=</span> <span class="fl">44.21651</span>,</span>
+<span>                 xmax <span class="op">=</span> <span class="fl">29.71806</span>,</span>
+<span>                 ymax <span class="op">=</span> <span class="fl">50.25584</span>,</span>
+<span>                 var_name <span class="op">=</span> <span class="st">"lake_id"</span>,</span>
+<span>                 lake_shape <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">my_directory</span>, <span class="st">"/hydrography90m_test_data"</span>,</span>
+<span>                                     <span class="st">"/hydrography90m_test_lakes.gpkg"</span><span class="op">)</span>,</span>
+<span>                 bbox <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>                 lake_id_table <span class="op">=</span> <span class="va">output_folder</span>,</span>
+<span>                 quiet <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>

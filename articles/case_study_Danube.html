@@ -5,12 +5,12 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Case study - Danube basin • hydrographr</title>
+<title>Case study - Danube Basin (Environment90m) • hydrographr</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Case study - Danube basin">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Case study - Danube Basin (Environment90m)">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -37,7 +37,7 @@
 <li><a class="dropdown-item" href="../articles/benchmark.html">Function benchmarks</a></li>
     <li><a class="dropdown-item" href="../articles/case_study_brazil.html">Case study - São Francisco drainage basin</a></li>
     <li><a class="dropdown-item" href="../articles/case_study_cuba.html">Case study - Cuba</a></li>
-    <li><a class="dropdown-item" href="../articles/case_study_Danube.html">Case study - Danube basin</a></li>
+    <li><a class="dropdown-item" href="../articles/case_study_Danube.html">Case study - Danube Basin (Environment90m)</a></li>
     <li><a class="dropdown-item" href="../articles/case_study_germany.html">Case study - Germany</a></li>
     <li><a class="dropdown-item" href="../articles/case_study_lakes.html">Case study - Lake Analysis</a></li>
     <li><a class="dropdown-item" href="../articles/example_other_stream_networks.html">Usage of hydrographr with other stream networks</a></li>
@@ -65,12 +65,12 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
 
-      <h1>Case study - Danube basin</h1>
+      <h1>Case study - Danube Basin (Environment90m)</h1>
             <h3 data-toc-skip class="subtitle">Retrieving and processing
 the Environment90m dataset for Species Distribution Modelling</h3>
                         <h4 data-toc-skip class="author"></h4>
             
-            <h4 data-toc-skip class="date">2025-12-12</h4>
+            <h4 data-toc-skip class="date">2025-12-18</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/glowabio/hydrographr/blob/HEAD/vignettes/case_study_Danube.Rmd" class="external-link"><code>vignettes/case_study_Danube.Rmd</code></a></small>
       <div class="d-none name"><code>case_study_Danube.Rmd</code></div>
@@ -83,7 +83,7 @@ the Environment90m dataset for Species Distribution Modelling</h3>
 </h2>
 <p>The following workflow uses the new functionalities of the
 hydrographr R package to download and process the Hydrography90m <span class="citation">(<a href="#ref-amatulli2022hydrography90m">Amatulli et
-al., 2022</a>)</span> and the Environment90m <span class="citation">(<a href="#ref-garcia2025environment90m">García Márquez et al.,
+al. 2022</a>)</span> and the Environment90m <span class="citation">(<a href="#ref-garcia2025environment90m">García Márquez et al.
 2025</a>)</span> datasets with the aim of preparing and processing the
 data needed to run a species distribution model to predict the habitat
 suitability of a fish species in the Danube basin.</p>
@@ -420,7 +420,7 @@ and save some disk space.</p>
 <em>Zingel streber</em> from the GBIF repository. The final table
 consists of three columns: species name, longitude and latitude
 coordinates. The original data can be found <a href="https://www.gbif.org/occurrence/download/0028469-231002084531237" class="external-link">here</a>
-<span class="citation">(<a href="#ref-gbifdata">GBIF.Org User,
+<span class="citation">(<a href="#ref-gbifdata">GBIF.Org User
 2023</a>)</span>.</p>
 <p>Read the file into the R session and have a look at it</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
@@ -641,23 +641,25 @@ Figure 4. Habitat suitability map of the species in the Danube basin
 <div class="section level3 unnumbered">
 <h3 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h3>
-<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0" line-spacing="2">
+<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
 <div id="ref-amatulli2022hydrography90m" class="csl-entry">
-Amatulli, G., Garcia Marquez, J., Sethi, T., Kiesel, J., Grigoropoulou,
-A., Üblacker, M. M., … Domisch, S. (2022). Hydrography90m: A new
-high-resolution global hydrographic dataset. <em>Earth System Science
-Data</em>, <em>14</em>(10), 4525–4550.
+Amatulli, Giuseppe, Jaime Garcia Marquez, Tushar Sethi, Jens Kiesel,
+Afroditi Grigoropoulou, Maria M Üblacker, Longzhu Q Shen, and Sami
+Domisch. 2022. <span>“Hydrography90m: A New High-Resolution Global
+Hydrographic Dataset.”</span> <em>Earth System Science Data</em> 14
+(10): 4525–50.
 </div>
 <div id="ref-garcia2025environment90m" class="csl-entry">
-García Márquez, J. R., Grigoropoulou, A., Tomiczek, T., Schürz, M.,
-Bremerich, V., Torres-Cambas, Y., … Domisch, S. (2025).
-<em>Environment90m: Globally standardized environmental variables for
-spatial freshwater biodiversity science at high spatial resolution</em>
-[Manuscript in preparation].
+García Márquez, Jaime R., Afroditi Grigoropoulou, Thomas Tomiczek,
+Marlene Schürz, Vanessa Bremerich, Yusdiel Torres-Cambas, Merret
+Buurman, Kristi Bego, Giuseppe Amatulli, and Sami Domisch. 2025.
+<span>“Environment90m: Globally Standardized Environmental Variables for
+Spatial Freshwater Biodiversity Science at High Spatial
+Resolution.”</span> Manuscript in preparation.
 </div>
 <div id="ref-gbifdata" class="csl-entry">
-GBIF.Org User. (2023). <em>Occurrence download</em>. The Global
-Biodiversity Information Facility. <a href="https://doi.org/10.15468/DL.QC7E3S" class="external-link">https://doi.org/10.15468/DL.QC7E3S</a>
+GBIF.Org User. 2023. <span>“Occurrence Download.”</span> The Global
+Biodiversity Information Facility. <a href="https://doi.org/10.15468/DL.QC7E3S" class="external-link">https://doi.org/10.15468/DL.QC7E3S</a>.
 </div>
 </div>
 </div>

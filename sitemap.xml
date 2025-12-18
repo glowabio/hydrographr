@@ -26,8 +26,11 @@
 <url><loc>/reference/extract_ids.html</loc></url>
 <url><loc>/reference/extract_lake_ids.html</loc></url>
 <url><loc>/reference/extract_zonal_stat.html</loc></url>
+<url><loc>/reference/figures/danube_map.html</loc></url>
+<url><loc>/reference/figures/germany_map.html</loc></url>
 <url><loc>/reference/fix_path.html</loc></url>
 <url><loc>/reference/get_all_upstream_distances.html</loc></url>
+<url><loc>/reference/get_buffer_along_the_network.html</loc></url>
 <url><loc>/reference/get_catchment_graph.html</loc></url>
 <url><loc>/reference/get_centrality.html</loc></url>
 <url><loc>/reference/get_distance.html</loc></url>
@@ -54,5 +57,7 @@
 <url><loc>/reference/snap_to_network.html</loc></url>
 <url><loc>/reference/snap_to_subc_segment.html</loc></url>
 <url><loc>/reference/split_table.html</loc></url>
+<url><loc>/reference/traverse_downstream.html</loc></url>
+<url><loc>/reference/traverse_upstream.html</loc></url>
 </urlset>
 
