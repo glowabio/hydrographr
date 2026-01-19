@@ -238,3 +238,9 @@ traverse_upstream <- function(lines_sf, segment_id, start_fraction, max_distance
   return(collected)
 }
 
+
+#' Helper operator for NULL coalescing
+#' @keywords internal
+`%||%` <- function(x, y) if (is.null(x)) y else x
+
+
