@@ -90,6 +90,16 @@ Imports:
 Suggests:
     testthat
 Collate:
+    'api_filter_by_attribute.R'
+    'api_get_basin_stream_segments.R'
+    'api_get_env90m_data.R'
+    'api_get_local_ids.R'
+    'api_get_local_ids_point.R'
+    'api_get_snapped_points.R'
+    'api_get_snapped_points_cascade_plural.R'
+    'api_get_snapped_points_df.R'
+    'api_get_snapped_points_strahler_plural.R'
+    'api_get_upstream_subcids.R'
     'check_tiles_filesize.R'
     'crop_to_extent.R'
     'download_env90m_tables.R'
@@ -99,6 +109,7 @@ Collate:
     'extract_from_gpkg.R'
     'extract_ids.R'
     'extract_lake_ids.R'
+    'extract_partial_stream_network.R'
     'extract_zonal_stat.R'
     'get_all_upstream_distances.R'
     'get_buffer_along_the_network.R'
@@ -126,3 +137,8 @@ Collate:
     'snap_to_network.R'
     'snap_to_subc_segment.R'
     'split_table.R'
+    'api_get_job_results.R'
+    'api_poll_job.R'
+    'api_get_snapped_points_strahler_async.R'
+    'api_get_snapped_points_cascade_async.R'
+    'api_get_basin_polygon.R'
