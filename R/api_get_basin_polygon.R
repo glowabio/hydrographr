@@ -210,7 +210,7 @@ api_get_basin_polygon <- function(basin_id = NULL,
 
   message(sprintf("Retrieving %d basin polygon(s)...", length(basin_ids)))
 
-  process_url <- "https://aqua.igb-berlin.de/pygeoapi-dev/processes/get-basin-polygon/execution"
+  process_url <- "https://aqua.igb-berlin.de/pygeoapi/processes/get-basin-polygon/execution"
 
   polygons_list <- list()
 

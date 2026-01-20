@@ -68,7 +68,7 @@ api_filter_by_attribute <- function(csv_url, keep = NULL, conditions = NULL, com
   )
 
   resp <- httr::POST(
-    url = "https://aqua.igb-berlin.de/pygeoapi-dev/processes/filter-by-attribute/execution",
+    url = "https://aqua.igb-berlin.de/pygeoapi/processes/filter-by-attribute/execution",
     httr::add_headers(`Content-Type` = "application/json"),
     body = jsonlite::toJSON(body, auto_unbox = TRUE)
   )

@@ -1,6 +1,6 @@
 api_get_local_ids_point <- function(subc_id, which_ids = "basin_id", comment = NULL) {
 
-  process_url <- "https://aqua.igb-berlin.de/pygeoapi-dev/processes/get-local-ids/execution"
+  process_url <- "https://aqua.igb-berlin.de/pygeoapi/processes/get-local-ids/execution"
 
   inputs <- list(
     subc_id = subc_id,

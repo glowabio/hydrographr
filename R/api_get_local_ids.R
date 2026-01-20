@@ -40,7 +40,7 @@ api_get_local_ids <- function(csv_url,
   }
 
   # ---- Define process URL ----
-  process_url <- "https://aqua.igb-berlin.de/pygeoapi-dev/processes/get-local-ids-plural/execution"
+  process_url <- "https://aqua.igb-berlin.de/pygeoapi/processes/get-local-ids-plural/execution"
 
   # ---- Build request body ----
   inputs <- list(

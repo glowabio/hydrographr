@@ -53,7 +53,7 @@ api_get_basin_streamsegments <- function(basin_id = NULL,
 
 # --- Construct body ------------------------------------------------
 # Define process url
-process_url <- "https://aqua.igb-berlin.de/pygeoapi-dev/processes/get-basin-streamsegments/execution"
+process_url <- "https://aqua.igb-berlin.de/pygeoapi/processes/get-basin-streamsegments/execution"
 
 # Assemble inputs dynamically
 inputs <- list(
@@ -138,7 +138,7 @@ return(segm_sf)
 #   # body <- jsonlite::toJSON(list(inputs = inputs), auto_unbox = TRUE)
 #
 #   # --- POST request ---
-#   url <- "https://aqua.igb-berlin.de/pygeoapi-dev/processes/get-basin-streamsegments/execution"
+#   url <- "https://aqua.igb-berlin.de/pygeoapi/processes/get-basin-streamsegments/execution"
 #
 #   # # Assemble inputs dynamically
 #   # inputs <- list(

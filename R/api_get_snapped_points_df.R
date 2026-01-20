@@ -66,9 +66,9 @@ api_get_snapped_points_df <- function(df,
 
   # ---- Select API endpoint ----
   process_url <- if (is.null(strahler) || isTRUE(strahler == 1)) {
-    "https://aqua.igb-berlin.de/pygeoapi-dev/processes/get-snapped-points-plural/execution"
+    "https://aqua.igb-berlin.de/pygeoapi/processes/get-snapped-points-plural/execution"
   } else {
-    "https://aqua.igb-berlin.de/pygeoapi-dev/processes/get-snapped-points-strahler/execution"
+    "https://aqua.igb-berlin.de/pygeoapi/processes/get-snapped-points-strahler/execution"
   }
 
   # ---- Build request body ----

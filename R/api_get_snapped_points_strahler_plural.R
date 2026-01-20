@@ -48,7 +48,7 @@ api_get_snapped_points_strahler_plural <- function(
     stop("min_strahler must be provided.")
   }
 
-  process_url <- "https://aqua.igb-berlin.de/pygeoapi-dev/processes/get-snapped-points-strahler-plural/execution"
+  process_url <- "https://aqua.igb-berlin.de/pygeoapi/processes/get-snapped-points-strahler-plural/execution"
 
   # Build POST body
   body <- list(

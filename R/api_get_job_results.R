@@ -9,7 +9,7 @@
 #' @export
 api_get_job_results <- function(
     jobID,
-    base_url = "https://aqua.igb-berlin.de/pygeoapi-dev",
+    base_url = "https://aqua.igb-berlin.de/pygeoapi",
     as_dataframe = TRUE
 ) {
 
