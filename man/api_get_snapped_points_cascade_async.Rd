@@ -54,7 +54,6 @@ A data.frame containing all successfully snapped points with columns:
   \item{longitude_snapped, latitude_snapped}{Coordinates of snapped location}
   \item{longitude_original, latitude_original}{Original input coordinates}
   \item{distance_metres}{Snapping distance in meters}
-  \item{strahler_level}{The Strahler level at which this point was successfully snapped}
 }
 If no points were successfully snapped, returns an empty data.frame.
 }
@@ -130,7 +129,6 @@ result <- api_get_snapped_points_cascade_debug(
 # Check results and diagnostic output
 head(result)
 summary(result$distance_metres)  # Snapping distances
-table(result$strahler_level)     # Distribution across Strahler levels
 
 # Review console output for:
 # - Data loss warnings (⚠️)
