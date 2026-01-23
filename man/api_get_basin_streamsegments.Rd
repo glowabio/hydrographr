@@ -51,6 +51,7 @@ leaflet(segm_sf) |>
 Other ocgapi: 
 \code{\link{api_filter_by_attribute}()},
 \code{\link{api_get_basin_polygon}()},
+\code{\link{api_get_basin_subcids}()},
 \code{\link{api_get_env90m_data}()},
 \code{\link{api_get_local_ids}()},
 \code{\link{api_get_snapped_points}()},
