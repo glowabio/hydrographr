@@ -113,11 +113,13 @@ for (i in seq_along(unique_basins)) {
   message(sprintf("[%d/%d] Basin %s...", i, length(unique_basins), basin))
 
   tryCatch({
-    stream_sf <- api_get_basin_str
-    eamsegments(
+    stream_sf <- api_get_basin_streamsegments(
       basin_id = basin,
       strahler_min = min(all_snapped$strahler)
     )
+
+    # ADD BASIN_ID COLUMN
+    stream_sf$basin_id <- basin
 
     stream_networks[[as.character(basin)]] <- stream_sf
 
@@ -135,7 +137,7 @@ if (length(stream_networks) > 0) {
   st_write(all_streams, temp_path, delete_dsn = TRUE)
 
   # Copy to nimbus
-  nimbus_dest <- file.path(nimbus_path, "stream_networks/all_stream_networks.gpkg")
+  nimbus_dest <- file.path(nimbus_path, "spatial/stream_networks/all_stream_networks.gpkg")
   system2("cp", args = c(shQuote(temp_path), shQuote(nimbus_dest)))
   unlink(temp_path)
 
@@ -154,9 +156,10 @@ all_streams_filtered <- extract_partial_stream_network(
   all_streams,
     all_snapped$subc_id,
     strahler_retain_threshold = 4,
-    upstream_buffer = 2      # number of upstream segments to include
+    upstream_buffer = 3      # number of upstream segments to include
 )
 
+save_to_nimbus(all_streams_filtered, "spatial/stream_networks/partial_stream_network2.gpkg")
 
 # ============================================================================
 # FINAL SUMMARY
