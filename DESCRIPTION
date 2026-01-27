@@ -96,7 +96,6 @@ Collate:
     'api_get_local_ids.R'
     'api_get_local_ids_point.R'
     'api_get_snapped_points.R'
-    'api_get_snapped_points_cascade_plural.R'
     'api_get_snapped_points_df.R'
     'api_get_snapped_points_strahler_plural.R'
     'api_get_upstream_subcids.R'

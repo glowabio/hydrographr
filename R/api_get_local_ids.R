@@ -1,30 +1,48 @@
 #' Retrieve Local IDs for Sampling Sites
 #'
-#' Queries the GeoFRESH API to obtain regional unit, basin,
-#' and subcatchment IDs for a set of sampling locations.
-#' Handles both single-point and multi-point inputs.
+#' @description
+#' Queries the GeoFRESH API to obtain regional unit, basin, and subcatchment
+#' IDs for sampling locations provided via a CSV file. Useful for linking
+#' observational data to the stream network hierarchy.
 #'
 #' @family ocgapi
-#' @param csv_url URL to a CSV file hosted online.
-#' @param colname_lat Name of the latitude column in CSV file.
-#' @param colname_lon Name of the longitude column in CSV file.
-#' @param colname_site_id Name of the site ID column in CSV file.
-#' @param colname_subc_id Name of the subcatchment ID column in CSV file (optional).
-#' @param which_ids Which ID type(s) to retrieve, e.g. `"reg_id"`, `"basin_id"`,
-#' `"subc_id"`.
-#' @param comment Optional comment string.
+#' @param csv_url Character. URL to a CSV file hosted online (must be publicly
+#'   accessible via HTTP/HTTPS).
+#' @param colname_lat Character. Name of the latitude column in CSV.
+#'   Default: `"latitude"`.
+#' @param colname_lon Character. Name of the longitude column in CSV.
+#'   Default: `"longitude"`.
+#' @param colname_site_id Character. Name of the site ID column in CSV.
+#'   Default: `"site_id"`.
+#' @param colname_subc_id Character (optional). Name of the subcatchment ID
+#'   column in CSV if pre-computed IDs should be used. Default: `NULL`.
+#' @param which_ids Character. ID type(s) to retrieve. Options: `"reg_id"`,
+#'   `"basin_id"`, `"subc_id"`. Default: `"reg_id"`.
+#' @param comment Character (optional). Comment for request logging.
+#'   Default: `NULL`.
 #'
-#' @return A list with two elements:
-#' \describe{
-#'   \item{data}{A `data.frame` with the retrieved IDs.}
-#'   \item{href}{A `character` string with the URL of the output CSV.}
+#' @return A list containing:
+#'   \describe{
+#'     \item{data}{data.frame. Retrieved IDs with one row per site.}
+#'     \item{href}{Character. URL of the output CSV file.}
+#'   }
+#'
+#' @examples
+#' \dontrun{
+#' # Retrieve basin IDs for sampling sites
+#' result <- api_get_local_ids(
+#'   csv_url = "https://example.com/sites.csv",
+#'   which_ids = "basin_id"
+#' )
+#'
+#' # Access the data
+#' head(result$data)
 #' }
 #'
-#' @import httr
-#' @import jsonlite
-#' @import dplyr
 #' @export
-#' @author Afroditi Grigoropoulou, Merret Buurman
+#' @importFrom httr POST add_headers status_code content
+#' @importFrom jsonlite toJSON
+#' @importFrom data.table fread
 api_get_local_ids <- function(csv_url,
                               colname_lat = "latitude",
                               colname_lon = "longitude",

@@ -14,67 +14,64 @@ api_get_basin_subcids(
 )
 }
 \arguments{
-\item{basin_id}{Integer. The ID of the basin. If NULL, must provide longitude
-and latitude.}
+\item{basin_id}{Integer (optional). Basin ID to query. If `NULL`, must
+provide `longitude` and `latitude`. Default: `NULL`.}
 
-\item{longitude}{Numeric. Longitude of a point to determine the basin (used if
-basin_id is NULL).}
+\item{longitude}{Numeric (optional). Point longitude to determine basin.
+Used only if `basin_id` is `NULL`. Default: `NULL`.}
 
-\item{latitude}{Numeric. Latitude of a point to determine the basin (used if
-basin_id is NULL).}
+\item{latitude}{Numeric (optional). Point latitude to determine basin.
+Used only if `basin_id` is `NULL`. Default: `NULL`.}
 
-\item{min_strahler}{Integer. Minimum Strahler order to filter subcatchments.
-Default: NULL (no filtering).}
+\item{min_strahler}{Integer (optional). Minimum Strahler order filter.
+Only subcatchments with Strahler >= this value returned.
+Default: `NULL` (no filtering).}
 
-\item{comment}{Character. Optional comment for API logging.}
+\item{comment}{Character (optional). Comment for API logging.
+Default: `NULL`.}
 
-\item{force_async}{Logical. NULL = auto-detect based on expected result size,
-TRUE = force async mode, FALSE = force sync mode. Default: TRUE (always async).}
+\item{force_async}{Logical (optional). Force async/sync mode:
+`NULL` = auto-detect, `TRUE` = force async, `FALSE` = force sync.
+Default: `TRUE`.}
 }
 \value{
-A list with:
+A list with elements depending on execution mode:
   \describe{
-    \item{data}{A data.frame with subcatchment IDs (if sync mode)}
-    \item{href}{The download link returned by the API (if sync mode)}
-    \item{jobID}{Job ID for async jobs (if async mode)}
-    \item{status}{Job status (if async mode)}
-    \item{async}{Logical indicating whether async mode was used}
+    \item{async}{Logical. Whether async mode was used.}
+    \item{jobID}{Character. Job ID (async mode only).}
+    \item{status}{Character. Job status (async mode only).}
+    \item{data}{data.frame. Subcatchment IDs (sync mode only).}
+    \item{href}{Character. Download URL (sync mode only).}
   }
+  For async jobs, use `api_poll_job(result$jobID)` to check completion.
 }
 \description{
-This function queries the API to get a list of subcatchment IDs within a basin.
-Two input modes are supported:
-1. Direct basin_id
-2. Point coordinates (lon/lat) - basin is determined from the point location
-
-For large basins or low Strahler thresholds, the function automatically uses
-async mode and returns a job object that must be polled using api_poll_job().
-}
-\details{
 Retrieves all subcatchment IDs within a basin from the GeoFRESH API,
-optionally filtered by minimum Strahler order. Can accept either a basin_id
-or point coordinates. Uses async mode for large requests.
+optionally filtered by minimum Strahler order. Accepts either a basin ID
+or point coordinates. Large requests automatically use async mode.
+
+**Input modes:**
+\itemize{
+  \item Direct `basin_id` (if known)
+  \item Point coordinates (lon/lat) - basin determined from location
+}
 }
 \examples{
 \dontrun{
-# Method 1: Using basin_id
+# Example 1: Using basin ID
 job <- api_get_basin_subcids(
   basin_id = 1288419,
-  min_strahler = 6,
-  comment = "high-order streams only"
+  min_strahler = 6
 )
-# Poll for results
 result <- api_poll_job(job$jobID)
 subcids <- api_get_job_results(result$href)
 
-# Method 2: Using coordinates
+# Example 2: Using point coordinates
 job <- api_get_basin_subcids(
   longitude = 8.278198,
   latitude = 53.549107,
   min_strahler = 6
 )
-result <- api_poll_job(job$jobID)
-subcids <- api_get_job_results(result$href)
 }
 
 }
@@ -84,16 +81,13 @@ Other ocgapi:
 \code{\link{api_get_basin_polygon}()},
 \code{\link{api_get_basin_streamsegments}()},
 \code{\link{api_get_env90m_data}()},
+\code{\link{api_get_job_results}()},
 \code{\link{api_get_local_ids}()},
 \code{\link{api_get_snapped_points}()},
 \code{\link{api_get_snapped_points_cascade_async}()},
-\code{\link{api_get_snapped_points_cascade_plural}()},
 \code{\link{api_get_snapped_points_df}()},
 \code{\link{api_get_snapped_points_strahler_async}()},
 \code{\link{api_get_snapped_points_strahler_plural}()},
 \code{\link{api_get_upstream_subcids}()}
-}
-\author{
-Afroditi Grigoropoulou, Merret Buurman
 }
 \concept{ocgapi}

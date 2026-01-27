@@ -1,12 +1,39 @@
-#' Download and return results from a completed job
+#' Download Results from Completed Async Job
 #'
-#' @param jobID Character. Job ID or the result object from api_poll_job().
-#' @param base_url Character. Base URL for the pygeoapi instance.
-#' @param as_dataframe Logical. If TRUE (default), return dataframe. If FALSE, return URL only.
+#' @description
+#' Downloads and returns the results from a completed asynchronous job.
+#' Can return either the data as a data.frame or just the download URL.
 #'
-#' @return Data frame with the results, or character URL if as_dataframe = FALSE
+#' @family ocgapi
+#' @param jobID Character. Job ID string or result object from `api_poll_job()`.
+#' @param base_url Character. Base URL for pygeoapi instance.
+#'   Default: `"https://aqua.igb-berlin.de"`.
+#' @param as_dataframe Logical. If `TRUE`, download and return data.frame.
+#'   If `FALSE`, return URL only. Default: `TRUE`.
+#'
+#' @return Depends on `as_dataframe`:
+#'   \itemize{
+#'     \item If `TRUE`: data.frame with job results
+#'     \item If `FALSE`: Character string with download URL
+#'   }
+#'
+#' @examples
+#' \dontrun{
+#' # After polling shows job is complete
+#' job_status <- api_poll_job("abc123")
+#'
+#' # Example 1: Get results as data.frame
+#' results_df <- api_get_job_results(job_status)
+#'
+#' # Example 2: Get only the URL
+#' results_url <- api_get_job_results(
+#'   job_status,
+#'   as_dataframe = FALSE
+#' )
+#' }
 #'
 #' @export
+#' @importFrom data.table fread
 api_get_job_results <- function(
     jobID,
     base_url = "https://aqua.igb-berlin.de/pygeoapi",

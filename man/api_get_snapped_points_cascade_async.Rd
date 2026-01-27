@@ -2,7 +2,7 @@
 % Please edit documentation in R/api_get_snapped_points_cascade_async.R
 \name{api_get_snapped_points_cascade_async}
 \alias{api_get_snapped_points_cascade_async}
-\title{Cascade Snapping Workflow with Multiple Strahler Levels (Debug Version)}
+\title{Snap Points to Stream Network (Cascade Workflow)}
 \usage{
 api_get_snapped_points_cascade_async(
   csv_url,
@@ -17,146 +17,109 @@ api_get_snapped_points_cascade_async(
 )
 }
 \arguments{
-\item{csv_url}{Character. URL to a CSV file containing point data to snap.
-The CSV must be publicly accessible via HTTP/HTTPS.}
+\item{csv_url}{Character. URL to CSV file with point data (must be publicly
+accessible via HTTP/HTTPS).}
 
-\item{colname_lon}{Character. Name of the longitude column in the CSV.
-Default: "longitude".}
+\item{colname_lon}{Character. Longitude column name in CSV.
+Default: `"longitude"`.}
 
-\item{colname_lat}{Character. Name of the latitude column in the CSV.
-Default: "latitude".}
+\item{colname_lat}{Character. Latitude column name in CSV.
+Default: `"latitude"`.}
 
-\item{colname_site_id}{Character. Name of the site ID column in the CSV.
-Default: "site_id".}
+\item{colname_site_id}{Character. Site ID column name in CSV.
+Default: `"site_id"`.}
 
-\item{strahler_seq}{Integer vector. Descending sequence of Strahler stream
-orders to try (e.g., `c(4, 3, 2)`). The function starts with the first
-(highest) value and proceeds to lower values as needed.}
+\item{strahler_seq}{Integer vector. Descending Strahler orders to try
+(e.g., `c(4, 3, 2)`). Higher values tried first.}
 
-\item{distance_threshold}{Numeric. Maximum allowed snapping distance in
-meters. Points snapped at a distance greater than this threshold will be
-re-snapped to the next lower Strahler level. Default: 150.}
+\item{distance_threshold}{Numeric. Maximum snapping distance in meters.
+Points exceeding this are re-snapped to next lower Strahler level.
+Default: `150`.}
 
-\item{poll_interval}{Numeric. Seconds to wait between status checks when
-polling async jobs. Default: 10.}
+\item{poll_interval}{Numeric. Seconds between async job status checks.
+Default: `10`.}
 
-\item{max_wait}{Numeric. Maximum seconds to wait for an async job to complete.
-Default: 7200 (2 hours).}
+\item{max_wait}{Numeric. Maximum seconds to wait for job completion.
+Default: `7200` (2 hours).}
 
-\item{debug}{Logical. Enable verbose debugging output. Default: TRUE.}
+\item{debug}{Logical. Enable verbose debugging output.
+Default: `TRUE`.}
 }
 \value{
-A data.frame containing all successfully snapped points with columns:
-\describe{
-  \item{site_id}{Site identifier from original data}
-  \item{subc_id}{Sub-catchment identifier of snapped location}
-  \item{strahler}{Strahler order of the stream segment}
-  \item{longitude_snapped, latitude_snapped}{Coordinates of snapped location}
-  \item{longitude_original, latitude_original}{Original input coordinates}
-  \item{distance_metres}{Snapping distance in meters}
-}
-If no points were successfully snapped, returns an empty data.frame.
+A data.frame with successfully snapped points containing:
+  \describe{
+    \item{site_id}{Character. Site identifier from input data.}
+    \item{subc_id}{Integer. Subcatchment ID of snapped location.}
+    \item{strahler}{Integer. Strahler order of stream segment.}
+    \item{longitude_snapped}{Numeric. Snapped longitude.}
+    \item{latitude_snapped}{Numeric. Snapped latitude.}
+    \item{longitude_original}{Numeric. Original input longitude.}
+    \item{latitude_original}{Numeric. Original input latitude.}
+    \item{distance_metres}{Numeric. Snapping distance in meters.}
+  }
+  Returns empty data.frame if no points successfully snapped.
 }
 \description{
-Performs iterative snapping across a descending sequence of Strahler orders
-with extensive debugging output to diagnose issues in the cascade workflow.
+Snaps points to stream network across descending Strahler orders with
+extensive debugging. Points exceeding distance threshold at higher orders
+are re-snapped to lower orders until successful or all levels exhausted.
 
-Points are first snapped to the highest Strahler level, and any points that
-exceed the maximum snapping distance threshold are re-snapped to the next
-lower Strahler level. This process continues until all points are successfully
-snapped or the lowest Strahler level is reached.
-
-The function uses asynchronous API calls for snapping operations to handle
-large datasets efficiently, but presents a synchronous interface to the user
-by automatically polling and waiting for job completion at each step.
-
-**This is a debug version** that provides detailed diagnostic output at each
-step to help identify data loss or filtering issues.
+Uses asynchronous API calls internally but blocks until completion, providing
+detailed diagnostics at each step for troubleshooting data loss or filtering
+issues.
 }
 \details{
-The workflow proceeds as follows for each Strahler level:
-1. Snap all remaining points to the current Strahler level (async)
-2. Wait for snapping job to complete
-3. Download ALL snapped results for verification
-4. Filter out points snapped within `distance_threshold` (successful)
-5. Filter out points that exceeded the threshold
-6. Verify counts and detect any data loss
-7. If points remain that exceeded the threshold:
-   - Extract their site IDs
-   - Filter the original CSV to get only those points (with original coordinates)
-   - Verify the filtered CSV contains expected points
-   - Proceed to next Strahler level
+**Workflow per Strahler level:**
+\enumerate{
+  \item Submit async snapping job for current Strahler level
+  \item Poll until job completes (with timeout protection)
+  \item Download and verify all snapped results
+  \item Separate points within vs exceeding distance threshold
+  \item Store successful snaps, prepare failed snaps for next level
+  \item Validate counts and check for data loss
+}
 
-Points are always snapped from their original coordinates, not from previously
-snapped locations. This ensures each snapping attempt starts fresh.
+Points always snap from original coordinates (not previously snapped
+locations) to ensure each attempt starts fresh.
 
-**Debug Output Includes:**
-- Row counts at each step
-- Distance statistics (min, max, NA/infinite values)
-- Verification of filter operations (expected vs actual counts)
-- ID matching checks (missing/extra IDs)
-- File size and content validation
-- Success rate calculations
+**Debug output includes:** row counts, distance statistics, filter
+verification, ID matching, file validation, and success rates.
 }
 \note{
-- All intermediate processing happens server-side via the pygeoAPI; only
-  final results are downloaded to R.
-- The function blocks until the entire cascade completes, which may take
-  several minutes for large datasets.
-- Async jobs are used internally for all snapping operations regardless of
-  dataset size to ensure consistency and prevent timeouts.
-- Debug mode downloads ALL snapped results at each level for verification,
-  which may increase runtime slightly.
-- This is a diagnostic version; use the standard `api_get_snapped_points_cascade_plural`
-  for production workflows once issues are resolved.
+\itemize{
+  \item All processing happens server-side; only final results downloaded
+  \item Function blocks until cascade completes (may take minutes for large datasets)
+  \item Debug mode downloads all intermediate results for verification
+  \item Use production version once issues diagnosed
+}
 }
 \examples{
 \dontrun{
-# Debug cascade snapping with default settings
-result <- api_get_snapped_points_cascade_debug(
-  csv_url = "https://example.com/points.csv",
+# Example 1: Debug cascade with custom threshold
+result <- api_get_snapped_points_cascade_async(
+  csv_url = "https://example.com/sites.csv",
+  strahler_seq = c(5, 4, 3),
   distance_threshold = 200
 )
 
-# Custom Strahler sequence with detailed logging
-result <- api_get_snapped_points_cascade_debug(
-  csv_url = "https://example.com/points.csv",
-  strahler_seq = c(5, 4, 3),
-  distance_threshold = 100,
-  debug = TRUE
-)
-
-# Check results and diagnostic output
-head(result)
-summary(result$distance_metres)  # Snapping distances
-
-# Review console output for:
-# - Data loss warnings (⚠️)
-# - Count mismatches
-# - Missing IDs
+# Example 2: Check success rate
+sprintf("Snapped \%d of \%d points", nrow(result), original_count)
 }
 
 }
 \seealso{
-\code{\link{api_get_snapped_points_cascade_plural}} for the production version
-\code{\link{api_get_snapped_points_strahler_async}} for single-level async snapping
-\code{\link{api_filter_by_attribute}} for attribute-based filtering
-
 Other ocgapi: 
 \code{\link{api_filter_by_attribute}()},
 \code{\link{api_get_basin_polygon}()},
 \code{\link{api_get_basin_streamsegments}()},
 \code{\link{api_get_basin_subcids}()},
 \code{\link{api_get_env90m_data}()},
+\code{\link{api_get_job_results}()},
 \code{\link{api_get_local_ids}()},
 \code{\link{api_get_snapped_points}()},
-\code{\link{api_get_snapped_points_cascade_plural}()},
 \code{\link{api_get_snapped_points_df}()},
 \code{\link{api_get_snapped_points_strahler_async}()},
 \code{\link{api_get_snapped_points_strahler_plural}()},
 \code{\link{api_get_upstream_subcids}()}
-}
-\author{
-Afroditi Grigoropoulou, Merret Buurman
 }
 \concept{ocgapi}

@@ -2,39 +2,41 @@
 % Please edit documentation in R/api_get_env90m_data.R
 \name{api_get_env90m_data}
 \alias{api_get_env90m_data}
-\title{Retrieve 90m-Resolution Environmental Variables for Subcatchments}
+\title{Retrieve 90m Environmental Variables for Subcatchments}
 \usage{
 api_get_env90m_data(subc_ids, variables, comment = NULL, chunk_size = 3000)
 }
 \arguments{
-\item{subc_ids}{A numeric vector of unique subcatchment IDs.}
+\item{subc_ids}{Numeric vector. Unique subcatchment IDs to retrieve data for.}
 
-\item{variables}{A character vector of variable names to retrieve
+\item{variables}{Character vector. Variable names to retrieve
 (e.g., `"bio5"`, `"slope_grad_dw_cel"`).}
 
-\item{comment}{Optional character string to include in the request
-metadata (can help with tracing requests on the server).}
+\item{comment}{Character (optional). Metadata comment for request tracing.
+Default: `NULL`.}
 
-\item{chunk_size}{Integer. Maximum number of subcatchments to send per request
-(default is 3000).}
+\item{chunk_size}{Integer. Maximum subcatchments per API request.
+Default: `3000`.}
 }
 \value{
-A data frame with one row per subcatchment and columns for each
-  requested environmental variable, plus a `subc_id` column.
-
-A data frame containing zonal statistics (mean,min,max) of environmental variables
-per subcatchment. Each row corresponds to one subcatchment.
+A data.frame containing zonal statistics (mean, min, max) of
+  environmental variables per subcatchment. One row per subcatchment with
+  columns for each requested variable plus a `subc_id` column.
 }
 \description{
-This function queries the GeoFRESH API to retrieve
-environmental zonal statistics of the variables included in the
-Environment90m dataset (Marquez et al., 2025, in prep.).
+Queries the GeoFRESH API to retrieve environmental zonal statistics from the
+Environment90m dataset (Marquez et al., 2025, in prep.) for specified
+subcatchments. Handles large requests automatically by chunking.
 }
 \examples{
 \dontrun{
+# Retrieve climate and flow variables
 subc_ids <- c(560230105, 560149764, 560251298)
-vars <- vars <- c("bio1", "flow", "cti")
-env_df <- api_get_env90m_data(subc_ids = subc_ids, variables = vars)
+vars <- c("bio1", "flow", "cti")
+env_df <- api_get_env90m_data(
+  subc_ids = subc_ids,
+  variables = vars
+)
 }
 
 }
@@ -44,16 +46,13 @@ Other ocgapi:
 \code{\link{api_get_basin_polygon}()},
 \code{\link{api_get_basin_streamsegments}()},
 \code{\link{api_get_basin_subcids}()},
+\code{\link{api_get_job_results}()},
 \code{\link{api_get_local_ids}()},
 \code{\link{api_get_snapped_points}()},
 \code{\link{api_get_snapped_points_cascade_async}()},
-\code{\link{api_get_snapped_points_cascade_plural}()},
 \code{\link{api_get_snapped_points_df}()},
 \code{\link{api_get_snapped_points_strahler_async}()},
 \code{\link{api_get_snapped_points_strahler_plural}()},
 \code{\link{api_get_upstream_subcids}()}
-}
-\author{
-Afroditi Grigoropoulou, Merret Buurman
 }
 \concept{ocgapi}

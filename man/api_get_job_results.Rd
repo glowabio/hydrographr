@@ -2,7 +2,7 @@
 % Please edit documentation in R/api_get_job_results.R
 \name{api_get_job_results}
 \alias{api_get_job_results}
-\title{Download and return results from a completed job}
+\title{Download Results from Completed Async Job}
 \usage{
 api_get_job_results(
   jobID,
@@ -11,15 +11,54 @@ api_get_job_results(
 )
 }
 \arguments{
-\item{jobID}{Character. Job ID or the result object from api_poll_job().}
+\item{jobID}{Character. Job ID string or result object from `api_poll_job()`.}
 
-\item{base_url}{Character. Base URL for the pygeoapi instance.}
+\item{base_url}{Character. Base URL for pygeoapi instance.
+Default: `"https://aqua.igb-berlin.de"`.}
 
-\item{as_dataframe}{Logical. If TRUE (default), return dataframe. If FALSE, return URL only.}
+\item{as_dataframe}{Logical. If `TRUE`, download and return data.frame.
+If `FALSE`, return URL only. Default: `TRUE`.}
 }
 \value{
-Data frame with the results, or character URL if as_dataframe = FALSE
+Depends on `as_dataframe`:
+  \itemize{
+    \item If `TRUE`: data.frame with job results
+    \item If `FALSE`: Character string with download URL
+  }
 }
 \description{
-Download and return results from a completed job
+Downloads and returns the results from a completed asynchronous job.
+Can return either the data as a data.frame or just the download URL.
 }
+\examples{
+\dontrun{
+# After polling shows job is complete
+job_status <- api_poll_job("abc123")
+
+# Example 1: Get results as data.frame
+results_df <- api_get_job_results(job_status)
+
+# Example 2: Get only the URL
+results_url <- api_get_job_results(
+  job_status,
+  as_dataframe = FALSE
+)
+}
+
+}
+\seealso{
+Other ocgapi: 
+\code{\link{api_filter_by_attribute}()},
+\code{\link{api_get_basin_polygon}()},
+\code{\link{api_get_basin_streamsegments}()},
+\code{\link{api_get_basin_subcids}()},
+\code{\link{api_get_env90m_data}()},
+\code{\link{api_get_local_ids}()},
+\code{\link{api_get_snapped_points}()},
+\code{\link{api_get_snapped_points_cascade_async}()},
+\code{\link{api_get_snapped_points_df}()},
+\code{\link{api_get_snapped_points_strahler_async}()},
+\code{\link{api_get_snapped_points_strahler_plural}()},
+\code{\link{api_get_upstream_subcids}()}
+}
+\concept{ocgapi}

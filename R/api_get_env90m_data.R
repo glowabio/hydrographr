@@ -1,38 +1,39 @@
-#' Retrieve 90m-Resolution Environmental Variables for Subcatchments
+#' Retrieve 90m Environmental Variables for Subcatchments
 #'
-#' This function queries the GeoFRESH API to retrieve
-#' environmental zonal statistics of the variables included in the
-#' Environment90m dataset (Marquez et al., 2025, in prep.).
+#' @description
+#' Queries the GeoFRESH API to retrieve environmental zonal statistics from the
+#' Environment90m dataset (Marquez et al., 2025, in prep.) for specified
+#' subcatchments. Handles large requests automatically by chunking.
 #'
 #' @family ocgapi
-#' @param subc_ids A numeric vector of unique subcatchment IDs.
-#' @param variables A character vector of variable names to retrieve
+#' @param subc_ids Numeric vector. Unique subcatchment IDs to retrieve data for.
+#' @param variables Character vector. Variable names to retrieve
 #'   (e.g., `"bio5"`, `"slope_grad_dw_cel"`).
-#' @param comment Optional character string to include in the request
-#'   metadata (can help with tracing requests on the server).
-#' @param chunk_size Integer. Maximum number of subcatchments to send per request
-#'   (default is 3000).
-#' @return A data frame with one row per subcatchment and columns for each
-#'   requested environmental variable, plus a `subc_id` column.
-#' @return A data frame containing zonal statistics (mean,min,max) of environmental variables
-#' per subcatchment. Each row corresponds to one subcatchment.
+#' @param comment Character (optional). Metadata comment for request tracing.
+#'   Default: `NULL`.
+#' @param chunk_size Integer. Maximum subcatchments per API request.
+#'   Default: `3000`.
 #'
-#' @import httr
-#' @import jsonlite
-#' @import dplyr
-#' @import purrr
+#' @return A data.frame containing zonal statistics (mean, min, max) of
+#'   environmental variables per subcatchment. One row per subcatchment with
+#'   columns for each requested variable plus a `subc_id` column.
 #'
 #' @examples
 #' \dontrun{
+#' # Retrieve climate and flow variables
 #' subc_ids <- c(560230105, 560149764, 560251298)
-#' vars <- vars <- c("bio1", "flow", "cti")
-#' env_df <- api_get_env90m_data(subc_ids = subc_ids, variables = vars)
+#' vars <- c("bio1", "flow", "cti")
+#' env_df <- api_get_env90m_data(
+#'   subc_ids = subc_ids,
+#'   variables = vars
+#' )
 #' }
 #'
 #' @export
-#'
-#' @author Afroditi Grigoropoulou, Merret Buurman
-#'
+#' @importFrom httr POST add_headers http_type content status_code
+#' @importFrom jsonlite fromJSON
+#' @importFrom dplyr bind_rows
+#' @importFrom purrr map_dfr
 api_get_env90m_data <- function(subc_ids, variables, comment = NULL,
 chunk_size = 3000) {
 

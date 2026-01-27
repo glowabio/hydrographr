@@ -15,32 +15,51 @@ api_get_local_ids(
 )
 }
 \arguments{
-\item{csv_url}{URL to a CSV file hosted online.}
+\item{csv_url}{Character. URL to a CSV file hosted online (must be publicly
+accessible via HTTP/HTTPS).}
 
-\item{colname_lat}{Name of the latitude column in CSV file.}
+\item{colname_lat}{Character. Name of the latitude column in CSV.
+Default: `"latitude"`.}
 
-\item{colname_lon}{Name of the longitude column in CSV file.}
+\item{colname_lon}{Character. Name of the longitude column in CSV.
+Default: `"longitude"`.}
 
-\item{colname_site_id}{Name of the site ID column in CSV file.}
+\item{colname_site_id}{Character. Name of the site ID column in CSV.
+Default: `"site_id"`.}
 
-\item{colname_subc_id}{Name of the subcatchment ID column in CSV file (optional).}
+\item{colname_subc_id}{Character (optional). Name of the subcatchment ID
+column in CSV if pre-computed IDs should be used. Default: `NULL`.}
 
-\item{which_ids}{Which ID type(s) to retrieve, e.g. `"reg_id"`, `"basin_id"`,
-`"subc_id"`.}
+\item{which_ids}{Character. ID type(s) to retrieve. Options: `"reg_id"`,
+`"basin_id"`, `"subc_id"`. Default: `"reg_id"`.}
 
-\item{comment}{Optional comment string.}
+\item{comment}{Character (optional). Comment for request logging.
+Default: `NULL`.}
 }
 \value{
-A list with two elements:
-\describe{
-  \item{data}{A `data.frame` with the retrieved IDs.}
-  \item{href}{A `character` string with the URL of the output CSV.}
-}
+A list containing:
+  \describe{
+    \item{data}{data.frame. Retrieved IDs with one row per site.}
+    \item{href}{Character. URL of the output CSV file.}
+  }
 }
 \description{
-Queries the GeoFRESH API to obtain regional unit, basin,
-and subcatchment IDs for a set of sampling locations.
-Handles both single-point and multi-point inputs.
+Queries the GeoFRESH API to obtain regional unit, basin, and subcatchment
+IDs for sampling locations provided via a CSV file. Useful for linking
+observational data to the stream network hierarchy.
+}
+\examples{
+\dontrun{
+# Retrieve basin IDs for sampling sites
+result <- api_get_local_ids(
+  csv_url = "https://example.com/sites.csv",
+  which_ids = "basin_id"
+)
+
+# Access the data
+head(result$data)
+}
+
 }
 \seealso{
 Other ocgapi: 
@@ -49,15 +68,12 @@ Other ocgapi:
 \code{\link{api_get_basin_streamsegments}()},
 \code{\link{api_get_basin_subcids}()},
 \code{\link{api_get_env90m_data}()},
+\code{\link{api_get_job_results}()},
 \code{\link{api_get_snapped_points}()},
 \code{\link{api_get_snapped_points_cascade_async}()},
-\code{\link{api_get_snapped_points_cascade_plural}()},
 \code{\link{api_get_snapped_points_df}()},
 \code{\link{api_get_snapped_points_strahler_async}()},
 \code{\link{api_get_snapped_points_strahler_plural}()},
 \code{\link{api_get_upstream_subcids}()}
-}
-\author{
-Afroditi Grigoropoulou, Merret Buurman
 }
 \concept{ocgapi}
