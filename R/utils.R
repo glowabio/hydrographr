@@ -239,6 +239,67 @@ traverse_upstream <- function(lines_sf, segment_id, start_fraction, max_distance
 }
 
 
+#' Trace downstream until reaching a Strahler threshold
+#'
+#' @param start_id Starting segment ID
+#' @param df Stream network data.frame with columns subc_id, target, strahler_order
+#' @param strahler_retain_threshold Minimum Strahler order to stop at
+#'
+#' @return Vector of segment IDs from start_id downstream to threshold
+#' @keywords internal
+trace_downstream <- function(start_id, df, strahler_retain_threshold) {
+  out <- start_id
+  current <- start_id
+
+  while (length(current) > 0) {
+    # Get current segment info
+    seg <- df[df$subc_id == current, ]
+    if (nrow(seg) == 0) break
+
+    # Stop if we've reached the threshold
+    if (seg$strahler_order[1] >= strahler_retain_threshold) break
+
+    # Get next downstream segment
+    next_id <- seg$target[1]
+    if (is.na(next_id)) break
+
+    out <- c(out, next_id)
+    current <- next_id
+  }
+
+  unique(out)
+}
+
+
+#' Trace upstream N steps, handling multiple tributaries
+#'
+#' @param start_id Starting segment ID
+#' @param df Stream network data.frame with columns subc_id, target
+#' @param steps Number of steps to trace upstream
+#'
+#' @return Vector of segment IDs encountered within N steps upstream
+#' @keywords internal
+trace_upstream_n <- function(start_id, df, steps) {
+  if (steps == 0) return(start_id)
+
+  out <- start_id
+  current_wave <- start_id  # All segments at current step
+
+  for (i in seq_len(steps)) {
+    # Find ALL segments that flow into ANY segment in current wave
+    parents <- df$subc_id[df$target %in% current_wave]
+
+    if (length(parents) == 0) break
+
+    out <- c(out, parents)
+    current_wave <- parents  # Next wave = all parents found
+  }
+
+  unique(out)
+}
+
+
+
 #' Helper operator for NULL coalescing
 #' @keywords internal
 `%||%` <- function(x, y) if (is.null(x)) y else x
