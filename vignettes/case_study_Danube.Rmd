@@ -1,17 +1,17 @@
 ---
-title: "Case study - Danube basin"
+title: "Case study - Danube Basin (Environment90m)"
 subtitle: "Retrieving and processing the Environment90m dataset for Species Distribution Modelling"
 author: ""
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Case study - Danube basin}
+  %\VignetteIndexEntry{Case study - Danube Basin (Environment90m)}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 bibliography: bib/references_danube.bib
 link-citations: yes
 linkcolor: blue
-csl: apa-6th-edition.csl
+# csl: apa-6th-edition.csl
 bib-latex-options: "style=apa, sorting=nyt, backend=biber, maxcitenames=2, useprefix, doi=true, isbn=false, uniquename=false"
 # nocite: '@*'
 editor_options:
