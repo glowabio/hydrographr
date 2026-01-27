@@ -37,9 +37,9 @@
 #' @importFrom sf st_read
 api_get_basin_streamsegments <- function(basin_id = NULL,
                                          subc_id = NULL,
-                                     geometry_only = FALSE,
-                                     comment = NULL,
-                                     strahler_min = NULL) {
+                                         geometry_only = FALSE,
+                                         comment = NULL,
+                                         strahler_min = NULL) {
   # --- Input validation ------------------------------------------------------
 
   if (missing(basin_id) || !is.numeric(basin_id)) {
@@ -51,133 +51,47 @@ api_get_basin_streamsegments <- function(basin_id = NULL,
   }
 
 
-# --- Construct body ------------------------------------------------
-# Define process url
-process_url <- "https://aqua.igb-berlin.de/pygeoapi/processes/get-basin-streamsegments/execution"
+  # --- Construct body ------------------------------------------------
+  # Define process url
+  process_url <- "https://aqua.igb-berlin.de/pygeoapi-dev/processes/get-basin-streamsegments/execution"  # ADD THIS LINE
 
-# Assemble inputs dynamically
-inputs <- list(
-  basin_id = as.integer(basin_id),
-  # subc_id = as.integer(subc_id),
-  geometry_only = geometry_only,
-  comment = comment
-)
+  # Assemble inputs dynamically
+  inputs <- list(
+    basin_id = as.integer(basin_id),
+    geometry_only = geometry_only,
+    comment = comment
+  )
 
-# Add strahler_min only if provided
-if (!is.null(strahler_min)) {
-  inputs$strahler_min <- as.integer(strahler_min)
+  # Add strahler_min only if provided
+  if (!is.null(strahler_min)) {
+    inputs$strahler_min <- as.integer(strahler_min)
+  }
+
+  # Add subc_id only if provided
+  if (!is.null(subc_id)) {
+    inputs$subc_id <- as.integer(subc_id)
+  }
+
+
+  body <- list(inputs = inputs)
+
+  # --- Send request ----------------------------------------------------------
+  resp <- httr2::request(process_url) |>
+    httr2::req_headers("Content-Type" = "application/json") |>
+    httr2::req_body_json(body) |>
+    httr2::req_perform()
+
+  # --- Handle response -------------------------------------------------------
+  if (httr2::resp_status(resp) >= 400) {
+    stop("Server returned an error: ", httr2::resp_status_desc(resp), call. = FALSE)
+  }
+
+  result <- httr2::resp_body_json(resp, simplifyVector = TRUE)
+
+  # --- Convert GeoJSON-like list to sf ---------------------------------------
+  segm_geojson <- jsonlite::toJSON(result, auto_unbox = TRUE)
+  segm_sf <- sf::st_read(segm_geojson, quiet = TRUE)
+
+  # --- Return sf object ------------------------------------------------------
+  return(segm_sf)
 }
-
-# Add subc_id only if provided
-if (!is.null(subc_id)) {
-  inputs$subc_id <- as.integer(subc_id)
-}
-
-
-body <- list(inputs = inputs)
-
-# --- Send request ----------------------------------------------------------
-resp <- httr2::request(process_url) |>
-  httr2::req_headers("Content-Type" = "application/json") |>
-  httr2::req_body_json(body) |>
-  httr2::req_perform()
-
-# --- Handle response -------------------------------------------------------
-if (httr2::resp_status(resp) >= 400) {
-  stop("Server returned an error: ", httr2::resp_status_desc(resp), call. = FALSE)
-}
-
-result <- httr2::resp_body_json(resp, simplifyVector = TRUE)
-
-# --- Convert GeoJSON-like list to sf ---------------------------------------
-segm_geojson <- jsonlite::toJSON(result, auto_unbox = TRUE)
-segm_sf <- sf::st_read(segm_geojson, quiet = TRUE)
-
-# --- Return sf object ------------------------------------------------------
-return(segm_sf)
-}
-#
-# api_get_basin_stream_segments <- function(
-#     basin_id = NULL,
-#     subc_id = NULL,
-#     geometry_only = FALSE,
-#     strahler_min = NULL
-# ) {
-#
-#   # --- Input validation ---
-#   # if (!is.null(basin_id) && !is.null(subc_id)) {
-#   #   stop("Provide either basin_id OR subc_id, not both.")
-#   # }
-#   # if (is.null(basin_id) && is.null(subc_id)) {
-#   #   stop("You must provide basin_id or subc_id.")
-#   # }
-#
-#   if (!is.null(strahler_min) && (!is.numeric(strahler_min) || strahler_min < 1)) {
-#     stop("`strahler_min` must be a positive numeric value or NULL.", call. = FALSE)
-#   }
-#
-#   # --- Build inputs list dynamically ---
-#   if (!is.null(subc_id)) {
-#     inputs <- list(
-#       subc_id = subc_id,
-#       geometry_only = geometry_only
-#     )
-#   } else {
-#     inputs <- list(
-#       basin_id = basin_id,
-#       geometry_only = geometry_only
-#     )
-#   }
-#
-#   #  Add strahler_min only if provided
-#     if (!is.null(strahler_min)) {
-#       inputs$strahler_min <- as.integer(strahler_min)
-#     }
-#
-#   # --- JSON body ---
-#   # body <- jsonlite::toJSON(list(inputs = inputs), auto_unbox = TRUE)
-#
-#   # --- POST request ---
-#   url <- "https://aqua.igb-berlin.de/pygeoapi/processes/get-basin-streamsegments/execution"
-#
-#   # # Assemble inputs dynamically
-#   # inputs <- list(
-#   #   basin_id = as.integer(basin_id),
-#   #   # subc_id = as.integer(subc_id),
-#   #   geometry_only = geometry_only,
-#   #   comment = comment
-#   # )
-#   #
-#   # # Add strahler_min only if provided
-#   # if (!is.null(strahler_min)) {
-#   #   inputs$strahler_min <- as.integer(strahler_min)
-#   # }
-#   #
-#   # # Add subc_id only if provided
-#   # if (!is.null(subc_id)) {
-#   #   inputs$subc_id <- as.integer(subc_id)
-#   # }
-#
-#
-#   body <- list(inputs = inputs)
-#
-#   # --- Send request ----------------------------------------------------------
-#   resp <- httr2::request(process_url) |>
-#     httr2::req_headers("Content-Type" = "application/json") |>
-#     httr2::req_body_json(body) |>
-#     httr2::req_perform()
-#
-#   # --- Handle response -------------------------------------------------------
-#   if (httr2::resp_status(resp) >= 400) {
-#     stop("Server returned an error: ", httr2::resp_status_desc(resp), call. = FALSE)
-#   }
-#
-#   result <- httr2::resp_body_json(resp, simplifyVector = TRUE)
-#
-#   # --- Convert GeoJSON-like list to sf ---------------------------------------
-#   segm_geojson <- jsonlite::toJSON(result, auto_unbox = TRUE)
-#   segm_sf <- sf::st_read(segm_geojson, quiet = TRUE)
-#
-#   # --- Return sf object ------------------------------------------------------
-#   return(segm_sf)
-# }
