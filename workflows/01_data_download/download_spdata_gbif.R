@@ -5,6 +5,11 @@ library(sf)
 library(data.table)
 library(dplyr)
 
+# Set working directory
+wdir <- "/run/user/1000/gvfs/dav:host=nimbus.igb-berlin.de,ssl=true,user=grigoropoulou,prefix=%2Fremote.php%2Fwebdav/workflow_paper/data"
+setwd(wdir)
+
+
 ## ----- configuration -----
 med_fish_orders <- c(
   "Anguilliformes", "Clupeiformes", "Siluriformes", "Acipenseriformes",
@@ -17,12 +22,13 @@ med_fish_orders <- c(
 greece_poly <- "POLYGON((19.0 42.0, 19.0 34.5, 29.7 34.5, 29.7 42.0, 19.0 42.0))"
 
 # local folder to save ZIPs and CSVs
-download_path <- "/home/grigoropoulou/Documents/Postdoc/projects/workflow_paper/data/"
+download_path <- file.path(wdir, "points_original/fish")
+dir.create(download_path)
 
 # Credentials (replace)
-GBIF_USER  <- "afrogri"
-GBIF_PWD   <- "2LYZcSFo51bu"
-GBIF_EMAIL <- "afroditi.grigoropoulou@igb-berlin.de"
+GBIF_USER  <- ""
+GBIF_PWD   <- ""
+GBIF_EMAIL <- ""
 
 ## ----- helper: safe name_backbone that tolerates failures -----
 safe_name_backbone <- function(name, rank = "ORDER") {
@@ -328,3 +334,28 @@ str(combined_fish_df)
 
 downloads <- download_gbif_fish_greece(med_fish_orders, greece_poly, "afrogri", "2LYZcSFo51bu", "afroditi.grigoropoulou@igb-berlin.de")
 
+
+# ============================================================================
+# FINALIZE AND SAVE FOR CLEANING PIPELINE
+# ============================================================================
+
+message("\n=== Saving Combined Data for Cleaning ===")
+
+# Ensure output directory exists
+output_dir <- file.path(download_path, "points_original/fish")
+dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
+
+# Save the combined dataset
+output_file <- file.path(output_dir, "combined_greece_fish_occurrences.csv")
+data.table::fwrite(combined_fish_df, output_file)
+
+message(sprintf("✓ Saved %d rows to: %s", nrow(combined_fish_df), output_file))
+message("\n" , paste(rep("=", 80), collapse = ""))
+message("GBIF DOWNLOAD COMPLETE")
+message(paste(rep("=", 80), collapse = ""))
+message(sprintf("\nDataset Summary:"))
+message(sprintf("  Total rows: %d", nrow(combined_fish_df)))
+message(sprintf("  Total columns: %d", ncol(combined_fish_df)))
+message(sprintf("  Orders downloaded: %d", length(unique(combined_fish_df$order_downloaded))))
+message("\nNext step: Run the cleaning script")
+message(sprintf("  Script location: ~/Documents/Postdoc/projects/workflow_paper/scripts/02_clean_gbif_data.R"))
