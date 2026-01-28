@@ -69,11 +69,11 @@ message("\nPoints by source:")
 message("\n=== Getting Basin IDs ===")
 
 basin_ids <- api_get_local_ids(csv_url = all_snapped_csv,
-  # colname_lon = "longitude_snapped",
-  # colname_lat = "latitude_snapped",
-  colname_site_id = "site_id",
-  colname_subc_id = "subc_id",
-  which_ids = "basin_id"
+                               # colname_lon = "longitude_snapped",
+                               # colname_lat = "latitude_snapped",
+                               colname_site_id = "site_id",
+                               colname_subc_id = "subc_id",
+                               which_ids = "basin_id"
 )
 
 # Merge with snapped data
@@ -154,9 +154,9 @@ if (length(stream_networks) > 0) {
 
 all_streams_filtered <- extract_partial_stream_network(
   all_streams,
-    all_snapped$subc_id,
-    strahler_retain_threshold = 4,
-    upstream_buffer = 3      # number of upstream segments to include
+  all_snapped$subc_id,
+  strahler_retain_threshold = 4,
+  upstream_buffer = 3      # number of upstream segments to include
 )
 
 save_to_nimbus(all_streams_filtered, "spatial/stream_networks/partial_stream_network2.gpkg")

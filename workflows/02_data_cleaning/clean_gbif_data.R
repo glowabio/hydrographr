@@ -21,44 +21,27 @@ library(htmlwidgets)
 # devtools::install_github("ytorres-cambas/danubeoccurR")
 library(danubeoccurR)
 
+# Load helper function
+source("~/Documents/PhD/scripts/hydrographr/workflows/helpers/save_to_nimbus.R")
+
 # ============================================================================
 # SETUP PATHS
 # ============================================================================
 
 # Set nimbus path
-nimbus_path <- "/run/user/1000/gvfs/dav:host=nimbus.igb-berlin.de,ssl=true,user=grigoropoulou,prefix=%2Fremote.php%2Fwebdav/workflow_paper/data"
+wdir <- "/run/user/1000/gvfs/dav:host=nimbus.igb-berlin.de,ssl=true,user=grigoropoulou,prefix=%2Fremote.php%2Fwebdav/workflow_paper/data"
+
+# delete
+wdir <- "~/Documents/Postdoc/projects/workflow_paper/data"
+
+setwd(wdir)
 
 # Create directory structure
 dir.create("points_original/fish", recursive = TRUE, showWarnings = FALSE)
 dir.create("points_original/maps", recursive = TRUE, showWarnings = FALSE)
-dir.create("points_cleaned", recursive = TRUE, showWarnings = FALSE)
+dir.create("points_cleaned/fish", recursive = TRUE, showWarnings = FALSE)
+dir.create("points_cleaned/maps", recursive = TRUE, showWarnings = FALSE)
 
-# Helper function to save to Nimbus
-save_to_nimbus <- function(data, filename, save_function = NULL, ...) {
-  local_path <- file.path(tempdir(), basename(filename))
-
-  if (is.null(save_function)) {
-    ext <- tools::file_ext(filename)
-
-    if (ext == "html") {
-      htmlwidgets::saveWidget(data, local_path, selfcontained = TRUE)
-    } else if (ext == "csv") {
-      data.table::fwrite(data, local_path, ...)
-    } else {
-      stop("Unknown file type. Please provide save_function argument.")
-    }
-  } else {
-    save_function(data, local_path, ...)
-  }
-
-  nimbus_dest <- file.path(nimbus_path, filename)
-  dir.create(dirname(nimbus_dest), recursive = TRUE, showWarnings = FALSE)
-  file.copy(local_path, nimbus_dest, overwrite = TRUE)
-  unlink(local_path)
-
-  message(sprintf("✓ Saved to Nimbus: %s", filename))
-  invisible(nimbus_dest)
-}
 
 # ============================================================================
 # 1. READ AND FIX MALFORMED CSV
@@ -66,7 +49,7 @@ save_to_nimbus <- function(data, filename, save_function = NULL, ...) {
 
 message("\n=== Step 1: Reading and Fixing Raw GBIF Data ===")
 
-file_raw <- file.path(nimbus_path, "points_original/fish/combined_greece_fish_occurrences.csv")
+file_raw <- file.path(wdir, "points_original/fish/combined_greece_fish_occurrences.csv")
 
 # Read with fread (handles large files efficiently)
 gbif <- fread(file_raw,
@@ -139,6 +122,9 @@ unlink(temp_file)
 
 # Save the fixed raw file
 save_to_nimbus(gbif_clean, "points_original/fish/combined_greece_fish_occurrences_fixed.csv")
+
+# delete?
+fwrite(gbif_clean, "points_original/fish/combined_greece_fish_occurrences_fixed.csv")
 
 message(sprintf("\n✓ CSV fixing complete: %d clean rows retained", nrow(gbif_clean)))
 
@@ -332,6 +318,9 @@ gbif_map <- leaflet(gbif_cleaned) %>%
 # Save map
 save_to_nimbus(gbif_map, "points_cleaned/maps/gbif_fish_cleaned_overview.html")
 
+# Save locally
+saveWidget(gbif_map, "points_cleaned/maps/gbif_fish_cleaned_overview.html")
+
 # ============================================================================
 # 10. SAVE CLEANED DATA
 # ============================================================================
@@ -340,6 +329,9 @@ message("\n=== Step 10: Saving Cleaned Data ===")
 
 # Save to Nimbus
 save_to_nimbus(gbif_cleaned, "points_cleaned/fish/fish_gbif_clean.csv")
+
+# Save locally
+fwrite(gbif_cleaned, "points_cleaned/fish/fish_gbif_clean.csv")
 
 # Remove duplicates, keep only coordinates and gbifID to snap
 gbif_cleaned_unique <- gbif_cleaned %>% distinct(decimalLongitude,decimalLatitude, .keep_all = TRUE)
@@ -389,3 +381,4 @@ message("  - points_original/fish/combined_greece_fish_occurrences_fixed.csv")
 message("  - points_cleaned/fish/fish_gbif_clean.csv")
 message("  - points_original/maps/gbif_fish_cleaned_overview.html")
 message("\n✓ Ready for snapping!")
+

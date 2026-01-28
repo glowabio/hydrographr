@@ -341,13 +341,9 @@ downloads <- download_gbif_fish_greece(med_fish_orders, greece_poly, "afrogri", 
 
 message("\n=== Saving Combined Data for Cleaning ===")
 
-# Ensure output directory exists
-output_dir <- file.path(download_path, "points_original/fish")
-dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
-
 # Save the combined dataset
-output_file <- file.path(output_dir, "combined_greece_fish_occurrences.csv")
-data.table::fwrite(combined_fish_df, output_file)
+output_file <- file.path(download_path, "combined_greece_fish_occurrences.csv")
+fwrite(combined_fish_df, output_file)
 
 message(sprintf("✓ Saved %d rows to: %s", nrow(combined_fish_df), output_file))
 message("\n" , paste(rep("=", 80), collapse = ""))

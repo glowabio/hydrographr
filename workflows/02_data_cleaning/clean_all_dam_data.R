@@ -18,22 +18,26 @@ library(sf)
 library(leaflet)
 library(htmlwidgets)
 # Load helper function
-source("~/Documents/Postdoc/code/workflow_paper/helpers/save_to_nimbus.R")
+source("~/Documents/PhD/scripts/hydrographr/workflows/helpers/save_to_nimbus.R")
 
 # ============================================================================
 # SETUP PATHS
 # ============================================================================
 
 # Set nimbus path
-nimbus_path <- "/run/user/1000/gvfs/dav:host=nimbus.igb-berlin.de,ssl=true,user=grigoropoulou,prefix=%2Fremote.php%2Fwebdav/workflow_paper/data"
+wdir <- "/run/user/1000/gvfs/dav:host=nimbus.igb-berlin.de,ssl=true,user=grigoropoulou,prefix=%2Fremote.php%2Fwebdav/workflow_paper/data"
+
+# delete
+wdir <- "~/Documents/Postdoc/projects/workflow_paper/data"
+
 
 # Set local working directory
-setwd(nimbus_path)
+setwd(wdir)
 
 # Create directory structure if needed
 dir.create("points_original/dams", recursive = TRUE, showWarnings = FALSE)
 dir.create("points_original/maps", recursive = TRUE, showWarnings = FALSE)
-dir.create("points_cleaned", recursive = TRUE, showWarnings = FALSE)
+dir.create("points_cleaned/dams", recursive = TRUE, showWarnings = FALSE)
 
 
 # ============================================================================
@@ -131,16 +135,20 @@ message(sprintf("RAAY: Processed %d hydropower plants", nrow(raay_dams)))
 message(sprintf("  Phases: %s", paste(unique(raay_dams$phase), collapse = ", ")))
 
 # Save individual file
-fwrite(raay_dams, "points_cleaned/dams_raay_clean.csv")
+fwrite(raay_dams, "points_cleaned/dams/dams_raay_clean.csv")
 
 # Convert to sf object and save as GPKG
 raay_dams_sf <- st_as_sf(raay_dams,
                          coords = c("longitude", "latitude"),
                          crs = 4326,  # WGS84
                          remove = FALSE)  # Keep lon/lat columns
-save_to_nimbus(raay_dams_sf, "points_cleaned/dams_raay_clean.gpkg")
+# Save to nimbus
+save_to_nimbus(raay_dams_sf, "points_cleaned/dams/dams_raay_clean.gpkg")
 
-message("GPKG file saved: points_cleaned/dams_raay_clean.gpkg")
+# Save locally
+st_write(raay_dams_sf, "points_cleaned/dams/dams_raay_clean.gpkg")
+
+message("GPKG file saved: points_cleaned/dams/dams_raay_clean.gpkg")
 
 # ============================================================================
 # 2. PROCESS AMBER DAMS
@@ -170,15 +178,19 @@ amber_dams <- read.csv(amber_file) %>%
 
 message(sprintf("AMBER: Processed %d dams", nrow(amber_dams)))
 
-# Save individual file
-fwrite(amber_dams, "points_cleaned/dams_amber_clean.csv")
+# Save individual file locally
+fwrite(amber_dams, "points_cleaned/dams/dams_amber_clean.csv")
 
 # Convert to sf object and save as GPKG
 amber_dams_sf <- st_as_sf(amber_dams,
                           coords = c("longitude", "latitude"),
                           crs = 4326,  # WGS84
                           remove = FALSE)  # Keep lon/lat columns
-save_to_nimbus(amber_dams_sf, "points_cleaned/amber_dams_clean.gpkg")
+save_to_nimbus(amber_dams_sf, "points_cleaned/dams/amber_dams_clean.gpkg")
+
+# Save locally
+st_write(amber_dams_sf, "points_cleaned/dams/amber_dams_clean.gpkg")
+
 
 # ============================================================================
 # 3. COMBINE ALL DAM DATASETS
@@ -211,7 +223,7 @@ for (i in 1:nrow(raay_summary)) {
 }
 
 # Save combined file
-fwrite(dams_all, "points_cleaned/dams_all_clean.csv")
+fwrite(dams_all, "points_cleaned/dams/dams_all_clean.csv")
 
 message("\n✓ All dam data cleaned and saved")
 
@@ -313,7 +325,11 @@ dams_map <- leaflet(dams_all) %>%
   hideGroup("RAAY by Phase")
 
 # Save map
-save_to_nimbus(dams_map, "points_original/maps/dams_all_sources_overview.html")
+save_to_nimbus(dams_map, "points_cleaned/maps/dams_all_sources_overview.html")
+
+# Save map locally
+saveWidget(dams_map, "points_cleaned/maps/dams_all_sources_overview.html")
+
 
 message("\n✓ Visualization complete")
 
@@ -418,8 +434,8 @@ if (nrow(duplicates_detailed) > 0) {
   }
 
   # Save duplicates to CSV
-  fwrite(duplicates_detailed, "points_cleaned/dams_duplicates.csv")
-  message("\n✓ Duplicates saved to: points_cleaned/dams_duplicates.csv")
+  fwrite(duplicates_detailed, "points_cleaned/dams/dams_duplicates.csv")
+  message("\n✓ Duplicates saved to: points_cleaned/dams/dams_duplicates.csv")
 
   # Create visualization of duplicates
   # Color palette for duplicate visualization
@@ -472,9 +488,15 @@ if (nrow(duplicates_detailed) > 0) {
       opacity = 0.8
     )
 
-  # Save duplicates map
-  save_to_nimbus(duplicates_map, "points_original/maps/dams_duplicates_map.html")
-  message("✓ Duplicate visualization saved: points_original/maps/dams_duplicates_map.html")
+  # Save duplicates map to nimbus
+  save_to_nimbus(duplicates_map, "points_cleaned/maps/dams_duplicates_map.html")
+  message("✓ Duplicate visualization saved: points_cleaned/maps/dams_duplicates_map.html")
+
+  # Save duplicates map locally
+  saveWidget(duplicates_map, "points_cleaned/maps/dams_duplicates_map.html")
+  message("✓ Duplicate visualization saved: points_cleaned/maps/dams_duplicates_map.html")
+
+
 
   # Create comparison table for cross-source duplicates
   cross_source_dups <- duplicates_detailed %>%
@@ -487,7 +509,7 @@ if (nrow(duplicates_detailed) > 0) {
   if (nrow(cross_source_dups) > 0) {
     message(sprintf("\n⚠️  Found %d records at locations appearing in multiple databases",
                     nrow(cross_source_dups)))
-    fwrite(cross_source_dups, "points_cleaned/dams_cross_source_duplicates.csv")
+    fwrite(cross_source_dups, "points_cleaned/dams/dams_cross_source_duplicates.csv")
     message("✓ Cross-source duplicates saved to: points_cleaned/dams_cross_source_duplicates.csv")
   }
 
