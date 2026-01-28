@@ -333,10 +333,41 @@ save_to_nimbus(gbif_cleaned, "points_cleaned/fish/fish_gbif_clean.csv")
 # Save locally
 fwrite(gbif_cleaned, "points_cleaned/fish/fish_gbif_clean.csv")
 
-# Remove duplicates, keep only coordinates and gbifID to snap
-gbif_cleaned_unique <- gbif_cleaned %>% distinct(decimalLongitude,decimalLatitude, .keep_all = TRUE)
-fwrite(gbif_cleaned_unique, "points_cleaned/fish/fish_gbif_clean_to_snap.csv")
+# gbif_cleaned <- fread("points_cleaned/fish/fish_gbif_clean.csv")
 
+# Remove duplicates, keep only coordinates and gbifID to snap
+gbif_cleaned_unique <- gbif_cleaned %>%
+  distinct(decimalLongitude,decimalLatitude, .keep_all = TRUE)
+
+fwrite(gbif_cleaned_unique, "points_cleaned/fish/fish_gbif_clean_unique.csv")
+
+
+# GBIF data of fish might include records in the sea that we do not need
+# We can test if this is the case, trying to obtain the regional unit ID of the
+# occurrences. In case any occurrences are not assigned an ID, it means they fall in the sea
+# and we can discard them from further steps. We chose regional unit id because
+# it is a higher level of organisation than basin or subcatchment id,
+# and thus it is faster to obtain it from the database
+
+# Get the URL of the above file to obtain the ids
+gbif_cleaned_unique_url <- "https://nimbus.igb-berlin.de/index.php/s/rTSNMo72XJ8sTZc/download/fish_gbif_clean_unique.csv"
+
+system.time(reg_unit_ids <- api_get_local_ids(csv_url = gbif_cleaned_unique_url,
+                   colname_lon = "decimalLongitude",
+                   colname_lat = "decimalLatitude",
+                   colname_site_id = "gbifID",
+                   which_ids = "reg_id"))
+
+# Keep only occurrences that were assigned regional unit id
+# Get site_id of these occurrences
+site_ids_keep <- reg_unit_ids$data %>% filter(!is.na(reg_id)) %>%
+  pull(site_id)
+
+# filter data to keep these site_ids
+gbif_cleaned_to_snap <- gbif_cleaned_unique %>%
+  filter(gbifID %in% site_ids_keep)
+
+fwrite(gbif_cleaned_to_snap, "points_cleaned/fish/fish_gbif_clean_to_snap.csv")
 
 
 # ============================================================================
