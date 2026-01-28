@@ -12,16 +12,23 @@ library(leaflet)
 library(htmlwidgets)
 library(sf)
 # Load helper function
-source("~/Documents/Postdoc/code/workflow_paper/helpers/save_to_nimbus.R")
+source("~/Documents/PhD/scripts/hydrographr/workflows/helpers/save_to_nimbus.R")
 
 # Set path to nimbus data folder
-nimbus_path <- "/run/user/1000/gvfs/dav:host=nimbus.igb-berlin.de,ssl=true,user=grigoropoulou,prefix=%2Fremote.php%2Fwebdav/workflow_paper/data"
-setwd(nimbus_path)
+wdir <- "/run/user/1000/gvfs/dav:host=nimbus.igb-berlin.de,ssl=true,user=grigoropoulou,prefix=%2Fremote.php%2Fwebdav/workflow_paper/data"
+nimbus_path <- wdir
 
-# Create maps directory if it doesn't exist
-if (!dir.exists("maps")) {
-  dir.create("maps", recursive = TRUE)
-}
+# delete
+wdir <- "~/Documents/Postdoc/projects/workflow_paper/data"
+
+setwd(wdir)
+
+
+# Create snapped points directories
+dir.create("points_snapped/fish", recursive = TRUE, showWarnings = FALSE)
+dir.create("points_snapped/dams", recursive = TRUE, showWarnings = FALSE)
+dir.create("points_snapped/maps", recursive = TRUE, showWarnings = FALSE)
+
 
 # Load cleaned data URLs (adjust these to your actual URLs)
 hcmr_url <- "https://nimbus.igb-berlin.de/index.php/s/6wGQqJAe6p3FTJg/download/fish_points_to_snap_hcmr.csv"
@@ -46,13 +53,15 @@ message(sprintf("Original GBIF points: %d", nrow(gbif_original)))
 
 # Snapping parameters
 STRAHLER_SEQ <- c(4, 3, 2)
-DISTANCE_THRESHOLD <- 800  # meters
+DISTANCE_THRESHOLD <- 400  # meters
 
 
 # ============================================================================
 # SNAP HCMR DATA
 # ============================================================================
 
+# We have survey data of freshwater fish. In this case we can try to snap directly without cross-checking
+# if the points are located at the sea, because we know where they were sampled
 
 message("\n=== Snapping HCMR Data ===")
 
@@ -68,10 +77,10 @@ hcmr_snap_result <- api_get_snapped_points_cascade_async(
 print(hcmr_snap_result)
 
 # Save
-fwrite(hcmr_snap_result, "points_snapped/hcmr_snapped_points.csv")
+fwrite(hcmr_snap_result, "points_snapped/fish/hcmr_snapped_points.csv")
 message(sprintf("HCMR: Snapped %d points", nrow(hcmr_snap_result)))
 
-hcmr_snap_result <- fread("points_snapped/hcmr_snapped_points.csv")
+hcmr_snap_result <- fread("points_snapped/fish/hcmr_snapped_points.csv")
 
 # ============================================================================
 # VISUALIZE HCMR SNAPPING
@@ -187,14 +196,13 @@ hcmr_map <- leaflet() %>%
     opacity = 0.7
   )
 
-
-
-
+hcmr_map
 
 # Save map
-dir.create("points_snapped/maps")
 save_to_nimbus(hcmr_map, "points_snapped/maps/hcmr_snapping_check.html")
 
+# Save map locally
+saveWidget(hcmr_map, "points_snapped/maps/hcmr_snapping_check.html")
 
 # Print snapping statistics
 message(sprintf("\nHCMR Snapping Statistics:"))
@@ -210,8 +218,8 @@ message(sprintf("  Points within %d m: %d (%.1f%%)",
 # Save list of failed points
 if (n_failed > 0) {
   hcmr_failed <- hcmr_original[!hcmr_original$snapped, ]
-  fwrite(hcmr_failed, "points_snapped/hcmr_failed_to_snap.csv")
-  message(sprintf("\nFailed points saved to: points_snapped/hcmr_failed_to_snap.csv"))
+  fwrite(hcmr_failed, "points_cleaned/fish/hcmr_failed_to_snap.csv")
+  message(sprintf("\nFailed points saved to: points_cleaned/fish/hcmr_failed_to_snap.csv"))
 }
 
 
@@ -230,17 +238,16 @@ ti <- system.time(gbif_snap_result <- api_get_snapped_points_cascade_async(
   distance_threshold = DISTANCE_THRESHOLD
 ))
 
-# 571.569 seconds
+# 218.761 seconds
 
 print(gbif_snap_result)
 
 # Save
-fwrite(gbif_snap_result, "points_snapped/gbif_snap_result_points.csv")
+min_strahler <- min(STRAHLER_SEQ)
+snap_out_path <- paste0("points_snapped/fish/gbif_snapped_points_min_strahler",min_strahler, "_dist_thresh_",DISTANCE_THRESHOLD, ".csv")
+fwrite(gbif_snap_result, snap_out_path)
+
 message(sprintf("GBIF: Snapped %d points", nrow(gbif_snap_result)))
-
-gbif_snap_result <- fread("points_snapped/all_snapped_fish_points.csv") %>%
-  filter(source == "GBIF")
-
 
 
 
@@ -252,7 +259,7 @@ gbif_snap_result <- fread("points_snapped/all_snapped_fish_points.csv") %>%
 message("\n--- Creating GBIF visualization ---")
 
 # Identify which points were successfully snapped
-gbif_snapped_ids <- gbif_snap_result$site_id
+gbif_snapped_ids <- gbif_snap_result$gbifID
 gbif_original$snapped <- gbif_original$gbifID %in% gbif_snapped_ids
 
 # Summary
@@ -359,7 +366,12 @@ gbif_map <- leaflet() %>%
     opacity = 0.7
   )
 
-# Save map
+gbif_map
+
+# Save map locally
+saveWidget(gbif_map, "points_snapped/maps/gbif_snapping_check.html")
+
+# Save map to nimbus
 save_to_nimbus(gbif_map, "points_snapped/maps/gbif_snapping_check.html")
 
 # Print snapping statistics
@@ -376,8 +388,8 @@ if (n_snapped_gbif > 0) {
 # Save list of failed points
 if (n_failed_gbif > 0) {
   gbif_failed <- gbif_original[!gbif_original$snapped, ]
-  fwrite(gbif_failed, "points_snapped/gbif_failed_to_snap.csv")
-  message(sprintf("\nFailed points saved to: points_snapped/gbif_failed_to_snap.csv"))
+  fwrite(gbif_failed, "points_cleaned/fish/gbif_failed_to_snap.csv")
+  message(sprintf("\nFailed points saved to: points_cleaned/fish/gbif_failed_to_snap.csv"))
 }
 
 
@@ -412,10 +424,10 @@ all_snapped <- rbind(
   gbif_snap_result[, ..common_cols]
 )
 
-fwrite(all_snapped, "points_snapped/all_snapped_fish_points.csv")
+fwrite(all_snapped, "points_snapped/fish/all_snapped_fish_points.csv")
 message(sprintf("Combined: %d total points", nrow(all_snapped)))
 
-all_snapped <- fread("points_snapped/all_snapped_fish_points.csv")
+# all_snapped <- fread("points_snapped/fish/all_snapped_fish_points.csv")
 
 # ============================================================================
 # FINAL SUMMARY
@@ -446,13 +458,14 @@ STRAHLER_SEQ <- c(4, 3, 2)
 DISTANCE_THRESHOLD <- 150  # meters
 
 # Load cleaned dams data URL
-dams_url <- "https://nimbus.igb-berlin.de/index.php/s/3TH467AYtFAxdNq/download/dams_all_clean.csv"
+dams_url <- "https://nimbus.igb-berlin.de/index.php/s/tagEWdtxTpbRE9g/download/dams_all_clean.csv"
 
 # Load original dams data
 dams_original <- fread(dams_url)
 message(sprintf("Original dams points: %d", nrow(dams_original)))
 
 # Snap dams data
+DISTANCE_THRESHOLD <- 150
 dams_snap_result <- api_get_snapped_points_cascade_async(
   csv_url = dams_url,
   colname_lon = "longitude",
@@ -464,13 +477,14 @@ dams_snap_result <- api_get_snapped_points_cascade_async(
 
 print(dams_snap_result)
 
-dams_snap_result <- fread("points_snapped/dams_snapped_points.csv")
+
+# dams_snap_result <- fread("points_snapped/dams/dams_snapped_points.csv")
 dams_snap_result <- dams_snap_result %>%
   left_join(dams_original, by = "id1") %>%
   select(-longitude, -latitude)
 
 # Save
-fwrite(dams_snap_result, "points_snapped/dams_snapped_points.csv")
+fwrite(dams_snap_result, "points_snapped/dams/dams_snapped_points.csv")
 message(sprintf("Dams: Snapped %d points", nrow(dams_snap_result)))
 
 # ============================================================================
@@ -600,7 +614,10 @@ dams_map <- leaflet() %>%
     opacity = 0.7
   )
 
-# Save map
+# Save map locally
+saveWidget(dams_map, "points_snapped/maps/dams_snapping_check.html")
+
+# Save map to nimbus
 save_to_nimbus(dams_map, "points_snapped/maps/dams_snapping_check.html")
 
 # Print snapping statistics
@@ -638,8 +655,8 @@ if (n_snapped_dams > 0) {
 # Save list of failed points
 if (n_failed_dams > 0) {
   dams_failed <- dams_original[!dams_original$snapped, ]
-  fwrite(dams_failed, "points_snapped/dams_failed_to_snap.csv")
-  message(sprintf("\nFailed points saved to: points_snapped/dams_failed_to_snap.csv"))
+  fwrite(dams_failed, "points_cleaned/dams/dams_failed_to_snap.csv")
+  message(sprintf("\nFailed points saved to: points_cleaned/dams/dams_failed_to_snap.csv"))
 }
 
 
