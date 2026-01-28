@@ -2,26 +2,49 @@
 % Please edit documentation in R/api_get_basin_subcids.R
 \name{api_get_basin_subcids}
 \alias{api_get_basin_subcids}
-\title{Get Subcatchment IDs for a Basin}
+\title{Get Subcatchment IDs for Basin(s)}
 \usage{
 api_get_basin_subcids(
   basin_id = NULL,
   longitude = NULL,
   latitude = NULL,
+  csv_url = NULL,
+  colname_basin_id = NULL,
+  colname_subc_id = NULL,
+  colname_lon = "longitude",
+  colname_lat = "latitude",
   min_strahler = NULL,
   comment = NULL,
-  force_async = TRUE
+  force_async = TRUE,
+  poll_interval = 10,
+  max_wait = 3600
 )
 }
 \arguments{
-\item{basin_id}{Integer (optional). Basin ID to query. If `NULL`, must
-provide `longitude` and `latitude`. Default: `NULL`.}
+\item{basin_id}{Integer or integer vector (optional). One or more basin IDs
+to query. If `NULL`, must provide coordinates, `csv_url`, or use CSV mode.
+Default: `NULL`.}
 
 \item{longitude}{Numeric (optional). Point longitude to determine basin.
-Used only if `basin_id` is `NULL`. Default: `NULL`.}
+Used only if `basin_id` and `csv_url` are `NULL`. Default: `NULL`.}
 
 \item{latitude}{Numeric (optional). Point latitude to determine basin.
-Used only if `basin_id` is `NULL`. Default: `NULL`.}
+Used only if `basin_id` and `csv_url` are `NULL`. Default: `NULL`.}
+
+\item{csv_url}{Character (optional). URL to CSV file with basin IDs,
+subcatchment IDs, or coordinates. Default: `NULL`.}
+
+\item{colname_basin_id}{Character (optional). Name of basin ID column in CSV.
+Use when CSV contains basin IDs. Default: `NULL`.}
+
+\item{colname_subc_id}{Character (optional). Name of subcatchment ID column
+in CSV. Use when CSV contains subcatchment IDs. Default: `NULL`.}
+
+\item{colname_lon}{Character (optional). Name of longitude column in CSV.
+Required when using coordinate-based CSV input. Default: `"longitude"`.}
+
+\item{colname_lat}{Character (optional). Name of latitude column in CSV.
+Required when using coordinate-based CSV input. Default: `"latitude"`.}
 
 \item{min_strahler}{Integer (optional). Minimum Strahler order filter.
 Only subcatchments with Strahler >= this value returned.
@@ -33,44 +56,63 @@ Default: `NULL`.}
 \item{force_async}{Logical (optional). Force async/sync mode:
 `NULL` = auto-detect, `TRUE` = force async, `FALSE` = force sync.
 Default: `TRUE`.}
+
+\item{poll_interval}{Numeric. Seconds to wait between status checks when
+polling async jobs. Default: `10`.}
+
+\item{max_wait}{Numeric. Maximum seconds to wait for job completion.
+Default: `3600` (1 hour).}
 }
 \value{
-A list with elements depending on execution mode:
+A list containing:
   \describe{
+    \item{data}{data.frame. Summary with basin_id, reg_id, num_subcatchments.}
+    \item{subc_ids}{Named list. Subcatchment IDs per basin (basin_id as names).}
+    \item{href}{Character. Download URL (if provided by API).}
     \item{async}{Logical. Whether async mode was used.}
-    \item{jobID}{Character. Job ID (async mode only).}
-    \item{status}{Character. Job status (async mode only).}
-    \item{data}{data.frame. Subcatchment IDs (sync mode only).}
-    \item{href}{Character. Download URL (sync mode only).}
+    \item{jobID}{Character. Job ID (if async mode was used).}
+    \item{status}{Character. Final job status.}
   }
-  For async jobs, use `api_poll_job(result$jobID)` to check completion.
 }
 \description{
-Retrieves all subcatchment IDs within a basin from the GeoFRESH API,
-optionally filtered by minimum Strahler order. Accepts either a basin ID
-or point coordinates. Large requests automatically use async mode.
+Retrieves all subcatchment IDs within one or more basins from the GeoFRESH API,
+optionally filtered by minimum Strahler order. Supports multiple input modes:
+direct basin ID(s), point coordinates, or CSV file with basin IDs, subcatchment
+IDs, or coordinates.
+
+The function automatically handles async jobs by polling until completion and
+returning the final results.
 
 **Input modes:**
 \itemize{
-  \item Direct `basin_id` (if known)
-  \item Point coordinates (lon/lat) - basin determined from location
+  \item Single `basin_id` or vector of `basin_ids`
+  \item Point coordinates (`longitude` + `latitude`)
+  \item CSV with basin ID column
+  \item CSV with subcatchment ID column
+  \item CSV with coordinate columns (lon/lat)
 }
 }
 \examples{
 \dontrun{
-# Example 1: Using basin ID
-job <- api_get_basin_subcids(
+# Example 1: Single basin ID
+result <- api_get_basin_subcids(
   basin_id = 1288419,
   min_strahler = 6
 )
-result <- api_poll_job(job$jobID)
-subcids <- api_get_job_results(result$href)
+head(result$data)
 
-# Example 2: Using point coordinates
-job <- api_get_basin_subcids(
-  longitude = 8.278198,
-  latitude = 53.549107,
-  min_strahler = 6
+# Example 2: Multiple basin IDs
+result <- api_get_basin_subcids(
+  basin_id = c(1288419, 1288420),
+  min_strahler = 4
+)
+# Access subcatchments for basin 1288419
+result$subc_ids$`1288419`
+
+# Example 3: CSV with basin IDs
+result <- api_get_basin_subcids(
+  csv_url = "https://example.com/sites.csv",
+  colname_basin_id = "basin_id"
 )
 }
 
