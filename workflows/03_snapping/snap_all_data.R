@@ -31,9 +31,8 @@ dir.create("points_snapped/maps", recursive = TRUE, showWarnings = FALSE)
 
 
 # Load cleaned data URLs (adjust these to your actual URLs)
-hcmr_url <- "https://nimbus.igb-berlin.de/index.php/s/6wGQqJAe6p3FTJg/download/fish_points_to_snap_hcmr.csv"
+hcmr_url <- "https://nimbus.igb-berlin.de/index.php/s/gfF6G7yoNtq3gLi/download/fish_points_to_snap_hcmr.csv"
 gbif_url <- "https://nimbus.igb-berlin.de/index.php/s/jfSDnfZPwARpbYH/download/fish_gbif_clean_to_snap.csv"
-
 
 
 # ============================================================================
@@ -249,6 +248,7 @@ fwrite(gbif_snap_result, snap_out_path)
 
 message(sprintf("GBIF: Snapped %d points", nrow(gbif_snap_result)))
 
+gbif_snap_result <- fread(snap_out_path)
 
 
 

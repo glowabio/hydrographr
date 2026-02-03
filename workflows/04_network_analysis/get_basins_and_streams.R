@@ -24,11 +24,11 @@ setwd(nimbus_path)
 message("\n=== Loading Snapped Points ===")
 
 # Load combined fish data
-fish_snapped <- fread("points_snapped/all_snapped_fish_points.csv")
+fish_snapped <- fread("points_snapped/fish/all_snapped_fish_points.csv")
 message(sprintf("Loaded fish data: %d points", nrow(fish_snapped)))
 
 # Load dams data
-dams_snapped <- fread("points_snapped/dams_snapped_points.csv")
+dams_snapped <- fread("points_snapped/dams/dams_snapped_points.csv")
 message(sprintf("Loaded dams data: %d points", nrow(dams_snapped)))
 
 # Add source identifier to dams if not present
@@ -55,7 +55,6 @@ message(sprintf("Combined total: %d snapped points", nrow(all_snapped)))
 
 # write out to get the URL of the file
 fwrite(all_snapped, "points_snapped/all_points_snapped.csv")
-
 all_snapped_csv <- "https://nimbus.igb-berlin.de/index.php/s/2aXF9TLqCxZBAwt/download/all_points_snapped.csv"
 all_snapped <- fread(all_snapped_csv)
 
@@ -68,9 +67,9 @@ message("\nPoints by source:")
 
 message("\n=== Getting Basin IDs ===")
 
-basin_ids <- api_get_local_ids(csv_url = all_snapped_csv,
-                               # colname_lon = "longitude_snapped",
-                               # colname_lat = "latitude_snapped",
+basin_ids <- api_get_local_ids_async(csv_url = all_snapped_csv,
+                               colname_lon = "longitude_snapped",
+                               colname_lat = "latitude_snapped",
                                colname_site_id = "site_id",
                                colname_subc_id = "subc_id",
                                which_ids = "basin_id"
@@ -137,7 +136,7 @@ if (length(stream_networks) > 0) {
   st_write(all_streams, temp_path, delete_dsn = TRUE)
 
   # Copy to nimbus
-  nimbus_dest <- file.path(nimbus_path, "spatial/stream_networks/all_stream_networks.gpkg")
+  nimbus_dest <- file.path(nimbus_path, "spatial/stream_networks/all_stream_networks_Feb.gpkg")
   system2("cp", args = c(shQuote(temp_path), shQuote(nimbus_dest)))
   unlink(temp_path)
 
@@ -159,7 +158,25 @@ all_streams_filtered <- extract_partial_stream_network(
   upstream_buffer = 3      # number of upstream segments to include
 )
 
-save_to_nimbus(all_streams_filtered, "spatial/stream_networks/partial_stream_network2.gpkg")
+save_to_nimbus(all_streams_filtered, "spatial/stream_networks/partial_stream_network_Feb.gpkg")
+
+# write out points as .gpkg
+all_snapped_with_basins_vect <- st_as_sf(
+  all_snapped_with_basins,
+  coords = c("longitude_snapped", "latitude_snapped"),  # Column names for x, y
+  crs = 4326                  # WGS84 (lat/lon)
+)
+
+save_to_nimbus(all_snapped_with_basins_vect, "points_snapped/all_snapped_points.gpkg")
+
+# original points
+all_original_with_basins_vect <- st_as_sf(
+  all_snapped_with_basins,
+  coords = c("longitude_original", "latitude_original"),  # Column names for x, y
+  crs = 4326                  # WGS84 (lat/lon)
+)
+save_to_nimbus(all_original_with_basins_vect, "points_cleaned/all_points_before_snap.gpkg")
+
 
 # ============================================================================
 # FINAL SUMMARY

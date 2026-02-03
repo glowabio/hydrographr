@@ -62,6 +62,7 @@ Other ocgapi:
 \code{\link{api_get_env90m_data}()},
 \code{\link{api_get_job_results}()},
 \code{\link{api_get_local_ids}()},
+\code{\link{api_get_local_ids_async}()},
 \code{\link{api_get_snapped_points}()},
 \code{\link{api_get_snapped_points_cascade_async}()},
 \code{\link{api_get_snapped_points_strahler_async}()},

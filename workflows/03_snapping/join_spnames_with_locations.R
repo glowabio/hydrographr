@@ -1,6 +1,15 @@
 # ============================================================================
 # MERGE SNAPPED COORDINATES WITH SPECIES DATA
 # ============================================================================
+library(hydrographr)
+library(data.table)
+library(dplyr)
+library(leaflet)
+library(htmlwidgets)
+library(sf)
+
+wdir <- "/run/user/1000/gvfs/dav:host=nimbus.igb-berlin.de,ssl=true,user=grigoropoulou,prefix=%2Fremote.php%2Fwebdav/workflow_paper/data"
+setwd(wdir)
 
 message("\n=== Merging Snapped Data with Species Information ===")
 
@@ -9,7 +18,7 @@ fish_hcmr <- fread("points_cleaned/fish/fish_greece_hcmr.csv")
 fish_gbif <- fread("points_cleaned/fish/fish_gbif_clean.csv")
 
 # Load snapped data
-all_snapped <- fread("points_snapped/all_snapped_fish_points.csv")
+all_snapped <- fread("points_snapped/fish/all_snapped_fish_points.csv")
 
 # Separate HCMR and GBIF from snapped data
 hcmr_snapped <- all_snapped %>% filter(source == "HCMR")
@@ -21,7 +30,9 @@ fish_hcmr_snapped <- fish_hcmr %>%
   rename(
     longitude_original_hcmr = longitude,
     latitude_original_hcmr = latitude
-  )
+  ) %>% # exclude the 2 points that were not snapped
+  filter(!is.na(longitude_snapped))
+
 
 message(sprintf("HCMR: %d records with species", nrow(fish_hcmr_snapped)))
 message(sprintf("  Successfully snapped: %d (%.1f%%)",
