@@ -67,9 +67,9 @@ message("\nPoints by source:")
 
 message("\n=== Getting Basin IDs ===")
 
-basin_ids <- api_get_local_ids_async(csv_url = all_snapped_csv,
-                               colname_lon = "longitude_snapped",
-                               colname_lat = "latitude_snapped",
+basin_ids2 <- api_get_local_ids(csv_url = all_snapped_csv,
+                               # colname_lon = "longitude_snapped",
+                               # colname_lat = "latitude_snapped",
                                colname_site_id = "site_id",
                                colname_subc_id = "subc_id",
                                which_ids = "basin_id"
