@@ -51,6 +51,7 @@ Other ocgapi:
 \code{\link{api_get_local_ids_async}()},
 \code{\link{api_get_snapped_points}()},
 \code{\link{api_get_snapped_points_cascade_async}()},
+\code{\link{api_get_snapped_points_cascade_df}()},
 \code{\link{api_get_snapped_points_df}()},
 \code{\link{api_get_snapped_points_strahler_async}()},
 \code{\link{api_get_snapped_points_strahler_df}()},
