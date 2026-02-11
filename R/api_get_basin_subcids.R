@@ -2,40 +2,27 @@
 #'
 #' @description
 #' Retrieves all subcatchment IDs within one or more basins from the GeoFRESH API,
-#' optionally filtered by minimum Strahler order. Supports multiple input modes:
-#' direct basin ID(s), point coordinates, or CSV file with basin IDs, subcatchment
-#' IDs, or coordinates.
+#' optionally filtered by minimum Strahler order. Supports three input modes:
+#' \itemize{
+#'   \item Basin IDs (`basin_ids`)
+#'   \item Subcatchment IDs (`subc_ids`)
+#'   \item Point coordinates (as GeoJSON FeatureCollection)
+#' }
 #'
 #' The function automatically handles async jobs by polling until completion and
 #' returning the final results.
 #'
-#' **Input modes:**
-#' \itemize{
-#'   \item Single `basin_id` or vector of `basin_ids`
-#'   \item Point coordinates (`longitude` + `latitude`)
-#'   \item CSV with basin ID column
-#'   \item CSV with subcatchment ID column
-#'   \item CSV with coordinate columns (lon/lat)
-#' }
-#'
 #' @family ocgapi
-#' @param basin_id Integer or integer vector (optional). One or more basin IDs
-#'   to query. If `NULL`, must provide coordinates, `csv_url`, or use CSV mode.
-#'   Default: `NULL`.
-#' @param longitude Numeric (optional). Point longitude to determine basin.
-#'   Used only if `basin_id` and `csv_url` are `NULL`. Default: `NULL`.
-#' @param latitude Numeric (optional). Point latitude to determine basin.
-#'   Used only if `basin_id` and `csv_url` are `NULL`. Default: `NULL`.
-#' @param csv_url Character (optional). URL to CSV file with basin IDs,
-#'   subcatchment IDs, or coordinates. Default: `NULL`.
-#' @param colname_basin_id Character (optional). Name of basin ID column in CSV.
-#'   Use when CSV contains basin IDs. Default: `NULL`.
-#' @param colname_subc_id Character (optional). Name of subcatchment ID column
-#'   in CSV. Use when CSV contains subcatchment IDs. Default: `NULL`.
-#' @param colname_lon Character (optional). Name of longitude column in CSV.
-#'   Required when using coordinate-based CSV input. Default: `"longitude"`.
-#' @param colname_lat Character (optional). Name of latitude column in CSV.
-#'   Required when using coordinate-based CSV input. Default: `"latitude"`.
+#' @param basin_ids Integer or integer vector (optional). One or more basin IDs
+#'   to query. Default: `NULL`.
+#' @param subc_ids Integer or integer vector (optional). One or more subcatchment IDs
+#'   to query. Default: `NULL`.
+#' @param points Data.frame or matrix (optional). Points with longitude and latitude.
+#'   Must have columns matching `colname_lon` and `colname_lat`. Default: `NULL`.
+#' @param colname_lon Character. Name of longitude column in `points`.
+#'   Default: `"longitude"`.
+#' @param colname_lat Character. Name of latitude column in `points`.
+#'   Default: `"latitude"`.
 #' @param min_strahler Integer (optional). Minimum Strahler order filter.
 #'   Only subcatchments with Strahler >= this value returned.
 #'   Default: `NULL` (no filtering).
@@ -61,40 +48,44 @@
 #'
 #' @examples
 #' \dontrun{
-#' # Example 1: Single basin ID
+#' # Example 1: Using basin IDs
 #' result <- api_get_basin_subcids(
-#'   basin_id = 1288419,
-#'   min_strahler = 6
+#'   basin_ids = c(1293500, 1293501),
+#'   min_strahler = 4,
+#'   comment = "Testing basin IDs"
 #' )
+#'
+#' # Example 2: Using subcatchment IDs
+#' result <- api_get_basin_subcids(
+#'   subc_ids = c(506319029, 509342352),
+#'   min_strahler = 4,
+#'   comment = "Testing subc IDs"
+#' )
+#'
+#' # Example 3: Using point coordinates
+#' points_df <- data.frame(
+#'   longitude = c(10.217977, 11.5),
+#'   latitude = c(54.301799, 53.2)
+#' )
+#' result <- api_get_basin_subcids(
+#'   points = points_df,
+#'   min_strahler = 6,
+#'   comment = "Testing points"
+#' )
+#'
+#' # Access results
 #' head(result$data)
-#'
-#' # Example 2: Multiple basin IDs
-#' result <- api_get_basin_subcids(
-#'   basin_id = c(1288419, 1288420),
-#'   min_strahler = 4
-#' )
-#' # Access subcatchments for basin 1288419
-#' result$subc_ids$`1288419`
-#'
-#' # Example 3: CSV with basin IDs
-#' result <- api_get_basin_subcids(
-#'   csv_url = "https://example.com/sites.csv",
-#'   colname_basin_id = "basin_id"
-#' )
+#' result$subc_ids
 #' }
 #'
 #' @export
 #' @importFrom httr POST GET add_headers status_code content
 #' @importFrom jsonlite toJSON fromJSON
-#' @importFrom data.table fread
 
 api_get_basin_subcids <- function(
-    basin_id = NULL,
-    longitude = NULL,
-    latitude = NULL,
-    csv_url = NULL,
-    colname_basin_id = NULL,
-    colname_subc_id = NULL,
+    basin_ids = NULL,
+    subc_ids = NULL,
+    points = NULL,
     colname_lon = "longitude",
     colname_lat = "latitude",
     min_strahler = NULL,
@@ -106,61 +97,66 @@ api_get_basin_subcids <- function(
 
   # ---------- INPUT VALIDATION ----------
 
-  # Determine input mode
-  has_basin_id <- !is.null(basin_id)
-  has_coords <- !is.null(latitude) && !is.null(longitude)
-  has_csv <- !is.null(csv_url)
-  has_csv_basin <- has_csv && !is.null(colname_basin_id)
-  has_csv_subc <- has_csv && !is.null(colname_subc_id)
-  has_csv_coords <- has_csv && !is.null(colname_lon) && !is.null(colname_lat)
-
   # Count input methods
-  input_methods <- sum(has_basin_id, has_coords, has_csv_basin, has_csv_subc, has_csv_coords)
+  input_count <- sum(!is.null(basin_ids), !is.null(subc_ids), !is.null(points))
 
-  if (input_methods == 0) {
-    stop("Must provide one of: 'basin_id', coordinates ('latitude' + 'longitude'), ",
-         "or 'csv_url' with appropriate column names.",
+  if (input_count == 0) {
+    stop("Must provide one of: 'basin_ids', 'subc_ids', or 'points'.",
          call. = FALSE)
   }
 
-  if (input_methods > 1) {
-    message("Multiple input methods provided. Priority: basin_id > csv > coordinates.")
-    if (has_basin_id) {
-      has_coords <- FALSE
-      has_csv <- FALSE
-      has_csv_basin <- FALSE
-      has_csv_subc <- FALSE
-      has_csv_coords <- FALSE
-    } else if (has_csv) {
-      has_coords <- FALSE
-    }
+  if (input_count > 1) {
+    stop("Only one input method allowed: 'basin_ids', 'subc_ids', or 'points'.",
+         call. = FALSE)
   }
 
-  # Validate basin_id(s)
-  if (has_basin_id) {
-    if (!is.numeric(basin_id)) {
-      stop("`basin_id` must be a numeric value or vector.", call. = FALSE)
+  # Validate basin_ids
+  if (!is.null(basin_ids)) {
+    if (!is.numeric(basin_ids)) {
+      stop("`basin_ids` must be a numeric value or vector.", call. = FALSE)
     }
-    basin_id <- as.integer(basin_id)
+    basin_ids <- as.integer(basin_ids)
   }
 
-  # Validate coordinates
-  if (has_coords) {
-    if (!is.numeric(latitude) || !is.numeric(longitude)) {
-      stop("`latitude` and `longitude` must be numeric values.", call. = FALSE)
+  # Validate subc_ids
+  if (!is.null(subc_ids)) {
+    if (!is.numeric(subc_ids)) {
+      stop("`subc_ids` must be a numeric value or vector.", call. = FALSE)
     }
-    if (latitude < -90 || latitude > 90) {
-      stop("`latitude` must be between -90 and 90.", call. = FALSE)
-    }
-    if (longitude < -180 || longitude > 180) {
-      stop("`longitude` must be between -180 and 180.", call. = FALSE)
-    }
+    subc_ids <- as.integer(subc_ids)
   }
 
-  # Validate CSV URL
-  if (has_csv) {
-    if (!is.character(csv_url) || !grepl("^https?://", csv_url)) {
-      stop("`csv_url` must be a valid HTTP or HTTPS URL.", call. = FALSE)
+  # Validate points
+  if (!is.null(points)) {
+    if (!is.data.frame(points) && !is.matrix(points)) {
+      stop("`points` must be a data.frame or matrix.", call. = FALSE)
+    }
+
+    # Convert to data.frame if matrix
+    if (is.matrix(points)) {
+      points <- as.data.frame(points)
+    }
+
+    # Check for required columns
+    if (!colname_lon %in% colnames(points)) {
+      stop(sprintf("`points` must have a '%s' column.", colname_lon), call. = FALSE)
+    }
+    if (!colname_lat %in% colnames(points)) {
+      stop(sprintf("`points` must have a '%s' column.", colname_lat), call. = FALSE)
+    }
+
+    # Validate coordinate ranges
+    lons <- points[[colname_lon]]
+    lats <- points[[colname_lat]]
+
+    if (any(lats < -90 | lats > 90, na.rm = TRUE)) {
+      stop("All latitudes must be between -90 and 90.", call. = FALSE)
+    }
+    if (any(lons < -180 | lons > 180, na.rm = TRUE)) {
+      stop("All longitudes must be between -180 and 180.", call. = FALSE)
+    }
+    if (any(is.na(lons)) || any(is.na(lats))) {
+      stop("`points` cannot contain NA values.", call. = FALSE)
     }
   }
 
@@ -169,6 +165,7 @@ api_get_basin_subcids <- function(
     if (!is.numeric(min_strahler) || min_strahler < 1) {
       stop("`min_strahler` must be a positive numeric value or NULL.", call. = FALSE)
     }
+    min_strahler <- as.integer(min_strahler)
   }
 
   # ---------- DETERMINE ASYNC MODE ----------
@@ -176,8 +173,11 @@ api_get_basin_subcids <- function(
   use_async <- force_async
 
   if (is.null(use_async)) {
-    # Auto-detect: use async for low Strahler thresholds or multiple basins
-    if (is.null(min_strahler) || min_strahler <= 4 || (has_basin_id && length(basin_id) > 1)) {
+    # Auto-detect based on request complexity
+    if (is.null(min_strahler) || min_strahler <= 4 ||
+        (!is.null(basin_ids) && length(basin_ids) > 1) ||
+        (!is.null(subc_ids) && length(subc_ids) > 1) ||
+        (!is.null(points) && nrow(points) > 1)) {
       use_async <- TRUE
       message("Large request detected. Using async mode.")
     } else {
@@ -195,34 +195,39 @@ api_get_basin_subcids <- function(
   # Build inputs based on input type
   inputs <- list()
 
-  if (has_basin_id) {
-    # Always use basin_ids (plural) - API expects this even for single basin
-    inputs$basin_ids <- basin_id
+  if (!is.null(basin_ids)) {
+    # Basin IDs mode
+    inputs$basin_ids <- basin_ids
+    input_type <- "basin_ids"
 
-  } else if (has_csv_basin) {
-    # CSV with basin ID column
-    inputs$csv_url <- csv_url
-    inputs$colname_basin_id <- colname_basin_id
-  } else if (has_csv_subc) {
-    # CSV with subcatchment ID column
-    inputs$csv_url <- csv_url
-    inputs$colname_subc_id <- colname_subc_id
-  } else if (has_csv_coords) {
-    # CSV with coordinate columns
-    inputs$csv_url <- csv_url
-    inputs$colname_lon <- colname_lon
-    inputs$colname_lat <- colname_lat
-  } else if (has_coords) {
-    # Single point with GeoJSON structure
-    inputs$point <- list(
-      type = "Point",
-      coordinates = c(longitude, latitude)  # [lon, lat] order for GeoJSON
+  } else if (!is.null(subc_ids)) {
+    # Subcatchment IDs mode
+    inputs$subc_ids <- subc_ids
+    input_type <- "subc_ids"
+
+  } else if (!is.null(points)) {
+    # Points mode - build GeoJSON FeatureCollection
+    features <- lapply(1:nrow(points), function(i) {
+      list(
+        type = "Feature",
+        geometry = list(
+          type = "Point",
+          coordinates = c(points[[colname_lon]][i], points[[colname_lat]][i])
+        ),
+        properties = list()
+      )
+    })
+
+    inputs$points_geojson <- list(
+      type = "FeatureCollection",
+      features = features
     )
+    input_type <- "points"
   }
 
   # Add optional parameters
   if (!is.null(min_strahler)) {
-    inputs$min_strahler <- as.integer(min_strahler)
+    inputs$min_strahler <- min_strahler
   }
 
   if (!is.null(comment)) {
@@ -236,11 +241,6 @@ api_get_basin_subcids <- function(
       transmissionMode = "reference"
     )
   )
-
-  # Ensure basin_ids is always an array in JSON (not auto-unboxed)
-  if (!is.null(inputs$basin_ids) && length(inputs$basin_ids) == 1) {
-    body$inputs$basin_ids <- I(inputs$basin_ids)
-  }
 
   # Build headers
   headers <- c("Content-Type" = "application/json")
@@ -261,7 +261,8 @@ api_get_basin_subcids <- function(
   if (status != 200 && status != 201) {
     stop(sprintf("API request failed (HTTP %s): %s",
                  status,
-                 httr::content(response, as = "text")))
+                 httr::content(response, as = "text")),
+         call. = FALSE)
   }
 
   result <- httr::content(response, as = "parsed", simplifyVector = TRUE)
@@ -274,20 +275,22 @@ api_get_basin_subcids <- function(
     message(sprintf("  Status: %s", result$status))
 
     # Add context about what was requested
-    if (has_basin_id) {
-      if (length(basin_id) == 1) {
-        message(sprintf("  Basin ID: %d", basin_id))
+    if (input_type == "basin_ids") {
+      if (length(basin_ids) == 1) {
+        message(sprintf("  Basin ID: %d", basin_ids))
       } else {
-        message(sprintf("  Basin IDs: %s", paste(basin_id, collapse = ", ")))
+        message(sprintf("  Basin IDs: %s", paste(basin_ids, collapse = ", ")))
       }
-    } else if (has_csv) {
-      message(sprintf("  CSV: %s", basename(csv_url)))
-      if (has_csv_basin) message(sprintf("  Column: %s (basin IDs)", colname_basin_id))
-      if (has_csv_subc) message(sprintf("  Column: %s (subcatchment IDs)", colname_subc_id))
-      if (has_csv_coords) message(sprintf("  Columns: %s, %s (coordinates)", colname_lon, colname_lat))
-    } else if (has_coords) {
-      message(sprintf("  Point: [%.6f, %.6f]", longitude, latitude))
+    } else if (input_type == "subc_ids") {
+      if (length(subc_ids) == 1) {
+        message(sprintf("  Subcatchment ID: %d", subc_ids))
+      } else {
+        message(sprintf("  Subcatchment IDs: %s", paste(subc_ids, collapse = ", ")))
+      }
+    } else if (input_type == "points") {
+      message(sprintf("  Number of points: %d", nrow(points)))
     }
+
     if (!is.null(min_strahler)) {
       message(sprintf("  Min Strahler: %d", min_strahler))
     }
@@ -303,10 +306,11 @@ api_get_basin_subcids <- function(
       elapsed <- as.numeric(difftime(Sys.time(), start_time, units = "secs"))
       if (elapsed > max_wait) {
         stop(sprintf("Job did not complete within %d seconds. Job ID: %s",
-                     max_wait, job_id))
+                     max_wait, job_id),
+             call. = FALSE)
       }
 
-      # Poll job status
+      # Poll job status (assumes api_poll_job function exists)
       job_status <- api_poll_job(job_id)
 
       if (job_status$status == "successful") {
@@ -314,6 +318,7 @@ api_get_basin_subcids <- function(
 
         if (!is.null(job_status$href)) {
           message("Downloading results...")
+          # Assumes parse_job_results function exists
           parsed_results <- parse_job_results(job_status$href)
 
           message(sprintf("Retrieved %d subcatchments across %d basin(s)",
@@ -329,12 +334,15 @@ api_get_basin_subcids <- function(
             status = "successful"
           ))
         } else {
-          stop("Job completed but no download link (href) provided.")
+          stop("Job completed but no download link (href) provided.",
+               call. = FALSE)
         }
       } else if (job_status$status == "failed") {
-        stop(sprintf("Job failed. Job ID: %s", job_id))
+        stop(sprintf("Job failed. Job ID: %s", job_id),
+             call. = FALSE)
       } else if (job_status$status == "dismissed") {
-        stop(sprintf("Job was dismissed. Job ID: %s", job_id))
+        stop(sprintf("Job was dismissed. Job ID: %s", job_id),
+             call. = FALSE)
       }
 
       # Still running, wait and poll again
@@ -365,6 +373,7 @@ api_get_basin_subcids <- function(
     ))
   } else {
     # Direct sync response without href (fallback)
-    stop("Sync mode without href not yet implemented. Use async mode or contact support.")
+    stop("Sync mode without href not yet implemented. Use async mode or contact support.",
+         call. = FALSE)
   }
 }

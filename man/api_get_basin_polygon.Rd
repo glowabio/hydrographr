@@ -6,9 +6,7 @@
 \usage{
 api_get_basin_polygon(
   basin_id = NULL,
-  latitude = NULL,
-  longitude = NULL,
-  csv_url = NULL,
+  points_df = NULL,
   colname_lat = "latitude",
   colname_lon = "longitude",
   colname_site_id = "site_id",
@@ -17,20 +15,17 @@ api_get_basin_polygon(
 )
 }
 \arguments{
-\item{basin_id}{Integer. The ID of the basin to retrieve. If NULL, must provide
-either single coordinates OR csv_url.}
+\item{basin_id}{Integer or integer vector. The ID(s) of the basin(s) to retrieve.
+If NULL, must provide `points_df`.}
 
-\item{latitude}{Numeric. Latitude of a single point (used if basin_id is NULL).}
+\item{points_df}{A data.frame with columns for longitude, latitude, and site_id.
+Used if `basin_id` is NULL. Each row is sent as a lon/lat point to the API.}
 
-\item{longitude}{Numeric. Longitude of a single point (used if basin_id is NULL).}
+\item{colname_lat}{Character. Name of latitude column in `points_df`. Default: "latitude".}
 
-\item{csv_url}{Character. URL to a CSV file with multiple points (used if basin_id is NULL).}
+\item{colname_lon}{Character. Name of longitude column in `points_df`. Default: "longitude".}
 
-\item{colname_lat}{Character. Name of latitude column in CSV. Default: "latitude".}
-
-\item{colname_lon}{Character. Name of longitude column in CSV. Default: "longitude".}
-
-\item{colname_site_id}{Character. Name of site ID column in CSV. Default: "site_id".}
+\item{colname_site_id}{Character. Name of site ID column in `points_df`. Default: "site_id".}
 
 \item{geometry_only}{Logical. If `TRUE`, returns only geometry without
 attributes. Defaults to `FALSE`.}
@@ -39,44 +34,42 @@ attributes. Defaults to `FALSE`.}
 }
 \value{
 An `sf` object representing the basin polygon(s). If multiple basins
-  are retrieved (from CSV input), returns all unique basins.
+  are retrieved, returns all unique basins.
 }
 \description{
-This function returns basin polygon(s) as an `sf` object. Three input modes:
-1. Direct basin_id (single polygon)
-2. Single point coordinates (retrieves basin_id, then polygon)
-3. CSV with multiple points (retrieves basin_ids for all points, then unique polygons)
+This function returns basin polygon(s) as an `sf` object. Two input modes:
+1. One or more basin_ids (vector of integers)
+2. A data.frame with point coordinates (retrieves basin polygons via lon/lat)
 }
 \details{
 Retrieves basin polygon boundary/boundaries from the GeoFRESH API.
-Can accept either a basin_id directly, a single point (lat/lon), or a CSV
-with multiple points to retrieve multiple basin polygons.
+Can accept either basin_id(s) directly or a data.frame of point coordinates
+(lon, lat, site_id). All requests are sent as JSON to the API.
 }
 \examples{
 \dontrun{
-# Method 1: Using basin_id directly
+# Method 1: Using a single basin_id
 basin_sf <- api_get_basin_polygon(
   basin_id = 1288419,
   geometry_only = FALSE
 )
 
-# Method 2: Using single point coordinates
-basin_sf <- api_get_basin_polygon(
-  latitude = 53.5,
-  longitude = 8.6
+# Method 1b: Using a vector of basin_ids
+basins_sf <- api_get_basin_polygon(
+  basin_id = c(1288419, 1288420, 1288421)
 )
 
-# Method 3: Using CSV with multiple points
-basins_sf <- api_get_basin_polygon(
-  csv_url = "https://example.com/sites.csv",
-  colname_lat = "lat",
-  colname_lon = "lon",
-  colname_site_id = "site_id"
+# Method 2: Using a data.frame of points
+pts <- data.frame(
+  site_id = c("site_a", "site_b"),
+  longitude = c(8.6, 9.1),
+  latitude = c(53.5, 52.3)
 )
+basins_sf <- api_get_basin_polygon(points_df = pts)
 
 # Visualize
 library(leaflet)
-leaflet(basin_sf) |>
+leaflet(basins_sf) |>
   addProviderTiles("CartoDB.Positron") |>
   addPolygons(color = "blue", fillOpacity = 0.3)
 }
