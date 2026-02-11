@@ -2,62 +2,97 @@
 % Please edit documentation in R/api_get_local_ids.R
 \name{api_get_local_ids}
 \alias{api_get_local_ids}
-\title{Retrieve Local IDs for Sampling Sites}
+\title{Get Local IDs (Regional Unit, Basin, Subcatchment) for Sampling Sites}
 \usage{
 api_get_local_ids(
-  csv_url,
-  colname_lat = "latitude",
+  data = NULL,
+  csv_url = NULL,
   colname_lon = "longitude",
+  colname_lat = "latitude",
   colname_site_id = "site_id",
   colname_subc_id = NULL,
-  which_ids = "reg_id",
-  comment = NULL
+  which_ids = c("subc_id", "basin_id", "reg_id"),
+  comment = NULL,
+  force_async = NULL,
+  async_threshold = 1000,
+  poll_interval = 10,
+  max_wait = 3600
 )
 }
 \arguments{
-\item{csv_url}{Character. URL to a CSV file hosted online (must be publicly
-accessible via HTTP/HTTPS).}
+\item{data}{Data.frame (optional). Points data with longitude, latitude, and
+optionally site_id columns. Default: `NULL`.}
 
-\item{colname_lat}{Character. Name of the latitude column in CSV.
-Default: `"latitude"`.}
+\item{csv_url}{Character (optional). URL to a CSV file with point data.
+Default: `NULL`.}
 
-\item{colname_lon}{Character. Name of the longitude column in CSV.
+\item{colname_lon}{Character. Name of longitude column.
 Default: `"longitude"`.}
 
-\item{colname_site_id}{Character. Name of the site ID column in CSV.
-Default: `"site_id"`.}
+\item{colname_lat}{Character. Name of latitude column.
+Default: `"latitude"`.}
 
-\item{colname_subc_id}{Character (optional). Name of the subcatchment ID
-column in CSV if pre-computed IDs should be used. Default: `NULL`.}
+\item{colname_site_id}{Character (optional). Name of site ID column.
+If `NULL`, sequential IDs will be generated. Default: `"site_id"`.}
 
-\item{which_ids}{Character. ID type(s) to retrieve. Options: `"reg_id"`,
-`"basin_id"`, `"subc_id"`. Default: `"reg_id"`.}
+\item{colname_subc_id}{Character (optional). Name of existing subcatchment ID
+column (if available). Default: `NULL`.}
 
-\item{comment}{Character (optional). Comment for request logging.
+\item{which_ids}{Character vector. Which IDs to retrieve. Options:
+`"reg_id"`, `"basin_id"`, `"subc_id"`. Default: `c("subc_id", "basin_id", "reg_id")`.}
+
+\item{comment}{Character (optional). Comment for API logging.
 Default: `NULL`.}
+
+\item{force_async}{Logical (optional). Force async/sync mode:
+`NULL` = auto-detect, `TRUE` = force async, `FALSE` = force sync.
+Default: `NULL`.}
+
+\item{async_threshold}{Numeric. Number of points threshold for auto-async.
+Default: `1000`.}
+
+\item{poll_interval}{Numeric. Seconds to wait between status checks.
+Default: `10`.}
+
+\item{max_wait}{Numeric. Maximum seconds to wait for job completion.
+Default: `3600` (1 hour).}
 }
 \value{
-A list containing:
-  \describe{
-    \item{data}{data.frame. Retrieved IDs with one row per site.}
-    \item{href}{Character. URL of the output CSV file.}
-  }
+Data.frame with original columns plus requested ID columns
+  (reg_id, basin_id, and/or subc_id).
 }
 \description{
-Queries the GeoFRESH API to obtain regional unit, basin, and subcatchment
-IDs for sampling locations provided via a CSV file. Useful for linking
-observational data to the stream network hierarchy.
+Retrieves regional unit IDs, basin IDs, and/or subcatchment IDs for sampling
+locations. Supports two input modes:
+\itemize{
+  \item Data.frame with longitude/latitude columns
+  \item CSV URL with longitude/latitude columns
+}
+
+For large datasets, automatically uses async mode and polls for completion.
 }
 \examples{
 \dontrun{
-# Retrieve basin IDs for sampling sites
+# Example 1: From data.frame
+sites <- data.frame(
+  site_id = 1:3,
+  longitude = c(10.698833, 12.808980, 11.915323),
+  latitude = c(53.517107, 52.421871, 52.730867)
+)
+result <- api_get_local_ids(data = sites)
+head(result)
+
+# Example 2: From CSV URL
 result <- api_get_local_ids(
   csv_url = "https://example.com/sites.csv",
-  which_ids = "basin_id"
+  which_ids = c("basin_id", "reg_id")
 )
 
-# Access the data
-head(result$data)
+# Example 3: Only regional IDs (faster)
+result <- api_get_local_ids(
+  data = sites,
+  which_ids = "reg_id"
+)
 }
 
 }
