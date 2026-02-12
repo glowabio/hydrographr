@@ -143,7 +143,7 @@ api_get_snapped_points_cascade_df <- function(
     message(sprintf("Points to snap: %d", nrow(current_data)))
 
     # 1. SNAP POINTS TO CURRENT STRAHLER LEVEL
-    snapped_df <- api_get_snapped_points_strahler_json(
+    snapped_df <- api_get_snapped_points_strahler_df(
       data = current_data,
       colname_lon = colname_lon,
       colname_lat = colname_lat,
