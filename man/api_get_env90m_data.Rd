@@ -48,7 +48,6 @@ Other ocgapi:
 \code{\link{api_get_basin_subcids}()},
 \code{\link{api_get_job_results}()},
 \code{\link{api_get_local_ids}()},
-\code{\link{api_get_local_ids_async}()},
 \code{\link{api_get_snapped_points}()},
 \code{\link{api_get_snapped_points_cascade_async}()},
 \code{\link{api_get_snapped_points_cascade_df}()},

@@ -341,7 +341,6 @@ gbif_cleaned_unique <- gbif_cleaned %>%
 
 fwrite(gbif_cleaned_unique, "points_cleaned/fish/fish_gbif_clean_unique.csv")
 
-
 # GBIF data of fish might include records in the sea that we do not need
 # We can test if this is the case, trying to obtain the regional unit ID of the
 # occurrences. In case any occurrences are not assigned an ID, it means they fall in the sea
@@ -357,6 +356,13 @@ system.time(reg_unit_ids <- api_get_local_ids(csv_url = gbif_cleaned_unique_url,
                    colname_lat = "decimalLatitude",
                    colname_site_id = "gbifID",
                    which_ids = "reg_id"))
+
+
+# system.time(reg_unit_ids2 <- api_get_local_ids(data = gbif_cleaned_unique,
+#                                               colname_lon = "decimalLongitude",
+#                                               colname_lat = "decimalLatitude",
+#                                               colname_site_id = "gbifID"))
+#
 
 # Keep only occurrences that were assigned regional unit id
 # Get site_id of these occurrences
