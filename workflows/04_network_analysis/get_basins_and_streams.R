@@ -67,16 +67,15 @@ message("\nPoints by source:")
 
 message("\n=== Getting Basin IDs ===")
 
-basin_ids2 <- api_get_local_ids(csv_url = all_snapped_csv,
-                               # colname_lon = "longitude_snapped",
-                               # colname_lat = "latitude_snapped",
+basin_ids <- api_get_local_ids(data = all_snapped,
+                               colname_lon = "longitude_snapped",
+                               colname_lat = "latitude_snapped",
                                colname_site_id = "site_id",
-                               colname_subc_id = "subc_id",
-                               which_ids = "basin_id"
+                               colname_subc_id = "subc_id"
 )
 
 # Merge with snapped data
-all_snapped_with_basins <- left_join(all_snapped, basin_ids$data, by = c("site_id"))
+all_snapped_with_basins <- left_join(all_snapped, basin_ids)
 
 # Save combined file
 # fwrite(all_snapped_with_basins, "points_snapped/all_snapped_with_basins.csv")
