@@ -143,4 +143,4 @@ Collate:
     'api_get_basin_polygon.R'
     'api_get_basin_subcids.R'
     'api_get_snapped_points_strahler_df.R'
-    'api_get_snapped_points_cascade_df.R'
+    'api_get_snapped_points_cascade.R'
