@@ -5,12 +5,9 @@
 \title{Get Subcatchment IDs for Basin(s)}
 \usage{
 api_get_basin_subcids(
-  basin_id = NULL,
-  longitude = NULL,
-  latitude = NULL,
-  csv_url = NULL,
-  colname_basin_id = NULL,
-  colname_subc_id = NULL,
+  basin_ids = NULL,
+  subc_ids = NULL,
+  points = NULL,
   colname_lon = "longitude",
   colname_lat = "latitude",
   min_strahler = NULL,
@@ -21,30 +18,20 @@ api_get_basin_subcids(
 )
 }
 \arguments{
-\item{basin_id}{Integer or integer vector (optional). One or more basin IDs
-to query. If `NULL`, must provide coordinates, `csv_url`, or use CSV mode.
-Default: `NULL`.}
+\item{basin_ids}{Integer or integer vector (optional). One or more basin IDs
+to query. Default: `NULL`.}
 
-\item{longitude}{Numeric (optional). Point longitude to determine basin.
-Used only if `basin_id` and `csv_url` are `NULL`. Default: `NULL`.}
+\item{subc_ids}{Integer or integer vector (optional). One or more subcatchment IDs
+to query. Default: `NULL`.}
 
-\item{latitude}{Numeric (optional). Point latitude to determine basin.
-Used only if `basin_id` and `csv_url` are `NULL`. Default: `NULL`.}
+\item{points}{Data.frame or matrix (optional). Points with longitude and latitude.
+Must have columns matching `colname_lon` and `colname_lat`. Default: `NULL`.}
 
-\item{csv_url}{Character (optional). URL to CSV file with basin IDs,
-subcatchment IDs, or coordinates. Default: `NULL`.}
+\item{colname_lon}{Character. Name of longitude column in `points`.
+Default: `"longitude"`.}
 
-\item{colname_basin_id}{Character (optional). Name of basin ID column in CSV.
-Use when CSV contains basin IDs. Default: `NULL`.}
-
-\item{colname_subc_id}{Character (optional). Name of subcatchment ID column
-in CSV. Use when CSV contains subcatchment IDs. Default: `NULL`.}
-
-\item{colname_lon}{Character (optional). Name of longitude column in CSV.
-Required when using coordinate-based CSV input. Default: `"longitude"`.}
-
-\item{colname_lat}{Character (optional). Name of latitude column in CSV.
-Required when using coordinate-based CSV input. Default: `"latitude"`.}
+\item{colname_lat}{Character. Name of latitude column in `points`.
+Default: `"latitude"`.}
 
 \item{min_strahler}{Integer (optional). Minimum Strahler order filter.
 Only subcatchments with Strahler >= this value returned.
@@ -76,44 +63,46 @@ A list containing:
 }
 \description{
 Retrieves all subcatchment IDs within one or more basins from the GeoFRESH API,
-optionally filtered by minimum Strahler order. Supports multiple input modes:
-direct basin ID(s), point coordinates, or CSV file with basin IDs, subcatchment
-IDs, or coordinates.
+optionally filtered by minimum Strahler order. Supports three input modes:
+\itemize{
+  \item Basin IDs (`basin_ids`)
+  \item Subcatchment IDs (`subc_ids`)
+  \item Point coordinates (as GeoJSON FeatureCollection)
+}
 
 The function automatically handles async jobs by polling until completion and
 returning the final results.
-
-**Input modes:**
-\itemize{
-  \item Single `basin_id` or vector of `basin_ids`
-  \item Point coordinates (`longitude` + `latitude`)
-  \item CSV with basin ID column
-  \item CSV with subcatchment ID column
-  \item CSV with coordinate columns (lon/lat)
-}
 }
 \examples{
 \dontrun{
-# Example 1: Single basin ID
+# Example 1: Using basin IDs
 result <- api_get_basin_subcids(
-  basin_id = 1288419,
-  min_strahler = 6
+  basin_ids = c(1293500, 1293501),
+  min_strahler = 4,
+  comment = "Testing basin IDs"
 )
+
+# Example 2: Using subcatchment IDs
+result <- api_get_basin_subcids(
+  subc_ids = c(506319029, 509342352),
+  min_strahler = 4,
+  comment = "Testing subc IDs"
+)
+
+# Example 3: Using point coordinates
+points_df <- data.frame(
+  longitude = c(10.217977, 11.5),
+  latitude = c(54.301799, 53.2)
+)
+result <- api_get_basin_subcids(
+  points = points_df,
+  min_strahler = 6,
+  comment = "Testing points"
+)
+
+# Access results
 head(result$data)
-
-# Example 2: Multiple basin IDs
-result <- api_get_basin_subcids(
-  basin_id = c(1288419, 1288420),
-  min_strahler = 4
-)
-# Access subcatchments for basin 1288419
-result$subc_ids$`1288419`
-
-# Example 3: CSV with basin IDs
-result <- api_get_basin_subcids(
-  csv_url = "https://example.com/sites.csv",
-  colname_basin_id = "basin_id"
-)
+result$subc_ids
 }
 
 }
@@ -128,8 +117,10 @@ Other ocgapi:
 \code{\link{api_get_local_ids_async}()},
 \code{\link{api_get_snapped_points}()},
 \code{\link{api_get_snapped_points_cascade_async}()},
+\code{\link{api_get_snapped_points_cascade_df}()},
 \code{\link{api_get_snapped_points_df}()},
 \code{\link{api_get_snapped_points_strahler_async}()},
+\code{\link{api_get_snapped_points_strahler_df}()},
 \code{\link{api_get_snapped_points_strahler_plural}()},
 \code{\link{api_get_upstream_subcids}()}
 }

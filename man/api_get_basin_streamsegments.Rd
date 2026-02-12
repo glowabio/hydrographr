@@ -7,19 +7,34 @@
 api_get_basin_streamsegments(
   basin_id = NULL,
   subc_id = NULL,
+  lon = NULL,
+  lat = NULL,
   geometry_only = FALSE,
-  comment = NULL,
-  strahler_min = NULL
+  strahler_min = NULL,
+  add_segment_ids = NULL,
+  comment = NULL
 )
 }
 \arguments{
-\item{basin_id}{Integer. The ID of the basin to retrieve stream segments for.}
+\item{basin_id}{Integer. The ID of the basin. One of `basin_id`, `subc_id`,
+or (`lon` + `lat`) must be provided.}
+
+\item{subc_id}{Integer. A sub-catchment ID from which the basin is inferred.}
+
+\item{lon}{Numeric. Longitude of a point (used together with `lat`).}
+
+\item{lat}{Numeric. Latitude of a point (used together with `lon`).}
 
 \item{geometry_only}{Logical. If `TRUE`, returns only the geometry of the stream
 segments without associated attributes. Defaults to `FALSE`.}
 
 \item{strahler_min}{Integer (optional). The minimum Strahler stream order to include.
 Streams below this order will be excluded. Defaults to `NULL` (no filtering).}
+
+\item{add_segment_ids}{Logical (optional). If `TRUE`, segment IDs are added to
+the output. Defaults to `NULL` (omitted from request).}
+
+\item{comment}{Character. Optional comment for API logging.}
 }
 \value{
 An `sf` object representing the stream segments of the given basin.
@@ -27,6 +42,8 @@ An `sf` object representing the stream segments of the given basin.
 \description{
 This function returns all stream segments within a specified basin as spatial
 features, optionally filtering by a minimum Strahler order.
+The basin can be identified by one of: `basin_id`, `subc_id`, or
+a pair of coordinates (`lon` + `lat`). All inputs are sent as JSON.
 }
 \details{
 Sends a request to the GeoFRESH API to retrieve
@@ -34,10 +51,25 @@ stream segments belonging to a given basin and returns them as an `sf` object.
 }
 \examples{
 \dontrun{
+# Using basin_id
 segm_sf <- api_get_basin_streamsegments(
   basin_id = 1288419,
   geometry_only = FALSE,
-  strahler_min = 3
+  strahler_min = 4,
+  add_segment_ids = TRUE
+)
+
+# Using subc_id
+segm_sf <- api_get_basin_streamsegments(
+  subc_id = 506586041,
+  geometry_only = TRUE
+)
+
+# Using lon/lat
+segm_sf <- api_get_basin_streamsegments(
+  lon = 8.278198242187502,
+  lat = 53.54910661890981,
+  geometry_only = TRUE
 )
 
 library(leaflet)
@@ -58,8 +90,10 @@ Other ocgapi:
 \code{\link{api_get_local_ids_async}()},
 \code{\link{api_get_snapped_points}()},
 \code{\link{api_get_snapped_points_cascade_async}()},
+\code{\link{api_get_snapped_points_cascade_df}()},
 \code{\link{api_get_snapped_points_df}()},
 \code{\link{api_get_snapped_points_strahler_async}()},
+\code{\link{api_get_snapped_points_strahler_df}()},
 \code{\link{api_get_snapped_points_strahler_plural}()},
 \code{\link{api_get_upstream_subcids}()}
 }
