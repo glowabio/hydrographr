@@ -64,15 +64,14 @@ DISTANCE_THRESHOLD <- 400  # meters
 
 message("\n=== Snapping HCMR Data ===")
 
-hcmr_snap_result <- api_get_snapped_points_cascade_async(
-  csv_url = hcmr_url,
+hcmr_snap_result <- api_get_snapped_points_cascade(
+  data = hcmr_original,
   colname_lon = "longitude",
   colname_lat = "latitude",
   colname_site_id = "Sites",
   strahler_seq = STRAHLER_SEQ,
   distance_threshold = DISTANCE_THRESHOLD
 )
-
 print(hcmr_snap_result)
 
 # Save
@@ -228,8 +227,8 @@ if (n_failed > 0) {
 
 message("\n=== Snapping GBIF Data ===")
 
-ti <- system.time(gbif_snap_result <- api_get_snapped_points_cascade_async(
-  csv_url = gbif_url,
+ti <- system.time(gbif_snap_result <- api_get_snapped_points_cascade(
+  data = gbif_original,
   colname_lon = "decimalLongitude",
   colname_lat = "decimalLatitude",
   colname_site_id = "gbifID",
@@ -237,7 +236,7 @@ ti <- system.time(gbif_snap_result <- api_get_snapped_points_cascade_async(
   distance_threshold = DISTANCE_THRESHOLD
 ))
 
-# 218.761 seconds
+# 166 seconds
 
 print(gbif_snap_result)
 
@@ -466,8 +465,8 @@ message(sprintf("Original dams points: %d", nrow(dams_original)))
 
 # Snap dams data
 DISTANCE_THRESHOLD <- 150
-dams_snap_result <- api_get_snapped_points_cascade_async(
-  csv_url = dams_url,
+dams_snap_result <- api_get_snapped_points_cascade(
+  data = dams_original,
   colname_lon = "longitude",
   colname_lat = "latitude",
   colname_site_id = "id1",
