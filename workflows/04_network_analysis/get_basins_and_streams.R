@@ -81,6 +81,8 @@ all_snapped_with_basins <- left_join(all_snapped, basin_ids)
 # fwrite(all_snapped_with_basins, "points_snapped/all_snapped_with_basins.csv")
 message(sprintf("Saved: points_snapped/all_snapped_with_basins.csv"))
 
+all_snapped_with_basins <- fread("points_snapped/all_snapped_with_basins.csv")
+
 # Summary by source
 message("\nPoints by source:")
 source_summary <- all_snapped_with_basins %>%

@@ -134,6 +134,7 @@ message(sprintf("\n✓ CSV fixing complete: %d clean rows retained", nrow(gbif_c
 
 message("\n=== Step 2: Initial Exploration ===")
 
+gbif_raw <- fread("points_original/fish/combined_greece_fish_occurrences_fixed.csv")
 gbif_raw <- gbif_clean
 
 message(sprintf("Dataset dimensions: %d rows × %d columns", nrow(gbif_raw), ncol(gbif_raw)))
