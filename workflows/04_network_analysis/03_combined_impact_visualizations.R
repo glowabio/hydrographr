@@ -33,8 +33,8 @@ library(htmlwidgets)
 library(igraph)
 
 # Set working directory
-wdir <- "/run/user/1000/gvfs/dav:host=nimbus.igb-berlin.de,ssl=true,user=grigoropoulou,prefix=%2Fremote.php%2Fwebdav/workflow_paper/data"
-setwd(wdir)
+# wdir <- "/run/user/1000/gvfs/dav:host=nimbus.igb-berlin.de,ssl=true,user=grigoropoulou,prefix=%2Fremote.php%2Fwebdav/workflow_paper/data"
+# setwd(wdir)
 
 # ============================================================
 # PARAMETERS
@@ -101,7 +101,8 @@ dams_existing <- dams_basin %>%
   filter(status == "existing")
 
 dams_planned <- dams_basin %>%
-  filter(status == "planned")
+  filter(status == "planned") %>%
+  filter(phase != "R")
 
 dams_existing_sf <- dams_existing %>%
   st_as_sf(coords = c("longitude_snapped", "latitude_snapped"), crs = 4326)
@@ -222,7 +223,7 @@ par(mar = c(5, 4.5, 3, 0.5))
 
 barplot(conn_loss,
         names.arg = c("Current", "Future"),
-        col = c("#FDB462", "#FC8D62"),
+        col = c("#7fbf7b", "#FC8D62"),
         ylab = "Connectivity loss (%)",
         main = "(a) Population Connectivity",
         cex.lab = 1.2,
@@ -251,7 +252,7 @@ par(mar = c(5, 4.5, 3, 0.5))
 
 barplot(habitat_affected,
         names.arg = c("Current", "Future"),
-        col = c("#FDB462", "#FC8D62"),
+        col = c("#7fbf7b", "#FC8D62"),
         ylab = "Habitat affected (%)",
         main = "(b) Habitat Impact",
         cex.lab = 1.2,
@@ -280,7 +281,7 @@ par(mar = c(5, 4.5, 3, 0.5))
 
 barplot(pairs_lost,
         names.arg = c("Current", "Future"),
-        col = c("#FDB462", "#FC8D62"),
+        col = c("#7fbf7b", "#FC8D62"),
         ylab = "Disconnected pairs",
         main = "(c) Population Isolation",
         cex.lab = 1.2,
@@ -338,7 +339,7 @@ layout(matrix(c(1, 2, 3, 4), nrow = 2, byrow = TRUE))
 # Panel A
 par(mar = c(5, 4.5, 3, 0.5))
 barplot(conn_loss, names.arg = c("Current", "Future"),
-        col = c("#FDB462", "#FC8D62"), ylab = "Connectivity loss (%)",
+        col = c("#7fbf7b", "#FC8D62"), ylab = "Connectivity loss (%)",
         main = "(a) Population Connectivity", cex.lab = 1.2, cex.main = 1.4,
         cex.names = 1.1, cex.axis = 1.0, ylim = c(0, max(conn_loss) * 1.3),
         border = "white", las = 1)
@@ -351,7 +352,7 @@ mtext(paste(nrow(dams_existing), "dams          ",
 # Panel B
 par(mar = c(5, 4.5, 3, 0.5))
 barplot(habitat_affected, names.arg = c("Current", "Future"),
-        col = c("#FDB462", "#FC8D62"), ylab = "Habitat affected (%)",
+        col = c("#7fbf7b", "#FC8D62"), ylab = "Habitat affected (%)",
         main = "(b) Habitat Impact", cex.lab = 1.2, cex.main = 1.4,
         cex.names = 1.1, cex.axis = 1.0, ylim = c(0, max(habitat_affected) * 1.3),
         border = "white", las = 1)
@@ -364,7 +365,7 @@ mtext(paste(round(impact_zone_summary$affected_length_existing_m/1000, 1), "km  
 # Panel C
 par(mar = c(5, 4.5, 3, 0.5))
 barplot(pairs_lost, names.arg = c("Current", "Future"),
-        col = c("#FDB462", "#FC8D62"), ylab = "Disconnected pairs",
+        col = c("#7fbf7b", "#FC8D62"), ylab = "Disconnected pairs",
         main = "(c) Population Isolation", cex.lab = 1.2, cex.main = 1.4,
         cex.names = 1.1, cex.axis = 1.0, ylim = c(0, max(pairs_lost) * 1.3),
         border = "white", las = 1)
@@ -387,6 +388,50 @@ dev.off()
 message("  Saved: connectivity/Figure_Combined_MEE.tiff")
 
 # ============================================================
+# Create combined figure caption
+# ============================================================
+
+caption_combined <- paste0(
+  "Integrated dam impact analysis on ", EXAMPLE_SPECIES, " in basin ", TARGET_BASIN_ID,
+  " combining population connectivity and habitat degradation metrics under current and future dam scenarios. ",
+
+  "(a) Population connectivity loss: Dams disconnect ", fragmentation_summary$Percent_lost[1], "% ",
+  "of population pairs under current conditions (", nrow(dams_existing), " existing dams), ",
+  "increasing to ", fragmentation_summary$Percent_lost[2], "% if all ", nrow(dams_planned),
+  " planned dams are constructed (", nrow(dams_existing) + nrow(dams_planned), " total dams). ",
+
+  "(b) Habitat impact: Dam footprints (", service_area_summary$upstream_radius_m, " m upstream, ",
+  service_area_summary$downstream_radius_m, " m downstream) affect ",
+  round(100 * service_area_summary$proportion_affected_existing, 1), "% of total habitat ",
+  "(", round(service_area_summary$affected_length_existing_m / 1000, 1), " km) under current conditions, ",
+  "increasing to ", round(100 * service_area_summary$proportion_affected_all, 1), "% ",
+  "(", round(service_area_summary$affected_length_all_m / 1000, 1), " km) with planned dam construction. ",
+
+  "(c) Population isolation: Number of disconnected population pairs increases from ",
+  pairs_lost[1], " (current) to ", pairs_lost[2], " (future), representing ",
+  pairs_lost[2] - pairs_lost[1], " additional isolated populations. ",
+
+  "(d) Cumulative impact of planned dams: Construction of ", nrow(dams_planned), " planned dams would cause ",
+  "an additional ", round(additional_metrics[1], 1), " percentage point loss in connectivity and ",
+  round(additional_metrics[2], 1), " percentage point increase in habitat degradation. ",
+
+  "The combined analysis reveals compound effects: planned dams would simultaneously increase ",
+  "both direct habitat loss (physical footprint) and functional habitat loss (population isolation). ",
+  "Dam footprints represent immediate physical impacts within service areas, while connectivity loss ",
+  "represents network-scale functional fragmentation that can extend far beyond dam locations. ",
+  "This dual impact threatens metapopulation viability through both reduced habitat quantity and ",
+  "compromised population connectivity essential for genetic exchange and recolonization."
+)
+
+writeLines(caption_combined, "connectivity/Figure_Combined_caption.txt")
+
+message("  Saved: connectivity/Figure_Combined_caption.txt")
+
+
+
+
+
+# ============================================================
 # STEP 5: Create standalone fragmentation figures (from script 01)
 # ============================================================
 
@@ -401,7 +446,7 @@ par(mfrow = c(1, 3), mar = c(6, 5, 4, 2))
 # Panel A: Connectivity loss
 barplot(conn_loss,
         names.arg = c("Current\n(existing)", "Future\n(+ planned)"),
-        col = c("#FDB462", "#FC8D62"),
+        col = c("#7fbf7b", "#FC8D62"),
         ylab = "Connectivity loss (%)",
         main = "(a) Connectivity Loss",
         cex.lab = 1.4, cex.main = 1.6, cex.names = 1.3, cex.axis = 1.2,
@@ -412,7 +457,7 @@ text(c(0.7, 1.9), conn_loss + max(conn_loss) * 0.05,
 # Panel B: Network components
 barplot(fragmentation_summary$N_components,
         names.arg = c("Current\n(existing)", "Future\n(+ planned)"),
-        col = c("#FDB462", "#FC8D62"),
+        col = c("#7fbf7b", "#FC8D62"),
         ylab = "Network components",
         main = "(b) Network Fragmentation",
         cex.lab = 1.4, cex.main = 1.6, cex.names = 1.3, cex.axis = 1.2,
@@ -423,7 +468,7 @@ text(c(0.7, 1.9), fragmentation_summary$N_components + max(fragmentation_summary
 # Panel C: Disconnected pairs
 barplot(pairs_lost,
         names.arg = c("Current\n(existing)", "Future\n(+ planned)"),
-        col = c("#FDB462", "#FC8D62"),
+        col = c("#7fbf7b", "#FC8D62"),
         ylab = "Disconnected pairs",
         main = "(c) Lost Connections",
         cex.lab = 1.4, cex.main = 1.6, cex.names = 1.3, cex.axis = 1.2,
@@ -572,8 +617,8 @@ service_map <- leaflet() %>%
 service_map
 
 # Save map
-save_to_nimbus(service_map,
-               "connectivity/impact_zone_map.html")
+# save_to_nimbus(service_map,
+#                "connectivity/impact_zone_map.html")
 saveWidget(service_map,
                "connectivity/impact_zone_map.html")
 
