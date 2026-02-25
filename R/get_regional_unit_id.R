@@ -13,6 +13,7 @@
 #' @param lat character. The name of the column with the latitude coordinates.
 #' @param quiet logical. If FALSE, the standard output will be printed.
 #' Default is TRUE.
+#' @param tempdir character. The directory to be used as temp folder. Optional.
 #' @importFrom stringi stri_rand_strings
 #' @importFrom dplyr select
 #' @importFrom data.table fread
@@ -44,7 +45,7 @@
 # provide points as an input and get the regional units
 # where the points belong (without the full extent)
 
-get_regional_unit_id <- function(data, lon, lat, quiet = TRUE) {
+get_regional_unit_id <- function(data, lon, lat, quiet = TRUE, tempdir = NULL) {
 
   # Check if input data is of type data.frame,
   # data.table or tibble
@@ -73,8 +74,11 @@ get_regional_unit_id <- function(data, lon, lat, quiet = TRUE) {
   # Increase time to allow downloading the reg unit file
   options(timeout = max(300, getOption("timeout")))
 
+  # Use tempdir passed by user, or the default one:
+  if (is.null(tempdir)) { tempdir <- tempdir() }
+
   # global file of regional units ids
-  reg_unit_file <- paste0(tempdir(), "/regional_unit_ovr.tif")
+  reg_unit_file <- paste0(tempdir, "/regional_unit_ovr.tif")
 
   # define download paths (two options):
   nimbus_url_base <- "https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4/download?path=%2F"
@@ -154,14 +158,14 @@ get_regional_unit_id <- function(data, lon, lat, quiet = TRUE) {
     select(matches(c(lon, lat)))
 
   # Export taxon occurrence points
-  coord_tmp_path <- paste0(tempdir(), "/coordinates_", rand_string, ".txt")
+  coord_tmp_path <- paste0(tempdir, "/coordinates_", rand_string, ".txt")
 
   ## Note:Only export lon/lat column
   fwrite(coord, coord_tmp_path, col.names = TRUE,
          row.names = FALSE, quote = FALSE, sep = " ")
 
   # Path where tmp regional unit ids text file will be written
-  ids_tmp_path <- paste0(tempdir(), "/reg_unit_ids", rand_string, ".txt")
+  ids_tmp_path <- paste0(tempdir, "/reg_unit_ids", rand_string, ".txt")
 
   # Check operating system
   sys_os <- get_os()
