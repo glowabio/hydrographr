@@ -8,8 +8,11 @@ library(leaflet)
 library(htmlwidgets)
 library(sf)
 
-wdir <- "/run/user/1000/gvfs/dav:host=nimbus.igb-berlin.de,ssl=true,user=grigoropoulou,prefix=%2Fremote.php%2Fwebdav/workflow_paper/data"
-setwd(wdir)
+# Set working directory
+source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
+# Check working directory
+BASE_DIR
+setwd(BASE_DIR)
 
 message("\n=== Merging Snapped Data with Species Information ===")
 

@@ -24,15 +24,12 @@ source("~/Documents/PhD/scripts/hydrographr/workflows/helpers/save_to_nimbus.R")
 # SETUP PATHS
 # ============================================================================
 
-# Set nimbus path
-wdir <- "/run/user/1000/gvfs/dav:host=nimbus.igb-berlin.de,ssl=true,user=grigoropoulou,prefix=%2Fremote.php%2Fwebdav/workflow_paper/data"
+# Set working directory
+source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
+# Check working directory
+BASE_DIR
+setwd(BASE_DIR)
 
-# delete
-wdir <- "~/Documents/Postdoc/projects/workflow_paper/data"
-
-
-# Set local working directory
-setwd(wdir)
 
 # Create directory structure if needed
 dir.create("points_original/dams", recursive = TRUE, showWarnings = FALSE)

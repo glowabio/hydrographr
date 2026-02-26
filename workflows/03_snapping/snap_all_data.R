@@ -14,14 +14,11 @@ library(sf)
 # Load helper function
 source("~/Documents/PhD/scripts/hydrographr/workflows/helpers/save_to_nimbus.R")
 
-# Set path to nimbus data folder
-wdir <- "/run/user/1000/gvfs/dav:host=nimbus.igb-berlin.de,ssl=true,user=grigoropoulou,prefix=%2Fremote.php%2Fwebdav/workflow_paper/data"
-nimbus_path <- wdir
-
-# delete
-wdir <- "~/Documents/Postdoc/projects/workflow_paper/data"
-
-setwd(wdir)
+# Set working directory
+source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
+# Check working directory
+BASE_DIR
+setwd(BASE_DIR)
 
 
 # Create snapped points directories

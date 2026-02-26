@@ -28,13 +28,11 @@ source("~/Documents/PhD/scripts/hydrographr/workflows/helpers/save_to_nimbus.R")
 # SETUP PATHS
 # ============================================================================
 
-# Set nimbus path
-wdir <- "/run/user/1000/gvfs/dav:host=nimbus.igb-berlin.de,ssl=true,user=grigoropoulou,prefix=%2Fremote.php%2Fwebdav/workflow_paper/data"
-
-# delete
-wdir <- "~/Documents/Postdoc/projects/workflow_paper/data"
-
-setwd(wdir)
+# Set working directory
+source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
+# Check working directory
+BASE_DIR
+setwd(BASE_DIR)
 
 # Create directory structure
 dir.create("points_original/fish", recursive = TRUE, showWarnings = FALSE)
@@ -49,7 +47,7 @@ dir.create("points_cleaned/maps", recursive = TRUE, showWarnings = FALSE)
 
 message("\n=== Step 1: Reading and Fixing Raw GBIF Data ===")
 
-file_raw <- file.path(wdir, "points_original/fish/combined_greece_fish_occurrences.csv")
+file_raw <- file.path(BASE_DIR, "points_original/fish/combined_greece_fish_occurrences.csv")
 
 # Read with fread (handles large files efficiently)
 gbif <- fread(file_raw,

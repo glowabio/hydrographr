@@ -25,13 +25,12 @@ message("\n", paste(rep("=", 80), collapse = ""))
 message("HCMR FISH DATA CLEANING")
 message(paste(rep("=", 80), collapse = ""))
 
-# Set nimbus dir to write out files
-wdir <- "/run/user/1000/gvfs/dav:host=nimbus.igb-berlin.de,ssl=true,user=grigoropoulou,prefix=%2Fremote.php%2Fwebdav/workflow_paper/data"
-# delete
-wdir <- "~/Documents/Postdoc/projects/workflow_paper/data"
+# Set working directory
+source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
+# Check working directory
+BASE_DIR
+setwd(BASE_DIR)
 
-# Set local working directory
-setwd(wdir)
 
 # Create directory structure
 dir.create("points_cleaned/fish", recursive = TRUE, showWarnings = FALSE)
@@ -80,7 +79,7 @@ dry_fishless <- sp %>% filter(!is.na(DRY) | !is.na(FISHLESS))
 message(sprintf("Found %d dry or fishless sites", nrow(dry_fishless)))
 
 if (nrow(dry_fishless) > 0) {
-  fwrite(dry_fishless, file.path(wdir, "points_original/fish/fish_hcmr_dry_fishless_sites.csv"))
+  fwrite(dry_fishless, file.path(BASE_DIR, "points_original/fish/fish_hcmr_dry_fishless_sites.csv"))
   message("✓ Saved dry/fishless sites separately")
 }
 
@@ -165,7 +164,7 @@ if (file.exists(barbus_file)) {
   }
 
   # Save standalone Barbus file (for reference)
-  fwrite(spdata, file.path(wdir, "points_cleaned/fish/spdata_barbus_vjosa_clean.csv"))
+  fwrite(spdata, file.path(BASE_DIR, "points_cleaned/fish/spdata_barbus_vjosa_clean.csv"))
   message("✓ Saved standalone Barbus file: spdata_barbus_vjosa_clean.csv")
 
   # ============================================================================
@@ -206,11 +205,11 @@ for (sp_name in unique_species_final) {
 }
 
 # Write clean version
-fwrite(sp_combined, file.path(wdir, "points_cleaned/fish/fish_greece_hcmr.csv"))
+fwrite(sp_combined, file.path(BASE_DIR, "points_cleaned/fish/fish_greece_hcmr.csv"))
 message("✓ Saved: points_cleaned/fish/fish_greece_hcmr.csv")
 
 # Re-read to verify
-sp_combined <- fread(file.path(wdir, "points_cleaned/fish/fish_greece_hcmr.csv"))
+sp_combined <- fread(file.path(BASE_DIR, "points_cleaned/fish/fish_greece_hcmr.csv"))
 message(sprintf("Verified: %d rows read back", nrow(sp_combined)))
 
 # Get unique coordinates to snap
@@ -219,7 +218,7 @@ sp_to_snap <- sp_combined %>% distinct(Sites, longitude, latitude)
 message(sprintf("Unique sites to snap: %d", nrow(sp_to_snap)))
 
 # write points to snap
-fwrite(sp_to_snap, file.path(wdir, "points_cleaned/fish/fish_points_to_snap_hcmr.csv"))
+fwrite(sp_to_snap, file.path(BASE_DIR, "points_cleaned/fish/fish_points_to_snap_hcmr.csv"))
 message("✓ Saved: points_cleaned/fish/fish_points_to_snap_hcmr.csv")
 
 # ============================================================================
@@ -242,7 +241,7 @@ hcmr_map <- leaflet(sp_combined) %>%
 
 # Save map
 saveWidget(hcmr_map,
-           file.path(wdir, "points_cleaned/maps/hcmr_fish_overview.html"),
+           file.path(BASE_DIR, "points_cleaned/maps/hcmr_fish_overview.html"),
            selfcontained = TRUE)
 message("✓ Created interactive map")
 

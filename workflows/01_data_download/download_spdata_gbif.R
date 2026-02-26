@@ -11,9 +11,13 @@ source("workflows/helpers/config.R")
 
 # ── Configuration ────────────────────────────────────────────────────────────
 
+# Set working directory
+source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
+# Check working directory
+BASE_DIR
 setwd(BASE_DIR)
 
-download_path <- file.path(wdir, "points_original/fish")
+download_path <- file.path(BASE_DIR, "points_original/fish")
 dir.create(download_path, recursive = TRUE, showWarnings = FALSE)
 
 GBIF_USER  <- Sys.getenv("GBIF_USER")
