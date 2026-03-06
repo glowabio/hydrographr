@@ -202,7 +202,7 @@ extract_and_combine <- function(submitted_keys, zip_dir = download_path) {
 
   combined_df  <- as.data.frame(data.table::rbindlist(combined_list, fill = TRUE),
                                 stringsAsFactors = FALSE)
-  combined_csv <- file.path(zip_dir, "combined_greece_fish_occurrences.csv")
+  combined_csv <- file.path(zip_dir, "combined_greece_fish_occurrences_from_sp_list.csv")
   data.table::fwrite(combined_df, combined_csv)
   cat("\nCombined CSV saved to:", combined_csv, "\n")
   combined_df
