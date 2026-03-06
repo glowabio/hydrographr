@@ -42,7 +42,7 @@ save_to_nimbus <- function(data, filename, save_function = NULL, ...) {
   }
 
   # Copy to Nimbus
-  nimbus_dest <- file.path(nimbus_path, filename)
+  nimbus_dest <- file.path(getwd(), filename)
 
   # Create directory if needed
   dir.create(dirname(nimbus_dest), recursive = TRUE, showWarnings = FALSE)
