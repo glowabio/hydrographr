@@ -529,37 +529,12 @@ download_and_parse_result <- function(url, input_type) {
 
 parse_json_to_dataframe <- function(json_result) {
 
-  # The API returns a nested structure with region_ids, basin_ids, subc_ids, and "everything"
-  # Example structure:
-  # {
-  #   "region_ids": "58",
-  #   "basin_ids": "1294020",
-  #   "subc_ids": "507307015, 506601172, 507081236",
-  #   "everything": {
-  #     "58": {
-  #       "1294020": {
-  #         "506601172": [ {feature1} ],
-  #         "507307015": [ {feature2} ],
-  #         "507081236": [ {feature3} ]
-  #       }
-  #     }
-  #   }
-  # }
-
   if (is.null(json_result$everything)) {
-    stop("Unexpected JSON structure: 'everything' field not found.",
-         call. = FALSE)
+    stop("Unexpected JSON structure: 'everything' field not found.", call. = FALSE)
   }
 
-  # Initialize vectors for each column
-  site_ids <- c()
-  longitudes <- c()
-  latitudes <- c()
-  subc_ids <- c()
-  basin_ids <- c()
-  reg_ids <- c()
+  rows_list <- list()
 
-  # Navigate through the nested structure
   for (reg_id in names(json_result$everything)) {
     reg_data <- json_result$everything[[reg_id]]
 
@@ -569,43 +544,44 @@ parse_json_to_dataframe <- function(json_result) {
       for (subc_id in names(basin_data)) {
         features <- basin_data[[subc_id]]
 
-        # Each subc_id contains a list of features
         for (feature in features) {
-          # Extract properties and geometry
-          site_id <- feature$properties$site_id
+          # Get the ACTUAL property name (could be gbifID, site_id, etc.)
+          props <- feature$properties
+
+          # Extract the site_id value (use the actual property name)
+          site_id <- if (!is.null(props) && length(props) > 0) {
+            # Get the first property value (works for any property name)
+            as.character(props[[1]])
+          } else {
+            NA_character_
+          }
+
           coords <- feature$geometry$coordinates
 
-          # Append to vectors
-          site_ids <- c(site_ids, if (!is.null(site_id)) site_id else NA)
-          longitudes <- c(longitudes, as.numeric(coords[1]))
-          latitudes <- c(latitudes, as.numeric(coords[2]))
-          subc_ids <- c(subc_ids, as.integer(subc_id))
-          basin_ids <- c(basin_ids, as.integer(basin_id))
-          reg_ids <- c(reg_ids, as.integer(reg_id))
+          rows_list[[length(rows_list) + 1]] <- data.frame(
+            site_id = site_id,
+            longitude = as.numeric(coords[[1]]),
+            latitude = as.numeric(coords[[2]]),
+            # CRITICAL: Keep as character - "None" can't convert to numeric!
+            subc_id = as.character(subc_id),
+            basin_id = as.character(basin_id),
+            reg_id = as.character(reg_id),
+            stringsAsFactors = FALSE
+          )
         }
       }
     }
   }
 
-  # Check if we found any data
-  if (length(site_ids) == 0) {
+  if (length(rows_list) == 0) {
     stop("No features found in JSON result.", call. = FALSE)
   }
 
-  # Create data.frame from vectors
-  result_df <- data.frame(
-    site_id = site_ids,
-    longitude = longitudes,
-    latitude = latitudes,
-    subc_id = subc_ids,
-    basin_id = basin_ids,
-    reg_id = reg_ids,
-    stringsAsFactors = FALSE
-  )
+  result_df <- do.call(rbind, rows_list)
+  rownames(result_df) <- NULL
 
   return(result_df)
 }
-
 
 
 #' Merge Result with Original Data
@@ -694,3 +670,4 @@ merge_with_original_data <- function(original_data, result_df,
 
   return(merged)
 }
+
