@@ -16,7 +16,7 @@ source("~/Documents/Postdoc/code/workflow_paper/helpers/save_to_nimbus.R")
 # Set working directory
 source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
 # Check working directory
-BASE_DIR
+BASE_DIR <- NIMBUS_DIR
 setwd(BASE_DIR)
 
 # ============================================================================
@@ -26,7 +26,7 @@ setwd(BASE_DIR)
 message("\n=== Loading Snapped Points ===")
 
 # Load combined fish data
-fish_snapped <- fread("points_snapped/fish/all_snapped_fish_points.csv")
+fish_snapped <- fread("points_snapped/fish/all_snapped_fish_points_from_sp_list.csv")
 message(sprintf("Loaded fish data: %d points", nrow(fish_snapped)))
 
 # Load dams data
@@ -56,8 +56,8 @@ all_snapped <- rbind(
 message(sprintf("Combined total: %d snapped points", nrow(all_snapped)))
 
 # write out to get the URL of the file
-fwrite(all_snapped, "points_snapped/all_points_snapped.csv")
-all_snapped_csv <- "https://nimbus.igb-berlin.de/index.php/s/2aXF9TLqCxZBAwt/download/all_points_snapped.csv"
+fwrite(all_snapped, "points_snapped/all_points_snapped_from_sp_list.csv")
+all_snapped_csv <- "https://nimbus.igb-berlin.de/index.php/s/iJ26bGqBPK7R3C5/download/all_points_snapped_from_sp_list.csv"
 all_snapped <- fread(all_snapped_csv)
 
 # Summary by source
@@ -80,10 +80,10 @@ basin_ids <- api_get_local_ids(data = all_snapped,
 all_snapped_with_basins <- left_join(all_snapped, basin_ids)
 
 # Save combined file
-# fwrite(all_snapped_with_basins, "points_snapped/all_snapped_with_basins.csv")
-message(sprintf("Saved: points_snapped/all_snapped_with_basins.csv"))
+# fwrite(all_snapped_with_basins, "points_snapped/all_snapped_with_basins_from_sp_list.csv")
+message(sprintf("Saved: points_snapped/all_snapped_with_basins_from_sp_list.csv"))
 
-all_snapped_with_basins <- fread("points_snapped/all_snapped_with_basins.csv")
+all_snapped_with_basins <- fread("points_snapped/all_snapped_with_basins_from_sp_list.csv")
 
 # Summary by source
 message("\nPoints by source:")
@@ -102,7 +102,7 @@ print(source_summary)
 
 message("\n=== Downloading Stream Networks ===")
 
-unique_basins <- unique(all_snapped_with_basins$basin_id)
+unique_basins <- as.numeric(unique(all_snapped_with_basins$basin_id))
 message(sprintf("Processing %d unique basins", length(unique_basins)))
 
 # Create directory for stream networks
@@ -135,13 +135,14 @@ if (length(stream_networks) > 0) {
   all_streams <- do.call(rbind, stream_networks)
 
   # Save locally first
-  temp_path <- tempfile(fileext = ".gpkg")
-  st_write(all_streams, temp_path, delete_dsn = TRUE)
+  # temp_path <- tempfile(fileext = ".gpkg")
+  # st_write(all_streams, temp_path, delete_dsn = TRUE)
 
-  # Copy to nimbus
-  nimbus_dest <- file.path(nimbus_path, "spatial/stream_networks/all_stream_networks_Feb.gpkg")
-  system2("cp", args = c(shQuote(temp_path), shQuote(nimbus_dest)))
-  unlink(temp_path)
+  # Save to nimbus
+  nimbus_dest <- file.path(NIMBUS_DIR, "spatial/stream_networks/all_stream_networks.gpkg")
+  save_to_nimbus(data = all_streams, filename = nimbus_dest)
+  # system2("cp", args = c(shQuote(temp_path), shQuote(nimbus_dest)))
+  # unlink(temp_path)
 
   message(sprintf("\n✓ Saved %d stream segments from %d basins",
                   nrow(all_streams), length(unique_basins)))
@@ -161,7 +162,7 @@ all_streams_filtered <- extract_partial_stream_network(
   upstream_buffer = 3      # number of upstream segments to include
 )
 
-save_to_nimbus(all_streams_filtered, "spatial/stream_networks/partial_stream_network_Feb.gpkg")
+save_to_nimbus(all_streams_filtered, "spatial/stream_networks/partial_stream_network.gpkg")
 
 # write out points as .gpkg
 all_snapped_with_basins_vect <- st_as_sf(
@@ -170,7 +171,7 @@ all_snapped_with_basins_vect <- st_as_sf(
   crs = 4326                  # WGS84 (lat/lon)
 )
 
-save_to_nimbus(all_snapped_with_basins_vect, "points_snapped/all_snapped_points.gpkg")
+save_to_nimbus(all_snapped_with_basins_vect, "points_snapped/all_snapped_points_from_sp_list.gpkg")
 
 # original points
 all_original_with_basins_vect <- st_as_sf(
@@ -178,7 +179,7 @@ all_original_with_basins_vect <- st_as_sf(
   coords = c("longitude_original", "latitude_original"),  # Column names for x, y
   crs = 4326                  # WGS84 (lat/lon)
 )
-save_to_nimbus(all_original_with_basins_vect, "points_cleaned/all_points_before_snap.gpkg")
+save_to_nimbus(all_original_with_basins_vect, "points_cleaned/all_points_before_snap_from_sp_list.gpkg")
 
 
 # ============================================================================
