@@ -17,7 +17,7 @@ source("~/Documents/PhD/scripts/hydrographr/workflows/helpers/save_to_nimbus.R")
 # Set working directory
 source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
 # Check working directory
-BASE_DIR
+BASE_DIR <- NIMBUS_DIR
 setwd(BASE_DIR)
 
 
@@ -29,7 +29,7 @@ dir.create("points_snapped/maps", recursive = TRUE, showWarnings = FALSE)
 
 # Load cleaned data URLs (adjust these to your actual URLs)
 hcmr_url <- "https://nimbus.igb-berlin.de/index.php/s/gfF6G7yoNtq3gLi/download/fish_points_to_snap_hcmr.csv"
-gbif_url <- "https://nimbus.igb-berlin.de/index.php/s/jfSDnfZPwARpbYH/download/fish_gbif_clean_to_snap.csv"
+gbif_url <- "https://nimbus.igb-berlin.de/index.php/s/tawfdYanHB3DPgS/download/fish_gbif_from_sp_list_clean_to_snap.csv"
 
 
 # ============================================================================
@@ -239,14 +239,14 @@ print(gbif_snap_result)
 
 # Save
 min_strahler <- min(STRAHLER_SEQ)
-snap_out_path <- paste0("points_snapped/fish/gbif_snapped_points_min_strahler",min_strahler, "_dist_thresh_",DISTANCE_THRESHOLD, ".csv")
+snap_out_path <- paste0("points_snapped/fish/gbif_snapped_points_from_sp_list_min_strahler",min_strahler, "_dist_thresh_",DISTANCE_THRESHOLD, ".csv")
 fwrite(gbif_snap_result, snap_out_path)
 
 message(sprintf("GBIF: Snapped %d points", nrow(gbif_snap_result)))
 
 gbif_snap_result <- fread(snap_out_path)
 
-
+## some of the points that failed to snap are in lakes
 
 # ============================================================================
 # VISUALIZE GBIF SNAPPING
@@ -420,7 +420,7 @@ all_snapped <- rbind(
   gbif_snap_result[, ..common_cols]
 )
 
-fwrite(all_snapped, "points_snapped/fish/all_snapped_fish_points.csv")
+fwrite(all_snapped, "points_snapped/fish/all_snapped_fish_points_from_sp_list.csv")
 message(sprintf("Combined: %d total points", nrow(all_snapped)))
 
 # all_snapped <- fread("points_snapped/fish/all_snapped_fish_points.csv")
