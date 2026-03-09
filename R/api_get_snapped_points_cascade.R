@@ -61,7 +61,7 @@
 #' )
 #'
 #' # Run cascade
-#' result <- api_get_snapped_points_cascade_df(
+#' result <- api_get_snapped_points_cascade(
 #'   data = sites,
 #'   strahler_seq = c(5, 4, 3),
 #'   distance_threshold = 200
@@ -69,7 +69,7 @@
 #'
 #' # Large dataset (auto-async)
 #' gbif_data <- data.table::fread("my_fish_data.csv")
-#' result <- api_get_snapped_points_cascade_df(
+#' result <- api_get_snapped_points_cascade(
 #'   data = gbif_data,
 #'   colname_lon = "decimalLongitude",
 #'   colname_lat = "decimalLatitude",
