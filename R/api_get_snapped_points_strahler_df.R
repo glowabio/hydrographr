@@ -161,26 +161,20 @@ api_get_snapped_points_strahler_df <- function(
 
   # Create features list
   features <- lapply(1:nrow(data), function(i) {
-
-    row <- data[i, ]
-
-    # Extract coordinates
-    coords <- c(as.numeric(row[[colname_lon]]),
-                as.numeric(row[[colname_lat]]))
-
-    # Create properties object (all columns)
-    properties <- as.list(row)
-
-    # Build feature
     list(
       type = "Feature",
       geometry = list(
         type = "Point",
-        coordinates = coords
+        coordinates = c(as.numeric(data[[colname_lon]][i]),
+                        as.numeric(data[[colname_lat]][i]))
       ),
-      properties = properties
+      properties = setNames(
+        list(as.character(data[[colname_site_id]][i])),
+        colname_site_id
+      )
     )
   })
+
 
   # Build FeatureCollection
   points_geojson <- list(

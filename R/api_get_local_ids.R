@@ -157,6 +157,18 @@ api_get_local_ids <- function(
       data[[colname_site_id]] <- seq_len(nrow(data))
     }
 
+    # Check/create site_id column
+    if (!is.null(colname_site_id) && !colname_site_id %in% colnames(data)) {
+      message(sprintf("Creating sequential site IDs in column '%s'", colname_site_id))
+      data[[colname_site_id]] <- seq_len(nrow(data))
+    }
+
+    # Coerce site_id to character to ensure merge compatibility
+    if (!is.null(colname_site_id) && colname_site_id %in% colnames(data)) {
+      data[[colname_site_id]] <- as.character(data[[colname_site_id]])
+    }
+
+
     original_data <- data
     input_type <- "dataframe"
     num_points <- nrow(data)
@@ -545,28 +557,26 @@ parse_json_to_dataframe <- function(json_result) {
         features <- basin_data[[subc_id]]
 
         for (feature in features) {
-          # Get the ACTUAL property name (could be gbifID, site_id, etc.)
-          props <- feature$properties
+          props  <- feature$properties
+          coords <- feature$geometry$coordinates
 
-          # Extract the site_id value (use the actual property name)
+          # Skip features with missing geometry
+          if (is.null(coords) || length(coords) < 2) next
+
+          # Extract site_id safely — props may be NULL, empty, or missing
           site_id <- if (!is.null(props) && length(props) > 0) {
-            # Get the first property value (works for any property name)
             as.character(props[[1]])
           } else {
             NA_character_
           }
 
-          coords <- feature$geometry$coordinates
-
-          rows_list[[length(rows_list) + 1]] <- data.frame(
-            site_id = site_id,
+          rows_list[[length(rows_list) + 1]] <- list(
+            site_id  = site_id,
             longitude = as.numeric(coords[[1]]),
-            latitude = as.numeric(coords[[2]]),
-            # CRITICAL: Keep as character - "None" can't convert to numeric!
-            subc_id = as.character(subc_id),
+            latitude  = as.numeric(coords[[2]]),
+            subc_id  = as.character(subc_id),
             basin_id = as.character(basin_id),
-            reg_id = as.character(reg_id),
-            stringsAsFactors = FALSE
+            reg_id   = as.character(reg_id)
           )
         }
       }
@@ -577,12 +587,12 @@ parse_json_to_dataframe <- function(json_result) {
     stop("No features found in JSON result.", call. = FALSE)
   }
 
-  result_df <- do.call(rbind, rows_list)
+  result_df <- do.call(rbind, lapply(rows_list, as.data.frame,
+                                     stringsAsFactors = FALSE))
   rownames(result_df) <- NULL
 
   return(result_df)
 }
-
 
 #' Merge Result with Original Data
 #'
@@ -601,6 +611,15 @@ parse_json_to_dataframe <- function(json_result) {
 
 merge_with_original_data <- function(original_data, result_df,
                                      colname_site_id, colname_lon, colname_lat) {
+
+  # Coerce site_id to character in both data frames to avoid type mismatch
+  # (e.g. integer64 vs character causes bmerge errors)
+  if (!is.null(colname_site_id) && colname_site_id %in% colnames(original_data)) {
+    original_data[[colname_site_id]] <- as.character(original_data[[colname_site_id]])
+  }
+  if ("site_id" %in% colnames(result_df)) {
+    result_df[["site_id"]] <- as.character(result_df[["site_id"]])
+  }
 
   # Determine merge keys
   merge_keys <- character(0)
