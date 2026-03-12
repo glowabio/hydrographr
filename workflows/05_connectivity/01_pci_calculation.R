@@ -9,7 +9,7 @@ library(igraph)
 library(riverconn)
 library(data.table)
 library(dplyr)
-source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/06_traits/03_index_calculation_efficient.R")
+source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/pci_sparse.R")
 
 
 # ============================================================
@@ -141,7 +141,7 @@ for (name_loop in fish_species) {
     graph_future  <- attach_presence(basin_graph_future, basin_presence)
 
     # Calculate PCI — CURRENT scenario
-    pci_current <- index_calculation_efficient(
+    pci_current <- pci_sparse(
       graph_current,
       weight     = "weight",
       field_B    = "length_reach",
@@ -153,7 +153,7 @@ for (name_loop in fish_species) {
              scenario = "current")
 
     # Calculate PCI — FUTURE scenario
-    pci_future <- index_calculation_efficient(
+    pci_future <- pci_sparse(
       graph_future,
       weight     = "weight",
       field_B    = "length_reach",
