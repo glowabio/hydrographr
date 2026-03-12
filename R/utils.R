@@ -89,7 +89,6 @@ fix_path <- function(path) {
 
 }
 
-
 #' Traverse downstream along a stream network
 #'
 #' @description
@@ -237,4 +236,162 @@ traverse_upstream <- function(lines_sf, segment_id, start_fraction, max_distance
   }
 
   return(collected)
+}
+
+
+#' Trace downstream until reaching a Strahler threshold
+#'
+#' @param start_id Starting segment ID
+#' @param df Stream network data.frame with columns subc_id, target, strahler_order
+#' @param strahler_retain_threshold Minimum Strahler order to stop at
+#'
+#' @return Vector of segment IDs from start_id downstream to threshold
+#' @keywords internal
+trace_downstream <- function(start_id, df, strahler_retain_threshold) {
+  out <- start_id
+  current <- start_id
+
+  while (length(current) > 0) {
+    # Get current segment info
+    seg <- df[df$subc_id == current, ]
+    if (nrow(seg) == 0) break
+
+    # Stop if we've reached the threshold
+    if (seg$strahler_order[1] >= strahler_retain_threshold) break
+
+    # Get next downstream segment
+    next_id <- seg$target[1]
+    if (is.na(next_id)) break
+
+    out <- c(out, next_id)
+    current <- next_id
+  }
+
+  unique(out)
+}
+
+
+#' Trace upstream N steps, handling multiple tributaries
+#'
+#' @param start_id Starting segment ID
+#' @param df Stream network data.frame with columns subc_id, target
+#' @param steps Number of steps to trace upstream
+#'
+#' @return Vector of segment IDs encountered within N steps upstream
+#' @keywords internal
+trace_upstream_n <- function(start_id, df, steps) {
+  if (steps == 0) return(start_id)
+
+  out <- start_id
+  current_wave <- start_id  # All segments at current step
+
+  for (i in seq_len(steps)) {
+    # Find ALL segments that flow into ANY segment in current wave
+    parents <- df$subc_id[df$target %in% current_wave]
+
+    if (length(parents) == 0) break
+
+    out <- c(out, parents)
+    current_wave <- parents  # Next wave = all parents found
+  }
+
+  unique(out)
+}
+
+
+
+#' Helper operator for NULL coalescing
+#' @keywords internal
+`%||%` <- function(x, y) if (is.null(x)) y else x
+
+
+#' Parse job results (JSON or CSV)
+#' @keywords internal
+parse_job_results <- function(href) {
+  if (grepl("\\.json$", href, ignore.case = TRUE)) {
+    # JSON format
+    response <- httr::GET(href)
+    result <- httr::content(response, as = "parsed", simplifyVector = FALSE)  # Changed to FALSE
+
+    # Check if it's the multi-basin structure
+    if (!is.null(result$subcatchment_ids_per_basin)) {
+      # Extract data from each basin
+      basin_data <- result$subcatchment_ids_per_basin
+
+      # Create named list of subc_ids
+      subc_ids_list <- list()
+      df_list <- list()
+
+      for (i in seq_along(basin_data)) {
+        basin_info <- basin_data[[i]]
+        basin_id_str <- as.character(basin_info$basin_id)
+
+        # Extract subc_ids - handle both list and vector cases
+        if (is.list(basin_info$subc_ids)) {
+          subc_ids_list[[basin_id_str]] <- unlist(basin_info$subc_ids)
+        } else {
+          subc_ids_list[[basin_id_str]] <- basin_info$subc_ids
+        }
+
+        # Build summary data frame row
+        df_list[[i]] <- data.frame(
+          basin_id = as.integer(basin_info$basin_id),
+          reg_id = as.integer(basin_info$reg_id),
+          num_subcatchments = as.integer(basin_info$num_subcatchments),
+          stringsAsFactors = FALSE
+        )
+      }
+
+      # Combine summary data
+      df <- do.call(rbind, df_list)
+
+      # Calculate total
+      total_subcs <- sum(df$num_subcatchments)
+
+      return(list(
+        summary = df,
+        subc_ids = subc_ids_list,
+        total_subcatchments = total_subcs
+      ))
+
+    } else {
+      # Single basin or other structure
+      subcids <- if (!is.null(result$subcatchment_ids)) {
+        result$subcatchment_ids
+      } else if (!is.null(result$subc_ids)) {
+        result$subc_ids
+      } else if (!is.null(result$data)) {
+        result$data
+      } else {
+        result
+      }
+
+      # Convert to vector if it's a list
+      if (is.list(subcids) && !is.data.frame(subcids)) {
+        subcids <- unlist(subcids)
+      }
+
+      if (is.vector(subcids) && !is.list(subcids)) {
+        df <- data.frame(subc_id = subcids)
+      } else if (is.data.frame(subcids)) {
+        df <- subcids
+      } else {
+        df <- as.data.frame(subcids)
+      }
+
+      return(list(
+        summary = df,
+        subc_ids = if (is.vector(subcids) && !is.list(subcids)) subcids else NULL,
+        total_subcatchments = nrow(df)
+      ))
+    }
+  } else {
+    # CSV format
+    df <- data.table::fread(href)
+    return(list(
+      summary = df,
+      subc_ids = NULL,
+      total_subcatchments = nrow(df)
+    ))
+  }
 }

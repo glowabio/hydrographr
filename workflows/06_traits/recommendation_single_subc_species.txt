@@ -1,0 +1,101 @@
+Excellent point — this is a real methodological vs. conservation tension.
+
+## Why exclude species in only 1 subcatchment?
+
+**Mathematical reason:** PCI measures **connectivity between populations**. The formula is:
+
+**PCI = Σᵢ Σⱼ (lᵢ × lⱼ × Bᵢⱼ × cᵢⱼ) / L²**
+
+If a species is in only 1 subcatchment (i = j always), then:
+- Bᵢⱼ = dispersal capacity **between** i and j → undefined/meaningless when i=j
+- cᵢⱼ = cumulative passability **between** i and j → always 1 when i=j
+- You get PCI = (l₁ × l₁ × 1 × 1) / L² = a constant that has nothing to do with barriers or connectivity
+
+So **PCI is not designed for single-population species** — it's a graph connectivity metric that requires ≥2 nodes.
+
+## What this means for rare/endangered species
+
+You're absolutely right that excluding them is problematic:
+- Rare species often occupy 1 subcatchment (small range = endangered)
+- These species may be **most vulnerable** to fragmentation (can't recolonize if extirpated)
+- You're potentially excluding the species **most in need of conservation**
+
+## How to deal with this
+
+**Option 1: Report them separately**
+```r
+# Species excluded from PCI (n=1 subcatchment)
+single_subcatchment_species <- fish_distribution %>%
+  group_by(species) %>%
+  summarise(n_subc = n_distinct(subc_id)) %>%
+  filter(n_subc == 1)
+
+write.table(single_subcatchment_species, "species_excluded_single_subc.txt",
+            row.names = FALSE, quote = FALSE)
+
+# In your paper/analysis:
+# "X species were excluded from PCI analysis as they occurred in only one
+# subcatchment. These species warrant separate conservation attention as
+# restricted-range taxa potentially vulnerable to local extinction."
+```
+
+**Option 2: Use a different metric for single-subcatchment species**
+
+For these species, fragmentation impact = **local habitat quality + extinction risk**, not connectivity. You could assess:
+- Number of barriers **within** their single subcatchment
+- Betweenness centrality of their subcatchment (is it isolated or central?)
+- Habitat length available
+
+```r
+single_subc_risk <- fish_distribution %>%
+  group_by(species) %>%
+  filter(n_distinct(subc_id) == 1) %>%
+  left_join(subcatchments %>%
+              st_drop_geometry() %>%
+              select(subc_id, n_shp, length, pass_tot)) %>%
+  left_join(centrality_df) %>%
+  mutate(
+    risk_score = case_when(
+      n_shp > 2 ~ "High risk (>2 barriers)",
+      n_shp > 0 ~ "Moderate risk (1-2 barriers)",
+      TRUE ~ "Low barrier impact"
+    )
+  )
+```
+
+**Option 3: Treat them as "maximally fragmented"**
+
+Philosophically, a species in 1 subcatchment **could** be the result of historical fragmentation that eliminated all other populations. You could assign them:
+
+```r
+# Assign FI = 100 (maximally fragmented) to single-subcatchment species
+# with justification: "unable to measure connectivity, assumed isolated"
+fi_summary_complete <- fi_summary %>%
+  bind_rows(
+    single_subcatchment_species %>%
+      mutate(
+        PCI_fragmented = 0,
+        FI = 100,
+        note = "Single subcatchment - assumed maximally fragmented"
+      )
+  )
+```
+
+**Option 4: Meta-population context**
+
+If you have occurrence data at finer spatial resolution (point localities), you could:
+- Check if multiple **local populations** exist within the 1 subcatchment
+- If yes, calculate PCI at a finer spatial scale for that species
+- If no, treat as truly isolated (Option 3)
+
+## My recommendation
+
+**Use Option 1 + Option 2 combined:**
+
+1. Exclude single-subcatchment species from PCI (mathematically necessary)
+2. Create a separate "restricted-range species risk assessment" table
+3. In your discussion/results, explicitly state this as a limitation and call out these species as high-priority for field surveys or habitat protection
+
+This way you're honest about the metric's limitations while still drawing conservation attention to the excluded species.
+
+Does this approach work for your study?

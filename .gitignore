@@ -5,4 +5,7 @@
 TRASH
 test_downloads
 docs
+vignettes/data_*
+man/figures*
 vignettes/bib
+

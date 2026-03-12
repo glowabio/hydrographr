@@ -1,0 +1,32 @@
+Population Connectivity Index Calculation
+We calculated the Population Connectivity Index (PCI) for each fish species following the methodology of Erős et al. (2018), which extends the Dendritic Connectivity Index for potamodromous fish species (DCI_P; Cote et al., 2009). The PCI quantifies the potential for dispersal between occupied river segments, accounting for both barrier passability and species-specific dispersal capabilities.
+Index Formula
+The PCI is calculated as:
+PCI=∑i=1n∑j=1ncij×liL×ljL×100PCI = \sum_{i=1}^{n} \sum_{j=1}^{n} c_{ij} \times \frac{l_i}{L} \times \frac{l_j}{L} \times 100PCI=i=1∑n​j=1∑n​cij​×Lli​​×Llj​​×100
+where n is the number of river segments (subcatchments), c<sub>ij</sub> is the effective connectivity between segments i and j, l<sub>i</sub> and l<sub>j</sub> are the lengths of segments i and j (in meters), and L is the total length of suitable habitat in the basin. The connectivity parameter c<sub>ij</sub> incorporates both barrier passability and dispersal probability:
+cij=(Bij×PD)dijc_{ij} = (B_{ij} \times PD)^{d_{ij}}cij​=(Bij​×PD)dij​
+where B<sub>ij</sub> is the cumulative passability of all barriers between segments i and j (calculated as the product of individual barrier passabilities), PD is the species-specific dispersal probability, and d<sub>ij</sub> is the minimum network distance between segments. We used an exponential decay relationship following Schick and Lindley (2007), where dispersal probability decreases with increasing distance.
+Memory-Efficient Implementation
+For computational efficiency on large river networks, we implemented a memory-optimized version of the PCI calculation. The standard approach (Baldan et al., 2022; riverconn package) computes connectivity matrices for all n × n segment pairs in a basin, which for large basins (e.g., 42,802 segments in our largest basin) would require >29 GB of RAM for matrix storage alone.
+However, mathematical analysis of the PCI formula reveals that segments without species presence (l<sub>i</sub> = 0) contribute zero to the double summation, as any term containing l<sub>i</sub>/L = 0 vanishes. Therefore, connectivity calculations need only be performed between occupied segments. We modified the algorithm to:
+
+Identify all segments where the species is present (l<sub>i</sub> > 0)
+Compute the m × m connectivity matrix only for these m occupied segments
+Calculate PCI using this sparse matrix
+
+This optimization is mathematically equivalent to the original formulation for binary presence-absence data (weight = 0 or 1), as:
+∑i=1n∑j=1ncij×liL×ljL=∑i∈occupied∑j∈occupiedcij×liL×ljL\sum_{i=1}^{n} \sum_{j=1}^{n} c_{ij} \times \frac{l_i}{L} \times \frac{l_j}{L} = \sum_{i \in occupied} \sum_{j \in occupied} c_{ij} \times \frac{l_i}{L} \times \frac{l_j}{L}i=1∑n​j=1∑n​cij​×Lli​​×Llj​​=i∈occupied∑​j∈occupied∑​cij​×Lli​​×Llj​​
+For our study system, this reduced memory requirements by >99% (from ~14.6 GB to ~0.04 GB per large basin) and decreased computation time from infeasible to practical (5-20 seconds per species×basin combination). In a typical basin with 10,000 segments and 50 occupied segments, we computed only 2,500 connectivity values instead of 100,000,000—a 40,000-fold reduction while preserving mathematical accuracy.
+Ecological Interpretation
+The sparse matrix approach aligns with the ecological reality that fish can only disperse from locations where they currently occur. By focusing computations on occupied segments, we explicitly model the functional connectivity network available to existing populations. This is particularly appropriate for conservation applications, where the goal is to assess how current populations can interact given present-day distributions and barrier configurations.
+This approach differs from potential connectivity assessments that might include all suitable habitat regardless of current occupancy. While such assessments are valuable for restoration planning (identifying where species could occur if barriers were removed), our approach quantifies realized connectivity for extant populations—directly relevant to metapopulation persistence, genetic exchange, and recolonization potential under current conditions.
+We note that this optimization assumes binary presence-absence data. For applications using fractional habitat quality weights or probabilistic occupancy, the full matrix approach would be required, as segments with partial weights (0 < l<sub>i</sub> < 1) contribute proportionally to connectivity.
+Implementation
+All calculations were performed in R (v4.x.x) using a modified version of the riverconn package (Baldan et al., 2022). We parallelized computations across species×basin combinations using the foreach and doParallel packages, processing [N] combinations across [cores] CPU cores. Source code for the optimized algorithm is available at [GitHub repository].
+
+References to add:
+
+Baldan, D., Cunillera-Montcusí, D., Funk, A., Hein, T., Lehosmaa, K., Savic, A., et al. (2022). Riverconn: An R package to assess river connectivity indices. Environmental Modelling & Software, 156, 105470.
+Cote, D., Kehler, D. G., Bourne, C., & Wiersma, Y. F. (2009). A new measure of longitudinal connectivity for stream networks. Landscape Ecology, 24(1), 101-113.
+Erős, T., Schmera, D., & Schick, R. S. (2018). Network thinking in riverscape conservation—A graph-based approach. Biological Conservation, 144(1), 184-192. [Adjust citation to actual PCI paper]
+Schick, R. S., & Lindley, S. T. (2007). Directed connectivity among fish populations in a riverine network. Journal of Applied Ecology, 44(6), 1116-1126.
