@@ -21,17 +21,17 @@ rename <- dplyr::rename
 # Set working directory
 source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
 # Check working directory
-BASE_DIR
+BASE_DIR <- NIMBUS_DIR
 setwd(BASE_DIR)
 
 # Load efficient function
-source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/07_traits/index_calculation_efficient.R")
+source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/06_traits/03_index_calculation_efficient.R")
 
 # ============================================================
 # PARAMETERS
 # ============================================================
 MIN_SUBCATCHMENTS <- 2
-N_CORES <- detectCores() - 1  # Leave one core free for system
+N_CORES <- detectCores() - 3  # Leave one core free for system
 
 message("Using ", N_CORES, " cores for parallel processing")
 
