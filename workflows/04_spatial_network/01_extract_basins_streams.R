@@ -181,6 +181,23 @@ all_original_with_basins_vect <- st_as_sf(
 )
 save_to_nimbus(all_original_with_basins_vect, "points_cleaned/all_points_before_snap_from_sp_list.gpkg")
 
+# ============================================================================
+# DOWNLOAD BASIN POLYGONS
+# ============================================================================
+
+basin_ids <- as.integer(unique(all_snapped_with_basins$basin_id))
+basin_polygons <- api_get_basin_polygon(basin_id = basin_ids,
+                                        points_df = NULL,
+                                        colname_lat = "latitude",
+                                        colname_lon = "longitude",
+                                        colname_site_id = "site_id",
+                                        geometry_only = FALSE,
+                                        comment = NULL)
+basin_path <- file.path(NIMBUS_DIR, "spatial/stream_networks/basin_polygons.gpkg")
+save_to_nimbus(data = basin_polygons, filename = basin_path)
+
+
+
 
 # ============================================================================
 # FINAL SUMMARY
@@ -197,3 +214,7 @@ message("  - points_snapped/all_snapped_with_basins.csv")
 message("  - points_snapped/fish_snapped_with_basins.csv")
 message("  - points_snapped/dams_snapped_with_basins.csv")
 message("  - stream_networks/all_stream_networks.gpkg")
+
+
+
+
