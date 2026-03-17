@@ -206,7 +206,7 @@ catchment_pci_full    <- do.call(rbind, catchment_pci_list)
 
 dir.create("connectivity/pci", recursive = TRUE, showWarnings = FALSE)
 saveRDS(catchment_pci_full,    "connectivity/pci/catchment_pci_full.RDS")
-
+# catchment_pci_full <- readRDS("connectivity/pci/catchment_pci_full.RDS")
 # ============================================================
 # SUMMARY TABLE
 # ============================================================
