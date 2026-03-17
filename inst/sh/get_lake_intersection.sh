@@ -181,12 +181,16 @@ rm $TMPDIR/reclass_code_${LK}.txt
 grass --tmp-project $TMPDIR/lbasin_reclass_${LK}.vrt --exec bash -c "
     r.external -o input=$TMPDIR/lbasin_reclass_${LK}.vrt output=out &&
     g.region zoom=out &&
-    g.region -p &&
-    r.out.gdal input=out out=${TMPDIR}/ALLbasins_${LK}.tif \
-        format=GTiff type=Byte createopt='COMPRESS=DEFLATE,BIGTIFF=YES' --overwrite &&
-    region_info=\$(g.region -w | awk -F '[=,]' '{print \$2,\$3,\$4,\$5}') &&
-    echo \"${LK} \$region_info\" > $TMPDIR/lakes_ref_extent_${LK}.txt
-    "
+    
+    r.out.gdal -f input=out out=${TMPDIR}/ALLbasins_${LK}.tif \
+        format=GTiff type=Byte createopt='COMPRESS=DEFLATE,BIGTIFF=YES' --overwrite
+"
+
+gdalinfo ${TMPDIR}/ALLbasins_${LK}.tif | awk '
+    /Upper Left/  { match($0, /\(([^,]+),([^)]+)\)/, a); w=a[1]+0; n=a[2]+0 }
+    /Lower Right/ { match($0, /\(([^,]+),([^)]+)\)/, a); e=a[1]+0; s=a[2]+0 }
+    END { print lk, w, s, e, n }
+' lk=$LK > $TMPDIR/lakes_ref_extent_${LK}.txt
 
 # extention to consider for upstream creation
 export EXT=$(awk '{print $2, $3, $4, $5}' $TMPDIR/lakes_ref_extent_${LK}.txt)

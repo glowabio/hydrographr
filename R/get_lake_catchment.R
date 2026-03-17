@@ -125,7 +125,8 @@ get_lake_catchment <- function(data, flow = "flow_accu_mean",
     processx::run(system.file("bat", "get_lake_catchment.bat",
                               package = "hydrographr"),
                   args = c(wsl_lak_tmp_path, lake_id, wsl_direction, wsl_tmp_path,
-                           wsl_lake_basin, n_cores, wsl_sh_file, echo = !quiet))
+                           wsl_lake_basin, n_cores, wsl_sh_file),
+                           echo = !quiet)
 
   }
   # Return message
