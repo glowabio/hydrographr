@@ -1,0 +1,1139 @@
+---
+title: "Case study - Magdalena river basin"
+output: html_document
+bibliography: references.bib
+---
+
+
+### Introduction
+
+The following workflow uses functions of the hydrographr R package to download and process the Hydrography90m [Amatulli2022] and the Environment90m [@essd-2025-399] datasets with the aim of preparing and processing the data needed to run a species distribution model to predict the habitat suitability of a fish species in the Magdalena river basin.
+
+### The species 
+
+*Pseudoplatystoma magdaleniatum* (Bagre rayado del Magdalena) is a large, migratory pimelodid (Family Pimelodidae) catfish endemic to the Magdalena–Cauca River system in Colombia [@BuitragoSuarez2007]. The species is currently classified as Endangered on the IUCN Red List, primarily due to overfishing, habitat degradation, and the fragmentation of migratory routes caused by dam construction [@Mojica2012].
+
+```{r fig.cap="Figura 1. *Pseudoplatystoma magdaleniatum* (Bagre rayado del Magdalena). Foto: Felipe Villegas, Instituto Humboldt. Source: https://www.humboldt.org.co/noticias/los-peces-del-rio-grande-de-la-magdalena-unicos-y-amenazados", out.width="80%", echo=FALSE}
+knitr::include_graphics("bagremagdalena.jpg")
+```
+
+### 1. Setting up the package environment and working directory
+
+We begin by loading the required packages and creating a working directory where all downloaded and processed files will be stored.
+
+```{r, eval=FALSE}
+#install.packages("remotes")
+#remotes::install_github("glowabio/hydrographr")
+
+# Load required packages
+library(hydrographr)
+library(sf)
+library(dplyr)
+library(leaflet)
+library(stringr)
+library(data.table)
+library(corrplot)
+library(usdm)
+library(ranger)
+library(caret)
+library(tmap)
+library(terra)
+library(viridisLite)
+library(pROC)
+library(ggplot2)
+library(pdp)
+```
+
+
+```{r, eval=FALSE}
+# Set up a working directory where all files will be downloaded. This is a read-only
+# directory 
+read_dir <- file.path(getwd(), "data_readonly")
+
+# Create the directory if it does not exist yet
+if (!dir.exists(read_dir)) {
+  dir.create(read_dir)
+}
+
+# Set up a working directory to write processed data
+# Create the directory if it does not exist yet
+
+write_dir <- file.path(getwd(), "data_write")
+
+# Create the directory if it does not exist yet
+if (!dir.exists(write_dir)) {
+  dir.create(write_dir)
+}
+
+```
+
+### 2. Occurrence data
+
+First, we will load and explore the occurrence dataset of *Pseudoplatystoma magdaleniatum*.
+The goal is to understand the temporal and spatial characteristics of the available records before using them for modelling.
+
+We will start by reading the dataset (a CSV file containing latitude, longitude, and year of observation) and inspecting its structure. Next, we will remove duplicate records with identical coordinates to ensure that each occurrence represents a unique sampling location.
+
+
+```{r,eval=FALSE}
+# Read species occurrence points (example CSV file stored in "data/")
+occ_pts <- read.csv(file.path(read_dir, "points_fish_colombia.csv"))
+
+# Inspect the structure and basic contents of the occurrence dataset
+names(occ_pts)       # Display column names
+head(occ_pts)        # Show the first few records to inspect data format
+
+# Keep only records with unique geographic coordinates
+occ_pts <- occ_pts %>%
+  distinct(longitude, latitude, .keep_all = TRUE) 
+  
+# Examine the temporal coverage of records
+range(occ_pts$year, na.rm = TRUE)   # Range of sampling years
+```
+
+Finally, we will convert the cleaned occurrence records into a spatial object and display them on an interactive map to verify their geographic distribution within the Magdalena basin.
+
+```{r, eval=FALSE}
+# Convert occurrence points to an sf object and visualize them on a map
+occ_pts_sf <- st_as_sf(occ_pts, coords = c("longitude", "latitude")) %>%
+  st_set_crs("WGS84")
+
+leaflet(occ_pts_sf) %>%
+  addProviderTiles("OpenStreetMap.Mapnik") %>%
+  setMaxBounds(-77.0, 1.0, -70.0, 12.0) %>%
+  addCircles(color = "purple")
+
+```
+
+
+### 3. Downloading hydrography layers
+
+The sub-catchments will serve as the spatial units for the species distribution models. To define the study area, we first identify the tiles covering the Magdalena River Basin using the [Hydrography90m portal](https://hydrography.org/hydrography90m/hydrography90m_layers). We then download the corresponding tiles containing the sub-catchment raster, as well as the basin raster and basin vector (GPKG) layers. These layers are required to preprocess and crop the sub-catchment raster to match the extent of the Magdalena Basin.
+
+First, we specify the tile IDs covering the Magdalena basin:
+
+```{r, eval=FALSE}
+# Specify tile IDs covering the Magdalena basin
+tile_id <- c("h10v08", "h10v06")
+```
+
+Now, we are ready to download the basin and sub-catchemnt layers as raster and vector tiles.
+
+Raster layers:
+
+```{r,  eval=FALSE}
+
+# Do NOT RUN
+
+# Download basin and sub-catchment layers as raster tiles
+download_tiles(variable = c("sub_catchment", "basin"), tile_id = tile_id, 
+               file_format = "tif", download_dir = read_dir)
+```
+
+Vector layers: 
+
+```{r, eval=FALSE}
+
+# DO NOT RUN
+
+# Download vector (gpkg) basin tiles to later extract only the Magdalena basin
+download_tiles(variable = "basin", tile_id = tile_id, file_format = "gpkg",
+               download_dir = read_dir)
+```
+
+### 4. Extracting the Magdalena basin
+
+The downloaded tiles include multiple basins beyond the Magdalena. In this step, we identify the basin ID corresponding to the Magdalena River Basin and filter the vector files accordingly, retaining only the polygons that belong to this basin.
+
+First, we identify the basin ID:
+
+```{r, eval=FALSE}
+
+# Path to raster tiles containing the basins
+basin_tiles_tif <- list.files(file.path(read_dir, "r.watershed", "basin_tiles20d"), 
+                              pattern = "\\.tif$", full.names = TRUE)
+
+# Create an empty vector to store extracted basin ID
+ID <- vector(mode = "numeric", length = length(basin_tiles_tif))
+
+# Loop through basin tiles to extract the basin IDs at occurrence points 
+for (itile in 1:length(basin_tiles_tif)) {
+  ID[itile] <- extract_ids(data = occ_pts,
+                           lon = "longitude",
+                           lat = "latitude",
+                           id = "occ_id",
+                           basin_layer = basin_tiles_tif[itile]) %>%
+    distinct(basin_id) %>%
+    pull()
+}
+
+# Show the result
+ID
+```
+
+Filter only the Magdalena basin from GPKG files:
+
+```{r, eval=FALSE}
+# List all GPKG tiles containing basin polygons   
+basin_tiles_gpkg <- list.files(file.path(read_dir, "r.watershed", "basin_tiles20d"), 
+                               pattern = "\\.gpkg$", full.names = TRUE)
+
+# Loop through each GPKG tile and import only polygons matching the target basin ID(s)
+for(itile in basin_tiles_gpkg) {
+  
+  # Import basin polygons as an sf object, filtering by the selected ID(s)
+  filtered_tile <- read_geopackage(itile,
+                                   import_as = "sf",
+                                   subc_id = ID[!is.na(ID)],
+                                   name = "ID")
+  # Save the filtered polygons to disk as temporary files
+  write_sf(filtered_tile, file.path(write_dir,
+                                    paste0(str_remove(basename(itile), ".gpkg"), "_tmp.gpkg")))
+}
+```
+
+We then merge the filtered basin GPKG tiles into a single vector file representing the complete Magdalena River Basin.
+
+```{r, eval=FALSE}
+# Merge into a single file
+merged_tiles <- merge_tiles(tile_dir = write_dir,
+            tile_names = list.files(write_dir, full.names = FALSE, pattern = "_tmp.gpkg$"),
+            out_dir = write_dir,
+            file_name = "basin_magdalena.gpkg",
+            name = "ID",
+            read = TRUE)
+```
+
+Visualize the merged tiles:
+
+```{r, eval=FALSE}
+# Visualize the result
+leaflet() %>%
+  addProviderTiles("OpenStreetMap.Mapnik") %>%
+  setMaxBounds(-77.0, 1.0, -70.0, 12.0) %>%
+  addPolygons(data = merged_tiles,
+              color = "#1B7837",    # Dark green border
+              weight = 2,
+              opacity = 0.8,
+              fillColor = "#A6DBA0", # Light green fill
+              fillOpacity = 0.3,
+              group = "Magdalena Basin") %>%
+  addCircles(data = occ_pts_sf,
+             color = "purple",
+             radius = 200,
+             opacity = 0.8,
+             fillOpacity = 0.6,
+             group = "Occurrences") %>%
+  addLayersControl(
+    overlayGroups = c("Magdalena Basin", "Occurrences"),
+    options = layersControlOptions(collapsed = FALSE)
+  )
+```
+
+
+### 5. Preparing the sub-catchment raster
+
+Next, we crop and merge the sub-catchment raster tiles to match the extent of the Magdalena basin, using the basin vector layer (GPKG) as a mask to ensure that only sub-catchments within the basin are retained.
+
+Crop raster tiles:
+
+```{r, eval=FALSE}
+# List all raster tiles containing sub-catchments
+raster_files <- list.files(file.path(read_dir, "r.watershed", "sub_catchment_tiles20d"), 
+                           pattern = ".tif$", full.names = TRUE)
+
+# Loop through each raster tile and crop it to the extent of the Magdalena basin
+# The basin boundary (GPKG file) is used as a spatial mask to retain only relevant sub-catchments
+for (ifile in raster_files) {
+  crop_to_extent(
+    ifile,
+    vector_layer = file.path(write_dir, "basin_magdalena.gpkg"),
+    out_dir = write_dir,
+    file_name = paste0(str_remove(basename(ifile), ".tif"), "_crop.tif"),
+    read = FALSE,
+    quiet = TRUE
+  )
+}
+```
+
+Merge cropped raster tiles into a single sub-catchment raster file
+
+```{r, eval=FALSE}
+# Merge all cropped raster tiles into a single sub-catchment raster
+# This creates a continuous layer covering the entire Magdalena basin
+merge_tiles(tile_dir = write_dir,
+            tile_names = list.files(write_dir, full.names = FALSE, pattern = "_crop.tif"),
+            out_dir = write_dir,
+            file_name = "subcatchments.tif",
+            read = FALSE, 
+            bigtiff = TRUE)
+```
+
+Clean up temporary files to save disk space:
+
+```{r, eval=FALSE}
+# Remove temporary files created during preprocessing to save disk space
+# This includes cropped raster tiles, temporary basin GPKG files, 
+# and the r.watershed directory used for intermediate storage
+file.remove(list.files(write_dir, pattern = "_crop.tif", full.names = TRUE))
+file.remove(list.files(write_dir, pattern = "_tmp.gpkg", full.names = TRUE))
+```
+
+### 6. Extracting sub-catchment IDs
+
+Finally, we create a list of sub-catchment IDs to use for extracting environmental variables in the next step.
+
+```{r, eval=FALSE}
+
+# Extract the unique sub-catchment IDs from the merged raster
+subc_ids <- extract_ids(subc_layer = file.path(write_dir, "subcatchments.tif"))
+
+# Inspect the extracted IDs
+head(subc_ids)
+nrow(subc_ids)
+
+# Save the list of sub-catchment IDs to a text file for later use
+fwrite(subc_ids, file=file.path(write_dir, "subc_ids.txt"))
+```
+
+### 7. Environmental information
+
+Now we will proceed to download the tables of the **Environment90m** dataset [@essd-2025-399], which provide globally standardized environmental layers for freshwater biodiversity modelling, that are relevant for *Pseudoplatystoma magdaleniatum*. We have implemented functions to download each of the different datasets (topography, climate, land cover, soils), which we will later combine for the analysis. The corresponding environmental variables can be explored at the [Environment90m layers page](https://hydrography.org/environment90m/environment90m_layers).
+
+You can inspect the variable names in each dataset by calling the corresponding function without arguments. For example:
+
+Topography
+
+```{r, eval=FALSE}
+download_hydrography90m_tables()
+```
+
+Climate 
+
+```{r, eval=FALSE}
+download_observed_climate_tables()
+```
+
+Land cover
+
+```{r, eval=FALSE}
+download_landcover_tables()
+```
+
+Soil
+
+```{r, eval=FALSE}
+download_soil_tables()
+```
+
+
+We will download few variables related to few topography variables describing the properties of the stream segments, climate, the land cover, and soil. In total, we will download around 23 GB. 
+
+### 8. Topographic variables
+
+For the topographic predictors, we will choose variables that capture the physical structure of river systems relevant to *Pseudoplatystoma magdaleniatum*. We will use **flow accumulation** as a proxy for river discharge and size, since this species occurs only in large mainstem channels. We will include **outlet distance (outlet_dist_dw_basin)** to represent the longitudinal extent of accessible river habitat, which reflects migration potential. To account for the hydraulic environment, we will select **channel gradient (channel_grad_dw_seg)**, which distinguishes the low-gradient reaches preferred by the species from steeper, less suitable sections. We will also incorporate the **Stream Power Index (spi)**, which integrates slope and discharge to estimate erosive energy and substrate stability, important for spawning. Finally, we will include the **Compound Topographic Index (cti)** as a proxy for floodplain wetness and inundation potential, which relates directly to the lateral habitats used for feeding and juvenile development.
+
+```{r, eval=FALSE}
+
+
+# Define variables of interest
+topo_vars   <- c("accumulation", "outlet_dist_dw_basin", 
+                 "channel_grad_dw_seg", "spi", "cti")
+
+
+#
+# DO NOT RUN
+
+# Download the selected topographic variables for the Magdalena basin.
+# The data will be saved in text format in the "data_dir" folder.
+download_hydrography90m_tables(subset = topo_vars,
+                               tile_ids = tile_id,
+                               download = TRUE,
+                               download_dir = read_dir,
+                               file_format = "txt",
+                               delete_zips = TRUE,
+                               ignore_missing = FALSE,
+                               tempdir = NULL,
+                               quiet = FALSE)
+```
+
+### 9. Climatic variables
+
+For climate, we will select variables that describe both thermal conditions and precipitation regimes. We will use **annual mean temperature (bio1)** to represent the overall thermal environment, and **minimum temperature of the coldest month (bio6)** to capture the lower thermal limits that may restrict the species in high-elevation tributaries. To reflect variability in temperature across the year, we will choose **temperature seasonality (bio4)**. On the precipitation side, we will include **annual precipitation (bio12)** to capture general water availability. We will also use **precipitation seasonality (bio15)** to represent the timing and strength of flood pulses that trigger migrations and reproduction. Finally, we will add **precipitation of the driest quarter (bio17)** to capture the intensity of dry-season bottlenecks that limit connectivity and survival. With this selection, we will account for both mean conditions and seasonal extremes.
+
+```{r,eval=FALSE}
+
+# Define variables of interest
+clim_vars   <- c("bio01_1981-2010_observed", "bio06_1981-2010_observed", "bio04_1981-2010_observed", "bio12_1981-2010_observed", "bio15_1981-2010_observed", "bio17_1981-2010_observed")
+
+# DO NOT RUN
+
+# Download the selected climatic variables for the Magdalena basin.
+# The data will be saved in text format in the "data_dir" folder.
+download_observed_climate_tables(subset = clim_vars,
+                                 tile_ids = tile_id,
+                                 download = TRUE,
+                                 download_dir = read_dir,
+                                 file_format = "txt",
+                                 delete_zips = TRUE,
+                                 ignore_missing = FALSE,
+                                 tempdir = NULL,
+                                 quiet = FALSE)
+```
+
+The tables have been downloaded to a new folder which has been named according to each dataset and automatically unzipped. By taking a look at any of the tables with climate information we can see that for every sub-catchment different statistics (i.e., minimum, maximum, mean, standard deviation, range) are available and that the format is columns separated by space.
+
+### 10. Land cover variables
+
+For land cover, we will combine indicators of human disturbance with variables representing natural habitats critical to the species. We will select **rainfed cropland (c10)** and **cropland-natural vegetation mosaics (c30)** as indicators of agricultural expansion, which is a major driver of habitat degradation in the Magdalena basin. To represent riparian and floodplain forests, we will include **broadleaved evergreen tree cover (c50)**. To capture seasonally inundated habitats essential for feeding and juvenile rearing, we will retain **flooded tree cover (c160)**. We will also add **urban areas (c190)** as proxies for anthropogenic pressures such as pollution and channel modification. Finally, we will include **water bodies (c210)** to account for floodplain lakes and aquatic habitats associated with the mainstem river. This set will balance disturbance indicators with natural habitat features.
+
+```{r,eval=FALSE}
+
+
+# Define variables of interest
+land_vars   <- c("c10", "c30", "c50", "c160", "c190", "c210")
+
+# DO NOT RUN 
+
+# Download the selected land cover variables for the Magdalena basin.
+# These variables describe natural vegetation, croplands, water bodies, and urban areas.
+# The data will be saved in text format in the "data_dir" folder.
+download_landcover_tables(base_vars = land_vars,
+                          years = c("2020"),
+                          tile_ids = tile_id,
+                          download = TRUE,
+                          download_dir = read_dir,
+                          file_format = "txt",
+                          delete_zips = TRUE,
+                          ignore_missing = FALSE,
+                          tempdir = NULL,
+                          quiet = FALSE)
+```
+
+### 11. Soil variables
+
+Although soils influence fish distributions only indirectly, we will include a small subset of soil predictors that are ecologically meaningful. We will use **clay fraction** as a proxy for fine sediment erosion and turbidity, which affect feeding efficiency and spawning substrate stability. We will select **soil pH** to account for chemical conditions that influence water chemistry and aquatic productivity. Finally, we will include **soil organic carbon** as a proxy for floodplain fertility and productivity, which supports prey availability for *P. magdaleniatum*. With these three variables, we will complement our topographic, climatic, and land cover predictors by representing substrate conditions, water chemistry, and the productivity of floodplain habitats.
+
+```{r,eval=FALSE}
+
+# Define variables of interest
+soil_vars   <- c("clyppt", "phihox", "orcdrc")
+
+# DO NOT RUN
+
+# Download the selected soil variables for the Magdalena basin.
+# These include clay fraction, soil pH, and soil organic carbon,
+# The data will be saved in text format in the "data_dir" folder.
+download_soil_tables(subset = soil_vars,
+                     tile_ids = tile_id,
+                     download = TRUE,
+                     download_dir = read_dir,
+                     file_format = "txt",
+                     delete_zips = TRUE,
+                     ignore_missing = FALSE,
+                     tempdir = NULL,
+                     quiet = FALSE)
+```
+
+### 12. Prediction table
+
+Once we have downloaded all environmental datasets of interest, we will proceed to create the prediction table. This table will contain the values of all selected environmental variables for the sub-catchments of interest—in our case, those within the Magdalena basin.
+
+We will refer to this as the prediction table because it will serve as the reference dataset used later to generate model predictions. Specifically, we will use it to predict habitat suitability values across all sub-catchments at the end of the exercise, using one of the available predict functions in R.
+
+The function `get_predict_table()` will automatically join all downloaded environmental variables based on the sub-catchment IDs. In this example, we will use the sub-catchment identifiers stored in the object subc_ids, which we previously created and saved in the file `subc_ids.txt`.
+
+Before creating the prediction table, we can enable parallel processing to speed up the data extraction and table assembly. Parallelisation in `get_predict_table()` occurs at the variable level—each environmental variable can be processed by a separate core.
+
+Since we are using several environmental variables in this example (five topographic, six climatic, six land cover, and three soil variables), we can take advantage of multiple cores to reduce computation time. To check the number of available cores on your system, you can use:
+
+```{r, eval=FALSE}
+cores <- parallel::detectCores()
+```
+
+The process takes around 7 minutes with 13 cores.
+
+```{r, eval=FALSE}
+# Create the prediction table by merging all downloaded environmental layers.
+# Parallelization is set to use total number of cores - 1 to process variables simultaneously.
+# The resulting table will be saved as "predict_table.csv" and read into R.
+variable <- c(topo_vars, clim_vars, "c10_2020", "c30_2020", "c50_2020", "c160_2020", "c190_2020", "c210_2020", soil_vars)
+              
+predict_table <- get_predict_table(
+  variable = variable,
+  statistics = c("mean"),
+  tile_id = tile_id,
+  input_var_path = read_dir,
+  subcatch_id = file.path(write_dir, "subc_ids.txt"),
+  out_file_path = file.path(write_dir, "predict_table.csv"),
+  read = TRUE,
+  quiet = FALSE,
+  overwrite = TRUE,
+  n_cores = cores - 1
+)
+```
+
+### 13. Quality check of the prediction table
+
+After creating the prediction table, it is good practice to perform a brief quality check before proceeding with model calibration. This allows us to verify that all variables were successfully extracted, that there are no missing values, and that predictors are not strongly correlated. High collinearity among variables can reduce model interpretability and lead to unstable model estimates, so it is essential to identify and remove redundant predictors.
+
+We will start by inspecting the table dimensions, checking for missing data, and reviewing the ranges of selected variables. We will then explore correlations among predictors and demonstrate how to filter out highly collinear variables.
+
+```{r, eval=FALSE}
+# Inspect the name of variables
+names(predict_table)
+# Check number of sub-catchments
+ifelse(
+  nrow(predict_table) == nrow(subc_ids),
+  "The number of rows in the prediction table matches the number of sub-catchments.",
+  "Mismatch detected: the number of sub-catchments and prediction table rows differ."
+) 
+# Check for missing values in each column
+colSums(is.na(predict_table))
+
+ # Simplify column names for readability
+  colnames(predict_table) <- gsub("_1981-2010_observed", "", colnames(predict_table))
+```
+
+Now we will assess collinearity among predictors using both pairwise correlations and the Variance Inflation Factor (VIF), which provides a measure of how much multicollinearity inflates the variance of regression coefficients.
+
+```{r,eval=FALSE}
+# Select numeric predictor variables (mean values only)
+numeric_vars <- predict_table %>%
+  dplyr::select(where(is.numeric)) %>%
+  dplyr::select(ends_with("_mean") | ends_with("2020"))
+
+# Compute correlation matrix
+cor_matrix <- cor(numeric_vars, use = "complete.obs")
+
+# Visualize correlations
+corrplot(cor_matrix, method = "color", type = "lower", tl.cex = 0.6, diag = FALSE)
+```
+
+High pairwise correlations (|r| > 0.7) indicate potential redundancy. To refine our predictor set, we can use the function `vifstep()` from the usdm package, which sequentially removes variables with high VIF values until all remaining predictors are below a given threshold (here we use 10 as the standard limit).
+
+```{r,eval=FALSE}
+# Perform Variance Inflation Factor (VIF) analysis
+vif_results <- vifstep(numeric_vars, th = 10)
+
+# Display the selected variables (after removing collinear ones)
+vif_results@results
+selected_vars <- vif_results@results$Variables
+selected_vars
+```
+
+We can then subset the prediction table to keep only the selected, non-collinear predictors:
+
+```{r,eval=FALSE}
+# Filter the table to retain only selected (non-collinear) variables
+predict_table <- predict_table %>%
+  dplyr::select(any_of(c("subcID", selected_vars)))
+
+# Check final  predictors
+names(predict_table)
+```
+
+After this step, `predict_table` will contain a refined set of environmental predictors ready for modeling, minimizing redundancy while retaining ecological interpretability.
+
+### Model Table
+
+The next step is to prepare the model fit table, which will serve as the input for model calibration. In this table, we link the sub-catchments containing *Pseudoplatystoma magdaleniatum* occurrence points with the environmental data previously compiled in the prediction table. We will build this table step by step; however, it is also possible to generate it directly using the dedicated function `get_modelfit_table()` available in the `hydrographr` package.
+
+Most species distribution modeling (SDM) algorithms require both presence and absence (or pseudoabsence) data. Because true absences are rarely available for aquatic species such as *P. magdaleniatum*, we will generate pseudoabsence points. 
+As Random Forest (RF) models are robust but benefit from a balanced ratio of presence to absence data, we will generate approximately two pseudoabsences for every presence record to improve model stability and predictive accuracy [@BarbetMassin2012, @Valavi2021].
+
+
+Generate model fit table:
+
+```{r, eval=FALSE}
+# Extract subcatchment IDs of occurrence records and remove duplicates
+occ_pts_ids <- extract_ids(data = occ_pts,
+                           lon = "longitude",
+                           lat = "latitude",
+                       subc_layer = file.path(write_dir, "subcatchments.tif")) %>%
+  distinct(subcatchment_id) %>%
+  pull()
+```
+
+```{r, eval=FALSE}
+# Define number of pseudoabsences (2x presences)
+n_pseudoabs <- length(occ_pts_ids) * 2  
+```
+
+```{r, eval=FALSE}
+# Ensures reproducibility of random sampling
+set.seed(123)
+# Randomly sample sub-catchments where the species was not observed
+df_pseudoabs <- predict_table %>%
+  filter(!subcID %in% occ_pts_ids) %>%      # exclude presence sub-catchments
+  slice_sample(n = n_pseudoabs) %>%         # randomly select pseudoabsences
+  mutate(PresAbs = 0)                       # mark as absences
+```
+
+```{r, eval=FALSE}
+# Generate a data frame with presences
+df_pres <- predict_table %>%
+  filter(subcID %in% occ_pts_ids) %>% # include presence sub-catchments
+  mutate(PresAbs = 1) # mark as presence
+```
+
+```{r, eval=FALSE}
+# Merge data frame with presences and data frame with pseudo absences to create
+# the model fit table
+model_fit_table <- df_pres %>%
+  bind_rows(df_pseudoabs)
+  
+```
+
+The resulting table will contain:
+
+- The sub-catchment IDs,
+
+- A binary column indicating species presence (1) or pseudoabsence (0), and
+
+- The values of all environmental predictors for each sub-catchment.
+
+```{r, eval=FALSE}
+# Inspect the model fit table
+head(model_fit_table)
+table(model_fit_table$PresAbs)
+# Check that column names of model_fit_table and predict_table are the same
+model_fit_table <- model_fit_table %>%
+  select(any_of(c(names(predict_table), "PresAbs")))
+```
+
+### 14. Applying the Species Distribution Model
+
+After preparing the model fit table, we will apply a Species Distribution Model (SDM) to predict the potential distribution of *Pseudoplatystoma magdaleniatum* across the Magdalena River Basin.
+Among the many statistical and machine-learning techniques available for SDMs, we will use a Random Forest (RF) algorithm, a non-parametric ensemble method that efficiently handles large datasets, nonlinear relationships, and interactions between predictors while providing robust predictive performance.
+
+Before model training, we must ensure that the presence–absence column is formatted as a factor and that there are no missing values in the dataset.
+
+```{r,eval=FALSE}
+# Convert presence-absence column to factor
+model_fit_table$PresAbs <- as.factor(model_fit_table$PresAbs)
+model_fit_table <- na.omit(model_fit_table)
+```
+
+To obtain an unbiased assessment of model performance, we will split the dataset into training and testing subsets.
+The training subset (e.g., 70% of the data) will be used to fit the model, while the testing subset (30%) will serve for independent validation.
+
+```{r,eval=FALSE}
+set.seed(123) # for reproducibility
+
+# Split data: 70% for training, 30% for testing. Train-test split are stratified by the PresAbs column to preserve the class ratio in both subsets.
+train_index <- createDataPartition(model_fit_table$PresAbs, p = 0.7, list = FALSE)
+train_data <- model_fit_table[train_index, ]
+test_data  <- model_fit_table[-train_index, ]
+```
+
+Now we are ready to train the Random Forest model.
+We will use the `ranger()` function from the `ranger` R package, which provides a fast and efficient implementation of Random Forests.
+Before fitting the model, we will simplify column names to remove redundant parts such as “_1981-2010_observed” for easier interpretation.
+
+```{r, eval=FALSE}
+# Train the Random Forest model
+rf_model <- ranger(
+  formula = train_data$PresAbs ~ .,
+  data = train_data[, 2:19],
+  replace = TRUE,
+  probability = TRUE,
+  importance = "impurity"
+)
+```
+
+Once trained, we will use the fitted model to predict the probability of occurrence of *P. magdaleniatum* across all sub-catchments in the Magdalena basin.
+
+```{r, eval=FALSE}
+ # Predict probabilities
+  rf_pred_list <- predict(rf_model, data = predict_table[, 2:19])
+
+  pred_df <- data.frame(rf_pred_list[["predictions"]]) %>%
+    rename(abs_prob = X0,
+           pres_prob = X1)
+```
+
+The predictions consist of two probability columns: one for absence and one for presence.
+We will focus on the probability of presence (the second column) as our measure of habitat suitability.
+
+```{r, eval=FALSE}
+# Check the first rows of predictions
+head(pred_df)
+```
+
+Finally, we will reclassify the sub-catchment raster using the predicted probabilities to create a habitat suitability map for *Pseudoplatystoma magdaleniatum*.
+
+```{r, eval=FALSE}
+
+# Merge sub-catchment IDs and predicted probabilities
+pred_df$prob_1_int <- as.integer(round(pred_df[,2], 2) * 100)
+reclassTB <- predict_table %>%
+  mutate(prob = pred_df$prob_1_int) %>%
+  select(subcID, prob)
+  
+
+# Reclassify sub-catchment raster with predicted habitat suitability values
+reclass_raster(
+  data = reclassTB,
+  rast_val = "subcID",
+  new_val = "prob",
+  raster_layer = file.path(write_dir, "subcatchments.tif"),
+  recl_layer =  file.path(write_dir,"prediction_magdalena.tif"),
+  read = FALSE
+)
+```
+
+### 15. Visualizing and Evaluating Predicted Habitat Suitability
+
+We will visualize the predicted habitat suitability for *Pseudoplatystoma magdaleniatum* across the Magdalena River Basin using an interactive map. This visualization helps assess both spatial prediction patterns and their correspondence with the known distribution. To evaluate ecological realism, we will overlay the IUCN Red List range polygon and compare areas of predicted suitability with the species’ documented range.
+
+```{r, eval=FALSE}
+# Load raster and downsample for display
+r <- rast(file.path(write_dir, "prediction_magdalena.tif"))
+r_down <- aggregate(r, fact = 5, fun = mean)
+
+# Create color palette
+pal <- colorNumeric(hcl.colors(256, "inferno"), domain = values(r_down), na.color = "transparent")
+
+# IUCN range map
+iucn_range_sf <- st_read(file.path(read_dir,"redlist_range_Pseudoplatystoma_magdaleniatum.gpkg"))
+# Render interactive map
+leaflet() %>%
+  addTiles() %>%
+  addRasterImage(r_down, colors = pal, opacity = 0.9) %>%
+  addPolygons(data = iucn_range_sf, 
+              color = "red", 
+              fill = FALSE, 
+              weight = 2, 
+              opacity = 0.8,
+              label = "IUCN Range") %>%
+  addCircles(data = occ_pts_sf,
+             color = "blue",
+             fillColor = "white",
+             fillOpacity = 0.7,
+             radius = 100) %>%
+  addLegend(
+    pal = pal,
+    values = values(r_down),
+    title = "Habitat suitability<br><i>Pseudoplatystoma magdaleniatum</i>"
+  )
+
+```
+
+### 16. Model Evaluation
+
+We visualized the predicted habitat suitability for *Pseudoplatystoma magdaleniatum* across the Magdalena River Basin using an interactive map, which also included the IUCN Red List range polygon to qualitatively assess spatial agreement with the species’ known distribution.
+
+Once the Random Forest model was trained and predictions generated, we proceeded to evaluate its quantitative performance using the independent test dataset and examined the contribution of individual environmental variables to the model’s predictive power.
+
+#### 16.1. Predictive accuracy
+
+We start by evaluating model performance using metrics such as the **Area Under the Receiver Operating Characteristic Curve (AUC)** and the confusion matrix.  
+The AUC is widely used in SDM studies to assess the discriminative ability of a model across all possible classification thresholds (i.e. its ability to differentiate presence vs absence) [@Jimenez2020; @Phillips2006].  
+However, it should be interpreted with caution — its value can be influenced by prevalence, spatial bias, and sampling scheme (e.g. presence-only vs presence–absence) [@Jimenez2020; @Lobo2008].
+
+```{r, eval=FALSE}
+# Predict probabilities for the test dataset
+rf_pred <- predict(rf_model, data = test_data)$predictions
+test_data$pred_prob <- rf_pred[, 2]  # probability of presence
+
+# Compute AUC
+roc_obj <- roc(test_data$PresAbs, test_data$pred_prob)
+auc_value <- auc(roc_obj)
+print(paste("AUC =", round(auc_value, 3)))
+```
+
+The AUC ranges from 0.5 (no discrimination) to 1 (perfect discrimination).
+Values above 0.8 generally indicate strong model performance, while the confusion matrix provides a more detailed summary of model accuracy, sensitivity (true positive rate), and specificity (true negative rate).
+
+#### 16.2. Variable contribution
+
+We can also assess which environmental variables contributed most to the model using the variable importance output from `ranger`.
+
+```{r, eval=FALSE}
+# Plot variable importance
+var_imp <- sort(rf_model$variable.importance, decreasing = TRUE)
+# Convert to data frame
+df_imp <- data.frame(
+  Variable = names(var_imp),
+  Importance = as.numeric(var_imp)
+)
+
+ggplot(df_imp, aes(x = reorder(Variable, Importance), y = Importance)) +
+  geom_col(fill = "steelblue") +
+  coord_flip() +
+  labs(
+    title = "Top 10 most important variables",
+    x = NULL,
+    y = "Variable importance (Impurity decrease)"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    plot.title = element_text(face = "bold"),
+    axis.text.y = element_text(size = 10)
+  )
+```
+
+To better understand how individual predictors influence the probability of species occurrence, we can visualize response curves (also called partial dependence plots). These plots display the relationship between a predictor variable and the model’s predicted probability of presence, while averaging out the effects of all other variables in the model. This approach helps interpret the ecological meaning of model results and assess whether responses align with known species–environment relationships (e.g., increasing suitability with river size or decreasing suitability with slope).
+
+Here, we use the pdp R package [@Greenwell2017] to compute partial dependence for the most influential predictors identified by the Random Forest model. The following example shows the response curve for the most important variable among the top four ranked by variable importance.
+
+```{r, eval=FALSE}
+vars <- names(sort(var_imp, decreasing = TRUE))[1:5]
+
+# Compute partial dependence for the most important predictor using the pdp package 
+pd <- partial(rf_model, pred.var = vars[1], train = train_data, prob = TRUE, which.class = 2)
+
+plotPartial(pd,
+            main = vars[1],
+            rug = FALSE,
+            xlab = vars[1],
+            ylab = "Presence probability")
+
+```
+
+
+
+
+# Connectivity Analysis
+
+
+
+## 1. Introduction
+
+This part demonstrates how to process a river network and species occurrence data to calculate **connectivity metrics** using the `hydrographr` package.  
+We focus on a small case study in the **Magdalena River Basin (Colombia)**, computing network metrics such as centrality and distances to a dam (Ituango Dam).
+
+Connectivity metrics from graph theory help quantify how connected or isolated different parts of a river network are — providing insights into **habitat connectivity**, **migration pathways**, and **potential barriers** for aquatic species.
+
+### Centrality Metrics Overview
+
+- **Degree centrality** — counts how many direct links a node has (how many upstream or downstream segments connect to it).  
+- **Closeness centrality** — measures how close a node is to all others (high values mean it’s centrally located).  
+- **Betweenness centrality** — counts how often a node lies on shortest paths between others (key connectors or “bridges”).  
+- **Eccentricity** — distance from a node to the farthest one (low values mean it’s near the network’s center).
+
+Before running these analyses, we’ll **snap species occurrence points** to the stream network using a flow accumulation-based method.
+
+---
+
+## 2. Setup and Data Import
+
+### 2.1 Load Packages
+
+```{r, eval=FALSE}
+library(hydrographr)
+library(sf)
+library(dplyr)
+library(ggplot2)
+library(leaflet)
+library(viridis)
+library(stringr)
+```
+
+### 2.2 Create Working Directory
+
+```{r, eval=FALSE}
+wd <- getwd()
+data_dir <- file.path(wd, "data")
+
+if (!dir.exists(data_dir)) {
+  dir.create(data_dir)
+}
+```
+
+### 2.3 Read Occurrence Data
+
+```{r, eval=FALSE}
+occ_pts <- read.csv(file.path(data_dir, "points_fish_colombia.csv"))
+```
+
+---
+
+## 3. Download Stream Network Tiles
+
+Here we download Hydrography90m tiles for the Magdalena basin.
+
+```{r, eval=FALSE}
+# Tile IDs covering the Magdalena River basin
+tile_id <- c("h10v08", "h10v06")
+
+# Increase timeout to allow large downloads
+options(timeout = 10000)
+
+# Download required tiles
+download_tiles("order_vect_segment", tile_id, "gpkg", data_dir)
+download_tiles("segment", tile_id, "tif", data_dir)
+download_tiles("accumulation", tile_id, "tif", data_dir)
+```
+
+---
+
+## 4. Prepare and Filter Stream Network Data
+
+We now filter the Hydrography90m stream tiles for the subcatchments that contain occurrence points.
+
+### 4.1 Filter and Crop Vector Tiles
+
+```{r, eval=FALSE}
+order_tiles <- list.files(data_dir, pattern = "order.+_h[v0-8]+.gpkg$", 
+                          full.names = TRUE, recursive = TRUE)
+
+subc_ids <- extract_ids(subc_layer = file.path(data_dir, "subcatchments.tif"))
+
+
+for (order_tile in order_tiles) {
+  filtered_stream <- read_geopackage(order_tile,
+                                     import_as = "sf",
+                                     subc_id = subc_ids$subcatchment_id,
+                                     name = "stream")
+
+  sf::write_sf(filtered_stream, paste0(
+    data_dir, "/", str_remove(basename(order_tile), ".gpkg"), "_crop.gpkg"))
+}
+```
+
+### 4.2 Merge Cropped Vector Tiles
+
+```{r, eval=FALSE}
+filtered_tiles <- list.files(data_dir, pattern = "_crop.gpkg", full.names = FALSE)
+
+merge_tiles(
+  tile_dir = data_dir,
+  tile_names = filtered_tiles,
+  out_dir = data_dir,
+  file_name = "stream_magdalena.gpkg",
+  name = "stream",
+  compression = "high",
+  read = TRUE
+)
+```
+
+---
+
+## 5. Process Raster Layers
+
+We crop and merge the `segment` and `accumulation` rasters to the Magdalena basin extent.
+
+### 5.1 Crop Raster Tiles
+
+```{r, eval=FALSE}
+# Crop stream raster tiles
+stream_tiles <- list.files(data_dir, pattern = "segment.*_h[v0-8]+.tif$", 
+                           recursive = TRUE, full.names = TRUE)
+
+for (stream_tile in stream_tiles) {
+  crop_to_extent(
+    stream_tile,
+    vector_layer = file.path(data_dir, "basin_magdalena.gpkg"),
+    out_dir = data_dir,
+    file_name = paste0(str_remove(basename(stream_tile), ".tif"), "_crop.tif"),
+    read = FALSE,
+    quiet = TRUE
+  )
+}
+
+# Crop accumulation raster tiles
+accu_tiles <- list.files(data_dir, pattern = "accumulation.*_h[v0-8]+.tif$", 
+                         recursive = TRUE, full.names = TRUE)
+
+for (accu_tile in accu_tiles) {
+  crop_to_extent(
+    accu_tile,
+    vector_layer = file.path(data_dir, "basin_magdalena.gpkg"),
+    out_dir = data_dir,
+    file_name = paste0(str_remove(basename(accu_tile), ".tif"), "_crop.tif"),
+    read = FALSE,
+    quiet = TRUE
+  )
+}
+```
+
+### 5.2 Merge Cropped Rasters
+
+```{r, eval=FALSE}
+cropped_segment_tiles <- list.files(data_dir, pattern = "segment.*_crop.tif$", full.names = FALSE)
+
+merge_tiles(data_dir, cropped_segment_tiles, data_dir,
+            "stream_magdalena.tif", read = TRUE, bigtiff = TRUE)
+
+cropped_accu_tiles <- list.files(data_dir, pattern = "accumulation.*_crop.tif$", full.names = FALSE)
+
+merge_tiles(data_dir, cropped_accu_tiles, data_dir,
+            "accumulation_magdalena.tif", read = TRUE, bigtiff = TRUE)
+```
+
+---
+
+## 6. Snap Fish Occurrences to the Stream Network
+
+```{r, eval=FALSE}
+occ_pts_snapped <- snap_to_network(
+  data = occ_pts,
+  lon = "longitude",
+  lat = "latitude",
+  id = "occ_id",
+  stream_layer = file.path(data_dir, "stream_magdalena.tif"),
+  accu_layer = file.path(data_dir, "accumulation_magdalena.tif"),
+  method = "accumulation",
+  quiet = FALSE
+)
+
+write.csv(occ_pts_snapped, file.path(data_dir, "points_fish_colombia_snapped.csv"), row.names = FALSE)
+```
+
+---
+
+## 7. Build the Stream Network Graph
+
+```{r, eval=FALSE}
+g <- read_geopackage(file.path(data_dir, "stream_magdalena.gpkg"), import_as = "graph")
+```
+
+---
+
+## 8. Compute Centrality Metrics
+
+We now calculate degree, closeness, betweenness, and eccentricity centrality indices to assess network connectivity.
+
+```{r, eval=FALSE}
+centrality <- get_centrality(g, index = "all", mode = "in")
+
+# Alternatively, read precomputed table
+# centrality <- read.csv(file.path(data_dir, "centrality_metrics.csv"))
+
+# Inspect results
+head(centrality)
+```
+
+### 8.1 Handling NA Values (Headwater Streams)
+
+Headwater subcatchments often have missing (NA) centrality values due to no upstream links.
+
+```{r, eval=FALSE}
+stream_table <- read_geopackage(file.path(data_dir, "stream_magdalena.gpkg"), import_as = "data.table")
+
+# Confirm NAs correspond to Strahler order 1
+sum(is.na(centrality$closeness))
+stream_table %>% filter(strahler == 1) %>% nrow()
+```
+
+### 8.2 Join Centrality with Occurrences
+
+```{r, eval=FALSE}
+centrality$subc_id <- as.integer(centrality$subc_id)
+
+occ_pts_snapped <- occ_pts_snapped %>%
+  left_join(centrality, by = c("subc_id_snap_accu" = "subc_id")) %>%
+  rename(subc_id = subc_id_snap_accu)
+```
+
+---
+
+## 9. Summarize and Visualize Centrality Metrics
+
+### 9.1 Summaries
+
+```{r, eval=FALSE}
+headwater_percent <- round(sum(is.na(occ_pts_snapped$closeness)) / nrow(occ_pts_snapped), 2)
+cat(headwater_percent, "of the occurrences are in 1st order streams\n")
+
+summary(occ_pts_snapped[, c("degree", "closeness", "betweeness", "eccentricity")])
+```
+
+### 9.2 Histogram Example
+
+```{r, eval=FALSE}
+ggplot(occ_pts_snapped %>% filter(!is.na(closeness)), aes(x = closeness)) +
+  geom_histogram(bins = 30, fill = "#4DAF4A", color = "white") +
+  theme_minimal() +
+  labs(title = "Distribution of Subcatchment Closeness Centrality",
+       x = "Closeness Centrality", y = "Count")
+```
+
+### 9.3 Interactive Map of Betweenness Centrality
+
+```{r, eval=FALSE}
+pal <- colorNumeric(palette = viridis(100),
+                    domain = occ_pts_snapped$betweeness,
+                    na.color = "transparent")
+
+leaflet(occ_pts_snapped) %>%
+  addProviderTiles(providers$CartoDB.Positron) %>%
+  addCircleMarkers(
+    ~longitude, ~latitude,
+    color = ~pal(betweeness),
+    radius = 5, stroke = FALSE, fillOpacity = 0.8,
+    popup = ~paste0(
+      "<b>Subcatchment:</b> ", subc_id, "<br>",
+      "<b>Degree:</b> ", degree, "<br>",
+      "<b>Closeness:</b> ", round(closeness, 4), "<br>",
+      "<b>Betweenness:</b> ", round(betweeness, 2), "<br>",
+      "<b>Eccentricity:</b> ", eccentricity
+    )
+  ) %>%
+  addLegend("bottomright",
+            pal = pal, values = ~betweeness,
+            title = "Betweenness<br>Centrality",
+            opacity = 0.8)
+```
+
+---
+
+## 10. Add the Ituango Dam
+
+### 10.1 Create Dam Point
+
+```{r, eval=FALSE}
+dam <- st_sf(
+  name = "Ituango Dam",
+  geometry = st_sfc(st_point(c(-75.663683, 7.132684)), crs = 4326)
+)
+```
+
+### 10.2 Extract Dam Subcatchment ID
+
+```{r, eval=FALSE}
+dam_coord <- data.frame(longitude = -75.663683, latitude = 7.132684, id = "d1")
+
+dam_ids <- extract_ids(
+  data = dam_coord, 
+  lon = "longitude", lat = "latitude", id = "id",
+  subc_layer = file.path(data_dir, "subcatchments.tif")
+)
+```
+
+---
+
+## 11. Calculate Distances Along the Network
+
+We now calculate the along-network distance (in meters) between each occurrence and the dam.
+
+```{r, eval=FALSE}
+occ_pts_snapped <- occ_pts_snapped %>% bind_rows(dam_ids)
+
+subc_distances <- get_distance_graph(
+  g,
+  subc_id = occ_pts_snapped$subcatchment_id,
+  variable = "length",
+  distance_m = TRUE
+)
+
+summary(subc_distances$distance)
+```
+
+---
+
+## 12. Identify Closest and Farthest Sites
+
+Finally, we extract the shortest and longest distances between the dam and the fish occurrences.
+
+```{r, eval=FALSE}
+fish_dam_dist <- subc_distances %>% 
+  filter(from == dam_ids$subcatchment_id | to == dam_ids$subcatchment_id)
+
+fish_dam_dist %>% arrange(distance) %>% slice_head(n = 1)
+fish_dam_dist %>% arrange(distance) %>% slice_tail(n = 1)
+```
+
+#### References
