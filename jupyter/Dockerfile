@@ -105,6 +105,10 @@ RUN chmod +x /usr/local/bin/start.sh
 # Drop back to non-root user:
 USER $NB_UID
 
+# Install these packages needed for markdown cells:
+# TODO: Move up
+RUN R -e "install.packages(c('xfun', 'knitr', 'rmarkdown', 'formatR', 'evaluate', 'stringr', 'yaml'), repos = 'https://cran.rstudio.com/')"
+
 # Copy directories:
 COPY ./input_data/spatial /home/bootstrap-data/spatial
 COPY ./input_data/env90m  /home/bootstrap-data/env90m
