@@ -52,11 +52,6 @@ RUN parallel --citation > /dev/null || true
 # Install gnu bc:
 RUN apt-get update && apt-get install -y bc
 
-# Create directories for user:
-RUN mkdir -p /home/participant/data_write \
- && mkdir -p /home/participant/data_readonly \
- && chown -R $NB_UID:$NB_GID /home/participant
-
 # Drop back to non-root for Jupyter
 USER $NB_UID
 
@@ -76,6 +71,7 @@ RUN R -e "library(hydrographr)"
 # Install mamba packages as root
 # TODO: Install this above?
 USER root
+
 # Install compatible R packages with mamba
 RUN mamba install -y -c conda-forge \
     r-sf>=1.0.19 \
@@ -90,11 +86,18 @@ USER $NB_UID
 COPY ./tmp_readonly/lookup_tile_regunit.txt /tmp/
 COPY ./tmp_readonly/regional_unit_ovr.tif /tmp/
 
+# Directory creation as root:
+USER root
+
+# Create directories for user:
+RUN mkdir -p /home/participant/data_write \
+ && mkdir -p /home/participant/data_readonly \
+ && chown -R $NB_UID:$NB_GID /home/participant
+
 # Make directory where to add the baked-in input data, and
 # add the script that copies the data from there to
 # /home/participant/data_write, where we will mount the user's
 # writeable docker-volume.
-USER root
 RUN mkdir -p /home/bootstrap-data
 COPY start.sh /usr/local/bin/start.sh
 RUN chmod +x /usr/local/bin/start.sh
