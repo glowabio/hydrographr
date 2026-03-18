@@ -107,11 +107,7 @@ USER $NB_UID
 
 # Copy directories:
 COPY ./input_data/spatial /home/bootstrap-data/spatial
-COPY \
-  ./input_data/chelsa_bioclim_v2_1 \
-  ./input_data/esa_cci_landcover_v2_1_1 \
-  ./input_data/hydrography90m_v1_0 \
-  /home/bootstrap-data/env90m/
+COPY ./input_data/env90m  /home/bootstrap-data/env90m
 
 # Copy files
 COPY \
