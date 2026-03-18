@@ -61,7 +61,8 @@ RUN mkdir -p /home/participant/data_write \
 USER $NB_UID
 
 # Install pure-R packages via:
-RUN R -e "install.packages(c('leaflet', 'corrplot', 'tmap', 'usdm', 'ranger', 'pdp'), repos='http://cran.rstudio.com/')"
+# TODO: Use some dependencies/requirements file?
+RUN R -e "install.packages(c('leaflet', 'corrplot', 'tmap', 'usdm', 'ranger', 'pdp', 'geojsonio'), repos='http://cran.rstudio.com/')"
 
 # Finally install hydrographr:
 # These env variables are needed to point R to the paths:
@@ -88,9 +89,6 @@ USER $NB_UID
 # Add temp files required by hydrographr
 COPY ./tmp_readonly/lookup_tile_regunit.txt /tmp/
 COPY ./tmp_readonly/regional_unit_ovr.tif /tmp/
-
-# Install another R package (TODO: Move up)
-RUN R -e "install.packages(c('geojsonio'), repos='http://cran.rstudio.com/')"
 
 # Make directory where to add the baked-in input data, and
 # add the script that copies the data from there to
