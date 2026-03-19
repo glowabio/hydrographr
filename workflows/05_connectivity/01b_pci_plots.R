@@ -6,6 +6,11 @@
 library(tidyverse)
 library(data.table)
 library(ggrepel)
+library(leaflet)
+library(sf)
+library(htmlwidgets)
+library(rnaturalearth)
+
 
 # Set working directory
 source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
@@ -20,6 +25,12 @@ setwd(BASE_DIR)
 
 fi_summary <- read.table("connectivity/pci/fi_summary.txt", header = TRUE)
 
+basin_lookup <- fread("spatial/basin_name_lookup.csv") %>%
+  mutate(basin_id = as.integer(basin_id))
+
+fi_summary <- fi_summary %>%
+  left_join(basin_lookup, by = "basin_id")
+
 fish_dis_class <- fread("traits/fish_dis_class.txt")
 
 # Join traits for coloring/faceting
@@ -28,6 +39,9 @@ fi_plot <- fi_summary %>%
               select(species, Migration_label, Caudal_fin_label,
                      dispersal_prob, max_TL),
             by = "species")
+
+
+basin_polygons <- read_sf("spatial/stream_networks/basin_polygons.gpkg")
 
 # ============================================================
 # SCATTERPLOT: PCI current vs PCI future
@@ -58,7 +72,7 @@ p1 <- ggplot(fi_plot, aes(x = PCI_current, y = PCI_future)) +
   theme_bw() +
   theme(legend.position = "right")
 
-
+p1
 ggsave("connectivity/pci/pci_current_vs_future.png",
        p1, width = 10, height = 8, dpi = 300)
 
@@ -81,7 +95,7 @@ fi_plot_top <- fi_summary %>%
   mutate(
     species_label = gsub("_", " ", species),
     # Combine species + basin for unique labels
-    combo_label =paste0(species_label, " — ", basin_id)
+    combo_label =paste0(species_label, " — ", basin_name)
   ) %>%
   arrange(desc(FI)) %>%
   head(25)
@@ -106,6 +120,8 @@ p_top <- ggplot(fi_plot_top, aes(x = FI, y = combo_label, fill = Migration_label
   theme_bw() +
   theme(axis.text.y = element_text(face = "italic", size = 9))
 
+p_top
+
 ggsave("connectivity/pci/top_impacted_species.png",
        p_top, width = 10, height = 8, dpi = 300)
 
@@ -116,13 +132,9 @@ cat("Plot saved: connectivity/pci/top_impacted_species.png\n")
 # LEAFLET MAP: Mean FI by basin
 # ============================================================
 
-library(sf)
-library(leaflet)
-library(htmlwidgets)
-
 # Aggregate FI by basin
 fi_by_basin <- fi_summary %>%
-  group_by(basin_id) %>%
+  group_by(basin_name, basin_id) %>%
   summarize(
     mean_FI = mean(FI, na.rm = TRUE),
     n_species = n(),
@@ -150,7 +162,7 @@ m <- leaflet() %>%
     color = "grey40",
     weight = 0.5,
     popup = ~paste0(
-      "<b>Basin: </b>", basin_id, "<br>",
+      "<b>Basin: </b>", basin_name, "<br>",
       "<b>Mean FI: </b>", round(mean_FI, 1), "%<br>",
       "<b>Species assessed: </b>", n_species, "<br>",
       "<b>Species impacted: </b>", n_impacted
@@ -174,12 +186,72 @@ m
 saveWidget(m, "connectivity/pci/fi_map_by_basin.html", selfcontained = TRUE)
 cat("Map saved: connectivity/pci/fi_map_by_basin.html\n")
 
+
+
+#################
+# same map but with ggplot
+# ============================================================
+
+# STATIC MAP: Mean FI by basin (ggplot)
+
+# ============================================================
+
+
+
+# Aggregate FI by basin
+
+fi_by_basin <- fi_summary %>%
+  group_by(basin_name, basin_id) %>%
+  summarize(
+    mean_FI = mean(FI, na.rm = TRUE),
+    n_species = n(),
+    n_impacted = sum(FI > 0, na.rm = TRUE),
+    .groups = "drop"
+
+  )
+
+# Join with spatial data
+
+basins_plot <- basin_polygons %>%
+  left_join(fi_by_basin, by = "basin_id") %>%
+  st_transform(4326)
+
+
+# Get country boundaries
+greece <- ne_countries(scale = 50, country = "Greece", returnclass = "sf")
+neighbors <- ne_countries(scale = 50,
+                          country = c("Turkey", "Bulgaria", "North Macedonia",
+                                      "Albania", "Italy"),
+                          returnclass = "sf")
+
+# Get bounding box of your basins for map limits
+bbox <- st_bbox(basins_plot)
+
+p_map <- ggplot() +
+  geom_sf(data = neighbors, fill = "grey95", color = "grey70", linewidth = 0.2) +
+  geom_sf(data = greece, fill = "grey85", color = "grey50", linewidth = 0.3) +
+  geom_sf(data = basins_plot, aes(fill = mean_FI), color = "grey40", linewidth = 0.2) +
+  scale_fill_gradient(low = "#FFF3E0", high = "#BF360C", name = "Mean FI (%)",
+                      na.value = "grey90") +
+  coord_sf(xlim = c(bbox["xmin"] - 0.5, bbox["xmax"] + 0.5),
+           ylim = c(bbox["ymin"] - 0.5, bbox["ymax"] + 0.5)) +
+  theme_bw() +
+  theme(axis.text = element_text(size = 8))
+p_map
+
+ggsave("connectivity/pci/fi_map_by_basin_static.png",
+       p_map, width = 10, height = 8, dpi = 300)
+
+#######################
+
+
+
 # ============================================================
 # BAR CHART: Species affected vs unaffected per basin
 # ============================================================
 
 fi_by_basin <- fi_summary %>%
-  group_by(basin_id) %>%
+  group_by(basin_id, basin_name) %>%
   summarize(
     n_impacted = sum(FI > 0, na.rm = TRUE),
     n_unaffected = sum(FI == 0, na.rm = TRUE),
@@ -194,25 +266,29 @@ fi_by_basin <- fi_summary %>%
     status = ifelse(status == "n_impacted", "Affected", "Unaffected")
   )
 
-# Order basins by total affected
+fi_by_basin <- fi_by_basin %>%
+  mutate(basin_label = paste0(basin_name, " (", basin_id, ")"))
+
+# order basins by number of affected species
 basin_order <- fi_by_basin %>%
   filter(status == "Affected") %>%
   arrange(n_species) %>%
-  pull(basin_id)
+  pull(basin_label)
 
 fi_by_basin <- fi_by_basin %>%
-  mutate(basin_id = factor(basin_id, levels = basin_order))
+  mutate(basin_label = factor(basin_label, levels = basin_order))
 
-p_affected <- ggplot(fi_by_basin, aes(x = basin_id, y = n_species, fill = status)) +
+p_affected <- ggplot(fi_by_basin, aes(x = basin_label, y = n_species, fill = status)) +
   geom_col(alpha = 0.8) +
-  scale_fill_manual(values = c("Affected" = "#F44336", "Unaffected" = "grey70"),
+  scale_fill_manual(values = c("Affected" = "#E07A5A", "Unaffected" = "#E8E0D5"),
                     name = NULL) +
   coord_flip() +
-  labs(x = "Basin ID",
+  labs(x = NULL,
        y = "Number of species",
        title = "Species affected by planned dams per river basin") +
   theme_bw() +
   theme(legend.position = "top")
 
+p_affected
 ggsave("connectivity/pci/species_affected_per_basin.png",
        p_affected, width = 8, height = 6, dpi = 300)
