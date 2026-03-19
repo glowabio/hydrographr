@@ -124,7 +124,7 @@ COPY ./input_data/Readme_env90m.md /home/bootstrap-data/env90m/Readme_env90m.md
 COPY ./input_data/workflow_diagram2.png /home/bootstrap-data/img/workflow_diagram2.png
 
 # Copy the Juypter Notebook (the vignette)
-COPY ./notebook_workshop_igb_20260317.ipynb /home/bootstrap-data/
+COPY ./notebook_workshop_igb_2026.ipynb /home/bootstrap-data/
 
 # Added the data-bootstrapping:
 ENTRYPOINT ["/usr/local/bin/start.sh"]
