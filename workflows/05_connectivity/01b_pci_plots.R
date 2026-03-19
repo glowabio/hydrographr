@@ -249,37 +249,36 @@ ggsave("connectivity/pci/fi_map_by_basin_static.png",
 # ============================================================
 # BAR CHART: Species affected vs unaffected per basin
 # ============================================================
-
+# Aggregate by basin NAME (merge multiple basin_ids)
 fi_by_basin <- fi_summary %>%
-  group_by(basin_id, basin_name) %>%
+  group_by(basin_name) %>%
   summarize(
     n_impacted = sum(FI > 0, na.rm = TRUE),
     n_unaffected = sum(FI == 0, na.rm = TRUE),
+    n_total = n(),
+    pct_impacted = round(100 * sum(FI > 0, na.rm = TRUE) / n(), 0),
     .groups = "drop"
   ) %>%
-  filter(n_impacted > 0) %>%
+  filter(n_impacted > 0)
+
+fi_by_basin_long <- fi_by_basin %>%
   pivot_longer(cols = c(n_impacted, n_unaffected),
                names_to = "status",
                values_to = "n_species") %>%
   mutate(
-    basin_id = as.factor(basin_id),
-    status = ifelse(status == "n_impacted", "Affected", "Unaffected")
+    status = ifelse(status == "n_impacted", "Affected", "Unaffected"),
+    basin_name = factor(basin_name,
+                        levels = fi_by_basin %>% arrange(n_impacted) %>% pull(basin_name))
   )
 
-fi_by_basin <- fi_by_basin %>%
-  mutate(basin_label = paste0(basin_name, " (", basin_id, ")"))
-
-# order basins by number of affected species
-basin_order <- fi_by_basin %>%
-  filter(status == "Affected") %>%
-  arrange(n_species) %>%
-  pull(basin_label)
-
-fi_by_basin <- fi_by_basin %>%
-  mutate(basin_label = factor(basin_label, levels = basin_order))
-
-p_affected <- ggplot(fi_by_basin, aes(x = basin_label, y = n_species, fill = status)) +
+p_affected <- ggplot(fi_by_basin_long, aes(x = basin_name, y = n_species, fill = status)) +
   geom_col(alpha = 0.8) +
+  geom_text(data = fi_by_basin %>%
+              mutate(basin_name = factor(basin_name,
+                                         levels = fi_by_basin %>% arrange(n_impacted) %>% pull(basin_name))),
+            aes(x = basin_name, y = n_total, fill = NULL,
+                label = paste0(pct_impacted, "%")),
+            hjust = -0.2, size = 3) +
   scale_fill_manual(values = c("Affected" = "#E07A5A", "Unaffected" = "#E8E0D5"),
                     name = NULL) +
   coord_flip() +
@@ -290,5 +289,6 @@ p_affected <- ggplot(fi_by_basin, aes(x = basin_label, y = n_species, fill = sta
   theme(legend.position = "top")
 
 p_affected
+
 ggsave("connectivity/pci/species_affected_per_basin.png",
        p_affected, width = 8, height = 6, dpi = 300)
