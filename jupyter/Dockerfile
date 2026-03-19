@@ -58,6 +58,8 @@ USER $NB_UID
 # Install pure-R packages via:
 # TODO: Use some dependencies/requirements file?
 RUN R -e "install.packages(c('leaflet', 'corrplot', 'tmap', 'usdm', 'ranger', 'pdp', 'geojsonio'), repos='http://cran.rstudio.com/')"
+# Install these packages needed for markdown cells:
+RUN R -e "install.packages(c('xfun', 'knitr', 'rmarkdown', 'formatR', 'evaluate', 'stringr', 'yaml'), repos = 'https://cran.rstudio.com/')"
 
 # Finally install hydrographr:
 # These env variables are needed to point R to the paths:
@@ -104,10 +106,6 @@ RUN chmod +x /usr/local/bin/start.sh
 
 # Drop back to non-root user:
 USER $NB_UID
-
-# Install these packages needed for markdown cells:
-# TODO: Move up
-RUN R -e "install.packages(c('xfun', 'knitr', 'rmarkdown', 'formatR', 'evaluate', 'stringr', 'yaml'), repos = 'https://cran.rstudio.com/')"
 
 # Copy directories:
 COPY ./input_data/spatial /home/bootstrap-data/spatial
