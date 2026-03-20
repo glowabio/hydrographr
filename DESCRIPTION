@@ -134,13 +134,10 @@ Collate:
     'snap_to_network.R'
     'snap_to_subc_segment.R'
     'split_table.R'
-<<<<<<< HEAD
     'api_get_job_results.R'
     'api_poll_job.R'
     'api_get_basin_polygon.R'
     'api_get_basin_subcids.R'
     'api_get_snapped_points_strahler_df.R'
     'api_get_snapped_points_cascade.R'
-=======
     'crop_vector_to_extent.R'
->>>>>>> main
