@@ -4,7 +4,7 @@
 \alias{get_regional_unit_id}
 \title{Get Hydrography90m regional unit IDs}
 \usage{
-get_regional_unit_id(data, lon, lat, quiet = TRUE)
+get_regional_unit_id(data, lon, lat, quiet = TRUE, tempdir = NULL)
 }
 \arguments{
 \item{data}{a data.frame or data.table that contains the columns regarding
@@ -16,6 +16,8 @@ the longitude / latitude coordinates in WGS84.}
 
 \item{quiet}{logical. If FALSE, the standard output will be printed.
 Default is TRUE.}
+
+\item{tempdir}{character. The directory to be used as temp folder. Optional.}
 }
 \description{
 Given the coordinates of input points (in WGS84), the function

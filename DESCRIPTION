@@ -126,3 +126,4 @@ Collate:
     'snap_to_network.R'
     'snap_to_subc_segment.R'
     'split_table.R'
+    'crop_vector_to_extent.R'

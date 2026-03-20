@@ -4,7 +4,7 @@
 \alias{get_tile_id}
 \title{Get the Hydrography90m 20°x20° tile ID}
 \usage{
-get_tile_id(data, lon, lat)
+get_tile_id(data, lon, lat, tempdir = NULL)
 }
 \arguments{
 \item{data}{a data.frame or data.table that contains the columns regarding
@@ -13,6 +13,8 @@ the longitude / latitude coordinates in WGS84.}
 \item{lon}{character. The name of the column with the longitude coordinates.}
 
 \item{lat}{character. The name of the column with the latitude coordinates.}
+
+\item{tempdir}{character. The directory to be used as temp folder. Optional.}
 }
 \description{
 Identifies the 20°x20° tile IDs of the Hydrography90m
