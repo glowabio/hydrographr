@@ -215,6 +215,9 @@ else
 
 fi
 
+## change subcID by subc_id in output table
+sed -i '1s/subcID/subc_id/' $OUTFILE
+
 
 #########################
 # remove temporal files (comment this to keep temp files):
