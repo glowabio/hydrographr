@@ -148,8 +148,8 @@ extract_lake_ids <- function(data, lon, lat, lake_shape,
     # else extract coordinates from the extent of species occurrence points
   } else {
 
-    longi <- data$lon
-    lati <- data$lat
+    longi <- data[[lon]]
+    lati <- data[[lat]]
 
     xmax <- max(longi)
     xmin <- min(longi)
@@ -158,8 +158,8 @@ extract_lake_ids <- function(data, lon, lat, lake_shape,
 
   }
 
-  longi <- data$lon
-  lati <- data$lat
+  longi <- data[[lon]]
+  lati <- data[[lat]]
 
   # convert table format to text files for the shell to run
   # Create random string to attach to the file name of the temporary
@@ -167,15 +167,15 @@ extract_lake_ids <- function(data, lon, lat, lake_shape,
 
   # Select columns with lon/lat coordinates
   # Remove duplicated rows across entire data frame
-  coord <- data.table(longitude = longi, latitude = lati)
-  coord <- coord[!duplicated(coord), ]
+  coord <- data.table(longi, lati)
+  setnames(coord, c(lon, lat))
 
   # Export taxon occurrence points
   coord_tmp_path <- paste0(tempdir(), "/coordinates_", rand_string, ".txt")
 
   ## Note:Only export lon/lat column
   fwrite(coord, coord_tmp_path, col.names = TRUE,
-         row.names = FALSE, quote = FALSE, sep = " ")
+       row.names = FALSE, quote = FALSE, sep = ",")
 
   # write the extent of the bounding box into one variable for the shell script
   bbox_coord <- data.frame(
