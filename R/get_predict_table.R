@@ -52,7 +52,7 @@
 #'
 #' # Download one variable, in this case elevation, from the Environment90m dataset
 #' # repository
-#' download_merit_dem_tables(subset="ALL", tile_ids = h18v04, download = TRUE,
+#' download_merit_dem_tables(subset="ALL", tile_ids = "h18v04", download = TRUE,
 #' download_dir = my_directory)
 #'
 #' # prepare file with list subcatchments of interest
@@ -64,9 +64,11 @@
 #' var <- c("elev")
 #' tile_id <- c("h18v04")
 #'
-#' # Point to input data
-#' in_path <- paste0(my_directory, '/hydrography90m_test_data')
+#' # Point to Env90m input data
+#' in_path <- my_directory
+#' # point to sub-catchment id table
 #' subc_ids <- paste0(my_directory, '/hydrography90m_test_data/subc_IDs.txt')
+#' # define output path
 #' output <- paste0(my_directory, '/hydrography90m_test_data/predictTB.csv')
 #'
 #' # Run the function with 2 cores
