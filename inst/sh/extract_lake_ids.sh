@@ -52,9 +52,11 @@ ogrinfo "$LAKE" -dialect SQLite -sql "UPDATE $pn SET diss = 1"
 
 # read in extent of lake.shp to be used in the rasterization
 export extent_line=$(ogrinfo -al -so "$LAKE" | grep "Extent:")
-echo "$extent_line" |
-  sed -E 's/.*\(([^,]+), ([^)]+)\) - \(([^,]+), ([^)]+)\).*/\1 \2 \3 \4/' |
-  read xmin ymin xmax ymax
+set -- $(echo "$extent_line" | sed -E 's/.*\(([^,]+), ([^)]+)\) - \(([^,]+), ([^)]+)\).*/\1 \2 \3 \4/')
+xmin=$1
+ymin=$2
+xmax=$3
+ymax=$4
 # read xmin ymin xmax ymax <<< "$(echo "$extent_line" | sed -E 's/.*\(([^,]+), ([^)]+)\) - \(([^,]+), ([^)]+)\).*/\1 \2 \3 \4/')"
 
 export xmin
@@ -75,7 +77,7 @@ echo "Hylak_id" > "$TMPDIR/output.txt"
 #   NR==1 { for (i=1; i<=NF; i++) { f[$i] = i } }
 #   NR>1  { print $(f[LON]), $(f[LAT]) }
 # ' "$DATA" | gdallocationinfo -valonly -geoloc "$LAKE_RAST" | awk '{ print (NF ? $0 : 0) }' >> "$TMPDIR/output.txt"
-awk -v LON=$LON -v LAT=$LAT '
+awk -F, -v LON=$LON -v LAT=$LAT '
   NR==1 { for (i=1; i<=NF; i++) { f[$i] = i } }
   NR>1  { print $(f[LON]), $(f[LAT]) }
 ' "$DATA" | gdallocationinfo -valonly -geoloc "$LAKE_RAST" | awk '{ print (NF ? $0 : 0) }'  >> "$TMPDIR/output.txt"
