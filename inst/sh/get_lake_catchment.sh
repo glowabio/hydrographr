@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 export DATA=$1
 export LAKEID=$2
