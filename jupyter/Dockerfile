@@ -134,6 +134,16 @@ COPY ./notebook_snapping_sdm.ipynb /home/bootstrap-data/notebook_snapping_sdm.ip
 COPY ./workflow_diagram_TT.svg /home/bootstrap-data/
 COPY ./notebook_lakes_final_final.ipynb /home/bootstrap-data/notebook_lakes.ipynb
 
+# Set PROJ_DATA globally
+# Note/TODO: We seem to have two conflicting versions of proj installed - only by conda
+# (probably by installing gdal through conda), and one in the system (probably by installing
+# gdal-bin python3-gdal through apt-get).
+# Two locations are found by running library(sf); sf::sf_proj_info("path"), but only
+# '/opt/conda/share/proj/' actually contains 'proj.db', so we set that manually.
+# In generall, it would be better to not install gdal twice!!! (TODO!)
+# I hope this is early enough...
+ENV PROJ_DATA=/opt/conda/share/proj
+
 # Added the data-bootstrapping:
 ENTRYPOINT ["/usr/local/bin/start.sh"]
 CMD ["start-notebook.py"]
