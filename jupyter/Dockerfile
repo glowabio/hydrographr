@@ -119,10 +119,20 @@ COPY \
   ./input_data/subc_ids.txt \
   /home/bootstrap-data/
 COPY ./input_data/Readme_env90m.md /home/bootstrap-data/env90m/Readme_env90m.md
-COPY ./input_data/workflow_diagram2.png /home/bootstrap-data/img/workflow_diagram2.png
+COPY ./input_data/workflow_20260323.png /home/bootstrap-data/img/workflow_20260323.png
+COPY \
+   ./input_data/lake_intersection_outlet.PNG \
+   ./input_data/lake_with_species.PNG \
+   ./input_data/lake_catchment.PNG \
+   ./input_data/lakes_with_species.PNG \
+   ./input_data/lakes_species_bbox.PNG \
+   /home/bootstrap-data/img/
 
 # Copy the Juypter Notebook (the vignette)
-COPY ./notebook_workshop_igb_2026.ipynb /home/bootstrap-data/
+# TODO: The part of the SDM had some missing libraries etc.
+COPY ./notebook_snapping_sdm.ipynb /home/bootstrap-data/notebook_snapping_sdm.ipynb
+COPY ./workflow_diagram_TT.svg /home/bootstrap-data/
+COPY ./notebook_lakes_final_final.ipynb /home/bootstrap-data/notebook_lakes.ipynb
 
 # Added the data-bootstrapping:
 ENTRYPOINT ["/usr/local/bin/start.sh"]
