@@ -66,7 +66,7 @@ RUN R -e "install.packages(c('xfun', 'knitr', 'rmarkdown', 'formatR', 'evaluate'
 RUN export LD_LIBRARY_PATH=/opt/conda/lib:$LD_LIBRARY_PATH && \
     export UDUNITS2_LIBS="-L/opt/conda/lib -ludunits2" && \
     export UDUNITS2_INCLUDE="/opt/conda/include" && \
-    R -e "remotes::install_github('glowabio/hydrographr@f6523a6c6ebe97ed13a559aa71610caa38a7af00')"
+    R -e "remotes::install_github('glowabio/hydrographr@328e1fe72e613b767bf9ba51e3cd6825a5389159')"
 # Test during build whether the installation was successful:
 RUN R -e "library(hydrographr)"
 
@@ -84,7 +84,7 @@ RUN mamba install -y -c conda-forge \
 # Drop back to non-root user:
 USER $NB_UID
 
-# Add temp files required by hydrographr
+# Copy temp files needed by hydrographr
 COPY ./tmp_readonly/lookup_tile_regunit.txt /tmp/
 COPY ./tmp_readonly/regional_unit_ovr.tif /tmp/
 
