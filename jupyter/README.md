@@ -13,6 +13,9 @@ Note: This was first done for the workshop at the Living data Conference in
 October 2025 in Bogotá, Colombia. This is the updated version for the IGB
 workshop in spring 2026.
 
+Note: There are instructions for vignette-developers on what to provide for
+their vignette to run smoothly in a JupyterNotebook on JupyterHub!
+
 
 ## Steps
 
@@ -343,7 +346,7 @@ the `COPY` command in the Dockerfile:
 cat Dockerfile | grep COPY
 COPY ./tmp_readonly/lookup_tile_regunit.txt /tmp/
 COPY ./tmp_readonly/regional_unit_ovr.tif /tmp/
-COPY ./data_readonly/notebook.ipynb /home/participant/data_write/notebook_changeme.ipynb
+COPY ./notebook_workshop.ipynb /home/participant/data_write/notebook_workshop.ipynb
 ```
 
 Background:
@@ -438,6 +441,21 @@ new dependency. If you need sudo rights to install, you can create a
 from the Dockerfile. Run a container of that image, test your code, install
 the required dependencies, write down the installation commands and later add
 them all at once to the normal (non-root) Dockerfile.
+
+**Life hack:**
+
+For complicated dependencies, add some check to the Dockerfile, so that
+failures are noticed during build and not during testing. For example,
+to check whether the R package `SWATrunR` was installed properly, add
+
+```
+RUN conda run -n r-environment R -e "library(SWATrunR)"
+# or in non-conda environments:
+RUN R -e "library(SWATrunR)"
+```
+
+This will fail quickly, and there is no need to deploy, login, run the vignette,
+fail, and restart the whole process.
 
 
 ## Adding files/data to the containers
@@ -558,8 +576,29 @@ sudo chown 1000:100 data_readonly/notebook.ipynb
 
 ### Bind-mounted from host (ideal for read-only data)
 
-We are not mounting any read-only data this time. All relevant data is added to
-the user's docker volumes, see below.
+This time, only the data for the lakes part of the workshop was added as
+_read-only_:
+
+
+```
+ls -lpahn /.../input_data/lakes
+total 232K
+drwxrwxr-x 7 1000  100 4.0K Mar 23 14:06 ./
+drwxr-xr-x 5 2002 2002 4.0K Mar 23 23:03 ../
+drwxr-xr-x 3 1000  100 4.0K Mar 23 11:12 esa_cci_landcover_v2_1_1/
+drwxr-xr-x 2 1000  100 4.0K Mar 23 11:12 hydrography90m/
+-rw-rw-r-- 1 1000  100  37K Mar 23 12:17 lake_id.txt
+-rw-rw-r-- 1 1000  100 3.4K Mar 23 12:17 lake_id_bbox.txt
+drwxr-xr-x 2 1000  100 4.0K Mar 23 11:12 lake_intersection/
+-rw-rw-r-- 1 1000  100  13K Mar 23 12:17 plot.png
+-rw-rw-r-- 1 1000  100 127K Mar 23 12:17 predictTB.csv
+drwxr-xr-x 7 1000  100 4.0K Mar 23 11:12 r.watershed/
+drwxr-xr-x 2 1000  100 4.0K Mar 23 11:12 spatial/
+-rw-rw-r-- 1 1000  100  15K Mar 23 12:18 subc_IDs.txt
+```
+
+TODO: Put a zipped copy of all this somewhere, as it is too big to commit to
+GitHub!
 
 ### Docker-volume for each user
 
@@ -569,27 +608,43 @@ container is started.
 ### Data baked into the image (added at build-time)
 
 Some input data (directories `spatial` and `env90m`, files `pred_tab.csv`,
-`pred_tab_complete.csv`, `subc_ids.txt`, `workflow_diagram2.png`) is baked
+`pred_tab_complete.csv`, `subc_ids.txt`, etc.) is baked
 into the image, using `COPY`:
 
 ```
+# Directories "spatial" and "env90m";
 COPY ./input_data/spatial /home/bootstrap-data/spatial
-
 COPY \
   ./input_data/chelsa_bioclim_v2_1 \
   ./input_data/esa_cci_landcover_v2_1_1 \
   ./input_data/hydrography90m_v1_0 \
   /home/bootstrap-data/env90m/
 
-# Copy files
+# Lots of smaller files:
 COPY \
-  ./input_data/notebook_merged__sent20260317afternoon.ipynb \
-  ./input_data/workflow_diagram2.png \
-  ./input_data/Readme_env90m.md \
+  ./input_data/fish_gbif_from_sp_list_clean_to_snap.csv \
   ./input_data/pred_tab.csv \
   ./input_data/pred_tab_complete.csv \
   ./input_data/subc_ids.txt \
   /home/bootstrap-data/
+COPY ./workflow_diagram_TT.svg /home/bootstrap-data/
+COPY ./input_data/Readme_env90m.md /home/bootstrap-data/env90m/Readme_env90m.md
+COPY ./input_data/workflow_20260323.png /home/bootstrap-data/img/workflow_20260323.png
+COPY \
+   ./input_data/lake_intersection_outlet.PNG \
+   ./input_data/lake_with_species.PNG \
+   ./input_data/lake_catchment.PNG \
+   ./input_data/lakes_with_species.PNG \
+   ./input_data/lakes_species_bbox.PNG \
+   /home/bootstrap-data/img/
+```
+
+Also, the notebook files (TODO: the part of the SDM had some missing libraries etc.):
+
+```
+# Copy the Juypter Notebook (the vignette)
+COPY ./notebook_snapping_sdm.ipynb /home/bootstrap-data/notebook_snapping_sdm.ipynb
+COPY ./notebook_lakes_final_final.ipynb /home/bootstrap-data/notebook_lakes.ipynb
 ```
 
 Inside the container, it is available in `/home/bootstrap-data`.
@@ -597,6 +652,10 @@ Inside the container, it is available in `/home/bootstrap-data`.
 As changes to this data would be gone when the containers are gone, we use the
 script `start.sh` to copy it over to the user's individual writeable docker
 volumes during docker container startup.
+
+TODO: Put a zipped copy of all this somewhere, as it is too big to commit to
+GitHub!
+
 
 ## Server cleanup
 
