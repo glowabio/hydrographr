@@ -107,6 +107,13 @@ RUN chmod +x /usr/local/bin/start.sh
 # Drop back to non-root user:
 USER $NB_UID
 
+# Guidos Tools, needed for Thomas' Lake Functionalities
+# TODO: These did not function, need to debug!
+WORKDIR /home/participant
+RUN curl -O https://ies-ows.jrc.ec.europa.eu/gtb/GWB/GWB_linux64.run
+RUN chmod u+x GWB_linux64.run
+RUN ./GWB_linux64.run
+
 # Copy directories:
 COPY ./input_data/spatial /home/bootstrap-data/spatial
 COPY ./input_data/env90m  /home/bootstrap-data/env90m
