@@ -1,5 +1,7 @@
 # hydrographr in JupyterHub
 
+Merret Buurman, IGB, 2026-03-25
+
 ## Introduction
 
 These are introductions to provide an R environment including hydrographr in
@@ -23,6 +25,7 @@ workshop in spring 2026.
 * JupyterNotebook Docker image with hydrographr
 * Adding files/data to the containers
 * Generating Jupyter Notebook files from R-markdown vignette files
+* Server cleanup
 
 
 ## Install Docker
@@ -594,4 +597,19 @@ Inside the container, it is available in `/home/bootstrap-data`.
 As changes to this data would be gone when the containers are gone, we use the
 script `start.sh` to copy it over to the user's individual writeable docker
 volumes during docker container startup.
+
+## Server cleanup
+
+Several things will fill up the server's disk, so don't forget some
+clean-up.
+
+Repeated testing of new images will add docker containers and docker volumes.
+Check for unneccessary containers with `docker ps -a` and for unneccessary
+volumes with `docker volume list`. Remove with `docker volume rm <volume>`
+and with `docker stop <container>; docker rm <container>`.
+
+Running `docker build ...` repeatedly will fill up disk space with cached
+build information and cached intermediate images. There is some `prune`
+command to clean up - but only do that once you have your final version,
+as the next `docker build ...` run afterwards will take much longer.
 
