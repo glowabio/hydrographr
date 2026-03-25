@@ -115,6 +115,9 @@ RUN chmod u+x GWB_linux64.run
 RUN ./GWB_linux64.run
 
 # Copy directories:
+# Note: Anything added to /home/bootstrap-data/ will be copied
+# to the user's /home/participant/data_write during container startup,
+# see script "start.sh"
 COPY ./input_data/spatial /home/bootstrap-data/spatial
 COPY ./input_data/env90m  /home/bootstrap-data/env90m
 
