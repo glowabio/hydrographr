@@ -126,6 +126,10 @@ crop_vector_to_extent <- function(vector_layer, clip_layer = NULL,
   if (sys_os == "linux" || sys_os == "osx") {
 
     if (!is.null(clip_layer)) {
+
+      # GeoJSON does not support -overwrite; delete existing file first
+      if (file.exists(output_path)) file.remove(output_path)
+
       # Crop using a polygon clip layer
       cat("\nCropping...\n")
       processx::run(system.file("sh", "crop_vector_to_extent_cl.sh",
@@ -147,6 +151,9 @@ crop_vector_to_extent <- function(vector_layer, clip_layer = NULL,
         xmax <- bb[2]
         ymax <- bb[4]
       }
+
+      # GeoJSON does not support -overwrite; delete existing file first
+      if (file.exists(output_path)) file.remove(output_path)
 
       # Crop using bounding box
       cat("\nCropping...\n")
@@ -172,6 +179,8 @@ crop_vector_to_extent <- function(vector_layer, clip_layer = NULL,
 
     if (!is.null(clip_layer)) {
       wsl_clip_layer <- fix_path(clip_layer)
+
+
       # Crop using a polygon clip layer
       cat("\nCropping...\n")
       processx::run(system.file("bat", "crop_vector_to_extent_cl.bat",
