@@ -91,7 +91,7 @@ api_get_upstream_stream_segments <- function(subc_id = NULL,
 
   # --- Construct body --------------------------------------------------------
 
-  process_url <- "https://aqua.igb-berlin.de/pygeoapi-dev/processes/get-upstream-streamsegments/execution"
+  process_url <- "https://aqua.igb-berlin.de/pygeoapi/processes/get-upstream-streamsegments/execution"
 
   inputs <- list(
     geometry_only = geometry_only,
