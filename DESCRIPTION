@@ -140,4 +140,7 @@ Collate:
     'api_get_basin_subcids.R'
     'api_get_snapped_points_strahler_df.R'
     'api_get_snapped_points_cascade.R'
+    'api_get_upstream_catchment.R'
+    'api_get_upstream_stream_segments'
+
     'crop_vector_to_extent.R'
