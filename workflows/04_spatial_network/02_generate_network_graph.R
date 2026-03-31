@@ -25,8 +25,10 @@ setwd(BASE_DIR)
 # ============================================================
 # INPUT FILES
 # ============================================================
-subcatchments <- st_read("spatial/stream_networks/partial_stream_network.gpkg")
-barriers <- read.csv("points_snapped/dams/dams_snapped_points.csv")
+subcatchments <- st_read("spatial/stream_networks/partial_stream_network.gpkg") %>%
+  filter(basin_id == 1292502) # filter for Vjosa basin
+barriers <- read.csv("points_snapped/dams/dams_snapped_points.csv") %>%
+  filter(subc_id %in% subcatchments$subc_id) # keep dams in Vjosa
 
 # ============================================================
 # PARAMETERS

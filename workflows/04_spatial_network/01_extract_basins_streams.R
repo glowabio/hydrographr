@@ -26,7 +26,7 @@ setwd(BASE_DIR)
 message("\n=== Loading Snapped Points ===")
 
 # Load combined fish data
-fish_snapped <- fread("points_snapped/fish/all_snapped_fish_points_from_sp_list.csv")
+fish_snapped <- fread("points_snapped/fish/all_snapped_fish_points.csv")
 message(sprintf("Loaded fish data: %d points", nrow(fish_snapped)))
 
 # Load dams data
@@ -56,8 +56,8 @@ all_snapped <- rbind(
 message(sprintf("Combined total: %d snapped points", nrow(all_snapped)))
 
 # write out to get the URL of the file
-fwrite(all_snapped, "points_snapped/all_points_snapped_from_sp_list.csv")
-all_snapped_csv <- "https://nimbus.igb-berlin.de/index.php/s/iJ26bGqBPK7R3C5/download/all_points_snapped_from_sp_list.csv"
+fwrite(all_snapped, "points_snapped/all_points_snapped.csv")
+all_snapped_csv <- "https://nimbus.igb-berlin.de/index.php/s/2aXF9TLqCxZBAwt/download/all_points_snapped.csv"
 all_snapped <- fread(all_snapped_csv)
 
 # Summary by source
@@ -80,10 +80,10 @@ basin_ids <- api_get_local_ids(data = all_snapped,
 all_snapped_with_basins <- left_join(all_snapped, basin_ids)
 
 # Save combined file
-# fwrite(all_snapped_with_basins, "points_snapped/all_snapped_with_basins_from_sp_list.csv")
-message(sprintf("Saved: points_snapped/all_snapped_with_basins_from_sp_list.csv"))
+fwrite(all_snapped_with_basins, "points_snapped/all_snapped_with_basins.csv")
+message(sprintf("Saved: points_snapped/all_snapped_with_basins.csv"))
 
-all_snapped_with_basins <- fread("points_snapped/all_snapped_with_basins_from_sp_list.csv")
+all_snapped_with_basins <- fread("points_snapped/all_snapped_with_basins.csv")
 
 # Summary by source
 message("\nPoints by source:")
@@ -155,6 +155,7 @@ if (length(stream_networks) > 0) {
 # EXTRACT PARTIAL STREAM NETWORK
 # ============================================================================
 
+all_streams <- st_read("spatial/stream_networks/all_stream_networks.gpkg")
 all_streams_filtered <- extract_partial_stream_network(
   all_streams,
   all_snapped$subc_id,
@@ -162,6 +163,7 @@ all_streams_filtered <- extract_partial_stream_network(
   upstream_buffer = 3      # number of upstream segments to include
 )
 
+st_write(all_streams_filtered, "spatial/stream_networks/partial_stream_network.gpkg")
 save_to_nimbus(all_streams_filtered, "spatial/stream_networks/partial_stream_network.gpkg")
 
 # write out points as .gpkg
@@ -171,7 +173,8 @@ all_snapped_with_basins_vect <- st_as_sf(
   crs = 4326                  # WGS84 (lat/lon)
 )
 
-save_to_nimbus(all_snapped_with_basins_vect, "points_snapped/all_snapped_points_from_sp_list.gpkg")
+st_write(all_snapped_with_basins_vect, "points_snapped/all_snapped_points.gpkg")
+save_to_nimbus(all_snapped_with_basins_vect, "points_snapped/all_snapped_points.gpkg")
 
 # original points
 all_original_with_basins_vect <- st_as_sf(
@@ -179,7 +182,9 @@ all_original_with_basins_vect <- st_as_sf(
   coords = c("longitude_original", "latitude_original"),  # Column names for x, y
   crs = 4326                  # WGS84 (lat/lon)
 )
-save_to_nimbus(all_original_with_basins_vect, "points_cleaned/all_points_before_snap_from_sp_list.gpkg")
+
+st_write(all_original_with_basins_vect, "points_snapped/all_points_before_snap.gpkg")
+save_to_nimbus(all_original_with_basins_vect, "points_cleaned/all_points_before_snap.gpkg")
 
 # ============================================================================
 # DOWNLOAD BASIN POLYGONS
@@ -193,7 +198,8 @@ basin_polygons <- api_get_basin_polygon(basin_id = basin_ids,
                                         colname_site_id = "site_id",
                                         geometry_only = FALSE,
                                         comment = NULL)
-basin_path <- file.path(NIMBUS_DIR, "spatial/stream_networks/basin_polygons.gpkg")
+basin_path <- file.path(BASE_DIR, "spatial/stream_networks/basin_polygons.gpkg")
+st_write(basin_polygons, basin_path)
 save_to_nimbus(data = basin_polygons, filename = basin_path)
 
 

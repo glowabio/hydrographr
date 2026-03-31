@@ -7,12 +7,11 @@ library(data.table)
 library(dplyr)
 library(readxl)
 library(stringr)
-source("workflows/helpers/config.R")
+source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
 
 # ── Configuration ────────────────────────────────────────────────────────────
 
 # Set working directory
-source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
 # Check working directory
 BASE_DIR
 setwd(BASE_DIR)
@@ -202,7 +201,7 @@ extract_and_combine <- function(submitted_keys, zip_dir = download_path) {
 
   combined_df  <- as.data.frame(data.table::rbindlist(combined_list, fill = TRUE),
                                 stringsAsFactors = FALSE)
-  combined_csv <- file.path(zip_dir, "combined_greece_fish_occurrences_from_sp_list.csv")
+  combined_csv <- file.path(zip_dir, "combined_greece_fish_occurrences.csv")
   data.table::fwrite(combined_df, combined_csv)
   cat("\nCombined CSV saved to:", combined_csv, "\n")
   combined_df
@@ -227,7 +226,7 @@ combined_fish_df <- extract_and_combine(submitted_keys, download_path)
 
 # ── Summary ──────────────────────────────────────────────────────────────────
 
-cat(fread(file.path(download_path, "combined_greece_fish_occurrences_from_sp_list.csv")) %>% colnames(), sep = "\n")
+cat(fread(file.path(download_path, "combined_greece_fish_occurrences.csv")) %>% colnames(), sep = "\n")
 
 message("\n", paste(rep("=", 60), collapse = ""))
 message("GBIF DOWNLOAD COMPLETE")

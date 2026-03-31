@@ -85,3 +85,4 @@ message("\n✓ Merged files created:")
 message("  - points_snapped/fish_hcmr_with_species_snapped.csv")
 message("  - points_snapped/fish_gbif_with_species_snapped.csv")
 message("  - points_snapped/fish_all_species_snapped.csv")
+

@@ -142,3 +142,22 @@ save_to_nimbus(results, filename = paste0(NIMBUS_DIR, "/range_maps/iucn_basins_i
 message("\nDone! ", nrow(results), " species x basin combinations")
 message("Species with range overlap: ", length(unique(results$species)))
 message("Basins with species: ", length(unique(results$basin_id)))
+
+
+## Filter species occurring in Vjosa
+results <- fread("range_maps/iucn_basins_intersect.csv")  %>%
+  mutate(species = gsub(" ", "_", species))
+
+species_subset <- results %>%
+  filter(basin_id == 1292502) %>%
+  pull(species)
+
+results_subset <- results %>%
+  filter(species %in% species_subset)
+fwrite(results_subset, "range_maps/vjosa_species_checklist_iucn.csv")
+
+
+sp_snapped_subset <- fread("points_snapped/fish/fish_all_species_snapped.csv") %>%
+  filter(species %in% species_subset)
+
+fwrite(sp_snapped_subset, "points_snapped/fish/occurr_for_sdm.csv")
