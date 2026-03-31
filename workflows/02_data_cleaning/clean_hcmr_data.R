@@ -28,7 +28,7 @@ message(paste(rep("=", 80), collapse = ""))
 # Set working directory
 source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
 # Check working directory
-BASE_DIR
+BASE_DIR <- NIMBUS_DIR
 setwd(BASE_DIR)
 
 
@@ -115,76 +115,88 @@ if (n_before > n_after) {
 }
 
 # ============================================================================
-# PART 2: PROCESS BARBUS ABUNDANCE DATA (SARANTAPOROS)
+# PART 2: PROCESS FISH ABUNDANCE DATA (SARANTAPOROS)
 # ============================================================================
 
-message("\n=== Step 2: Processing Barbus Abundance Data (Sarantaporos) ===")
+message("\n=== Step 2: Processing Fish Abundance Data (Sarantaporos) ===")
 
-# Check if Sarantaporos Barbus file exists
-barbus_file <- "points_original/fish/Sarantaporos_Barbus.xlsx"
+# Check if Sarantaporos file exists
+sarantaporos_file <- "points_original/fish/Sarantaporos.xlsx"
 
-if (file.exists(barbus_file)) {
-  message(sprintf("Found Barbus file: %s", barbus_file))
+if (file.exists(sarantaporos_file)) {
+  message(sprintf("Found Barbus file: %s", sarantaporos_file))
 
-  # Clean fish data (using your exact logic)
-  spdata <- read_xlsx(barbus_file) %>%
-    rename(Rel_Abund = "Barbus prespensis") %>%
-    filter(Rel_Abund > 0) %>%
-    mutate(site_id = paste0("Sarant_", row_number())) %>%
-    rename(longitude = "Latitude",    # Note: these are swapped in original file
-           latitude  = "Longtitude") %>%
-    select(site_id, longitude, latitude, Rel_Abund)
+    # Read and identify species columns (everything except site/coordinate cols)
+    raw <- read_xlsx(sarantaporos_file) %>%
+      rename(longitude = "Latitude",    # Note: swapped in original file
+             latitude  = "Longtitude") %>%
+      mutate(site_id = paste0("Sarant_", row_number()))
 
-  message(sprintf("Loaded %d Barbus records with abundance > 0", nrow(spdata)))
+    coord_cols <- c("site_id", "longitude", "latitude")
+    species_cols <- setdiff(names(raw), coord_cols)[-1]
 
-  # Convert to long format matching main dataset structure
-  barbus_long <- spdata %>%
-    mutate(
-      Sites = site_id,
-      species = "Barbus_prespensis"
-    ) %>%
-    select(Sites, latitude, longitude, species)
+    message(sprintf("Found %d species columns: %s",
+                    length(species_cols),
+                    paste(species_cols, collapse = ", ")))
 
-  message(sprintf("Converted to %d Barbus presence records", nrow(barbus_long)))
+    # Pivot to long format, keep only presences
+    sarantaporos_long <- raw %>%
+      select(all_of(c(coord_cols, species_cols))) %>%
+      pivot_longer(
+        cols      = all_of(species_cols),
+        names_to  = "species",
+        values_to = "abundance"
+      ) %>%
+      filter(!is.na(abundance), abundance > 0) %>%
+      mutate(
+        Sites   = site_id,
+        species = gsub(" ", "_", species)   # match naming convention
+      ) %>%
+      select(Sites, latitude, longitude, species)
 
-  # Spatial validation
-  n_before_barbus <- nrow(barbus_long)
-  barbus_long <- barbus_long %>%
-    filter(
-      !is.na(latitude), !is.na(longitude),
-      latitude > 10,
-      longitude >= 19, longitude <= 29,
-      latitude >= 34, latitude <= 42
-    )
-  n_after_barbus <- nrow(barbus_long)
+    message(sprintf("Converted to %d presence records across %d species",
+                    nrow(sarantaporos_long),
+                    n_distinct(sarantaporos_long$species)))
 
-  if (n_before_barbus > n_after_barbus) {
-    message(sprintf("Removed %d Barbus records with invalid coordinates",
-                    n_before_barbus - n_after_barbus))
+    # Spatial validation
+    n_before <- nrow(sarantaporos_long)
+    sarantaporos_long <- sarantaporos_long %>%
+      filter(
+        !is.na(latitude), !is.na(longitude),
+        latitude  > 10,
+        longitude >= 19, longitude <= 29,
+        latitude  >= 34, latitude  <= 42
+      )
+    n_after <- nrow(sarantaporos_long)
+
+    if (n_before > n_after) {
+      message(sprintf("Removed %d records with invalid coordinates", n_before - n_after))
+    }
+
+    # Save standalone Sarantaporos file (for reference)
+    fwrite(sarantaporos_long,
+           file.path(BASE_DIR, "points_cleaned/fish/spdata_sarantaporos_clean.csv"))
+    message("✓ Saved standalone Sarantaporos file: spdata_sarantaporos_clean.csv")
+
+    # ============================================================================
+    # COMBINE MAIN + SARANTAPOROS
+    # ============================================================================
+
+    message("\n=== Step 3: Combining Main and Sarantaporos Datasets ===")
+
+    sp <- sp %>% mutate(latitude  = as.numeric(latitude),
+                        longitude = as.numeric(longitude))
+    sp_combined <- bind_rows(sp, sarantaporos_long)
+
+    message(sprintf("Combined dataset: %d total records", nrow(sp_combined)))
+    message(sprintf("  - Main dataset:        %d records", nrow(sp)))
+    message(sprintf("  - Sarantaporos data:   %d records", nrow(sarantaporos_long)))
+
+  } else {
+    message(sprintf("⚠️  Sarantaporos file not found: %s", sarantaporos_file))
+    message("Using only main dataset")
+    sp_combined <- sp
   }
-
-  # Save standalone Barbus file (for reference)
-  fwrite(spdata, file.path(BASE_DIR, "points_cleaned/fish/spdata_barbus_vjosa_clean.csv"))
-  message("✓ Saved standalone Barbus file: spdata_barbus_vjosa_clean.csv")
-
-  # ============================================================================
-  # COMBINE MAIN + BARBUS
-  # ============================================================================
-
-  message("\n=== Step 3: Combining Main and Barbus Datasets ===")
-  sp <- sp %>% mutate(latitude= as.numeric(latitude),
-                      longitude = as.numeric(longitude))
-  sp_combined <- bind_rows(sp, barbus_long)
-
-  message(sprintf("Combined dataset: %d total records", nrow(sp_combined)))
-  message(sprintf("  - Main dataset: %d records", nrow(sp)))
-  message(sprintf("  - Barbus data: %d records", nrow(barbus_long)))
-
-} else {
-  message(sprintf("⚠️  Barbus file not found: %s", barbus_file))
-  message("Using only main dataset")
-  sp_combined <- sp
-}
 
 # ============================================================================
 # FINAL STEPS: SAVE AND VISUALIZE
@@ -256,13 +268,12 @@ message(paste(rep("=", 80), collapse = ""))
 message("\nSummary Statistics:")
 message(sprintf("  Total occurrence records: %d", nrow(sp_combined)))
 message(sprintf("  Unique sites: %d", nrow(sp_to_snap)))
-message(sprintf("  Unique species: %d", length(unique_species_final)))
 message(sprintf("  Dry/fishless sites excluded: %d", nrow(dry_fishless)))
 
 # Species frequency
 species_counts <- sp_combined %>% count(species) %>% arrange(desc(n))
 message("\nMost common species:")
-for (i in 1:min(10, nrow(species_counts))) {
+for (i in 1:min(20, nrow(species_counts))) {
   message(sprintf("  %d. %s: %d occurrences",
                   i,
                   species_counts$species[i],
@@ -291,9 +302,8 @@ message(sprintf("  Latitude: %.4f to %.4f",
                 min(sp_combined$latitude), max(sp_combined$latitude)))
 
 message("\nFiles Created:")
-message("  - points_cleaned/fish/fish_greece_hcmr.csv (all species including Barbus)")
+message("  - points_cleaned/fish/fish_greece_hcmr.csv (all species including Sarantaporos)")
 message("  - points_cleaned/fish/fish_points_to_snap_hcmr.csv (unique sites)")
-message("  - points_cleaned/fish/spdata_barbus_clean.csv (standalone Barbus reference)")
 message("  - points_cleaned/maps/hcmr_fish_overview.html")
 if (nrow(dry_fishless) > 0) {
   message("  - points_original/fish/fish_hcmr_dry_fishless_sites.csv")

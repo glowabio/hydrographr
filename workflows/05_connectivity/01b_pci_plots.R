@@ -23,7 +23,7 @@ setwd(BASE_DIR)
 # READ INPUTS
 # ============================================================
 
-fi_summary <- read.table("connectivity/pci/fi_summary.txt", header = TRUE)
+fi_summary <- read.table("connectivity/pci/fi_summary_subhabitats.txt", header = TRUE)
 
 basin_lookup <- fread("spatial/basin_name_lookup.csv") %>%
   mutate(basin_id = as.integer(basin_id))
@@ -36,6 +36,7 @@ fish_dis_class <- fread("traits/fish_dis_class.txt")
 # Join traits for coloring/faceting
 fi_plot <- fi_summary %>%
   left_join(fish_dis_class %>%
+              rename(species = species_name) %>%
               select(species, Migration_label, Caudal_fin_label,
                      dispersal_prob, max_TL),
             by = "species")

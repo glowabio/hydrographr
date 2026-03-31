@@ -66,7 +66,9 @@ Other ocgapi:
 \code{\link{api_get_snapped_points}()},
 \code{\link{api_get_snapped_points_cascade}()},
 \code{\link{api_get_snapped_points_df}()},
-\code{\link{api_get_snapped_points_strahler_df}()}
+\code{\link{api_get_snapped_points_strahler_df}()},
+\code{\link{api_get_upstream_catchment}()},
+\code{\link{api_get_upstream_stream_segments}()}
 }
 \author{
 Afroditi Grigoropoulou, Merret Buurman

@@ -141,6 +141,5 @@ Collate:
     'api_get_snapped_points_strahler_df.R'
     'api_get_snapped_points_cascade.R'
     'api_get_upstream_catchment.R'
-    'api_get_upstream_stream_segments'
-
+    'api_get_upstream_stream_segments.R'
     'crop_vector_to_extent.R'
