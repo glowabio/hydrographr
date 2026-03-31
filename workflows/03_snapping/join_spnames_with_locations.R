@@ -18,10 +18,10 @@ message("\n=== Merging Snapped Data with Species Information ===")
 
 # Load original data with species
 fish_hcmr <- fread("points_cleaned/fish/fish_greece_hcmr.csv")
-fish_gbif <- fread("points_cleaned/fish/fish_gbif_from_sp_list_clean.csv")
+fish_gbif <- fread("points_cleaned/fish/fish_gbif_clean.csv")
 
 # Load snapped data
-all_snapped <- fread("points_snapped/fish/all_snapped_fish_points_from_sp_list.csv")
+all_snapped <- fread("points_snapped/fish/all_snapped_fish_points.csv")
 
 # Separate HCMR and GBIF from snapped data
 hcmr_snapped <- all_snapped %>% filter(source == "HCMR")
