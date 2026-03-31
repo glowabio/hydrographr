@@ -47,7 +47,7 @@ dir.create("points_cleaned/maps", recursive = TRUE, showWarnings = FALSE)
 
 message("\n=== Step 1: Reading and Fixing Raw GBIF Data ===")
 
-file_raw <- file.path(BASE_DIR, "points_original/fish/combined_greece_fish_occurrences_from_sp_list.csv")
+file_raw <- file.path(BASE_DIR, "points_original/fish/combined_greece_fish_occurrences.csv")
 
 # Read with fread (handles large files efficiently)
 gbif <- fread(file_raw,
@@ -122,7 +122,7 @@ unlink(temp_file)
 save_to_nimbus(gbif_clean, "points_original/fish/combined_greece_fish_occurrences_fixed.csv")
 
 # delete?
-fwrite(gbif_clean, "points_original/fish/combined_greece_fish_occurrences_from_sp_list_fixed.csv")
+fwrite(gbif_clean, "points_original/fish/combined_greece_fish_occurrences_fixed.csv")
 
 message(sprintf("\n✓ CSV fixing complete: %d clean rows retained", nrow(gbif_clean)))
 
@@ -132,7 +132,7 @@ message(sprintf("\n✓ CSV fixing complete: %d clean rows retained", nrow(gbif_c
 
 message("\n=== Step 2: Initial Exploration ===")
 
-gbif_raw <- fread("points_original/fish/combined_greece_fish_occurrences_from_sp_list_fixed.csv")
+gbif_raw <- fread("points_original/fish/combined_greece_fish_occurrences_fixed.csv")
 gbif_raw <- gbif_clean
 
 message(sprintf("Dataset dimensions: %d rows × %d columns", nrow(gbif_raw), ncol(gbif_raw)))
@@ -284,7 +284,8 @@ gbif_cleaned <- gbif_taxa_curated %>%
   filter(
     !is.na(decimalLongitude),
     !is.na(decimalLatitude)
-  )
+  ) %>%
+  filter(year > 1980)
 
 message(sprintf("\nFinal cleaned dataset: %d rows", nrow(gbif_cleaned)))
 
@@ -322,7 +323,7 @@ gbif_map <- leaflet(gbif_cleaned) %>%
 save_to_nimbus(gbif_map, "points_cleaned/maps/gbif_fish_cleaned_overview.html")
 
 # Save locally
-saveWidget(gbif_map, "points_cleaned/maps/gbif_fish__from_sp_list_cleaned_overview.html")
+saveWidget(gbif_map, "points_cleaned/maps/gbif_fish__cleaned_overview.html")
 
 # ============================================================================
 # 10. SAVE CLEANED DATA
@@ -334,15 +335,14 @@ message("\n=== Step 10: Saving Cleaned Data ===")
 save_to_nimbus(gbif_cleaned, "points_cleaned/fish/fish_gbif_clean.csv")
 
 # Save locally
-fwrite(gbif_cleaned, "points_cleaned/fish/fish_gbif_from_sp_list_clean.csv")
+fwrite(gbif_cleaned, "points_cleaned/fish/fish_gbif_clean.csv")
 
-# gbif_cleaned <- fread("points_cleaned/fish/fish_gbif_clean.csv")
+gbif_cleaned <- fread("points_cleaned/fish/fish_gbif_clean.csv")
 
 # Remove duplicates, keep only coordinates and gbifID to snap
 gbif_cleaned_unique <- gbif_cleaned %>%
   distinct(decimalLongitude,decimalLatitude, .keep_all = TRUE)
 
-fwrite(gbif_cleaned_unique, "points_cleaned/fish/fish_gbif_from_sp_list_clean_unique.csv")
 
 # GBIF data of fish might include records in the sea that we do not need
 # We can test if this is the case, trying to obtain the regional unit ID of the
@@ -351,22 +351,12 @@ fwrite(gbif_cleaned_unique, "points_cleaned/fish/fish_gbif_from_sp_list_clean_un
 # it is a higher level of organisation than basin or subcatchment id,
 # and thus it is faster to obtain it from the database
 
-gbif_cleaned_unique <- fread("points_cleaned/fish/fish_gbif_from_sp_list_clean_unique.csv")
-
 
 system.time(reg_unit_ids <- api_get_local_ids(data = gbif_cleaned_unique,
                                               colname_lon = "decimalLongitude",
                                               colname_lat = "decimalLatitude",
                                               colname_site_id = "gbifID"))
-# CSV version
-# Get the URL of the above file to obtain the ids
-# gbif_cleaned_unique_url <- "https://nimbus.igb-berlin.de/index.php/s/kq7pLJrtdC7WsFW/download/fish_gbif_from_sp_list_clean_unique.csv"
 
-# system.time(reg_unit_ids2 <- api_get_local_ids(csv_url = gbif_cleaned_unique_url,
-#                    colname_lon = "decimalLongitude",
-#                    colname_lat = "decimalLatitude",
-#                    colname_site_id = "gbifID",
-#                    which_ids = "reg_id"))
 
 # Keep only occurrences that were assigned regional unit id
 # Get site_id of these occurrences
@@ -377,7 +367,7 @@ site_ids_keep <- reg_unit_ids %>% filter(!is.na(reg_id)) %>%
 gbif_cleaned_to_snap <- gbif_cleaned_unique %>%
   filter(gbifID %in% site_ids_keep)
 
-fwrite(gbif_cleaned_to_snap, "points_cleaned/fish/fish_gbif_from_sp_list_clean_to_snap.csv")
+fwrite(gbif_cleaned_to_snap, "points_cleaned/fish/fish_gbif_clean_to_snap.csv")
 
 
 # ============================================================================
