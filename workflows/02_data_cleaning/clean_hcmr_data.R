@@ -230,7 +230,7 @@ sp_to_snap <- sp_combined %>% distinct(Sites, longitude, latitude)
 message(sprintf("Unique sites to snap: %d", nrow(sp_to_snap)))
 
 # write points to snap
-fwrite(sp_to_snap, file.path(NIMBUS_DIR, "points_cleaned/fish/fish_points_to_snap_hcmr.csv"))
+fwrite(sp_to_snap, file.path(BASE_DIR, "points_cleaned/fish/fish_points_to_snap_hcmr.csv"))
 message("✓ Saved: points_cleaned/fish/fish_points_to_snap_hcmr.csv")
 
 # ============================================================================
