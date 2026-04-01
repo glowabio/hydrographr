@@ -4,7 +4,8 @@
 #' upstream of a given point or sub-catchment and returns them as an `sf` object.
 #'
 #' @description
-#' This function returns all stream segments upstream of a specified location.
+#' This function returns all stream segments upstream of a specified location,
+#' optionally filtered by a minimum Strahler stream order.
 #' The location can be identified by one of: `subc_id`, or a pair of
 #' coordinates (`lon` + `lat`). All inputs are sent as JSON.
 #'
@@ -17,9 +18,14 @@
 #'   segments without associated attributes. Defaults to `FALSE`.
 #' @param add_upstream_ids Logical. If `TRUE`, upstream sub-catchment IDs are
 #'   added to the output. Defaults to `FALSE`.
+#' @param min_strahler Integer (optional). The minimum Strahler stream order to
+#'   include. Streams below this order will be excluded from the result.
+#'   Defaults to `NULL` (no filtering).
 #' @param comment Character. Optional comment for API logging.
 #'
-#' @return An `sf` object representing the upstream stream segments.
+#' @return An `sf` object representing the upstream stream segments. If
+#'   `min_strahler` is set higher than the Strahler order of any upstream
+#'   segment, an empty `sf` object is returned.
 #'
 #' @examples
 #' \dontrun{
@@ -29,6 +35,14 @@
 #'   lat = 40.113735,
 #'   geometry_only = FALSE,
 #'   add_upstream_ids = TRUE
+#' )
+#'
+#' # Using lon/lat with minimum Strahler order filter
+#' upstream_sf <- api_get_upstream_stream_segments(
+#'   lon = 20.538704,
+#'   lat = 40.113735,
+#'   geometry_only = FALSE,
+#'   min_strahler = 4
 #' )
 #'
 #' # Using subc_id
@@ -53,6 +67,7 @@ api_get_upstream_stream_segments <- function(subc_id = NULL,
                                              lat = NULL,
                                              geometry_only = FALSE,
                                              add_upstream_ids = FALSE,
+                                             min_strahler = NULL,
                                              comment = NULL) {
 
   # --- Input validation ------------------------------------------------------
@@ -89,9 +104,13 @@ api_get_upstream_stream_segments <- function(subc_id = NULL,
     stop("`add_upstream_ids` must be logical (TRUE/FALSE).", call. = FALSE)
   }
 
+  if (!is.null(min_strahler) && (!is.numeric(min_strahler) || min_strahler < 1)) {
+    stop("`min_strahler` must be a positive numeric value or NULL.", call. = FALSE)
+  }
+
   # --- Construct body --------------------------------------------------------
 
-  process_url <- "https://aqua.igb-berlin.de/pygeoapi/processes/get-upstream-streamsegments/execution"
+  process_url <- "https://aqua.igb-berlin.de/pygeoapi-dev/processes/get-upstream-streamsegments/execution"
 
   inputs <- list(
     geometry_only = geometry_only,
@@ -103,6 +122,10 @@ api_get_upstream_stream_segments <- function(subc_id = NULL,
   } else {
     inputs$lon <- lon
     inputs$lat <- lat
+  }
+
+  if (!is.null(min_strahler)) {
+    inputs$min_strahler <- as.integer(min_strahler)
   }
 
   if (!is.null(comment)) {

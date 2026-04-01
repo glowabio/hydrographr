@@ -10,6 +10,7 @@ api_get_upstream_stream_segments(
   lat = NULL,
   geometry_only = FALSE,
   add_upstream_ids = FALSE,
+  min_strahler = NULL,
   comment = NULL
 )
 }
@@ -27,13 +28,20 @@ segments without associated attributes. Defaults to `FALSE`.}
 \item{add_upstream_ids}{Logical. If `TRUE`, upstream sub-catchment IDs are
 added to the output. Defaults to `FALSE`.}
 
+\item{min_strahler}{Integer (optional). The minimum Strahler stream order to
+include. Streams below this order will be excluded from the result.
+Defaults to `NULL` (no filtering).}
+
 \item{comment}{Character. Optional comment for API logging.}
 }
 \value{
-An `sf` object representing the upstream stream segments.
+An `sf` object representing the upstream stream segments. If
+  `min_strahler` is set higher than the Strahler order of any upstream
+  segment, an empty `sf` object is returned.
 }
 \description{
-This function returns all stream segments upstream of a specified location.
+This function returns all stream segments upstream of a specified location,
+optionally filtered by a minimum Strahler stream order.
 The location can be identified by one of: `subc_id`, or a pair of
 coordinates (`lon` + `lat`). All inputs are sent as JSON.
 }
@@ -49,6 +57,14 @@ upstream_sf <- api_get_upstream_stream_segments(
   lat = 40.113735,
   geometry_only = FALSE,
   add_upstream_ids = TRUE
+)
+
+# Using lon/lat with minimum Strahler order filter
+upstream_sf <- api_get_upstream_stream_segments(
+  lon = 20.538704,
+  lat = 40.113735,
+  geometry_only = FALSE,
+  min_strahler = 4
 )
 
 # Using subc_id
