@@ -84,11 +84,14 @@ message("  Subbasin polygon saved")
 subbasin_streams <- api_get_upstream_stream_segments(
   lon = OUTLET_LON,
   lat = OUTLET_LAT,
-  # strahler = ...
+  min_strahler = 2
 )
 
+st_write(subbasin_streams, "spatial/sarantaporos/sarantaporos_stream_network.gpkg",
+         delete_dsn = TRUE)
 save_to_nimbus(subbasin_streams, "spatial/sarantaporos/sarantaporos_stream_network.gpkg")
 message("  Stream network saved: ", nrow(subbasin_streams), " segments")
+
 
 # Get subcatchment IDs within the subbasin
 sarantaporos_subc_ids <- unique(subbasin_streams$subc_id)
@@ -192,6 +195,20 @@ if (length(unexpected) > 0) {
   cat("\n  Unexpected species in Sarantaporos (not in IUCN Vjosa list):\n")
   cat("  ", paste(unexpected, collapse = ", "), "\n")
 }
+
+
+### Prune network
+subbasin_streams_filtered <- extract_partial_stream_network(
+  subbasin_streams,
+  all_snapped$subc_id,
+  strahler_retain_threshold = 4,
+  upstream_buffer = 3      # number of upstream segments to include
+)
+
+st_write(all_streams_filtered, "spatial/stream_networks/partial_stream_network.gpkg")
+
+
+
 
 # ============================================================
 # SUMMARY
