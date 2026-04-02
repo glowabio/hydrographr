@@ -1,8 +1,8 @@
 Package: hydrographr
 Type: Package
 Title: Scalable Hydrographic Data Processing in R
-Date: 2025
-Version: 1.4.0
+Date: 2026
+Version: 1.5.0
 Authors@R:
     c(person("Marlene", "Schürz",
              email = "marlene.schuerz@igb-berlin.de",
