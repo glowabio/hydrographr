@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">hydrographr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.4.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.5.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -70,7 +70,7 @@
 the Environment90m dataset for Species Distribution Modelling</h3>
                         <h4 data-toc-skip class="author"></h4>
             
-            <h4 data-toc-skip class="date">2025-12-18</h4>
+            <h4 data-toc-skip class="date">2026-04-02</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/glowabio/hydrographr/blob/HEAD/vignettes/case_study_Danube.Rmd" class="external-link"><code>vignettes/case_study_Danube.Rmd</code></a></small>
       <div class="d-none name"><code>case_study_Danube.Rmd</code></div>
@@ -248,7 +248,7 @@ using the function <em>extract_ids</em>.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">subc_ids</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># save the object to a file</span></span>
-<span><span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/fwrite.html" class="external-link">fwrite</a></span><span class="op">(</span><span class="va">subc_ids</span>, file<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"subc_ids.txt"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/pkg/data.table/man/fwrite.html" class="external-link">fwrite</a></span><span class="op">(</span><span class="va">subc_ids</span>, file<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"subc_ids.txt"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>As you can see, the file consists of one column with all the
 sub-catchment IDs. In the Danube basin there are around 4,3 million
 sub-catchments!</p>
@@ -424,7 +424,7 @@ coordinates. The original data can be found <a href="https://www.gbif.org/occurr
 2023</a>)</span>.</p>
 <p>Read the file into the R session and have a look at it</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">spdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/fread.html" class="external-link">fread</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"hydrography90m_test_data/hydrographr_data/Zingel_streber.csv"</span><span class="op">)</span>, sep <span class="op">=</span> <span class="st">","</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">spdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/data.table/man/fread.html" class="external-link">fread</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"hydrography90m_test_data/hydrographr_data/Zingel_streber.csv"</span><span class="op">)</span>, sep <span class="op">=</span> <span class="st">","</span><span class="op">)</span></span>
 <span><span class="va">spdata</span></span></code></pre></div>
 <pre><code><span><span class="co">##             Species Longitude Latitude</span></span>
 <span><span class="co">##              &lt;char&gt;     &lt;num&gt;    &lt;num&gt;</span></span>
@@ -560,8 +560,8 @@ object.</p>
 <span>    <span class="va">pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">model</span>, data <span class="op">=</span> <span class="va">predtb</span><span class="op">[</span>,<span class="fl">2</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span><span class="op">)</span></span>
 <span>    <span class="va">subc</span> <span class="op">&lt;-</span> <span class="va">predtb</span><span class="op">[</span>,<span class="fl">1</span><span class="op">]</span></span>
 <span>    </span>
-<span>    <span class="va">pred_sub</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/setDT.html" class="external-link">setDT</a></span><span class="op">(</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">pred</span><span class="op">)</span><span class="op">)</span></span>
-<span>    <span class="va">subc_sub</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/setDT.html" class="external-link">setDT</a></span><span class="op">(</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">subc</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="va">pred_sub</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/data.table/man/setDT.html" class="external-link">setDT</a></span><span class="op">(</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">pred</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="va">subc_sub</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/data.table/man/setDT.html" class="external-link">setDT</a></span><span class="op">(</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">subc</span><span class="op">)</span><span class="op">)</span></span>
 <span>    </span>
 <span>    <span class="fu"><a href="https://rspatial.github.io/terra/reference/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">pred_sub</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"prob_0"</span>, <span class="st">"prob_1"</span><span class="op">)</span></span>
 <span>    <span class="fu"><a href="https://rspatial.github.io/terra/reference/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">subc_sub</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="st">"subcID"</span></span>
@@ -579,9 +579,9 @@ first table:</p>
 <p>We can now combine all predictions and sub-catchment IDs.</p>
 <div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># combine all predictions</span></span>
-<span><span class="va">pred_all</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/rbindlist.html" class="external-link">rbindlist</a></span><span class="op">(</span><span class="va">pred_list</span><span class="op">)</span></span>
+<span><span class="va">pred_all</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/data.table/man/rbindlist.html" class="external-link">rbindlist</a></span><span class="op">(</span><span class="va">pred_list</span><span class="op">)</span></span>
 <span><span class="co"># combine all sub-catchments</span></span>
-<span><span class="va">subc_all</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/rbindlist.html" class="external-link">rbindlist</a></span><span class="op">(</span><span class="va">subc_list</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">subc_all</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/data.table/man/rbindlist.html" class="external-link">rbindlist</a></span><span class="op">(</span><span class="va">subc_list</span><span class="op">)</span></span></code></pre></div>
 <p>Our final goal is to visualize the probability of occurrence -or
 habitat suitability- of the fish species on a map of the Danube basin.
 In order to transfer the prediction values into the map we will use the

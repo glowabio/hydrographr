@@ -17,7 +17,7 @@ raster mask(s) using download_tiles()."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">hydrographr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.4.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.5.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -67,7 +67,7 @@ raster mask(s) using <code><a href="download_tiles.html">download_tiles()</a></c
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_regional_unit_id</span><span class="op">(</span><span class="va">data</span>, <span class="va">lon</span>, <span class="va">lat</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_regional_unit_id</span><span class="op">(</span><span class="va">data</span>, <span class="va">lon</span>, <span class="va">lat</span>, quiet <span class="op">=</span> <span class="cn">TRUE</span>, tempdir <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -90,6 +90,10 @@ the longitude / latitude coordinates in WGS84.</p></dd>
 <dt id="arg-quiet">quiet<a class="anchor" aria-label="anchor" href="#arg-quiet"></a></dt>
 <dd><p>logical. If FALSE, the standard output will be printed.
 Default is TRUE.</p></dd>
+
+
+<dt id="arg-tempdir">tempdir<a class="anchor" aria-label="anchor" href="#arg-tempdir"></a></dt>
+<dd><p>character. The directory to be used as temp folder. Optional.</p></dd>
 
 </dl></div>
     <div class="section level2">
