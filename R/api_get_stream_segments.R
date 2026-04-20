@@ -239,7 +239,7 @@ api_get_stream_segments <- function(basin_id = NULL,
 
     # --- BASIN MODE: Construct body --------
 
-    process_url <- "https://aqua.igb-berlin.de/pygeoapi-dev/processes/get-basin-streamsegments/execution"
+    process_url <- "https://aqua.igb-berlin.de/pygeoapi/processes/get-basin-streamsegments/execution"
 
     inputs <- list(geometry_only = geometry_only)
 
