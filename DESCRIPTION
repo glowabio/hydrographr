@@ -91,7 +91,6 @@ Suggests:
     testthat
 Collate:
     'api_filter_by_attribute.R'
-    'api_get_basin_stream_segments.R'
     'api_get_env90m_data.R'
     'api_get_local_ids.R'
     'api_get_snapped_points.R'
@@ -141,5 +140,5 @@ Collate:
     'api_get_snapped_points_strahler_df.R'
     'api_get_snapped_points_cascade.R'
     'api_get_upstream_catchment.R'
-    'api_get_upstream_stream_segments.R'
     'crop_vector_to_extent.R'
+    'api_get_stream_segments.R'
