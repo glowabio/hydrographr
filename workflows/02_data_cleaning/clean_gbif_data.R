@@ -18,7 +18,7 @@ library(leaflet)
 library(htmlwidgets)
 
 # Install danubeoccurR if needed
-# devtools::install_github("ytorres-cambas/danubeoccurR")
+# pak::pak("ytorres-cambas/danubeoccurR")
 library(danubeoccurR)
 
 # Load helper function
