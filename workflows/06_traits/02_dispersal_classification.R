@@ -17,7 +17,7 @@
 library(tidyverse)
 library(readxl)
 library(data.table)
-# devtools::install_github("cran/fishmove")
+# pak:pak("cran/fishmove")
 library(fishmove)
 
 # ============================================================
