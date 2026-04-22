@@ -32,9 +32,9 @@
 #'   or (`lon` + `lat`); `basin_id` is not supported in upstream mode. Default: FALSE.
 #' @param geometry_only Logical. If `TRUE`, returns only the geometry of the stream
 #'   segments without associated attributes. Defaults to `FALSE`.
-#' @param strahler_min Integer (optional). The minimum Strahler stream order to include.
+#' @param min_strahler Integer (optional). The minimum Strahler stream order to include.
 #'   Streams below this order will be excluded. Defaults to `NULL` (no filtering).
-#'   Note: parameter name is `strahler_min` in basin mode, `min_strahler` in upstream mode
+#'   Note: parameter name is `min_strahler` in basin mode, `min_strahler` in upstream mode
 #'   (the function handles this internally).
 #' @param add_segment_ids Logical (optional). If `TRUE`, segment IDs are added to
 #'   the output. Only used in basin mode. Defaults to `NULL` (omitted from request).
@@ -52,7 +52,7 @@
 #' segm_sf <- api_get_stream_segments(
 #'   basin_id = 1288419,
 #'   geometry_only = FALSE,
-#'   strahler_min = 4,
+#'   min_strahler = 4,
 #'   add_segment_ids = TRUE
 #' )
 #'
@@ -76,7 +76,7 @@
 #'   subc_id = 506586041,
 #'   upstream = TRUE,
 #'   geometry_only = FALSE,
-#'   strahler_min = 1
+#'   min_strahler = 1
 #' )
 #'
 #' # Using lon/lat to get upstream segments (Sarantaporos outlet)
@@ -105,7 +105,7 @@ api_get_stream_segments <- function(basin_id = NULL,
                                     lat = NULL,
                                     upstream = FALSE,
                                     geometry_only = FALSE,
-                                    strahler_min = NULL,
+                                    min_strahler = NULL,
                                     add_segment_ids = NULL,
                                     add_upstream_ids = FALSE,
                                     comment = NULL) {
@@ -164,9 +164,9 @@ api_get_stream_segments <- function(basin_id = NULL,
       stop("`add_upstream_ids` must be logical (TRUE/FALSE).", call. = FALSE)
     }
 
-    # Validate strahler_min
-    if (!is.null(strahler_min) && (!is.numeric(strahler_min) || strahler_min < 1)) {
-      stop("`strahler_min` must be a positive numeric value or NULL.", call. = FALSE)
+    # Validate min_strahler
+    if (!is.null(min_strahler) && (!is.numeric(min_strahler) || min_strahler < 1)) {
+      stop("`min_strahler` must be a positive numeric value or NULL.", call. = FALSE)
     }
 
     # --- UPSTREAM MODE: Construct body -----
@@ -185,8 +185,8 @@ api_get_stream_segments <- function(basin_id = NULL,
       inputs$lat <- lat
     }
 
-    if (!is.null(strahler_min)) {
-      inputs$min_strahler <- as.integer(strahler_min)  # Note: API uses "min_strahler"
+    if (!is.null(min_strahler)) {
+      inputs$min_strahler <- as.integer(min_strahler)  # Note: API uses "min_strahler"
     }
 
     if (!is.null(comment)) {
@@ -227,9 +227,9 @@ api_get_stream_segments <- function(basin_id = NULL,
       }
     }
 
-    # Validate strahler_min
-    if (!is.null(strahler_min) && (!is.numeric(strahler_min) || strahler_min < 1)) {
-      stop("`strahler_min` must be a positive numeric value or NULL.", call. = FALSE)
+    # Validate min_strahler
+    if (!is.null(min_strahler) && (!is.numeric(min_strahler) || min_strahler < 1)) {
+      stop("`min_strahler` must be a positive numeric value or NULL.", call. = FALSE)
     }
 
     # Validate add_segment_ids
@@ -252,8 +252,8 @@ api_get_stream_segments <- function(basin_id = NULL,
       inputs$lat <- lat
     }
 
-    if (!is.null(strahler_min)) {
-      inputs$strahler_min <- as.integer(strahler_min)  # Note: API uses "strahler_min"
+    if (!is.null(min_strahler)) {
+      inputs$min_strahler <- as.integer(min_strahler)  # Note: API uses "min_strahler"
     }
 
     if (!is.null(add_segment_ids)) {

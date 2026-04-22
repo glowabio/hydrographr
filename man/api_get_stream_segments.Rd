@@ -11,7 +11,7 @@ api_get_stream_segments(
   lat = NULL,
   upstream = FALSE,
   geometry_only = FALSE,
-  strahler_min = NULL,
+  min_strahler = NULL,
   add_segment_ids = NULL,
   add_upstream_ids = FALSE,
   comment = NULL
@@ -38,9 +38,9 @@ or (`lon` + `lat`); `basin_id` is not supported in upstream mode. Default: FALSE
 \item{geometry_only}{Logical. If `TRUE`, returns only the geometry of the stream
 segments without associated attributes. Defaults to `FALSE`.}
 
-\item{strahler_min}{Integer (optional). The minimum Strahler stream order to include.
+\item{min_strahler}{Integer (optional). The minimum Strahler stream order to include.
 Streams below this order will be excluded. Defaults to `NULL` (no filtering).
-Note: parameter name is `strahler_min` in basin mode, `min_strahler` in upstream mode
+Note: parameter name is `min_strahler` in basin mode, `min_strahler` in upstream mode
 (the function handles this internally).}
 
 \item{add_segment_ids}{Logical (optional). If `TRUE`, segment IDs are added to
@@ -79,7 +79,7 @@ to a given basin, or all upstream segments of a specific location.
 segm_sf <- api_get_stream_segments(
   basin_id = 1288419,
   geometry_only = FALSE,
-  strahler_min = 4,
+  min_strahler = 4,
   add_segment_ids = TRUE
 )
 
@@ -103,7 +103,7 @@ upstream_sf <- api_get_stream_segments(
   subc_id = 506586041,
   upstream = TRUE,
   geometry_only = FALSE,
-  strahler_min = 1
+  min_strahler = 1
 )
 
 # Using lon/lat to get upstream segments (Sarantaporos outlet)
