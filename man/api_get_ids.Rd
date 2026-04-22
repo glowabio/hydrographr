@@ -2,74 +2,109 @@
 % Please edit documentation in R/api_get_ids.R
 \name{api_get_ids}
 \alias{api_get_ids}
-\title{Get Subcatchment/Geographic IDs (Basin, Upstream, or Point Location)}
+\title{Get Subcatchment/Geographic IDs}
 \usage{
 api_get_ids(
+  points = NULL,
   basin_ids = NULL,
   subc_ids = NULL,
-  points = NULL,
-  lon = NULL,
-  lat = NULL,
   mode = "basin",
-  which_ids = c("subc_id", "basin_id", "reg_id"),
   min_strahler = NULL,
   colname_lon = "longitude",
   colname_lat = "latitude",
   colname_site_id = "site_id",
-  comment = NULL,
+  colname_subc_id = NULL,
   force_async = TRUE,
   poll_interval = 10,
   max_wait = 3600
 )
 }
 \arguments{
-\item{basin_ids}{Integer or vector. Basin IDs to query (mode="basin" only).}
+\item{points}{Data.frame. Input sites. Used in all three modes:
+- mode="basin": must contain longitude and latitude columns (and optionally
+  site_id). Can alternatively supply `basin_ids` or `subc_ids` directly.
+- mode="upstream": must contain longitude, latitude, and site_id columns.
+- mode="local": must contain either longitude + latitude columns, or a
+  subc_id column. Returns one row of IDs per input row.}
 
-\item{subc_ids}{Integer or vector. Subcatchment IDs (mode="basin" only).}
+\item{basin_ids}{Integer or vector. Basin IDs (mode="basin" only).
+Alternative to `points` or `subc_ids`.}
 
-\item{points}{Data.frame. Sites with lon/lat/site_id columns (mode="upstream" only).}
+\item{subc_ids}{Integer or vector. Subcatchment IDs (mode="basin" only).
+Alternative to `points` or `basin_ids`.}
 
-\item{lon}{Numeric. Longitude for point location (mode="point" only).}
+\item{mode}{Character. One of "basin", "upstream", or "local".
+Default: "basin".}
 
-\item{lat}{Numeric. Latitude for point location (mode="point" only).}
+\item{min_strahler}{Integer. Minimum Strahler order filter
+(mode="basin" and mode="upstream" only). Default: NULL.}
 
-\item{mode}{Character. "basin", "upstream", or "point". Default: "basin".}
+\item{colname_lon}{Character. Name of the longitude column in `points`.
+Default: "longitude".}
 
-\item{which_ids}{Character vector. Which IDs to return: "subc_id", "basin_id", "reg_id".}
+\item{colname_lat}{Character. Name of the latitude column in `points`.
+Default: "latitude".}
 
-\item{min_strahler}{Integer. Minimum Strahler order filter (mode="basin" only).}
+\item{colname_site_id}{Character. Name of the site ID column in `points`.
+Default: "site_id".}
 
-\item{colname_lon, colname_lat, colname_site_id}{Character. Column names.}
+\item{colname_subc_id}{Character. Name of an existing subcatchment ID column
+in `points` (mode="local" only). If provided, the API uses these directly
+instead of looking up from coordinates. Default: NULL.}
 
-\item{comment}{Character. API logging comment.}
-
-\item{force_async}{Logical. Force async/sync mode. Default: TRUE.}
+\item{force_async}{Logical. Force async (TRUE) or sync (FALSE) mode.
+Default: TRUE.}
 
 \item{poll_interval}{Numeric. Seconds between status checks. Default: 10.}
 
-\item{max_wait}{Numeric. Max seconds to wait for job. Default: 3600.}
+\item{max_wait}{Numeric. Max seconds to wait for async job. Default: 3600.}
 }
 \value{
-- mode="basin": Integer vector of subcatchment IDs
-- mode="upstream": Data.frame with `site_id`, `subc_id`, `upstream_id`
-- mode="point": List with `subc_id`, `basin_id`, `reg_id`, `coordinates`
+- mode="basin": Integer vector of all subcatchment IDs in the basin(s).
+- mode="upstream": Data.frame with columns `site_id`, `subc_id`,
+  `upstream_id` (one row per upstream subcatchment per site).
+- mode="local": Data.frame with one row per input point, containing
+  `subc_id`, `basin_id`, and `reg_id`.
 }
 \description{
-Consolidated function to retrieve subcatchment IDs and geographic identifiers
-from the GeoFRESH API. Replaces api_get_basin_subcids(), api_get_upstream_subcids(),
-and api_get_local_ids() with a unified interface.
+Retrieves subcatchment IDs and related geographic identifiers from the
+GeoFRESH API. Three modes cover distinct spatial queries:
+}
+\details{
+- **"basin"**: returns all subcatchment IDs contained within the basin(s)
+  of the given locations.
+- **"upstream"**: returns all subcatchment IDs upstream of each input point.
+- **"local"**: returns the local identifiers (subc_id, basin_id, reg_id)
+  for each input point or subcatchment — i.e. the reverse lookup.
 }
 \examples{
 \dontrun{
-# Basin mode
+# Basin mode: get all subcatchments in a basin
 result <- api_get_ids(basin_ids = 1288419, mode = "basin")
 
-# Upstream mode
-sites <- data.frame(site_id = "S1", longitude = 20.5, latitude = 40.1)
+# Basin mode: from snapped points dataframe
+result <- api_get_ids(
+  points          = all_snapped,
+  colname_lon     = "longitude_snapped",
+  colname_lat     = "latitude_snapped",
+  colname_site_id = "site_id",
+  mode            = "basin"
+)
+
+# Upstream mode: all upstream subcatchments per site
+sites <- data.frame(site_id = "S1", longitude = 9.93, latitude = 54.70)
 result <- api_get_ids(points = sites, mode = "upstream")
 
-# Point mode
-result <- api_get_ids(lon = 10.7, lat = 53.5, mode = "point")
+# Local mode: get subc_id, basin_id, reg_id for each point
+sites <- data.frame(longitude = c(10.7, 9.9), latitude = c(53.5, 54.7))
+result <- api_get_ids(points = sites, mode = "local")
+
+# Local mode: from existing subc_ids column
+result <- api_get_ids(
+  points         = my_df,
+  colname_subc_id = "subc_id",
+  mode           = "local"
+)
 }
 
 }

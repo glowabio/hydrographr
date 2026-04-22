@@ -4,44 +4,45 @@
 
 # Cases covered:
 # --- MODE: BASIN ---
-# * normal case: single basin_id                                  (test 1)
-# * normal case: single basin_id with min_strahler filter         (test 2)
-# * normal case: multiple basin_ids                               (test 3)
-# * normal case: input via subc_ids                               (test 4)
-# * normal case: input via points data.frame                      (test 5)
-# * normal case: Strahler filter shrinks result                   (test 6)
+# * normal case: single basin_id                                        (test 1)
+# * normal case: single basin_id with min_strahler filter              (test 2)
+# * normal case: multiple basin_ids                                     (test 3)
+# * normal case: input via subc_ids                                     (test 4)
+# * normal case: input via points data.frame                            (test 5)
+# * normal case: Strahler filter shrinks result                         (test 6)
 # --- MODE: UPSTREAM ---
-# * normal case: single site                                      (test 7)
-# * normal case: multiple sites, all site_ids present             (test 8)
-# * normal case: non-default column names                         (test 9)
-# --- MODE: POINT ---
-# * normal case: all three IDs returned                           (test 10)
-# * normal case: different location                               (test 11)
-# * cross-check: point basin_id contains point subc_id            (test 12)
-# * cross-check: upstream subc_id matches point subc_id           (test 13)
+# * normal case: single site, correct columns returned                  (test 7)
+# * normal case: multiple sites, all site_ids present                   (test 8)
+# * normal case: non-default column names preserved in output           (test 9)
+# --- MODE: LOCAL ---
+# * normal case: returns data.frame with three ID columns appended      (test 10)
+# * normal case: input column names preserved in output                 (test 11)
+# * normal case: non-default column names preserved in output           (test 12)
+# * normal case: different location (Amiens, France)                    (test 13)
+# * cross-check: local basin_id contains local subc_id (basin mode)    (test 14)
+# * cross-check: upstream subc_id matches local subc_id                (test 15)
 # --- ERROR CASES ---
-# * MUST FAIL: invalid mode                                       (test 14)
-# * MUST FAIL: basin mode, no input provided                      (test 15)
-# * MUST FAIL: basin mode, multiple inputs provided               (test 16)
-# * MUST FAIL: basin mode, non-numeric basin_ids                  (test 17)
-# * MUST FAIL: upstream mode, no points provided                  (test 18)
-# * MUST FAIL: upstream mode, missing site_id column              (test 19)
-# * MUST FAIL: point mode, missing lon                            (test 20)
-# * MUST FAIL: point mode, lon out of range                       (test 21)
+# * MUST FAIL: invalid mode                                             (test 16)
+# * MUST FAIL: basin mode, no input provided                            (test 17)
+# * MUST FAIL: basin mode, multiple inputs provided                     (test 18)
+# * MUST FAIL: basin mode, non-numeric basin_ids                        (test 19)
+# * MUST FAIL: upstream mode, no points provided                        (test 20)
+# * MUST FAIL: upstream mode, missing site_id column                    (test 21)
+# * MUST FAIL: local mode, no points provided                           (test 22)
+# * MUST FAIL: local mode, missing lon/lat columns                      (test 23)
 
 
 #########################
 ### Some preparations ###
 #########################
 
-# Reusable input objects
+basin_id_schlei <- 1288419
+basin_ids_multi <- c(1293500, 1173222)
+subc_ids_two    <- c(506319029, 509342352)
 
-basin_id_schlei  <- 1288419
-basin_ids_multi  <- c(1293500, 1173222)
-
-subc_ids_two     <- c(506319029, 509342352)
-
+# Points with default column names
 pts_df <- data.frame(
+  site_id   = c("A", "B"),
   longitude = c(10.217977, 10.233422),
   latitude  = c(54.301799, 54.314711)
 )
@@ -58,10 +59,21 @@ sites2 <- data.frame(
   latitude  = c(54.695070, 54.301799, 49.914233)
 )
 
-sites3 <- data.frame(
+# Points with non-default column names
+sites_custom <- data.frame(
   id  = "test",
   lon = 10.217977,
   lat = 54.301799
+)
+
+# Single point for local + cross-check tests
+lon_check <- 10.217977
+lat_check <- 54.301799
+
+sites_check <- data.frame(
+  site_id   = "check",
+  longitude = lon_check,
+  latitude  = lat_check
 )
 
 
@@ -81,7 +93,7 @@ test_that(testname, {
 })
 
 
-testname <- "2: Single basin_id with min_strahler returns fewer subcatchments"
+testname <- "2: Single basin_id with min_strahler returns integer vector"
 test_that(testname, {
 
   result <- api_get_ids(basin_ids = basin_id_schlei, mode = "basin",
@@ -102,14 +114,13 @@ test_that(testname, {
 })
 
 
-testname <- "4: Input via subc_ids returns integer vector"
+testname <- "4: Input via subc_ids returns integer vector containing inputs"
 test_that(testname, {
 
   result <- api_get_ids(subc_ids = subc_ids_two, mode = "basin")
 
   expect_type(result, "integer")
   expect_gt(length(result), 0)
-  # The input subc_ids should be contained in the result
   expect_true(all(subc_ids_two %in% result))
 })
 
@@ -144,7 +155,6 @@ test_that(testname, {
   expect_s3_class(result, "data.frame")
   expect_true(all(c("site_id", "subc_id", "upstream_id") %in% colnames(result)))
   expect_gt(nrow(result), 0)
-  # One row per upstream subcatchment - could be many
   expect_equal(unique(result$site_id), "schlei")
 })
 
@@ -156,17 +166,16 @@ test_that(testname, {
 
   expect_s3_class(result, "data.frame")
   expect_true(all(c("S1", "S2", "S3") %in% result$site_id))
-  # Each site should have at least one upstream segment
   counts <- table(result$site_id)
   expect_true(all(counts > 0))
 })
 
 
-testname <- "9: Non-default column names work correctly"
+testname <- "9: Non-default column names are preserved in upstream output"
 test_that(testname, {
 
   result <- api_get_ids(
-    points          = sites3,
+    points          = sites_custom,
     mode            = "upstream",
     colname_lon     = "lon",
     colname_lat     = "lat",
@@ -175,69 +184,107 @@ test_that(testname, {
 
   expect_s3_class(result, "data.frame")
   expect_gt(nrow(result), 0)
+  # site_id in output should reflect the value from the "id" column
   expect_equal(unique(result$site_id), "test")
 })
 
 
-# --- MODE: POINT ---
+# --- MODE: LOCAL ---
 
-testname <- "10: Point mode returns list with subc_id, basin_id, reg_id"
+testname <- "10: Local mode returns data.frame with ID columns appended"
 test_that(testname, {
 
-  result <- api_get_ids(lon = 10.7, lat = 53.5, mode = "point")
+  result <- api_get_ids(points = sites_check, mode = "local")
 
-  expect_type(result, "list")
-  expect_true(all(c("subc_id", "basin_id", "reg_id", "coordinates") %in% names(result)))
-  expect_false(is.na(result$subc_id))
-  expect_false(is.na(result$basin_id))
-  expect_false(is.na(result$reg_id))
+  expect_s3_class(result, "data.frame")
+  expect_equal(nrow(result), nrow(sites_check))
+  # ID columns appended
+  expect_true(all(c("subc_id", "basin_id", "reg_id") %in% colnames(result)))
+  # No NAs in ID columns
+  expect_false(any(is.na(result$subc_id)))
+  expect_false(any(is.na(result$basin_id)))
+  expect_false(any(is.na(result$reg_id)))
 })
 
 
-testname <- "11: Point mode works for a different location (Amiens, France)"
+testname <- "11: Local mode preserves input column names in output"
 test_that(testname, {
 
-  result <- api_get_ids(lon = 2.172944, lat = 49.914233, mode = "point")
+  result <- api_get_ids(points = sites_check, mode = "local")
 
-  expect_type(result, "list")
-  expect_false(is.na(result$subc_id))
-  expect_false(is.na(result$basin_id))
-  expect_false(is.na(result$reg_id))
-  # Coordinates echoed back correctly
-  expect_equal(result$coordinates[["lon"]], 2.172944)
-  expect_equal(result$coordinates[["lat"]], 49.914233)
+  # All original columns must still be present
+  expect_true(all(colnames(sites_check) %in% colnames(result)))
+  # Values must be unchanged
+  expect_equal(result$site_id,   sites_check$site_id)
+  expect_equal(result$longitude, sites_check$longitude)
+  expect_equal(result$latitude,  sites_check$latitude)
 })
 
 
-testname <- "12: Cross-check: point basin_id contains point subc_id"
+testname <- "12: Local mode preserves non-default column names"
 test_that(testname, {
 
-  pt  <- api_get_ids(lon = 10.217977, lat = 54.301799, mode = "point")
-  bsn <- api_get_ids(basin_ids = pt$basin_id, mode = "basin")
-
-  expect_true(pt$subc_id %in% bsn)
-})
-
-
-testname <- "13: Cross-check: upstream subc_id matches point subc_id"
-test_that(testname, {
-
-  sites_check <- data.frame(
-    site_id   = "check",
-    longitude = 10.217977,
-    latitude  = 54.301799
+  result <- api_get_ids(
+    points          = sites_custom,
+    mode            = "local",
+    colname_lon     = "lon",
+    colname_lat     = "lat",
+    colname_site_id = "id"
   )
 
-  up  <- api_get_ids(points = sites_check, mode = "upstream")
-  pt  <- api_get_ids(lon = 10.217977, lat = 54.301799, mode = "point")
+  expect_s3_class(result, "data.frame")
+  # Original non-default columns must be present
+  expect_true(all(c("id", "lon", "lat") %in% colnames(result)))
+  # ID columns appended
+  expect_true(all(c("subc_id", "basin_id", "reg_id") %in% colnames(result)))
+  # Values unchanged
+  expect_equal(result$lon, sites_custom$lon)
+  expect_equal(result$lat, sites_custom$lat)
+})
 
-  expect_equal(unique(up$subc_id), pt$subc_id)
+
+testname <- "13: Local mode works for a different location (Amiens, France)"
+test_that(testname, {
+
+  amiens <- data.frame(
+    site_id   = "amiens",
+    longitude = 2.172944,
+    latitude  = 49.914233
+  )
+
+  result <- api_get_ids(points = amiens, mode = "local")
+
+  expect_s3_class(result, "data.frame")
+  expect_equal(nrow(result), 1)
+  expect_false(is.na(result$subc_id))
+  expect_false(is.na(result$basin_id))
+  expect_false(is.na(result$reg_id))
+})
+
+
+testname <- "14: Cross-check: local basin_id contains local subc_id"
+test_that(testname, {
+
+  local_result <- api_get_ids(points = sites_check, mode = "local")
+  basin_result <- api_get_ids(basin_ids = local_result$basin_id, mode = "basin")
+
+  expect_true(local_result$subc_id %in% basin_result)
+})
+
+
+testname <- "15: Cross-check: upstream subc_id matches local subc_id"
+test_that(testname, {
+
+  up    <- api_get_ids(points = sites_check, mode = "upstream")
+  local <- api_get_ids(points = sites_check, mode = "local")
+
+  expect_equal(unique(up$subc_id), local$subc_id)
 })
 
 
 # --- ERROR CASES ---
 
-testname <- "14: MUST FAIL: invalid mode"
+testname <- "16: MUST FAIL: invalid mode"
 test_that(testname, {
 
   expect_error(
@@ -247,7 +294,7 @@ test_that(testname, {
 })
 
 
-testname <- "15: MUST FAIL: basin mode with no input"
+testname <- "17: MUST FAIL: basin mode with no input"
 test_that(testname, {
 
   expect_error(
@@ -257,7 +304,7 @@ test_that(testname, {
 })
 
 
-testname <- "16: MUST FAIL: basin mode with multiple inputs"
+testname <- "18: MUST FAIL: basin mode with multiple inputs"
 test_that(testname, {
 
   expect_error(
@@ -268,7 +315,7 @@ test_that(testname, {
 })
 
 
-testname <- "17: MUST FAIL: basin mode with non-numeric basin_ids"
+testname <- "19: MUST FAIL: basin mode with non-numeric basin_ids"
 test_that(testname, {
 
   expect_error(
@@ -278,7 +325,7 @@ test_that(testname, {
 })
 
 
-testname <- "18: MUST FAIL: upstream mode with no points"
+testname <- "20: MUST FAIL: upstream mode with no points"
 test_that(testname, {
 
   expect_error(
@@ -288,7 +335,7 @@ test_that(testname, {
 })
 
 
-testname <- "19: MUST FAIL: upstream mode with missing site_id column"
+testname <- "21: MUST FAIL: upstream mode with missing site_id column"
 test_that(testname, {
 
   bad_df <- data.frame(longitude = 9.93, latitude = 54.7)
@@ -300,21 +347,23 @@ test_that(testname, {
 })
 
 
-testname <- "20: MUST FAIL: point mode with missing lon"
+testname <- "22: MUST FAIL: local mode with no points"
 test_that(testname, {
 
   expect_error(
-    api_get_ids(lat = 53.5, mode = "point"),
-    regexp = "lon.*lat|lat.*lon"
+    api_get_ids(mode = "local"),
+    regexp = "non-empty data.frame"
   )
 })
 
 
-testname <- "21: MUST FAIL: point mode with lon out of range"
+testname <- "23: MUST FAIL: local mode with missing lon/lat columns"
 test_that(testname, {
 
+  bad_df <- data.frame(site_id = "x", some_col = 1)
+
   expect_error(
-    api_get_ids(lon = 200, lat = 53.5, mode = "point"),
-    regexp = "-180 to 180"
+    api_get_ids(points = bad_df, mode = "local"),
+    regexp = "longitude|latitude|lon|lat"
   )
 })
