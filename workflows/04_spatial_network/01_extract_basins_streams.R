@@ -69,11 +69,11 @@ message("\nPoints by source:")
 
 message("\n=== Getting Basin IDs ===")
 
-basin_ids <- api_get_local_ids(data = all_snapped,
-                               colname_lon = "longitude_snapped",
-                               colname_lat = "latitude_snapped",
-                               colname_site_id = "site_id",
-                               colname_subc_id = "subc_id"
+basin_ids <- api_get_ids(points = all_snapped,
+                         colname_lon = "longitude_snapped",
+                         colname_lat = "latitude_snapped",
+                         colname_site_id = "site_id",
+                         mode = "local"
 )
 
 # Merge with snapped data
