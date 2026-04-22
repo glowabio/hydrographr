@@ -92,7 +92,6 @@ Suggests:
 Collate:
     'api_get_local_ids.R'
     'api_get_snapped_points.R'
-    'api_get_upstream_subcids.R'
     'check_tiles_filesize.R'
     'crop_to_extent.R'
     'download_env90m_tables.R'
@@ -132,7 +131,6 @@ Collate:
     'split_table.R'
     'api_poll_job.R'
     'api_get_basin_polygon.R'
-    'api_get_basin_subcids.R'
     'api_get_snapped_points_cascade.R'
     'api_get_upstream_catchment.R'
     'crop_vector_to_extent.R'
