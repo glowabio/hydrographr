@@ -47,8 +47,8 @@
 #'
 #' # Visualize
 #' library(leaflet)
-#' leaflet(basins_sf) |>
-#'   addProviderTiles("CartoDB.Positron") |>
+#' leaflet(basins_sf) %>%
+#'   addProviderTiles("CartoDB.Positron") %>%
 #'   addPolygons(color = "blue", fillOpacity = 0.3)
 #' }
 #'
@@ -115,14 +115,14 @@ api_get_basin_polygon <- function(basin_id = NULL,
 
   # --- Helper: fetch a single basin polygon via JSON -------------------------
 
-  process_url <- "https://aqua.igb-berlin.de/pygeoapi-dev/processes/get-basin-polygon/execution"
+  # process_url <- "https://aqua.igb-berlin.de/pygeoapi-dev/processes/get-basin-polygon/execution"
 
   fetch_polygon <- function(inputs, label = "") {
     body <- list(inputs = inputs)
 
-    resp <- httr2::request(process_url) |>
-      httr2::req_headers("Content-Type" = "application/json") |>
-      httr2::req_body_json(body) |>
+    resp <- httr2::request(process_url) %>%
+      httr2::req_headers("Content-Type" = "application/json") %>%
+      httr2::req_body_json(body) %>%
       httr2::req_perform()
 
     if (httr2::resp_status(resp) >= 400) {

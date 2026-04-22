@@ -49,8 +49,8 @@
 #' )
 #'
 #' library(leaflet)
-#' leaflet(catchment_sf) |>
-#'   addProviderTiles("CartoDB.Positron") |>
+#' leaflet(catchment_sf) %>%
+#'   addProviderTiles("CartoDB.Positron") %>%
 #'   addPolygons(color = "blue")
 #' }
 #'
@@ -129,9 +129,9 @@ api_get_upstream_catchment <- function(subc_id = NULL,
 
   # --- Send request ----------------------------------------------------------
 
-  resp <- httr2::request(process_url) |>
-    httr2::req_headers("Content-Type" = "application/json") |>
-    httr2::req_body_json(body) |>
+  resp <- httr2::request(process_url) %>%
+    httr2::req_headers("Content-Type" = "application/json") %>%
+    httr2::req_body_json(body) %>%
     httr2::req_perform()
 
   # --- Handle response -------------------------------------------------------

@@ -89,8 +89,8 @@
 #'
 #' # Visualize with leaflet
 #' library(leaflet)
-#' leaflet(upstream_sf) |>
-#'   addProviderTiles("CartoDB.Positron") |>
+#' leaflet(upstream_sf) %>%
+#'   addProviderTiles("CartoDB.Positron") %>%
 #'   addPolylines(color = "blue")
 #' }
 #'
@@ -269,9 +269,9 @@ api_get_stream_segments <- function(basin_id = NULL,
 
   # --- Send request ----------------------------------------------------------
 
-  resp <- httr2::request(process_url) |>
-    httr2::req_headers("Content-Type" = "application/json") |>
-    httr2::req_body_json(body) |>
+  resp <- httr2::request(process_url) %>%
+    httr2::req_headers("Content-Type" = "application/json") %>%
+    httr2::req_body_json(body) %>%
     httr2::req_perform()
 
   # --- Handle response -------------------------------------------------------
