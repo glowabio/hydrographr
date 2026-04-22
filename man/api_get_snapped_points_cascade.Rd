@@ -107,12 +107,9 @@ result <- api_get_snapped_points_cascade(
 \seealso{
 Other ocgapi: 
 \code{\link{api_get_basin_polygon}()},
-\code{\link{api_get_basin_subcids}()},
 \code{\link{api_get_ids}()},
-\code{\link{api_get_local_ids}()},
 \code{\link{api_get_snapped_points}()},
 \code{\link{api_get_stream_segments}()},
-\code{\link{api_get_upstream_catchment}()},
-\code{\link{api_get_upstream_subcids}()}
+\code{\link{api_get_upstream_catchment}()}
 }
 \concept{ocgapi}
