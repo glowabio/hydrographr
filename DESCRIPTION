@@ -64,7 +64,7 @@ URL: https://glowabio.github.io/hydrographr/
 BugReports: https://github.com/glowabio/hydrographr/issues
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Imports:
     processx (>= 3.7.0),
     data.table (>= 1.14.2),
@@ -90,11 +90,8 @@ Imports:
 Suggests:
     testthat
 Collate:
-    'api_filter_by_attribute.R'
-    'api_get_env90m_data.R'
     'api_get_local_ids.R'
     'api_get_snapped_points.R'
-    'api_get_snapped_points_df.R'
     'api_get_upstream_subcids.R'
     'check_tiles_filesize.R'
     'crop_to_extent.R'
@@ -133,12 +130,11 @@ Collate:
     'snap_to_network.R'
     'snap_to_subc_segment.R'
     'split_table.R'
-    'api_get_job_results.R'
     'api_poll_job.R'
     'api_get_basin_polygon.R'
     'api_get_basin_subcids.R'
-    'api_get_snapped_points_strahler_df.R'
     'api_get_snapped_points_cascade.R'
     'api_get_upstream_catchment.R'
     'crop_vector_to_extent.R'
     'api_get_stream_segments.R'
+    'api_get_ids.R'

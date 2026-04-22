@@ -2,69 +2,92 @@
 % Please edit documentation in R/api_get_snapped_points.R
 \name{api_get_snapped_points}
 \alias{api_get_snapped_points}
-\title{Snap Site Coordinates to the River Network}
+\title{Snap Points to the River Network}
 \usage{
 api_get_snapped_points(
-  csv_url,
-  colname_lat = "latitude",
+  data,
   colname_lon = "longitude",
-  colname_site_id = "site_id"
+  colname_lat = "latitude",
+  colname_site_id = "site_id",
+  min_strahler = NULL,
+  add_distance = TRUE,
+  force_async = NULL,
+  async_threshold = 500,
+  poll_interval = 10,
+  max_wait = 3600
 )
 }
 \arguments{
-\item{csv_url}{A URL to a CSV file hosted online. The CSV must contain latitude, longitude, and site ID columns.}
+\item{data}{Data.frame. Must contain columns for longitude, latitude, and
+a site identifier.}
 
-\item{colname_lat}{Name of the latitude column in the CSV. Default is "latitude".}
+\item{colname_lon}{Character. Name of the longitude column. Default: "longitude".}
 
-\item{colname_lon}{Name of the longitude column in the CSV. Default is "longitude".}
+\item{colname_lat}{Character. Name of the latitude column. Default: "latitude".}
 
-\item{colname_site_id}{Name of the site ID column in the CSV. Default is "site_id".}
+\item{colname_site_id}{Character. Name of the site ID column. Default: "site_id".}
+
+\item{min_strahler}{Integer. Minimum Strahler order to snap to. Required.}
+
+\item{add_distance}{Logical. If TRUE, includes a `distance_metres` column
+with the snapping distance. Default: TRUE.}
+
+\item{force_async}{Logical. If NULL (default), async mode is used
+automatically for datasets >= `async_threshold`. Set TRUE or FALSE to
+force a mode regardless of dataset size.}
+
+\item{async_threshold}{Integer. Number of points above which async mode is
+used automatically. Default: 500.}
+
+\item{poll_interval}{Numeric. Seconds between status checks when polling
+async jobs. Default: 10.}
+
+\item{max_wait}{Numeric. Maximum seconds to wait for async job completion.
+Default: 3600.}
 }
 \value{
-A list with two elements:
-\describe{
-  \item{data}{A `data.frame` containing the snapped coordinates and additional information.}
-  \item{href}{A `character` string with the URL of the output CSV.}
-}
+Data.frame with one row per snapped point, containing:
+  - All original columns from `data`
+  - `longitude_snapped`, `latitude_snapped`: snapped coordinates
+  - `subc_id`: subcatchment ID of the snapped segment
+  - `strahler`: Strahler order of the snapped segment
+  - `distance_metres`: distance from original to snapped point (if `add_distance = TRUE`)
 }
 \description{
-Sends a request to the GeoFRESH API to snap a set of site coordinates to the nearest flowline
-in the river network. Returns both the snapped and original coordinates, along with a link
-to download the results or to use it in another function of the family ocgapi.
+Snaps input point locations to the nearest stream segment at or above a
+given Strahler order, using the GeoFRESH API.
 }
 \examples{
 \dontrun{
-# Example usage
-url <- "https://example.com/sites.csv"
-snapped_df <- api_get_snapped_points(csv_url = url,
- colname_lat = "latitude",
- colname_lon = "longitude",
- colname_site_id = "site_id")
+sites <- data.frame(
+  site_id   = c("S1", "S2", "S3"),
+  longitude = c(9.931555, 9.921555, 9.941555),
+  latitude  = c(54.695070, 54.295070, 54.495070)
+)
 
+# Snap to streams with Strahler >= 4
+result <- api_get_snapped_points(data = sites, min_strahler = 4)
 
-#' head(result$data)
-cat("Download link:", result$href)
-
+# Non-default column names
+result <- api_get_snapped_points(
+  data           = sites,
+  colname_lon    = "decimalLongitude",
+  colname_lat    = "decimalLatitude",
+  colname_site_id = "gbifID",
+  min_strahler   = 4
+)
 }
-
-
-
 
 }
 \seealso{
 Other ocgapi: 
-\code{\link{api_filter_by_attribute}()},
 \code{\link{api_get_basin_polygon}()},
-\code{\link{api_get_basin_streamsegments}()},
 \code{\link{api_get_basin_subcids}()},
-\code{\link{api_get_env90m_data}()},
-\code{\link{api_get_job_results}()},
+\code{\link{api_get_ids}()},
 \code{\link{api_get_local_ids}()},
 \code{\link{api_get_snapped_points_cascade}()},
-\code{\link{api_get_snapped_points_df}()},
-\code{\link{api_get_snapped_points_strahler_df}()},
+\code{\link{api_get_stream_segments}()},
 \code{\link{api_get_upstream_catchment}()},
-\code{\link{api_get_upstream_stream_segments}()},
 \code{\link{api_get_upstream_subcids}()}
 }
 \concept{ocgapi}

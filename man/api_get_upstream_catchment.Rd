@@ -69,26 +69,21 @@ catchment_sf <- api_get_upstream_catchment(
 )
 
 library(leaflet)
-leaflet(catchment_sf) |>
-  addProviderTiles("CartoDB.Positron") |>
+leaflet(catchment_sf) \%>\%
+  addProviderTiles("CartoDB.Positron") \%>\%
   addPolygons(color = "blue")
 }
 
 }
 \seealso{
 Other ocgapi: 
-\code{\link{api_filter_by_attribute}()},
 \code{\link{api_get_basin_polygon}()},
-\code{\link{api_get_basin_streamsegments}()},
 \code{\link{api_get_basin_subcids}()},
-\code{\link{api_get_env90m_data}()},
-\code{\link{api_get_job_results}()},
+\code{\link{api_get_ids}()},
 \code{\link{api_get_local_ids}()},
 \code{\link{api_get_snapped_points}()},
 \code{\link{api_get_snapped_points_cascade}()},
-\code{\link{api_get_snapped_points_df}()},
-\code{\link{api_get_snapped_points_strahler_df}()},
-\code{\link{api_get_upstream_stream_segments}()},
+\code{\link{api_get_stream_segments}()},
 \code{\link{api_get_upstream_subcids}()}
 }
 \concept{ocgapi}
