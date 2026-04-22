@@ -13,8 +13,7 @@ api_get_stream_segments(
   geometry_only = FALSE,
   min_strahler = NULL,
   add_segment_ids = NULL,
-  add_upstream_ids = FALSE,
-  comment = NULL
+  add_upstream_ids = FALSE
 )
 }
 \arguments{
@@ -48,8 +47,6 @@ the output. Only used in basin mode. Defaults to `NULL` (omitted from request).}
 
 \item{add_upstream_ids}{Logical (optional). If `TRUE`, upstream sub-catchment IDs
 are added to the output. Only used in upstream mode. Defaults to `FALSE`.}
-
-\item{comment}{Character. Optional comment for API logging.}
 }
 \value{
 An `sf` object representing the stream segments. Geometry type: LINESTRING.

@@ -40,7 +40,6 @@
 #'   the output. Only used in basin mode. Defaults to `NULL` (omitted from request).
 #' @param add_upstream_ids Logical (optional). If `TRUE`, upstream sub-catchment IDs
 #'   are added to the output. Only used in upstream mode. Defaults to `FALSE`.
-#' @param comment Character. Optional comment for API logging.
 #'
 #' @return An `sf` object representing the stream segments. Geometry type: LINESTRING.
 #'
@@ -107,8 +106,7 @@ api_get_stream_segments <- function(basin_id = NULL,
                                     geometry_only = FALSE,
                                     min_strahler = NULL,
                                     add_segment_ids = NULL,
-                                    add_upstream_ids = FALSE,
-                                    comment = NULL) {
+                                    add_upstream_ids = FALSE) {
 
   # --- Input validation ------------------------------------------------------
 
@@ -186,11 +184,7 @@ api_get_stream_segments <- function(basin_id = NULL,
     }
 
     if (!is.null(min_strahler)) {
-      inputs$min_strahler <- as.integer(min_strahler)  # Note: API uses "min_strahler"
-    }
-
-    if (!is.null(comment)) {
-      inputs$comment <- comment
+      inputs$strahler_min <- as.integer(min_strahler)  # Note: API uses "strahler_min"
     }
 
     body <- list(inputs = inputs)
@@ -253,16 +247,13 @@ api_get_stream_segments <- function(basin_id = NULL,
     }
 
     if (!is.null(min_strahler)) {
-      inputs$min_strahler <- as.integer(min_strahler)  # Note: API uses "min_strahler"
+      inputs$strahler_min <- as.integer(min_strahler)  # Note: API uses "strahler_min"
     }
 
     if (!is.null(add_segment_ids)) {
       inputs$add_segment_ids <- add_segment_ids
     }
 
-    if (!is.null(comment)) {
-      inputs$comment <- comment
-    }
 
     body <- list(inputs = inputs)
   }
