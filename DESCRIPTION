@@ -90,7 +90,6 @@ Imports:
 Suggests:
     testthat
 Collate:
-    'api_get_local_ids.R'
     'api_get_snapped_points.R'
     'check_tiles_filesize.R'
     'crop_to_extent.R'
