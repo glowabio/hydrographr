@@ -1,11 +1,11 @@
 #' Get Basin Polygon(s)
 #'
-#' Retrieves basin polygon boundary/boundaries from the GeoFRESH API.
+#' Retrieves whole basin polygon boundary/boundaries from the GeoFRESH API.
 #' Can accept either basin_id(s) directly or a data.frame of point coordinates
 #' (lon, lat, site_id). All requests are sent as JSON to the API.
 #'
 #' @description
-#' This function returns basin polygon(s) as an `sf` object. Two input modes:
+#' This function returns whole basin polygon(s) as an `sf` object. Two input modes:
 #' 1. One or more basin_ids (vector of integers)
 #' 2. A data.frame with point coordinates (retrieves basin polygons via lon/lat)
 #'
