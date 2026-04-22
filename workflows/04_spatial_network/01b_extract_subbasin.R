@@ -80,6 +80,8 @@ st_write(subbasin_polygon, "spatial/sarantaporos/subbasin_polygon.gpkg")
 save_to_nimbus(subbasin_polygon, "spatial/sarantaporos/subbasin_polygon.gpkg")
 message("  Subbasin polygon saved")
 
+subbasin_polygon <- st_read("spatial/sarantaporos/subbasin_polygon.gpkg")
+
 # Get upstream stream segments from the outlet point
 subbasin_streams <- api_get_upstream_stream_segments(
   lon = OUTLET_LON,
@@ -178,6 +180,8 @@ species_summary <- data.frame(
     n_occ_greece = sapply(species, function(sp)
       sum(fish_vjosa_species_greece$species == sp))
   )
+
+species_summary %>% arrange(desc(n_occ_sarantaporos))
 
 fwrite(species_summary, "points_snapped/sarantaporos/species_coverage_summary.csv")
 
