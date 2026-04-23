@@ -34,6 +34,7 @@
 #' @param colname_subc_id Character. Name of an existing subcatchment ID column
 #'   in `points` (mode="local" only). If provided, the API uses these directly
 #'   instead of looking up from coordinates. Default: NULL.
+#' @param comment Character. Optional comment for API logging. Default: NULL.
 #' @param force_async Logical. Force async (TRUE) or sync (FALSE) mode.
 #'   Default: TRUE.
 #' @param poll_interval Numeric. Seconds between status checks. Default: 10.
@@ -90,6 +91,7 @@ api_get_ids <- function(
     colname_lat     = "latitude",
     colname_site_id = "site_id",
     colname_subc_id = NULL,
+    comment         = NULL,
     force_async     = TRUE,
     poll_interval   = 10,
     max_wait        = 3600
@@ -103,17 +105,17 @@ api_get_ids <- function(
     result <- .basin_mode(
       basin_ids, subc_ids, points,
       min_strahler, colname_lon, colname_lat, colname_site_id,
-      force_async, poll_interval, max_wait
+      comment, force_async, poll_interval, max_wait
     )
   } else if (mode == "upstream") {
     result <- .upstream_mode(
       points, colname_lon, colname_lat, colname_site_id,
-      min_strahler
+      min_strahler, comment
     )
   } else if (mode == "local") {
     result <- .local_mode(
       points, colname_lon, colname_lat, colname_site_id, colname_subc_id,
-       force_async, poll_interval, max_wait
+      comment, force_async, poll_interval, max_wait
     )
   }
 
@@ -126,7 +128,7 @@ api_get_ids <- function(
 
 .basin_mode <- function(basin_ids, subc_ids, points, min_strahler,
                         colname_lon, colname_lat, colname_site_id,
-                        force_async, poll_interval, max_wait) {
+                        comment, force_async, poll_interval, max_wait) {
 
   # --- INPUT VALIDATION ---
 
@@ -180,6 +182,7 @@ api_get_ids <- function(
   }
 
   if (!is.null(min_strahler)) inputs$min_strahler <- min_strahler
+  if (!is.null(comment))      inputs$comment      <- comment
 
   body <- list(
     inputs  = inputs,
@@ -257,7 +260,7 @@ api_get_ids <- function(
 # ============================================================================
 
 .upstream_mode <- function(points, colname_lon, colname_lat, colname_site_id,
-                           min_strahler) {
+                           min_strahler, comment) {
 
   # --- INPUT VALIDATION ---
 
@@ -286,6 +289,7 @@ api_get_ids <- function(
 
     inputs <- list(lon = lon, lat = lat)
     if (!is.null(min_strahler)) inputs$min_strahler <- min_strahler
+    if (!is.null(comment))      inputs$comment      <- paste0(comment, "_row_", i)
 
     resp <- tryCatch(
       httr2::request(process_url) |>
@@ -333,7 +337,7 @@ api_get_ids <- function(
 # ============================================================================
 
 .local_mode <- function(points, colname_lon, colname_lat, colname_site_id,
-                        colname_subc_id, force_async, poll_interval,
+                        colname_subc_id, comment, force_async, poll_interval,
                         max_wait) {
 
   # --- INPUT VALIDATION ---
@@ -395,7 +399,7 @@ api_get_ids <- function(
     )
   }
 
-
+  if (!is.null(comment)) inputs$comment <- comment
 
   body <- list(
     inputs  = inputs,
@@ -460,8 +464,18 @@ api_get_ids <- function(
   message("Downloading results...")
   csv_result <- utils::read.csv(href, stringsAsFactors = FALSE)
 
-  # Extract only the ID columns from the API response,
-  # excluding any already present in original_points (e.g. subc_id)
+  # The API returns one row per unique coordinate, potentially reordered.
+  # We join back to original_points by coordinate. Multiple input rows that
+  # share the same snapped coordinate all get the same IDs — which is correct.
+
+  # Rename API lon/lat columns to join keys
+  if ("lon" %in% colnames(csv_result)) names(csv_result)[names(csv_result) == "lon"] <- ".api_lon"
+  if ("lat" %in% colnames(csv_result)) names(csv_result)[names(csv_result) == "lat"] <- ".api_lat"
+
+  csv_result$.join_lon <- round(csv_result$.api_lon, 6)
+  csv_result$.join_lat <- round(csv_result$.api_lat, 6)
+
+  # Only keep new ID columns (exclude what's already in input)
   id_cols <- setdiff(
     intersect(c("subc_id", "basin_id", "reg_id"), colnames(csv_result)),
     colnames(original_points)
@@ -472,15 +486,27 @@ api_get_ids <- function(
          "Columns found: ", paste(colnames(csv_result), collapse = ", "), call. = FALSE)
   }
 
-  if (nrow(csv_result) != nrow(original_points)) {
-    warning(sprintf(
-      "API returned %d rows but input had %d rows. Results may be incomplete.",
-      nrow(csv_result), nrow(original_points)
-    ))
-  }
+  # Deduplicate API result on coordinate (one result row per unique location)
+  csv_slim <- csv_result[!duplicated(csv_result[, c(".join_lon", ".join_lat")]),
+                         c(".join_lon", ".join_lat", id_cols), drop = FALSE]
 
-  # Bind new ID columns onto the original input (preserving user's column names)
-  result <- cbind(original_points, csv_result[, id_cols, drop = FALSE])
+  # Add coordinate join keys to original input
+  original_points$.join_lon <- round(original_points[[colname_lon]], 6)
+  original_points$.join_lat <- round(original_points[[colname_lat]], 6)
+
+  # Join by coordinate: one API row fans out to all input rows at that location
+  result <- merge(original_points, csv_slim,
+                  by = c(".join_lon", ".join_lat"),
+                  all.x = TRUE, sort = FALSE)
+
+  # Remove join keys and restore original row order
+  result$.join_lon <- NULL
+  result$.join_lat <- NULL
+  original_points$.join_lon <- NULL
+  original_points$.join_lat <- NULL
+
+  result <- result[order(match(result[[colname_site_id]],
+                               original_points[[colname_site_id]])), ]
   rownames(result) <- NULL
 
   return(result)

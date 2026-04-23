@@ -14,6 +14,7 @@ api_get_ids(
   colname_lat = "latitude",
   colname_site_id = "site_id",
   colname_subc_id = NULL,
+  comment = NULL,
   force_async = TRUE,
   poll_interval = 10,
   max_wait = 3600
@@ -51,6 +52,8 @@ Default: "site_id".}
 \item{colname_subc_id}{Character. Name of an existing subcatchment ID column
 in `points` (mode="local" only). If provided, the API uses these directly
 instead of looking up from coordinates. Default: NULL.}
+
+\item{comment}{Character. Optional comment for API logging. Default: NULL.}
 
 \item{force_async}{Logical. Force async (TRUE) or sync (FALSE) mode.
 Default: TRUE.}
