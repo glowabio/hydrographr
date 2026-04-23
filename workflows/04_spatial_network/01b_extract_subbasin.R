@@ -83,10 +83,11 @@ message("  Subbasin polygon saved")
 subbasin_polygon <- st_read("spatial/sarantaporos/subbasin_polygon.gpkg")
 
 # Get upstream stream segments from the outlet point
-subbasin_streams <- api_get_upstream_stream_segments(
+subbasin_streams <- api_get_stream_segments(
   lon = OUTLET_LON,
   lat = OUTLET_LAT,
-  min_strahler = 2
+  min_strahler = 2,
+  upstream = TRUE
 )
 
 st_write(subbasin_streams, "spatial/sarantaporos/sarantaporos_stream_network.gpkg",
