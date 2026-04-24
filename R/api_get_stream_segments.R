@@ -34,8 +34,6 @@
 #'   segments without associated attributes. Defaults to `FALSE`.
 #' @param min_strahler Integer (optional). The minimum Strahler stream order to include.
 #'   Streams below this order will be excluded. Defaults to `NULL` (no filtering).
-#'   Note: parameter name is `min_strahler` in basin mode, `min_strahler` in upstream mode
-#'   (the function handles this internally).
 #' @param add_segment_ids Logical (optional). If `TRUE`, segment IDs are added to
 #'   the output. Only used in basin mode. Defaults to `NULL` (omitted from request).
 #' @param add_upstream_ids Logical (optional). If `TRUE`, upstream sub-catchment IDs
@@ -185,7 +183,7 @@ api_get_stream_segments <- function(basin_id = NULL,
     }
 
     if (!is.null(min_strahler)) {
-      inputs$strahler_min <- as.integer(min_strahler)  # Note: API uses "strahler_min"
+      inputs$min_strahler <- as.integer(min_strahler)
     }
 
     body <- list(inputs = inputs)
@@ -248,7 +246,7 @@ api_get_stream_segments <- function(basin_id = NULL,
     }
 
     if (!is.null(min_strahler)) {
-      inputs$strahler_min <- as.integer(min_strahler)  # Note: API uses "strahler_min"
+      inputs$min_strahler <- as.integer(min_strahler)
     }
 
     if (!is.null(add_segment_ids)) {

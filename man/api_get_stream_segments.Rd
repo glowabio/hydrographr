@@ -38,9 +38,7 @@ or (`lon` + `lat`); `basin_id` is not supported in upstream mode. Default: FALSE
 segments without associated attributes. Defaults to `FALSE`.}
 
 \item{min_strahler}{Integer (optional). The minimum Strahler stream order to include.
-Streams below this order will be excluded. Defaults to `NULL` (no filtering).
-Note: parameter name is `min_strahler` in basin mode, `min_strahler` in upstream mode
-(the function handles this internally).}
+Streams below this order will be excluded. Defaults to `NULL` (no filtering).}
 
 \item{add_segment_ids}{Logical (optional). If `TRUE`, segment IDs are added to
 the output. Only used in basin mode. Defaults to `NULL` (omitted from request).}
