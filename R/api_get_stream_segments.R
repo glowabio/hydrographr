@@ -173,7 +173,8 @@ api_get_stream_segments <- function(basin_id = NULL,
 
     inputs <- list(
       geometry_only = geometry_only,
-      add_upstream_ids = add_upstream_ids
+      add_upstream_ids = add_upstream_ids,
+      add_target_streams = TRUE  # ensures target column is returned
     )
 
     if (has_subc_id) {
