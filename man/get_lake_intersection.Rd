@@ -61,6 +61,7 @@ between the stream network (i.e., Hydrography90m) and the corresponding
 lake's geospatial file (e.g., HydroLAKES shapefile).
 }
 \examples{
+#' \dontrun{
 # Download test data into the temporary R folder
 # or define a different directory
 my_directory <- tempdir()
@@ -105,6 +106,7 @@ lake_intersect_table <- get_lake_intersection(data, lake_id = "lake_id",
                             lakes, lake_name = "lake_id", buffer = TRUE, edge,
                             stream, flow, basins, lake_dat, n_cores = 1,
                             quiet = FALSE)
+}
 }
 \references{
 https://grass.osgeo.org/grass82/manuals/

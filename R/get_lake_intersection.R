@@ -42,6 +42,7 @@
 #' \url{https://ies-ows.jrc.ec.europa.eu/gtb/GTB/MSPA_Guide.pdf}
 #'
 #' @examples
+#' #' \dontrun{
 #' # Download test data into the temporary R folder
 #' # or define a different directory
 #' my_directory <- tempdir()
@@ -86,6 +87,7 @@
 #'                             lakes, lake_name = "lake_id", buffer = TRUE, edge,
 #'                             stream, flow, basins, lake_dat, n_cores = 1,
 #'                             quiet = FALSE)
+#'}
 
 
 get_lake_intersection <- function(data, lake_id = "HydroLAKES_polys_v10", lakes,

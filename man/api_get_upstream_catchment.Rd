@@ -48,7 +48,7 @@ as an `sf` object.
 # Using lon/lat (Sarantaporos outlet)
 catchment_sf <- api_get_upstream_catchment(
   lon = 20.538704,
-  lat = 40.113735
+  lat = 40.113735,
   add_upstream_ids = TRUE
 )
 
