@@ -1,5 +1,5 @@
-pandoc: 3.6.3
-pkgdown: 2.1.3
+pandoc: 3.8.3
+pkgdown: 2.2.0
 pkgdown_sha: ~
 articles:
   benchmark: benchmark.html
@@ -13,4 +13,4 @@ articles:
   linux_system_setup: linux_system_setup.html
   macos_system_setup: macos_system_setup.html
   windows_system_setup: windows_system_setup.html
-last_built: 2026-04-02T12:20Z
+last_built: 2026-04-27T12:02Z

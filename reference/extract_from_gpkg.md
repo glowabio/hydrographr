@@ -1,0 +1,156 @@
+# Extract values from the stream order .gpkg files.
+
+The function reads the attribute table of the stream network GeoPackage
+file (.gpkg) stored on disk and extracts the data for one or more (or
+all) input sub-catchment (i.e. stream segment) IDs. The output is a
+data.table, and only the output is loaded into R.
+
+## Usage
+
+``` r
+extract_from_gpkg(
+  data_dir,
+  subc_id,
+  subc_layer,
+  var_layer,
+  out_dir = NULL,
+  file_name = NULL,
+  n_cores = NULL,
+  quiet = TRUE
+)
+```
+
+## Arguments
+
+- data_dir:
+
+  character. Path to the directory containing all input data.
+
+- subc_id:
+
+  a numeric vector of sub-catchment IDs or "all". If "all", the
+  attribute table is extracted for all the stream segments of the input
+  .gpkg layer. The stream segment IDs are the same as the sub-catchment
+  IDs. A vector of the sub-catchment IDs can be acquired from the
+  extract_ids() function, by sub-setting the resulting data.frame.
+
+- subc_layer:
+
+  character. Full path to the sub-catchment ID .tif layer
+
+- var_layer:
+
+  character vector of .gpkg files on disk, e.g.
+  "order_vect_point_h18v04.gpkg".
+
+- out_dir:
+
+  character. The directory where the output will be stored. If the
+  out_dir is specified, the attribute tables will be stored as .csv
+  files in this location, named after their input variable vector files
+  (e.g. "/path/to/stats_order_vect_point_h18v04.csv"). If NULL, the
+  output is only loaded in R and not stored on disk.
+
+- file_name:
+
+  character. Name of the .csv file where the output table will be
+  stored. out_dir should also be specified for this purpose.
+
+- n_cores:
+
+  numeric. Number of cores used for parallelization, in case multiple
+  .gpkg files are provided to var_layer. If NULL, available cores - 1
+  will be used.
+
+- quiet:
+
+  logical. If FALSE, the standard output will be printed. Default is
+  TRUE.
+
+## Details
+
+The following attributes are stored in the stream network .gpkg files
+(as produced by the GRASS GIS function r.stream.order:
+
+- cat - category
+
+- stream - sub-catchment / stream segment ID (equal to cat)
+
+- next_stream - downstream sub-catchment / stream segment ID
+
+- prev_streams; two or more uptstream sub-catchment / stream segment IDs
+
+- strahler - Strahler's stream order
+
+- horton - Hortons's stream order
+
+- shreve - Shreve's stream magnitude
+
+- hack - Hack's main streams or Gravelius order
+
+- topo_dim - Topological dimension streams order
+
+- scheidegger - Scheidegger's Consisted Associated Integers
+
+- drwal - Drwal's stream hierarchy
+
+- length - length of the stream segment
+
+- stright - length of the stream segment as a stright line
+
+- sinusoid - fractal dimension: stream segment length / stright stream
+
+- segment length;
+
+- cum_length - length of the stream from the source
+
+- flow_accum - flow accumulation within the sub-catchment of a stream
+  segment
+
+- out_dist - distance of current stream initialisation from outlet
+
+- source_elev - elevation at stream segment initialisation
+
+- outlet_elev - elevation at stream segment outlet
+
+- elev_drop difference between source_elev and outlet_elev + drop outlet
+
+- out_drop - drop at the outlet of the stream segment
+
+- gradient - drop/length
+
+## References
+
+<https://grass.osgeo.org/grass82/manuals/v.in.ogr.html>
+<https://grass.osgeo.org/grass82/manuals/addons/r.stream.order.html>
+
+## Author
+
+Afroditi Grigoropoulou, Jaime Garcia Marquez, Marlene Schürz
+
+## Examples
+
+``` r
+# Download test data into temporary R folder
+# or define a different directory
+my_directory <- tempdir()
+download_test_data(my_directory)
+
+# Define path to the directory containing all input data
+test_data <- paste0(my_directory, "/hydrography90m_test_data")
+
+# Define sub-catchment ID layer
+subc_raster <- paste0(my_directory, "/hydrography90m_test_data",
+                  "/subcatchment_1264942.tif")
+
+# Extract the attribute table of the file order_vect_59.gpkg for all the
+# sub-catchment IDs of the subcatchment_1264942.tif raster layer
+attribute_table <- extract_from_gpkg(data_dir = test_data,
+                                     subc_id = "all",
+                                     subc_layer = subc_raster,
+                                     var_layer = "order_vect_59.gpkg",
+                                     n_cores = 1)
+
+# Show the output table
+attribute_table
+```

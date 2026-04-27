@@ -1,0 +1,154 @@
+# Snap Points to Stream Network (Cascade Workflow) - JSON Input
+
+Snaps points to stream network across descending Strahler orders using
+data.frame input. Points exceeding distance threshold at higher orders
+are re-snapped to lower orders until successful or all levels exhausted.
+
+## Usage
+
+``` r
+api_get_snapped_points_cascade(
+  data,
+  colname_lon = "longitude",
+  colname_lat = "latitude",
+  colname_site_id = "site_id",
+  strahler_seq = c(4, 3, 2),
+  distance_threshold = 150,
+  async_threshold = 500,
+  poll_interval = 10,
+  max_wait = 7200
+)
+```
+
+## Arguments
+
+- data:
+
+  A data.frame containing point data with coordinates and site IDs.
+
+- colname_lon:
+
+  Character. Longitude column name in data.frame. Default:
+  \`"longitude"\`.
+
+- colname_lat:
+
+  Character. Latitude column name in data.frame. Default:
+  \`"latitude"\`.
+
+- colname_site_id:
+
+  Character. Site ID column name in data.frame. Default: \`"site_id"\`.
+
+- strahler_seq:
+
+  Integer vector. Descending Strahler orders to try (e.g., \`c(4, 3,
+  2)\`). Higher values tried first.
+
+- distance_threshold:
+
+  Numeric. Maximum snapping distance in meters. Points exceeding this
+  are re-snapped to next lower Strahler level. Default: \`150\`.
+
+- async_threshold:
+
+  Numeric. Number of points threshold for auto-async. Default: \`500\`.
+
+- poll_interval:
+
+  Numeric. Seconds between async job status checks. Default: \`10\`.
+
+- max_wait:
+
+  Numeric. Maximum seconds to wait for job completion. Default: \`7200\`
+  (2 hours).
+
+## Value
+
+A data.frame with successfully snapped points containing:
+
+- site_id:
+
+  Site identifier from input data.
+
+- subc_id:
+
+  Subcatchment ID of snapped location.
+
+- strahler:
+
+  Strahler order of stream segment.
+
+- longitude_snapped, latitude_snapped:
+
+  Snapped coordinates.
+
+- longitude_original, latitude_original:
+
+  Original coordinates.
+
+- distance_metres:
+
+  Snapping distance in meters.
+
+- ...:
+
+  Any other columns from original data.
+
+Returns empty data.frame if no points successfully snapped.
+
+## Details
+
+\*\*Workflow per Strahler level:\*\*
+
+1.  Convert data.frame to GeoJSON and snap to current Strahler level
+
+2.  Poll until job completes (if async)
+
+3.  Separate points within vs exceeding distance threshold
+
+4.  Store successful snaps, prepare failed snaps for next level
+
+5.  Re-snap failures from original coordinates at next lower Strahler
+
+Points always snap from original coordinates to ensure each attempt
+starts fresh.
+
+## See also
+
+Other ocgapi: [`api_get_basin_polygon()`](api_get_basin_polygon.md),
+[`api_get_ids()`](api_get_ids.md),
+[`api_get_snapped_points()`](api_get_snapped_points.md),
+[`api_get_stream_segments()`](api_get_stream_segments.md),
+[`api_get_upstream_catchment()`](api_get_upstream_catchment.md)
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+# Create sample data
+sites <- data.frame(
+  site_id = c("site_1", "site_2", "site_3"),
+  longitude = c(9.931555, 9.921555, 9.941555),
+  latitude = c(54.695070, 54.295070, 54.495070),
+  species = c("Trout", "Salmon", "Pike")
+)
+
+# Run cascade
+result <- api_get_snapped_points_cascade(
+  data = sites,
+  strahler_seq = c(5, 4, 3),
+  distance_threshold = 200
+)
+
+# Large dataset (auto-async)
+gbif_data <- data.table::fread("my_fish_data.csv")
+result <- api_get_snapped_points_cascade(
+  data = gbif_data,
+  colname_lon = "decimalLongitude",
+  colname_lat = "decimalLatitude",
+  colname_site_id = "gbifID",
+  strahler_seq = c(4, 3, 2)
+)
+} # }
+```

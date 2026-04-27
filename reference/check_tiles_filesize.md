@@ -1,0 +1,60 @@
+# Internal function that checks the size of single files before downloading. It is called and inherits arguments by the function 'download_tiles()'
+
+Internal function that checks the size of single files before
+downloading. It is called and inherits arguments by the function
+'download_tiles()'
+
+## Usage
+
+``` r
+check_tiles_filesize(
+  variable,
+  file_format = "tif",
+  tile_id = NULL,
+  global = FALSE,
+  h90m_varnames,
+  h90m_tile_id,
+  h90m_file_names,
+  file_size_table
+)
+```
+
+## Arguments
+
+- variable:
+
+  character vector of variable names.
+
+- file_format:
+
+  character. Format of the requested file ("tif" or "gpkg").
+
+- tile_id:
+
+  character. The ID of the requested tile or regional unit.
+
+- global:
+
+  logical. If TRUE, the global extent file is downloaded. Default is
+  FALSE.
+
+- h90m_varnames:
+
+  character vector. the valid names of the hydrography90m files
+  available for download, (inherited by 'download_tiles()').
+
+- h90m_tile_id:
+
+  character vector. The valid IDs of the hydrography90m. regular tiles
+  available for download (inherited by 'download_tiles()').
+
+- h90m_file_names:
+
+  character vector. The names of the files available for download. Used
+  to verify whether the requested format is valid (inherited by
+  'download_tiles()').
+
+- file_size_table:
+
+  data.frame. Lookup table including file names and sizes (inherited by
+  'download_tiles()').

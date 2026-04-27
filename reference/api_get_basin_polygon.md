@@ -1,0 +1,107 @@
+# Get Basin Polygon(s)
+
+This function returns whole basin polygon(s) as an \`sf\` object. Two
+input modes: 1. One or more basin_ids (vector of integers) 2. A
+data.frame with point coordinates (retrieves basin polygons via lon/lat)
+
+## Usage
+
+``` r
+api_get_basin_polygon(
+  basin_id = NULL,
+  points_df = NULL,
+  colname_lat = "latitude",
+  colname_lon = "longitude",
+  colname_site_id = "site_id",
+  geometry_only = FALSE,
+  comment = NULL
+)
+```
+
+## Arguments
+
+- basin_id:
+
+  Integer or integer vector. The ID(s) of the basin(s) to retrieve. If
+  NULL, must provide \`points_df\`.
+
+- points_df:
+
+  A data.frame with columns for longitude, latitude, and site_id. Used
+  if \`basin_id\` is NULL. Each row is sent as a lon/lat point to the
+  API.
+
+- colname_lat:
+
+  Character. Name of latitude column in \`points_df\`. Default:
+  "latitude".
+
+- colname_lon:
+
+  Character. Name of longitude column in \`points_df\`. Default:
+  "longitude".
+
+- colname_site_id:
+
+  Character. Name of site ID column in \`points_df\`. Default:
+  "site_id".
+
+- geometry_only:
+
+  Logical. If \`TRUE\`, returns only geometry without attributes.
+  Defaults to \`FALSE\`.
+
+- comment:
+
+  Character. Optional comment for API logging.
+
+## Value
+
+An \`sf\` object representing the basin polygon(s). If multiple basins
+are retrieved, returns all unique basins.
+
+## Details
+
+Retrieves whole basin polygon boundary/boundaries from the GeoFRESH API.
+Can accept either basin_id(s) directly or a data.frame of point
+coordinates (lon, lat, site_id). All requests are sent as JSON to the
+API.
+
+## See also
+
+Other ocgapi: [`api_get_ids()`](api_get_ids.md),
+[`api_get_snapped_points()`](api_get_snapped_points.md),
+[`api_get_snapped_points_cascade()`](api_get_snapped_points_cascade.md),
+[`api_get_stream_segments()`](api_get_stream_segments.md),
+[`api_get_upstream_catchment()`](api_get_upstream_catchment.md)
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+# Method 1: Using a single basin_id
+basin_sf <- api_get_basin_polygon(
+  basin_id = 1288419,
+  geometry_only = FALSE
+)
+
+# Method 1b: Using a vector of basin_ids
+basins_sf <- api_get_basin_polygon(
+  basin_id = c(1288419, 1288420, 1288421)
+)
+
+# Method 2: Using a data.frame of points
+pts <- data.frame(
+  site_id = c("site_a", "site_b"),
+  longitude = c(8.6, 9.1),
+  latitude = c(53.5, 52.3)
+)
+basins_sf <- api_get_basin_polygon(points_df = pts)
+
+# Visualize
+library(leaflet)
+leaflet(basins_sf) %>%
+  addProviderTiles("CartoDB.Positron") %>%
+  addPolygons(color = "blue", fillOpacity = 0.3)
+} # }
+```
