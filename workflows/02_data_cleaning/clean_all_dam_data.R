@@ -49,8 +49,7 @@ file_map <- c(
   "V_SDI_R_HYDRO12_Installation_Licence.csv" = "IL",  # Installation Permit
   "V_SDI_R_HYDRO13_Operational_Licence.csv"  = "OL",  # Operational Permit
   "V_SDI_R_HYDRO11_Production_Licence.csv"   = "PL",  # Production Permit
-  "V_SDI_R_HYDRO7_Evaluation.csv"            = "E",   # Evaluation
-  "V_SDI_R_HYDRO_OTHER_VALUES_Rejected.csv"  = "R"    # Rejected
+  "V_SDI_R_HYDRO7_Evaluation.csv"            = "E"   # Evaluation
 )
 
 # Function to process each CSV file
@@ -239,8 +238,8 @@ source_colors <- colorFactor(
 # Color palette for RAAY phases
 phase_colors <- colorFactor(
   palette = c("IL" = "lightblue", "OL" = "darkblue", "PL" = "purple",
-              "E" = "orange", "R" = "gray"),
-  domain = c("IL", "OL", "PL", "E", "R")
+              "E" = "orange"),
+  domain = c("IL", "OL", "PL", "E")
 )
 
 # Create overview map
