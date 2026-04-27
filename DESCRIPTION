@@ -2,7 +2,7 @@ Package: hydrographr
 Type: Package
 Title: Scalable Hydrographic Data Processing in R
 Date: 2026
-Version: 1.5.0
+Version: 1.6.0
 Authors@R:
     c(person("Marlene", "Schürz",
              email = "marlene.schuerz@igb-berlin.de",
@@ -41,24 +41,24 @@ Maintainer: Thomas Tomiczek <thomas.tomiczek@igb-berlin.de>,
     Merret Buurman <merret.buurman@igb-berlin.de>,
     Marlene Schürz <marlene.schuerz@igb-berlin.de> and
     Afroditi Grigoropoulou <afroditi.grigoropoulou@igb-berlin.de>
-Description: Scalable hydrographic geospatial data processing tools using 
-    open-source command-line utilities. The package provides functions to 
-    download the Hydrography90m data (https://essd.copernicus.org/articles/14/4525/2022/), 
-    processing, reading and extracting information, as well as assessing network
-    distances and network connectivity. While the functions are, by default, 
-    tailored towards the Hydrography90m data, they can also be generalized 
-    towards other data and purposes, such as efficient cropping and merging 
-    of raster and vector data, point-raster extraction, raster reclassification, 
-    and data aggregation. The package depends on the open-source software 
-    GDAL/OGR, GRASS-GIS and the AWK programming language in the Linux 
-    environment, allowing a seamless language integration. Since the data is 
-    processed outside R, hydrographr allows creating scalable geo-processing 
-    workflows. Please see the installation guide of the additional software 
-    at https://glowabio.github.io/hydrographr/articles/hydrographr.html. 
-    Windows users need to to first activate the Windows Subsystem for Linux 
-    (WSL) feature. Instructions on how to use hydrographr with other, finer 
-    resolution stream networks, can be found at 
-    https://glowabio.github.io/hydrographr/articles/example_other_stream_networks.html 
+Description: Scalable hydrographic geospatial data processing tools using open-source
+  command-line utilities and a remote spatial database accessible via an OGC
+  API. The package provides functions to download the Hydrography90m data
+  (https://essd.copernicus.org/articles/14/4525/2022/), process and extract
+  hydrographic information, and assess network distances and connectivity. A
+  dedicated set of API functions serves as a user-friendly R wrapper around
+  an OGC API-compliant server hosting the Hydrography90m dataset in a
+  PostgreSQL/PostGIS database, enabling computing-intensive spatial operations
+  to be performed server-side without local data downloads. While the local
+  processing functions are tailored towards the Hydrography90m data, they can
+  also be applied to other data for tasks such as cropping and merging raster
+  and vector data, point-raster extraction, raster reclassification, and data
+  aggregation. Local processing depends on GDAL/OGR, GRASS-GIS and AWK in a
+  Linux environment. Windows users need to first activate the Windows
+  Subsystem for Linux (WSL) feature. Please see the installation guide at
+  https://glowabio.github.io/hydrographr/articles/hydrographr.html and
+  instructions for use with other stream networks at
+  https://glowabio.github.io/hydrographr/articles/example_other_stream_networks.html.
 License: GPL-3
 URL: https://glowabio.github.io/hydrographr/
 BugReports: https://github.com/glowabio/hydrographr/issues
