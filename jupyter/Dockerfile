@@ -104,15 +104,22 @@ RUN mkdir -p /home/bootstrap-data
 COPY start.sh /usr/local/bin/start.sh
 RUN chmod +x /usr/local/bin/start.sh
 
+WORKDIR /home/participant
+
+# Guidos Tools, needed for Thomas' Lake Functionalities
+# Repo: https://github.com/ec-jrc/GWB
+# Website: https://forest.jrc.ec.europa.eu/en/activities/lpa/gwb/
+# Install Guide: https://ies-ows.jrc.ec.europa.eu/gtb/GWB/GWB_Installation.pdf
+RUN curl -O https://ies-ows.jrc.ec.europa.eu/gtb/GWB/gwb_amd64.deb
+RUN apt-get update \
+ && apt install -y ./gwb_amd64.deb
+
 # Drop back to non-root user:
 USER $NB_UID
 
-# Guidos Tools, needed for Thomas' Lake Functionalities
-# TODO: These did not function, need to debug!
-WORKDIR /home/participant
-RUN curl -O https://ies-ows.jrc.ec.europa.eu/gtb/GWB/GWB_linux64.run
-RUN chmod u+x GWB_linux64.run
-RUN ./GWB_linux64.run
+# Test installation of Guidos Toolbox Workbench
+# Note: The script returns 50 in case of success, so we need to turn that into exit code 0.
+RUN GWB || [ $? -eq 50 ]
 
 # Copy directories:
 # Note: Anything added to /home/bootstrap-data/ will be copied
