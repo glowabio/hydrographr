@@ -158,6 +158,82 @@ message("  Subbasin stream segments: ", nrow(subbasin_streams))
 subbasin_subc_ids <- unique(subbasin_streams$subc_id)
 message("  Subcatchments in subbasin: ", length(subbasin_subc_ids))
 
+
+# ============================================================
+# STEP 3b: Download full basin stream network
+#
+# The full Vjosa basin network is used as the SDM training extent.
+# Pseudoabsences will be sampled from basin subcatchments, providing
+# a broader environmental background than the subbasin alone.
+# The network is pruned to reaches where target species were recorded.
+# ============================================================
+
+message("\n=== Step 3b: Downloading full basin stream network ===")
+
+dir.create("spatial/basin", recursive = TRUE, showWarnings = FALSE)
+dir.create("points_snapped/basin", recursive = TRUE, showWarnings = FALSE)
+
+basin_streams <- api_get_stream_segments(
+  basin_id      = BASIN_ID,
+  geometry_only = FALSE,
+  min_strahler  = 2
+)
+basin_streams$basin_id <- BASIN_ID
+
+st_write(basin_streams, "spatial/basin/stream_network.gpkg", delete_dsn = TRUE)
+save_to_nimbus(basin_streams, "spatial/basin/stream_network.gpkg")
+message("  Basin stream segments: ", nrow(basin_streams))
+
+# All basin subcatchment IDs
+basin_subc_ids <- unique(basin_streams$subc_id)
+message("  Subcatchments in basin: ", length(basin_subc_ids))
+
+# Fish points within the full basin (target species only)
+# Used to drive pruning — retains reaches where SDM species were recorded
+fish_basin_species <- fread("points_snapped/fish/fish_all_species_snapped.csv") %>%
+  filter(subc_id %in% basin_subc_ids)
+
+# Load species checklist early to filter to target species
+# (full checklist load repeated in Step 8 for coverage summary)
+vjosa_species_for_pruning <- fread("range_maps/vjosa_species_checklist_iucn.csv") %>%
+  filter(basin_id == BASIN_ID) %>%
+  pull(species) %>%
+  unique()
+
+fish_basin_sdm <- fish_basin_species %>%
+  filter(species %in% vjosa_species_for_pruning)
+
+message("  Fish points for basin pruning: ", nrow(fish_basin_sdm),
+        " (", n_distinct(fish_basin_sdm$species), " species)")
+
+# Prune basin network to reaches with target species observations
+basin_streams_pruned <- extract_partial_stream_network(
+  stream                    = basin_streams,
+  snapped_subcs             = fish_basin_sdm$subc_id,
+  strahler_retain_threshold = MIN_STRAHLER,
+  upstream_buffer           = UPSTREAM_BUFFER
+)
+
+
+st_write(basin_streams_pruned, "spatial/basin/stream_network_pruned.gpkg",
+         delete_dsn = TRUE)
+save_to_nimbus(basin_streams_pruned, "spatial/basin/stream_network_pruned.gpkg")
+message("  Pruned basin stream segments: ", nrow(basin_streams_pruned),
+        " (from ", nrow(basin_streams), " full basin segments)")
+
+# Save basin pruned subcatchment IDs
+# Used for: environmental variable extraction + pseudoabsence sampling
+basin_subc_ids_pruned <- unique(basin_streams_pruned$subc_id)
+message("  Basin subcatchments after pruning: ", length(basin_subc_ids_pruned),
+        " (from ", length(basin_subc_ids), " full basin subcatchments)")
+
+fwrite(
+  data.table(subc_id = basin_subc_ids_pruned),
+  "points_snapped/basin/basin_subc_ids_pruned.csv"
+)
+
+
+
 # ============================================================
 # STEP 4: Filter fish + dams to subbasin
 # ============================================================
@@ -275,6 +351,11 @@ print(map_full)
 # predict table construction script.
 # ============================================================
 
+# Minimum Strahler order for network pruning
+MIN_STRAHLER <- 4
+UPSTREAM_BUFFER <- 3
+
+
 message("\n=== Step 6: Pruning stream network ===")
 
 fish_subbasin <- fread("points_snapped/subbasin/fish_subbasin.csv")
@@ -282,13 +363,14 @@ dams_subbasin <- fread("points_snapped/subbasin/dams_subbasin.csv")
 
 
 subbasin_streams_pruned <- extract_partial_stream_network(
-  stream = subbasin_streams,
-  snapped_subcs = c(fish_subbasin$subc_id, dams_subbasin$subc_id),
-  strahler_retain_threshold = 3,
-  upstream_buffer           = 3 # number of upstream segments to include
+  stream                    = subbasin_streams,
+  snapped_subcs             = c(fish_subbasin$subc_id, dams_subbasin$subc_id),
+  strahler_retain_threshold = MIN_STRAHLER,
+  upstream_buffer           = UPSTREAM_BUFFER
 )
 
-st_write(subbasin_streams_pruned, "spatial/subbasin/stream_network_pruned_min3.gpkg",
+
+st_write(subbasin_streams_pruned, "spatial/subbasin/stream_network_pruned.gpkg",
          delete_dsn = TRUE)
 save_to_nimbus(subbasin_streams_pruned, "spatial/subbasin/stream_network_pruned.gpkg")
 message("  Pruned stream segments: ", nrow(subbasin_streams_pruned),
@@ -313,6 +395,8 @@ fwrite(
 # ============================================================
 
 message("\n=== Step 7: Comparing full vs pruned stream network ===")
+
+subbasin_polygon <- st_read("spatial/subbasin/subbasin_polygon.gpkg")
 
 map_pruning <- leaflet() %>%
   addProviderTiles("CartoDB.Positron") %>%
@@ -457,3 +541,6 @@ message("  SDM:          use fish_vjosa_species_subbasin.csv for training,")
 message("                predict on subbasin_subc_ids_pruned subcatchments")
 message("  Connectivity: use fish_subbasin.csv + dams_subbasin.csv")
 message("                with 02_generate_network_graph.R")
+message("  spatial/basin/stream_network.gpkg")
+message("  spatial/basin/stream_network_pruned.gpkg")
+message("  points_snapped/basin/basin_subc_ids_pruned.csv          (SDM pseudoabsences)")

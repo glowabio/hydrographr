@@ -28,8 +28,8 @@ dir.create("points_snapped/maps", recursive = TRUE, showWarnings = FALSE)
 
 
 # Load cleaned data URLs (adjust these to your actual URLs)
-hcmr_url <- "https://nimbus.igb-berlin.de/index.php/s/GxakANySoGxGLnm/download/fish_points_to_snap_hcmr.csv"
-gbif_url <- "https://nimbus.igb-berlin.de/index.php/s/ceGgy4n75y92gSk/download/fish_gbif_clean_to_snap.csv"
+hcmr_url <- "https://nimbus.igb-berlin.de/index.php/s/2Q8AJGHB6GqsD4m/download/fish_points_to_snap_hcmr.csv"
+gbif_url <- "https://nimbus.igb-berlin.de/index.php/s/3WnoTAT7J7M46aP/download/fish_gbif_clean_to_snap.csv"
 
 
 # ============================================================================
@@ -65,7 +65,7 @@ hcmr_snap_result <- api_get_snapped_points_cascade(
   data = hcmr_original,
   colname_lon = "longitude",
   colname_lat = "latitude",
-  colname_site_id = "Sites",
+  colname_site_id = "site_id",
   strahler_seq = STRAHLER_SEQ,
   distance_threshold = DISTANCE_THRESHOLD
 )
@@ -84,8 +84,8 @@ hcmr_snap_result <- fread("points_snapped/fish/hcmr_snapped_points.csv")
 message("\n--- Creating HCMR visualization ---")
 
 # Identify which points were successfully snapped
-hcmr_snapped_ids <- hcmr_snap_result$Sites
-hcmr_original$snapped <- hcmr_original$Sites %in% hcmr_snapped_ids
+hcmr_snapped_ids <- hcmr_snap_result$site_id
+hcmr_original$snapped <- hcmr_original$site_id %in% hcmr_snapped_ids
 
 # Summary
 n_snapped <- sum(hcmr_original$snapped)
@@ -112,7 +112,7 @@ hcmr_map <- leaflet() %>%
     group = "Original (Snapped)",
     popup = ~paste0(
       "<b>Original Point (Successfully Snapped)</b><br>",
-      "Site ID: ", Sites, "<br>",
+      "Site ID: ", site_id, "<br>",
       "Lon: ", round(longitude, 5), "<br>",
       "Lat: ", round(latitude, 5)
     )
@@ -132,7 +132,7 @@ hcmr_map <- leaflet() %>%
     group = "Original (Failed)",
     popup = ~paste0(
       "<b>⚠️ Original Point (FAILED TO SNAP)</b><br>",
-      "Site ID: ", Sites, "<br>",
+      "Site ID: ", site_id, "<br>",
       "Lon: ", round(longitude, 5), "<br>",
       "Lat: ", round(latitude, 5), "<br>",
       "<b style='color:red;'>This point was not successfully snapped</b>"
@@ -153,7 +153,7 @@ hcmr_map <- leaflet() %>%
     group = "Snapped Points",
     popup = ~paste0(
       "<b>Snapped Point</b><br>",
-      "Site ID: ", Sites, "<br>",
+      "Site ID: ", site_id, "<br>",
       "Lon: ", round(longitude_snapped, 5), "<br>",
       "Lat: ", round(latitude_snapped, 5), "<br>",
       "Distance: ", round(distance_metres, 1), " m<br>",
@@ -224,16 +224,16 @@ if (n_failed > 0) {
 
 message("\n=== Snapping GBIF Data ===")
 
-ti <- system.time(gbif_snap_result <- api_get_snapped_points_cascade(
+gbif_snap_result <- api_get_snapped_points_cascade(
   data = gbif_original,
   colname_lon = "decimalLongitude",
   colname_lat = "decimalLatitude",
   colname_site_id = "gbifID",
   strahler_seq = STRAHLER_SEQ,
   distance_threshold = DISTANCE_THRESHOLD
-))
+)
 
-# 166 seconds
+
 
 print(gbif_snap_result)
 
@@ -409,9 +409,6 @@ gbif_snap_result <- gbif_snap_result %>%
          latitude_snapped = decimalLatitude_snapped,
          site_id = gbifID)
 
-# Rename site_id column of HCMR dataset
-hcmr_snap_result <- hcmr_snap_result %>%
-  rename(site_id = Sites)
 
 # Get common columns
 common_cols <- intersect(names(hcmr_snap_result), names(gbif_snap_result))
@@ -454,11 +451,12 @@ STRAHLER_SEQ <- c(4, 3, 2)
 DISTANCE_THRESHOLD <- 150  # meters
 
 # Load cleaned dams data URL
-dams_url <- "https://nimbus.igb-berlin.de/index.php/s/tagEWdtxTpbRE9g/download/dams_all_clean.csv"
+dams_url <- "https://nimbus.igb-berlin.de/index.php/s/nzMQKArCD8SqNcK/download/dams_all_clean.csv"
 
 # Load original dams data
 dams_original <- fread(dams_url)
 message(sprintf("Original dams points: %d", nrow(dams_original)))
+
 
 # Snap dams data
 DISTANCE_THRESHOLD <- 150
@@ -476,8 +474,9 @@ print(dams_snap_result)
 
 # dams_snap_result <- fread("points_snapped/dams/dams_snapped_points.csv")
 dams_snap_result <- dams_snap_result %>%
-  left_join(dams_original, by = "id1") %>%
+  left_join(dams_original) %>%
   select(-longitude, -latitude)
+
 
 # Save
 fwrite(dams_snap_result, "points_snapped/dams/dams_snapped_points.csv")
@@ -513,8 +512,8 @@ dams_map <- leaflet() %>%
   # Original points that were successfully snapped (colored by source)
   addCircleMarkers(
     data = dams_original[dams_original$snapped, ],
-    lng = ~longitude,
-    lat = ~latitude,
+    lng = ~longitude_original,
+    lat = ~latitude_original,
     color = ~dams_source_colors(source),
     fillColor = ~dams_source_colors(source),
     radius = 5,
@@ -537,8 +536,8 @@ dams_map <- leaflet() %>%
   # Original points that FAILED to snap (orange)
   addCircleMarkers(
     data = dams_original[!dams_original$snapped, ],
-    lng = ~longitude,
-    lat = ~latitude,
+    lng = ~longitude_original,
+    lat = ~latitude_original,
     color = "orange",
     fillColor = "orange",
     radius = 6,
