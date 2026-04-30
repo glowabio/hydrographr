@@ -318,9 +318,9 @@ basin_ids_gbif <- api_get_ids(
 # Join back and filter
 gbif_cleaned <- gbif_cleaned %>%
   left_join(basin_ids_gbif) %>%
-  filter(basin_id == BASIN_ID)
+  filter(basin_id == BASIN_ID) %>%
+  select(-subc_id, - basin_id, -reg_id)
 
-cat("  Records missing basin_id:", sum(is.na(gbif_cleaned$basin_id)), "\n")
 message("  Records in target basin: ", nrow(gbif_cleaned))
 message("  Species in target basin: ", n_distinct(gbif_cleaned$species))
 
@@ -377,8 +377,7 @@ gbif_cleaned <- fread("points_cleaned/fish/fish_gbif_clean.csv")
 
 # Remove duplicates, keep only coordinates and gbifID to snap
 gbif_cleaned_to_snap <- gbif_cleaned %>%
-  distinct(decimalLongitude,decimalLatitude, .keep_all = TRUE) %>%
-  select(-subc_id, - basin_id, -reg_id)
+  distinct(decimalLongitude,decimalLatitude, .keep_all = TRUE)
 
 fwrite(gbif_cleaned_to_snap, "points_cleaned/fish/fish_gbif_clean_to_snap.csv")
 save_to_nimbus(gbif_cleaned_to_snap, "points_cleaned/fish/fish_gbif_clean_to_snap.csv")

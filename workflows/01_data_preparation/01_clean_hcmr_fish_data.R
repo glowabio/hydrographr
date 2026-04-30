@@ -341,7 +341,7 @@ message("  Validated species: ", n_distinct(sp_basin_validated$species))
 # Example: sp_basin_validated <- sp_basin_validated %>% filter(species != "...")
 # For now retain all validated records
 sp_basin <- sp_basin_validated %>% mutate(species = speciescheck) %>%
-  select(-manually_updated, -speciescheck)
+  select(-manually_updated, -speciescheck, -subc_id, -basin_id, -reg_id)
 
 message("  Records after taxonomic validation: ", nrow(sp_basin))
 

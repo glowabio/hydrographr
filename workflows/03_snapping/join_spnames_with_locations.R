@@ -17,7 +17,7 @@ setwd(BASE_DIR)
 message("\n=== Merging Snapped Data with Species Information ===")
 
 # Load original data with species
-fish_hcmr <- fread("points_cleaned/fish/fish_greece_hcmr.csv")
+fish_hcmr <- fread("points_cleaned/fish/fish_basin_hcmr.csv")
 fish_gbif <- fread("points_cleaned/fish/fish_gbif_clean.csv")
 
 # Load snapped data
@@ -30,11 +30,12 @@ gbif_snapped <- all_snapped %>% filter(source == "GBIF")
 # Merge HCMR
 fish_hcmr_snapped <- fish_hcmr %>%
   left_join(hcmr_snapped, by = c("Sites" = "site_id")) %>%
-  rename(
-    longitude_original_hcmr = longitude,
-    latitude_original_hcmr = latitude
-  ) %>% # exclude the 2 points that were not snapped
-  filter(!is.na(longitude_snapped))
+  # rename(
+  #   longitude_original_hcmr = longitude,
+  #   latitude_original_hcmr = latitude
+  # ) %>% # exclude the 2 points that were not snapped
+  filter(!is.na(longitude_snapped))%>%
+  mutate(species = gsub(" ", "_", species))
 
 
 message(sprintf("HCMR: %d records with species", nrow(fish_hcmr_snapped)))
