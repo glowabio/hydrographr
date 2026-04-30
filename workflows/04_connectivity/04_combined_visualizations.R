@@ -22,7 +22,7 @@
 #   - connectivity/Figure_Scenarios_MEE.png (from script 01)
 #   - connectivity/scenario_comparison_map.html (from script 01)
 #
-# LOCATION: workflows/04_network_analysis/03_combined_visualizations.R
+# LOCATION: workflows/04_connectivity/04_combined_visualizations.R
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 
 library(tidyverse)

@@ -9,7 +9,7 @@
 #' - PLUS a configurable number of *upstream* same-Strahler segments for context
 #'
 #' @param stream sf object with columns:
-#'   `subc_id`, `target`, `strahler_order`, and LINESTRING geometry.
+#'   `subc_id`, `target`, `strahler`, and LINESTRING geometry.
 #' @param snapped_subcs integer vector: subc_ids after snapping.
 #' @param strahler_retain_threshold integer: minimum Strahler to fully retain (default 4).
 #' @param upstream_buffer integer: how many same-Strahler upstream segments to retain.
@@ -25,12 +25,12 @@ extract_partial_stream_network <- function(
 
 
   # --- 1: keep all >= strahler_retain_threshold ---
-  stream_high <- subset(stream, strahler_order >= strahler_retain_threshold)
+  stream_high <- subset(stream, strahler >= strahler_retain_threshold)
 
   # --- 2: fine-order snapped segments (strict original condition) ---
   snapped_fine <- intersect(
     snapped_subcs,
-    stream$subc_id[stream$strahler_order < strahler_retain_threshold]
+    stream$subc_id[stream$strahler < strahler_retain_threshold]
   )
 
   # IMPORTANT: always retain snapped segments exactly as original

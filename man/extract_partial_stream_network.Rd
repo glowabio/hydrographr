@@ -13,7 +13,7 @@ extract_partial_stream_network(
 }
 \arguments{
 \item{stream}{sf object with columns:
-`subc_id`, `target`, `strahler_order`, and LINESTRING geometry.}
+`subc_id`, `target`, `strahler`, and LINESTRING geometry.}
 
 \item{snapped_subcs}{integer vector: subc_ids after snapping.}
 

@@ -9,7 +9,7 @@ trace_downstream(start_id, df, strahler_retain_threshold)
 \arguments{
 \item{start_id}{Starting segment ID}
 
-\item{df}{Stream network data.frame with columns subc_id, target, strahler_order}
+\item{df}{Stream network data.frame with columns subc_id, target, strahler}
 
 \item{strahler_retain_threshold}{Minimum Strahler order to stop at}
 }
