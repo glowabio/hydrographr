@@ -71,7 +71,7 @@ subcatchment ids of interest.
 # Download test data into the temporary R folder
 # or define a different directory
 my_directory <- tempdir()
-download_test_data(my_directory) 
+download_test_data(my_directory)
 
 # Download one variable, in this case elevation, from the Environment90m dataset
 # repository
