@@ -1,5 +1,5 @@
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
-# 01_clean_hcmr_fish_data.R
+# 01_clean_hcmr_fish.R
 #
 # Clean and format freshwater fish occurrence records from HCMR Excel file.
 # Derives the study basin ID from a known anchor point and filters all
@@ -26,7 +26,7 @@
 #   - config/study_area_params.csv                     (BASIN_ID for downstream)
 #   - points_cleaned/maps/hcmr_fish_overview.html
 #
-# LOCATION: workflows/01_clean_hcmr_fish.R
+# LOCATION: workflows/01_data_preparation/01_clean_hcmr_fish.R
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 
 library(hydrographr)

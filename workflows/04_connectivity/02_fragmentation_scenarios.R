@@ -16,7 +16,7 @@
 #   - Scenario comparison figures (2-panel plots)
 #   - Summary statistics for both scenarios
 #
-# LOCATION: workflows/05_connectivity/02_fragmentation_scenarios.R
+# LOCATION: workflows/04_connectivity/02_fragmentation_scenarios.R
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 
 library(tidyverse)

@@ -1,5 +1,5 @@
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
-# 04_clean_all_dam_data.R
+# 04_clean_dam_data.R
 #
 # Process and combine dam data from RAAY and AMBER sources,
 # filter to target basin, and prepare for snapping.
@@ -25,7 +25,7 @@
 #   - points_cleaned/maps/dams_all_sources_overview.html
 #   - points_cleaned/maps/dams_duplicates_map.html
 #
-# LOCATION: workflows/01_data_preparation/04_clean_all_dam_data.R
+# LOCATION: workflows/01_data_preparation/04_clean_dam_data.R
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 
 library(hydrographr)
