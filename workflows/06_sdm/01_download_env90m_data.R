@@ -27,8 +27,8 @@ setwd(BASE_DIR)
 
 message("\n=== Loading Existing Stream Network ===")
 
-stream_network <- read_geopackage(
-  "spatial/sarantaporos/sarantaporos_stream_network.gpkg",
+stream_network <- hydrographr::read_geopackage(
+    "spatial/basin/stream_network_pruned.gpkg",
   import_as = "data.table"
 )
 
@@ -210,7 +210,7 @@ message("\n=== Creating Subcatchment ID Reference File ===")
 
 subc_ids_dt <- data.table(subc_id = subc_ids)
 fwrite(subc_ids_dt,
-       file = "env90m/subc_ids.txt",
+       file = "env90m/subc_ids_basin.txt",
        col.names = FALSE)
 
 message(sprintf("✓ Saved %d subcatchment IDs to: env90m/subc_ids.txt",

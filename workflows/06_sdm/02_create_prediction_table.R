@@ -27,8 +27,8 @@ setwd(BASE_DIR)
 
 message("\n=== Verifying Input Files ===")
 
-if (!file.exists("env90m/subc_ids.txt")) {
-  stop("ERROR: env90m/subc_ids.txt not found!",
+if (!file.exists("env90m/subc_ids_basin.txt")) {
+  stop("ERROR: env90m/subc_ids_basin.txt not found!",
        "\n  Please run script 01_download_environmental_variables.R first.")
 }
 
@@ -91,7 +91,7 @@ message("\n=== Creating Prediction Table ===")
 message("This may take several minutes depending on data size...")
 
 # Define output path
-output_file <- "env90m/pred_tab2.csv"
+output_file <- "env90m/pred_tab.csv"
 
 # Run get_predict_table
 pred_tab <- get_predict_table(
@@ -99,7 +99,7 @@ pred_tab <- get_predict_table(
   statistics = statistics,
   tile_id = tile_id,
   input_var_path = "env90m",
-  subcatch_id = "env90m/subc_ids.txt",
+  subcatch_id = "env90m/subc_ids_basin.txt",
   out_file_path = output_file,
   read = TRUE,
   quiet = FALSE,
