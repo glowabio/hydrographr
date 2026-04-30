@@ -1,11 +1,11 @@
 #' @title Get predict table
 #'
 #' @description This function creates a table by joining the information of one
-#' or more variables available in the Environment90m dataset. These variables 
-#' need to be downloaded beforehand for the tiles overlapping with the area of 
+#' or more variables available in the Environment90m dataset. These variables
+#' need to be downloaded beforehand for the tiles overlapping with the area of
 #' interest. The subsetting of the original tables occurs by providing a list of
-#' subcatchment ids of interest.  
-#' 
+#' subcatchment ids of interest.
+#'
 #'
 #' @param variable(s) character vector of variable(s) names. Possible values are:
 #'  all variables in the Environment90m dataset, which can bew viewed by calling
@@ -14,7 +14,7 @@
 #' @param statistics character vector of statistics names. Possible values are
 #' "sd", "mean", "min", "max", "range" or "ALL". Default "ALL".
 #' @param tile_id character. The IDs of the tiles of interest.
-#' @param input_var_path path to directory that contains the tables of the 
+#' @param input_var_path path to directory that contains the tables of the
 #' Environment90m dataset. Tables may be in subdirectories of the provided directory.
 #' @param subcatch_id path to a text file with subcatchment ids, or numeric
 #'  vector containing subcatchment ids.
@@ -48,7 +48,7 @@
 #' # Download test data into the temporary R folder
 #' # or define a different directory
 #' my_directory <- tempdir()
-#' download_test_data(my_directory) 
+#' download_test_data(my_directory)
 #'
 #' # Download one variable, in this case elevation, from the Environment90m dataset
 #' # repository
@@ -59,7 +59,7 @@
 #' subc_raster <- paste0(my_directory, "subcatchment_1264942.tif")
 #' target_ids <- extract_ids(subc_layer = subc_raster)
 #' fwrite(target_ids, paste0(my_directory, 'subc_IDs.txt'))
-#' 
+#'
 #' # Define variable and tile:
 #' var <- c("elev")
 #' tile_id <- c("h18v04")
@@ -343,7 +343,22 @@ get_predict_table <- function(variable,
 
   if (read == TRUE) {
     if (!quiet) message("INFO: Reading result table from ", out_file_path)
-    predict_table <- fread(out_file_path)
+    predict_table <- fread(out_file_path, fill = TRUE)
+
+    # Remove malformed rows — caused by paste misalignment in parallel bash processing.
+    # Malformed rows have a leading comma which shifts the subc_id to column 2,
+    # leaving column 1 as NA. Since subc_ids always start with a digit,
+    # filtering on !is.na(column 1) cleanly removes all malformed rows.
+    n_raw <- nrow(predict_table)
+    predict_table <- predict_table[!is.na(predict_table[[1]])]
+    predict_table <- predict_table[!duplicated(predict_table[[1]])]
+
+    if (!quiet && (n_raw - nrow(predict_table)) > 0)
+      message("INFO: Removed ", n_raw - nrow(predict_table),
+              " malformed/duplicate rows")
+    if (!quiet)
+      message("INFO: Clean predict table: ", nrow(predict_table), " rows")
+
     return(predict_table)
   }
 
