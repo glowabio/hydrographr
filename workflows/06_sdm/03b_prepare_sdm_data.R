@@ -16,7 +16,7 @@
 # Input:
 #   - points_snapped/fish/fish_all_species_snapped.csv
 #   - points_snapped/basin/basin_subc_ids_pruned.csv
-#   - env90m/predict_table_basin.csv
+#   - env90m/predict_table.csv
 #   - points_original/fish/species_list_sarantaporos.txt
 #   - config/study_area_params.csv
 #
@@ -82,7 +82,7 @@ message("  Sources: ", paste(unique(fish_all$source), collapse = ", "))
 
 message("\n=== Step 2: Loading environmental predictors ===")
 
-predict_table <- fread("env90m/predict_table_basin.csv")
+predict_table <- fread("env90m/predict_table_vif.csv")
 message("  Predict table: ", nrow(predict_table), " subcatchments, ",
         ncol(predict_table), " columns")
 

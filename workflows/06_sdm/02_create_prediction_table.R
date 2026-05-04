@@ -3,7 +3,7 @@
 # ============================================================================
 # Purpose: Create prediction table from downloaded Environment90m data
 # Input: Downloaded environmental tables from script 01
-# Output: pred_tab.csv - ready for SDM modeling
+# Output: predict_table.csv - ready for SDM modeling
 # ============================================================================
 # Date: 2026-04-23
 # ============================================================================
@@ -91,10 +91,10 @@ message("\n=== Creating Prediction Table ===")
 message("This may take several minutes depending on data size...")
 
 # Define output path
-output_file <- "env90m/pred_tab.csv"
+output_file <- "env90m/predict_table.csv"
 
 # Run get_predict_table
-pred_tab <- get_predict_table(
+predict_table <- get_predict_table(
   variable = variables,
   statistics = statistics,
   tile_id = tile_id,
@@ -108,8 +108,8 @@ pred_tab <- get_predict_table(
 )
 
 message(sprintf("\n✓ Prediction table created: %d rows, %d columns",
-                nrow(pred_tab),
-                ncol(pred_tab)))
+                nrow(predict_table),
+                ncol(predict_table)))
 
 # ============================================================================
 # HANDLE MISSING DATA (IF ANY)
@@ -117,7 +117,9 @@ message(sprintf("\n✓ Prediction table created: %d rows, %d columns",
 
 message("\n=== Checking for Missing Data ===")
 
-missing_counts <- pred_tab[, lapply(.SD, function(x) sum(is.na(x)))]
+# predict_table <- fread(output_file)
+
+missing_counts <- predict_table[, lapply(.SD, function(x) sum(is.na(x)))]
 has_missing <- any(missing_counts > 0)
 
 if (has_missing) {
@@ -127,7 +129,7 @@ if (has_missing) {
     if (col != "subc_id") {
       n_missing <- missing_counts[[col]]
       if (n_missing > 0) {
-        pct_missing <- 100 * n_missing / nrow(pred_tab)
+        pct_missing <- 100 * n_missing / nrow(predict_table)
         message(sprintf("  %s: %d (%.1f%%)", col, n_missing, pct_missing))
       }
     }
@@ -140,19 +142,19 @@ if (has_missing) {
 
   message("\nSaving two versions:")
 
-  fwrite(pred_tab, "env90m/pred_tab_full.csv")
-  message("  ✓ Saved: env90m/pred_tab_full.csv (all rows, including NAs)")
+  fwrite(predict_table, "env90m/predict_table_full.csv")
+  message("  ✓ Saved: env90m/predict_table_full.csv (all rows, including NAs)")
 
-  pred_tab_complete <- na.omit(pred_tab)
-  fwrite(pred_tab_complete, "env90m/pred_tab_complete.csv")
-  message(sprintf("  ✓ Saved: env90m/pred_tab_complete.csv (%d rows, NAs removed)",
-                  nrow(pred_tab_complete)))
+  predict_table_complete <- na.omit(predict_table)
+  fwrite(predict_table_complete, "env90m/predict_table_complete.csv")
+  message(sprintf("  ✓ Saved: env90m/predict_table_complete.csv (%d rows, NAs removed)",
+                  nrow(predict_table_complete)))
 
   message(sprintf("\nRemoved %d rows (%.1f%%) with missing values",
-                  nrow(pred_tab) - nrow(pred_tab_complete),
-                  100 * (nrow(pred_tab) - nrow(pred_tab_complete)) / nrow(pred_tab)))
+                  nrow(predict_table) - nrow(predict_table_complete),
+                  100 * (nrow(predict_table) - nrow(predict_table_complete)) / nrow(predict_table)))
 
-  pred_tab <- pred_tab_complete
+  predict_table <- predict_table_complete
 
 } else {
   message("✓ No missing values detected")
@@ -164,21 +166,21 @@ if (has_missing) {
 
 message("\n=== Data Quality Summary ===")
 
-message(sprintf("\nDimensions: %d rows × %d columns", nrow(pred_tab), ncol(pred_tab)))
+message(sprintf("\nDimensions: %d rows × %d columns", nrow(predict_table), ncol(predict_table)))
 
 message("\nColumn names:")
-print(names(pred_tab))
+print(names(predict_table))
 
 message("\nBasic statistics:")
-print(summary(pred_tab))
+print(summary(predict_table))
 
 message("\nChecking for extreme values...")
-for (col in names(pred_tab)) {
-  if (col != "subc_id" && is.numeric(pred_tab[[col]])) {
-    q <- quantile(pred_tab[[col]], probs = c(0.01, 0.99), na.rm = TRUE)
-    n_outliers <- sum(pred_tab[[col]] < q[1] | pred_tab[[col]] > q[2], na.rm = TRUE)
+for (col in names(predict_table)) {
+  if (col != "subc_id" && is.numeric(predict_table[[col]])) {
+    q <- quantile(predict_table[[col]], probs = c(0.01, 0.99), na.rm = TRUE)
+    n_outliers <- sum(predict_table[[col]] < q[1] | predict_table[[col]] > q[2], na.rm = TRUE)
     if (n_outliers > 0) {
-      pct_outliers <- 100 * n_outliers / nrow(pred_tab)
+      pct_outliers <- 100 * n_outliers / nrow(predict_table)
       message(sprintf("  %s: %d values (%.1f%%) outside 1st-99th percentile",
                       col, n_outliers, pct_outliers))
     }
@@ -197,10 +199,10 @@ downloaded_size <- sum(
   na.rm = TRUE
 ) / 1024 / 1024 / 1024
 
-pred_tab_size <- file.info("env90m/pred_tab.csv")$size / 1024 / 1024
+predict_table_size <- file.info("env90m/predict_table.csv")$size / 1024 / 1024
 
 message(sprintf("Downloaded tables: %.2f GB", downloaded_size))
-message(sprintf("Prediction table: %.2f MB", pred_tab_size))
+message(sprintf("Prediction table: %.2f MB", predict_table_size))
 message(sprintf("Space savings if deleted: %.2f GB", downloaded_size))
 
 message("\nTo free up disk space, you can delete the downloaded tables:")
@@ -223,25 +225,25 @@ message("=== PREDICTION TABLE CREATION COMPLETE ===")
 message("========================================")
 
 message("\nFiles created:")
-message("  ✓ env90m/pred_tab.csv (main file)")
+message("  ✓ env90m/predict_table.csv (main file)")
 if (has_missing) {
-  message("  ✓ env90m/pred_tab_full.csv (with NAs)")
-  message("  ✓ env90m/pred_tab_complete.csv (NAs removed)")
+  message("  ✓ env90m/predict_table_full.csv (with NAs)")
+  message("  ✓ env90m/predict_table_complete.csv (NAs removed)")
 }
 
 message("\nPrediction table summary:")
-message(sprintf("  Rows:      %d", nrow(pred_tab)))
-message(sprintf("  Columns:   %d", ncol(pred_tab)))
+message(sprintf("  Rows:      %d", nrow(predict_table)))
+message(sprintf("  Columns:   %d", ncol(predict_table)))
 message(sprintf("  Variables: %d", length(variables)))
-message(sprintf("  File size: %.2f MB", pred_tab_size))
+message(sprintf("  File size: %.2f MB", predict_table_size))
 
 message("\nNext steps:")
-message("  1. Load pred_tab.csv in your SDM workflow")
+message("  1. Load predict_table.csv in your SDM workflow")
 message("  2. Join with species occurrence data")
 message("  3. Run species distribution models")
 message("  4. Predict habitat suitability")
 
 message("\nExample usage:")
-message("  pred_tab <- fread('env90m/pred_tab.csv')")
+message("  predict_table <- fread('env90m/predict_table.csv')")
 
 message("\n========================================\n")
