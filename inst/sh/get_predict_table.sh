@@ -147,8 +147,7 @@ fi
 echo ${var[@]} | xargs -n 1 -P $NCORES bash -c $'
 
 X=$1
-
-listf=( $(find $TMP -name "ENV_*_${X}.txt")  )
+listf=( $(find $TMP -name "ENV_*_${X}.txt" | grep "ENV_h[0-9]*v[0-9]*_${X}\.txt$") )
 
 cat ${listf[@]} > $TMP/aggreg_${X}.txt
 awk \'FNR == 1; FNR > 1 && /^[0-9]/\' $TMP/aggreg_${X}.txt \
