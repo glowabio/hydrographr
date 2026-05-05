@@ -13,7 +13,7 @@
 #
 # Input:
 #   - env90m/predict_table.csv
-#   - points_snapped/basin/basin_subc_ids_pruned.csv
+#   - spatial/basin/basin_subc_ids_pruned.csv
 #
 # Output:
 #   - env90m/predict_table_vif.csv   (filtered predict table)
@@ -44,7 +44,7 @@ predict_table <- fread("env90m/predict_table.csv")
 message("  Rows: ", nrow(predict_table))
 message("  Columns: ", ncol(predict_table))
 
-basin_subc_ids_pruned <- fread("points_snapped/basin/basin_subc_ids_pruned.csv") %>%
+basin_subc_ids_pruned <- fread("spatial/basin/basin_subc_ids_pruned.csv") %>%
   pull(subc_id)
 
 # Check row count matches expected subcatchments

@@ -19,7 +19,7 @@
 # Input:
 #   - spatial/subbasin/stream_network_pruned.gpkg
 #   - points_snapped/subbasin/fish_sdm_subbasin.csv  (presences)
-#   - points_snapped/subbasin/subbasin_subc_ids_pruned.csv (prediction sites)
+#   - spatial/subbasin/subbasin_subc_ids_pruned.csv (prediction sites)
 #   - env90m/predict_table_subbasin.csv  (environmental predictors)
 #   - points_original/fish/species_list_sarantaporos.txt
 #
@@ -115,7 +115,7 @@ message("  Predict table: ", nrow(predict_table), " subcatchments, ",
         ncol(predict_table), " columns")
 
 # Subbasin pruned subcatchment IDs — used for prediction sites
-subbasin_subc_ids <- fread("points_snapped/subbasin/subbasin_subc_ids_pruned.csv") %>%
+subbasin_subc_ids <- fread("spatial/subbasin/subbasin_subc_ids_pruned.csv") %>%
   pull(subc_id)
 
 # ============================================================

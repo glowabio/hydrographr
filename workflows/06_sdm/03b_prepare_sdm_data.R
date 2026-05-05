@@ -15,7 +15,7 @@
 #
 # Input:
 #   - points_snapped/fish/fish_all_species_snapped.csv
-#   - points_snapped/basin/basin_subc_ids_pruned.csv
+#   - spatial/basin/basin_subc_ids_pruned.csv
 #   - env90m/predict_table.csv
 #   - points_original/fish/species_list_sarantaporos.txt
 #   - config/study_area_params.csv
@@ -102,7 +102,7 @@ message("  Predictor columns: ", length(predictor_cols))
 
 message("\n=== Step 3: Loading basin subcatchment IDs ===")
 
-basin_subc_ids_pruned <- fread("points_snapped/basin/basin_subc_ids_pruned.csv") %>%
+basin_subc_ids_pruned <- fread("spatial/basin/basin_subc_ids_pruned.csv") %>%
   pull(subc_id)
 
 message("  Basin pruned subcatchments: ", length(basin_subc_ids_pruned))
