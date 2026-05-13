@@ -59,6 +59,24 @@ library(data.table)
 library(dplyr)
 library(ggplot2)
 library(broom)
+library(dismo)
+
+# Compute MCC across thresholds (same as 05_maxent.R and 06_random_forest.R)
+compute_mcc_threshold <- function(pres_preds, abs_preds,
+                                  thresh_seq = seq(0, 1, by = 0.01)) {
+  mcc_vals <- sapply(thresh_seq, function(t) {
+    TP <- as.numeric(sum(pres_preds >= t, na.rm = TRUE))
+    FN <- as.numeric(sum(pres_preds <  t, na.rm = TRUE))
+    FP <- as.numeric(sum(abs_preds  >= t, na.rm = TRUE))
+    TN <- as.numeric(sum(abs_preds  <  t, na.rm = TRUE))
+    denom <- sqrt((TP+FP) * (TP+FN) * (TN+FP) * (TN+FN))
+    if (is.na(denom) || denom == 0) return(NA)
+    (TP * TN - FP * FN) / denom
+  })
+  best_thresh <- thresh_seq[which.max(mcc_vals)]
+  best_mcc    <- max(mcc_vals, na.rm = TRUE)
+  return(list(threshold = best_thresh, mcc = best_mcc))
+}
 
 select <- dplyr::select
 
@@ -546,14 +564,53 @@ for (sp in target_species) {
             " — ", round(max(pred_df$probability), 3))
   }
 
+
+  # ---- Evaluate SSN: AUC + TSS + MCC (in-sample fitted values) ----
+  # Note: in-sample evaluation — optimistic upper bound on performance
+  # Cross-validation not feasible due to computational cost of SSN fitting
+  fitted_probs <- 1 / (1 + exp(-fitted(best_model_reml)))
+  obs_data_eval <- ssn_get_data(ssn_obj_sp, "obs") %>%
+    st_drop_geometry()
+
+  pres_probs <- fitted_probs[obs_data_eval$pres_abs == 1]
+  abs_probs  <- fitted_probs[obs_data_eval$pres_abs == 0]
+
+  # AUC + TSS threshold using dismo
+  eval_obj       <- dismo::evaluate(p = pres_probs, a = abs_probs)
+  auc_ssn        <- eval_obj@auc
+  thresh_ssn_tss <- dismo::threshold(eval_obj)$spec_sens
+
+  sensitivity_ssn <- mean(pres_probs >= thresh_ssn_tss)
+  specificity_ssn <- mean(abs_probs  <  thresh_ssn_tss)
+  tss_ssn         <- sensitivity_ssn + specificity_ssn - 1
+
+  # MCC threshold
+  mcc_result_ssn  <- compute_mcc_threshold(pres_probs, abs_probs)
+  thresh_ssn_mcc  <- mcc_result_ssn$threshold
+  mcc_ssn         <- mcc_result_ssn$mcc
+
+  message("  AUC (in-sample):           ", round(auc_ssn, 3))
+  message("  TSS (in-sample):           ", round(tss_ssn, 3),
+          " | threshold: ",               round(thresh_ssn_tss, 3))
+  message("  MCC threshold (in-sample): ", round(thresh_ssn_mcc, 3),
+          " | MCC: ",                     round(mcc_ssn, 3))
+  message("  loocv RMSPE:               ", round(rmspe, 4))
+
+
   ssn_results[[sp]] <- list(
     best_cov         = best_name,
     n_presences      = n_pres,
     n_true_absences  = sum(sp_data$source == "HCMR_true_absence"),
     n_pseudoabsences = sum(sp_data$source == "pseudoabsence"),
     AICc             = round(glance(best_model_reml)$AICc, 2),
-    loocv_RMSPE      = round(rmspe, 4)
+    loocv_RMSPE      = round(rmspe, 4),
+    AUC              = round(auc_ssn, 3),
+    TSS              = round(tss_ssn, 3),
+    best_threshold_tss = round(thresh_ssn_tss, 3),
+    MCC              = round(mcc_ssn, 3),
+    best_threshold_mcc = round(thresh_ssn_mcc, 3)
   )
+
 
   rm(ssn_obj_sp, fitted_models, best_model, best_model_reml,
      obs_sites_sp, obs_snapped_sp, site_list_sp)
@@ -608,13 +665,18 @@ message("  Saved: spatial/subbasin/stream_network_predictions.gpkg")
 results_summary <- lapply(names(ssn_results), function(sp) {
   r <- ssn_results[[sp]]
   data.frame(
-    species          = sp,
-    n_presences      = r$n_presences,
-    n_true_absences  = r$n_true_absences,
-    n_pseudoabsences = r$n_pseudoabsences,
-    best_cov         = r$best_cov,
-    AICc             = r$AICc,
-    loocv_RMSPE      = r$loocv_RMSPE
+    species            = sp,
+    n_presences        = r$n_presences,
+    n_true_absences    = r$n_true_absences,
+    n_pseudoabsences   = r$n_pseudoabsences,
+    best_cov           = r$best_cov,
+    AICc               = r$AICc,
+    loocv_RMSPE        = r$loocv_RMSPE,
+    AUC                = r$AUC,
+    TSS                = r$TSS,
+    best_threshold_tss = r$best_threshold_tss,
+    MCC                = r$MCC,
+    best_threshold_mcc = r$best_threshold_mcc
   )
 }) %>% rbindlist()
 
