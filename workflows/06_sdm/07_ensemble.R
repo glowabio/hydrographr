@@ -204,7 +204,8 @@ network <- st_read("spatial/subbasin/stream_network_pruned.gpkg")
 ensemble_files <- list.files("sdm/ensemble",
                              pattern = "ensemble_.*\\.csv$",
                              full.names = TRUE) %>%
-  .[!grepl("summary", .)]
+  .[!grepl("summary", .)] %>%
+  .[!grepl("thresholds", .)]
 
 for (f in ensemble_files) {
 
@@ -270,22 +271,42 @@ message("  Saved: spatial/subbasin/stream_network_ensemble.gpkg")
 
 
 ## Ensemble threshold
-maxent_eval <- fread("sdm/maxent_models/maxent_evaluation.csv")
-rf_eval     <- fread("sdm/rf_models/rf_evaluation.csv")
+ssn_eval <- fread("sdm/ssn_models/model_summary.csv") %>%
+  filter(species %in% SSN_SPECIES) %>%
+  select(species,
+         thresh_ssn_tss = best_threshold_tss,
+         thresh_ssn_mcc = best_threshold_mcc)
 
+maxent_eval <- fread("sdm/maxent_models/maxent_evaluation.csv") %>%
+  select(species,
+         thresh_maxent_tss = best_threshold_tss,
+         thresh_maxent_mcc = best_threshold_mcc)
+
+rf_eval <- fread("sdm/rf_models/rf_evaluation.csv") %>%
+  select(species,
+         thresh_rf_tss = best_threshold_tss,
+         thresh_rf_mcc = best_threshold_mcc)
+
+# For SSN species: mean of 3 models; for others: mean of 2
 ensemble_thresholds <- maxent_eval %>%
-  select(species, thresh_maxent = best_threshold) %>%
-  left_join(rf_eval %>% select(species, thresh_rf = best_threshold),
-            by = "species") %>%
+  left_join(rf_eval, by = "species") %>%
+  left_join(ssn_eval, by = "species") %>%
   mutate(
-    # Average MaxEnt + RF thresholds
-    # Note: thresholds computed on individual model scale
-    # applied to ensemble mean predictions
-    ensemble_threshold = round((thresh_maxent + thresh_rf) / 2, 3)
+    threshold_tss = case_when(
+      species %in% SSN_SPECIES ~
+        round((thresh_maxent_tss + thresh_rf_tss + thresh_ssn_tss) / 3, 3),
+      TRUE ~
+        round((thresh_maxent_tss + thresh_rf_tss) / 2, 3)
+    ),
+    threshold_mcc = case_when(
+      species %in% SSN_SPECIES ~
+        round((thresh_maxent_mcc + thresh_rf_mcc + thresh_ssn_mcc) / 3, 3),
+      TRUE ~
+        round((thresh_maxent_mcc + thresh_rf_mcc) / 2, 3)
+    )
   )
 
 fwrite(ensemble_thresholds, "sdm/ensemble/ensemble_thresholds.csv")
-
 
 
 # ============================================================

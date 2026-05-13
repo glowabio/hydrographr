@@ -31,7 +31,7 @@ library(tidyr)
 select <- dplyr::select
 
 source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
-BASE_DIR <- NIMBUS_DIR
+# BASE_DIR <- NIMBUS_DIR
 setwd(BASE_DIR)
 
 # ============================================================
@@ -135,6 +135,11 @@ vif_results@results
 selected_vars <- vif_results@results$Variables
 message("  Variables retained after VIF: ", length(selected_vars))
 print(selected_vars)
+
+# replace channel_elv_up_seg_mean with channel_elv_up_seg_mean for interpretability
+selected_vars <- gsub("channel_elv_up_seg_mean",
+                      "channel_elv_dw_seg_mean",
+                      selected_vars)
 
 # ============================================================
 # STEP 5: Save outputs

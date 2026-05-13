@@ -64,8 +64,8 @@ variables <- c(
   "c120_2020", "c130_2020", "c150_2020", "c160_2020", "c180_2020",
   "c190_2020", "c200_2020", "c210_2020",
 
-  "order_strahler", "length", "cum_length", "gradient", "elev_drop", "accumulation",
-  "channel_grad_dw_seg", "channel_grad_up_seg", "channel_elv_dw_seg", "channel_elv_up_seg",
+  "cti", "order_strahler", "length", "cum_length", "gradient", "elev_drop", "accumulation",
+   "channel_elv_dw_seg", "channel_elv_up_seg",
    "stream_dist_dw_near", "stream_dist_up_near", "slope_grad_dw_cel"
 )
 
@@ -76,7 +76,7 @@ statistics <- c("mean")
 tile_id <- c("h18v04", "h20v04")
 
 # Detect available cores for parallel processing
-n_cores <- parallel::detectCores() - 2
+n_cores <- parallel::detectCores() - 1
 
 message(sprintf("Variables: %d total", length(variables)))
 message(sprintf("Statistics: %s", paste(statistics, collapse = ", ")))
@@ -110,6 +110,71 @@ predict_table <- get_predict_table(
 message(sprintf("\n✓ Prediction table created: %d rows, %d columns",
                 nrow(predict_table),
                 ncol(predict_table)))
+
+# Simplify bioclimatic variable names — remove temporal suffix
+# bio01_1981-2010_observed_mean → bio01_mean
+colnames(predict_table) <- gsub("_1981-2010_observed", "", colnames(predict_table))
+
+message("  Column names after simplification:")
+print(names(predict_table))
+
+# ============================================================
+# RESCALE VARIABLES — apply scale factors from Hydrography90m paper
+# ============================================================
+
+message("\n=== Rescaling variables ===")
+# predict_table <- fread(output_file)
+
+# CTI: raw values have scale factor of 10^8
+# divide to get dimensionless wetness index (typical range 0-30)
+predict_table <- predict_table %>%
+  mutate(cti_mean = cti_mean / 1e8,
+         slope_grad_dw_cel_mean   = slope_grad_dw_cel_mean / 1e6)
+
+
+cat("CTI range after rescaling:",
+    round(range(predict_table$cti_mean, na.rm=TRUE), 3), "\n")
+
+# Bioclimatic variables: all raw values are × 10
+# bio01, 05, 06, 08, 09, 10, 11: temperature variables in Kelvin × 10
+#   → divide by 10 then subtract 273.15 to convert to °C
+# bio04: temperature seasonality (SD × 100) × 10 → divide by 10 only
+# bio02, 03, 07: temperature range/isothermality × 10 → divide by 10 only
+# bio12-19: precipitation variables × 10 → divide by 10 only (mm)
+
+# Variables that need /10 AND -273.15 (temperature in Kelvin)
+bio_kelvin <- c("bio01", "bio05", "bio06", "bio08", "bio09", "bio10", "bio11")
+
+# Variables that need /10 only
+bio_scale_only <- c("bio02", "bio03", "bio04", "bio07",
+                    "bio12", "bio13", "bio14", "bio15",
+                    "bio16", "bio17", "bio18", "bio19")
+
+# Apply to columns present in predict table
+# Column names follow pattern bio01_mean, bio05_mean etc.
+for (bio in bio_kelvin) {
+  col <- paste0(bio, "_mean")
+  if (col %in% names(predict_table)) {
+    predict_table <- predict_table %>%
+      mutate(!!col := (.data[[col]] / 10) - 273.15)
+    cat(col, "range after rescaling:",
+        round(range(predict_table[[col]], na.rm=TRUE), 2), "°C\n")
+  }
+}
+
+for (bio in bio_scale_only) {
+  col <- paste0(bio, "_mean")
+  if (col %in% names(predict_table)) {
+    predict_table <- predict_table %>%
+      mutate(!!col := .data[[col]] / 10)
+    cat(col, "range after rescaling:",
+        round(range(predict_table[[col]], na.rm=TRUE), 2), "\n")
+  }
+}
+
+# Save corrected predict table
+fwrite(predict_table, "env90m/predict_table.csv")
+message("Saved rescaled predict table: env90m/predict_table.csv")
 
 # ============================================================================
 # HANDLE MISSING DATA (IF ANY)
