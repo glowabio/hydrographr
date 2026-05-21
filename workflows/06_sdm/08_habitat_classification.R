@@ -263,7 +263,8 @@ for (sp in target_species) {
       sigma_mob    = sigma_mob,
       max_gap_m    = MAX_GAP_M
     )
-    gap_filled_ids <- setdiff(suitable_after, suitable_before)
+    gap_filled_ids <- setdiff(as.character(suitable_after),
+                              as.character(suitable_before))
     message("  [", label, "] After gap filling: ", length(suitable_after),
             " (", length(gap_filled_ids), " filled)")
 

@@ -19,15 +19,21 @@ group_by <- dplyr::group_by
 
 # Set working directory
 source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
-BASE_DIR <- NIMBUS_DIR
+# BASE_DIR <- NIMBUS_DIR
 setwd(BASE_DIR)
 
 # ============================================================
 # INPUT FILES
 # ============================================================
-subcatchments <- st_read("spatial/stream_networks/partial_stream_network.gpkg") %>%
-  filter(basin_id == 1292502) # filter for Vjosa basin
-barriers <- read.csv("points_snapped/dams/dams_snapped_points.csv") %>%
+subcatchments <- st_read("spatial/subbasin_sarantaporos/stream_network_pruned.gpkg")
+
+# temporary fix until length is returned by api_getupstreamstreamsegments
+basin_stream_length <- read_geopackage("spatial/basin/stream_network_pruned.gpkg", import_as = "data.table") %>%
+  select(subc_id, length)
+
+subcatchments <- subcatchments %>% left_join(basin_stream_length)
+
+barriers <- read.csv("points_snapped/subbasin_sarantaporos/dams_sarantaporos.csv") %>%
   filter(subc_id %in% subcatchments$subc_id) # keep dams in Vjosa
 
 # ============================================================
@@ -85,9 +91,9 @@ build_river_graph <- function(subcatchments_raw, barrier_counts, pass_shp) {
   # Step 5: Build vertices
   vertices_df <- sc %>%
     st_drop_geometry() %>%
-    select(subc_id, length, pass_tot, basin_id) %>%
+    select(subc_id, length, pass_tot) %>%   # removed basin_id
     rename(name = subc_id, length_reach = length) %>%
-    mutate(name = as.character(name),
+    mutate(name         = as.character(name),
            length_reach = ifelse(is.na(length_reach), 0, length_reach))
 
   # Step 6: Create igraph (first pass)
@@ -95,9 +101,11 @@ build_river_graph <- function(subcatchments_raw, barrier_counts, pass_shp) {
 
   rg_v_df <- igraph::as_data_frame(rg, "vertices") %>%
     left_join(vertices_df, by = "name") %>%
-    mutate(length_reach = ifelse(name == "0" | is.na(length_reach), 1, length_reach),
-           pass_tot     = ifelse(name == "0" | is.na(pass_tot),     1, pass_tot),
-           basin_id     = ifelse(name == "0" | is.na(basin_id),     NA, basin_id))
+    mutate(
+      length_reach = ifelse(name == "0" | is.na(length_reach), 1, length_reach),
+      pass_tot     = ifelse(name == "0" | is.na(pass_tot),     1, pass_tot)
+      # basin_id line removed
+    )
 
   rg_tmp <- igraph::graph_from_data_frame(edges_df, v = rg_v_df)
 

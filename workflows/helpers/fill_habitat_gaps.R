@@ -120,7 +120,7 @@ fill_habitat_gaps <- function(g,
   # Use undirected for component detection so upstream/downstream
   # unsuitable sequences are treated as single gaps
   g_unsuitable <- induced_subgraph(g, unsuitable_ids)
-  g_unsuitable_undir <- as.undirected(g_unsuitable, mode = "collapse")
+  g_unsuitable_undir <- as_undirected(g_unsuitable, mode = "collapse")
 
   # Find connected components of unsuitable reaches
   comps <- components(g_unsuitable_undir)
