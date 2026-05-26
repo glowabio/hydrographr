@@ -9,9 +9,10 @@
 #   - Background: all basin subcatchments
 #   - Predictors: all VIF-filtered environmental variables
 #   - Default regularization (beta = 1.0) and feature classes
-#   - Evaluation: AUC + TSS
+#   - Evaluation: AUC + TSS + MCC
 #     * Jackknife (leave-one-out) for species with < 10 presences
 #     * Random 20% hold-out for species with >= 10 presences
+#   - Variable importance: permutation-based AUC drop
 #   - Prediction: full basin → subbasin extracted for gpkg
 #
 # Input:
@@ -20,13 +21,14 @@
 #   - env90m/predict_table_vif.csv
 #   - points_original/fish/species_list_sarantaporos.txt
 #   - spatial/subbasin/stream_network_pruned.gpkg  (for output gpkg)
-#   - points_snapped/subbasin/subbasin_subc_ids_pruned.csv
+#   - spatial/subbasin/subbasin_subc_ids_pruned.csv
 #
 # Output:
 #   - sdm/maxent_models/maxent_{species}.rds
 #   - sdm/maxent_models/maxent_evaluation.csv
+#   - sdm/maxent_models/maxent_variable_importance.csv
 #   - sdm/predictions/pred_maxent_{species}.csv  (full basin)
-#   - spatial/subbasin/stream_network_predictions_mcc_maxent.gpkg
+#   - spatial/subbasin/stream_network_predictions_maxent.gpkg
 #
 # LOCATION: workflows/06_sdm/05_maxent.R
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
@@ -35,10 +37,12 @@ library(maxnet)
 library(data.table)
 library(dplyr)
 library(sf)
-library(mltools)
 
 select <- dplyr::select
 
+# ============================================================
+# HELPER FUNCTIONS
+# ============================================================
 
 # Compute MCC across thresholds
 # pres_preds: predicted probabilities at presence/test sites
@@ -59,7 +63,39 @@ compute_mcc_threshold <- function(pres_preds, abs_preds,
   return(list(threshold = best_thresh, mcc = best_mcc))
 }
 
+# Compute MaxEnt variable importance via permutation
+# Permutes each predictor in background data and measures AUC drop
+# Positive importance: predictor improves discrimination
+# Negative importance: permuting predictor improves AUC (predictor adds noise)
+compute_maxent_varimp <- function(mod, pres_data, bg_data,
+                                  predictor_cols, n_permut = 10) {
+  pres_preds <- predict(mod,
+                        newdata = as.data.frame(pres_data),
+                        type    = "cloglog")
+  bg_preds   <- predict(mod,
+                        newdata = as.data.frame(bg_data),
+                        type    = "cloglog")
+  auc_base   <- mean(sapply(pres_preds, function(p) mean(p > bg_preds)))
 
+  imp_list <- list()
+  for (pred in predictor_cols) {
+    auc_permut <- numeric(n_permut)
+    for (k in seq_len(n_permut)) {
+      bg_permut          <- as.data.frame(bg_data)
+      bg_permut[[pred]]  <- sample(bg_permut[[pred]])
+      bg_preds_p         <- predict(mod,
+                                    newdata = bg_permut,
+                                    type    = "cloglog")
+      auc_permut[k]      <- mean(sapply(pres_preds,
+                                        function(p) mean(p > bg_preds_p)))
+    }
+    imp_list[[pred]] <- data.frame(
+      predictor  = pred,
+      importance = round(auc_base - mean(auc_permut), 4)
+    )
+  }
+  rbindlist(imp_list) %>% arrange(desc(importance))
+}
 
 source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
 # BASE_DIR <- NIMBUS_DIR
@@ -83,6 +119,10 @@ HOLDOUT_PROP <- 0.2
 # Regularization multiplier (beta) — default 1.0
 # Higher values = smoother, less complex response curves
 BETA <- 1.0
+
+# Number of permutations for variable importance
+# Higher = more stable estimates but slower
+N_PERMUT <- 10
 
 set.seed(42)
 
@@ -149,6 +189,7 @@ message("  Background rows after NA removal: ", nrow(background_env))
 message("\n=== Step 3: Fitting MaxEnt models per species ===")
 
 evaluation_list <- list()
+importance_list <- list()
 
 for (sp in target_species) {
 
@@ -187,7 +228,6 @@ for (sp in target_species) {
   # ---- Evaluation strategy ----
   # Jackknife for species with < MIN_PRES_HOLDOUT presences
   # 20% hold-out for species with >= MIN_PRES_HOLDOUT presences
-
   use_jackknife <- n_pres_env < MIN_PRES_HOLDOUT
   message("  Evaluation strategy: ",
           ifelse(use_jackknife, "jackknife (leave-one-out)", "20% hold-out"))
@@ -202,8 +242,6 @@ for (sp in target_species) {
 
       train_pres <- pres_env[-i, ] %>% select(all_of(predictor_cols))
       test_pres  <- pres_env[i, ]  %>% select(all_of(predictor_cols))
-
-      # Combine train presences + background for model matrix
       train_bg   <- background_env %>% select(all_of(predictor_cols))
 
       p_vec <- c(rep(1, nrow(train_pres)), rep(0, nrow(train_bg)))
@@ -223,7 +261,7 @@ for (sp in target_species) {
       }
     }
 
-    # Background predictions from full model (fitted on all presences)
+    # Full model fitted on all presences (for background predictions + importance)
     p_full <- c(rep(1, n_pres_env), rep(0, nrow(background_env)))
     x_full <- bind_rows(
       pres_env %>% select(all_of(predictor_cols)),
@@ -243,9 +281,6 @@ for (sp in target_species) {
                         type = "cloglog")
 
     # AUC — compare jackknife presence predictions vs background predictions
-    n_pres_valid <- sum(!is.na(jack_preds))
-    n_bg         <- length(bg_preds)
-
     auc <- mean(sapply(jack_preds[!is.na(jack_preds)], function(p) {
       mean(p > bg_preds)
     }))
@@ -262,17 +297,10 @@ for (sp in target_species) {
     message("  TSS (jackknife): ", round(tss, 3),
             " at threshold: ", round(best_thresh, 3))
 
-
     # MCC threshold — using jackknife preds vs background preds
-    mcc_result <- compute_mcc_threshold(
-      jack_preds[!is.na(jack_preds)], bg_preds
-    )
+    mcc_result <- compute_mcc_threshold(jack_preds[!is.na(jack_preds)], bg_preds)
     mcc_thresh <- mcc_result$threshold
     mcc_val    <- mcc_result$mcc
-    message("  MCC threshold: ", round(mcc_thresh, 3),
-            " | MCC: ", round(mcc_val, 3))
-    mcc_thresh  <- mcc_result$threshold
-    mcc_val     <- mcc_result$mcc
     message("  MCC threshold: ", round(mcc_thresh, 3),
             " | MCC: ", round(mcc_val, 3))
 
@@ -329,7 +357,7 @@ for (sp in target_species) {
     message("  MCC threshold: ", round(mcc_thresh, 3),
             " | MCC: ", round(mcc_val, 3))
 
-    # Refit on all presences for final prediction
+    # Refit on all presences for final prediction + importance
     p_full <- c(rep(1, n_pres_env), rep(0, nrow(background_env)))
     x_full <- bind_rows(
       pres_env %>% select(all_of(predictor_cols)),
@@ -347,6 +375,31 @@ for (sp in target_species) {
   # ---- Save model ----
   saveRDS(mod_full, paste0("sdm/maxent_models/maxent_", sp, ".rds"))
   message("  Model saved")
+
+  # ---- Variable importance via permutation ----
+  message("  Computing variable importance (", N_PERMUT, " permutations)...")
+
+  imp_sp <- tryCatch(
+    compute_maxent_varimp(
+      mod            = mod_full,
+      pres_data      = pres_env %>% select(all_of(predictor_cols)),
+      bg_data        = background_env %>% select(all_of(predictor_cols)),
+      predictor_cols = predictor_cols,
+      n_permut       = N_PERMUT
+    ),
+    error = function(e) {
+      message("  Variable importance failed: ", e$message)
+      NULL
+    }
+  )
+
+  if (!is.null(imp_sp)) {
+    imp_sp$species <- sp
+    importance_list[[sp]] <- imp_sp %>%
+      select(species, predictor, importance)
+    message("  Top predictor: ", imp_sp$predictor[1],
+            " (", round(imp_sp$importance[1], 4), ")")
+  }
 
   # ---- Predict across full basin ----
   basin_pred_data <- background_env %>%
@@ -370,27 +423,33 @@ for (sp in target_species) {
 
   # ---- Store evaluation ----
   evaluation_list[[sp]] <- data.frame(
-    species          = sp,
-    n_presences      = n_pres_env,
-    eval_strategy    = ifelse(use_jackknife, "jackknife", "20pct_holdout"),
-    AUC              = round(auc, 3),
-    TSS              = round(tss, 3),
-    best_threshold_tss = round(best_thresh, 3),  # rename from best_threshold
-    MCC              = round(mcc_val, 3),
+    species            = sp,
+    n_presences        = n_pres_env,
+    eval_strategy      = ifelse(use_jackknife, "jackknife", "20pct_holdout"),
+    AUC                = round(auc, 3),
+    TSS                = round(tss, 3),
+    best_threshold_tss = round(best_thresh, 3),
+    MCC                = round(mcc_val, 3),
     best_threshold_mcc = round(mcc_thresh, 3)
   )
 }
 
 # ============================================================
-# STEP 4: Save evaluation table
+# STEP 4: Save evaluation table + variable importance
 # ============================================================
 
-message("\n=== Step 4: Saving evaluation table ===")
+message("\n=== Step 4: Saving evaluation table and variable importance ===")
 
 eval_df <- rbindlist(evaluation_list)
 print(eval_df)
 fwrite(eval_df, "sdm/maxent_models/maxent_evaluation.csv")
 message("  Saved: sdm/maxent_models/maxent_evaluation.csv")
+
+if (length(importance_list) > 0) {
+  imp_df_all <- rbindlist(importance_list)
+  fwrite(imp_df_all, "sdm/maxent_models/maxent_variable_importance.csv")
+  message("  Saved: sdm/maxent_models/maxent_variable_importance.csv")
+}
 
 # ============================================================
 # STEP 5: Join subbasin predictions to network gpkg
@@ -422,9 +481,9 @@ for (f in pred_files) {
 }
 
 st_write(network,
-         "spatial/subbasin/stream_network_predictions_mcc_maxent.gpkg",
+         "spatial/subbasin/stream_network_predictions_maxent.gpkg",
          delete_dsn = TRUE)
-message("  Saved: spatial/subbasin/stream_network_predictions_mcc_maxent.gpkg")
+message("  Saved: spatial/subbasin/stream_network_predictions_maxent.gpkg")
 
 # ============================================================
 # SUMMARY
@@ -436,6 +495,7 @@ message(paste(rep("=", 60), collapse = ""))
 message("\nOutputs:")
 message("  sdm/maxent_models/maxent_{species}.rds")
 message("  sdm/maxent_models/maxent_evaluation.csv")
+message("  sdm/maxent_models/maxent_variable_importance.csv")
 message("  sdm/predictions/pred_maxent_{species}.csv  (full basin)")
-message("  spatial/subbasin/stream_network_predictions_mcc_maxent.gpkg")
+message("  spatial/subbasin/stream_network_predictions_maxent.gpkg")
 message("\nNext: 06_random_forest.R, 07_ensemble.R")
