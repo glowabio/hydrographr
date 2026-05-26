@@ -242,7 +242,7 @@ traverse_upstream <- function(lines_sf, segment_id, start_fraction, max_distance
 #' Trace downstream until reaching a Strahler threshold
 #'
 #' @param start_id Starting segment ID
-#' @param df Stream network data.frame with columns subc_id, target, strahler_order
+#' @param df Stream network data.frame with columns subc_id, target, strahler
 #' @param strahler_retain_threshold Minimum Strahler order to stop at
 #'
 #' @return Vector of segment IDs from start_id downstream to threshold
@@ -257,7 +257,7 @@ trace_downstream <- function(start_id, df, strahler_retain_threshold) {
     if (nrow(seg) == 0) break
 
     # Stop if we've reached the threshold
-    if (seg$strahler_order[1] >= strahler_retain_threshold) break
+    if (seg$strahler[1] >= strahler_retain_threshold) break
 
     # Get next downstream segment
     next_id <- seg$target[1]

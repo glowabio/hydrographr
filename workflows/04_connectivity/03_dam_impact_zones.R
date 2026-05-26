@@ -19,7 +19,7 @@
 #   - impact_zone_summary.csv (affected lengths by dam/scenario)
 #   - impact_zone_map.html (interactive map)
 #
-# LOCATION: workflows/05_connectivity/023_dam_impact_zones.R
+# LOCATION: workflows/04_connectivity/03_dam_impact_zones.R
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 
 library(tidyverse)

@@ -19,7 +19,7 @@
 #   - fragmentation_by_basin.csv (basin summaries)
 #   - scenario_impact_summary.csv (additional impact of planned dams)
 #
-# LOCATION: workflows/05_connectivity/02_fragmentation_ALL_species.R
+# LOCATION: workflows/04_connectivity/02b_fragmentation_all_species.R
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 
 library(tidyverse)

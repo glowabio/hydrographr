@@ -1,12 +1,52 @@
+# R project files
 .Rproj.user
 .Rhistory
 .RData
 .Ruserdata
+.Renviron
+.Rprofile
+.positai
+
+# R cache
+cache/
+*.Rcache
+*.Rcache.gz
+
+# Large spatial output files — stored on Nimbus, not git
+spatial/
+*.gpkg
+*.shp
+*.shx
+*.dbf
+*.prj
+*.cpg
+*.geojson
+
+# Large data files — stored on Nimbus, not git
+*.csv
+*.xlsx
+*.zip
+*.gz
+*.rds
+
+# Output directories — generated, not source
+points_snapped/
+points_cleaned/
+points_original/
+range_maps/
+config/
+
+# HTML outputs
+*.html
+*_files/
+
+# Scratch/aggregated function files
+all_funs.R
+
+# Project-specific ignores
 TRASH
 test_downloads
 docs
 vignettes/data_*
 man/figures*
 vignettes/bib
-
-.positai
