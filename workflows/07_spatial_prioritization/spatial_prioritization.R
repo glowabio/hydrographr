@@ -233,33 +233,18 @@ pu_dat <- pu_dat %>%
       select(id, hfp_wgs_mean),
     by = "id"
   ) %>%
-  rename(hfi_mean = hfp_wgs_mean) %>%
-  mutate(
-    # HFP 2021 uses a 0–50000 scale (not 0–50).
-    # Sub-catchments with no HFI coverage (NA, i.e. outside the raster extent)
-    # are assigned the median value of matched sub-catchments to avoid
-    # artificially treating unsampled reaches as pristine (cost = 0).
-    hfi_mean = ifelse(is.na(hfi_mean),
-                      median(hfi_mean, na.rm = TRUE),
-                      hfi_mean)
-  )
+  rename(hfi_mean = hfp_wgs_mean)
 
 message("  Planning units: ", nrow(pu_dat))
-message("  HFI column names available: ", paste(names(hfi), collapse = ", "))
 
 # --- Diagnostics: check HFI join ---
 n_na_hfi <- sum(is.na(pu_dat$hfi_mean))
-
-message("  HFI unmatched (NA after join): ", n_na_hfi,
-        " (", round(100 * n_na_hfi / nrow(pu_dat), 1), "% of PUs)")
+if (n_na_hfi > 0) stop("HFI join failed: ", n_na_hfi, " NAs in hfi_mean — ",
+                       "check that hfp_zonal_stats.csv was computed for the ",
+                       "same sub-catchment network as stream_network_pruned.gpkg")
 message("  HFI range (raw): [",
-        round(min(pu_dat$hfi_mean, na.rm = TRUE), 2), ", ",
-        round(max(pu_dat$hfi_mean, na.rm = TRUE), 2), "]")
-
-if (n_na_hfi > 0) {
-  message("  WARNING: ", n_na_hfi, " PUs have no HFI match — setting hfi_mean to 0")
-  pu_dat <- pu_dat %>% mutate(hfi_mean = ifelse(is.na(hfi_mean), 0, hfi_mean))
-}
+        round(min(pu_dat$hfi_mean), 2), ", ",
+        round(max(pu_dat$hfi_mean), 2), "]")
 
 # Re-compute cost after any NA fill — guard against constant vector (all same
 # value → division by zero → NaN); assign uniform cost = 1 in that edge case
