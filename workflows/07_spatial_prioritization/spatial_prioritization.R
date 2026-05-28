@@ -48,7 +48,7 @@
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 
 library(prioritizr)
-library(lpsymphony)
+# CBC solver required: pak::pak("dirkschumacher/rcbc")
 library(sf)
 library(data.table)
 library(dplyr)
@@ -118,11 +118,11 @@ message("\n=== Step 1: Loading inputs ===")
 # --- Sub-catchment spatial layer (planning units) ---
 # Stream network sub-catchments for the Sarantaporos sub-basin,
 # after pruning (Module 3 output). Each sub-catchment is one planning unit.
-subcatchments <- read_sf("spatial/subbasin/stream_network_pruned.gpkg")
+subcatchments <- read_sf("spatial/subbasin_sarantaporos/stream_network_pruned.gpkg")
 
 # --- Stream network lines (for mapping) ---
 # Same GeoPackage, line geometry — used for leaflet visualisation
-stream_lines <- read_sf("spatial/subbasin/stream_network_pruned.gpkg",
+stream_lines <- read_sf("spatial/subbasin_sarantaporos/stream_network_pruned.gpkg",
                         layer = "stream_network_pruned")
 
 message("  Sub-catchments (planning units): ", nrow(subcatchments))
@@ -429,14 +429,17 @@ solve_prioritization <- function(pu_dat, spec_dat, puvspr_dat,
     add_binary_decisions() %>%
     add_boundary_penalties(penalty = BOUNDARY_PENALTY, data = bmat)
 
-  # Solver: lpsymphony (open-source, install with BiocManager::install("lpsymphony")).
-  # For larger problems, Gurobi is faster (requires licence):
+  # Solver: CBC (open-source, no licence required).
+  # Install with: install.packages("rcbc", repos = "https://cran.r-universe.dev")
+  # For better performance on larger problems, Gurobi can be substituted:
   #   add_gurobi_solver(gap = gap, threads = threads, verbose = FALSE)
-  if (!requireNamespace("lpsymphony", quietly = TRUE)) {
-    stop("lpsymphony not found. Install with:\n",
-         "  BiocManager::install('lpsymphony')")
+  #   Free academic licence at https://www.gurobi.com/academia/academic-program-and-licenses/
+  #   IGB Berlin users: igb-berlin.de is a registered academic domain.
+  if (!requireNamespace("rcbc", quietly = TRUE)) {
+    stop("rcbc not found. Install CBC with:\n",
+         "  install.packages('rcbc', repos = 'https://cran.r-universe.dev')")
   }
-  p <- p %>% add_lpsymphony_solver(gap = gap, verbose = FALSE)
+  p <- p %>% add_cbc_solver(gap = gap, threads = threads, verbose = FALSE)
 
   solve(p)
 }
@@ -498,7 +501,7 @@ for (target in TARGETS) {
     mutate(priority = as.integer(solution_1 == 1))
 
   out_gpkg <- paste0("prioritization/solutions/solution_", target_pct, ".gpkg")
-  # save_to_nimbus(solution_sf, out_gpkg)
+  st_write(solution_sf, out_gpkg, delete_dsn = TRUE)
   message("  Saved: ", out_gpkg)
 }
 
@@ -543,19 +546,19 @@ for (target_pct in names(all_solutions)) {
 
     # Non-priority reaches
     addPolylines(
-      data   = solution_sf %>% filter(priority == 0),
-      color  = "grey70",
-      weight = 1,
-      opacity = 0.6,
-      popup  = ~paste0("<b>Sub-catchment:</b> ", subc_id,
-                       "<br><b>HFI cost:</b> ",  round(cost, 3),
-                       "<br><b>Priority:</b> No")
+      data    = solution_sf %>% filter(priority == 0),
+      color   = "#a0a0a0",
+      weight  = 1.5,
+      opacity = 0.8,
+      popup   = ~paste0("<b>Sub-catchment:</b> ", subc_id,
+                        "<br><b>HFI cost:</b> ",  round(cost, 3),
+                        "<br><b>Priority:</b> No")
     ) %>%
 
     # Priority reaches
     addPolylines(
       data    = solution_sf %>% filter(priority == 1),
-      color   = "#c0392b",
+      color   = "darkgreen",
       weight  = 3,
       opacity = 1,
       popup   = ~paste0("<b>Sub-catchment:</b> ", subc_id,
@@ -565,7 +568,7 @@ for (target_pct in names(all_solutions)) {
 
     addLegend(
       position = "bottomright",
-      colors   = c("grey90", "#c0392b"),
+      colors   = c("grey90", "darkgreen"),
       labels   = c("Non-priority", "Priority reach"),
       title    = paste0("Conservation priority<br>",
                         "(target = ", tgt_label, ")")
@@ -577,7 +580,7 @@ for (target_pct in names(all_solutions)) {
     )
 
   out_html <- paste0("prioritization/maps/priority_map_", target_pct, ".html")
-  # save_to_nimbus(m, out_html)
+  saveWidget(m, out_html)
   message("  Saved: ", out_html)
 }
 
@@ -626,3 +629,4 @@ message("  prioritization/maps/priority_map_{target_pct}.html")
 message("  prioritization/maps/summary_selected_reaches.png")
 message("\nNext: overlay priority reaches with planned dam locations to")
 message("identify which dams conflict with the highest-priority network.")
+
