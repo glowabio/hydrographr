@@ -101,19 +101,19 @@ get_lake_intersection <- function(data, lake_id = "HydroLAKES_polys_v10", lakes,
 
   # Check if paths exists
   if (!file.exists(lakes))
-    stop(paste0("Please provide the path to lake geo-spatial files"))
+    stop(paste0("Please provide the path to lake geo-spatial files (parameter 'lakes')"))
 
   # Check if paths exists
   if (is.null(edge))
-    stop(paste0("Please provide the path to GuidosToolbox Workbench MSPA tool"))
+    stop(paste0("Please provide the path to GuidosToolbox Workbench MSPA tool (parameter 'edge')"))
 
   # Check if paths exists
   if (!file.exists(stream))
-    stop(paste0("Please provide the path to the stream raster file"))
+    stop(paste0("Please provide the path to the stream raster file (parameter 'stream')"))
 
   # Check if paths exists
   if (!file.exists(flow))
-    stop(paste0("Please provide the path to the flow raster file"))
+    stop(paste0("Please provide the path to the flow raster file (parameter 'flow')"))
 
   # Check if path to GuidosToolbox Workbench (GWB) tool exists
   if (is.null(edge) || !dir.exists(edge))
@@ -122,11 +122,11 @@ get_lake_intersection <- function(data, lake_id = "HydroLAKES_polys_v10", lakes,
 
   # Check if paths exists
   if (!file.exists(basins))
-    stop(paste0("Please provide the path to the basin raster file"))
+    stop(paste0("Please provide the path to the basin raster file (parameter 'basins')"))
 
   # Check if paths exists
   if (!file.exists(lake_dat))
-    stop(paste0("Please provide the output path to store intersection tables"))
+    stop(paste0("Please provide the output path to store intersection tables (parameter 'lake_dat')"))
 
   # Check if quiet is logical
   if (!is.logical(quiet))
