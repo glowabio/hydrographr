@@ -4,8 +4,8 @@
 # TWO SCENARIOS: current (existing dam only) vs future (existing + planned)
 #
 # NOTE ON PASSABILITY:
-#   This script does not take into account species. It carries the number of dams per
-#   reach (n_shp) on nodes and edges, but does not assign a passability
+#   This script is species-agnostic. It carries the number of dams per
+#   reach (n_shp) on nodes and edges, but does NOT assign a passability
 #   value. Structural fragmentation (Module 5) treats any edge with
 #   n_shp > 0 as a blocking barrier. Species-specific passability
 #   (0.8 / 0.5 / 0) is applied later, at PCI computation time
@@ -45,7 +45,7 @@ subcatchments <- subcatchments %>% left_join(basin_stream_length)
 barriers <- read.csv("points_snapped/dams/dams_snapped_points.csv") %>%
   filter(subc_id %in% subcatchments$subc_id)   # keep dams on the Sarantaporos network
 
-message("Barriers on Sarantaporos network: ", nrow(barriers),
+message("Barriers on network: ", nrow(barriers),
         "  (existing: ", sum(barriers$status == "existing"),
         ", planned: ",   sum(barriers$status == "planned"), ")")
 
@@ -92,10 +92,10 @@ build_river_graph <- function(subcatchments_raw, barrier_counts) {
     mutate(from = as.character(from),
            to   = as.character(to))
 
-  # Step 4: Build vertices (carry reach length and dam count)
+  # Step 4: Build vertices (carry reach length, dam count, Strahler order)
   vertices_df <- sc %>%
     st_drop_geometry() %>%
-    select(subc_id, length, n_shp) %>%
+    select(subc_id, length, strahler, n_shp) %>%
     rename(name = subc_id, length_reach = length) %>%
     mutate(name         = as.character(name),
            length_reach = ifelse(is.na(length_reach), 0, length_reach),
