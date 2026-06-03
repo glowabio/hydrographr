@@ -1,27 +1,27 @@
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 # 04_clean_dam_data.R
 #
-# Process and combine dam data from RAAY and AMBER sources,
-# filter to target basin, and prepare for snapping.
+# Process barrier data from HCMR,
+#  keep only true dams, classify into existing vs. planned,
+# filter to the target basin, and prepare for snapping.
 #
 # Workflow:
-#   1. Process RAAY small hydropower plants
-#   2. Process AMBER dams
-#   3. Combine datasets
-#   3b. Filter to target basin via api_get_ids()
+#   1. Load and clean dam inventory (keep type == "DAM" only)
+#   2. Classify existing vs. planned
+#   3. Filter to target basin via api_get_ids()
 #   4. Visualise
 #   5. Data quality checks
 #   6. Duplicate analysis
 #
 # Input:
-#   - points_original/dams/V_SDI_R_HYDRO*.csv  (RAAY)
-#   - points_original/dams/atlas-country-Greece.csv  (AMBER)
-#   - config/study_area_params.csv  (BASIN_ID from clean_hcmr_fish.R)
+#   - points_original/dams/dams_sarantaporos_table.csv   (semicolon-delimited;
+#       columns: site_id;Name;Name_GR;type;longitude;latitude
+#       type takes values FACTORY, EXCLUDE, DAM — only DAM is retained)
+#   - config/study_area_params.csv              (BASIN_ID from 01_clean_hcmr_fish.R)
 #
 # Output:
-#   - points_cleaned/dams/dams_all_clean.csv        (basin-filtered, all sources)
+#   - points_cleaned/dams/dams_all_clean.csv    (basin-filtered DAMs, existing+planned)
 #   - points_cleaned/dams/dams_duplicates.csv
-#   - points_cleaned/dams/dams_cross_source_duplicates.csv
 #   - points_cleaned/maps/dams_all_sources_overview.html
 #   - points_cleaned/maps/dams_duplicates_map.html
 #
@@ -29,11 +29,9 @@
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 
 library(hydrographr)
-library(readxl)
 library(dplyr)
 library(tidyr)
 library(stringr)
-library(purrr)
 library(data.table)
 library(sf)
 library(leaflet)
@@ -43,137 +41,86 @@ select <- dplyr::select
 
 source("~/Documents/PhD/scripts/hydrographr/workflows/helpers/save_to_nimbus.R")
 source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
-BASE_DIR <- NIMBUS_DIR
+# BASE_DIR <- NIMBUS_DIR
 setwd(BASE_DIR)
 
 dir.create("points_original/dams", recursive = TRUE, showWarnings = FALSE)
-dir.create("points_cleaned/dams", recursive = TRUE, showWarnings = FALSE)
-dir.create("points_cleaned/maps", recursive = TRUE, showWarnings = FALSE)
+dir.create("points_cleaned/dams",  recursive = TRUE, showWarnings = FALSE)
+dir.create("points_cleaned/maps",  recursive = TRUE, showWarnings = FALSE)
 
-# ============================================================================
-# 1. PROCESS RAAY SMALL HYDROPOWER PLANTS
-# ============================================================================
+# ============================================================
+# PARAMETERS
+# ============================================================
 
-message("\n=== Step 1: Processing RAAY hydropower data ===")
+# Path to the curated dam inventory (semicolon-delimited)
+DAM_FILE <- "points_original/dams/dams_sarantaporos_table.csv"
 
-csv_dir  <- "points_original/dams"
-file_map <- c(
-  "V_SDI_R_HYDRO12_Installation_Licence.csv" = "IL",
-  "V_SDI_R_HYDRO13_Operational_Licence.csv"  = "OL",
-  "V_SDI_R_HYDRO11_Production_Licence.csv"   = "PL",
-  "V_SDI_R_HYDRO7_Evaluation.csv"            = "E"
-)
+# site_id of the single existing operational dam.
+# All other DAMs are treated as planned.
+EXISTING_DAM_ID <- "37793"
 
-read_and_process_raay <- function(file_name, phase_code) {
-  file_path <- file.path(csv_dir, file_name)
-  if (!file.exists(file_path)) {
-    warning("File not found: ", file_path)
-    return(NULL)
-  }
-  df <- fread(file_path)
-  if ("katastash_code" %in% names(df)) df <- rename(df, status_code = katastash_code)
-  if ("geometry" %in% names(df)) {
-    df <- df %>%
-      mutate(
-        geometry = str_remove_all(geometry, "MULTIPOINT|\\(|\\)"),
-        geometry = str_trim(geometry)
-      ) %>%
-      separate_rows(geometry, sep = ",") %>%
-      group_by(across(-geometry)) %>%
-      slice(1) %>%
-      ungroup() %>%
-      separate(geometry, into = c("longitude", "latitude"), sep = " ", convert = TRUE)
-  }
-  if ("part" %in% names(df)) df <- df %>% filter(part == "Y/L")
-  df <- mutate(df,
-               phase  = phase_code,
-               type   = "shp",
-               source = "RAAY",
-               status = if_else(phase_code == "OL", "existing", "planned"))
-  df %>%
-    group_by(longitude, latitude) %>%
-    arrange(desc(imerominia)) %>%
-    slice(1) %>%
-    ungroup()
+# ============================================================
+# STEP 1: Load and clean dam inventory
+# ============================================================
+
+message("\n", paste(rep("=", 80), collapse = ""))
+message("DAM DATA CLEANING")
+message(paste(rep("=", 80), collapse = ""))
+
+message("\n=== Step 1: Loading dam inventory ===")
+
+if (!file.exists(DAM_FILE)) stop("Dam inventory not found: ", DAM_FILE)
+
+dams_raw <- fread(DAM_FILE, sep = ";")
+
+message("  Rows loaded: ", nrow(dams_raw))
+message("  type values: ",
+        paste(names(table(dams_raw$type)), table(dams_raw$type),
+              sep = "=", collapse = ", "))
+
+# Keep only true dams; drop FACTORY and EXCLUDE
+dams_all <- dams_raw %>%
+  mutate(site_id = as.character(site_id)) %>%
+  filter(type == "DAM") %>%
+  select(site_id, Name, longitude, latitude) %>%
+  mutate(
+    longitude = as.numeric(longitude),
+    latitude  = as.numeric(latitude)
+  )
+
+message("  DAM records retained: ", nrow(dams_all))
+
+# ============================================================
+# STEP 2: Classify existing vs. planned
+# ============================================================
+
+message("\n=== Step 2: Classifying existing vs. planned ===")
+
+dams_all <- dams_all %>%
+  mutate(status = if_else(site_id == EXISTING_DAM_ID, "existing", "planned"))
+
+if (!any(dams_all$status == "existing")) {
+  warning("Existing dam id ", EXISTING_DAM_ID,
+          " not found among DAM records — check EXISTING_DAM_ID.")
 }
 
-raay_dams <- imap_dfr(names(file_map), ~ read_and_process_raay(.x, file_map[[.x]]))
+message("  Existing dams: ", sum(dams_all$status == "existing"))
+message("  Planned dams:  ", sum(dams_all$status == "planned"))
 
-raay_dams <- raay_dams %>%
-  group_by(longitude, latitude) %>%
-  arrange(desc(imerominia)) %>%
-  slice(1) %>%
-  ungroup()
+# ============================================================
+# STEP 3: Filter to target basin
+# ============================================================
 
-if (nrow(raay_dams) == 0) stop("No RAAY data loaded. Check file paths.")
+message("\n=== Step 3: Filtering to target basin ===")
 
-raay_dams <- raay_dams %>%
-  select(id1, phase, status_code, longitude, latitude, type, source, status, imerominia) %>%
-  rename(date = imerominia)
-
-message("  RAAY hydropower plants: ", nrow(raay_dams))
-message("  Phases: ", paste(unique(raay_dams$phase), collapse = ", "))
-
-# ============================================================================
-# 2. PROCESS AMBER DAMS
-# ============================================================================
-
-message("\n=== Step 2: Processing AMBER dams ===")
-
-amber_dams <- read.csv("points_original/dams/atlas-country-Greece.csv") %>%
-  select(GUID, Longitude_WGS84, Latitude_WGS84, type) %>%
-  rename(longitude = Longitude_WGS84, latitude = Latitude_WGS84) %>%
-  mutate(
-    type        = "dam",
-    phase       = "amber",
-    status_code = "existing",
-    source      = "AMBER",
-    status      = "existing",
-    GUID        = gsub("\\{|\\}", "", GUID)
-  ) %>%
-  mutate(id1 = sapply(strsplit(as.character(GUID), "-"), `[`, 5), .before = GUID) %>%
-  select(id1, phase, status_code, longitude, latitude, type, source, status) %>%
-  mutate(date = NA)
-
-message("  AMBER dams: ", nrow(amber_dams))
-
-# ============================================================================
-# 3. COMBINE
-# ============================================================================
-
-message("\n=== Step 3: Combining datasets ===")
-
-dams_all <- rbind(raay_dams, amber_dams)
-
-message("  Total dams combined: ", nrow(dams_all))
-message("  By source:")
-print(table(dams_all$source))
-message("  RAAY by phase:")
-print(table(raay_dams$phase))
-
-# ============================================================================
-# 3b. FILTER TO TARGET BASIN
-# ============================================================================
-
-message("\n=== Step 3b: Filtering to target basin ===")
-
-# Load basin ID derived in clean_hcmr_fish.R
+# Load basin ID derived in 01_clean_hcmr_fish.R
 study_params <- fread("config/study_area_params.csv")
 BASIN_ID <- study_params[param == "BASIN_ID", as.integer(value)]
 message("  Target basin ID: ", BASIN_ID)
 
-# Unique locations for API call
 dams_unique_locs <- dams_all %>%
-  distinct(id1, longitude, latitude) %>%
+  distinct(site_id, longitude, latitude) %>%
   filter(!is.na(longitude), !is.na(latitude))
-
-# Check for duplicate id1 values across sources
-dup_ids <- dams_unique_locs %>% group_by(id1) %>% filter(n() > 1)
-if (nrow(dup_ids) > 0) {
-  message("  WARNING: ", n_distinct(dup_ids$id1),
-          " duplicate id1 values across sources — check cross-source IDs")
-  print(dup_ids)
-}
 
 message("  Unique dam locations to query: ", nrow(dams_unique_locs))
 
@@ -181,107 +128,62 @@ basin_ids_dams <- api_get_ids(
   points          = dams_unique_locs,
   colname_lon     = "longitude",
   colname_lat     = "latitude",
-  colname_site_id = "id1",
+  colname_site_id = "site_id",
   mode            = "local"
 )
 
 dams_all <- dams_all %>%
   left_join(basin_ids_dams) %>%
-  filter(basin_id == BASIN_ID)%>%
+  filter(basin_id == BASIN_ID) %>%
   select(-basin_id, -subc_id, -reg_id)
 
-cat("  Dams missing basin_id:", sum(is.na(dams_all$basin_id)), "\n")
 message("  Dams in target basin: ", nrow(dams_all))
-message("  By source:")
-print(table(dams_all$source))
-message("  By phase:")
-print(table(dams_all$phase))
+message("    existing: ", sum(dams_all$status == "existing"))
+message("    planned:  ", sum(dams_all$status == "planned"))
 
-# Save basin-filtered combined file
 fwrite(dams_all, "points_cleaned/dams/dams_all_clean.csv")
 message("  Saved: points_cleaned/dams/dams_all_clean.csv")
 
-# ============================================================================
-# 4. VISUALISE
-# ============================================================================
+# ============================================================
+# STEP 4: Visualise
+# ============================================================
 
 message("\n=== Step 4: Creating visualisation ===")
 
-source_colors <- colorFactor(
-  palette = c("RAAY" = "blue", "AMBER" = "green"),
-  domain  = c("RAAY", "AMBER")
-)
-
-phase_colors <- colorFactor(
-  palette = c("IL" = "lightblue", "OL" = "darkblue",
-              "PL" = "purple", "E" = "orange", "amber" = "green"),
-  domain  = c("IL", "OL", "PL", "E", "amber")
+status_colors <- colorFactor(
+  palette = c("existing" = "darkblue", "planned" = "orange"),
+  domain  = c("existing", "planned")
 )
 
 dams_map <- leaflet(dams_all) %>%
   addProviderTiles("CartoDB.Positron", group = "CartoDB") %>%
   addProviderTiles(providers$Esri.WorldImagery, group = "Satellite") %>%
-
   addCircleMarkers(
     lng         = ~longitude,
     lat         = ~latitude,
-    color       = ~source_colors(source),
-    fillColor   = ~source_colors(source),
+    color       = ~status_colors(status),
+    fillColor   = ~status_colors(status),
     radius      = 4,
     fillOpacity = 0.7,
     stroke      = TRUE,
     weight      = 1,
-    group       = "By Source",
     popup       = ~paste0(
-      "<b>Dam ID:</b> ", id1, "<br>",
-      "<b>Source:</b> ", source, "<br>",
-      "<b>Phase:</b> ",  phase, "<br>",
-      "<b>Status:</b> ", status_code, "<br>",
-      "<b>Type:</b> ",   type
+      "<b>Dam ID:</b> ", site_id, "<br>",
+      "<b>Name:</b> ",   Name, "<br>",
+      "<b>Status:</b> ", status
     )
   ) %>%
-
-  addCircleMarkers(
-    data        = dams_all %>% filter(source == "RAAY"),
-    lng         = ~longitude,
-    lat         = ~latitude,
-    color       = ~phase_colors(phase),
-    fillColor   = ~phase_colors(phase),
-    radius      = 4,
-    fillOpacity = 0.7,
-    stroke      = TRUE,
-    weight      = 1,
-    group       = "RAAY by Phase",
-    popup       = ~paste0(
-      "<b>Dam ID:</b> ", id1, "<br>",
-      "<b>Phase:</b> ",  phase, "<br>",
-      "<b>Status:</b> ", status_code
-    )
-  ) %>%
-
   addLayersControl(
-    baseGroups    = c("CartoDB", "Satellite"),
-    overlayGroups = c("By Source", "RAAY by Phase"),
-    options       = layersControlOptions(collapsed = FALSE)
+    baseGroups = c("CartoDB", "Satellite"),
+    options    = layersControlOptions(collapsed = FALSE)
   ) %>%
-
   addLegend(
     position = "bottomright",
-    pal      = source_colors,
-    values   = ~source,
-    title    = "Dam source",
+    pal      = status_colors,
+    values   = ~status,
+    title    = "Dam status",
     opacity  = 0.7
-  ) %>%
-
-  addLegend(
-    position = "bottomleft",
-    pal      = phase_colors,
-    values   = dams_all$phase,
-    title    = "Phase",
-    opacity  = 0.7
-  ) %>%
-
-  hideGroup("RAAY by Phase")
+  )
 
 saveWidget(dams_map,
            "points_cleaned/maps/dams_all_sources_overview.html",
@@ -289,16 +191,15 @@ saveWidget(dams_map,
 save_to_nimbus(dams_map, "points_cleaned/maps/dams_all_sources_overview.html")
 message("  Saved: points_cleaned/maps/dams_all_sources_overview.html")
 
-# ============================================================================
-# 5. DATA QUALITY CHECKS
-# ============================================================================
+# ============================================================
+# STEP 5: Data quality checks
+# ============================================================
 
 message("\n=== Step 5: Data quality checks ===")
 
 missing_coords <- dams_all %>% filter(is.na(longitude) | is.na(latitude))
 if (nrow(missing_coords) > 0) {
   message("  WARNING: ", nrow(missing_coords), " dams with missing coordinates")
-  print(table(missing_coords$source))
 } else {
   message("  No missing coordinates")
 }
@@ -306,14 +207,15 @@ if (nrow(missing_coords) > 0) {
 out_of_bounds <- dams_all %>%
   filter(longitude < 19 | longitude > 28 | latitude < 34 | latitude > 42)
 if (nrow(out_of_bounds) > 0) {
-  message("  WARNING: ", nrow(out_of_bounds), " dams outside Greece bounds — check manually")
+  message("  WARNING: ", nrow(out_of_bounds),
+          " dams outside Greece bounds — check manually")
 } else {
   message("  All coordinates within Greece bounds")
 }
 
-# ============================================================================
-# 6. DUPLICATE ANALYSIS
-# ============================================================================
+# ============================================================
+# STEP 6: Duplicate analysis
+# ============================================================
 
 message("\n=== Step 6: Duplicate analysis ===")
 
@@ -322,7 +224,7 @@ duplicates_detailed <- dams_all %>%
   mutate(n_at_location = n(), is_duplicate = n() > 1) %>%
   ungroup() %>%
   filter(is_duplicate) %>%
-  arrange(longitude, latitude, source)
+  arrange(longitude, latitude)
 
 if (nrow(duplicates_detailed) > 0) {
 
@@ -331,49 +233,16 @@ if (nrow(duplicates_detailed) > 0) {
           n_distinct(paste(duplicates_detailed$longitude,
                            duplicates_detailed$latitude)))
 
-  duplicate_combos <- duplicates_detailed %>%
-    group_by(longitude, latitude) %>%
-    summarise(
-      sources      = paste(sort(unique(source)), collapse = " + "),
-      n_sources    = n_distinct(source),
-      total_records = n(),
-      .groups = "drop"
-    )
-
-  message("  Locations in multiple databases: ", sum(duplicate_combos$n_sources > 1))
-  message("  Locations in same database only: ", sum(duplicate_combos$n_sources == 1))
-
   fwrite(duplicates_detailed, "points_cleaned/dams/dams_duplicates.csv")
   message("  Saved: points_cleaned/dams/dams_duplicates.csv")
 
-  cross_source_dups <- duplicates_detailed %>%
-    group_by(longitude, latitude) %>%
-    filter(n_distinct(source) > 1) %>%
-    arrange(longitude, latitude, source) %>%
-    select(longitude, latitude, source, id1, phase, status_code, type) %>%
-    ungroup()
-
-  if (nrow(cross_source_dups) > 0) {
-    message("  Cross-source duplicates: ", nrow(cross_source_dups))
-    fwrite(cross_source_dups,
-           "points_cleaned/dams/dams_cross_source_duplicates.csv")
-    message("  Saved: points_cleaned/dams/dams_cross_source_duplicates.csv")
-  }
-
-  # Visualise duplicates
-  dup_source_colors <- colorFactor(
-    palette = c("RAAY" = "red", "AMBER" = "orange"),
-    domain  = c("RAAY", "AMBER")
-  )
-
-  duplicates_map <- leaflet() %>%
+  duplicates_map <- leaflet(duplicates_detailed) %>%
     addProviderTiles("CartoDB.Positron") %>%
     addCircleMarkers(
-      data        = duplicates_detailed,
       lng         = ~longitude,
       lat         = ~latitude,
-      color       = ~dup_source_colors(source),
-      fillColor   = ~dup_source_colors(source),
+      color       = "red",
+      fillColor   = "red",
       radius      = 6,
       fillOpacity = 0.8,
       stroke      = TRUE,
@@ -381,18 +250,9 @@ if (nrow(duplicates_detailed) > 0) {
       popup       = ~paste0(
         "<b style='color:red;'>DUPLICATE LOCATION</b><br>",
         "<b>Records here:</b> ", n_at_location, "<br>",
-        "<b>Dam ID:</b> ", id1, "<br>",
-        "<b>Source:</b> ", source, "<br>",
-        "<b>Phase:</b> ", phase
-      ),
-      label = ~paste0("Duplicate: ", n_at_location, " records (", source, ")")
-    ) %>%
-    addLegend(
-      position = "bottomright",
-      pal      = dup_source_colors,
-      values   = duplicates_detailed$source,
-      title    = "Duplicate source",
-      opacity  = 0.8
+        "<b>Dam ID:</b> ", site_id, "<br>",
+        "<b>Status:</b> ", status
+      )
     )
 
   saveWidget(duplicates_map,
@@ -405,23 +265,15 @@ if (nrow(duplicates_detailed) > 0) {
   message("  No duplicate locations found")
 }
 
-# ============================================================================
+# ============================================================
 # SUMMARY
-# ============================================================================
+# ============================================================
 
 message("\n", paste(rep("=", 80), collapse = ""))
 message("DAM DATA CLEANING COMPLETE")
 message(paste(rep("=", 80), collapse = ""))
 message("\nTarget basin ID: ", BASIN_ID)
-message("\nDams in basin: ", nrow(dams_all))
-message("  RAAY: ", sum(dams_all$source == "RAAY"))
-message("  AMBER: ", sum(dams_all$source == "AMBER"))
-message("\nFiles created:")
-message("  points_cleaned/dams/dams_all_clean.csv")
-if (exists("duplicates_detailed") && nrow(duplicates_detailed) > 0) {
-  message("  points_cleaned/dams/dams_duplicates.csv")
-  if (nrow(cross_source_dups) > 0)
-    message("  points_cleaned/dams/dams_cross_source_duplicates.csv")
-}
-message("  points_cleaned/maps/dams_all_sources_overview.html")
+message("Dams in basin: ", nrow(dams_all),
+        "  (existing: ", sum(dams_all$status == "existing"),
+        ", planned: ",   sum(dams_all$status == "planned"), ")")
 message("\nNext: snapping script")
