@@ -1,20 +1,27 @@
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 # 02_generate_network_graph.R
 # Build igraph river network from H90M subcatchments + barriers
-# TWO SCENARIOS: current (operational dams) vs future (+ planned dams)
+# TWO SCENARIOS: current (existing dam only) vs future (existing + planned)
+#
+# NOTE ON PASSABILITY:
+#   This script does not take into account species. It carries the number of dams per
+#   reach (n_shp) on nodes and edges, but does not assign a passability
+#   value. Structural fragmentation (Module 5) treats any edge with
+#   n_shp > 0 as a blocking barrier. Species-specific passability
+#   (0.8 / 0.5 / 0) is applied later, at PCI computation time
+#   (Module 10 / pci script), as pass = species_passability ^ n_shp.
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 
 library(tidyverse)
 library(sf)
 library(igraph)
-library(riverconn)
 library(dplyr)
 
 # ============================================================
 # FIX: Prevent MASS::select from masking dplyr::select
 # ============================================================
-select <- dplyr::select
-rename <- dplyr::rename
+select   <- dplyr::select
+rename   <- dplyr::rename
 group_by <- dplyr::group_by
 
 # Set working directory
@@ -28,32 +35,32 @@ setwd(BASE_DIR)
 subcatchments <- st_read("spatial/subbasin_sarantaporos/stream_network_pruned.gpkg")
 
 # temporary fix until length is returned by api_getupstreamstreamsegments
-basin_stream_length <- read_geopackage("spatial/basin/stream_network_pruned.gpkg", import_as = "data.table") %>%
+basin_stream_length <- read_geopackage("spatial/basin/stream_network_pruned.gpkg",
+                                       import_as = "data.table") %>%
   select(subc_id, length)
 
 subcatchments <- subcatchments %>% left_join(basin_stream_length)
 
-barriers <- read.csv("points_snapped/subbasin_sarantaporos/dams_sarantaporos.csv") %>%
-  filter(subc_id %in% subcatchments$subc_id) # keep dams in Vjosa
+# New snapped dam inventory (status column: "existing" / "planned")
+barriers <- read.csv("points_snapped/dams/dams_snapped_points.csv") %>%
+  filter(subc_id %in% subcatchments$subc_id)   # keep dams on the Sarantaporos network
+
+message("Barriers on Sarantaporos network: ", nrow(barriers),
+        "  (existing: ", sum(barriers$status == "existing"),
+        ", planned: ",   sum(barriers$status == "planned"), ")")
 
 # ============================================================
-# PARAMETERS
-# ============================================================
-PASS_SHP <- 0.2  # passability of small hydropower plants
-
-# ============================================================
-# BARRIER SCENARIOS
+# BARRIER SCENARIOS  (driven by the 'status' column)
 # ============================================================
 
-# Current: only operational dams (OL + amber = existing)
+# Current: only the existing operational dam
 barrier_counts_current <- barriers %>%
-  filter(phase %in% c("OL", "amber")) %>%
+  filter(status == "existing") %>%
   group_by(subc_id) %>%
   summarise(n_shp = n(), .groups = "drop")
 
-# Future: operational + all planned (everything except rejected)
+# Future: existing + all planned (rejected/EXCLUDE already removed upstream)
 barrier_counts_future <- barriers %>%
-  filter(phase != "R") %>%
   group_by(subc_id) %>%
   summarise(n_shp = n(), .groups = "drop")
 
@@ -64,23 +71,20 @@ message("Future scenario:  ", sum(barrier_counts_future$n_shp), " dams in ",
 
 # ============================================================
 # FUNCTION: Build river graph from subcatchments + barrier counts
+#   Carries n_shp (dam count) on nodes and edges. No passability.
 # ============================================================
-build_river_graph <- function(subcatchments_raw, barrier_counts, pass_shp) {
+build_river_graph <- function(subcatchments_raw, barrier_counts) {
 
   # Step 1: Join barrier counts with subcatchments
   sc <- subcatchments_raw %>%
     left_join(barrier_counts, by = "subc_id") %>%
     mutate(n_shp = ifelse(is.na(n_shp), 0, n_shp))
 
-  # Step 2: Compute passability
-  sc <- sc %>%
-    mutate(pass_tot = pass_shp ^ n_shp)
-
-  # Step 3: Deduplicate
+  # Step 2: Deduplicate
   sc <- sc %>%
     distinct(subc_id, .keep_all = TRUE)
 
-  # Step 4: Build edges
+  # Step 3: Build edges
   edges_df <- sc %>%
     st_drop_geometry() %>%
     select(subc_id, target) %>%
@@ -88,48 +92,55 @@ build_river_graph <- function(subcatchments_raw, barrier_counts, pass_shp) {
     mutate(from = as.character(from),
            to   = as.character(to))
 
-  # Step 5: Build vertices
+  # Step 4: Build vertices (carry reach length and dam count)
   vertices_df <- sc %>%
     st_drop_geometry() %>%
-    select(subc_id, length, pass_tot) %>%   # removed basin_id
+    select(subc_id, length, n_shp) %>%
     rename(name = subc_id, length_reach = length) %>%
     mutate(name         = as.character(name),
-           length_reach = ifelse(is.na(length_reach), 0, length_reach))
+           length_reach = ifelse(is.na(length_reach), 0, length_reach),
+           n_shp        = ifelse(is.na(n_shp), 0, n_shp))
 
-  # Step 6: Create igraph (first pass)
+  # Step 5: Create igraph (first pass) and attach vertex attributes
   rg <- igraph::graph_from_data_frame(edges_df)
 
   rg_v_df <- igraph::as_data_frame(rg, "vertices") %>%
     left_join(vertices_df, by = "name") %>%
     mutate(
       length_reach = ifelse(name == "0" | is.na(length_reach), 1, length_reach),
-      pass_tot     = ifelse(name == "0" | is.na(pass_tot),     1, pass_tot)
-      # basin_id line removed
+      n_shp        = ifelse(name == "0" | is.na(n_shp),        0, n_shp)
     )
 
   rg_tmp <- igraph::graph_from_data_frame(edges_df, v = rg_v_df)
 
-  # Step 7: Transfer passability from nodes -> edges
+  # Step 6: Transfer dam count from nodes -> edges
+  #   An edge is considered barriered if either of its connected nodes
+  #   carries a dam. We keep the per-edge dam count (max of the two nodes)
+  #   so the PCI step can compute species_passability ^ n_shp downstream.
   graph_v_df <- igraph::as_data_frame(rg_tmp, "vertices")
 
   graph_e_df <- igraph::as_data_frame(rg_tmp, "edges") %>%
-    left_join(graph_v_df %>% select(name, pass_tot) %>% rename(from = name),
+    left_join(graph_v_df %>% select(name, n_shp) %>% rename(from = name),
               by = "from") %>%
-    rename(d_att_from = pass_tot) %>%
-    left_join(graph_v_df %>% rename(to = name) %>% select(to, pass_tot),
+    rename(n_shp_from = n_shp) %>%
+    left_join(graph_v_df %>% select(name, n_shp) %>% rename(to = name),
               by = "to") %>%
-    rename(d_att_to = pass_tot) %>%
-    mutate(pass_tot = (d_att_from ^ 0.5) * (d_att_to ^ 0.5),
-           pass_u   = sqrt(pass_tot),
-           pass_d   = sqrt(pass_tot)) %>%
-    select(from, to, pass_u, pass_d)
+    rename(n_shp_to = n_shp) %>%
+    mutate(
+      n_shp_from = ifelse(is.na(n_shp_from), 0, n_shp_from),
+      n_shp_to   = ifelse(is.na(n_shp_to),   0, n_shp_to),
+      n_shp_edge = pmax(n_shp_from, n_shp_to)
+    ) %>%
+    select(from, to, n_shp_edge)
 
-  # Step 8: Final graph
+  # Step 7: Final graph
   rg_final <- igraph::graph_from_data_frame(d = graph_e_df, vertices = graph_v_df)
 
-  V(rg_final)$weight <- 1
-  E(rg_final)$pass_u <- ifelse(is.na(E(rg_final)$pass_u), 1, E(rg_final)$pass_u)
-  E(rg_final)$pass_d <- ifelse(is.na(E(rg_final)$pass_d), 1, E(rg_final)$pass_d)
+  V(rg_final)$weight   <- 1
+  E(rg_final)$n_shp    <- ifelse(is.na(E(rg_final)$n_shp_edge), 0,
+                                 E(rg_final)$n_shp_edge)
+  # convenience flag for structural fragmentation (Module 5)
+  E(rg_final)$barrier  <- E(rg_final)$n_shp > 0
 
   return(rg_final)
 }
@@ -139,12 +150,14 @@ build_river_graph <- function(subcatchments_raw, barrier_counts, pass_shp) {
 # ============================================================
 
 message("\nBuilding current scenario graph...")
-river_graph_current <- build_river_graph(subcatchments, barrier_counts_current, PASS_SHP)
-message("Current: ", vcount(river_graph_current), " nodes, ", ecount(river_graph_current), " edges")
+river_graph_current <- build_river_graph(subcatchments, barrier_counts_current)
+message("Current: ", vcount(river_graph_current), " nodes, ",
+        ecount(river_graph_current), " edges")
 
 message("\nBuilding future scenario graph...")
-river_graph_future <- build_river_graph(subcatchments, barrier_counts_future, PASS_SHP)
-message("Future:  ", vcount(river_graph_future), " nodes, ", ecount(river_graph_future), " edges")
+river_graph_future <- build_river_graph(subcatchments, barrier_counts_future)
+message("Future:  ", vcount(river_graph_future), " nodes, ",
+        ecount(river_graph_future), " edges")
 
 # ============================================================
 # SAVE
@@ -158,16 +171,15 @@ message("\nBoth graphs saved!")
 # DIAGNOSTICS
 # ============================================================
 message("\n--- Current scenario ---")
-message("Passability summary (edges):")
-print(summary(E(river_graph_current)$pass_u))
+message("Barriered edges: ", sum(E(river_graph_current)$barrier),
+        " out of ", ecount(river_graph_current))
 
 message("\n--- Future scenario ---")
-message("Passability summary (edges):")
-print(summary(E(river_graph_future)$pass_u))
+message("Barriered edges: ", sum(E(river_graph_future)$barrier),
+        " out of ", ecount(river_graph_future))
 
-# Compare: how many edges have lower passability in future?
-pass_current <- E(river_graph_current)$pass_u
-pass_future  <- E(river_graph_future)$pass_u
-n_affected <- sum(pass_future < pass_current)
-message("\nEdges with reduced passability in future: ", n_affected,
-        " out of ", length(pass_current))
+# How many additional edges are barriered in the future?
+n_affected <- sum(E(river_graph_future)$barrier) -
+  sum(E(river_graph_current)$barrier)
+message("\nAdditional barriered edges in future scenario: ", n_affected)
+
