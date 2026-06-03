@@ -17,7 +17,7 @@ source("~/Documents/PhD/scripts/hydrographr/workflows/helpers/save_to_nimbus.R")
 # Set working directory
 source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
 # Check working directory
-BASE_DIR <- NIMBUS_DIR
+# BASE_DIR <- NIMBUS_DIR
 setwd(BASE_DIR)
 
 
@@ -464,7 +464,7 @@ dams_snap_result <- api_get_snapped_points_cascade(
   data = dams_original,
   colname_lon = "longitude",
   colname_lat = "latitude",
-  colname_site_id = "id1",
+  colname_site_id = "site_id",
   strahler_seq = STRAHLER_SEQ,
   distance_threshold = DISTANCE_THRESHOLD
 )
@@ -489,8 +489,8 @@ message(sprintf("Dams: Snapped %d points", nrow(dams_snap_result)))
 message("\n--- Creating Dams visualization ---")
 
 # Identify which points were successfully snapped
-dams_snapped_ids <- dams_snap_result$id1
-dams_original$snapped <- dams_original$id1 %in% dams_snapped_ids
+dams_snapped_ids <- dams_snap_result$site_id
+dams_original$snapped <- dams_original$site_id %in% dams_snapped_ids
 
 # Summary
 n_snapped_dams <- sum(dams_original$snapped)
@@ -512,8 +512,8 @@ dams_map <- leaflet() %>%
   # Original points that were successfully snapped (colored by source)
   addCircleMarkers(
     data = dams_original[dams_original$snapped, ],
-    lng = ~longitude_original,
-    lat = ~latitude_original,
+    lng = ~longitude,
+    lat = ~latitude,
     color = ~dams_source_colors(source),
     fillColor = ~dams_source_colors(source),
     radius = 5,
@@ -523,10 +523,9 @@ dams_map <- leaflet() %>%
     group = "Original (Snapped)",
     popup = ~paste0(
       "<b>Original Dam (Successfully Snapped)</b><br>",
-      "Dam ID: ", id1, "<br>",
-      "Source: ", source, "<br>",
-      "Phase: ", phase, "<br>",
-      "Status: ", status, "<br>",
+      "Dam ID: ", site_id, "<br>",
+      # "Source: ", source, "<br>",
+      # "Status: ", status, "<br>",
       "Type: ", type, "<br>",
       "Lon: ", round(longitude, 5), "<br>",
       "Lat: ", round(latitude, 5)
@@ -536,8 +535,8 @@ dams_map <- leaflet() %>%
   # Original points that FAILED to snap (orange)
   addCircleMarkers(
     data = dams_original[!dams_original$snapped, ],
-    lng = ~longitude_original,
-    lat = ~latitude_original,
+    lng = ~longitude,
+    lat = ~latitude,
     color = "orange",
     fillColor = "orange",
     radius = 6,
@@ -547,10 +546,10 @@ dams_map <- leaflet() %>%
     group = "Original (Failed)",
     popup = ~paste0(
       "<b>⚠️ Original Dam (FAILED TO SNAP)</b><br>",
-      "Dam ID: ", id1, "<br>",
-      "Source: ", source, "<br>",
-      "Phase: ", phase, "<br>",
-      "Status: ", status, "<br>",
+      "Dam ID: ", site_id, "<br>",
+      # "Source: ", source, "<br>",
+      # "Phase: ", phase, "<br>",
+      # "Status: ", status, "<br>",
       "Lon: ", round(longitude, 5), "<br>",
       "Lat: ", round(latitude, 5), "<br>",
       "<b style='color:red;'>This point was not successfully snapped</b>"
@@ -571,7 +570,7 @@ dams_map <- leaflet() %>%
     group = "Snapped Points",
     popup = ~paste0(
       "<b>Snapped Dam</b><br>",
-      "Dam ID: ", id1, "<br>",
+      "Dam ID: ", site_id, "<br>",
       "Lon: ", round(longitude_snapped, 5), "<br>",
       "Lat: ", round(latitude_snapped, 5), "<br>",
       "Distance: ", round(distance_metres, 1), " m<br>",
