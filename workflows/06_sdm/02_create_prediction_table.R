@@ -65,7 +65,7 @@ variables <- c(
   "c190_2020", "c200_2020", "c210_2020",
 
   "cti", "order_strahler", "length", "cum_length", "gradient", "elev_drop", "accumulation",
-   "channel_elv_dw_seg", "channel_elv_up_seg",
+   "channel_elv_dw_seg", "channel_elv_up_seg", "outlet_diff_dw_basin",
    "stream_dist_dw_near", "stream_dist_up_near", "slope_grad_dw_cel"
 )
 

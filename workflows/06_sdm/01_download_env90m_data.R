@@ -163,7 +163,8 @@ download_hydrography90m_tables(
   subset = c("cti", "order_strahler", "length", "cum_length", "gradient", "elev_drop",
              "accumulation", #"channel_grad_dw_seg", "channel_grad_up_seg",
              "channel_elv_dw_seg", "channel_elv_up_seg", "connections",
-             "stream_dist_dw_near", "stream_dist_up_near", "slope_grad_dw_cel"),
+             "stream_dist_dw_near", "stream_dist_up_near", "slope_grad_dw_cel",
+             "outlet_diff_dw_basin"),
   tile_ids = tile_id,
   download = TRUE,
   download_dir = "env90m",
@@ -173,6 +174,8 @@ download_hydrography90m_tables(
   tempdir = NULL,
   quiet = FALSE
 )
+
+
 
 message("\n✓ Hydrography tables downloaded to: env90m/hydrography90m_v1_0/")
 
