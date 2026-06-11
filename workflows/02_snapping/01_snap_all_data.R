@@ -453,10 +453,11 @@ DISTANCE_THRESHOLD <- 150  # meters
 # Load cleaned dams data URL
 dams_url <- "https://nimbus.igb-berlin.de/index.php/s/nzMQKArCD8SqNcK/download/dams_all_clean.csv"
 
-# Load original dams data
-dams_original <- fread(dams_url)
-message(sprintf("Original dams points: %d", nrow(dams_original)))
+# Load original dams data -- replace url with new dam data June 2026
+# dams_original <- fread(dams_url)
+# message(sprintf("Original dams points: %d", nrow(dams_original)))
 
+dams_original <- fread("points_cleaned/dams/dams_sarantaporos_clean.csv")
 
 # Snap dams data
 DISTANCE_THRESHOLD <- 150
@@ -479,7 +480,7 @@ dams_snap_result <- dams_snap_result %>%
 
 
 # Save
-fwrite(dams_snap_result, "points_snapped/dams/dams_snapped_points.csv")
+fwrite(dams_snap_result, "points_snapped/dams/dams_snapped_points_june.csv")
 message(sprintf("Dams: Snapped %d points", nrow(dams_snap_result)))
 
 # ============================================================================

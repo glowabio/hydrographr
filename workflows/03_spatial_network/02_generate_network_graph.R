@@ -114,23 +114,19 @@ build_river_graph <- function(subcatchments_raw, barrier_counts) {
   rg_tmp <- igraph::graph_from_data_frame(edges_df, v = rg_v_df)
 
   # Step 6: Transfer dam count from nodes -> edges
-  #   An edge is considered barriered if either of its connected nodes
-  #   carries a dam. We keep the per-edge dam count (max of the two nodes)
-  #   so the PCI step can compute species_passability ^ n_shp downstream.
+  #   A dam sits ON a reach (node), but a barrier severs ONE connection.
+  #   The network is a directed tree rooted at the outlet, so each node has
+  #   exactly one downstream edge (the edge where from == node). We attribute
+  #   the dam to that single downstream edge only, so that one dam cuts the
+  #   network once and produces two fragments (rather than isolating the
+  #   dammed reach by cutting on both sides).
   graph_v_df <- igraph::as_data_frame(rg_tmp, "vertices")
 
   graph_e_df <- igraph::as_data_frame(rg_tmp, "edges") %>%
     left_join(graph_v_df %>% select(name, n_shp) %>% rename(from = name),
               by = "from") %>%
-    rename(n_shp_from = n_shp) %>%
-    left_join(graph_v_df %>% select(name, n_shp) %>% rename(to = name),
-              by = "to") %>%
-    rename(n_shp_to = n_shp) %>%
-    mutate(
-      n_shp_from = ifelse(is.na(n_shp_from), 0, n_shp_from),
-      n_shp_to   = ifelse(is.na(n_shp_to),   0, n_shp_to),
-      n_shp_edge = pmax(n_shp_from, n_shp_to)
-    ) %>%
+    rename(n_shp_edge = n_shp) %>%
+    mutate(n_shp_edge = ifelse(is.na(n_shp_edge), 0, n_shp_edge)) %>%
     select(from, to, n_shp_edge)
 
   # Step 7: Final graph
@@ -182,4 +178,3 @@ message("Barriered edges: ", sum(E(river_graph_future)$barrier),
 n_affected <- sum(E(river_graph_future)$barrier) -
   sum(E(river_graph_current)$barrier)
 message("\nAdditional barriered edges in future scenario: ", n_affected)
-
