@@ -13,13 +13,13 @@
 #
 # Input:
 #   - env90m/predict_table.csv
-#   - points_snapped/basin/basin_subc_ids_pruned.csv
+#   - spatial/basin/basin_subc_ids_pruned.csv
 #
 # Output:
 #   - env90m/predict_table_vif.csv   (filtered predict table)
 #   - env90m/selected_vars.csv             (retained variable names)
 #
-# LOCATION: workflows/06_sdm/03_check_multicollinearity.R
+# LOCATION: workflows/07_sdm/03_check_multicollinearity.R
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 
 library(data.table)
@@ -31,7 +31,7 @@ library(tidyr)
 select <- dplyr::select
 
 source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
-BASE_DIR <- NIMBUS_DIR
+# BASE_DIR <- NIMBUS_DIR
 setwd(BASE_DIR)
 
 # ============================================================
@@ -44,7 +44,7 @@ predict_table <- fread("env90m/predict_table.csv")
 message("  Rows: ", nrow(predict_table))
 message("  Columns: ", ncol(predict_table))
 
-basin_subc_ids_pruned <- fread("points_snapped/basin/basin_subc_ids_pruned.csv") %>%
+basin_subc_ids_pruned <- fread("spatial/basin/basin_subc_ids_pruned.csv") %>%
   pull(subc_id)
 
 # Check row count matches expected subcatchments
@@ -135,6 +135,11 @@ vif_results@results
 selected_vars <- vif_results@results$Variables
 message("  Variables retained after VIF: ", length(selected_vars))
 print(selected_vars)
+
+# replace channel_elv_up_seg_mean with channel_elv_up_seg_mean for interpretability
+selected_vars <- gsub("channel_elv_up_seg_mean",
+                      "channel_elv_dw_seg_mean",
+                      selected_vars)
 
 # ============================================================
 # STEP 5: Save outputs

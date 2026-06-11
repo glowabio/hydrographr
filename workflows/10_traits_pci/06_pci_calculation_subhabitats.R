@@ -10,7 +10,7 @@ library(riverconn)
 library(data.table)
 library(dplyr)
 source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/pci_sparse.R")
-source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/05_connectivity/get_subgraph_between_points.R")
+source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/get_subgraph_between_points.R")
 
 # ============================================================
 # FIX: Prevent MASS::select from masking dplyr::select

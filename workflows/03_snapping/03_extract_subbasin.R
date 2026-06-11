@@ -26,17 +26,17 @@
 #   - spatial/basin/basin_polygon.gpkg
 #   - spatial/basin/stream_network.gpkg
 #   - spatial/basin/stream_network_pruned.gpkg
-#   - points_snapped/basin/basin_subc_ids_pruned.csv
+#   - spatial/basin/basin_subc_ids_pruned.csv
 #   - spatial/subbasin/subbasin_polygon.gpkg
 #   - spatial/subbasin/stream_network.gpkg
 #   - spatial/subbasin/stream_network_pruned.gpkg
-#   - points_snapped/subbasin/subbasin_subc_ids_pruned.csv
+#   - spatial/subbasin/subbasin_subc_ids_pruned.csv
 #   - points_snapped/subbasin/fish_subbasin.csv
 #   - points_snapped/subbasin/dams_subbasin.csv
 #   - points_snapped/subbasin/fish_sdm_basin.csv
 #   - points_snapped/subbasin/fish_sdm_subbasin.csv
 #
-# LOCATION: workflows/03_spatial_network/01_extract_subbasin.R
+# LOCATION: workflows/03_snapping/03_extract_subbasin.R
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 
 library(hydrographr)
@@ -126,6 +126,8 @@ basin_streams <- api_get_stream_segments(
 )
 basin_streams$basin_id <- BASIN_ID
 
+
+
 st_write(basin_streams, "spatial/basin/stream_network.gpkg", delete_dsn = TRUE)
 save_to_nimbus(basin_streams, "spatial/basin/stream_network.gpkg")
 
@@ -136,10 +138,22 @@ message("  Basin stream segments: ", nrow(basin_streams),
 # Prune basin network based on all fish + dam points in basin
 basin_streams_pruned <- extract_partial_stream_network(
   stream                    = basin_streams,
-  snapped_subcs             = all_snapped$subc_id,
+  snapped_subcs             = c(fish_unique$subc_id, dams_unique$subc_id),
   strahler_retain_threshold = MIN_STRAHLER,
   upstream_buffer           = UPSTREAM_BUFFER
 )
+
+
+# Deduplicate by subc_id — keep first occurrence
+n_before <- nrow(basin_streams_pruned)
+basin_streams_pruned <- basin_streams_pruned %>%
+  distinct(subc_id, .keep_all = TRUE)
+n_after <- nrow(basin_streams_pruned)
+
+if (n_before > n_after) {
+  message("  Removed ", n_before - n_after,
+          " duplicate edges from pruned network")
+}
 
 st_write(basin_streams_pruned, "spatial/basin/stream_network_pruned.gpkg",
          delete_dsn = TRUE)
@@ -150,8 +164,8 @@ message("  Pruned basin segments: ", nrow(basin_streams_pruned),
         " | subcatchments: ", length(basin_subc_ids_pruned))
 
 fwrite(data.table(subc_id = basin_subc_ids_pruned),
-       "points_snapped/basin/basin_subc_ids_pruned.csv")
-message("  Saved: points_snapped/basin/basin_subc_ids_pruned.csv")
+       "spatial/basin/basin_subc_ids_pruned.csv")
+message("  Saved: spatial/basin/basin_subc_ids_pruned.csv")
 
 # ============================================================
 # STEP 3: Extract subbasin polygon + stream network + prune
@@ -179,6 +193,7 @@ subbasin_streams <- api_get_stream_segments(
   min_strahler       = 2
 )
 
+
 st_write(subbasin_streams, "spatial/subbasin/stream_network.gpkg", delete_dsn = TRUE)
 save_to_nimbus(subbasin_streams, "spatial/subbasin/stream_network.gpkg")
 
@@ -194,13 +209,27 @@ message("  Subbasin stream segments: ", nrow(subbasin_streams),
 # Prune subbasin network
 subbasin_streams_pruned <- extract_partial_stream_network(
   stream                    = subbasin_streams,
-  snapped_subcs             = all_snapped$subc_id,
+  snapped_subcs             = c(fish_unique$subc_id, dams_unique$subc_id),
   strahler_retain_threshold = MIN_STRAHLER,
   upstream_buffer           = UPSTREAM_BUFFER
 )
 
-st_write(subbasin_streams_pruned, "spatial/subbasin/stream_network_pruned.gpkg",
+# Deduplicate by subc_id — keep first occurrence
+n_before <- nrow(subbasin_streams_pruned)
+subbasin_streams_pruned <- subbasin_streams_pruned %>%
+  distinct(subc_id, .keep_all = TRUE)
+n_after <- nrow(subbasin_streams_pruned)
+
+if (n_before > n_after) {
+  message("  Removed ", n_before - n_after,
+          " duplicate edges from pruned network")
+}
+
+# save the clean version
+st_write(subbasin_streams_pruned,
+         "spatial/subbasin/stream_network_pruned.gpkg",
          delete_dsn = TRUE)
+
 save_to_nimbus(subbasin_streams_pruned, "spatial/subbasin/stream_network_pruned.gpkg")
 
 subbasin_subc_ids_pruned <- unique(subbasin_streams_pruned$subc_id)
@@ -208,8 +237,8 @@ message("  Pruned subbasin segments: ", nrow(subbasin_streams_pruned),
         " | subcatchments: ", length(subbasin_subc_ids_pruned))
 
 fwrite(data.table(subc_id = subbasin_subc_ids_pruned),
-       "points_snapped/subbasin/subbasin_subc_ids_pruned.csv")
-message("  Saved: points_snapped/subbasin/subbasin_subc_ids_pruned.csv")
+       "spatial/subbasin/subbasin_subc_ids_pruned.csv")
+message("  Saved: spatial/subbasin/subbasin_subc_ids_pruned.csv")
 
 # ============================================================
 # STEP 4: Filter fish + dams to subbasin
@@ -419,13 +448,13 @@ message("\nBasin (training extent):")
 message("  spatial/basin/basin_polygon.gpkg")
 message("  spatial/basin/stream_network.gpkg")
 message("  spatial/basin/stream_network_pruned.gpkg")
-message("  points_snapped/basin/basin_subc_ids_pruned.csv")
+message("  spatial/basin/basin_subc_ids_pruned.csv")
 message("  points_snapped/basin/fish_sdm_basin.csv")
 message("\nSubbasin (prediction extent + connectivity):")
 message("  spatial/subbasin/subbasin_polygon.gpkg")
 message("  spatial/subbasin/stream_network.gpkg")
 message("  spatial/subbasin/stream_network_pruned.gpkg")
-message("  points_snapped/subbasin/subbasin_subc_ids_pruned.csv")
+message("  spatial/subbasin/subbasin_subc_ids_pruned.csv")
 message("  points_snapped/subbasin/fish_subbasin.csv")
 message("  points_snapped/subbasin/dams_subbasin.csv")
 message("  points_snapped/subbasin/fish_sdm_subbasin.csv")

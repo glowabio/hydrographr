@@ -26,7 +26,7 @@
 #   - config/study_area_params.csv                     (BASIN_ID for downstream)
 #   - points_cleaned/maps/hcmr_fish_overview.html
 #
-# LOCATION: workflows/01_data_preparation/01_clean_hcmr_fish.R
+# LOCATION: workflows/01_biodiversity_data/01_clean_hcmr_fish.R
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 
 library(hydrographr)

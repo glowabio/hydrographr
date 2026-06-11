@@ -163,8 +163,18 @@ read_geopackage <- function(gpkg, import_as = "data.table", layer_name = NULL,
 
     if (import_as == "graph") { # only for network
       cat("Building graph...\n")
+
+      # Ensure the edge list columns (stream → next_stream) are first
+      # graph_from_data_frame() uses the first two columns as from/to
+      id_col   <- intersect(c("stream", "subc_id", "from"), names(network_table))[1]
+      next_col <- intersect(c("next_stream", "target", "to"), names(network_table))[1]
+
+      other_cols <- setdiff(names(network_table), c(id_col, next_col))
+      network_table <- network_table[, c(id_col, next_col, other_cols), with = FALSE]
+
       g_out <- graph_from_data_frame(network_table, directed = TRUE)
       return(g_out)
+
       }
 
   } else if (import_as == "sf") {
