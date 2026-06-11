@@ -37,7 +37,7 @@
 #   points_snapped/subbasin_sarantaporos/fish_sarantaporos.csv
 #   points_snapped/subbasin_sarantaporos/dams_sarantaporos.csv
 #
-# LOCATION: workflows/03_spatial_network/01b_extract_sarantaporos_subbasin.R
+# LOCATION: workflows/03_snapping/04_extract_sarantaporos_subbasin.R
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 
 library(hydrographr)

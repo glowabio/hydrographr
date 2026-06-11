@@ -28,7 +28,7 @@
 #   - sdm/input/occurr/{species}/occurr_{species}.csv  (per species)
 #   - sdm/input/occurr/species_data_summary.csv
 #
-# LOCATION: workflows/06_sdm/03b_prepare_sdm_data.R
+# LOCATION: workflows/07_sdm/03b_prepare_sdm_data.R
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 
 library(data.table)

@@ -19,7 +19,7 @@
 #   - env90m/predict_table_vif.csv   (filtered predict table)
 #   - env90m/selected_vars.csv             (retained variable names)
 #
-# LOCATION: workflows/06_sdm/03_check_multicollinearity.R
+# LOCATION: workflows/07_sdm/03_check_multicollinearity.R
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 
 library(data.table)

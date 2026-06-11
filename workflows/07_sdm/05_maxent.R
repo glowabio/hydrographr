@@ -30,7 +30,7 @@
 #   - sdm/predictions/pred_maxent_{species}.csv  (full basin)
 #   - spatial/subbasin/stream_network_predictions_maxent.gpkg
 #
-# LOCATION: workflows/06_sdm/05_maxent.R
+# LOCATION: workflows/07_sdm/05_maxent.R
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 
 library(maxnet)

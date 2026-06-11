@@ -48,7 +48,7 @@
 #   - sdm/predictions/pred_{species}.csv       (full basin)
 #   - spatial/subbasin/stream_network_predictions.gpkg  (subbasin only)
 #
-# LOCATION: workflows/06_sdm/04_ssn_models.R
+# LOCATION: workflows/07_sdm/04_ssn_models.R
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 
 library(SSNbler)

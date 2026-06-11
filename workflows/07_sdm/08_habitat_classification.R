@@ -57,7 +57,7 @@
 #   - spatial/subbasin/stream_network_habitat_tss.gpkg  (primary)
 #   - spatial/subbasin/stream_network_habitat_mcc.gpkg  (sensitivity)
 #
-# LOCATION: workflows/06_sdm/08_habitat_classification.R
+# LOCATION: workflows/07_sdm/08_habitat_classification.R
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 
 library(data.table)

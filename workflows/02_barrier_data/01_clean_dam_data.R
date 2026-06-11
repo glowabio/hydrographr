@@ -53,7 +53,7 @@
 #   - points_cleaned/dams/dams_classification_full.csv   (all parts + type, audit trail)
 #   - points_cleaned/maps/dams_sarantaporos_clean.html
 #
-# LOCATION: workflows/01_data_preparation/04_clean_dam_data.R
+# LOCATION: workflows/02_barrier_data/01_clean_dam_data.R
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 
 library(hydrographr)

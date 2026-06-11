@@ -28,7 +28,7 @@
 # Output:
 #   - prioritization/planned_dam_ranking.csv
 #
-# LOCATION: workflows/07_spatial_prioritization/02_planned_dam_ranking.R
+# LOCATION: workflows/09_spatial_prioritization/02_planned_dam_ranking.R
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 
 library(sf)

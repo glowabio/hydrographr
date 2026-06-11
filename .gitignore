@@ -40,8 +40,6 @@ config/
 *.html
 *_files/
 
-# Scratch/aggregated function files
-all_funs.R
 
 # Project-specific ignores
 TRASH

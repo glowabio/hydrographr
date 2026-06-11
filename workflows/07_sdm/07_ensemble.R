@@ -26,7 +26,7 @@
 #   - sdm/ensemble/ensemble_summary.csv
 #   - spatial/subbasin/stream_network_ensemble.gpkg
 #
-# LOCATION: workflows/06_sdm/07_ensemble.R
+# LOCATION: workflows/07_sdm/07_ensemble.R
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 
 library(data.table)

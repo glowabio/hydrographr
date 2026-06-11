@@ -36,7 +36,7 @@
 #   - points_snapped/subbasin/fish_sdm_basin.csv
 #   - points_snapped/subbasin/fish_sdm_subbasin.csv
 #
-# LOCATION: workflows/03_spatial_network/01_extract_subbasin.R
+# LOCATION: workflows/03_snapping/03_extract_subbasin.R
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 
 library(hydrographr)

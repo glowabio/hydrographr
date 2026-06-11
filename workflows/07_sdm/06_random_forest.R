@@ -34,7 +34,7 @@
 #   Valavi et al. (2021) Modelling species presence-only data with random forests
 #   Ecography 44: 1731-1742
 #
-# LOCATION: workflows/06_sdm/06_random_forest.R
+# LOCATION: workflows/07_sdm/06_random_forest.R
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 
 library(ranger)
