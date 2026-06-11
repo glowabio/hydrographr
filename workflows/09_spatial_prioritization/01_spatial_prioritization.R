@@ -185,7 +185,7 @@ fwrite(pu_dat, "prioritization/pu_dat.csv")
 message("\n=== Step 2b: Building MW opportunity-cost layer (planned only) ===")
 
 dam_mw <- fread("points_snapped/dams/dams_snapped_points_june.csv")
-# power   <- read_geopackage("points_cleaned/dams/dams_sarantaporos_power.gpkg",
+# power   <- read_geopackage("points_cleaned/dams/dams_sarantaporos_clean.gpkg",
 #                            import_as = "data.table")
 
 # attach MW to each snapped dam by site_id

@@ -23,7 +23,7 @@
 #   - prioritization/pu_dat.csv              (planning units, length_km)
 #   - spatial/stream_networks/river_graph_current.RDS
 #   - points_snapped/dams/dams_snapped_points.csv
-#   - points_cleaned/dams/dams_sarantaporos_power.gpkg
+#   - points_cleaned/dams/dams_sarantaporos_clean.gpkg
 #
 # Output:
 #   - prioritization/planned_dam_ranking.csv
@@ -79,7 +79,7 @@ message("  Reaches with non-zero suitability: ", nrow(reach_value))
 message("\n=== Step 3: Planned-dam reaches and MW ===")
 
 snapped <- fread("points_snapped/dams/dams_snapped_points.csv")
-power   <-   read_geopackage("points_cleaned/dams/dams_sarantaporos_power.gpkg",
+power   <-   read_geopackage("points_cleaned/dams/dams_sarantaporos_clean.gpkg",
                              import_as = "data.table")
 
 planned <- snapped[status == "planned", .(site_id, subc_id)][
