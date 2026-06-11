@@ -263,7 +263,7 @@ message("  Barrier edges: current = ",
 
 message("\n=== Step 3: Loading dam data and occurrence points ===")
 
-dams <- fread("points_snapped/dams/dams_snapped_points.csv") %>%
+dams <- fread("points_snapped/dams/dams_snapped_points_june.csv") %>%
   filter(subc_id %in% network_dt$subc_id)
 
 dams_current <- dams %>% filter(status == "existing")

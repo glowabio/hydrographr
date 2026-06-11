@@ -25,7 +25,7 @@
 #       map3_fragments_{species}_main.png         — Barbus + Salmo, two-panel
 #       map3_fragments_all_species_supplementary.png
 #
-# Inputs (from 07a_habitat_fragmentation_metrics.R):
+# Inputs (from 01_habitat_fragmentation_metrics.R):
 #   sdm/patch_metrics/patch_membership_{species}.csv
 #   sdm/patch_metrics/dist_point_{species}.csv
 #   sdm/patch_metrics/dist_patch_{species}.csv
