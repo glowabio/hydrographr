@@ -43,7 +43,7 @@ basin_stream_length <- read_geopackage("spatial/basin/stream_network_pruned.gpkg
 subcatchments <- subcatchments %>% left_join(basin_stream_length)
 
 # New snapped dam inventory (status column: "existing" / "planned")
-barriers <- read.csv("points_snapped/dams/dams_snapped_points_june.csv") %>%
+barriers <- read.csv("points_snapped/dams/dams_snapped_points.csv") %>%
   filter(subc_id %in% subcatchments$subc_id)   # keep dams on the Sarantaporos network
 
 message("Barriers on network: ", nrow(barriers),

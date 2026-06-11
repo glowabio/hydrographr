@@ -480,7 +480,7 @@ dams_snap_result <- dams_snap_result %>%
 
 
 # Save
-fwrite(dams_snap_result, "points_snapped/dams/dams_snapped_points_june.csv")
+fwrite(dams_snap_result, "points_snapped/dams/dams_snapped_points.csv")
 message(sprintf("Dams: Snapped %d points", nrow(dams_snap_result)))
 
 # ============================================================================
