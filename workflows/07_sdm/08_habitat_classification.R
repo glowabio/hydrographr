@@ -72,10 +72,6 @@ source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/
 # BASE_DIR <- NIMBUS_DIR
 setwd(BASE_DIR)
 
-# Source fill_habitat_gaps function
-# TODO: move to hydrographr package
-source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/fill_habitat_gaps.R")
-
 dir.create("sdm/habitat", recursive = TRUE, showWarnings = FALSE)
 
 # ============================================================
