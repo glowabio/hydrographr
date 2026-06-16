@@ -91,31 +91,31 @@ message("\n=== Step 0: Downloading env90m tables (5 variables) ===")
 
 dir.create("env90m", showWarnings = FALSE, recursive = TRUE)
 
-# Climate: bio01 (temperature) + bio15 (precipitation seasonality)
-download_observed_climate_tables(
-  subset       = c("bio01_1981-2010_observed", "bio15_1981-2010_observed"),
-  tile_ids     = tile_id,
-  download      = TRUE,
-  download_dir = "env90m",
-  file_format  = "txt",
-  delete_zips  = TRUE,
-  ignore_missing = FALSE,
-  tempdir      = NULL,
-  quiet        = FALSE
-)
-
-# Hydrography: Strahler order, elevation diff to outlet, downstream slope gradient
-download_hydrography90m_tables(
-  subset       = c("order_strahler", "outlet_diff_dw_basin", "slope_grad_dw_cel"),
-  tile_ids     = tile_id,
-  download      = TRUE,
-  download_dir = "env90m",
-  file_format  = "txt",
-  delete_zips  = TRUE,
-  ignore_missing = FALSE,
-  tempdir      = NULL,
-  quiet        = FALSE
-)
+# # Climate: bio01 (temperature) + bio15 (precipitation seasonality)
+# download_observed_climate_tables(
+#   subset       = c("bio01_1981-2010_observed", "bio15_1981-2010_observed"),
+#   tile_ids     = tile_id,
+#   download      = TRUE,
+#   download_dir = "env90m",
+#   file_format  = "txt",
+#   delete_zips  = TRUE,
+#   ignore_missing = FALSE,
+#   tempdir      = NULL,
+#   quiet        = FALSE
+# )
+#
+# # Hydrography: Strahler order, elevation diff to outlet, downstream slope gradient
+# download_hydrography90m_tables(
+#   subset       = c("order_strahler", "outlet_diff_dw_basin", "slope_grad_dw_cel"),
+#   tile_ids     = tile_id,
+#   download      = TRUE,
+#   download_dir = "env90m",
+#   file_format  = "txt",
+#   delete_zips  = TRUE,
+#   ignore_missing = FALSE,
+#   tempdir      = NULL,
+#   quiet        = FALSE
+# )
 
 # subc_ids_basin.txt is created by the SDM download step. If running this
 # module independently, ensure it exists (it lists the basin sub-catchment
@@ -132,46 +132,48 @@ message("\n=== Step 1: Building env_space table (5 variables) ===")
 
 env_space_file <- "env90m/env_space_table.csv"   # distinct from SDM predict_table.csv
 
-env_tbl <- get_predict_table(
-  variable      = variables,
-  statistics    = statistics,
-  tile_id       = tile_id,
-  input_var_path = "env90m",
-  subcatch_id   = "env90m/subc_ids_basin.txt",
-  out_file_path = env_space_file,
-  read          = TRUE,
-  quiet         = FALSE,
-  n_cores       = n_cores,
-  overwrite     = TRUE
-)
+# env_tbl <- get_predict_table(
+#   variable      = variables,
+#   statistics    = statistics,
+#   tile_id       = tile_id,
+#   input_var_path = "env90m",
+#   subcatch_id   = "env90m/subc_ids_basin.txt",
+#   out_file_path = env_space_file,
+#   read          = TRUE,
+#   quiet         = FALSE,
+#   n_cores       = n_cores,
+#   overwrite     = TRUE
+# )
+#
+# # Strip temporal suffix on climate columns: bio01_1981-2010_observed_mean -> bio01_mean
+# colnames(env_tbl) <- gsub("_1981-2010_observed", "", colnames(env_tbl))
+#
+# message("  Columns: ", paste(names(env_tbl), collapse = ", "))
+#
+# # ============================================================
+# # STEP 2: Rescale (identical scale factors to the SDM module)
+# # ============================================================
+#
+# message("\n=== Step 2: Rescaling ===")
+#
+# # slope gradient: /1e6
+# if ("slope_grad_dw_cel_mean" %in% names(env_tbl))
+#   env_tbl <- env_tbl %>% mutate(slope_grad_dw_cel_mean = slope_grad_dw_cel_mean / 1e6)
+#
+# # bio01: temperature in Kelvin x10 -> /10 then -273.15 (deg C)
+# if ("bio01_mean" %in% names(env_tbl))
+#   env_tbl <- env_tbl %>% mutate(bio01_mean = (bio01_mean / 10) - 273.15)
+#
+# # bio15: precipitation seasonality x10 -> /10
+# if ("bio15_mean" %in% names(env_tbl))
+#   env_tbl <- env_tbl %>% mutate(bio15_mean = bio15_mean / 10)
+#
+# # outlet_diff_dw_basin and order_strahler: no scale factor (raw units)
+#
+# fwrite(env_tbl, env_space_file)
+# message("  Saved rescaled table: ", env_space_file)
 
-# Strip temporal suffix on climate columns: bio01_1981-2010_observed_mean -> bio01_mean
-colnames(env_tbl) <- gsub("_1981-2010_observed", "", colnames(env_tbl))
-
-message("  Columns: ", paste(names(env_tbl), collapse = ", "))
-
-# ============================================================
-# STEP 2: Rescale (identical scale factors to the SDM module)
-# ============================================================
-
-message("\n=== Step 2: Rescaling ===")
-
-# slope gradient: /1e6
-if ("slope_grad_dw_cel_mean" %in% names(env_tbl))
-  env_tbl <- env_tbl %>% mutate(slope_grad_dw_cel_mean = slope_grad_dw_cel_mean / 1e6)
-
-# bio01: temperature in Kelvin x10 -> /10 then -273.15 (deg C)
-if ("bio01_mean" %in% names(env_tbl))
-  env_tbl <- env_tbl %>% mutate(bio01_mean = (bio01_mean / 10) - 273.15)
-
-# bio15: precipitation seasonality x10 -> /10
-if ("bio15_mean" %in% names(env_tbl))
-  env_tbl <- env_tbl %>% mutate(bio15_mean = bio15_mean / 10)
-
-# outlet_diff_dw_basin and order_strahler: no scale factor (raw units)
-
-fwrite(env_tbl, env_space_file)
-message("  Saved rescaled table: ", env_space_file)
+env_tbl <- fread(env_space_file)
 
 # ============================================================
 # STEP 3: Subset to fish occurrence sub-catchments
@@ -280,6 +282,7 @@ pca_dat <- occ_env %>%
 
 pca_mat <- pca_dat %>% select(all_of(pca_cols)) %>% as.matrix()
 pca     <- prcomp(pca_mat, center = TRUE, scale. = TRUE)
+round(pca$rotation[, 1:2], 3)
 
 # scores + loadings
 scores <- as.data.frame(pca$x[, 1:2]) %>%

@@ -106,11 +106,12 @@ make_panel <- function(net_sf, n_frag, title_label) {
 
 p_cur <- make_panel(streams_cur, n_cur, "Current") +
   geom_sf(data = dams_sf %>% filter(status == "existing"),
-          shape = 21, fill = "black", colour = "white", size = 2.5)
+          shape = 24,
+          fill = "#E41A1C", colour = "white", size = 2.5, stroke = 0.5)
 
 p_fut <- make_panel(streams_fut, n_fut, "Future") +
-  geom_sf(data = dams_sf, shape = 21, fill = "black",
-          colour = "white", size = 2)
+  geom_sf(data = dams_sf,shape = 24,
+          fill = "#E41A1C", colour = "white", size = 2.5, stroke = 0.5)
 
 combined <- p_cur + p_fut +
   plot_annotation(
