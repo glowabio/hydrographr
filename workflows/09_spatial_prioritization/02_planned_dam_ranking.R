@@ -78,13 +78,13 @@ message("  Reaches with non-zero suitability: ", nrow(reach_value))
 
 message("\n=== Step 3: Planned-dam reaches and MW ===")
 
-snapped <- fread("points_snapped/dams/dams_snapped_points.csv")
-power   <-   read_geopackage("points_cleaned/dams/dams_sarantaporos_clean.gpkg",
-                             import_as = "data.table")
-
-planned <- snapped[status == "planned", .(site_id, subc_id)][
-  power[, .(site_id, power_mw)], on = "site_id", nomatch = NULL]
-planned <- planned[subc_id %in% as.integer(subc_ids_basin)]
+dams <- fread("points_snapped/dams/dams_snapped_points.csv")
+# power   <-   read_geopackage("points_cleaned/dams/dams_sarantaporos_clean.gpkg",
+#                              import_as = "data.table")
+#
+# planned <- snapped[status == "planned", .(site_id, subc_id)][
+#   power[, .(site_id, power_mw)], on = "site_id", nomatch = NULL]
+planned <- dams %>% filter(status == "planned")
 
 dam_reach <- planned[, .(power_mw = sum(power_mw, na.rm = TRUE),
                          n_dams   = .N,
