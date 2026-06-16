@@ -76,11 +76,11 @@ leaflet(catchment_sf) \%>\%
 
 }
 \seealso{
-Other ocgapi: 
-\code{\link{api_get_basin_polygon}()},
-\code{\link{api_get_ids}()},
-\code{\link{api_get_snapped_points}()},
-\code{\link{api_get_snapped_points_cascade}()},
-\code{\link{api_get_stream_segments}()}
+Other ocgapi:
+\code{\link[=api_get_basin_polygon]{api_get_basin_polygon()}},
+\code{\link[=api_get_ids]{api_get_ids()}},
+\code{\link[=api_get_snapped_points]{api_get_snapped_points()}},
+\code{\link[=api_get_snapped_points_cascade]{api_get_snapped_points_cascade()}},
+\code{\link[=api_get_stream_segments]{api_get_stream_segments()}}
 }
 \concept{ocgapi}
