@@ -20,15 +20,15 @@
 #   - spatial/basin/basin_subc_ids_pruned.csv
 #   - env90m/predict_table_vif.csv
 #   - points_original/fish/species_list_sarantaporos.txt
-#   - spatial/subbasin/stream_network_pruned.gpkg
-#   - spatial/subbasin/subbasin_subc_ids_pruned.csv
+#   - spatial/subbasin_sarantaporos/stream_network_pruned.gpkg
+#   - spatial/subbasin_sarantaporos/subbasin_subc_ids_pruned.csv
 #
 # Output:
 #   - sdm/rf_models/rf_{species}.rds
 #   - sdm/rf_models/rf_evaluation.csv
 #   - sdm/rf_models/rf_variable_importance.csv
 #   - sdm/predictions/pred_rf_{species}.csv  (full basin)
-#   - spatial/subbasin/stream_network_predictions_rf.gpkg
+#   - spatial/subbasin_sarantaporos/stream_network_predictions_rf.gpkg
 #
 # References:
 #   Valavi et al. (2021) Modelling species presence-only data with random forests
@@ -122,7 +122,7 @@ basin_subc_ids <- fread("spatial/basin/basin_subc_ids_pruned.csv") %>%
   pull(subc_id)
 
 # Subbasin subcatchment IDs — for output gpkg
-subbasin_subc_ids <- fread("spatial/subbasin/subbasin_subc_ids_pruned.csv") %>%
+subbasin_subc_ids <- fread("spatial/subbasin_sarantaporos/subbasin_subc_ids_pruned.csv") %>%
   pull(subc_id)
 
 # Full basin prediction data
@@ -428,7 +428,7 @@ message("  Saved: sdm/rf_models/rf_variable_importance.csv")
 
 message("\n=== Step 4: Joining predictions to subbasin network ===")
 
-network <- st_read("spatial/subbasin/stream_network_pruned.gpkg")
+network <- st_read("spatial/subbasin_sarantaporos/stream_network_pruned.gpkg")
 
 pred_files <- list.files("sdm/predictions",
                          pattern = "pred_rf_.*\\.csv$",
@@ -452,9 +452,9 @@ for (f in pred_files) {
 }
 
 st_write(network,
-         "spatial/subbasin/stream_network_predictions_rf.gpkg",
+         "spatial/subbasin_sarantaporos/stream_network_predictions_rf.gpkg",
          delete_dsn = TRUE)
-message("  Saved: spatial/subbasin/stream_network_predictions_rf.gpkg")
+message("  Saved: spatial/subbasin_sarantaporos/stream_network_predictions_rf.gpkg")
 
 # ============================================================
 # SUMMARY
@@ -468,5 +468,5 @@ message("  sdm/rf_models/rf_{species}.rds")
 message("  sdm/rf_models/rf_evaluation.csv")
 message("  sdm/rf_models/rf_variable_importance.csv")
 message("  sdm/predictions/pred_rf_{species}.csv  (full basin)")
-message("  spatial/subbasin/stream_network_predictions_rf.gpkg")
+message("  spatial/subbasin_sarantaporos/stream_network_predictions_rf.gpkg")
 message("\nNext: 07_ensemble.R")

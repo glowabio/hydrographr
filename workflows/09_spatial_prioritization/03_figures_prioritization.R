@@ -271,3 +271,4 @@ message(paste(rep("=", 80), collapse = ""))
 message("  Fig 1: prioritization/maps/fig1_dam_ranking_bars.png")
 message("  Fig 2: prioritization/maps/fig2_dam_damage_map.png")
 message("  Fig 3: prioritization/maps/fig3_priority_comparison_30pct.png")
+

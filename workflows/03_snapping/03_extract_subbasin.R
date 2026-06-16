@@ -1,20 +1,33 @@
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
-# 01_extract_subbasin.R
+# 03_extract_subbasin.R
 #
 # Extract the target basin and subbasin networks for connectivity and
 # SDM analysis.
 #
 # Training extent:   full Vjosa/Aoos basin (SDM model fitting + pseudoabsences)
-# Prediction extent: subbasin upstream of outlet (Sarantaporos + Voidomatis)
+# Prediction extent: Sarantaporos sub-basin only (SDM predictions +
+#                    connectivity + fragmentation analysis)
+#
+# Note on extents:
+#   SDM models are trained on the full Vjosa/Aoos basin to provide a broad
+#   environmental space for fitting and a large pseudoabsence pool. All
+#   predictions, however, are generated for the Sarantaporos sub-basin only,
+#   which is the sub-basin with the highest planned hydropower development
+#   pressure and where field data are concentrated. Using a single prediction
+#   extent (Sarantaporos) throughout keeps the SDM, connectivity and
+#   fragmentation analyses spatially consistent. The outlet point is placed at
+#   the confluence of Sarantaporos into Voidomatis, so the extracted catchment
+#   is the Sarantaporos drainage only.
 #
 # Workflow:
 #   1. Load basin-filtered snapped fish + dams
 #   2. Download basin polygon + stream network + prune  (SDM training extent)
-#   3. Extract subbasin polygon + stream network + prune (SDM prediction extent)
+#   3. Extract Sarantaporos subbasin polygon + stream network + prune
+#      (SDM prediction extent + connectivity analysis)
 #   4. Filter fish + dams to subbasin subcatchments
 #   5. [VISUALISATION] Basin + subbasin networks + points
 #   6. [VISUALISATION] Full vs pruned subbasin network
-#   7. Filter fish to target species → SDM outputs
+#   7. Filter fish to target species -> SDM outputs
 #
 # Input:
 #   - points_snapped/fish/fish_all_species_snapped.csv
@@ -27,14 +40,15 @@
 #   - spatial/basin/stream_network.gpkg
 #   - spatial/basin/stream_network_pruned.gpkg
 #   - spatial/basin/basin_subc_ids_pruned.csv
-#   - spatial/subbasin/subbasin_polygon.gpkg
-#   - spatial/subbasin/stream_network.gpkg
-#   - spatial/subbasin/stream_network_pruned.gpkg
-#   - spatial/subbasin/subbasin_subc_ids_pruned.csv
-#   - points_snapped/subbasin/fish_subbasin.csv
-#   - points_snapped/subbasin/dams_subbasin.csv
-#   - points_snapped/subbasin/fish_sdm_basin.csv
-#   - points_snapped/subbasin/fish_sdm_subbasin.csv
+#   - spatial/subbasin_sarantaporos/subbasin_polygon.gpkg
+#   - spatial/subbasin_sarantaporos/stream_network.gpkg
+#   - spatial/subbasin_sarantaporos/stream_network_pruned.gpkg
+#   - spatial/subbasin_sarantaporos/subbasin_subc_ids_pruned.csv
+#   - points_snapped/subbasin_sarantaporos/fish_subbasin.csv
+#   - points_snapped/subbasin_sarantaporos/dams_subbasin.csv
+#   - points_snapped/basin/fish_sdm_basin.csv
+#   - points_snapped/subbasin_sarantaporos/fish_sdm_subbasin.csv
+#   - points_snapped/subbasin_sarantaporos/species_coverage_summary.csv
 #
 # LOCATION: workflows/03_snapping/03_extract_subbasin.R
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
@@ -49,7 +63,6 @@ select <- dplyr::select
 
 source("~/Documents/PhD/scripts/hydrographr/workflows/helpers/save_to_nimbus.R")
 source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
-BASE_DIR <- NIMBUS_DIR
 setwd(BASE_DIR)
 
 # ============================================================
@@ -61,10 +74,12 @@ study_params <- fread("config/study_area_params.csv")
 BASIN_ID <- study_params[param == "BASIN_ID", as.integer(value)]
 message("  Basin ID: ", BASIN_ID)
 
-# Subbasin outlet point (confluence of Sarantaporos + Voidomatis → Aoos mainstem)
+# Subbasin outlet point = confluence of Sarantaporos into Voidomatis.
+# This delineates the Sarantaporos drainage only (Voidomatis excluded).
 # Coordinates obtained from https://aqua.igb-berlin.de/upstream-dev/
-OUTLET_LON <- 20.5870613
-OUTLET_LAT <- 40.0728991
+OUTLET_LON <- 20.592
+OUTLET_LAT <- 40.071
+
 
 # Network pruning parameters — applied to both basin and subbasin
 MIN_STRAHLER    <- 4
@@ -97,7 +112,7 @@ fish_unique <- fish_snapped %>%
   distinct(site_id, longitude_snapped, latitude_snapped, subc_id, source)
 
 dams_unique <- dams_snapped %>%
-  distinct(site_id, longitude_snapped, latitude_snapped, subc_id, source)
+  distinct(site_id, longitude_snapped, latitude_snapped, subc_id)
 
 message("  Unique fish sites: ", nrow(fish_unique))
 message("  Unique dam sites:  ", nrow(dams_unique))
@@ -121,12 +136,11 @@ message("  Basin polygon saved")
 # Full basin stream network
 basin_streams <- api_get_stream_segments(
   basin_id      = BASIN_ID,
+  upstream = FALSE,
   geometry_only = FALSE,
   min_strahler  = 2
 )
 basin_streams$basin_id <- BASIN_ID
-
-
 
 st_write(basin_streams, "spatial/basin/stream_network.gpkg", delete_dsn = TRUE)
 save_to_nimbus(basin_streams, "spatial/basin/stream_network.gpkg")
@@ -142,7 +156,6 @@ basin_streams_pruned <- extract_partial_stream_network(
   strahler_retain_threshold = MIN_STRAHLER,
   upstream_buffer           = UPSTREAM_BUFFER
 )
-
 
 # Deduplicate by subc_id — keep first occurrence
 n_before <- nrow(basin_streams_pruned)
@@ -168,43 +181,42 @@ fwrite(data.table(subc_id = basin_subc_ids_pruned),
 message("  Saved: spatial/basin/basin_subc_ids_pruned.csv")
 
 # ============================================================
-# STEP 3: Extract subbasin polygon + stream network + prune
+# STEP 3: Extract Sarantaporos subbasin polygon + stream network + prune
 # (SDM prediction extent + connectivity analysis)
+#
+# Outlet = confluence of Sarantaporos into Voidomatis, so the extracted
+# upstream catchment is the Sarantaporos drainage only.
 # ============================================================
 
-message("\n=== Step 3: Extracting subbasin (SDM prediction extent) ===")
+message("\n=== Step 3: Extracting Sarantaporos subbasin (prediction extent) ===")
+message("  Outlet: lon = ", OUTLET_LON, " | lat = ", OUTLET_LAT)
+message("  (Confluence of Sarantaporos into Voidomatis)")
 
-dir.create("spatial/subbasin",        recursive = TRUE, showWarnings = FALSE)
-dir.create("points_snapped/subbasin", recursive = TRUE, showWarnings = FALSE)
+dir.create("spatial/subbasin_sarantaporos",        recursive = TRUE, showWarnings = FALSE)
+dir.create("points_snapped/subbasin_sarantaporos", recursive = TRUE, showWarnings = FALSE)
 
-# Subbasin polygon
-subbasin_polygon <- api_get_upstream_catchment(lon = OUTLET_LON, lat = OUTLET_LAT)
-st_write(subbasin_polygon, "spatial/subbasin/subbasin_polygon.gpkg", delete_dsn = TRUE)
-save_to_nimbus(subbasin_polygon, "spatial/subbasin/subbasin_polygon.gpkg")
-message("  Subbasin polygon saved")
+# Subbasin polygon — Sarantaporos drainage only
+subbasin_polygon <- api_get_upstream_catchment(lon = OUTLET_LON, lat = OUTLET_LAT,)
+st_write(subbasin_polygon, "spatial/subbasin_sarantaporos/subbasin_polygon.gpkg", delete_dsn = TRUE)
+save_to_nimbus(subbasin_polygon, "spatial/subbasin_sarantaporos/subbasin_polygon.gpkg")
+message("  Subbasin polygon saved | Area: ",
+        round(as.numeric(st_area(subbasin_polygon)) / 1e6, 1), " km2")
 
 # Full subbasin stream network
-# add_target_streams = TRUE ensures target column is returned (needed for pruning)
 subbasin_streams <- api_get_stream_segments(
-  lon                = OUTLET_LON,
-  lat                = OUTLET_LAT,
-  upstream           = TRUE,
-  geometry_only      = FALSE,
-  min_strahler       = 2
+  lon           = OUTLET_LON,
+  lat           = OUTLET_LAT,
+  upstream      = TRUE,
+  geometry_only = FALSE,
+  min_strahler  = 2
 )
 
-
-st_write(subbasin_streams, "spatial/subbasin/stream_network.gpkg", delete_dsn = TRUE)
-save_to_nimbus(subbasin_streams, "spatial/subbasin/stream_network.gpkg")
+st_write(subbasin_streams, "spatial/subbasin_sarantaporos/stream_network.gpkg", delete_dsn = TRUE)
+save_to_nimbus(subbasin_streams, "spatial/subbasin_sarantaporos/stream_network.gpkg")
 
 subbasin_subc_ids <- unique(subbasin_streams$subc_id)
 message("  Subbasin stream segments: ", nrow(subbasin_streams),
         " | subcatchments: ", length(subbasin_subc_ids))
-
-# Filter points to subbasin before pruning
-# (pruning is based on which reaches have observations)
-# fish_subbasin_unique <- fish_unique %>% filter(subc_id %in% subbasin_subc_ids)
-# dams_subbasin_unique <- dams_unique %>% filter(subc_id %in% subbasin_subc_ids)
 
 # Prune subbasin network
 subbasin_streams_pruned <- extract_partial_stream_network(
@@ -227,18 +239,17 @@ if (n_before > n_after) {
 
 # save the clean version
 st_write(subbasin_streams_pruned,
-         "spatial/subbasin/stream_network_pruned.gpkg",
+         "spatial/subbasin_sarantaporos/stream_network_pruned.gpkg",
          delete_dsn = TRUE)
-
-save_to_nimbus(subbasin_streams_pruned, "spatial/subbasin/stream_network_pruned.gpkg")
+save_to_nimbus(subbasin_streams_pruned, "spatial/subbasin_sarantaporos/stream_network_pruned.gpkg")
 
 subbasin_subc_ids_pruned <- unique(subbasin_streams_pruned$subc_id)
 message("  Pruned subbasin segments: ", nrow(subbasin_streams_pruned),
         " | subcatchments: ", length(subbasin_subc_ids_pruned))
 
 fwrite(data.table(subc_id = subbasin_subc_ids_pruned),
-       "spatial/subbasin/subbasin_subc_ids_pruned.csv")
-message("  Saved: spatial/subbasin/subbasin_subc_ids_pruned.csv")
+       "spatial/subbasin_sarantaporos/subbasin_subc_ids_pruned.csv")
+message("  Saved: spatial/subbasin_sarantaporos/subbasin_subc_ids_pruned.csv")
 
 # ============================================================
 # STEP 4: Filter fish + dams to subbasin
@@ -261,8 +272,14 @@ if (nrow(dams_subbasin) > 0) {
   print(table(dams_subbasin$phase))
 }
 
-fwrite(fish_subbasin, "points_snapped/subbasin/fish_subbasin.csv")
-fwrite(dams_subbasin, "points_snapped/subbasin/dams_subbasin.csv")
+fwrite(fish_subbasin, "points_snapped/subbasin_sarantaporos/fish_subbasin.csv")
+fwrite(dams_subbasin, "points_snapped/subbasin_sarantaporos/dams_subbasin.csv")
+
+# unique-site versions for visualisation
+fish_subbasin_unique <- fish_unique %>%
+  filter(subc_id %in% subbasin_subc_ids)
+dams_subbasin_unique <- dams_unique %>%
+  filter(subc_id %in% subbasin_subc_ids)
 
 # sf versions for visualisation
 fish_subbasin_sf <- fish_subbasin_unique %>%
@@ -415,7 +432,7 @@ message("  Basin SDM training records: ", nrow(fish_sdm_basin),
 fish_sdm_subbasin <- fish_subbasin %>%
   filter(species %in% target_species)
 
-fwrite(fish_sdm_subbasin, "points_snapped/subbasin/fish_sdm_subbasin.csv")
+fwrite(fish_sdm_subbasin, "points_snapped/subbasin_sarantaporos/fish_sdm_subbasin.csv")
 message("  Subbasin SDM records: ", nrow(fish_sdm_subbasin),
         " (", n_distinct(fish_sdm_subbasin$species), " species)")
 
@@ -429,7 +446,7 @@ species_coverage <- data.frame(species = target_species) %>%
   ) %>%
   arrange(desc(n_basin))
 
-fwrite(species_coverage, "points_snapped/subbasin/species_coverage_summary.csv")
+fwrite(species_coverage, "points_snapped/subbasin_sarantaporos/species_coverage_summary.csv")
 
 cat("\nSpecies coverage:\n")
 cat("  Target species:               ", length(target_species), "\n")
@@ -450,15 +467,15 @@ message("  spatial/basin/stream_network.gpkg")
 message("  spatial/basin/stream_network_pruned.gpkg")
 message("  spatial/basin/basin_subc_ids_pruned.csv")
 message("  points_snapped/basin/fish_sdm_basin.csv")
-message("\nSubbasin (prediction extent + connectivity):")
-message("  spatial/subbasin/subbasin_polygon.gpkg")
-message("  spatial/subbasin/stream_network.gpkg")
-message("  spatial/subbasin/stream_network_pruned.gpkg")
-message("  spatial/subbasin/subbasin_subc_ids_pruned.csv")
-message("  points_snapped/subbasin/fish_subbasin.csv")
-message("  points_snapped/subbasin/dams_subbasin.csv")
-message("  points_snapped/subbasin/fish_sdm_subbasin.csv")
-message("  points_snapped/subbasin/species_coverage_summary.csv")
+message("\nSubbasin = Sarantaporos (prediction extent + connectivity):")
+message("  spatial/subbasin_sarantaporos/subbasin_polygon.gpkg")
+message("  spatial/subbasin_sarantaporos/stream_network.gpkg")
+message("  spatial/subbasin_sarantaporos/stream_network_pruned.gpkg")
+message("  spatial/subbasin_sarantaporos/subbasin_subc_ids_pruned.csv")
+message("  points_snapped/subbasin_sarantaporos/fish_subbasin.csv")
+message("  points_snapped/subbasin_sarantaporos/dams_subbasin.csv")
+message("  points_snapped/subbasin_sarantaporos/fish_sdm_subbasin.csv")
+message("  points_snapped/subbasin_sarantaporos/species_coverage_summary.csv")
 message("\nNext steps:")
 message("  SDM: download env vars for basin_subc_ids_pruned,")
 message("       predict on subbasin_subc_ids_pruned")

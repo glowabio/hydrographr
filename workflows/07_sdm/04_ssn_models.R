@@ -46,7 +46,7 @@
 #   - sdm/ssn_models/torgegram_{species}.png
 #   - sdm/ssn_models/model_summary.csv
 #   - sdm/predictions/pred_{species}.csv       (full basin)
-#   - spatial/subbasin/stream_network_predictions.gpkg  (subbasin only)
+#   - spatial/subbasin_sarantaporos/stream_network_predictions.gpkg  (subbasin only)
 #
 # LOCATION: workflows/07_sdm/04_ssn_models.R
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
@@ -152,7 +152,7 @@ basin_subc_ids <- fread("spatial/basin/basin_subc_ids_pruned.csv") %>%
   pull(subc_id)
 
 # Subbasin subcatchment IDs — for saving subbasin predictions to gpkg
-subbasin_subc_ids <- fread("spatial/subbasin/subbasin_subc_ids_pruned.csv") %>%
+subbasin_subc_ids <- fread("spatial/subbasin_sarantaporos/subbasin_subc_ids_pruned.csv") %>%
   pull(subc_id)
 
 # ============================================================
@@ -626,7 +626,7 @@ message("\n=== Step 16: Saving outputs ===")
 
 # Join predictions to subbasin stream network for QGIS visualisation
 # Predictions cover full basin but we display subbasin only
-network <- st_read("spatial/subbasin/stream_network_pruned.gpkg")
+network <- st_read("spatial/subbasin_sarantaporos/stream_network_pruned.gpkg")
 
 pred_files <- list.files("sdm/predictions",
                          pattern = "pred_.*\\.csv$",
@@ -657,9 +657,9 @@ network <- network %>%
   )
 
 st_write(network,
-         "spatial/subbasin/stream_network_predictions.gpkg",
+         "spatial/subbasin_sarantaporos/stream_network_predictions.gpkg",
          delete_dsn = TRUE)
-message("  Saved: spatial/subbasin/stream_network_predictions.gpkg")
+message("  Saved: spatial/subbasin_sarantaporos/stream_network_predictions.gpkg")
 
 # Model summary
 results_summary <- lapply(names(ssn_results), function(sp) {
@@ -772,5 +772,5 @@ message("  sdm/ssn_models/ssn_{species}.rds")
 message("  sdm/ssn_models/torgegram_{species}.png")
 message("  sdm/ssn_models/model_summary.csv")
 message("  sdm/predictions/pred_{species}.csv  (full basin)")
-message("  spatial/subbasin/stream_network_predictions.gpkg  (subbasin)")
+message("  spatial/subbasin_sarantaporos/stream_network_predictions.gpkg  (subbasin)")
 message("\nNext: 05_maxent.R, 06_random_forest.R, 07_ensemble.R")

@@ -11,7 +11,7 @@
 # READS:
 #   sdm/ensemble/ensemble_<species>.csv   (subc_id, ensemble_mean, ...)
 #   sdm/ensemble/ensemble_thresholds.csv  (species, threshold_tss)
-#   spatial/subbasin/stream_network_pruned.gpkg
+#   spatial/subbasin_sarantaporos/stream_network_pruned.gpkg
 #
 # WRITES:
 #   figures/sdm/fig_ensemble_continuous.png   (main, 173 mm wide)
