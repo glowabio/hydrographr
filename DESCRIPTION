@@ -64,7 +64,6 @@ URL: https://glowabio.github.io/hydrographr/
 BugReports: https://github.com/glowabio/hydrographr/issues
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.3.3
 Imports:
     processx (>= 3.7.0),
     data.table (>= 1.14.2),
@@ -135,3 +134,5 @@ Collate:
     'crop_vector_to_extent.R'
     'api_get_stream_segments.R'
     'api_get_ids.R'
+    'fill_habitat_gaps.R'
+Config/roxygen2/version: 8.0.0

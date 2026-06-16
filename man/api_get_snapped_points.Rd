@@ -80,11 +80,11 @@ result <- api_get_snapped_points(
 
 }
 \seealso{
-Other ocgapi: 
-\code{\link{api_get_basin_polygon}()},
-\code{\link{api_get_ids}()},
-\code{\link{api_get_snapped_points_cascade}()},
-\code{\link{api_get_stream_segments}()},
-\code{\link{api_get_upstream_catchment}()}
+Other ocgapi:
+\code{\link[=api_get_basin_polygon]{api_get_basin_polygon()}},
+\code{\link[=api_get_ids]{api_get_ids()}},
+\code{\link[=api_get_snapped_points_cascade]{api_get_snapped_points_cascade()}},
+\code{\link[=api_get_stream_segments]{api_get_stream_segments()}},
+\code{\link[=api_get_upstream_catchment]{api_get_upstream_catchment()}}
 }
 \concept{ocgapi}

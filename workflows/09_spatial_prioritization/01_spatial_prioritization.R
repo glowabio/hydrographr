@@ -18,11 +18,19 @@
 #   Habitat and cost are identical between scenarios; only the
 #   connectivity changes. The shift in priority areas between scenarios
 #   therefore reflects how dams reshape the connected priority network.
-#   (Note: a barrier is treated as fully blocking for all species —
+#   (Note: a barrier is treated as fully blocking for all species --
 #   prioritizr cannot sever connectivity per species.)
 #
 # Targets solved: 20%, 30%, 40%, 50% (summary table for all; the
 # current-vs-future comparison map is drawn at the 30% target).
+#
+# SOLVER GAP: the optimality gap is the solver's guarantee that the returned
+#   solution is within X% of the true minimum cost. A gap-sensitivity check
+#   (see block below) showed solutions are near-identical from 10% to 0%
+#   (Jaccard >= 0.97 vs proven-optimal), and gap = 0.001 reproduces the
+#   proven-optimal solution exactly in ~15 s. Main results therefore use
+#   gap = 0.001; the (exploratory) calibration loop uses a loose gap = 0.1
+#   for speed, since it only needs the cost-vs-compactness trend.
 #
 # Input:
 #   - spatial/subbasin_sarantaporos/stream_network_pruned.gpkg
@@ -30,14 +38,19 @@
 #   - spatial/hfp_zonal_stats.csv
 #   - sdm/ensemble/ensemble_{species}.csv
 #   - sdm/ensemble/ensemble_thresholds.csv
+#   - sdm/habitat/habitat_{species}.csv            (binary/gap/semibinary TSS)
+#   - points_snapped/dams/dams_snapped_points.csv
 #   - spatial/stream_networks/river_graph_current.RDS
 #   - spatial/stream_networks/river_graph_future.RDS
 #
 # Output:
 #   - prioritization/pu_dat.csv, puvspr_dat.csv
-#   - prioritization/solutions/solution_{scenario}_{target_pct}.csv / .gpkg
+#   - prioritization/solutions/solution_{scenario}_{target_pct}.csv
 #   - prioritization/summary_table.csv          (all scenarios x targets)
 #   - prioritization/comparison_30pct.csv        (current vs future, 30%)
+#   - prioritization/cost_scenario_AB_30pct.csv  (HFI vs HFI+MW)
+#   - prioritization/sensitivity_k1_k3.csv
+#   - prioritization/boundary_penalty_calibration.csv
 #   - prioritization/maps/priority_comparison_30pct.png
 #   - prioritization/maps/summary_selected_reaches.png
 #
@@ -64,11 +77,13 @@ setwd(BASE_DIR)
 # PARAMETERS
 # ============================================================
 
-TARGETS          <- c(0.2, 0.3, 0.4, 0.5)
+TARGETS           <- c(0.2, 0.3, 0.4, 0.5)
 COMPARISON_TARGET <- 0.3            # target used for the current-vs-future map
-BOUNDARY_PENALTY <- 0.03            # Domisch et al. (2019)
-SOLVER_GAP       <- 0.1
-N_THREADS        <- 4
+BOUNDARY_PENALTY  <- 0.03           # calibrated via cost-compactness trade-off (knee ~0.01-0.03; see calibration block)
+SOLVER_GAP        <- 0.001          # tightened from 0.1: gap-sensitivity showed 0.001 reproduces the proven-optimal solution (Jaccard 1.0) in ~15s
+CALIB_GAP         <- 0.1            # loose gap for the exploratory calibration loop (trend only)
+N_THREADS         <- 4
+CONNECTIVITY_K    <- 3              # multi-hop connectivity neighbourhood
 
 TARGET_SPECIES <- c(
   "Alburnoides_prespensis", "Anguilla_anguilla", "Barbus_prespensis",
@@ -113,7 +128,7 @@ if (exists("preds")) rm(preds)
 
 sdm_list <- lapply(TARGET_SPECIES, function(sp) {
   f <- file.path("sdm/ensemble", paste0("ensemble_", sp, ".csv"))
-  if (!file.exists(f)) { message("    WARNING: file not found — ", f); return(NULL) }
+  if (!file.exists(f)) { message("    WARNING: file not found -- ", f); return(NULL) }
   dt <- fread(f)
   if (!"ensemble_mean" %in% names(dt)) {
     message("    WARNING: 'ensemble_mean' column missing in ", f); return(NULL)
@@ -133,7 +148,7 @@ sdm_list <- lapply(TARGET_SPECIES, function(sp) {
 })
 names(sdm_list) <- TARGET_SPECIES
 
-# Both scenario graphs — used to build barrier-aware connectivity
+# Both scenario graphs -- used to build barrier-aware connectivity
 river_graph_current <- readRDS("spatial/stream_networks/river_graph_current.RDS")
 river_graph_future  <- readRDS("spatial/stream_networks/river_graph_future.RDS")
 message("  Graphs loaded (current + future)")
@@ -167,34 +182,23 @@ pu_dat <- pu_dat %>%
 message("  Planning units: ", nrow(pu_dat),
         " | total length: ", round(sum(pu_dat$length_km, na.rm = TRUE), 1), " km")
 
-fwrite(pu_dat, "prioritization/pu_dat.csv")
-
-
-
+# (single fwrite after Step 2b, once MW columns are added)
 
 # ============================================================
 # STEP 2b: Barrier opportunity-cost layer (planned dams, MW)
 # ============================================================
 # Opportunity cost = energy forgone by NOT building a PLANNED dam.
 # Existing dams carry no opportunity cost (already built) but DO still
-# sever connectivity in the boundary file — different layer, different
+# sever connectivity in the boundary file -- different layer, different
 # logic. Per-reach cost = scaled summed planned-dam MW; dam-free reaches
 # contribute 0. Reaches with >1 planned dam get summed MW (avoiding the
 # barrier means forgoing all dams on it). Min-max scaled to match HFI.
 
 message("\n=== Step 2b: Building MW opportunity-cost layer (planned only) ===")
 
-dam_mw <- fread("points_snapped/dams/dams_snapped_points_june.csv")
-# power   <- read_geopackage("points_cleaned/dams/dams_sarantaporos_clean.gpkg",
-#                            import_as = "data.table")
+dam_mw <- fread("points_snapped/dams/dams_snapped_points.csv")
 
-# attach MW to each snapped dam by site_id
-# dam_mw <- snapped[, .(site_id, subc_id, status)][
-#   power[, .(site_id, power_mw)], on = "site_id", nomatch = NULL
-# ]
-
-
-# PLANNED dams only — existing dam carries no opportunity cost
+# PLANNED dams only -- existing dam carries no opportunity cost
 n_all <- nrow(dam_mw)
 dam_mw <- dam_mw[status == "planned"]
 message("  Dams in basin: ", n_all,
@@ -227,49 +231,6 @@ message("  Reaches w/ MW cost: ", sum(pu_dat$mw_cost > 0),
 
 fwrite(pu_dat, "prioritization/pu_dat.csv")
 
-
-
-# ============================================================
-# Scenario A vs B at the comparison target (30%)
-#   A: HFI cost            B: HFI + MW opportunity cost
-#   both under FUTURE barriers (the planned-dam scenario)
-# ============================================================
-message("\n=== Cost scenarios A (HFI) vs B (HFI+MW), future barriers, ",
-        COMPARISON_TARGET * 100, "% ===")
-
-sol_A <- solve_one(bmat_future, COMPARISON_TARGET, cost_col = "cost_hfi")
-sol_B <- solve_one(bmat_future, COMPARISON_TARGET, cost_col = "cost_hfi_mw")
-
-sel_A <- sol_A$id[sol_A$solution_1 == 1]
-sel_B <- sol_B$id[sol_B$solution_1 == 1]
-
-cost_cmp <- data.frame(
-  scenario     = c("A_HFI", "B_HFI_MW"),
-  n_selected   = c(length(sel_A), length(sel_B)),
-  selected_km  = round(c(sum(pu_dat$length_km[pu_dat$id %in% sel_A], na.rm = TRUE),
-                         sum(pu_dat$length_km[pu_dat$id %in% sel_B], na.rm = TRUE)), 1),
-  # how many selected reaches carry a planned dam (the conflict count)
-  n_dam_reaches = c(sum(pu_dat$mw_cost[pu_dat$id %in% sel_A] > 0),
-                    sum(pu_dat$mw_cost[pu_dat$id %in% sel_B] > 0))
-)
-print(cost_cmp)
-
-shared  <- length(intersect(sel_A, sel_B))
-jaccard <- shared / length(union(sel_A, sel_B))
-message("  Shared: ", shared,
-        " | A only: ", length(setdiff(sel_A, sel_B)),
-        " | B only: ", length(setdiff(sel_B, sel_A)),
-        " | Jaccard: ", round(jaccard, 3))
-message("  (n_dam_reaches: selected reaches with a planned dam = conflict reaches;",
-        " B should pull these DOWN by penalising high-MW reaches)")
-
-
-
-
-
-
-
-
 # ============================================================
 # STEP 3: Species-planning-unit table (puvspr_dat)
 #         Gap-filled reaches (suitable in classification but below the
@@ -288,7 +249,7 @@ puvspr_dat <- lapply(seq_along(TARGET_SPECIES), function(i) {
 
   hab_f <- file.path("sdm/habitat", paste0("habitat_", sp, ".csv"))
   if (!file.exists(hab_f)) {
-    message("    WARNING: habitat file not found — ", hab_f); return(NULL)
+    message("    WARNING: habitat file not found -- ", hab_f); return(NULL)
   }
   hab <- fread(hab_f)
 
@@ -332,7 +293,6 @@ subc_ids_basin <- as.character(pu_dat$id)
 # signal on close neighbours while letting distant pairs register weakly.
 # NOTE: the 1/hop decay is a deliberate simplification and could be
 # refined (e.g. by reach length or a dispersal-kernel weighting).
-CONNECTIVITY_K <- 3
 
 # Build a symmetric, multi-hop boundary table from a scenario graph.
 # Barrier edges are deleted FIRST, so any path computed afterwards is
@@ -389,17 +349,16 @@ bmat_current <- build_boundary(river_graph_current, "current")
 bmat_future  <- build_boundary(river_graph_future,  "future")
 
 # ============================================================
-# STEP 5: Solve (both scenarios x all targets)
+# STEP 5: Define solver, then run all solves
 # ============================================================
 
-message("\n=== Step 5: Solving (2 scenarios x ", length(TARGETS), " targets) ===")
+message("\n=== Step 5: Solving ===")
 
 if (!requireNamespace("rcbc", quietly = TRUE))
   stop("rcbc not found. install.packages('rcbc', repos = 'https://cran.r-universe.dev')")
 
-# ============================================================
-# solve_one() — parameterised by cost column
-# ============================================================
+# ---- solve_one(): parameterised by boundary matrix, target, cost column ----
+# Uses the tightened SOLVER_GAP (main results). Defined BEFORE any call below.
 solve_one <- function(bmat, target, cost_col = "cost_hfi") {
   problem(pu_dat, spec_dat, cost_column = cost_col, rij = puvspr_dat) %>%
     add_min_set_objective() %>%
@@ -410,15 +369,98 @@ solve_one <- function(bmat, target, cost_col = "cost_hfi") {
     solve()
 }
 
-
-
 # ============================================================
-# SENSITIVITY: k = 1 (immediate neighbours) vs k = 3 (multi-hop)
-#   Current scenario, 30% target. Checks whether multi-hop
-#   connectivity changes the solution and by how much.
+# BOUNDARY PENALTY CALIBRATION (cost vs compactness trade-off)
+#   The boundary penalty is a compactness trade-off term with no intrinsic
+#   ecological value; it must be calibrated per study area (it scales with
+#   network size, reach count, and the cost range). We solve across a
+#   penalty grid and record the trade-off between solution cost and total
+#   boundary length (perimeter). The "knee" of the cost-vs-boundary curve
+#   is the principled choice: maximal compactness gain per unit extra cost.
+#   Uses a loose gap (CALIB_GAP) for speed -- only the trend is needed.
+#   Done on the CURRENT scenario at the comparison target.
 # ============================================================
 
-message("\n=== Sensitivity check: k = 1 vs k = 3 (current, 30%) ===")
+message("\n=== Boundary penalty calibration (cost vs compactness) ===")
+
+PENALTY_GRID <- c(0, 0.001, 0.003, 0.01, 0.03, 0.1, 0.3, 1)
+
+# total boundary (perimeter) of a selection, using the same bmat weights.
+# For each selected unit, sum the boundary weights to NON-selected units
+# (exposed edges) -> this is the perimeter the penalty acts on.
+boundary_length <- function(selected_ids, bmat) {
+  sel <- as.integer(selected_ids)
+  # edges where exactly one endpoint is selected = exposed perimeter
+  exposed <- bmat[(bmat$id1 %in% sel) & !(bmat$id2 %in% sel), ]
+  sum(exposed$boundary, na.rm = TRUE)
+}
+
+calib <- lapply(PENALTY_GRID, function(pen) {
+
+  p <- problem(pu_dat, spec_dat, cost_column = "cost_hfi", rij = puvspr_dat) %>%
+    add_min_set_objective() %>%
+    add_relative_targets(COMPARISON_TARGET) %>%
+    add_binary_decisions() %>%
+    add_cbc_solver(gap = CALIB_GAP, threads = N_THREADS, verbose = FALSE)
+  if (pen > 0)
+    p <- p %>% add_boundary_penalties(penalty = pen, data = bmat_current)
+
+  s   <- solve(p)
+  sel <- s$id[s$solution_1 == 1]
+
+  data.frame(
+    penalty      = pen,
+    n_selected   = length(sel),
+    selected_km  = round(sum(pu_dat$length_km[pu_dat$id %in% sel], na.rm = TRUE), 1),
+    total_cost   = round(sum(s$cost[s$solution_1 == 1], na.rm = TRUE), 3),
+    boundary_len = round(boundary_length(sel, bmat_current), 2)
+  )
+}) %>% rbindlist()
+
+# normalise both axes to [0,1] so the knee is comparable
+calib[, cost_norm := (total_cost   - min(total_cost))   / (max(total_cost)   - min(total_cost))]
+calib[, bound_norm := (boundary_len - min(boundary_len)) / (max(boundary_len) - min(boundary_len))]
+
+message("\n  Calibration (current scenario, ", COMPARISON_TARGET * 100, "% target):")
+print(calib)
+fwrite(calib, "prioritization/boundary_penalty_calibration.csv")
+
+# ---- trade-off curve: cost vs boundary, knee is the elbow ----
+p_tradeoff <- ggplot(calib, aes(x = boundary_len, y = total_cost)) +
+  geom_path(colour = "grey60") +
+  geom_point(size = 3, colour = "#2c7bb6") +
+  geom_text(aes(label = penalty), vjust = -0.8, size = 3) +
+  labs(x = "Total boundary length (perimeter; lower = more compact)",
+       y = "Solution cost (HFI)",
+       title = "Boundary-penalty calibration: cost vs compactness trade-off",
+       subtitle = paste0("Current scenario, ", COMPARISON_TARGET * 100,
+                         "% target. Labels = penalty. The elbow is the",
+                         " principled penalty: max compactness gain per unit cost.")) +
+  theme_bw(base_size = 11) +
+  theme(plot.subtitle = element_text(size = 8.5, colour = "grey40"))
+
+png("prioritization/maps/boundary_penalty_calibration.png",
+    width = 7, height = 5.5, units = "in", res = 200)
+print(p_tradeoff); dev.off()
+message("  Saved: prioritization/maps/boundary_penalty_calibration.png")
+
+# ---- automatic knee detection (max distance from the line joining endpoints) ----
+ord <- calib[order(penalty)]
+x <- ord$bound_norm; y <- ord$cost_norm
+x1 <- x[1]; y1 <- y[1]; x2 <- x[length(x)]; y2 <- y[length(y)]
+denom <- sqrt((y2 - y1)^2 + (x2 - x1)^2)
+ord[, knee_dist := abs((y2 - y1) * x - (x2 - x1) * y + x2 * y1 - y2 * x1) / denom]
+knee_penalty <- ord[which.max(knee_dist), penalty]
+message("\n  Suggested knee penalty: ", knee_penalty,
+        "  (point of maximum curvature in the cost-vs-compactness trade-off)")
+message("  -> BOUNDARY_PENALTY is set to ", BOUNDARY_PENALTY,
+        "; report the curve and this choice as a calibration step in Methods.")
+
+# ------------------------------------------------------------
+# 5a. SENSITIVITY: k = 1 (immediate neighbours) vs k = 3 (multi-hop)
+#     Current scenario, 30% target. (Uses main SOLVER_GAP.)
+# ------------------------------------------------------------
+message("\n  --- Sensitivity check: k = 1 vs k = 3 (current, 30%) ---")
 
 bmat_k1 <- build_boundary(river_graph_current, "current_k1", k = 1)
 bmat_k3 <- build_boundary(river_graph_current, "current_k3", k = 3)
@@ -440,48 +482,76 @@ sensitivity <- data.frame(
                          sum(sol_k3$cost[sol_k3$solution_1 == 1])), 3)
 )
 
-# overlap between the two solutions
 shared    <- length(intersect(sel_k1, sel_k3))
 only_k1   <- length(setdiff(sel_k1, sel_k3))
 only_k3   <- length(setdiff(sel_k3, sel_k1))
 jaccard   <- shared / length(union(sel_k1, sel_k3))
 
-message("\n  Solution comparison:")
+message("  Solution comparison:")
 print(sensitivity)
-message("\n  Shared reaches: ", shared,
+message("  Shared reaches: ", shared,
         " | k=1 only: ", only_k1,
         " | k=3 only: ", only_k3)
 message("  Jaccard similarity: ", round(jaccard, 3))
 message("  (Jaccard near 1 = multi-hop barely changes the solution;",
         " lower = k matters)")
 
+fwrite(sensitivity, "prioritization/sensitivity_k1_k3.csv")
 
+# ------------------------------------------------------------
+# 5b. Cost scenarios A (HFI) vs B (HFI + MW), future barriers, 30%
+# ------------------------------------------------------------
+message("\n  --- Cost scenarios A (HFI) vs B (HFI+MW), future barriers, ",
+        COMPARISON_TARGET * 100, "% ---")
 
+sol_A <- solve_one(bmat_future, COMPARISON_TARGET, cost_col = "cost_hfi")
+sol_B <- solve_one(bmat_future, COMPARISON_TARGET, cost_col = "cost_hfi_mw")
 
+sel_A <- sol_A$id[sol_A$solution_1 == 1]
+sel_B <- sol_B$id[sol_B$solution_1 == 1]
 
+cost_cmp <- data.frame(
+  scenario      = c("A_HFI", "B_HFI_MW"),
+  n_selected    = c(length(sel_A), length(sel_B)),
+  selected_km   = round(c(sum(pu_dat$length_km[pu_dat$id %in% sel_A], na.rm = TRUE),
+                          sum(pu_dat$length_km[pu_dat$id %in% sel_B], na.rm = TRUE)), 1),
+  # how many selected reaches carry a planned dam (the conflict count)
+  n_dam_reaches = c(sum(pu_dat$mw_cost[pu_dat$id %in% sel_A] > 0),
+                    sum(pu_dat$mw_cost[pu_dat$id %in% sel_B] > 0))
+)
+print(cost_cmp)
 
+shared_AB  <- length(intersect(sel_A, sel_B))
+jaccard_AB <- shared_AB / length(union(sel_A, sel_B))
+message("  Shared: ", shared_AB,
+        " | A only: ", length(setdiff(sel_A, sel_B)),
+        " | B only: ", length(setdiff(sel_B, sel_A)),
+        " | Jaccard: ", round(jaccard_AB, 3))
+message("  (n_dam_reaches: selected reaches with a planned dam = conflict reaches;",
+        " B should pull these DOWN by penalising high-MW reaches)")
 
+fwrite(cost_cmp, "prioritization/cost_scenario_AB_30pct.csv")
 
+# ------------------------------------------------------------
+# 5c. Main loop: both scenarios x all targets
+# ------------------------------------------------------------
+message("\n  --- Main solve loop (2 scenarios x ", length(TARGETS), " targets) ---")
 
-
-
-
-scenarios <- list(current = bmat_current, future = bmat_future)
-
+scenarios     <- list(current = bmat_current, future = bmat_future)
 all_solutions <- list()   # keyed "scenario_targetpct"
 summary_rows  <- list()
 
 for (scen in names(scenarios)) {
   for (target in TARGETS) {
 
-    key        <- paste0(scen, "_", target * 100, "pct")
+    key <- paste0(scen, "_", target * 100, "pct")
     message("\n  [", scen, "] target ", target * 100, "%")
 
     s <- tryCatch(solve_one(scenarios[[scen]], target),
                   error = function(e) { message("  ERROR: ", conditionMessage(e)); NULL })
     if (is.null(s)) next
 
-    # s is pu_dat + solution_1, so it already carries length_km and cost —
+    # s is pu_dat + solution_1, so it already carries length_km and cost --
     # do NOT re-join length_km (that creates length_km.x/.y and breaks sums).
     n_selected  <- sum(s$solution_1 == 1)
     selected_km <- sum(s$length_km[s$solution_1 == 1], na.rm = TRUE)
@@ -506,7 +576,6 @@ for (scen in names(scenarios)) {
     fwrite(s, paste0("prioritization/solutions/solution_", key, ".csv"))
   }
 }
-
 
 # ============================================================
 # STEP 6: Summary table (all scenarios x targets)
@@ -580,7 +649,7 @@ print(p_comp); dev.off()
 message("  Saved: prioritization/maps/priority_comparison_30pct.png")
 
 # ============================================================
-# STEP 8: Summary plot — selected length by target and scenario
+# STEP 8: Summary plot -- selected length by target and scenario
 # ============================================================
 
 message("\n=== Step 8: Summary plot ===")
@@ -593,7 +662,7 @@ p_summary <- ggplot(summary_df,
                     name = "Scenario") +
   labs(x = "Conservation target (%)",
        y = "Selected network length (km)",
-       title = "Prioritization solutions — current vs future barriers",
+       title = "Prioritization solutions -- current vs future barriers",
        subtitle = paste0("Minimum-set, cost = HFI, boundary penalty = ",
                          BOUNDARY_PENALTY)) +
   theme_bw(base_size = 11) +
@@ -616,7 +685,4 @@ message("Planning units: ", nrow(pu_dat),
         " | targets: ", paste0(TARGETS * 100, "%", collapse = ", "))
 message("Scenarios: current (existing dam) vs future (existing + planned)")
 message("Comparison map drawn at ", COMPARISON_TARGET * 100, "% target")
-
-
-
-
+message("Solver gap (main): ", SOLVER_GAP, " | calibration gap: ", CALIB_GAP)

@@ -41,8 +41,7 @@
 #' }
 #'
 #' @importFrom igraph induced_subgraph components neighbors V E edge_attr
-#'   as_ids is_directed
-#' @importFrom data.table data.table rbindlist
+#'@importFrom igraph as_ids is_directed as_undirected
 #'
 #' @author Afroditi Grigoropoulou
 #'

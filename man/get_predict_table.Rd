@@ -42,7 +42,7 @@ If FALSE, the table is only stored on disk. Default is TRUE.}
 Default is TRUE.}
 
 \item{tempdir}{String. Path to the directory where to store/look for the
-file size table. If not passed, defaults to the output of \code{\link[base:tempfile]{base::tempdir()}}.}
+file size table. If not passed, defaults to the output of \code{\link[base:tempdir]{base::tempdir()}}.}
 
 \item{overwrite}{logical. If TRUE, the output file will be overwritten if it.
 already exists. Useful for repeated testing. Default is FALSE.}

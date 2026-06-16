@@ -20,8 +20,6 @@
 # Input:
 #   - prioritization/planned_dam_ranking.csv          (from 02_)
 #   - prioritization/comparison_30pct.csv             (from 01_, Step 7)
-#   - prioritization/solutions/solution_current_30pct.csv  (from 01_)
-#   - prioritization/solutions/solution_future_30pct.csv   (from 01_)
 #   - spatial/subbasin_sarantaporos/stream_network_pruned.gpkg
 #   - points_snapped/dams/dams_snapped_points.csv
 #
@@ -37,6 +35,7 @@ library(sf)
 library(data.table)
 library(dplyr)
 library(tidyr)
+library(tibble)
 library(ggplot2)
 library(patchwork)
 
@@ -63,6 +62,24 @@ status_cols <- c("Both"         = "#1a7a3c",
                  "Future only"  = "#2c7bb6",
                  "Neither"      = "grey85")
 
+# Place-name lookup (Greek -> Latin). Edit values as preferred.
+thesh_lookup <- tribble(
+  ~thesh,                            ~thesh_lat,
+  "Π.ΣΑΡΑΝΤΑΠΟΡΟΣ",                  "Sarantaporos",
+  "ΕΠΤΑΧΩΡΙ",                        "Eptachori",
+  "ΠΛΑΓΙΑ",                          "Plagia",
+  "ΚΕΦΑΛΟΒΡΥΣΟ",                     "Kefalovryso",
+  "ΒΟΥΡΜΠΙΑΝΗ - Ρ. ΒΟΥΡΜΠΙΑΝΙΤΙΚΟ",  "Vourbianitiko",
+  "ΡΕΜΑ ΜΕΣΟΠΟΤΑΜΟΣ",               "Mesopotamos",
+  "Ρ.Χελιμόδι",                      "Chelimodi",
+  "ΡΕΜΑ ΜΑΝΟΥΡΑΣ",                   "Manouras",
+  "ΡΕΜΑ ΠΗΓΩΝ ΣΑΡΑΝΤΑΠΟΡΟΥ",        "Piges Sarantaporou",
+  "ΑΜΑΡΑΝΤΟΣ",                       "Amarantos",
+  "ΡΑΧΟΒΙΤΣΑ",                       "Rachovitsa",
+  "ΡΕΜΑ ΕΛΛΗΝΙΚΟ",                   "Elliniko",
+  "ΛΑΪΣΤΑ",                          "Laista"
+)
+
 # ============================================================
 # STEP 1: Load inputs
 # ============================================================
@@ -79,26 +96,29 @@ stream_lines <- read_sf(
 
 dams_snapped <- fread("points_snapped/dams/dams_snapped_points.csv")
 
-# attach snapped coordinates to each ranked dam reach. For reaches with
-# two co-located dams, take the first snapped point (same reach, ~same
-# location); the ranking already summed their MW and damage.
-dam_xy <- dams_snapped[, .(longitude_snapped, latitude_snapped),
-                       by = subc_id][, .SD[1], by = subc_id]
+# one place-name + one snapped coordinate per ranked reach (co-located
+# dams share the reach; the ranking already summed their MW and damage).
+dam_meta <- dams_snapped %>%
+  group_by(subc_id) %>%
+  slice(1) %>%
+  ungroup() %>%
+  select(subc_id, thesh, longitude_snapped, latitude_snapped) %>%
+  left_join(thesh_lookup, by = "thesh") %>%
+  mutate(thesh_lat = coalesce(thesh_lat, as.character(subc_id)))
 
 dam_rank <- dam_rank %>%
-  left_join(dam_xy, by = "subc_id")
+  left_join(dam_meta, by = "subc_id")
 
 n_no_xy <- sum(is.na(dam_rank$longitude_snapped))
 if (n_no_xy > 0)
   message("  WARNING: ", n_no_xy, " ranked dams have no snapped coordinates")
 
 # ============================================================
-# STEP 2: FIG 1 — ranked bar chart (damage-per-MW)
+# STEP 2: FIG 1 -- ranked bar chart (damage-per-MW)
 # ============================================================
 
-message("\n=== Step 2: Fig 1 — ranked bar chart ===")
+message("\n=== Step 2: Fig 1 -- ranked bar chart ===")
 
-# split off the off-scale dam(s)
 offscale <- dam_rank %>% filter(damage_per_mw > OFFSCALE_CUTOFF)
 onscale  <- dam_rank %>% filter(damage_per_mw <= OFFSCALE_CUTOFF)
 
@@ -106,18 +126,17 @@ message("  Off-scale dams (annotated): ", nrow(offscale),
         " | on-scale dams (plotted): ", nrow(onscale))
 
 # long format so each bar is split into isolated vs dewatered damage.
-# We scale the two damage components to per-MW so the stacked bar height
-# equals damage_per_mw (the ranking metric).
+# Components scaled to per-MW so the stacked bar height equals damage_per_mw.
 bar_long <- onscale %>%
   mutate(
     per_mw_isolated  = damage_isolated  / power_mw,
     per_mw_dewatered = damage_dewatered / power_mw,
-    dam_label        = paste0(subc_id,
+    dam_label        = paste0(thesh_lat, " (", subc_id, ")",
                               ifelse(n_dams > 1,
-                                     paste0(" (", n_dams, " dams)"), ""))
+                                     paste0(" [", n_dams, " dams]"), ""))
   ) %>%
   arrange(damage_per_mw) %>%                       # ascending -> worst on top
-  mutate(dam_label = factor(dam_label, levels = dam_label)) %>%
+  mutate(dam_label = factor(dam_label, levels = unique(dam_label))) %>%
   select(dam_label, power_mw,
          Isolated = per_mw_isolated, Dewatered = per_mw_dewatered) %>%
   pivot_longer(c(Isolated, Dewatered),
@@ -125,12 +144,10 @@ bar_long <- onscale %>%
   mutate(component = factor(component, levels = c("Dewatered", "Isolated")))
 
 offscale_note <- if (nrow(offscale) > 0) {
-    paste0("Off-scale: reach ", offscale$subc_id[1],
-         " (damage/MW = ", round(offscale$damage_per_mw[1]),
+  paste0("Off-scale: ", offscale$thesh_lat[1], " (reach ", offscale$subc_id[1],
+         ", damage/MW = ", round(offscale$damage_per_mw[1]),
          "), near the outlet, fragments the whole sub-basin")
 } else NULL
-
-
 
 p1 <- ggplot(bar_long,
              aes(x = dam_label, y = per_mw, fill = component)) +
@@ -141,7 +158,7 @@ p1 <- ggplot(bar_long,
                     name = "Damage component",
                     breaks = c("Isolated", "Dewatered")) +
   labs(
-    x = "Planned dam (reach subc_id)",
+    x = "Planned dam (location, reach)",
     y = "Connectivity + dewatering damage per MW",
     title = "Planned dams ranked by habitat damage per MW",
     subtitle = paste0("Damage = summed SDM suitability of isolated (upstream) ",
@@ -159,18 +176,17 @@ print(p1); dev.off()
 message("  Saved: prioritization/maps/fig1_dam_ranking_bars.png")
 
 # ============================================================
-# STEP 3: FIG 2 — dam damage map
+# STEP 3: FIG 2 -- dam damage map
 # ============================================================
 
-message("\n=== Step 3: Fig 2 — dam damage map ===")
+message("\n=== Step 3: Fig 2 -- dam damage map ===")
 
 dam_sf <- dam_rank %>%
   filter(!is.na(longitude_snapped)) %>%
   st_as_sf(coords = c("longitude_snapped", "latitude_snapped"), crs = 4326)
 
 # Split off the off-scale (outlet) dam so it doesn't compress the colour
-# and size scales for the other dams. It is drawn separately with a fixed
-# marker and a label, so it stays on the map without distorting the legend.
+# and size scales for the other dams.
 dam_sf_on  <- dam_sf %>% filter(damage_per_mw <= OFFSCALE_CUTOFF)
 dam_sf_off <- dam_sf %>% filter(damage_per_mw >  OFFSCALE_CUTOFF)
 
@@ -188,13 +204,12 @@ p2 <- ggplot() +
                         name = "Total damage\n(SDM suitability)") +
   guides(colour = guide_legend(), size = guide_legend())     # merge legends
 
-# add the outlet dam as a distinct hollow marker + label, if present
 if (nrow(dam_sf_off) > 0) {
   p2 <- p2 +
     geom_sf(data = dam_sf_off, shape = 21, fill = NA,
             colour = "black", stroke = 1.1, size = 9) +
     geom_sf_text(data = dam_sf_off,
-                 aes(label = paste0("outlet dam\n(damage ",
+                 aes(label = paste0(thesh_lat, "\n(outlet, damage ",
                                     round(damage_total), ")")),
                  size = 2.8, colour = "black",
                  nudge_y = 0.012, lineheight = 0.9)
@@ -214,10 +229,10 @@ print(p2); dev.off()
 message("  Saved: prioritization/maps/fig2_dam_damage_map.png")
 
 # ============================================================
-# STEP 4: FIG 3 — current vs future priority comparison (30%)
+# STEP 4: FIG 3 -- current vs future priority comparison (30%)
 # ============================================================
 
-message("\n=== Step 4: Fig 3 — priority comparison (30%) ===")
+message("\n=== Step 4: Fig 3 -- priority comparison (30%) ===")
 
 comparison <- fread("prioritization/comparison_30pct.csv")
 
