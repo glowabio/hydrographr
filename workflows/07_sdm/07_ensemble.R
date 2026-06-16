@@ -17,14 +17,14 @@
 #   - sdm/predictions/pred_{species}.csv           (SSN, full basin)
 #   - sdm/predictions/pred_maxent_{species}.csv    (MaxEnt, full basin)
 #   - sdm/predictions/pred_rf_{species}.csv        (RF, full basin)
-#   - spatial/subbasin/subbasin_subc_ids_pruned.csv
-#   - spatial/subbasin/stream_network_pruned.gpkg
+#   - spatial/subbasin_sarantaporos/subbasin_subc_ids_pruned.csv
+#   - spatial/subbasin_sarantaporos/stream_network_pruned.gpkg
 #   - points_original/fish/species_list_sarantaporos.txt
 #
 # Output:
 #   - sdm/ensemble/ensemble_{species}.csv          (full basin)
 #   - sdm/ensemble/ensemble_summary.csv
-#   - spatial/subbasin/stream_network_ensemble.gpkg
+#   - spatial/subbasin_sarantaporos/stream_network_ensemble.gpkg
 #
 # LOCATION: workflows/07_sdm/07_ensemble.R
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
@@ -59,7 +59,7 @@ target_species <- fread("points_original/fish/species_list_sarantaporos.txt") %>
 
 message("\n=== Step 1: Loading subbasin IDs ===")
 
-subbasin_subc_ids <- fread("spatial/subbasin/subbasin_subc_ids_pruned.csv") %>%
+subbasin_subc_ids <- fread("spatial/subbasin_sarantaporos/subbasin_subc_ids_pruned.csv") %>%
   pull(subc_id)
 
 message("  Subbasin subcatchments: ", length(subbasin_subc_ids))
@@ -199,7 +199,7 @@ message("  Saved: sdm/ensemble/ensemble_summary.csv")
 
 message("\n=== Step 4: Joining ensemble to subbasin network ===")
 
-network <- st_read("spatial/subbasin/stream_network_pruned.gpkg")
+network <- st_read("spatial/subbasin_sarantaporos/stream_network_pruned.gpkg")
 
 ensemble_files <- list.files("sdm/ensemble",
                              pattern = "ensemble_.*\\.csv$",
@@ -265,9 +265,9 @@ for (sp in target_species) {
 }
 
 st_write(network,
-         "spatial/subbasin/stream_network_ensemble.gpkg",
+         "spatial/subbasin_sarantaporos/stream_network_ensemble.gpkg",
          delete_dsn = TRUE)
-message("  Saved: spatial/subbasin/stream_network_ensemble.gpkg")
+message("  Saved: spatial/subbasin_sarantaporos/stream_network_ensemble.gpkg")
 
 
 ## Ensemble threshold
@@ -323,7 +323,7 @@ message("  All other species:      MaxEnt + RF")
 message("\nOutputs:")
 message("  sdm/ensemble/ensemble_{species}.csv  (full basin)")
 message("  sdm/ensemble/ensemble_summary.csv")
-message("  spatial/subbasin/stream_network_ensemble.gpkg")
+message("  spatial/subbasin_sarantaporos/stream_network_ensemble.gpkg")
 message("    — columns: ens_{species}, me_{species}, rf_{species},")
 message("      ssn_{species} (Alburnoides + Barbus only)")
 message("\nNext: check fragmentation in QGIS,")

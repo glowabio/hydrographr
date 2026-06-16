@@ -40,7 +40,7 @@
 #   Single suitable reaches with no suitable immediate neighbours removed.
 #
 # Input:
-#   - spatial/subbasin/stream_network_ensemble.gpkg
+#   - spatial/subbasin_sarantaporos/stream_network_ensemble.gpkg
 #   - sdm/maxent_models/maxent_evaluation.csv
 #   - sdm/rf_models/rf_evaluation.csv
 #   - sdm/ssn_models/model_summary.csv  (SSN thresholds for Alburnoides + Barbus)
@@ -54,8 +54,8 @@
 #              binary_tss, semibinary_tss, gap_filled_tss, isolated_removed_tss,
 #              binary_mcc, semibinary_mcc, gap_filled_mcc, isolated_removed_mcc
 #   - sdm/habitat/habitat_summary.csv
-#   - spatial/subbasin/stream_network_habitat_tss.gpkg  (primary)
-#   - spatial/subbasin/stream_network_habitat_mcc.gpkg  (sensitivity)
+#   - spatial/subbasin_sarantaporos/stream_network_habitat_tss.gpkg  (primary)
+#   - spatial/subbasin_sarantaporos/stream_network_habitat_mcc.gpkg  (sensitivity)
 #
 # LOCATION: workflows/07_sdm/08_habitat_classification.R
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
@@ -92,7 +92,7 @@ target_species <- fread("points_original/fish/species_list_sarantaporos.txt") %>
 message("\n=== Step 1: Loading data ===")
 
 # Ensemble network
-network_sf <- st_read("spatial/subbasin/stream_network_ensemble.gpkg")
+network_sf <- st_read("spatial/subbasin_sarantaporos/stream_network_ensemble.gpkg")
 network_dt <- network_sf %>% st_drop_geometry()
 
 message("  Network reaches: ", nrow(network_dt))
@@ -103,7 +103,7 @@ message("  Ensemble columns: ", paste(ens_cols, collapse = ", "))
 # Build graph for gap filling and isolation filter
 # Rebuild with correct subc_id → target topology
 ensemble_dt <- read_geopackage(
-  "spatial/subbasin/stream_network_ensemble.gpkg",
+  "spatial/subbasin_sarantaporos/stream_network_ensemble.gpkg",
   import_as = "data.table"
 )
 
@@ -398,15 +398,15 @@ for (sp in target_species) {
 
 # Save TSS gpkg — primary analysis
 st_write(network_tss,
-         "spatial/subbasin/stream_network_habitat_tss.gpkg",
+         "spatial/subbasin_sarantaporos/stream_network_habitat_tss.gpkg",
          delete_dsn = TRUE)
-message("  Saved: spatial/subbasin/stream_network_habitat_tss.gpkg (primary)")
+message("  Saved: spatial/subbasin_sarantaporos/stream_network_habitat_tss.gpkg (primary)")
 
 # Save MCC gpkg — sensitivity analysis
 st_write(network_mcc,
-         "spatial/subbasin/stream_network_habitat_mcc.gpkg",
+         "spatial/subbasin_sarantaporos/stream_network_habitat_mcc.gpkg",
          delete_dsn = TRUE)
-message("  Saved: spatial/subbasin/stream_network_habitat_mcc.gpkg (sensitivity)")
+message("  Saved: spatial/subbasin_sarantaporos/stream_network_habitat_mcc.gpkg (sensitivity)")
 
 message("  Columns per species in each gpkg: bin_, semi_, gap_, isol_")
 
@@ -429,6 +429,6 @@ message("Note: IDW not applied — apply selectively per species if needed")
 message("\nOutputs:")
 message("  sdm/habitat/habitat_{species}.csv")
 message("  sdm/habitat/habitat_summary.csv")
-message("  spatial/subbasin/stream_network_habitat_tss.gpkg  (primary)")
-message("  spatial/subbasin/stream_network_habitat_mcc.gpkg  (sensitivity)")
+message("  spatial/subbasin_sarantaporos/stream_network_habitat_tss.gpkg  (primary)")
+message("  spatial/subbasin_sarantaporos/stream_network_habitat_mcc.gpkg  (sensitivity)")
 message("\nNext: 10_patch_metrics.R")

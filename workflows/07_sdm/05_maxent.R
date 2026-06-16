@@ -20,15 +20,15 @@
 #   - spatial/basin/basin_subc_ids_pruned.csv  (background)
 #   - env90m/predict_table_vif.csv
 #   - points_original/fish/species_list_sarantaporos.txt
-#   - spatial/subbasin/stream_network_pruned.gpkg  (for output gpkg)
-#   - spatial/subbasin/subbasin_subc_ids_pruned.csv
+#   - spatial/subbasin_sarantaporos/stream_network_pruned.gpkg  (for output gpkg)
+#   - spatial/subbasin_sarantaporos/subbasin_subc_ids_pruned.csv
 #
 # Output:
 #   - sdm/maxent_models/maxent_{species}.rds
 #   - sdm/maxent_models/maxent_evaluation.csv
 #   - sdm/maxent_models/maxent_variable_importance.csv
 #   - sdm/predictions/pred_maxent_{species}.csv  (full basin)
-#   - spatial/subbasin/stream_network_predictions_maxent.gpkg
+#   - spatial/subbasin_sarantaporos/stream_network_predictions_maxent.gpkg
 #
 # LOCATION: workflows/07_sdm/05_maxent.R
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
@@ -162,7 +162,7 @@ basin_subc_ids <- fread("spatial/basin/basin_subc_ids_pruned.csv") %>%
 message("  Background subcatchments (full basin): ", length(basin_subc_ids))
 
 # Subbasin subcatchment IDs — for output gpkg
-subbasin_subc_ids <- fread("spatial/subbasin/subbasin_subc_ids_pruned.csv") %>%
+subbasin_subc_ids <- fread("spatial/subbasin_sarantaporos/subbasin_subc_ids_pruned.csv") %>%
   pull(subc_id)
 
 # ============================================================
@@ -457,7 +457,7 @@ if (length(importance_list) > 0) {
 
 message("\n=== Step 5: Joining predictions to subbasin network ===")
 
-network <- st_read("spatial/subbasin/stream_network_pruned.gpkg")
+network <- st_read("spatial/subbasin_sarantaporos/stream_network_pruned.gpkg")
 
 pred_files <- list.files("sdm/predictions",
                          pattern = "pred_maxent_.*\\.csv$",
@@ -481,9 +481,9 @@ for (f in pred_files) {
 }
 
 st_write(network,
-         "spatial/subbasin/stream_network_predictions_maxent.gpkg",
+         "spatial/subbasin_sarantaporos/stream_network_predictions_maxent.gpkg",
          delete_dsn = TRUE)
-message("  Saved: spatial/subbasin/stream_network_predictions_maxent.gpkg")
+message("  Saved: spatial/subbasin_sarantaporos/stream_network_predictions_maxent.gpkg")
 
 # ============================================================
 # SUMMARY
@@ -497,5 +497,5 @@ message("  sdm/maxent_models/maxent_{species}.rds")
 message("  sdm/maxent_models/maxent_evaluation.csv")
 message("  sdm/maxent_models/maxent_variable_importance.csv")
 message("  sdm/predictions/pred_maxent_{species}.csv  (full basin)")
-message("  spatial/subbasin/stream_network_predictions_maxent.gpkg")
+message("  spatial/subbasin_sarantaporos/stream_network_predictions_maxent.gpkg")
 message("\nNext: 06_random_forest.R, 07_ensemble.R")
