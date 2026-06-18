@@ -36,12 +36,11 @@ library(dplyr)
 library(tidyr)
 library(leaflet)
 library(htmlwidgets)
+pak::pak("ytorres-cambas/danubeoccurR")
 
 select <- dplyr::select
 
-source("~/Documents/Postdoc/code/workflow_paper/helpers/save_to_nimbus.R")
 source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
-BASE_DIR <- NIMBUS_DIR
 setwd(BASE_DIR)
 
 # ============================================================
@@ -236,9 +235,7 @@ message("  Unique sites to query: ", nrow(sites_to_query))
 
 # Write to Nimbus for API call
 fwrite(sites_to_query, "points_cleaned/fish/sites_for_basin_id_query.csv")
-# sites_csv_url <- "https://nimbus.igb-berlin.de/index.php/s/PLACEHOLDER/download/sites_for_basin_id_query.csv"
-# # NOTE: update the Nimbus URL after uploading
-# sites_to_query <- fread(sites_csv_url)
+
 
 basin_ids <- api_get_ids(
   points          = sites_to_query,
@@ -320,7 +317,6 @@ message("  Records remaining: ", nrow(sp_basin))
 message("\n=== Step 5c: Taxonomic name validation ===")
 message("  This may take several minutes...")
 
-# install.packages("danubeoccurR") if not available
 library(danubeoccurR)
 
 sp_basin_validated <- check_species_name(
