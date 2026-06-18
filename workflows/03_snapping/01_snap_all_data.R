@@ -451,7 +451,7 @@ STRAHLER_SEQ <- c(4, 3, 2)
 DISTANCE_THRESHOLD <- 150  # meters
 
 # Load cleaned dams data URL
-dams_url <- "https://nimbus.igb-berlin.de/index.php/s/nzMQKArCD8SqNcK/download/dams_all_clean.csv"
+dams_url <- "https://nimbus.igb-berlin.de/index.php/s/jMtZ3wKtTYaXLc4/download/dams_sarantaporos_clean.csv"
 
 # Load original dams data -- replace url with new dam data June 2026
 # dams_original <- fread(dams_url)
