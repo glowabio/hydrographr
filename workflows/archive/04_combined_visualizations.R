@@ -7,10 +7,10 @@
 #   - connectivity/scenario_comparison_summary.csv (from script 01)
 #   - connectivity/impact_zone_summary.csv (from script 02)
 #   - connectivity/impact_zone_by_dam.gpkg (from script 02)
-#   - spatial/stream_networks/partial_stream_network.gpkg
+#   - spatial/stream_network_graphs/partial_stream_network.gpkg
 #   - points_snapped/dams/dams_snapped_points.csv
 #   - points_snapped/fish/fish_all_species_snapped.csv
-#   - spatial/stream_networks/river_graph.RDS
+#   - spatial/stream_network_graphs/river_graph.RDS
 #
 # CREATES:
 #   - connectivity/Figure_Combined_MEE.png (4-panel combined figure)
@@ -75,7 +75,7 @@ message("  Impact zone data loaded")
 message("\n[2/6] Loading spatial data...")
 
 # River network
-river_graph <- readRDS("spatial/stream_networks/river_graph.RDS")
+river_graph <- readRDS("spatial/stream_network_graphs/river_graph.RDS")
 
 node_data <- data.frame(
   name = V(river_graph)$name,
@@ -87,7 +87,7 @@ basin_nodes <- node_data %>%
   filter(basin_id == TARGET_BASIN_ID) %>%
   pull(name)
 
-stream_spatial <- st_read("spatial/stream_networks/partial_stream_network.gpkg", quiet = TRUE)
+stream_spatial <- st_read("spatial/stream_network_graphs/partial_stream_network.gpkg", quiet = TRUE)
 
 basin_streams <- stream_spatial %>%
   filter(subc_id %in% basin_nodes) %>%

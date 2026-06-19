@@ -54,7 +54,7 @@ message("Date: ", Sys.Date())
 # ============================================================
 
 message("\n[1/9] Loading river network graph...")
-river_graph <- readRDS("spatial/stream_networks/river_graph.RDS")
+river_graph <- readRDS("spatial/stream_network_graphs/river_graph.RDS")
 
 message("  Network loaded: ",
         vcount(river_graph), " nodes, ",

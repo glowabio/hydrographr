@@ -158,8 +158,8 @@ message("Future:  ", vcount(river_graph_future), " nodes, ",
 # ============================================================
 # SAVE
 # ============================================================
-saveRDS(river_graph_current, "spatial/stream_networks/river_graph_current.RDS")
-saveRDS(river_graph_future,  "spatial/stream_networks/river_graph_future.RDS")
+saveRDS(river_graph_current, "spatial/stream_network_graphs/river_graph_current.RDS")
+saveRDS(river_graph_future,  "spatial/stream_network_graphs/river_graph_future.RDS")
 
 message("\nBoth graphs saved!")
 

@@ -317,7 +317,7 @@ if (has_missing) {
   message("  ✓ env90m/pred_tab_full.csv (with NAs)")
   message("  ✓ env90m/pred_tab_complete.csv (NAs removed)")
 }
-message("  ✓ spatial/stream_networks/stream_network_with_env.csv")
+message("  ✓ spatial/stream_network_graphs/stream_network_with_env.csv")
 
 message("\nPrediction table summary:")
 message(sprintf("  Rows: %d", nrow(pred_tab)))

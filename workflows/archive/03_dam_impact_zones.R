@@ -63,12 +63,12 @@ message("Date: ", Sys.Date())
 
 message("\n[1/7] Loading spatial river network...")
 
-stream_network <- st_read("spatial/stream_networks/partial_stream_network.gpkg",
+stream_network <- st_read("spatial/stream_network_graphs/partial_stream_network.gpkg",
                           quiet = TRUE)
 
 # Filter to target basin
 # First need to get basin_id from graph or node data
-river_graph <- readRDS("spatial/stream_networks/river_graph.RDS")
+river_graph <- readRDS("spatial/stream_network_graphs/river_graph.RDS")
 
 node_data <- data.frame(
   name = V(river_graph)$name,
