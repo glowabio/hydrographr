@@ -1,665 +1,245 @@
-# ============================================================================
-# SNAP ALL DATA TO STREAM NETWORK
-# ============================================================================
-# Purpose: Snap both HCMR and GBIF data to stream network using async API
-# Input: Cleaned CSV files (from step 02)
-# Output: Snapped points with network coordinates
-# ============================================================================
+#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
+# 01_snap_all_data.R   (Module 3 -- Snapping)
+#
+# Snap fish (HCMR + GBIF) and dam points to the stream network using the
+# GeoFRESH cascade-snapping API. Each dataset is snapped, a check map is
+# written, failed points are saved separately, and the two fish sources are
+# combined into one snapped dataset.
+#
+# Cascade snapping tries each Strahler order in turn (4 -> 3 -> 2), so a
+# point snaps to the largest nearby stream first and only falls back to
+# smaller streams if needed, within the distance threshold.
+#
+# Workflow:
+#   1. Load cleaned fish + dam points
+#   2. Snap HCMR fish, GBIF fish, dams (one call each)
+#   3. Write a snapping-check map and failed-points list per dataset
+#   4. Combine HCMR + GBIF into all_snapped_fish_points.csv
+#
+# INPUT:
+#   - points_cleaned/fish/fish_points_to_snap_hcmr.csv   (from 01_clean_hcmr_fish.R)
+#   - points_cleaned/fish/fish_gbif_clean_to_snap.csv     (from 03_clean_gbif_fish.R)
+#   - points_cleaned/dams/dams_sarantaporos_clean.csv     (from 01_clean_dam_data.R)
+#
+# OUTPUT:
+#   - points_snapped/fish/all_snapped_fish_points.csv     (combined HCMR + GBIF)
+#   - points_snapped/dams/dams_snapped_points.csv
+#   - points_snapped/maps/{hcmr,gbif,dams}_snapping_check.html
+#   - points_cleaned/{fish,dams}/*_failed_to_snap.csv      (if any fail)
+#
+# REQUIRES: internet access (GeoFRESH snapping API).
+#
+# LOCATION: workflows/03_snapping/01_snap_all_data.R
+#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
+
 library(hydrographr)
 library(data.table)
 library(dplyr)
 library(leaflet)
 library(htmlwidgets)
 library(sf)
-# Load helper function
-source("~/Documents/PhD/scripts/hydrographr/workflows/helpers/save_to_nimbus.R")
 
-# Set working directory
+select <- dplyr::select
+
 source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
-# Check working directory
-# BASE_DIR <- NIMBUS_DIR
 setwd(BASE_DIR)
 
-
-# Create snapped points directories
 dir.create("points_snapped/fish", recursive = TRUE, showWarnings = FALSE)
 dir.create("points_snapped/dams", recursive = TRUE, showWarnings = FALSE)
 dir.create("points_snapped/maps", recursive = TRUE, showWarnings = FALSE)
 
+# ============================================================
+# PARAMETERS
+# ============================================================
 
-# Load cleaned data URLs (adjust these to your actual URLs)
-hcmr_url <- "https://nimbus.igb-berlin.de/index.php/s/2Q8AJGHB6GqsD4m/download/fish_points_to_snap_hcmr.csv"
-gbif_url <- "https://nimbus.igb-berlin.de/index.php/s/3WnoTAT7J7M46aP/download/fish_gbif_clean_to_snap.csv"
+# Fish snap with a looser threshold than dams: survey/GBIF coordinates are
+# coarser, while dams need tighter snapping to land on the correct reach.
+STRAHLER_SEQ        <- c(4, 3, 2)
+FISH_DIST_THRESHOLD <- 400   # metres
+DAM_DIST_THRESHOLD  <- 150   # metres
 
+# ============================================================
+# HELPERS
+# ============================================================
 
-# ============================================================================
-# LOAD ORIGINAL DATA
-# ============================================================================
+# Build a snapping-check leaflet map: original points coloured by whether
+# they snapped, the snapped locations, and grey lines linking the two.
+# lon_col/lat_col are the ORIGINAL coordinate column names (these differ
+# between HCMR/dams "longitude" and GBIF "decimalLongitude").
+make_snap_map <- function(original, snapped, id_col, lon_col, lat_col, title) {
+  # original gained a logical `snapped` column before being passed in
+  ok   <- original[original$snapped, ]
+  fail <- original[!original$snapped, ]
 
-message("\n=== Loading Original Data ===")
+  # Snapped-coordinate column names follow the API convention: <orig>_snapped
+  lon_snapped <- paste0(lon_col, "_snapped")
+  lat_snapped <- paste0(lat_col, "_snapped")
+  lon_orig    <- paste0(lon_col, "_original")
+  lat_orig    <- paste0(lat_col, "_original")
 
-# Download original HCMR data
-hcmr_original <- fread(hcmr_url)
-message(sprintf("Original HCMR points: %d", nrow(hcmr_original)))
+  link_lines <- lapply(seq_len(nrow(snapped)), function(i) {
+    st_linestring(matrix(c(
+      snapped[[lon_orig]][i],    snapped[[lat_orig]][i],
+      snapped[[lon_snapped]][i], snapped[[lat_snapped]][i]
+    ), ncol = 2, byrow = TRUE))
+  }) %>% st_sfc(crs = 4326)
 
-# Download original GBIF data
-gbif_original <- fread(gbif_url)
-message(sprintf("Original GBIF points: %d", nrow(gbif_original)))
-
-
-# Snapping parameters
-STRAHLER_SEQ <- c(4, 3, 2)
-DISTANCE_THRESHOLD <- 400  # meters
-
-
-# ============================================================================
-# SNAP HCMR DATA
-# ============================================================================
-
-# We have survey data of freshwater fish. In this case we can try to snap directly without cross-checking
-# if the points are located at the sea, because we know where they were sampled
-
-message("\n=== Snapping HCMR Data ===")
-
-hcmr_snap_result <- api_get_snapped_points_cascade(
-  data = hcmr_original,
-  colname_lon = "longitude",
-  colname_lat = "latitude",
-  colname_site_id = "site_id",
-  strahler_seq = STRAHLER_SEQ,
-  distance_threshold = DISTANCE_THRESHOLD
-)
-print(hcmr_snap_result)
-
-# Save
-fwrite(hcmr_snap_result, "points_snapped/fish/hcmr_snapped_points.csv")
-message(sprintf("HCMR: Snapped %d points", nrow(hcmr_snap_result)))
-
-hcmr_snap_result <- fread("points_snapped/fish/hcmr_snapped_points.csv")
-
-# ============================================================================
-# VISUALIZE HCMR SNAPPING
-# ============================================================================
-
-message("\n--- Creating HCMR visualization ---")
-
-# Identify which points were successfully snapped
-hcmr_snapped_ids <- hcmr_snap_result$site_id
-hcmr_original$snapped <- hcmr_original$site_id %in% hcmr_snapped_ids
-
-# Summary
-n_snapped <- sum(hcmr_original$snapped)
-n_failed <- sum(!hcmr_original$snapped)
-message(sprintf("  Successfully snapped: %d", n_snapped))
-message(sprintf("  Failed to snap: %d", n_failed))
-
-# Create map
-hcmr_map <- leaflet() %>%
-  addTiles(group = "OpenStreetMap") %>%
-  addProviderTiles(providers$Esri.WorldImagery, group = "Satellite") %>%
-
-  # Original points that were successfully snapped (blue)
-  addCircleMarkers(
-    data = hcmr_original[hcmr_original$snapped, ],
-    lng = ~longitude,
-    lat = ~latitude,
-    color = "blue",
-    fillColor = "blue",
-    radius = 5,
-    fillOpacity = 0.7,
-    stroke = TRUE,
-    weight = 2,
-    group = "Original (Snapped)",
-    popup = ~paste0(
-      "<b>Original Point (Successfully Snapped)</b><br>",
-      "Site ID: ", site_id, "<br>",
-      "Lon: ", round(longitude, 5), "<br>",
-      "Lat: ", round(latitude, 5)
-    )
-  ) %>%
-
-  # Original points that FAILED to snap (orange)
-  addCircleMarkers(
-    data = hcmr_original[!hcmr_original$snapped, ],
-    lng = ~longitude,
-    lat = ~latitude,
-    color = "orange",
-    fillColor = "orange",
-    radius = 6,
-    fillOpacity = 0.9,
-    stroke = TRUE,
-    weight = 3,
-    group = "Original (Failed)",
-    popup = ~paste0(
-      "<b>⚠️ Original Point (FAILED TO SNAP)</b><br>",
-      "Site ID: ", site_id, "<br>",
-      "Lon: ", round(longitude, 5), "<br>",
-      "Lat: ", round(latitude, 5), "<br>",
-      "<b style='color:red;'>This point was not successfully snapped</b>"
-    )
-  ) %>%
-
-  # Snapped points (red)
-  addCircleMarkers(
-    data = hcmr_snap_result,
-    lng = ~longitude_snapped,
-    lat = ~latitude_snapped,
-    color = "red",
-    fillColor = "red",
-    radius = 5,
-    fillOpacity = 0.7,
-    stroke = TRUE,
-    weight = 2,
-    group = "Snapped Points",
-    popup = ~paste0(
-      "<b>Snapped Point</b><br>",
-      "Site ID: ", site_id, "<br>",
-      "Lon: ", round(longitude_snapped, 5), "<br>",
-      "Lat: ", round(latitude_snapped, 5), "<br>",
-      "Distance: ", round(distance_metres, 1), " m<br>",
-      "Strahler: ", strahler
-    )
-  ) %>%
-
-  # Add lines connecting original to snapped (only for successfully snapped)
-  addPolylines(
-    data = lapply(1:nrow(hcmr_snap_result), function(i) {
-      st_linestring(matrix(c(
-        hcmr_snap_result$longitude_original[i], hcmr_snap_result$latitude_original[i],
-        hcmr_snap_result$longitude_snapped[i], hcmr_snap_result$latitude_snapped[i]
-      ), ncol = 2, byrow = TRUE))
-    }) %>% st_sfc(crs = 4326),
-    color = "gray",
-    weight = 1,
-    opacity = 0.5,
-    group = "Snap Lines"
-  ) %>%
-
-  # Layer controls
-  addLayersControl(
-    baseGroups = c("OpenStreetMap", "Satellite"),
-    overlayGroups = c("Original (Snapped)", "Original (Failed)", "Snapped Points", "Snap Lines"),
-    options = layersControlOptions(collapsed = FALSE)
-  ) %>%
-
-  # Legend
-  addLegend(
-    position = "bottomright",
-    colors = c("blue", "orange", "red", "gray"),
-    labels = c("Original (Snapped)", "Original (Failed)", "Snapped Points", "Snap Lines"),
-    title = "HCMR Data",
-    opacity = 0.7
-  )
-
-hcmr_map
-
-# Save map
-save_to_nimbus(hcmr_map, "points_snapped/maps/hcmr_snapping_check.html")
-
-# Save map locally
-saveWidget(hcmr_map, "points_snapped/maps/hcmr_snapping_check.html")
-
-# Print snapping statistics
-message(sprintf("\nHCMR Snapping Statistics:"))
-message(sprintf("  Total points: %d", nrow(hcmr_snap_result)))
-message(sprintf("  Mean distance: %.1f m", mean(hcmr_snap_result$distance_metres)))
-message(sprintf("  Median distance: %.1f m", median(hcmr_snap_result$distance_metres)))
-message(sprintf("  Max distance: %.1f m", max(hcmr_snap_result$distance_metres)))
-message(sprintf("  Points within %d m: %d (%.1f%%)",
-                DISTANCE_THRESHOLD,
-                sum(hcmr_snap_result$distance_metres <= DISTANCE_THRESHOLD),
-                100 * sum(hcmr_snap_result$distance_metres <= DISTANCE_THRESHOLD) / nrow(hcmr_snap_result)))
-
-# Save list of failed points
-if (n_failed > 0) {
-  hcmr_failed <- hcmr_original[!hcmr_original$snapped, ]
-  fwrite(hcmr_failed, "points_cleaned/fish/hcmr_failed_to_snap.csv")
-  message(sprintf("\nFailed points saved to: points_cleaned/fish/hcmr_failed_to_snap.csv"))
+  leaflet() %>%
+    addTiles(group = "OpenStreetMap") %>%
+    addProviderTiles(providers$Esri.WorldImagery, group = "Satellite") %>%
+    addCircleMarkers(lng = ok[[lon_col]], lat = ok[[lat_col]],
+                     color = "blue", radius = 5, fillOpacity = 0.7, weight = 2,
+                     group = "Original (Snapped)") %>%
+    addCircleMarkers(lng = fail[[lon_col]], lat = fail[[lat_col]],
+                     color = "orange", radius = 6, fillOpacity = 0.9, weight = 3,
+                     group = "Original (Failed)") %>%
+    addCircleMarkers(lng = snapped[[lon_snapped]], lat = snapped[[lat_snapped]],
+                     color = "red", radius = 5, fillOpacity = 0.7, weight = 2,
+                     group = "Snapped Points") %>%
+    addPolylines(data = link_lines, color = "gray", weight = 1, opacity = 0.5,
+                 group = "Snap Lines") %>%
+    addLayersControl(
+      baseGroups    = c("OpenStreetMap", "Satellite"),
+      overlayGroups = c("Original (Snapped)", "Original (Failed)",
+                        "Snapped Points", "Snap Lines"),
+      options = layersControlOptions(collapsed = FALSE)) %>%
+    addLegend(position = "bottomright",
+              colors = c("blue", "orange", "red", "gray"),
+              labels = c("Original (Snapped)", "Original (Failed)",
+                         "Snapped Points", "Snap Lines"),
+              title = title, opacity = 0.7)
 }
 
-
-# ============================================================================
-# SNAP GBIF DATA
-# ============================================================================
-
-message("\n=== Snapping GBIF Data ===")
-
-gbif_snap_result <- api_get_snapped_points_cascade(
-  data = gbif_original,
-  colname_lon = "decimalLongitude",
-  colname_lat = "decimalLatitude",
-  colname_site_id = "gbifID",
-  strahler_seq = STRAHLER_SEQ,
-  distance_threshold = DISTANCE_THRESHOLD
-)
-
-
-
-print(gbif_snap_result)
-
-# Save
-min_strahler <- min(STRAHLER_SEQ)
-snap_out_path <- paste0("points_snapped/fish/gbif_snapped_points_min_strahler",min_strahler, "_dist_thresh_",DISTANCE_THRESHOLD, ".csv")
-fwrite(gbif_snap_result, snap_out_path)
-
-message(sprintf("GBIF: Snapped %d points", nrow(gbif_snap_result)))
-
-gbif_snap_result <- fread(snap_out_path)
-
-## some of the points that failed to snap are in lakes
-
-# ============================================================================
-# VISUALIZE GBIF SNAPPING
-# ============================================================================
-
-message("\n--- Creating GBIF visualization ---")
-
-# Identify which points were successfully snapped
-gbif_snapped_ids <- gbif_snap_result$gbifID
-gbif_original$snapped <- gbif_original$gbifID %in% gbif_snapped_ids
-
-# Summary
-n_snapped_gbif <- sum(gbif_original$snapped)
-n_failed_gbif <- sum(!gbif_original$snapped)
-message(sprintf("  Successfully snapped: %d", n_snapped_gbif))
-message(sprintf("  Failed to snap: %d", n_failed_gbif))
-
-# Create map
-gbif_map <- leaflet() %>%
-  addTiles(group = "OpenStreetMap") %>%
-  addProviderTiles(providers$Esri.WorldImagery, group = "Satellite") %>%
-
-  # Original points that were successfully snapped (blue)
-  addCircleMarkers(
-    data = gbif_original[gbif_original$snapped, ],
-    lng = ~decimalLongitude,
-    lat = ~decimalLatitude,
-    color = "blue",
-    fillColor = "blue",
-    radius = 4,
-    fillOpacity = 0.6,
-    stroke = TRUE,
-    weight = 1,
-    group = "Original (Snapped)",
-    popup = ~paste0(
-      "<b>Original Point (Successfully Snapped)</b><br>",
-      "GBIF ID: ", gbifID, "<br>",
-      "Lon: ", round(decimalLongitude, 5), "<br>",
-      "Lat: ", round(decimalLatitude, 5)
-    )
-  ) %>%
-
-  # Original points that FAILED to snap (orange)
-  addCircleMarkers(
-    data = gbif_original[!gbif_original$snapped, ],
-    lng = ~decimalLongitude,
-    lat = ~decimalLatitude,
-    color = "orange",
-    fillColor = "orange",
-    radius = 5,
-    fillOpacity = 0.9,
-    stroke = TRUE,
-    weight = 3,
-    group = "Original (Failed)",
-    popup = ~paste0(
-      "<b>⚠️ Original Point (FAILED TO SNAP)</b><br>",
-      "GBIF ID: ", gbifID, "<br>",
-      "Lon: ", round(decimalLongitude, 5), "<br>",
-      "Lat: ", round(decimalLatitude, 5), "<br>",
-      "<b style='color:red;'>This point was not successfully snapped</b>"
-    )
-  ) %>%
-
-  # Snapped points (red)
-  addCircleMarkers(
-    data = gbif_snap_result,
-    lng = ~decimalLongitude_snapped,
-    lat = ~decimalLatitude_snapped,
-    color = "red",
-    fillColor = "red",
-    radius = 4,
-    fillOpacity = 0.6,
-    stroke = TRUE,
-    weight = 1,
-    group = "Snapped Points",
-    popup = ~paste0(
-      "<b>Snapped Point</b><br>",
-      "GBIF ID: ", gbifID, "<br>",
-      "Lon: ", round(decimalLongitude_snapped, 5), "<br>",
-      "Lat: ", round(decimalLatitude_snapped, 5), "<br>",
-      "Distance: ", round(distance_metres, 1), " m<br>",
-      "Strahler: ", strahler
-    )
-  ) %>%
-
-  # Add lines connecting original to snapped
-  addPolylines(
-    data = lapply(1:nrow(gbif_snap_result), function(i) {
-      st_linestring(matrix(c(
-        gbif_snap_result$decimalLongitude_original[i], gbif_snap_result$decimalLatitude_original[i],
-        gbif_snap_result$decimalLongitude_snapped[i], gbif_snap_result$decimalLatitude_snapped[i]
-      ), ncol = 2, byrow = TRUE))
-    }) %>% st_sfc(crs = 4326),
-    color = "gray",
-    weight = 1,
-    opacity = 0.3,
-    group = "Snap Lines"
-  ) %>%
-
-  # Layer controls
-  addLayersControl(
-    baseGroups = c("OpenStreetMap", "Satellite"),
-    overlayGroups = c("Original (Snapped)", "Original (Failed)", "Snapped Points", "Snap Lines"),
-    options = layersControlOptions(collapsed = FALSE)
-  ) %>%
-
-  # Legend
-  addLegend(
-    position = "bottomright",
-    colors = c("blue", "orange", "red", "gray"),
-    labels = c("Original (Snapped)", "Original (Failed)", "Snapped Points", "Snap Lines"),
-    title = "GBIF Data",
-    opacity = 0.7
-  )
-
-gbif_map
-
-# Save map locally
-saveWidget(gbif_map, "points_snapped/maps/gbif_snapping_check.html")
-
-# Save map to nimbus
-save_to_nimbus(gbif_map, "points_snapped/maps/gbif_snapping_check.html")
-
-# Print snapping statistics
-message(sprintf("\nGBIF Snapping Statistics:"))
-message(sprintf("  Original points: %d", nrow(gbif_original)))
-message(sprintf("  Successfully snapped: %d (%.1f%%)", n_snapped_gbif, 100 * n_snapped_gbif / nrow(gbif_original)))
-message(sprintf("  Failed to snap: %d (%.1f%%)", n_failed_gbif, 100 * n_failed_gbif / nrow(gbif_original)))
-if (n_snapped_gbif > 0) {
-  message(sprintf("  Mean snap distance: %.1f m", mean(gbif_snap_result$distance_metres)))
-  message(sprintf("  Median snap distance: %.1f m", median(gbif_snap_result$distance_metres)))
-  message(sprintf("  Max snap distance: %.1f m", max(gbif_snap_result$distance_metres)))
+# Print basic snapping stats (n snapped/failed, mean distance).
+report_snap <- function(label, original, snapped, id_col) {
+  original$snapped <- original[[id_col]] %in% snapped[[id_col]]
+  n_ok   <- sum(original$snapped)
+  n_fail <- sum(!original$snapped)
+  message(sprintf("\n%s snapping: %d snapped, %d failed (mean dist %.1f m)",
+                  label, n_ok, n_fail, mean(snapped$distance_metres)))
+  original  # return with `snapped` column added
 }
 
-# Save list of failed points
-if (n_failed_gbif > 0) {
-  gbif_failed <- gbif_original[!gbif_original$snapped, ]
-  fwrite(gbif_failed, "points_cleaned/fish/gbif_failed_to_snap.csv")
-  message(sprintf("\nFailed points saved to: points_cleaned/fish/gbif_failed_to_snap.csv"))
-}
+# ============================================================
+# STEP 1: Load cleaned data
+# ============================================================
 
+message("\n=== Loading cleaned data ===")
 
-
-
-
-# ============================================================================
-# COMBINE DATASETS
-# ============================================================================
-
-message("\n=== Combining Datasets ===")
-
-hcmr_snap_result$source <- "HCMR"
-gbif_snap_result$source <- "GBIF"
-
-# Rename lon, lat, site_id columns of gbif dataset
-gbif_snap_result <- gbif_snap_result %>%
-  rename(longitude_original = decimalLongitude_original,
-         latitude_original = decimalLatitude_original,
-         longitude_snapped = decimalLongitude_snapped,
-         latitude_snapped = decimalLatitude_snapped,
-         site_id = gbifID)
-
-
-# Get common columns
-common_cols <- intersect(names(hcmr_snap_result), names(gbif_snap_result))
-all_snapped <- rbind(
-  hcmr_snap_result[, ..common_cols],
-  gbif_snap_result[, ..common_cols]
-)
-
-fwrite(all_snapped, "points_snapped/fish/all_snapped_fish_points.csv")
-message(sprintf("Combined: %d total points", nrow(all_snapped)))
-
-# all_snapped <- fread("points_snapped/fish/all_snapped_fish_points.csv")
-
-# ============================================================================
-# FINAL SUMMARY
-# ============================================================================
-
-message("\n=== Snapping Complete ===")
-message("\nFinal Statistics:")
-message(sprintf("  Total HCMR points: %d", sum(all_snapped$source == "HCMR")))
-message(sprintf("  Total GBIF points: %d", sum(all_snapped$source == "GBIF")))
-message(sprintf("  Grand total: %d points", nrow(all_snapped)))
-message(sprintf("\n  Overall mean snap distance: %.1f m", mean(all_snapped$distance_metres)))
-message(sprintf("  Overall median snap distance: %.1f m", median(all_snapped$distance_metres)))
-
-message("\nMaps created:")
-message("  - maps/hcmr_snapping_check.html")
-message("  - maps/gbif_snapping_check.html")
-message("  - maps/combined_snapping_check.html")
-
-
-
-# ============================================================================
-# SNAP DAMS DATA
-# ============================================================================
-message("\n=== Snapping Dams Data ===")
-
-# Snapping parameters
-STRAHLER_SEQ <- c(4, 3, 2)
-DISTANCE_THRESHOLD <- 150  # meters
-
-# Load cleaned dams data URL
-dams_url <- "https://nimbus.igb-berlin.de/index.php/s/jMtZ3wKtTYaXLc4/download/dams_sarantaporos_clean.csv"
-
-# Load original dams data -- replace url with new dam data June 2026
-# dams_original <- fread(dams_url)
-# message(sprintf("Original dams points: %d", nrow(dams_original)))
-
+hcmr_original <- fread("points_cleaned/fish/fish_points_to_snap_hcmr.csv")
+gbif_original <- fread("points_cleaned/fish/fish_gbif_clean_to_snap.csv")
 dams_original <- fread("points_cleaned/dams/dams_sarantaporos_clean.csv")
 
-# Snap dams data
-DISTANCE_THRESHOLD <- 150
-dams_snap_result <- api_get_snapped_points_cascade(
-  data = dams_original,
-  colname_lon = "longitude",
-  colname_lat = "latitude",
+message(sprintf("  HCMR: %d  GBIF: %d  Dams: %d points",
+                nrow(hcmr_original), nrow(gbif_original), nrow(dams_original)))
+
+# ============================================================
+# STEP 2a: Snap HCMR fish
+# ============================================================
+# Survey data with known sampling locations, so we snap directly without
+# screening for sea/lake points first.
+
+hcmr_snap <- api_get_snapped_points_cascade(
+  data = hcmr_original, colname_lon = "longitude", colname_lat = "latitude",
   colname_site_id = "site_id",
-  strahler_seq = STRAHLER_SEQ,
-  distance_threshold = DISTANCE_THRESHOLD
+  strahler_seq = STRAHLER_SEQ, distance_threshold = FISH_DIST_THRESHOLD
+)
+fwrite(hcmr_snap, "points_snapped/fish/hcmr_snapped_points.csv")
+
+hcmr_original <- report_snap("HCMR", hcmr_original, hcmr_snap, "site_id")
+saveWidget(make_snap_map(hcmr_original, hcmr_snap, "site_id",
+                         "longitude", "latitude", "HCMR Data"),
+           "points_snapped/maps/hcmr_snapping_check.html")
+
+if (sum(!hcmr_original$snapped) > 0) {
+  fwrite(hcmr_original[!hcmr_original$snapped, ],
+         "points_cleaned/fish/hcmr_failed_to_snap.csv")
+}
+
+# ============================================================
+# STEP 2b: Snap GBIF fish
+# ============================================================
+# Some points that fail here are in lakes (off the stream network).
+
+gbif_snap <- api_get_snapped_points_cascade(
+  data = gbif_original, colname_lon = "decimalLongitude", colname_lat = "decimalLatitude",
+  colname_site_id = "gbifID",
+  strahler_seq = STRAHLER_SEQ, distance_threshold = FISH_DIST_THRESHOLD
+)
+fwrite(gbif_snap, sprintf(
+  "points_snapped/fish/gbif_snapped_points_min_strahler%d_dist_thresh_%d.csv",
+  min(STRAHLER_SEQ), FISH_DIST_THRESHOLD))
+
+gbif_original <- report_snap("GBIF", gbif_original, gbif_snap, "gbifID")
+saveWidget(make_snap_map(gbif_original, gbif_snap, "gbifID",
+                         "decimalLongitude", "decimalLatitude", "GBIF Data"),
+           "points_snapped/maps/gbif_snapping_check.html")
+
+if (sum(!gbif_original$snapped) > 0) {
+  fwrite(gbif_original[!gbif_original$snapped, ],
+         "points_cleaned/fish/gbif_failed_to_snap.csv")
+}
+
+# ============================================================
+# STEP 3: Combine HCMR + GBIF
+# ============================================================
+
+message("\n=== Combining fish datasets ===")
+
+hcmr_snap$source <- "HCMR"
+gbif_snap$source <- "GBIF"
+
+# Rename GBIF columns to the HCMR convention so the two can be row-bound.
+gbif_snap <- gbif_snap %>%
+  rename(longitude_original = decimalLongitude_original,
+         latitude_original  = decimalLatitude_original,
+         longitude_snapped  = decimalLongitude_snapped,
+         latitude_snapped   = decimalLatitude_snapped,
+         site_id            = gbifID)
+
+common_cols <- intersect(names(hcmr_snap), names(gbif_snap))
+all_snapped <- rbind(hcmr_snap[, ..common_cols], gbif_snap[, ..common_cols])
+
+fwrite(all_snapped, "points_snapped/fish/all_snapped_fish_points.csv")
+message(sprintf("  Combined: %d points (HCMR %d, GBIF %d)",
+                nrow(all_snapped),
+                sum(all_snapped$source == "HCMR"),
+                sum(all_snapped$source == "GBIF")))
+
+# ============================================================
+# STEP 4: Snap dams
+# ============================================================
+
+dams_snap <- api_get_snapped_points_cascade(
+  data = dams_original, colname_lon = "longitude", colname_lat = "latitude",
+  colname_site_id = "site_id",
+  strahler_seq = STRAHLER_SEQ, distance_threshold = DAM_DIST_THRESHOLD
 )
 
-print(dams_snap_result)
-
-
-# dams_snap_result <- fread("points_snapped/dams/dams_snapped_points.csv")
-dams_snap_result <- dams_snap_result %>%
+# Re-attach the dam attributes dropped by the snapping call.
+dams_snap <- dams_snap %>%
   left_join(dams_original) %>%
   select(-longitude, -latitude)
 
+fwrite(dams_snap, "points_snapped/dams/dams_snapped_points.csv")
 
-# Save
-fwrite(dams_snap_result, "points_snapped/dams/dams_snapped_points.csv")
-message(sprintf("Dams: Snapped %d points", nrow(dams_snap_result)))
+dams_original <- report_snap("Dams", dams_original, dams_snap, "site_id")
+saveWidget(make_snap_map(dams_original, dams_snap, "site_id",
+                         "longitude", "latitude", "Dam Source"),
+           "points_snapped/maps/dams_snapping_check.html")
 
-# ============================================================================
-# VISUALIZE DAMS SNAPPING
-# ============================================================================
-
-message("\n--- Creating Dams visualization ---")
-
-# Identify which points were successfully snapped
-dams_snapped_ids <- dams_snap_result$site_id
-dams_original$snapped <- dams_original$site_id %in% dams_snapped_ids
-
-# Summary
-n_snapped_dams <- sum(dams_original$snapped)
-n_failed_dams <- sum(!dams_original$snapped)
-message(sprintf("  Successfully snapped: %d", n_snapped_dams))
-message(sprintf("  Failed to snap: %d", n_failed_dams))
-
-# Color palette for sources
-dams_source_colors <- colorFactor(
-  palette = c("RAAY" = "blue", "AMBER" = "green"),
-  domain = c("RAAY", "AMBER")
-)
-
-# Create map
-dams_map <- leaflet() %>%
-  addTiles(group = "OpenStreetMap") %>%
-  addProviderTiles(providers$Esri.WorldImagery, group = "Satellite") %>%
-
-  # Original points that were successfully snapped (colored by source)
-  addCircleMarkers(
-    data = dams_original[dams_original$snapped, ],
-    lng = ~longitude,
-    lat = ~latitude,
-    color = ~dams_source_colors(source),
-    fillColor = ~dams_source_colors(source),
-    radius = 5,
-    fillOpacity = 0.7,
-    stroke = TRUE,
-    weight = 2,
-    group = "Original (Snapped)",
-    popup = ~paste0(
-      "<b>Original Dam (Successfully Snapped)</b><br>",
-      "Dam ID: ", site_id, "<br>",
-      # "Source: ", source, "<br>",
-      # "Status: ", status, "<br>",
-      "Type: ", type, "<br>",
-      "Lon: ", round(longitude, 5), "<br>",
-      "Lat: ", round(latitude, 5)
-    )
-  ) %>%
-
-  # Original points that FAILED to snap (orange)
-  addCircleMarkers(
-    data = dams_original[!dams_original$snapped, ],
-    lng = ~longitude,
-    lat = ~latitude,
-    color = "orange",
-    fillColor = "orange",
-    radius = 6,
-    fillOpacity = 0.9,
-    stroke = TRUE,
-    weight = 3,
-    group = "Original (Failed)",
-    popup = ~paste0(
-      "<b>⚠️ Original Dam (FAILED TO SNAP)</b><br>",
-      "Dam ID: ", site_id, "<br>",
-      # "Source: ", source, "<br>",
-      # "Phase: ", phase, "<br>",
-      # "Status: ", status, "<br>",
-      "Lon: ", round(longitude, 5), "<br>",
-      "Lat: ", round(latitude, 5), "<br>",
-      "<b style='color:red;'>This point was not successfully snapped</b>"
-    )
-  ) %>%
-
-  # Snapped points (red)
-  addCircleMarkers(
-    data = dams_snap_result,
-    lng = ~longitude_snapped,
-    lat = ~latitude_snapped,
-    color = "red",
-    fillColor = "red",
-    radius = 5,
-    fillOpacity = 0.7,
-    stroke = TRUE,
-    weight = 2,
-    group = "Snapped Points",
-    popup = ~paste0(
-      "<b>Snapped Dam</b><br>",
-      "Dam ID: ", site_id, "<br>",
-      "Lon: ", round(longitude_snapped, 5), "<br>",
-      "Lat: ", round(latitude_snapped, 5), "<br>",
-      "Distance: ", round(distance_metres, 1), " m<br>",
-      "Strahler: ", strahler
-    )
-  ) %>%
-
-  # Add lines connecting original to snapped
-  addPolylines(
-    data = lapply(1:nrow(dams_snap_result), function(i) {
-      st_linestring(matrix(c(
-        dams_snap_result$longitude_original[i], dams_snap_result$latitude_original[i],
-        dams_snap_result$longitude_snapped[i], dams_snap_result$latitude_snapped[i]
-      ), ncol = 2, byrow = TRUE))
-    }) %>% st_sfc(crs = 4326),
-    color = "gray",
-    weight = 1,
-    opacity = 0.5,
-    group = "Snap Lines"
-  ) %>%
-
-  # Layer controls
-  addLayersControl(
-    baseGroups = c("OpenStreetMap", "Satellite"),
-    overlayGroups = c("Original (Snapped)", "Original (Failed)", "Snapped Points", "Snap Lines"),
-    options = layersControlOptions(collapsed = FALSE)
-  ) %>%
-
-  # Legend for sources
-  addLegend(
-    position = "bottomright",
-    pal = dams_source_colors,
-    values = dams_original$source,
-    title = "Dam Source",
-    opacity = 0.7
-  )
-
-# Save map locally
-saveWidget(dams_map, "points_snapped/maps/dams_snapping_check.html")
-
-# Save map to nimbus
-save_to_nimbus(dams_map, "points_snapped/maps/dams_snapping_check.html")
-
-# Print snapping statistics
-message(sprintf("\nDams Snapping Statistics:"))
-message(sprintf("  Original points: %d", nrow(dams_original)))
-message(sprintf("  Successfully snapped: %d (%.1f%%)", n_snapped_dams, 100 * n_snapped_dams / nrow(dams_original)))
-message(sprintf("  Failed to snap: %d (%.1f%%)", n_failed_dams, 100 * n_failed_dams / nrow(dams_original)))
-
-if (n_snapped_dams > 0) {
-  message(sprintf("  Mean snap distance: %.1f m", mean(dams_snap_result$distance_metres)))
-  message(sprintf("  Median snap distance: %.1f m", median(dams_snap_result$distance_metres)))
-  message(sprintf("  Max snap distance: %.1f m", max(dams_snap_result$distance_metres)))
-
-  # Statistics by source
-  message("\n  By source:")
-  for (src in unique(dams_original$source)) {
-    snapped_from_source <- sum(dams_snap_result$source == src, na.rm = TRUE)
-    total_from_source <- sum(dams_original$source == src)
-    message(sprintf("    %s: %d/%d snapped (%.1f%%)",
-                    src, snapped_from_source, total_from_source,
-                    100 * snapped_from_source / total_from_source))
-  }
-
-  # Statistics by status
-  message("\n  By status:")
-  for (stat in unique(dams_original$status)) {
-    snapped_from_status <- sum(dams_snap_result$status == stat, na.rm = TRUE)
-    total_from_status <- sum(dams_original$status == stat)
-    message(sprintf("    %s: %d/%d snapped (%.1f%%)",
-                    stat, snapped_from_status, total_from_status,
-                    100 * snapped_from_status / total_from_status))
-  }
+if (sum(!dams_original$snapped) > 0) {
+  fwrite(dams_original[!dams_original$snapped, ],
+         "points_cleaned/dams/dams_failed_to_snap.csv")
 }
 
-# Save list of failed points
-if (n_failed_dams > 0) {
-  dams_failed <- dams_original[!dams_original$snapped, ]
-  fwrite(dams_failed, "points_cleaned/dams/dams_failed_to_snap.csv")
-  message(sprintf("\nFailed points saved to: points_cleaned/dams/dams_failed_to_snap.csv"))
-}
+# ============================================================
+# SUMMARY
+# ============================================================
 
-
-
-
-
-
-
-
-
-
+message("\n", paste(rep("=", 60), collapse = ""))
+message("SNAPPING COMPLETE")
+message(paste(rep("=", 60), collapse = ""))
+message(sprintf("  Fish (combined): %d points", nrow(all_snapped)))
+message(sprintf("  Dams:            %d points", nrow(dams_snap)))
+message("\nNext: 03_snapping/02_join_spnames_with_locations.R")

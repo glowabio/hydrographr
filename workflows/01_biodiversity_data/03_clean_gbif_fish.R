@@ -1,11 +1,41 @@
-# ============================================================================
-# CLEAN GBIF FISH OCCURRENCE DATA
-# ============================================================================
-# Purpose: Clean, spatially validate, and taxonomically check freshwater fish
-#          occurrence records from GBIF for Greece
-# Input: Raw GBIF CSV (may have malformed rows)
-# Output: Cleaned GBIF fish occurrences ready for snapping
-# ============================================================================
+#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
+# 03_clean_gbif_fish.R   (Module 1 -- Biodiversity Data)
+#
+# Clean, spatially validate, and taxonomically check the freshwater fish
+# occurrence records downloaded from GBIF (script 02). Repairs malformed
+# CSV rows, applies metadata and spatial filters, validates taxonomy against
+# the GBIF backbone, filters to the study basin, and exports occurrences
+# ready for snapping.
+#
+# Extent: full Vjosa/Aoos basin (basin filter in Step 8b), matching the SDM
+# training extent. The Sarantaporos subbasin trim happens later, in Module 3.
+#
+# Workflow:
+#   1.  Read raw GBIF CSV and repair malformed rows
+#   2.  Initial exploration / duplicate check
+#   3.  Convert coordinates to numeric
+#   4.  Metadata-based filtering (year, precision, uncertainty)
+#   5.  Spatial filtering (CoordinateCleaner: centroids, capitals, institutions)
+#   6.  Taxonomic name validation against GBIF backbone (interactive)
+#   7.  Manual curation hook
+#   8.  Final column selection + filter; 8b filter to target basin
+#   9.  Visualise
+#   10. Save cleaned + to-snap datasets
+#
+# INPUT:
+#   - points_original/fish/fish_data_gbif.csv   (raw download, from script 02)
+#   - config/study_area_params.csv              (BASIN_ID, from script 01)
+#
+# OUTPUT:
+#   - points_original/fish/fish_data_gbif_fixed.csv  (CSV-repaired raw)
+#   - points_cleaned/fish/fish_gbif_clean.csv        (cleaned, basin only)
+#   - points_cleaned/fish/fish_gbif_clean_to_snap.csv (unique locs for snapping)
+#   - points_cleaned/maps/gbif_fish_cleaned_overview.html
+#
+# REQUIRES: internet access (api_get_ids for basin assignment).
+#
+# LOCATION: workflows/01_biodiversity_data/03_clean_gbif_fish.R
+#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 
 library(data.table)
 library(dplyr)
@@ -17,94 +47,73 @@ library(readr)
 library(leaflet)
 library(htmlwidgets)
 
-# Install danubeoccurR if needed
-# pak::pak("ytorres-cambas/danubeoccurR")
+# danubeoccurR provides check_species_name() for Step 6 (GBIF taxonomy
+# validation). Install from GitHub only if missing, so the script does not
+# hit GitHub/token on every run.
+if (!requireNamespace("danubeoccurR", quietly = TRUE)) {
+  pak::pak("ytorres-cambas/danubeoccurR")
+}
 library(danubeoccurR)
 
-# Load helper function
-source("~/Documents/PhD/scripts/hydrographr/workflows/helpers/save_to_nimbus.R")
+select <- dplyr::select
 
-# ============================================================================
-# SETUP PATHS
-# ============================================================================
-
-# Set working directory
 source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
-# Check working directory
-BASE_DIR <- NIMBUS_DIR
 setwd(BASE_DIR)
 
-# Create directory structure
 dir.create("points_original/fish", recursive = TRUE, showWarnings = FALSE)
 dir.create("points_original/maps", recursive = TRUE, showWarnings = FALSE)
-dir.create("points_cleaned/fish", recursive = TRUE, showWarnings = FALSE)
-dir.create("points_cleaned/maps", recursive = TRUE, showWarnings = FALSE)
+dir.create("points_cleaned/fish",  recursive = TRUE, showWarnings = FALSE)
+dir.create("points_cleaned/maps",  recursive = TRUE, showWarnings = FALSE)
 
-
-# ============================================================================
-# 1. READ AND FIX MALFORMED CSV
-# ============================================================================
+# ============================================================
+# STEP 1: Read and fix malformed CSV
+# ============================================================
 
 message("\n=== Step 1: Reading and Fixing Raw GBIF Data ===")
 
 file_raw <- file.path(BASE_DIR, "points_original/fish/fish_data_gbif.csv")
 
-# Read with fread (handles large files efficiently)
+# fread handles large files; fill = Inf tolerates ragged rows so the repair
+# steps below can detect and drop them rather than failing on read.
 gbif <- fread(file_raw,
               quote = "\"",
-              fill = Inf)
+              fill  = Inf)
 
 message(sprintf("Initial read: %d rows, %d columns", nrow(gbif), ncol(gbif)))
 
-# ============================================================================
-# 1a. Remove rows with extra V columns (malformed rows)
-# ============================================================================
-
-# Identify V columns (overflow columns from malformed rows)
+# --- 1a. Remove rows with overflow (V*) columns from malformed records ---
+# Ragged rows push extra fields into auto-named V1, V2... columns. A row is
+# malformed if any V column is non-empty; keep only rows where all are empty.
 v_cols <- grep("^V[0-9]+$", names(gbif), value = TRUE)
 
 if (length(v_cols) > 0) {
   message(sprintf("Found %d overflow columns (V*) - removing malformed rows", length(v_cols)))
-
-  # Keep only rows where all V columns are empty
   gbif_tmp <- gbif[rowSums(gbif[, ..v_cols] != "", na.rm = TRUE) == 0]
-  gbif_tmp <- gbif_tmp[, !..v_cols]  # Drop V columns
-
+  gbif_tmp <- gbif_tmp[, !..v_cols]   # drop the now-empty V columns
   message(sprintf("Removed %d malformed rows", nrow(gbif) - nrow(gbif_tmp)))
 } else {
   gbif_tmp <- gbif
   message("No overflow columns found")
 }
 
-# ============================================================================
-# 1b. Fix problematic longitude values
-# ============================================================================
-
-# Check for unrealistic longitude values
+# --- 1b. Drop unrealistic longitude values (field-shift artifacts) ---
 if ("decimalLongitude" %in% names(gbif_tmp)) {
   bad_lons <- gbif_tmp %>%
     filter(!is.na(decimalLongitude), decimalLongitude > 1000)
-
   if (nrow(bad_lons) > 0) {
     message(sprintf("Found %d rows with invalid longitude (>1000)", nrow(bad_lons)))
     gbif_tmp <- gbif_tmp %>% filter(decimalLongitude < 1000 | is.na(decimalLongitude))
   }
 }
 
-# ============================================================================
-# 1c. Use readr to catch remaining parsing issues
-# ============================================================================
-
-# Save temporary file
+# --- 1c. Round-trip through readr to catch any remaining parse problems ---
+# readr reports row-level parsing issues that fread silently tolerates, so
+# we write out, re-read, and drop flagged rows.
 temp_file <- tempfile(fileext = ".csv")
 fwrite(gbif_tmp, temp_file)
-
 message(sprintf("Saved %d rows to temp file for validation", nrow(gbif_tmp)))
 
-# Read with readr to detect remaining problems
 gbif_tmp <- read_csv(temp_file, show_col_types = FALSE)
-
-# Get problematic row numbers
 prob_rows <- problems(gbif_tmp)$row
 
 if (length(prob_rows) > 0) {
@@ -114,51 +123,42 @@ if (length(prob_rows) > 0) {
   message("No parsing issues found")
   gbif_clean <- gbif_tmp
 }
-
-# Clean up temp file
 unlink(temp_file)
 
-# Save the fixed raw file
-save_to_nimbus(gbif_clean, "points_original/fish/fish_data_gbif_fixed.csv")
-
-# delete?
 fwrite(gbif_clean, "points_original/fish/fish_data_gbif_fixed.csv")
+message(sprintf("\nCSV fixing complete: %d clean rows retained", nrow(gbif_clean)))
 
-message(sprintf("\n✓ CSV fixing complete: %d clean rows retained", nrow(gbif_clean)))
-
-# ============================================================================
-# 2. INITIAL EXPLORATION
-# ============================================================================
+# ============================================================
+# STEP 2: Initial exploration
+# ============================================================
 
 message("\n=== Step 2: Initial Exploration ===")
 
-gbif_raw <- fread("points_original/fish/fish_data_gbif_fixed.csv")
 gbif_raw <- gbif_clean
 
-message(sprintf("Dataset dimensions: %d rows × %d columns", nrow(gbif_raw), ncol(gbif_raw)))
+message(sprintf("Dataset dimensions: %d rows x %d columns", nrow(gbif_raw), ncol(gbif_raw)))
 message("\nColumn names:")
 print(names(gbif_raw))
 
-# Check for duplicates
+# Flag exact duplicate coordinate-species-year-dataset combinations.
 duplicates <- gbif_raw %>%
   count(decimalLongitude, decimalLatitude, speciesKey, datasetKey, year) %>%
   filter(n > 1)
 
 if (nrow(duplicates) > 0) {
-  message(sprintf("\n⚠️  Found %d duplicate coordinate-species-year combinations", nrow(duplicates)))
+  message(sprintf("\nFound %d duplicate coordinate-species-year combinations", nrow(duplicates)))
 } else {
-  message("\n✓ No exact duplicates found")
+  message("\nNo exact duplicates found")
 }
 
-# ============================================================================
-# 3. COORDINATE TYPE CONVERSION
-# ============================================================================
-
-
-## First filter occurrences only from Greece
-gbif_raw <- gbif_raw %>% filter(countryCode=="GR")
+# ============================================================
+# STEP 3: Coordinate type conversion
+# ============================================================
 
 message("\n=== Step 3: Converting Coordinates to Numeric ===")
+
+# Restrict to Greek records first (country code), then coerce coordinates.
+gbif_raw <- gbif_raw %>% filter(countryCode == "GR")
 
 gbif_raw <- gbif_raw %>%
   mutate(
@@ -166,7 +166,7 @@ gbif_raw <- gbif_raw %>%
     decimalLongitude = as.numeric(decimalLongitude)
   )
 
-# Check coordinate ranges (Greece: lon ~19-28, lat ~34-42)
+# Report coordinate ranges as a sanity check (Greece: lon ~19-28, lat ~34-42).
 coord_summary <- gbif_raw %>%
   filter(!is.na(decimalLongitude), !is.na(decimalLatitude)) %>%
   summarise(
@@ -179,14 +179,17 @@ coord_summary <- gbif_raw %>%
 message(sprintf("Longitude range: %.2f to %.2f", coord_summary$min_lon, coord_summary$max_lon))
 message(sprintf("Latitude range: %.2f to %.2f", coord_summary$min_lat, coord_summary$max_lat))
 
-# ============================================================================
-# 4. METADATA-BASED FILTERING
-# ============================================================================
+# ============================================================
+# STEP 4: Metadata-based filtering
+# ============================================================
 
 message("\n=== Step 4: Metadata Filtering ===")
 
 n_before <- nrow(gbif_raw)
 
+# Keep records with a year, fine coordinate precision, and low spatial
+# uncertainty. The named uncertainty values (301, 3036, 999, 9999) are known
+# GBIF placeholder/default codes, not real measurements, so they are dropped.
 gbif_metadata_filtered <- gbif_raw %>%
   filter(!is.na(year)) %>%
   filter(coordinatePrecision < 0.01 | is.na(coordinatePrecision)) %>%
@@ -198,14 +201,16 @@ message(sprintf("Removed %d rows (%.1f%%) based on metadata filters",
                 n_before - n_after,
                 100 * (n_before - n_after) / n_before))
 
-# ============================================================================
-# 5. SPATIAL FILTERS (CoordinateCleaner)
-# ============================================================================
+# ============================================================
+# STEP 5: Spatial filters (CoordinateCleaner)
+# ============================================================
 
 message("\n=== Step 5: Spatial Filtering with CoordinateCleaner ===")
 
 n_before <- nrow(gbif_metadata_filtered)
 
+# Remove records at country centroids, capitals, and biodiversity
+# institutions (common geocoding artifacts), then de-duplicate.
 gbif_spatial_cleaned <- gbif_metadata_filtered %>%
   cc_cen(buffer = 10, verbose = TRUE) %>%
   cc_cap(buffer = 10, verbose = TRUE) %>%
@@ -225,88 +230,71 @@ message(sprintf("Removed %d rows (%.1f%%) with spatial filters",
                 n_before - n_after,
                 100 * (n_before - n_after) / n_before))
 
-# ============================================================================
-# 6. TAXONOMIC VALIDATION
-# ============================================================================
+# ============================================================
+# STEP 6: Taxonomic validation
+# ============================================================
 
 message("\n=== Step 6: Taxonomic Name Checking ===")
 message("This may take several minutes...")
 
+# manual = TRUE triggers interactive review for ambiguous matches, so this
+# step is run interactively, not in batch.
 gbif_taxa_checked <- check_species_name(
-  data = gbif_spatial_cleaned,
-  col_species_name = "species",
-  target_accuracy = 90,
+  data               = gbif_spatial_cleaned,
+  col_species_name   = "species",
+  target_accuracy    = 90,
   accuracy_decrement = NULL,
-  verbose = TRUE,
-  manual = TRUE
+  verbose            = TRUE,
+  manual             = TRUE
 )
 
 message(sprintf("Taxonomic validation complete: %d species validated",
                 length(unique(gbif_taxa_checked$species))))
 
-# ============================================================================
-# 7. MANUAL CURATION
-# ============================================================================
+# ============================================================
+# STEP 7: Manual curation
+# ============================================================
 
 message("\n=== Step 7: Manual Curation ===")
 
-# Remove specific problematic rows if identified during manual review
-# Adjust row numbers based on your manual inspection
-# gbif_taxa_curated <- gbif_taxa_checked[-c(5836:5840), ]
-
-# For now, keep all
+# Hook for removing problematic rows identified during manual review.
+# Example: gbif_taxa_curated <- gbif_taxa_checked[-c(5836:5840), ]
 gbif_taxa_curated <- gbif_taxa_checked
 
 message(sprintf("After manual curation: %d rows", nrow(gbif_taxa_curated)))
 
-# ============================================================================
-# 8. FINAL CLEANING AND COLUMN SELECTION
-# ============================================================================
+# ============================================================
+# STEP 8: Final cleaning and column selection
+# ============================================================
 
 message("\n=== Step 8: Final Cleaning ===")
 
+# Empty strings -> NA, keep the columns needed downstream, require
+# coordinates, and restrict to post-1980 records (older records are sparse
+# and less reliable for SDM).
 gbif_cleaned <- gbif_taxa_curated %>%
   mutate(across(where(is.character), ~ na_if(.x, ""))) %>%
   select(
-    gbifID,
-    datasetKey,
-    class,
-    order,
-    family,
-    genus,
-    species,
-    year,
-    month,
-    day,
-    decimalLongitude,
-    decimalLatitude
+    gbifID, datasetKey, class, order, family, genus, species,
+    year, month, day, decimalLongitude, decimalLatitude
   ) %>%
-  filter(
-    !is.na(decimalLongitude),
-    !is.na(decimalLatitude)
-  ) %>%
+  filter(!is.na(decimalLongitude), !is.na(decimalLatitude)) %>%
   filter(year > 1980)
 
-
-# ============================================================================
-# 8b. FILTER TO TARGET BASIN
-# ============================================================================
-
+# --- 8b. Filter to target basin ---
 message("\n=== Step 8b: Filtering to target basin ===")
 
-# Load basin ID derived in clean_hcmr_fish.R
+# BASIN_ID is derived once in 01_clean_hcmr_fish.R and shared via config.
 study_params <- fread("config/study_area_params.csv")
 BASIN_ID <- study_params[param == "BASIN_ID", as.integer(value)]
 message("  Target basin ID: ", BASIN_ID)
 
-# Get unique locations for API call
-# Use gbifID as site identifier
+# Assign basin IDs by unique location (gbifID as site id) and keep only the
+# records that fall inside the study basin.
 gbif_unique_locs <- gbif_cleaned %>%
   distinct(gbifID, decimalLongitude, decimalLatitude)
-
 message("  Unique locations to query: ", nrow(gbif_unique_locs))
 
-# Assign basin IDs
 basin_ids_gbif <- api_get_ids(
   points          = gbif_unique_locs,
   colname_lon     = "decimalLongitude",
@@ -315,35 +303,32 @@ basin_ids_gbif <- api_get_ids(
   mode            = "local"
 )
 
-# Join back and filter
 gbif_cleaned <- gbif_cleaned %>%
   left_join(basin_ids_gbif) %>%
   filter(basin_id == BASIN_ID) %>%
-  select(-subc_id, - basin_id, -reg_id)
+  select(-subc_id, -basin_id, -reg_id)
 
 message("  Records in target basin: ", nrow(gbif_cleaned))
 message("  Species in target basin: ", n_distinct(gbif_cleaned$species))
 
-
-# ============================================================================
-# 9. VISUALIZATION
-# ============================================================================
+# ============================================================
+# STEP 9: Visualise
+# ============================================================
 
 message("\n=== Step 9: Creating Visualization ===")
 
-# Create overview map
 gbif_map <- leaflet(gbif_cleaned) %>%
   addTiles(group = "OpenStreetMap") %>%
   addProviderTiles(providers$Esri.WorldImagery, group = "Satellite") %>%
   addCircleMarkers(
-    lng = ~decimalLongitude,
-    lat = ~decimalLatitude,
-    radius = 3,
-    color = "blue",
-    fillColor = "blue",
+    lng         = ~decimalLongitude,
+    lat         = ~decimalLatitude,
+    radius      = 3,
+    color       = "blue",
+    fillColor   = "blue",
     fillOpacity = 0.5,
-    stroke = FALSE,
-    popup = ~paste0(
+    stroke      = FALSE,
+    popup       = ~paste0(
       "<b>Species:</b> ", species, "<br>",
       "<b>Family:</b> ", family, "<br>",
       "<b>Year:</b> ", year, "<br>",
@@ -352,40 +337,31 @@ gbif_map <- leaflet(gbif_cleaned) %>%
   ) %>%
   addLayersControl(
     baseGroups = c("OpenStreetMap", "Satellite"),
-    options = layersControlOptions(collapsed = FALSE)
+    options    = layersControlOptions(collapsed = FALSE)
   )
 
-# Save map
-save_to_nimbus(gbif_map, "points_cleaned/maps/gbif_fish_cleaned_overview.html")
-
-# Save locally
 saveWidget(gbif_map, "points_cleaned/maps/gbif_fish_cleaned_overview.html")
+message("  Saved: points_cleaned/maps/gbif_fish_cleaned_overview.html")
 
-# ============================================================================
-# 10. SAVE CLEANED DATA
-# ============================================================================
+# ============================================================
+# STEP 10: Save cleaned data
+# ============================================================
 
 message("\n=== Step 10: Saving Cleaned Data ===")
 
-# Save to Nimbus
-save_to_nimbus(gbif_cleaned, "points_cleaned/fish/fish_gbif_clean.csv")
-
-# Save locally
 fwrite(gbif_cleaned, "points_cleaned/fish/fish_gbif_clean.csv")
+message("  Saved: points_cleaned/fish/fish_gbif_clean.csv")
 
-gbif_cleaned <- fread("points_cleaned/fish/fish_gbif_clean.csv")
-
-# Remove duplicates, keep only coordinates and gbifID to snap
+# Unique locations for snapping (one row per coordinate, not per occurrence).
 gbif_cleaned_to_snap <- gbif_cleaned %>%
-  distinct(decimalLongitude,decimalLatitude, .keep_all = TRUE)
+  distinct(decimalLongitude, decimalLatitude, .keep_all = TRUE)
 
 fwrite(gbif_cleaned_to_snap, "points_cleaned/fish/fish_gbif_clean_to_snap.csv")
-save_to_nimbus(gbif_cleaned_to_snap, "points_cleaned/fish/fish_gbif_clean_to_snap.csv")
+message("  Saved: points_cleaned/fish/fish_gbif_clean_to_snap.csv")
 
-
-# ============================================================================
-# SUMMARY STATISTICS
-# ============================================================================
+# ============================================================
+# SUMMARY
+# ============================================================
 
 message("\n", paste(rep("=", 80), collapse = ""))
 message("GBIF DATA CLEANING COMPLETE")
@@ -423,6 +399,6 @@ message(sprintf("  Latitude: %.2f to %.2f",
 message("\nFiles created:")
 message("  - points_original/fish/fish_data_gbif_fixed.csv")
 message("  - points_cleaned/fish/fish_gbif_clean.csv")
-message("  - points_original/maps/gbif_fish_cleaned_overview.html")
-message("\n✓ Ready for snapping!")
-
+message("  - points_cleaned/fish/fish_gbif_clean_to_snap.csv")
+message("  - points_cleaned/maps/gbif_fish_cleaned_overview.html")
+message("\nNext: 03_snapping/01_snap_all_data.R")

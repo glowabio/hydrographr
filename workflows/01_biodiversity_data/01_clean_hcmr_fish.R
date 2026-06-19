@@ -1,30 +1,38 @@
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
-# 01_clean_hcmr_fish.R
+# 01_clean_hcmr_fish.R   (Module 1 -- Biodiversity Data)
 #
-# Clean and format freshwater fish occurrence records from HCMR Excel file.
-# Derives the study basin ID from a known anchor point and filters all
-# occurrences to the target basin. Saves basin ID for downstream scripts.
+# Clean and format freshwater fish occurrence records from the HCMR Excel
+# file. Combines the Greece-wide HCMR dataset with the Sarantaporos basin
+# field dataset, assigns basin IDs via api_get_ids(), derives the study
+# BASIN_ID from a known anchor point, and filters all occurrences to that
+# basin. The basin ID is saved to config for every downstream script.
+#
+# Extent: full Vjosa/Aoos basin (not Sarantaporos-only). SDM training in
+# Module 7 needs the wider basin occurrence set; the Sarantaporos subbasin
+# trim happens later, in Module 3 (03_extract_subbasin.R).
 #
 # Workflow:
-#   1. Load and clean main HCMR dataset (Greece-wide)
-#   2. Load and clean basin field dataset
-#   3. Combine datasets
-#   4. Assign basin IDs via api_get_ids()
-#   5. Derive BASIN_ID from known anchor point and filter to target basin
-#   6. Save outputs + basin ID config
-#   7. Visualise
+#   1.  Load and clean main HCMR dataset (Greece-wide)
+#   2.  Load and clean basin field dataset (Sarantaporos.xlsx)
+#   3.  Combine datasets
+#   4.  Assign basin IDs via api_get_ids()
+#   5.  Derive BASIN_ID from anchor point and filter to target basin
+#   5b. Remove invalid/undetermined taxa
+#   5c. Validate taxonomic names against GBIF backbone (interactive)
+#   6.  Save outputs + basin ID config
+#   7.  Visualise
 #
-# Input:
+# INPUT:
 #   - points_original/fish/Fish distributional & traits data (1).xlsx
-#   - points_original/fish/Sarantaporos.xlsx  (basin field data)
+#   - points_original/fish/Sarantaporos.xlsx            (basin field data)
 #   - points_original/fish/species_list_sarantaporos.txt
 #
-# Output:
-#   - points_cleaned/fish/fish_basin_hcmr.csv          (all species, basin only)
-#   - points_cleaned/fish/fish_points_to_snap_hcmr.csv (unique sites for snapping)
-#   - points_cleaned/fish/fish_hcmr_dry_fishless_sites.csv
-#   - config/study_area_params.csv                     (BASIN_ID for downstream)
-#   - points_cleaned/maps/hcmr_fish_overview.html
+# OUTPUT:
+#   - points_cleaned/fish/fish_basin_hcmr.csv           (all species, basin only)
+#   - points_cleaned/fish/fish_points_to_snap_hcmr.csv  (unique sites for snapping)
+#   - points_cleaned/fish/fish_basin_field_data_clean.csv
+#   - config/study_area_params.csv                      (BASIN_ID for downstream)
+#   - points_cleaned/maps/hcmr_fish_basin_overview.html
 #
 # LOCATION: workflows/01_biodiversity_data/01_clean_hcmr_fish.R
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
@@ -36,34 +44,37 @@ library(dplyr)
 library(tidyr)
 library(leaflet)
 library(htmlwidgets)
-pak::pak("ytorres-cambas/danubeoccurR")
+
+# danubeoccurR provides check_species_name() for Step 5c (taxonomy
+# validation). Install from GitHub only if missing
+if (!requireNamespace("danubeoccurR", quietly = TRUE)) {
+  pak::pak("ytorres-cambas/danubeoccurR")
+}
+library(danubeoccurR)
 
 select <- dplyr::select
 
 source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
 setwd(BASE_DIR)
 
+dir.create("points_cleaned/fish", recursive = TRUE, showWarnings = FALSE)
+dir.create("points_cleaned/maps", recursive = TRUE, showWarnings = FALSE)
+dir.create("config",              recursive = TRUE, showWarnings = FALSE)
+
 # ============================================================
 # PARAMETERS
 # ============================================================
 
-# Known anchor point confirmed to be within the target basin (Aoos/Vjosa)
-# Used to derive BASIN_ID from api_get_ids() output
+# Known anchor point confirmed to be within the target basin (Aoos/Vjosa).
+# Used to derive BASIN_ID from the api_get_ids() output: whatever basin this
+# point falls in is the study basin, so we never hard-code the basin number.
 ANCHOR_SITE_ID  <- "40POROS_DW"
 ANCHOR_LON      <- 20.72211
 ANCHOR_LAT      <- 40.11128
 
-# ============================================================
-# SETUP
-# ============================================================
-
 message("\n", paste(rep("=", 80), collapse = ""))
 message("HCMR FISH DATA CLEANING")
 message(paste(rep("=", 80), collapse = ""))
-
-dir.create("points_cleaned/fish", recursive = TRUE, showWarnings = FALSE)
-dir.create("points_cleaned/maps", recursive = TRUE, showWarnings = FALSE)
-dir.create("config",              recursive = TRUE, showWarnings = FALSE)
 
 # ============================================================
 # STEP 1: Load and clean main HCMR dataset (Greece-wide)
@@ -77,7 +88,8 @@ sp_raw <- read_xlsx("points_original/fish/Fish distributional & traits data (1).
 
 message("  Loaded: ", nrow(sp_raw), " rows, ", ncol(sp_raw), " columns")
 
-# Fix inverted lat/lon
+# Some rows have lat/lon swapped: detect by checking whether "latitude"
+# actually falls in the longitude range for Greece, then swap those rows.
 sp <- sp_raw %>%
   mutate(
     inverted_lat_lon = latitude >= 19 & latitude <= 29 &
@@ -95,7 +107,8 @@ sp <- sp %>%
   select(-latitude, -longitude, -inverted_lat_lon) %>%
   rename(latitude = latitude_fixed, longitude = longitude_fixed)
 
-# Separate dry/fishless sites
+# Separate dry/fishless sites: these are true-absence survey sites, not
+# occurrence records, so they must not enter the presence dataset.
 dry_fishless <- sp %>% filter(!is.na(DRY) | !is.na(FISHLESS))
 message("  Dry/fishless sites: ", nrow(dry_fishless))
 
@@ -110,7 +123,7 @@ sp <- sp %>%
 
 message("  Sites with fish presence: ", length(unique(sp$Sites)))
 
-# Pivot to long format — keep only presences
+# Pivot wide species columns to long format; keep only presences (non-NA).
 sp <- sp %>%
   pivot_longer(
     cols      = -c(Sites, latitude, longitude),
@@ -122,7 +135,7 @@ sp <- sp %>%
 
 message("  Occurrence records: ", nrow(sp))
 
-# Remove invalid latitudes
+# Drop records with clearly invalid latitude (placeholder/garbage values).
 n_before <- nrow(sp)
 sp <- sp %>% filter(latitude > 10)
 message("  Removed invalid latitude records: ", n_before - nrow(sp))
@@ -137,9 +150,11 @@ basin_file <- "points_original/fish/Sarantaporos.xlsx"
 
 if (file.exists(basin_file)) {
 
+  # Lat/lon column headers are swapped in the source file, so rename them
+  # crossed here to read the coordinates correctly.
   raw <- read_xlsx(basin_file) %>%
     rename(
-      longitude = "Latitude",    # swapped in original file
+      longitude = "Latitude",
       latitude  = "Longtitude"
     ) %>%
     mutate(site_id = paste0("Basin_", row_number()))
@@ -149,7 +164,7 @@ if (file.exists(basin_file)) {
 
   message("  Species columns found: ", length(species_cols))
 
-  # Pivot to long format, keep only presences
+  # Pivot to long format, keep only presences (abundance > 0).
   basin_long <- raw %>%
     select(all_of(c(coord_cols, species_cols))) %>%
     pivot_longer(
@@ -167,7 +182,7 @@ if (file.exists(basin_file)) {
   message("  Presence records: ", nrow(basin_long),
           " (", n_distinct(basin_long$species), " species)")
 
-  # Coordinate validation
+  # Coordinate validation: keep only points inside the Greece bounding box.
   n_before <- nrow(basin_long)
   basin_long <- basin_long %>%
     filter(
@@ -177,7 +192,6 @@ if (file.exists(basin_file)) {
     )
   message("  Removed invalid coordinate records: ", n_before - nrow(basin_long))
 
-  # Save standalone basin field dataset
   fwrite(basin_long, "points_cleaned/fish/fish_basin_field_data_clean.csv")
   message("  Saved: points_cleaned/fish/fish_basin_field_data_clean.csv")
 
@@ -209,20 +223,19 @@ message("  Combined total records:      ", nrow(sp_combined))
 message("  Unique species:              ", n_distinct(sp_combined$species))
 message("  Unique sites:                ", n_distinct(sp_combined$Sites))
 
-
 # ============================================================
 # STEP 4: Assign basin IDs via api_get_ids()
 # ============================================================
 
 message("\n=== Step 4: Assigning basin IDs ===")
 
-# Get unique site coordinates for API call
+# One API call per unique site coordinate (not per occurrence record).
 sites_to_query <- sp_combined %>%
   distinct(Sites, longitude, latitude) %>%
   rename(site_id = Sites)
 
-# Add anchor point to ensure BASIN_ID can always be derived
-# even if anchor site is not in the HCMR data
+# Add the anchor point so BASIN_ID can always be derived in Step 5, even if
+# the anchor site is not itself present in the HCMR data.
 anchor_row <- data.frame(
   site_id   = ANCHOR_SITE_ID,
   longitude = ANCHOR_LON,
@@ -233,9 +246,7 @@ sites_to_query <- bind_rows(sites_to_query, anchor_row) %>%
 
 message("  Unique sites to query: ", nrow(sites_to_query))
 
-# Write to Nimbus for API call
 fwrite(sites_to_query, "points_cleaned/fish/sites_for_basin_id_query.csv")
-
 
 basin_ids <- api_get_ids(
   points          = sites_to_query,
@@ -245,7 +256,7 @@ basin_ids <- api_get_ids(
   mode            = "local"
 )
 
-# Join basin IDs back to combined data
+# Join basin IDs back to every occurrence record.
 sp_with_basins <- sp_combined %>%
   left_join(basin_ids %>% rename(Sites = site_id))
 
@@ -257,7 +268,9 @@ cat("  Sites missing basin_id:", sum(is.na(sp_with_basins$basin_id)), "\n")
 
 message("\n=== Step 5: Deriving basin ID and filtering ===")
 
-# Derive BASIN_ID from known anchor point
+# The study basin is whichever basin the anchor point falls in. Deriving it
+# this way (rather than hard-coding) keeps the script reusable if the
+# hydrography version or basin numbering changes.
 BASIN_ID <- basin_ids %>%
   filter(site_id == ANCHOR_SITE_ID) %>%
   pull(basin_id)
@@ -269,14 +282,14 @@ if (length(BASIN_ID) == 0 || is.na(BASIN_ID)) {
 
 message("  BASIN_ID derived from anchor point (", ANCHOR_SITE_ID, "): ", BASIN_ID)
 
-# Save BASIN_ID to config for all downstream scripts
+# Persist BASIN_ID so all downstream scripts read the same study area.
 fwrite(
   data.table(param = "BASIN_ID", value = BASIN_ID),
   "config/study_area_params.csv"
 )
 message("  Saved: config/study_area_params.csv")
 
-# Filter to target basin only
+# Keep only occurrences inside the target basin.
 n_before <- nrow(sp_with_basins)
 sp_basin <- sp_with_basins %>%
   filter(basin_id == BASIN_ID)
@@ -287,16 +300,14 @@ message("  Records excluded:            ", n_before - nrow(sp_basin))
 message("  Species in basin:            ", n_distinct(sp_basin$species))
 message("  Sites in basin:              ", n_distinct(sp_basin$Sites))
 
-
-
 # ============================================================
 # STEP 5b: Remove invalid taxa
 # ============================================================
 
 message("\n=== Step 5b: Removing invalid taxa ===")
 
-# Remove hybrid/undetermined taxa not suitable for SDM
-# Squalius_sp._Aoos: undetermined species-level identification
+# Squalius_sp._Aoos is an undetermined species-level identification and is
+# not suitable for species distribution modelling, so drop it.
 invalid_taxa <- c("Squalius_sp._Aoos")
 
 n_before <- nrow(sp_basin)
@@ -310,37 +321,33 @@ message("  Records remaining: ", nrow(sp_basin))
 # ============================================================
 # STEP 5c: Taxonomic name validation
 # ============================================================
-# Uses danubeoccurR::check_species_name() to validate species names
-# against GBIF backbone taxonomy. Manual review is triggered for
-# ambiguous matches. Run interactively — not suitable for batch execution.
+# danubeoccurR::check_species_name() validates names against the GBIF
+# backbone taxonomy. manual = TRUE triggers interactive review for ambiguous
+# matches, so this step is run interactively, not in batch.
 
 message("\n=== Step 5c: Taxonomic name validation ===")
 message("  This may take several minutes...")
 
-library(danubeoccurR)
-
 sp_basin_validated <- check_species_name(
-  data             = sp_basin %>% mutate(species = gsub("_", " ", species)),
-  col_species_name = "species",
-  target_accuracy  = 90,
+  data               = sp_basin %>% mutate(species = gsub("_", " ", species)),
+  col_species_name   = "species",
+  target_accuracy    = 90,
   accuracy_decrement = NULL,
-  verbose          = TRUE,
-  manual           = TRUE
+  verbose            = TRUE,
+  manual             = TRUE
 )
 
-# We manually changed "Chondrostoma ohridana"
-# to the updated name "Chondrostoma ohridanum"
-
+# During manual review we changed "Chondrostoma ohridana" to the updated
+# accepted name "Chondrostoma ohridanum".
 message("  Validated species: ", n_distinct(sp_basin_validated$species))
 
-# Manual curation — add removals here after reviewing check_species_name output
-# Example: sp_basin_validated <- sp_basin_validated %>% filter(species != "...")
-# For now retain all validated records
-sp_basin <- sp_basin_validated %>% mutate(species = speciescheck) %>%
+# Adopt the validated names and drop the helper columns added by
+# check_species_name(). Add manual removals here after reviewing output.
+sp_basin <- sp_basin_validated %>%
+  mutate(species = speciescheck) %>%
   select(-manually_updated, -speciescheck, -subc_id, -basin_id, -reg_id)
 
 message("  Records after taxonomic validation: ", nrow(sp_basin))
-
 
 # ============================================================
 # STEP 6: Save outputs
@@ -348,11 +355,11 @@ message("  Records after taxonomic validation: ", nrow(sp_basin))
 
 message("\n=== Step 6: Saving outputs ===")
 
-# All species, basin only
+# All species, basin only.
 fwrite(sp_basin, "points_cleaned/fish/fish_basin_hcmr.csv")
 message("  Saved: points_cleaned/fish/fish_basin_hcmr.csv")
 
-# Unique sites for snapping
+# Unique sites for the snapping step (one row per site, not per occurrence).
 sp_to_snap <- sp_basin %>%
   distinct(Sites, longitude, latitude) %>%
   rename(site_id = Sites)
@@ -380,7 +387,6 @@ hcmr_map <- leaflet(sp_basin) %>%
     fillOpacity = 0.7,
     stroke      = FALSE
   ) %>%
-  # Anchor point marker
   addMarkers(
     lng   = ANCHOR_LON,
     lat   = ANCHOR_LAT,
@@ -424,6 +430,6 @@ message("\nFiles created:")
 message("  points_cleaned/fish/fish_basin_hcmr.csv")
 message("  points_cleaned/fish/fish_points_to_snap_hcmr.csv")
 message("  points_cleaned/fish/fish_basin_field_data_clean.csv")
-message("  config/study_area_params.csv  ← BASIN_ID = ", BASIN_ID)
+message("  config/study_area_params.csv  <- BASIN_ID = ", BASIN_ID)
 message("  points_cleaned/maps/hcmr_fish_basin_overview.html")
 message("\nNext: snapping script")

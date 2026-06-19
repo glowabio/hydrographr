@@ -58,10 +58,10 @@ library(sf)
 library(data.table)
 library(dplyr)
 library(leaflet)
+library(ggplot2)
 
 select <- dplyr::select
 
-source("~/Documents/PhD/scripts/hydrographr/workflows/helpers/save_to_nimbus.R")
 source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
 setwd(BASE_DIR)
 
@@ -130,7 +130,6 @@ dir.create("points_snapped/basin", recursive = TRUE, showWarnings = FALSE)
 # Basin polygon
 basin_polygon <- api_get_basin_polygon(basin_id = BASIN_ID)
 st_write(basin_polygon, "spatial/basin/basin_polygon.gpkg", delete_dsn = TRUE)
-save_to_nimbus(basin_polygon, "spatial/basin/basin_polygon.gpkg")
 message("  Basin polygon saved")
 
 # Full basin stream network
@@ -143,7 +142,6 @@ basin_streams <- api_get_stream_segments(
 basin_streams$basin_id <- BASIN_ID
 
 st_write(basin_streams, "spatial/basin/stream_network.gpkg", delete_dsn = TRUE)
-save_to_nimbus(basin_streams, "spatial/basin/stream_network.gpkg")
 
 basin_subc_ids <- unique(basin_streams$subc_id)
 message("  Basin stream segments: ", nrow(basin_streams),
@@ -170,7 +168,6 @@ if (n_before > n_after) {
 
 st_write(basin_streams_pruned, "spatial/basin/stream_network_pruned.gpkg",
          delete_dsn = TRUE)
-save_to_nimbus(basin_streams_pruned, "spatial/basin/stream_network_pruned.gpkg")
 
 basin_subc_ids_pruned <- unique(basin_streams_pruned$subc_id)
 message("  Pruned basin segments: ", nrow(basin_streams_pruned),
@@ -198,7 +195,6 @@ dir.create("points_snapped/subbasin_sarantaporos", recursive = TRUE, showWarning
 # Subbasin polygon — Sarantaporos drainage only
 subbasin_polygon <- api_get_upstream_catchment(lon = OUTLET_LON, lat = OUTLET_LAT,)
 st_write(subbasin_polygon, "spatial/subbasin_sarantaporos/subbasin_polygon.gpkg", delete_dsn = TRUE)
-save_to_nimbus(subbasin_polygon, "spatial/subbasin_sarantaporos/subbasin_polygon.gpkg")
 message("  Subbasin polygon saved | Area: ",
         round(as.numeric(st_area(subbasin_polygon)) / 1e6, 1), " km2")
 
@@ -212,7 +208,6 @@ subbasin_streams <- api_get_stream_segments(
 )
 
 st_write(subbasin_streams, "spatial/subbasin_sarantaporos/stream_network.gpkg", delete_dsn = TRUE)
-save_to_nimbus(subbasin_streams, "spatial/subbasin_sarantaporos/stream_network.gpkg")
 
 subbasin_subc_ids <- unique(subbasin_streams$subc_id)
 message("  Subbasin stream segments: ", nrow(subbasin_streams),
@@ -241,7 +236,6 @@ if (n_before > n_after) {
 st_write(subbasin_streams_pruned,
          "spatial/subbasin_sarantaporos/stream_network_pruned.gpkg",
          delete_dsn = TRUE)
-save_to_nimbus(subbasin_streams_pruned, "spatial/subbasin_sarantaporos/stream_network_pruned.gpkg")
 
 subbasin_subc_ids_pruned <- unique(subbasin_streams_pruned$subc_id)
 message("  Pruned subbasin segments: ", nrow(subbasin_streams_pruned),
@@ -455,6 +449,90 @@ cat("  With records in subbasin:     ", sum(species_coverage$in_subbasin), "\n")
 cat("  No records anywhere:          ",
     sum(!species_coverage$in_basin), "\n")
 print(species_coverage)
+
+
+
+
+
+
+####### Visualisation of pruning
+
+
+
+# Outlet as sf point (for consistent CRS handling)
+outlet_sf <- st_sf(
+  geometry = st_sfc(st_point(c(OUTLET_LON, OUTLET_LAT)), crs = 4326)
+)
+
+library(patchwork)
+
+# --- MAIN: Sarantaporos sub-basin only ---
+p_main <- ggplot() +
+  geom_sf(data = subbasin_polygon, colour = "#525252",
+          linewidth = 0.6, fill = "#525252", alpha = 0.05) +
+  geom_sf(data = subbasin_streams, colour = "#bdbdbd",
+          linewidth = 0.3, alpha = 0.8) +
+  geom_sf(data = subbasin_streams_pruned, colour = "#2166ac",
+          linewidth = 0.7, alpha = 0.9) +
+  geom_sf(data = fish_subbasin_sf, colour = "#e6550d",
+          size = 1.8, alpha = 0.8) +
+  geom_sf(data = outlet_sf, shape = 17, size = 4, colour = "#2166ac",
+          stroke = 0) +
+  geom_point(data = fish_subbasin,
+             aes(longitude_snapped, latitude_snapped), size = 2, colour = "black") +
+  geom_point(data = dams_subbasin,
+             aes(longitude_snapped, latitude_snapped), shape = 17, size = 2, colour = "red") +
+  geom_point(data = data.frame(lon = OUTLET_LON, lat = OUTLET_LAT),
+             aes(lon, lat), shape = 60, size = 6, colour = "#2166ac") +
+  # zoom to the subbasin extent
+  coord_sf(xlim = st_bbox(subbasin_polygon)[c("xmin", "xmax")],
+           ylim = st_bbox(subbasin_polygon)[c("ymin", "ymax")],
+           expand = TRUE) +
+  theme_minimal(base_size = 11) +
+  theme(panel.grid = element_blank(),          # remove the checkered grid
+        panel.background = element_rect(fill = "white", colour = NA),
+        axis.title = element_blank())+
+ # Scale bar + north arrow
+  annotation_scale(
+    location = "br", width_hint = 0.25,
+    text_col = "grey10", line_col = "grey10",
+    bar_cols = c("grey10", "white")
+  ) +
+    annotation_north_arrow(
+      location = "br",
+      pad_x    = unit(0.05, "in"),
+      pad_y    = unit(0.20, "in"),
+      style    = north_arrow_fancy_orienteering(
+        fill     = c("grey10", "white"),
+        line_col = "grey10",
+        text_col = "grey10"
+      )
+    )
+p_main
+
+# --- INSET: whole basin, subbasin highlighted ---
+p_inset <- ggplot() +
+  geom_sf(data = basin_polygon, colour = "#525252",
+          linewidth = 0.3, fill = "grey95") +
+  geom_sf(data = subbasin_polygon, colour = "#2166ac",
+          linewidth = 0.5, fill = "#2166ac", alpha = 0.25) +
+  coord_sf(expand = FALSE) +
+  theme_void() +
+  theme(panel.background = element_rect(fill = "white", colour = "grey70"),
+        panel.border = element_rect(fill = NA, colour = "grey70", linewidth = 0.4))
+
+
+p_final <- p_main +
+  inset_element(p_inset,
+                left = 0.0, bottom = 0.68, right = 0.32, top = 1.2,
+                align_to = "panel")
+
+
+p_final
+
+png("figures/sarantaporos_map_prunning.png", width = 9, height = 8, units = "in", res = 200)
+print(p_final); dev.off()
+
 
 # ============================================================
 # SUMMARY

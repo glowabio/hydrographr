@@ -22,7 +22,7 @@ library(rnaturalearth)
 library(patchwork)
 library(data.table)
 
-source("workflows/helpers/config.R")
+source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
 setwd(BASE_DIR)
 
 # ============================================================
