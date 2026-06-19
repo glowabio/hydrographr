@@ -1,5 +1,5 @@
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
-# 04_lake_landcover_analysis.R   (Module X -- Lake analysis)
+# 04_lake_landcover_analysis.R   (Module 11 -- Lake analysis)
 #
 # Build a land cover area time series (1992-2020) for the lake catchment.
 # For each year, per-sub-catchment ESA CCI class proportions are weighted by

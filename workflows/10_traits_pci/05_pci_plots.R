@@ -42,7 +42,7 @@ fi_plot <- fi_summary %>%
             by = "species")
 
 
-basin_polygons <- read_sf("spatial/stream_networks/basin_polygons.gpkg")
+basin_polygons <- read_sf("spatial/stream_network_graphs/basin_polygons.gpkg")
 
 # ============================================================
 # SCATTERPLOT: PCI current vs PCI future

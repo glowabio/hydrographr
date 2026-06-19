@@ -34,8 +34,8 @@ UPSTREAM_BUFFER   <- 3   # reaches to extend upstream from occurrence points
 # READ INPUTS
 # ============================================================
 
-river_graph_current <- readRDS("spatial/stream_networks/river_graph_current.RDS")
-river_graph_future  <- readRDS("spatial/stream_networks/river_graph_future.RDS")
+river_graph_current <- readRDS("spatial/stream_network_graphs/river_graph_current.RDS")
+river_graph_future  <- readRDS("spatial/stream_network_graphs/river_graph_future.RDS")
 
 # Convert length_reach from meters to tens of km
 V(river_graph_current)$length_reach <- V(river_graph_current)$length_reach / 10000

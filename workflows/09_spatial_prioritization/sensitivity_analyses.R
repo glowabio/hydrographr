@@ -7,7 +7,7 @@
 #   at the comparison target (30%) across a range of penalties and report
 #   the shift (reaches/km that change priority status).
 # ============================================================
-
+library(prioritizr)
 message("\n=== Sensitivity: boundary penalty sweep (", COMPARISON_TARGET * 100, "%) ===")
 
 PENALTY_GRID <- c(0, 0.001, 0.01, 0.03, 0.1, 0.3, 1)

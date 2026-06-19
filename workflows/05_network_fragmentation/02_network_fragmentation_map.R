@@ -8,8 +8,8 @@
 # fragments (future).
 #
 # INPUT:
-#   - spatial/stream_networks/river_graph_current.RDS
-#   - spatial/stream_networks/river_graph_future.RDS
+#   - spatial/stream_network_graphs/river_graph_current.RDS
+#   - spatial/stream_network_graphs/river_graph_future.RDS
 #   - spatial/subbasin_sarantaporos/stream_network_pruned.gpkg
 #   - points_snapped/dams/dams_snapped_points.csv   (to mark dam locations)
 #
@@ -35,8 +35,8 @@ dir.create("figures", showWarnings = FALSE)
 # ============================================================
 # LOAD
 # ============================================================
-river_graph_current <- readRDS("spatial/stream_networks/river_graph_current.RDS")
-river_graph_future  <- readRDS("spatial/stream_networks/river_graph_future.RDS")
+river_graph_current <- readRDS("spatial/stream_network_graphs/river_graph_current.RDS")
+river_graph_future  <- readRDS("spatial/stream_network_graphs/river_graph_future.RDS")
 
 streams <- st_read("spatial/subbasin_sarantaporos/stream_network_pruned.gpkg",
                    quiet = TRUE) %>%

@@ -1,5 +1,5 @@
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
-# 03_delineate_lake_catchment.R   (Module X -- Lake analysis)
+# 03_delineate_lake_catchment.R   (Module 11 -- Lake analysis)
 #
 # Delineate the catchment draining to the lake, merge it with the lake
 # surface, compute its area, and extract the sub-catchment IDs that make up

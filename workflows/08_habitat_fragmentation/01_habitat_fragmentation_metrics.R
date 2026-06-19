@@ -64,8 +64,8 @@
 #   spatial/subbasin_sarantaporos/subbasin_subc_ids_pruned.csv
 #   spatial/subbasin_sarantaporos/stream_network_pruned.gpkg  (reach lengths)
 #   spatial/subbasin/stream_network_habitat_tss.gpkg          (SDM predictions)
-#   spatial/stream_networks/river_graph_current.RDS
-#   spatial/stream_networks/river_graph_future.RDS
+#   spatial/stream_network_graphs/river_graph_current.RDS
+#   spatial/stream_network_graphs/river_graph_future.RDS
 #   points_snapped/dams/dams_snapped_points.csv
 #   points_snapped/basin/fish_sdm_basin.csv
 #
@@ -240,8 +240,8 @@ message("\n=== Step 2: Loading scenario graphs ===")
 # the reach), built by 04_network_analyses/01_generate_network_graph.R.
 # A dam attributes to a single downstream edge, so one dam = one cut.
 # We delete barrier edges for binary structural fragmentation.
-river_graph_current <- readRDS("spatial/stream_networks/river_graph_current.RDS")
-river_graph_future  <- readRDS("spatial/stream_networks/river_graph_future.RDS")
+river_graph_current <- readRDS("spatial/stream_network_graphs/river_graph_current.RDS")
+river_graph_future  <- readRDS("spatial/stream_network_graphs/river_graph_future.RDS")
 
 message("  Current: ", vcount(river_graph_current), " nodes | ",
         ecount(river_graph_current), " edges")

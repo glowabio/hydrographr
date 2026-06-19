@@ -33,8 +33,8 @@ MIN_SUBCATCHMENTS <- 2   # species must occupy >= this many subcatchments
 # READ INPUTS
 # ============================================================
 
-river_graph_current <- readRDS("spatial/stream_networks/river_graph_current.RDS")
-river_graph_future  <- readRDS("spatial/stream_networks/river_graph_future.RDS")
+river_graph_current <- readRDS("spatial/stream_network_graphs/river_graph_current.RDS")
+river_graph_future  <- readRDS("spatial/stream_network_graphs/river_graph_future.RDS")
 
 # Convert length_reach from meters to tens of km
 # (matching Mekong study convention; ensures param^distance

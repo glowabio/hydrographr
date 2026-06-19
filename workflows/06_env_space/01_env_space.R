@@ -181,13 +181,23 @@ env_tbl <- fread(env_space_file)
 
 message("\n=== Step 3: Subsetting to occurrence sub-catchments ===")
 
+subbasin_streams <- read_geopackage("spatial/subbasin_sarantaporos/stream_network.gpkg",
+                                    import_as = "data.table")
+
 fish <- fread("points_snapped/fish/fish_all_species_snapped.csv") %>%
   filter(species %in% gsub("_", " ", TARGET_SPECIES) | species %in% TARGET_SPECIES) %>%
   mutate(species = gsub(" ", "_", species)) %>%
   select(species, subc_id) %>%
-  distinct()
+  distinct() %>% filter(subc_id %in% subbasin_streams$subc_id)
+
+
+# fish_subbasin <- fish %>% filter(subc_id %in% subbasin_streams$subc_id)
 
 message("  Occurrence records: ", nrow(fish))
+
+
+
+
 
 # The five rescaled columns we will plot
 plot_cols <- c("outlet_diff_dw_basin_mean", "bio01_mean", "bio15_mean",
@@ -297,8 +307,10 @@ loadings <- as.data.frame(pca$rotation[, 1:2]) %>%
 var_expl <- round(100 * (pca$sdev^2) / sum(pca$sdev^2), 1)
 
 p_pca <- ggplot() +
-  geom_point(data = scores, aes(PC1, PC2, colour = species_label),
-             size = 2, alpha = 0.75) +
+  geom_point(data = scores, aes(PC1, PC2, colour = species_label, shape = species_label),
+             size = 2.2, alpha = 0.8,
+             position = position_jitter(width = 0.08, height = 0.08, seed = 42)) +
+  scale_shape_manual(values = c(16, 17, 15, 18, 8, 3, 4)) +
   geom_segment(data = loadings,
                aes(x = 0, y = 0, xend = PC1, yend = PC2),
                arrow = arrow(length = unit(0.2, "cm")), colour = "grey25") +
@@ -307,7 +319,7 @@ p_pca <- ggplot() +
             size = 3, colour = "grey25") +
   labs(x = paste0("PC1 (", var_expl[1], "%)"),
        y = paste0("PC2 (", var_expl[2], "%)"),
-       colour = "Species",
+       colour = "Species", shape = "Species",
        title = "Occurrences in environmental space (PCA)") +
   theme_bw(base_size = 11) +
   theme(legend.text = element_text(face = "italic"))

@@ -1,5 +1,5 @@
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
-# 02_extract_lake_intersection.R   (Module X -- Lake analysis)
+# 02_extract_lake_intersection.R   (Module 11 -- Lake analysis)
 #
 # Find lakes inside the bounding box of the fish occurrences, subset to the
 # target lake (Aoos reservoir), and compute where that lake intersects the

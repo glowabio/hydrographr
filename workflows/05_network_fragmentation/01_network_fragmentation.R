@@ -14,8 +14,8 @@
 # fragmentation in Module 8. No fish data are used here.
 #
 # INPUT:
-#   - spatial/stream_networks/river_graph_current.RDS
-#   - spatial/stream_networks/river_graph_future.RDS
+#   - spatial/stream_network_graphs/river_graph_current.RDS
+#   - spatial/stream_network_graphs/river_graph_future.RDS
 #     (built by 02_generate_network_graph.R; carry V()$length_reach,
 #      V()$strahler, E()$barrier)
 #
@@ -40,8 +40,8 @@ dir.create("connectivity", showWarnings = FALSE)
 # ============================================================
 
 message("Loading scenario graphs...")
-river_graph_current <- readRDS("spatial/stream_networks/river_graph_current.RDS")
-river_graph_future  <- readRDS("spatial/stream_networks/river_graph_future.RDS")
+river_graph_current <- readRDS("spatial/stream_network_graphs/river_graph_current.RDS")
+river_graph_future  <- readRDS("spatial/stream_network_graphs/river_graph_future.RDS")
 
 message("  Current: ", vcount(river_graph_current), " nodes, ",
         ecount(river_graph_current), " edges")

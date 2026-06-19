@@ -1,5 +1,5 @@
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
-# 01_download_lake_data.R   (Module X -- Lake analysis)
+# 01_download_lake_data.R   (Module 11 -- Lake analysis)
 #
 # Download the Hydrography90m and Env90m layers the lake workflow needs.
 # Isolated from the analysis steps because these are large, slow downloads

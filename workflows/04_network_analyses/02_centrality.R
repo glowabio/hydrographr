@@ -11,7 +11,7 @@
 # the fragmentation analysis in Module 5).
 #
 # INPUT:
-#   - spatial/stream_networks/river_graph_current.RDS
+#   - spatial/stream_network_graphs/river_graph_current.RDS
 #       (any scenario graph works -- centrality uses topology only, not dams;
 #        we use the current graph, which carries the same 642 reaches)
 #   - spatial/subbasin_sarantaporos/stream_network_pruned.gpkg
@@ -19,7 +19,7 @@
 #
 # OUTPUT:
 #   - connectivity/centrality_table.csv
-#   - spatial/stream_networks/stream_betweeness.gpkg   (stream network + bc)
+#   - spatial/stream_network_graphs/stream_betweeness.gpkg   (stream network + bc)
 #
 # LOCATION: workflows/04_network_analyses/02_centrality.R
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
@@ -43,7 +43,7 @@ dir.create("connectivity", showWarnings = FALSE)
 # Centrality uses topology only; dams are irrelevant here. We load the
 # current-scenario graph simply because it carries the full reach set.
 message("Loading network graph...")
-river_graph <- readRDS("spatial/stream_networks/river_graph_current.RDS")
+river_graph <- readRDS("spatial/stream_network_graphs/river_graph_current.RDS")
 
 # Drop the artificial root node "0" so it does not distort centrality
 if ("0" %in% V(river_graph)$name) {
@@ -90,9 +90,9 @@ streams_bc <- streams %>%
   left_join(centrality %>% select(subc_id, betweeness), by = "subc_id")
 
 st_write(streams_bc,
-         "spatial/stream_networks/stream_betweeness.gpkg",
+         "spatial/stream_network_graphs/stream_betweeness.gpkg",
          delete_dsn = TRUE, quiet = TRUE)
-message("  Saved: spatial/stream_networks/stream_betweeness.gpkg")
+message("  Saved: spatial/stream_network_graphs/stream_betweeness.gpkg")
 
 # ============================================================
 # QUICK MAP (ggplot) -- betweeness along the network

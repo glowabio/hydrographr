@@ -21,7 +21,7 @@
 # Input:
 #   - prioritization/puvspr_dat.csv          (species x PU suitability)
 #   - prioritization/pu_dat.csv              (planning units, length_km)
-#   - spatial/stream_networks/river_graph_current.RDS
+#   - spatial/stream_network_graphs/river_graph_current.RDS
 #   - points_snapped/dams/dams_snapped_points.csv
 #   - points_cleaned/dams/dams_sarantaporos_clean.gpkg
 #
@@ -59,7 +59,7 @@ subc_ids_basin <- as.character(pu_dat$id)
 message("  Planning units: ", nrow(pu_dat),
         " | species-PU rows: ", nrow(puvspr_dat))
 
-river_graph_current <- readRDS("spatial/stream_networks/river_graph_current.RDS")
+river_graph_current <- readRDS("spatial/stream_network_graphs/river_graph_current.RDS")
 message("  Current network graph loaded")
 
 # ============================================================
