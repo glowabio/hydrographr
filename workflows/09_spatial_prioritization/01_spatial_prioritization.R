@@ -40,8 +40,8 @@
 #   - sdm/ensemble/ensemble_thresholds.csv
 #   - sdm/habitat/habitat_{species}.csv            (binary/gap/semibinary TSS)
 #   - points_snapped/dams/dams_snapped_points.csv
-#   - spatial/stream_networks/river_graph_current.RDS
-#   - spatial/stream_networks/river_graph_future.RDS
+#   - spatial/stream_network_graphs/river_graph_current.RDS
+#   - spatial/stream_network_graphs/river_graph_future.RDS
 #
 # Output:
 #   - prioritization/pu_dat.csv, puvspr_dat.csv
@@ -79,8 +79,7 @@ setwd(BASE_DIR)
 
 TARGETS           <- c(0.2, 0.3, 0.4, 0.5)
 COMPARISON_TARGET <- 0.3            # target used for the current-vs-future map
-BOUNDARY_PENALTY  <- 0.03           # calibrated via cost-compactness trade-off (knee ~0.01-0.03; see calibration block)
-SOLVER_GAP        <- 0.001          # tightened from 0.1: gap-sensitivity showed 0.001 reproduces the proven-optimal solution (Jaccard 1.0) in ~15s
+BOUNDARY_PENALTY  <- 0.03           # calibrated via cost-connectivity trade-off (knee ~0.01-0.03; see calibration block)SOLVER_GAP        <- 0.001          # tightened from 0.1: gap-sensitivity showed 0.001 reproduces the proven-optimal solution (Jaccard 1.0) in ~15s
 CALIB_GAP         <- 0.1            # loose gap for the exploratory calibration loop (trend only)
 N_THREADS         <- 4
 CONNECTIVITY_K    <- 3              # multi-hop connectivity neighbourhood
@@ -149,8 +148,8 @@ sdm_list <- lapply(TARGET_SPECIES, function(sp) {
 names(sdm_list) <- TARGET_SPECIES
 
 # Both scenario graphs -- used to build barrier-aware connectivity
-river_graph_current <- readRDS("spatial/stream_networks/river_graph_current.RDS")
-river_graph_future  <- readRDS("spatial/stream_networks/river_graph_future.RDS")
+river_graph_current <- readRDS("spatial/stream_network_graphs/river_graph_current.RDS")
+river_graph_future  <- readRDS("spatial/stream_network_graphs/river_graph_future.RDS")
 message("  Graphs loaded (current + future)")
 
 # ============================================================
@@ -369,28 +368,26 @@ solve_one <- function(bmat, target, cost_col = "cost_hfi") {
     solve()
 }
 
-# ============================================================
-# BOUNDARY PENALTY CALIBRATION (cost vs compactness trade-off)
-#   The boundary penalty is a compactness trade-off term with no intrinsic
+# BOUNDARY PENALTY CALIBRATION (cost vs connectivity trade-off)
+#   The boundary penalty is a connectivity trade-off term with no intrinsic
 #   ecological value; it must be calibrated per study area (it scales with
 #   network size, reach count, and the cost range). We solve across a
-#   penalty grid and record the trade-off between solution cost and total
-#   boundary length (perimeter). The "knee" of the cost-vs-boundary curve
-#   is the principled choice: maximal compactness gain per unit extra cost.
-#   Uses a loose gap (CALIB_GAP) for speed -- only the trend is needed.
-#   Done on the CURRENT scenario at the comparison target.
-# ============================================================
+#   penalty grid and record the trade-off between solution cost and the
+#   total boundary weight (the summed connectivity weight of edges linking
+#   selected to unselected reaches). The "knee" of the curve is the
+#   principled choice: maximal connectivity gain per unit extra cost.
 
 message("\n=== Boundary penalty calibration (cost vs compactness) ===")
 
 PENALTY_GRID <- c(0, 0.001, 0.003, 0.01, 0.03, 0.1, 0.3, 1)
 
-# total boundary (perimeter) of a selection, using the same bmat weights.
+# total boundary weight of a selection, using the same bmat weights.
 # For each selected unit, sum the boundary weights to NON-selected units
-# (exposed edges) -> this is the perimeter the penalty acts on.
+# (exposed edges) -> the summed connectivity weight linking the selected
+# network to the rest. This is what the boundary penalty acts on.
 boundary_length <- function(selected_ids, bmat) {
   sel <- as.integer(selected_ids)
-  # edges where exactly one endpoint is selected = exposed perimeter
+  # edges where exactly one endpoint is selected = exposed boundary
   exposed <- bmat[(bmat$id1 %in% sel) & !(bmat$id2 %in% sel), ]
   sum(exposed$boundary, na.rm = TRUE)
 }
@@ -430,12 +427,12 @@ p_tradeoff <- ggplot(calib, aes(x = boundary_len, y = total_cost)) +
   geom_path(colour = "grey60") +
   geom_point(size = 3, colour = "#2c7bb6") +
   geom_text(aes(label = penalty), vjust = -0.8, size = 3) +
-  labs(x = "Total boundary length (perimeter; lower = more compact)",
+  labs(x = "Total boundary weight (lower = more connected selection)",
        y = "Solution cost (HFI)",
-       title = "Boundary-penalty calibration: cost vs compactness trade-off",
+       title = "Boundary-penalty calibration: cost vs connectivity trade-off",
        subtitle = paste0("Current scenario, ", COMPARISON_TARGET * 100,
                          "% target. Labels = penalty. The elbow is the",
-                         " principled penalty: max compactness gain per unit cost.")) +
+                         " principled penalty: maximal connectivity gain per unit cost.")) + +
   theme_bw(base_size = 11) +
   theme(plot.subtitle = element_text(size = 8.5, colour = "grey40"))
 
