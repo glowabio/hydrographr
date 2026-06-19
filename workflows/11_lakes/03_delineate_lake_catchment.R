@@ -41,7 +41,6 @@ setwd(BASE_DIR)
 
 LAKE_ID   <- 2130004632
 TILE_ID   <- "h20v04"
-BASIN_ID  <- 1292502    # Vjosa basin id (direction raster suffix)
 
 # Minimum fraction of a sub-catchment cell that must be covered by the lake
 # catchment for that cell to be kept.
@@ -69,7 +68,7 @@ coord_dat <- coord_dat[indx, ]
 
 message("\n=== Delineating lake catchment ===")
 
-direction <- sprintf("data/spatial/direction_%d.tif", BASIN_ID)
+direction <- sprintf("data/spatial/direction_%d.tif", TILE_ID)
 catch     <- "data/lakes/lake_intersections/"
 
 get_lake_catchment(coord_dat,

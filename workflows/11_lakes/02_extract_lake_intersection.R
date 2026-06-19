@@ -50,6 +50,9 @@ dir.create("data/lakes/lake_intersections", recursive = TRUE, showWarnings = FAL
 # occurrence bounding box.
 LAKE_ID <- 2130004632
 
+# Tile covering the study area.
+TILE_ID <- "h20v04"
+
 # SWOT prior lake database, downloaded via https://hydroweb.next.theia-land.fr/
 SWOT_LAKES <- "data/spatial/swot_lakes.gpkg"
 
@@ -74,9 +77,9 @@ gpkg_data <- st_read("data/spatial/vjosa_partial.gpkg")
 species <- fread("data/species/all_snapped_fish_points_from_sp_list.csv")
 
 # raster layers for the intersection call
-stream <- "data/spatial/segment.tif"
-flow   <- "data/spatial/accumulation.tif"
-basins <- "data/spatial/basin.tif"
+stream <- sprintf("data/spatial/segment_%s.tif", TILE_ID)
+flow   <- sprintf("data/spatial/accumulation_%s.tif", TILE_ID)
+basins <- sprintf("data/spatial/basin_%s.tif", TILE_ID)
 
 # quick look at the SWOT lake database
 lakes <- st_read(SWOT_LAKES)
