@@ -8,7 +8,7 @@
 # ensemble SDM predictions. Cost = Human Footprint Index. A boundary
 # penalty rewards spatially connected priority networks.
 #
-# BARRIER-AWARE CONNECTIVITY (reviewer suggestion):
+# BARRIER-AWARE CONNECTIVITY:
 #   The boundary (connectivity) file lists which planning units are
 #   adjacent. A dam breaks the connection between the reaches it sits
 #   between. We therefore build the boundary file from edges that are
@@ -57,16 +57,8 @@
 # LOCATION: workflows/09_spatial_prioritization/01_spatial_prioritization.R
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 
-library(prioritizr)
-# CBC solver required
-library(sf)
-library(data.table)
-library(dplyr)
-library(tidyr)
-library(igraph)
-library(ggplot2)
-library(patchwork)
-library(hydrographr)
+
+
 
 select <- dplyr::select
 
@@ -79,7 +71,8 @@ setwd(BASE_DIR)
 
 TARGETS           <- c(0.2, 0.3, 0.4, 0.5)
 COMPARISON_TARGET <- 0.3            # target used for the current-vs-future map
-BOUNDARY_PENALTY  <- 0.03           # calibrated via cost-connectivity trade-off (knee ~0.01-0.03; see calibration block)SOLVER_GAP        <- 0.001          # tightened from 0.1: gap-sensitivity showed 0.001 reproduces the proven-optimal solution (Jaccard 1.0) in ~15s
+BOUNDARY_PENALTY  <- 0.03           # calibrated via cost-connectivity trade-off (knee ~0.01-0.03; see calibration block)
+SOLVER_GAP        <- 0.001          # tightened from 0.1: gap-sensitivity showed 0.001 reproduces the proven-optimal solution (Jaccard 1.0) in ~15s
 CALIB_GAP         <- 0.1            # loose gap for the exploratory calibration loop (trend only)
 N_THREADS         <- 4
 CONNECTIVITY_K    <- 3              # multi-hop connectivity neighbourhood
@@ -432,7 +425,7 @@ p_tradeoff <- ggplot(calib, aes(x = boundary_len, y = total_cost)) +
        title = "Boundary-penalty calibration: cost vs connectivity trade-off",
        subtitle = paste0("Current scenario, ", COMPARISON_TARGET * 100,
                          "% target. Labels = penalty. The elbow is the",
-                         " principled penalty: maximal connectivity gain per unit cost.")) + +
+                         " principled penalty: maximal connectivity gain per unit cost.")) +
   theme_bw(base_size = 11) +
   theme(plot.subtitle = element_text(size = 8.5, colour = "grey40"))
 
