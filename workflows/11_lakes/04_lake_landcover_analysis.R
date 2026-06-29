@@ -11,6 +11,7 @@
 #   3. Sum per class per year, reshape to long
 #   4. Plot the land cover time series
 #   5. Rank classes by area for the most recent year
+#   6. Plot individual land cover classes, colored by group
 #
 # INPUT:
 #   - data/subc_IDs.txt                                  (from 03_)
@@ -20,6 +21,7 @@
 # OUTPUT:
 #   - data/env90m/predictTB.csv                           (land cover table)
 #   - figures/lake_landcover_timeseries.png
+#   - figures/lake_landcover_classes_grouped_colors.png
 #
 # LOCATION: workflows/XX_lakes/04_lake_landcover_analysis.R
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
@@ -51,14 +53,88 @@ LC_CLASSES <- c("c10", "c20", "c30", "c40", "c50", "c60", "c70", "c80", "c90",
                 "c100", "c110", "c120", "c130", "c140", "c150", "c160", "c170",
                 "c180", "c190", "c200", "c210", "c220")
 
-# Kelly's (1965) 22 colours of maximum contrast, designed for 22 categories.
-KELLY_COLORS <- setNames(
-  c("#E68FAC", "#875692", "#F38400", "#A1CAF1", "#BE0032",
-    "#008856", "#848482", "#C2B280", "#F3C300", "#0067A5",
-    "#F99379", "#604E97", "#F6A600", "#B3446C", "#DCD300",
-    "#882D17", "#8DB600", "#654522", "#E25822", "#2B3D26",
-    "#222222", "#7B4173"),
-  LC_CLASSES)
+# One hardcoded color per class, grouped by hue (all tree cover greens
+# together, all cropland yellows together, etc.) so they read as a family
+# in the legend, but every color is explicit and can be adjusted
+# individually. Used for the per-class plot in step 6.
+CLASS_COLORS <- c(
+  # Cropland (yellow)
+  c10  = "#F9D71C",
+  c20  = "#CDAD00",
+  # Cropland/natural vegetation
+  c30  = "#DAA520",
+  # Natural vegetation/cropland
+  c40  = "#9ACD32",
+  # Tree cover (green)
+  c50  = "#1B5E20",
+  c60  = "#2E7D32",
+  c70  = "#388E3C",
+  c80  = "#43A047",
+  c90  = "#66BB6A",
+  # Tree and shrub
+  c100 = "#2E8B57",
+  # Herbaceous/tree and shrub
+  c110 = "#66CDAA",
+  # Shrubland
+  c120 = "#8B4513",
+  # Grassland
+  c130 = "#2fff2f",
+  # Lichens, mosses
+  c140 = "#708090",
+  # Sparse vegetation
+  c150 = "#D2B48C",
+  # Tree cover, flooded (teal)
+  c160 = "#00798C",
+  c170 = "#005F6B",
+  # Shrub or herbaceous, flooded
+  c180 = "#20B2AA",
+  # Urban areas
+  c190 = "#B22222",
+  # Bare areas
+  c200 = "#A0522D",
+  # Water bodies
+  c210 = "#1E90FF",
+  # Snow and ice
+  c220 = "#4DD0E1"
+)
+
+# Alternative palette: 22 distinct, ungrouped colors (Sasha Trubetskoy's
+# "maximally distinct" set). Swap in for CLASS_COLORS below if every class
+# should stand out on its own rather than read as a family.
+CLASS_COLORS_DISTINCT <- c(
+  c10  = "#E6194B", c20  = "#3CB44B", c30  = "#FFE119", c40  = "#4363D8",
+  c50  = "#F58231", c60  = "#911EB4", c70  = "#46F0F0", c80  = "#F032E6",
+  c90  = "#BFEF45", c100 = "#FABED4", c110 = "#469990", c120 = "#DCBEFF",
+  c130 = "#9A6324", c140 = "#FFFAC8", c150 = "#800000", c160 = "#AAFFC3",
+  c170 = "#808000", c180 = "#FFD8B1", c190 = "#000075", c200 = "#A9A9A9",
+  c210 = "#000000", c220 = "#E6BEFF"
+)
+
+# Human-readable ESA CCI class names for the step 6 legend.
+LC_CLASS_LABELS <- c(
+  c10  = "Cropland, rainfed",
+  c20  = "Cropland, irrigated or post-flooding",
+  c30  = "Mosaic cropland / natural vegetation",
+  c40  = "Mosaic natural vegetation / cropland",
+  c50  = "Tree cover, broadleaved, evergreen",
+  c60  = "Tree cover, broadleaved, deciduous",
+  c70  = "Tree cover, needleleaved, evergreen",
+  c80  = "Tree cover, needleleaved, deciduous",
+  c90  = "Tree cover, mixed leaf type",
+  c100 = "Mosaic tree and shrub / herbaceous cover",
+  c110 = "Mosaic herbaceous cover / tree and shrub",
+  c120 = "Shrubland",
+  c130 = "Grassland",
+  c140 = "Lichens and mosses",
+  c150 = "Sparse vegetation",
+  c160 = "Tree cover, flooded, fresh or brackish water",
+  c170 = "Tree cover, flooded, saline water",
+  c180 = "Shrub or herbaceous cover, flooded",
+  c190 = "Urban areas",
+  c200 = "Bare areas",
+  c210 = "Water bodies",
+  c220 = "Snow and ice"
+)
 
 # ============================================================
 # STEP 1: Extract land cover proportions per sub-catchment
@@ -124,7 +200,7 @@ message("\n=== Plotting land cover time series ===")
 
 p <- ggplot(lake_land_cover, aes(x = year, y = area_km2, color = variable)) +
   geom_line(linewidth = 1.2) +
-  scale_color_manual(values = KELLY_COLORS) +
+  scale_color_manual(values = CLASS_COLORS) +
   scale_x_continuous(
     breaks = seq(min(lake_land_cover$year), max(lake_land_cover$year), by = 2)) +
   scale_y_continuous(labels = scales::comma) +
@@ -149,5 +225,44 @@ lake_land_cover_2020 <- lake_land_cover[lake_land_cover$year == max(YEARS), ]
 lake_land_cover_2020 <- lake_land_cover_2020[
   order(lake_land_cover_2020$area_km2, decreasing = TRUE), ]
 print(lake_land_cover_2020, n = length(LC_CLASSES))
+
+# ============================================================
+# STEP 6: Individual land cover classes, colored by group
+# ============================================================
+
+message("\n=== Plotting individual land cover classes ===")
+
+# choose which palette to use below: CLASS_COLORS (grouped by land cover
+# family) or CLASS_COLORS_DISTINCT (all classes visually distinct)
+selected_colors <- CLASS_COLORS
+
+# order the legend to match the vertical stacking order of the lines at
+# their final-year endpoint, so reading down the legend mirrors reading
+# down the right edge of the plot
+legend_order <- lake_land_cover %>%
+  filter(year == max(year)) %>%
+  arrange(desc(area_km2)) %>%
+  pull(variable) %>%
+  as.character()
+
+p3 <- ggplot(lake_land_cover, aes(x = year, y = area_km2, color = variable)) +
+  geom_line(linewidth = 1) +
+  scale_color_manual(values = selected_colors, labels = LC_CLASS_LABELS,
+                     breaks = legend_order) +
+  scale_x_continuous(
+    breaks = seq(min(lake_land_cover$year), max(lake_land_cover$year), by = 2)) +
+  scale_y_continuous(labels = scales::comma) +
+  labs(x = "Year", y = "Landcover area (km²)", color = "") +
+  theme_minimal(base_size = 14) +
+  theme(axis.text.x     = element_text(angle = 45, hjust = 1),
+        legend.position = "right",
+        legend.text     = element_text(size = 9)) +
+  guides(color = guide_legend(ncol = 1))
+
+# png() over ggsave() to avoid the ragg device conflict
+png("figures/lake_landcover_classes_grouped_colors.png",
+    width = 3000, height = 2100, res = 300)
+print(p3)
+dev.off()
 
 message("\nLand cover analysis complete.")
