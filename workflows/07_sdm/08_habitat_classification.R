@@ -119,21 +119,21 @@ message("  Graph: ", vcount(network_g), " nodes, ",
         ecount(network_g), " edges")
 
 # Add reach length as edge attribute
-############ TODO: REPLACE WHEN get_stream_segments IS FIXED
-basin_network_dt <- read_geopackage(
-  "spatial/basin/stream_network_pruned.gpkg",
-  import_as = "data.table"
-) %>% select(subc_id, length)
+length_lookup <- ensemble_dt %>%
+  mutate(subc_id = as.character(subc_id)) %>%
+  select(subc_id, length) %>%
+  distinct()
 
-E(network_g)$weight <- basin_network_dt$length[
-  match(edges_df$from, as.character(basin_network_dt$subc_id))
+E(network_g)$weight <- length_lookup$length[
+  match(edges_df$from, length_lookup$subc_id)
 ]
-############
 
 # Named vector of reach lengths for fill_habitat_gaps()
 edge_length <- setNames(E(network_g)$weight, edges_df$from)
 cat("Edge length range (m):", range(edge_length, na.rm = TRUE), "\n")
 cat("NAs in edge length:", sum(is.na(edge_length)), "\n")
+
+
 
 # TSS + MCC thresholds — mean of MaxEnt + RF per species
 # SSN excluded (RMSPE not comparable to AUC/TSS/MCC)
