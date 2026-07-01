@@ -1,5 +1,5 @@
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
-# 04_lake_landcover_analysis.R   (Module 11 -- Lake analysis)
+# 04_lake_landcover_analysis.R   (Module 12 -- Lake analysis)
 #
 # Build a land cover area time series (1992-2020) for the lake catchment.
 # For each year, per-sub-catchment ESA CCI class proportions are weighted by
@@ -14,16 +14,16 @@
 #   6. Plot individual land cover classes, colored by group
 #
 # INPUT:
-#   - data/subc_IDs.txt                                  (from 03_)
-#   - data/spatial/subc_id_lake_catchment.tif             (from 03_)
-#   - data/env90m/esa_cci_landcover_v2_1_1/*.txt          (from 01_)
+#   - lakes/subc_IDs_lake_catchment.txt          (from 03_)
+#   - spatial/subc_id_lake_catchment.tif         (from 03_)
+#   - env90m/esa_cci_landcover_v2_1_1/*.txt       (from 01_)
 #
 # OUTPUT:
-#   - data/env90m/predictTB.csv                           (land cover table)
-#   - figures/lake_landcover_timeseries.png
-#   - figures/lake_landcover_classes_grouped_colors.png
+#   - env90m/predictTB_lake_landcover.csv         (land cover table)
+#   - figures/lakes/lake_landcover_timeseries.png
+#   - figures/lakes/lake_landcover_classes_grouped_colors.png
 #
-# LOCATION: workflows/XX_lakes/04_lake_landcover_analysis.R
+# LOCATION: workflows/12_lakes/04_lake_landcover_analysis.R
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 
 library(hydrographr)
@@ -39,7 +39,7 @@ select <- dplyr::select
 source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
 setwd(BASE_DIR)
 
-dir.create("figures", recursive = TRUE, showWarnings = FALSE)
+dir.create("figures/lakes", recursive = TRUE, showWarnings = FALSE)
 
 # ============================================================
 # PARAMETERS
@@ -149,14 +149,14 @@ get_predict_table(
   variable       = var_names,
   statistics     = "mean",
   tile_id        = TILE_ID,
-  input_var_path = "data/env90m/esa_cci_landcover_v2_1_1/",
-  subcatch_id    = "data/subc_IDs.txt",
-  out_file_path  = "data/env90m/predictTB.csv",
+  input_var_path = "env90m/esa_cci_landcover_v2_1_1/",
+  subcatch_id    = "lakes/subc_IDs_lake_catchment.txt",
+  out_file_path  = "env90m/predictTB_lake_landcover.csv",
   read           = FALSE,
   overwrite      = TRUE,
   n_cores        = 6)
 
-landcover <- fread("data/env90m/predictTB.csv")
+landcover <- fread("env90m/predictTB_lake_landcover.csv")
 head(landcover)
 
 # ============================================================
@@ -166,7 +166,7 @@ head(landcover)
 message("\n=== Weighting proportions by sub-catchment area ===")
 
 # sub-catchment areas (km^2) from the lake-catchment raster
-subc_raster <- rast("data/spatial/subc_id_lake_catchment.tif")
+subc_raster <- rast("spatial/subc_id_lake_catchment.tif")
 subc_areas  <- terra::expanse(subc_raster, unit = "km", zones = subc_raster)
 names(subc_areas) <- c("layer", "subc_id", "area_km2")
 
@@ -212,10 +212,11 @@ p <- ggplot(lake_land_cover, aes(x = year, y = area_km2, color = variable)) +
   guides(color = guide_legend(nrow = 2))
 
 # png() over ggsave() to avoid the ragg device conflict
-png("figures/lake_landcover_timeseries.png",
+png("figures/lakes/lake_landcover_timeseries.png",
     width = 2400, height = 1500, res = 300)
 print(p)
 dev.off()
+message("  Saved: figures/lakes/lake_landcover_timeseries.png")
 
 # ============================================================
 # STEP 5: Rank classes by area for the most recent year
@@ -252,7 +253,7 @@ p3 <- ggplot(lake_land_cover, aes(x = year, y = area_km2, color = variable)) +
   scale_x_continuous(
     breaks = seq(min(lake_land_cover$year), max(lake_land_cover$year), by = 2)) +
   scale_y_continuous(labels = scales::comma) +
-  labs(x = "Year", y = "Landcover area (km²)", color = "") +
+  labs(x = "Year", y = "Landcover area (km\u00b2)", color = "") +
   theme_minimal(base_size = 14) +
   theme(axis.text.x     = element_text(angle = 45, hjust = 1),
         legend.position = "right",
@@ -260,9 +261,10 @@ p3 <- ggplot(lake_land_cover, aes(x = year, y = area_km2, color = variable)) +
   guides(color = guide_legend(ncol = 1))
 
 # png() over ggsave() to avoid the ragg device conflict
-png("figures/lake_landcover_classes_grouped_colors.png",
+png("figures/lakes/lake_landcover_classes_grouped_colors.png",
     width = 3000, height = 2100, res = 300)
 print(p3)
 dev.off()
+message("  Saved: figures/lakes/lake_landcover_classes_grouped_colors.png")
 
 message("\nLand cover analysis complete.")

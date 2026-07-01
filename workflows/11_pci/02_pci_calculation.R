@@ -29,7 +29,7 @@
 #
 # DISPERSAL
 #   Dispersal probability per species (the B_ij kernel base) comes from
-#   01_dispersal_estimation.R (traits/fish_dis_class.txt): three migration
+#   01_dispersal_estimation.R (traits/fish_dispersal_rank.txt): three migration
 #   tiers mapped to 0.3 / 0.6 / 0.9. Reach lengths are converted to tens of
 #   km so that dispersal_prob ^ distance is well scaled.
 #
@@ -41,7 +41,7 @@
 #   spatial/stream_network_graphs/river_graph_current.RDS   (carries n_shp)
 #   spatial/stream_network_graphs/river_graph_future.RDS    (carries n_shp)
 #   points_snapped/fish/fish_all_species_snapped.csv         (species, subc_id)
-#   traits/fish_dis_class.txt                                (dispersal_prob)
+#   traits/fish_dispersal_rank.txt                                (dispersal_prob)
 #   traits/species_passability.csv                           (passability)
 #
 # OUTPUT
@@ -87,7 +87,7 @@ V(river_graph_future)$length_reach  <- V(river_graph_future)$length_reach  / LEN
 occurrences <- fread("points_snapped/fish/fish_all_species_snapped.csv") %>%
   dplyr::mutate(species = gsub(" ", "_", species))
 
-fish_dis_class <- fread("traits/fish_dis_class.txt") %>%
+fish_dis_class <- fread("traits/fish_dispersal_rank.txt") %>%
   dplyr::filter(!is.na(dispersal_prob))
 
 passability <- fread("traits/species_passability.csv")
@@ -134,8 +134,8 @@ set_passability <- function(g, species_pass) {
 # ============================================================
 attach_presence <- function(g, presence_df) {
   graph_from_data_frame(
-    as_data_frame(g, "edges"),
-    vertices = as_data_frame(g, "vertices") %>%
+    igraph::as_data_frame(g, "edges"),
+    vertices = igraph::as_data_frame(g, "vertices") %>%
       dplyr::select(-dplyr::any_of("weight")) %>%
       dplyr::left_join(presence_df, by = "name") %>%
       dplyr::mutate(weight = ifelse(is.na(weight), 0, weight))
@@ -227,3 +227,4 @@ fi_summary %>%
     median_FI    = round(median(FI, na.rm = TRUE), 1),
     max_FI       = round(max(FI,    na.rm = TRUE), 1)
   ) %>% as.data.frame() %>% print()
+

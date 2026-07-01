@@ -1,5 +1,5 @@
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
-# 03_delineate_lake_catchment.R   (Module 11 -- Lake analysis)
+# 03_delineate_lake_catchment.R   (Module 12 -- Lake analysis)
 #
 # Delineate the catchment draining to the lake, merge it with the lake
 # surface, compute its area, and extract the sub-catchment IDs that make up
@@ -14,22 +14,24 @@
 #   6. Draw the lake catchment map (+ basin locator inset)
 #
 # INPUT:
-#   - data/lakes/lake_intersections/coord_lake_<id>.txt  (from 02_)
-#   - data/lakes/lake_intersections/lake_<id>.tif         (from 02_)
-#   - data/lakes/lake_intersections/outlets_<id>.gpkg     (from 02_)
-#   - data/spatial/vjosa_partial.gpkg                     (stream network)
-#   - data/spatial/swot_lakes.gpkg                        (SWOT prior lake DB)
-#   - data/spatial/direction_<basin>.tif                  (flow direction)
-#   - data/spatial/sub_catchment_<tile>.tif
+#   - lakes/lake_intersections/coord_lake_<id>.txt   (from 02_)
+#   - lakes/lake_intersections/lake_<id>.tif          (from 02_)
+#   - lakes/lake_intersections/outlets_<id>.gpkg      (from 02_)
+#   - spatial/basin/stream_network_pruned.gpkg        (stream network)
+#   - lakes/swot_lakes.gpkg                           (SWOT prior lake DB)
+#   - spatial/direction_<tile>.tif                    (flow direction, from 01_)
+#   - spatial/sub_catchment_<tile>.tif                (from 01_)
+#   - spatial/basin/basin_polygon.gpkg                (if present; else fetched)
 #
 # OUTPUT:
-#   - data/lakes/lake_intersections/basin_lake_<id>_merged.tif
-#   - data/spatial/subc_id_lake_catchment.tif
-#   - data/spatial/basin/basin_polygon.gpkg                (Vjosa/Aoos basin)
-#   - data/subc_IDs.txt                                   (sub-catchment IDs)
-#   - lake_catchment_map.png / lake_catchment_map2.png    (with basin inset)
+#   - lakes/lake_intersections/basin_lake_<id>_merged.tif
+#   - spatial/subc_id_lake_catchment.tif
+#   - spatial/basin/basin_polygon.gpkg                (Vjosa/Aoos basin, if fetched)
+#   - lakes/subc_IDs_lake_catchment.txt               (sub-catchment IDs)
+#   - figures/lakes/lake_catchment_map.png
+#   - figures/lakes/lake_catchment_inset_basin_map.png
 #
-# LOCATION: workflows/XX_lakes/03_delineate_lake_catchment.R
+# LOCATION: workflows/12_lakes/03_delineate_lake_catchment.R
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 
 library(hydrographr)
@@ -43,6 +45,8 @@ library(patchwork)
 source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
 setwd(BASE_DIR)
 
+dir.create("figures/lakes", recursive = TRUE, showWarnings = FALSE)
+
 # ============================================================
 # PARAMETERS
 # ============================================================
@@ -54,9 +58,8 @@ TILE_ID   <- "h20v04"
 # catchment for that cell to be kept.
 COVER_MIN <- 0.9
 
-# SWOT prior lake database, downloaded via https://hydroweb.next.theia-land.fr/
-# (same file used in 02_extract_lake_intersection.R)
-SWOT_LAKES     <- "data/spatial/swot_lakes.gpkg"
+# SWOT prior lake database (same manual download used in 02_).
+SWOT_LAKES     <- "lakes/swot_lakes.gpkg"
 SWOT_LAKE_NAME <-
   "swot_lakedatabase_20000101t000000_20991231t235959_20250331t170000_v202_light_eu__lake"
 
@@ -66,10 +69,10 @@ SWOT_LAKE_NAME <-
 
 message("\n=== Loading lake intersection points ===")
 
-gpkg_data <- st_read("data/spatial/vjosa_partial.gpkg")
+gpkg_data <- st_read("spatial/basin/stream_network_pruned.gpkg")
 
 coord_dat <- fread(sprintf(
-  "data/lakes/lake_intersections/coord_lake_%d.txt", LAKE_ID))
+  "lakes/lake_intersections/coord_lake_%d.txt", LAKE_ID))
 head(coord_dat)
 
 # keep only intersection points whose reach is in the stream network
@@ -82,8 +85,8 @@ coord_dat <- coord_dat[indx, ]
 
 message("\n=== Delineating lake catchment ===")
 
-direction <- sprintf("data/spatial/direction_%d.tif", TILE_ID)
-catch     <- "data/lakes/lake_intersections/"
+direction <- sprintf("spatial/direction_%s.tif", TILE_ID)
+catch     <- "lakes/lake_intersections/"
 
 get_lake_catchment(coord_dat,
                    direction  = direction,
@@ -99,9 +102,9 @@ get_lake_catchment(coord_dat,
 message("\n=== Merging catchment with lake surface ===")
 
 lake_catch <- terra::rast(sprintf(
-  "data/lakes/lake_intersections/basin_lake_%d_coord_1.tif", LAKE_ID))
+  "lakes/lake_intersections/basin_lake_%d_coord_1.tif", LAKE_ID))
 lake_rast  <- terra::rast(sprintf(
-  "data/lakes/lake_intersections/lake_%d.tif", LAKE_ID))
+  "lakes/lake_intersections/lake_%d.tif", LAKE_ID))
 
 lake_catch <- terra::merge(lake_catch, lake_rast)
 
@@ -112,7 +115,7 @@ lake_catch_area <- terra::expanse(lake_catch_laea, unit = "km",
 print(lake_catch_area)
 
 terra::writeRaster(lake_catch, sprintf(
-  "data/lakes/lake_intersections/basin_lake_%d_merged.tif", LAKE_ID),
+  "lakes/lake_intersections/basin_lake_%d_merged.tif", LAKE_ID),
   overwrite = TRUE)
 
 # ============================================================
@@ -122,7 +125,7 @@ terra::writeRaster(lake_catch, sprintf(
 message("\n=== Aligning to sub-catchment grid ===")
 
 subc_raster <- terra::rast(sprintf(
-  "data/spatial/sub_catchment_%s.tif", TILE_ID))
+  "spatial/sub_catchment_%s.tif", TILE_ID))
 
 # crop to the lake catchment bbox (keeps the sub-catchment grid intact)
 lake_catch_crop <- terra::crop(subc_raster, lake_catch)
@@ -139,7 +142,7 @@ lake_catch_crop <- terra::trim(
   terra::mask(lake_catch_crop, lake_catch_cover >= COVER_MIN,
               maskvalues = FALSE))
 
-writeRaster(lake_catch_crop, "data/spatial/subc_id_lake_catchment.tif",
+writeRaster(lake_catch_crop, "spatial/subc_id_lake_catchment.tif",
             overwrite = TRUE)
 
 # ============================================================
@@ -147,9 +150,9 @@ writeRaster(lake_catch_crop, "data/spatial/subc_id_lake_catchment.tif",
 # ============================================================
 
 lake_catch_ids <- extract_ids(
-  subc_layer = "data/spatial/subc_id_lake_catchment.tif")
+  subc_layer = "spatial/subc_id_lake_catchment.tif")
 
-fwrite(lake_catch_ids, "data/subc_IDs.txt")
+fwrite(lake_catch_ids, "lakes/subc_IDs_lake_catchment.txt")
 
 message(sprintf("\nLake catchment: %d sub-catchments", nrow(lake_catch_ids)))
 
@@ -165,7 +168,7 @@ swot_lakes <- st_read(SWOT_LAKES, quiet = TRUE)
 lake_surface_vect <- swot_lakes[swot_lakes[[SWOT_LAKE_NAME]] == LAKE_ID, ]
 
 lake_outlet <- st_read(sprintf(
-  "data/lakes/lake_intersections/outlets_%d.gpkg", LAKE_ID), quiet = TRUE)
+  "lakes/lake_intersections/outlets_%d.gpkg", LAKE_ID), quiet = TRUE)
 
 # vectorize the lake catchment raster for plotting with geom_sf
 lake_catch_vect <- terra::as.polygons(lake_catch, dissolve = TRUE) |>
@@ -178,22 +181,21 @@ lake_catch_bbox <- st_bbox(lake_catch_vect)
 # legend only reflects streams actually shown on the map
 gpkg_data_crop <- st_crop(gpkg_data, lake_catch_bbox)
 
-## download/load the larger basin polygon (Vjosa/Aoos basin) for the inset
-# map, using the lake outlet location to look up the basin it belongs to
-dir.create("data/spatial/basin", recursive = TRUE, showWarnings = FALSE)
-
-basin_polygon_path <- "data/spatial/basin/basin_polygon.gpkg"
+## load the larger basin polygon (Vjosa/Aoos basin) for the inset map. Use
+# the existing file if present (created elsewhere in the workflow); otherwise
+# look it up from the lake outlet location.
+basin_polygon_path <- "spatial/basin/basin_polygon.gpkg"
 
 if (file.exists(basin_polygon_path)) {
   basin_polygon <- st_read(basin_polygon_path, quiet = TRUE)
 } else {
+  dir.create("spatial/basin", recursive = TRUE, showWarnings = FALSE)
   outlet_coords <- st_coordinates(st_zm(lake_outlet))
   outlet_df <- data.frame(
-    site_id = paste0("lake_", LAKE_ID, "_outlet"),
+    site_id   = paste0("lake_", LAKE_ID, "_outlet"),
     longitude = outlet_coords[1, "X"],
-    latitude = outlet_coords[1, "Y"]
+    latitude  = outlet_coords[1, "Y"]
   )
-
   basin_polygon <- api_get_basin_polygon(points_df = outlet_df)
   st_write(basin_polygon, basin_polygon_path, delete_dsn = TRUE)
 }
@@ -212,10 +214,10 @@ p <- ggplot() +
   labs(title = "Aoos Springs reservoir lake catchment")
 
 # version without the inset map
-png("lake_catchment_map.png", width = 2700, height = 2400, res = 300)
+png("figures/lakes/lake_catchment_map.png", width = 2700, height = 2400, res = 300)
 print(p)
 dev.off()
-message("  Saved: lake_catchment_map.png")
+message("  Saved: figures/lakes/lake_catchment_map.png")
 
 # inset (locator) map: the larger Vjosa/Aoos basin polygon, with the lake
 # surface highlighted to show where the main map sits within the basin
@@ -234,9 +236,9 @@ inset_map <- ggplot() +
 # outline regardless of the catchment's shape
 p_with_inset <- p + inset_map + plot_layout(widths = c(3, 1.5))
 
-png("lake_catchment_inset_basin_map.png", width = 2700, height = 2400, res = 300)
+png("figures/lakes/lake_catchment_inset_basin_map.png", width = 2700, height = 2400, res = 300)
 print(p_with_inset)
 dev.off()
-message("  Saved: lake_catchment_inset_basin_map.png")
+message("  Saved: figures/lakes/lake_catchment_inset_basin_map.png")
 
-message("Next: XX_lakes/04_lake_landcover_analysis.R")
+message("Next: 12_lakes/04_lake_landcover_analysis.R")

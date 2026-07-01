@@ -1,5 +1,5 @@
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
-# 02_extract_lake_intersection.R   (Module 11 -- Lake analysis)
+# 02_extract_lake_intersection.R   (Module 12 -- Lake analysis)
 #
 # Find lakes inside the bounding box of the fish occurrences, subset to the
 # target lake (Aoos reservoir), and compute where that lake intersects the
@@ -18,19 +18,20 @@
 #   4. get_lake_intersection() -> lake/stream intersection points
 #
 # INPUT:
-#   - data/spatial/vjosa_partial.gpkg                    (stream network)
-#   - data/species/all_snapped_fish_points_from_sp_list.csv
-#   - data/spatial/swot_lakes.gpkg                       (SWOT prior lake DB)
-#   - data/spatial/{segment,accumulation,basin}.tif      (from 01_)
+#   - spatial/basin/stream_network_pruned.gpkg                    (stream network)
+#   - points_snapped/fish/all_snapped_fish_points.csv
+#   - lakes/swot_lakes.gpkg              (SWOT prior lake DB; manual download
+#       from https://hydroweb.next.theia-land.fr/ -- place here before running)
+#   - spatial/{segment,accumulation,basin}_h20v04.tif   (from 01_)
 #
 # OUTPUT:
-#   - data/lakes/lake_id.txt                             (all lake IDs in bbox)
-#   - data/lakes/lake_intersections/coord_lake_<id>.txt  (intersection points)
-#   - data/lakes/lake_intersections/lake_<id>.tif
+#   - lakes/lake_id.txt                             (all lake IDs in bbox)
+#   - lakes/lake_intersections/coord_lake_<id>.txt  (intersection points)
+#   - lakes/lake_intersections/lake_<id>.tif
 #
 # REQUIRES: GuidosToolbox Workbench (GWB) installed locally.
 #
-# LOCATION: workflows/XX_lakes/02_extract_lake_intersection.R
+# LOCATION: workflows/12_lakes/02_extract_lake_intersection.R
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 
 library(hydrographr)
@@ -40,7 +41,7 @@ library(data.table)
 source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
 setwd(BASE_DIR)
 
-dir.create("data/lakes/lake_intersections", recursive = TRUE, showWarnings = FALSE)
+dir.create("lakes/lake_intersections", recursive = TRUE, showWarnings = FALSE)
 
 # ============================================================
 # PARAMETERS
@@ -54,15 +55,16 @@ LAKE_ID <- 2130004632
 TILE_ID <- "h20v04"
 
 # SWOT prior lake database, downloaded via https://hydroweb.next.theia-land.fr/
-SWOT_LAKES <- "data/spatial/swot_lakes.gpkg"
+SWOT_LAKES <- "lakes/swot_lakes/swot_lakes.gpkg"
 
 # Internal SWOT layer name carried by get_lake_intersection().
 SWOT_LAKE_NAME <-
   "swot_lakedatabase_20000101t000000_20991231t235959_20250331t170000_v202_light_eu__lake"
 
-# Full paths to the local GWB install (virtual-machine Linux paths).
-EDGE <- "/home/USER/GWB1.9.8/GWB"
-GWB  <- "/home/USER/GWB1.9.8/GWB"
+# Full path to the local GWB install. EDIT THIS to your actual install
+# location (the colleague's was /home/USER/GWB1.9.8/GWB).
+EDGE <- "/home/grigoropoulou/GWB1.9.8/GWB"
+GWB  <- "/home/grigoropoulou/GWB1.9.8/GWB"
 
 # ============================================================
 # STEP 1: Load inputs
@@ -71,20 +73,20 @@ GWB  <- "/home/USER/GWB1.9.8/GWB"
 message("\n=== Loading inputs ===")
 
 # stream network
-gpkg_data <- st_read("data/spatial/vjosa_partial.gpkg")
+gpkg_data <- st_read("spatial/basin/stream_network_pruned.gpkg")
 
 # fish occurrences used to define the search bounding box
-species <- fread("data/species/all_snapped_fish_points_from_sp_list.csv")
+species <- fread("points_snapped/fish/all_snapped_fish_points.csv")
 
 # raster layers for the intersection call
-stream <- sprintf("data/spatial/segment_%s.tif", TILE_ID)
-flow   <- sprintf("data/spatial/accumulation_%s.tif", TILE_ID)
-basins <- sprintf("data/spatial/basin_%s.tif", TILE_ID)
+stream <- sprintf("spatial/segment_%s.tif", TILE_ID)
+flow   <- sprintf("spatial/accumulation_%s.tif", TILE_ID)
+basins <- sprintf("spatial/basin_%s.tif", TILE_ID)
 
 # quick look at the SWOT lake database
 lakes <- st_read(SWOT_LAKES)
 head(lakes)
-
+rm(lakes);gc()
 # ============================================================
 # STEP 2: Extract lake IDs within the occurrence bounding box
 # ============================================================
@@ -97,14 +99,14 @@ extract_lake_ids(data          = species,
                  bbox          = TRUE,
                  var_name      = "lake_id",
                  lake_shape    = SWOT_LAKES,
-                 lake_id_table = "data/lakes",
+                 lake_id_table = "lakes",
                  quiet         = TRUE)
 
 # ============================================================
 # STEP 3: Subset to the target lake
 # ============================================================
 
-lake_ids <- fread("data/lakes/lake_id.txt", header = TRUE)
+lake_ids <- fread("lakes/lake_id.txt", header = TRUE)
 lake_ids <- lake_ids[lake_ids$lake_id == LAKE_ID, ]
 
 # ============================================================
@@ -113,7 +115,7 @@ lake_ids <- lake_ids[lake_ids$lake_id == LAKE_ID, ]
 
 message("\n=== Computing lake / stream intersections ===")
 
-lake_dat <- "data/lakes/lake_intersections/"
+lake_dat <- "lakes/lake_intersections/"
 
 lake_intersect_table <- get_lake_intersection(
   lake_ids,
@@ -126,4 +128,4 @@ lake_intersect_table <- get_lake_intersection(
   quiet     = TRUE)
 
 message("\nIntersection complete.")
-message("Next: XX_lakes/03_delineate_lake_catchment.R")
+message("Next: 12_lakes/03_delineate_lake_catchment.R")

@@ -29,7 +29,6 @@ library(ggplot2)
 library(patchwork)
 library(scales)      # label_number for legend
 
-source("~/Documents/PhD/scripts/hydrographr/workflows/helpers/save_to_nimbus.R")
 source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
 setwd(BASE_DIR)
 

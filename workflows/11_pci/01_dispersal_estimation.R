@@ -44,7 +44,7 @@
 #   points_snapped/fish/fish_all_species_snapped.csv     (optional; for max_SO)
 #
 # OUTPUT
-#   traits/fish_dis_class.txt
+#   traits/fish_dispersal_rank.txt
 #     columns: species, max_TL, max_SO, Migration, Migration_label,
 #              dispersal_prob, source
 #
@@ -211,9 +211,9 @@ fish_dis_class <- fish_traits %>%
   dplyr::arrange(dispersal_prob, species)
 
 dir.create("traits", showWarnings = FALSE, recursive = TRUE)
-fwrite(fish_dis_class, "traits/fish_dis_class.txt", sep = "\t")
+fwrite(fish_dis_class, "traits/fish_dispersal_rank.txt", sep = "\t")
 
-message("\ntraits/fish_dis_class.txt written")
+message("\ntraits/fish_dispersal_rank.txt written")
 cat("\n========== DISPERSAL CLASSES ==========\n")
 as.data.frame(fish_dis_class) %>% print()
 

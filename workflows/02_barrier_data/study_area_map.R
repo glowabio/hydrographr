@@ -142,12 +142,12 @@ main_map <- ggplot() +
 
   # Scale bar + north arrow
   annotation_scale(
-    location = "bl", width_hint = 0.25,
+    location = "tl", width_hint = 0.25,
     text_col = "grey10", line_col = "grey10",
     bar_cols = c("grey10", "white")
   ) +
   annotation_north_arrow(
-    location = "bl",
+    location = "tl",
     pad_x    = unit(0.15, "in"),
     pad_y    = unit(0.32, "in"),
     style    = north_arrow_fancy_orienteering(
@@ -179,25 +179,28 @@ message("Building inset...")
 
 greece    <- ne_countries(scale = "medium", country = "Greece",
                           returnclass = "sf")
+albania    <- ne_countries(scale = "medium", country = "Albania",
+                          returnclass = "sf")
 neighbors <- ne_countries(scale = "medium",
-                          country = c("Albania", "North Macedonia",
-                                      "Bulgaria", "Turkey"),
+                          country = c("North Macedonia", "Serbia",
+                                      "Bulgaria", "Turkey", "Kosovo"),
                           returnclass = "sf")
 
 subbasin_box <- sf::st_as_sfc(sf::st_bbox(subbasin)) %>%
   sf::st_set_crs(4326)
 
-inset <- ggplot() +
+greece_panel <- ggplot() +
   geom_sf(data = neighbors, fill = "grey88", colour = "grey65",
           linewidth = 0.2) +
   geom_sf(data = greece,    fill = "grey75", colour = "grey45",
+          linewidth = 0.3) +
+  geom_sf(data = albania,    fill = "grey75", colour = "grey45",
           linewidth = 0.3) +
   geom_sf(data = basin,     fill = alpha(COL_BASIN, 0.40),
           colour = COL_BASIN, linewidth = 0.7) +
   geom_sf(data = subbasin_box, fill = NA,
           colour = "red", linewidth = 1.2) +
-  coord_sf(xlim = c(19.4, 26.9), ylim = c(34.7, 42.1), expand = FALSE) +
-  theme_void() +
+  coord_sf(xlim = c(18.8, 27.5), ylim = c(34.2, 42.6), expand = FALSE) +  theme_void() +
   theme(
     panel.background = element_rect(fill = "#d6eaf8", colour = NA),
     panel.border     = element_rect(fill = NA, colour = "grey35",
@@ -211,18 +214,18 @@ inset <- ggplot() +
 
 message("Combining...")
 
-combined <- main_map +
-  inset_element(inset,
-                left     = 0.65,
-                bottom   = 0.00,
-                right    = 1.00,
-                top      = 0.40,
-                align_to = "plot")
+combined <- main_map + greece_panel +
+  plot_layout(ncol = 2, widths = c(1, 0.7)) +
+  plot_annotation(tag_levels = "a", tag_prefix = "(", tag_suffix = ")") &
+  theme(
+    plot.tag          = element_text(size = 13, hjust = 0),
+    plot.tag.position = c(0, 0.98)
+  )
 
 dir.create("figures", showWarnings = FALSE)
 
-png("figures/study_area_map.png",
-    width = 2400, height = 2200, res = 300, bg = "white")
+pdf("figures/study_area_map.pdf",
+    bg = "white")
 print(combined)
 dev.off()
 

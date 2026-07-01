@@ -44,7 +44,7 @@
 #   - sdm/maxent_models/maxent_evaluation.csv
 #   - sdm/rf_models/rf_evaluation.csv
 #   - sdm/ssn_models/model_summary.csv  (SSN thresholds for Alburnoides + Barbus)
-#   - traits/fish_dis_class.txt
+#   - traits/fish_dispersal_distance.txt
 #   - points_original/fish/species_list_sarantaporos.txt
 #   - spatial/basin/stream_network_pruned.gpkg  (for reach length)
 #
@@ -183,8 +183,7 @@ print(tss_thresholds %>%
                thresh_maxent_mcc, thresh_rf_mcc, threshold_mcc))
 
 # Dispersal distances (sigma_mob) per species
-fish_dis_class <- fread("traits/fish_dis_class.txt", sep = "\t") %>%
-  rename(species = species_name) %>%
+fish_dis_class <- fread("traits/fish_dispersal_distance.txt", sep = "\t") %>%
   filter(species %in% target_species) %>%
   select(species, sigma_mob = distance)
 

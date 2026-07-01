@@ -1,5 +1,5 @@
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
-# 01_download_lake_data.R   (Module 11 -- Lake analysis)
+# 01_download_lake_data.R   (Module 12 -- Lake analysis)
 #
 # Download the Hydrography90m and Env90m layers the lake workflow needs.
 # Isolated from the analysis steps because these are large, slow downloads
@@ -16,12 +16,12 @@
 #   3. Download Env90m ESA CCI land cover tables (1992-2020)
 #
 # OUTPUT:
-#   - data/spatial/{basin,sub_catchment,segment,accumulation,direction}*.tif
-#   - data/env90m/esa_cci_landcover_v2_1_1/*.txt
+#   - spatial/{basin,sub_catchment,segment,accumulation,direction}*.tif
+#   - env90m/esa_cci_landcover_v2_1_1/*.txt
 #
 # REQUIRES: internet access (Hydrography90m + Env90m download endpoints).
 #
-# LOCATION: workflows/XX_lakes/01_download_lake_data.R
+# LOCATION: workflows/12_lakes/01_download_lake_data.R
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 
 library(hydrographr)
@@ -29,8 +29,8 @@ library(hydrographr)
 source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
 setwd(BASE_DIR)
 
-dir.create("data/spatial", recursive = TRUE, showWarnings = FALSE)
-dir.create("data/env90m", recursive = TRUE, showWarnings = FALSE)
+dir.create("spatial", recursive = TRUE, showWarnings = FALSE)
+dir.create("env90m", recursive = TRUE, showWarnings = FALSE)
 
 # ============================================================
 # PARAMETERS
@@ -54,7 +54,7 @@ message("\n=== Downloading Hydrography90m tiles ===")
 download_tiles(variable     = VARS_TIF,
                tile_id      = TILE_ID,
                file_format  = "tif",
-               download_dir = "data/spatial")
+               download_dir = "spatial")
 
 # ============================================================
 # STEP 2: Download Env90m land cover tables (1992-2020)
@@ -67,11 +67,11 @@ download_landcover_tables(
   years        = "ALL",
   tile_ids     = TILE_ID,
   download     = TRUE,
-  download_dir = "data/env90m",
+  download_dir = "env90m",
   file_format  = "txt",
   delete_zips  = TRUE,
   quiet        = TRUE
 )
 
 message("\nDownloads complete.")
-message("Next: XX_lakes/02_extract_lake_intersection.R")
+message("Next: 12_lakes/02_extract_lake_intersection.R")
