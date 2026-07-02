@@ -123,7 +123,7 @@ lake_intersect_table <- get_lake_intersection(
   SWOT_LAKES,
   lake_name = SWOT_LAKE_NAME,
   lake_id   = "lake_id",
-  buffer    = FALSE,
+  buffer    = TRUE,
   EDGE, stream, flow, basins, lake_dat,
   n_cores   = 1,
   quiet     = TRUE)
