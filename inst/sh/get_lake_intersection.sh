@@ -109,7 +109,7 @@ ogrinfo $LAKE -sql "ALTER TABLE $pn  ADD COLUMN diss INTEGER"
 ogrinfo $LAKE -dialect SQLite -sql "UPDATE $pn SET diss = 1"
 
 gdal_rasterize -a_srs EPSG:4326  -at -a diss -l $pn \
-    -tr 0.000833333333333 -0.000833333333333 \
+    -tr 0.000833333333333 0.000833333333333 \
     -te $xmin $ymin $xmax $ymax -a_nodata 0  \
     -co COMPRESS=DEFLATE -co ZLEVEL=9 -ot Byte \
     $LAKE $TMPDIR/lake_${LK}cp.tif
@@ -129,7 +129,7 @@ ymin=$(pkinfo -i $TMPDIR/lake_${LK}rm.tif -te | awk '{print $3-0.001666667}')
 xmax=$(pkinfo -i $TMPDIR/lake_${LK}rm.tif -te | awk '{print $4+0.001666667}')
 ymax=$(pkinfo -i $TMPDIR/lake_${LK}rm.tif -te | awk '{print $5+0.001666667}')
 
-gdalwarp -te $xmin $ymin $xmax $ymax -tr 0.000833333333333 -0.000833333333333 \
+gdalwarp -te $xmin $ymin $xmax $ymax -tr 0.000833333333333 0.000833333333333 \
     -co COMPRESS=DEFLATE -co ZLEVEL=9 -ot Byte \
     $TMPDIR/lake_${LK}rm.tif $TMPDIR/lake_${LK}.tif
 
