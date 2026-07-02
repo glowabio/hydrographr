@@ -116,6 +116,11 @@ get_lake_intersection <- function(data, lake_id = "HydroLAKES_polys_v10", lakes,
   if (!file.exists(flow))
     stop(paste0("Please provide the path to the flow raster file"))
 
+  # Check if path to GuidosToolbox Workbench (GWB) tool exists
+  if (is.null(edge) || !dir.exists(edge))
+    stop("edge: GuidosToolbox Workbench (GWB) directory not found ('", edge,
+         "'). Please provide a valid path to the GWB tool.")
+
   # Check if paths exists
   if (!file.exists(basins))
     stop(paste0("Please provide the path to the basin raster file"))
