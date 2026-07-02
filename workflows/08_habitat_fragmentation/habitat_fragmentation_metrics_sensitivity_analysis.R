@@ -95,7 +95,7 @@ sarantaporos_ids_pruned <- fread(
   "spatial/subbasin_sarantaporos/subbasin_subc_ids_pruned.csv"
 )$subc_id
 
-hab_gpkg <- paste0("spatial/subbasin/stream_network_habitat_",
+hab_gpkg <- paste0("spatial/subbasin_sarantaporos/stream_network_habitat_",
                    THRESHOLD_METHOD, ".gpkg")
 
 network_sf <- st_read(hab_gpkg, quiet = TRUE) %>%
