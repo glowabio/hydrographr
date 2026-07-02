@@ -57,14 +57,15 @@ TILE_ID <- "h20v04"
 # SWOT prior lake database, downloaded via https://hydroweb.next.theia-land.fr/
 SWOT_LAKES <- "lakes/swot_lakes/swot_lakes.gpkg"
 
+# Check the layer name of the lake dataset geopackage
+sf::st_layers(data/spatial/swot_lakes.gpkg)
+
 # Internal SWOT layer name carried by get_lake_intersection().
-SWOT_LAKE_NAME <-
-  "swot_lakedatabase_20000101t000000_20991231t235959_20250331t170000_v202_light_eu__lake"
+SWOT_LAKE_NAME <- "lake"
 
 # Full path to the local GWB install. EDIT THIS to your actual install
-# location (the colleague's was /home/USER/GWB1.9.8/GWB).
-EDGE <- "/home/grigoropoulou/GWB1.9.8/GWB"
-GWB  <- "/home/grigoropoulou/GWB1.9.8/GWB"
+# location
+EDGE <- "/home/grigoropoulou/"
 
 # ============================================================
 # STEP 1: Load inputs
