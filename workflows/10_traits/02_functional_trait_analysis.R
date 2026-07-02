@@ -1,5 +1,5 @@
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
-# 07_functional_traits.R   (Module 10 -- Traits & PCI)
+# 07_functional_trait_analysis.R   (Module 10 -- Traits)
 #
 # Group the focal Sarantaporos fish species by their functional traits and
 # map the resulting composition and diversity across the sub-basin. Three
@@ -32,7 +32,7 @@
 #   - figures/traits/fish_fd_map.png
 #   - figures/traits/fish_fd_map_table.csv
 #
-# LOCATION: workflows/10_traits_pci/07_functional_traits.R
+# LOCATION: workflows/10_traits/07_functional_trait_analysis.R
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 
 library(data.table)
