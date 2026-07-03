@@ -233,6 +233,43 @@ if (sum(!dams_original$snapped) > 0) {
          "points_cleaned/dams/dams_failed_to_snap.csv")
 }
 
+
+
+
+# ============================================================
+# STEP 6: Snap factories (powerhouses) -- for diversion length
+# ============================================================
+# Identical cascade to dams (same DAM_DIST_THRESHOLD), so dam and factory
+# land on the network consistently and their along-network separation is
+# a valid measure of the diverted/dewatered reach.
+factories_original <- fread("points_cleaned/dams/factories_sarantaporos_clean.csv")
+# increased threshold because factories can be further away from streams
+FACTORY_DIST_THRESHOLD <- 500
+factories_snap <- api_get_snapped_points_cascade(
+  data = factories_original, colname_lon = "longitude", colname_lat = "latitude",
+  colname_site_id = "site_id",
+  strahler_seq = STRAHLER_SEQ,
+  distance_threshold = FACTORY_DIST_THRESHOLD
+)
+
+factories_snap <- factories_snap %>%
+  left_join(factories_original) %>%
+  select(-longitude, -latitude)
+
+fwrite(factories_snap, "points_snapped/dams/factories_snapped_points.csv")
+
+factories_original <- report_snap("Factories", factories_original, factories_snap, "site_id")
+saveWidget(make_snap_map(factories_original, factories_snap, "site_id",
+                         "longitude", "latitude", "Factory Source"),
+           "points_snapped/maps/factories_snapping_check.html")
+
+if (sum(!factories_original$snapped) > 0) {
+  fwrite(factories_original[!factories_original$snapped, ],
+         "points_cleaned/dams/factories_failed_to_snap.csv")
+}
+
+
+
 # ============================================================
 # SUMMARY
 # ============================================================

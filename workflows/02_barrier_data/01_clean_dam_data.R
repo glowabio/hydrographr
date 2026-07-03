@@ -68,7 +68,6 @@ library(htmlwidgets)
 
 select <- dplyr::select
 
-source("~/Documents/PhD/scripts/hydrographr/workflows/helpers/save_to_nimbus.R")
 source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
 setwd(BASE_DIR)
 
@@ -273,6 +272,28 @@ st_write(dams_sf %>%
          delete_dsn = TRUE, quiet = TRUE)
 message("  Saved: points_cleaned/dams/dams_sarantaporos_clean.gpkg")
 
+
+
+# ============================================================
+# STEP 5b: Export FACTORY (powerhouse) points -- for diversion length
+# ============================================================
+# The powerhouse (expert type FACTORY) is the downstream end of each
+# licence's diversion. Exported here in the same format as dams so
+# Module 3 snaps it with the identical cascade, and Module 8 pairs
+# dam <-> factory by 'aa' to measure the dewatered (bypassed) reach.
+factories_out <- rae %>%          # the classified RAE points object
+  filter(type == "FACTORY") %>%
+  mutate(site_id = ifelse(is.na(site_id), paste0("F-", aa, "-", part), site_id)) %>%
+  select(site_id, aa, a_m, part, company, longitude, latitude)
+
+fwrite(factories_out, "points_cleaned/dams/factories_sarantaporos_clean.csv")
+message("  Saved: points_cleaned/dams/factories_sarantaporos_clean.csv (",
+        nrow(factories_out), " powerhouse points)")
+
+
+
+
+
 # ============================================================
 # STEP 6: Map
 # ============================================================
@@ -301,7 +322,6 @@ m <- leaflet(dams_out) %>%
             title = "Dam status", opacity = 0.8)
 
 saveWidget(m, "points_cleaned/maps/dams_sarantaporos_clean.html", selfcontained = TRUE)
-save_to_nimbus(m, "points_cleaned/maps/dams_sarantaporos_clean.html")
 message("  Saved: points_cleaned/maps/dams_sarantaporos_clean.html")
 
 # ============================================================
