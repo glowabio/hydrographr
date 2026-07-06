@@ -58,14 +58,14 @@ TILE_ID <- "h20v04"
 SWOT_LAKES <- "lakes/swot_lakes/swot_lakes.gpkg"
 
 # Check the layer name of the lake dataset geopackage
-sf::st_layers(data/spatial/swot_lakes.gpkg)
+sf::st_layers("lakes/swot_lakes/swot_lakes.gpkg")
 
 # Internal SWOT layer name carried by get_lake_intersection().
 SWOT_LAKE_NAME <- "lake"
 
 # Full path to the local GWB install. EDIT THIS to your actual install
 # location
-EDGE <- "/home/grigoropoulou/"
+EDGE <- "/home/grigoropoulou/GWB2.0.3/"
 
 # ============================================================
 # STEP 1: Load inputs
@@ -88,6 +88,7 @@ basins <- sprintf("spatial/basin_%s.tif", TILE_ID)
 lakes <- st_read(SWOT_LAKES)
 head(lakes)
 rm(lakes);gc()
+
 # ============================================================
 # STEP 2: Extract lake IDs within the occurrence bounding box
 # ============================================================
@@ -126,7 +127,7 @@ lake_intersect_table <- get_lake_intersection(
   buffer    = FALSE,
   EDGE, stream, flow, basins, lake_dat,
   n_cores   = 1,
-  quiet     = TRUE)
+  quiet     = FALSE)
 
 message("\nIntersection complete.")
 message("Next: 12_lakes/03_delineate_lake_catchment.R")
