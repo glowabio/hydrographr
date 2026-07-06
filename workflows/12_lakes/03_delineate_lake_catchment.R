@@ -59,9 +59,7 @@ TILE_ID   <- "h20v04"
 COVER_MIN <- 0.9
 
 # SWOT prior lake database (same manual download used in 02_).
-SWOT_LAKES     <- "lakes/swot_lakes.gpkg"
-SWOT_LAKE_NAME <-
-  "swot_lakedatabase_20000101t000000_20991231t235959_20250331t170000_v202_light_eu__lake"
+SWOT_LAKES     <- "lakes/swot_lakes/swot_lakes.gpkg"
 
 # ============================================================
 # STEP 1: Load intersection points, keep network reaches
@@ -165,7 +163,9 @@ message("\n=== Drawing lake catchment map ===")
 # load lake surface (vector), subset to the target lake, and the lake outlet
 # point (both produced alongside the intersection points in 02_)
 swot_lakes <- st_read(SWOT_LAKES, quiet = TRUE)
-lake_surface_vect <- swot_lakes[swot_lakes[[SWOT_LAKE_NAME]] == LAKE_ID, ]
+lake_surface_vect <- swot_lakes %>% filter(lake_id == LAKE_ID)
+
+
 
 lake_outlet <- st_read(sprintf(
   "lakes/lake_intersections/outlets_%d.gpkg", LAKE_ID), quiet = TRUE)
@@ -201,10 +201,10 @@ if (file.exists(basin_polygon_path)) {
 }
 
 p <- ggplot() +
-  geom_sf(data = gpkg_data_crop, colour = "darkblue", linewidth = 0.8) +
-  geom_sf(data = lake_surface_vect, fill = "blue", colour = NA, alpha = 0.6) +
-  geom_sf(data = lake_catch_vect, fill = NA, colour = "black", linewidth = 0.8) +
-  geom_sf(data = lake_outlet, colour = "magenta", size = 4) +
+  geom_sf(data = gpkg_data_crop, colour = "#2166ac", linewidth = 0.8) +
+  geom_sf(data = lake_surface_vect, fill = "#2166ac", colour = NA, alpha = 0.6) +
+  geom_sf(data = lake_catch_vect, fill = NA, colour = "grey65", linewidth = 0.8) +
+  geom_sf(data = lake_outlet, colour = "#2166ac", size = 4, shape=17) +
   annotation_scale(location = "bl", width_hint = 0.3) +
   annotation_north_arrow(location = "tr", which_north = "true",
                          style = north_arrow_fancy_orienteering()) +
@@ -213,18 +213,24 @@ p <- ggplot() +
   theme_minimal() +
   labs(title = "Aoos Springs reservoir lake catchment")
 
+p
+
 # version without the inset map
 png("figures/lakes/lake_catchment_map.png", width = 2700, height = 2400, res = 300)
 print(p)
 dev.off()
 message("  Saved: figures/lakes/lake_catchment_map.png")
 
+pdf("figures/lakes/lake_catchment_map.pdf")
+print(p)
+dev.off()
+
 # inset (locator) map: the larger Vjosa/Aoos basin polygon, with the lake
 # surface highlighted to show where the main map sits within the basin
 inset_map <- ggplot() +
   geom_sf(data = basin_polygon, fill = "grey90", colour = "grey40", linewidth = 0.3) +
   geom_sf(data = gpkg_data, colour = "grey60", linewidth = 0.2) +
-  geom_sf(data = lake_surface_vect, fill = "blue", colour = "blue", linewidth = 0.5) +
+  geom_sf(data = lake_surface_vect, fill = "#2166ac", colour = "#2166ac", linewidth = 0.5) +
   theme_void() +
   theme(
     panel.background = element_rect(fill = "white", colour = "black", linewidth = 0.4),
@@ -241,4 +247,7 @@ print(p_with_inset)
 dev.off()
 message("  Saved: figures/lakes/lake_catchment_inset_basin_map.png")
 
+pdf("figures/lakes/lake_catchment_inset_basin_map.pdf")
+print(p_with_inset)
+dev.off()
 message("Next: 12_lakes/04_lake_landcover_analysis.R")
