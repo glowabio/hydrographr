@@ -149,14 +149,14 @@ get_predict_table(
   variable       = var_names,
   statistics     = "mean",
   tile_id        = TILE_ID,
-  input_var_path = "env90m/esa_cci_landcover_v2_1_1/",
-  subcatch_id    = "lakes/subc_IDs_lake_catchment.txt",
-  out_file_path  = "env90m/predictTB_lake_landcover.csv",
+  input_var_path = paste0(BASE_DIR, "/env90m/esa_cci_landcover_v2_1_1/"),
+  subcatch_id    = paste0(BASE_DIR, "/lakes/subc_IDs_lake_catchment.txt"),
+  out_file_path  = paste0(BASE_DIR, "/env90m/predictTB_lake_landcover.csv"),
   read           = FALSE,
   overwrite      = TRUE,
   n_cores        = 6)
 
-landcover <- fread("env90m/predictTB_lake_landcover.csv")
+landcover <- fread(paste0(BASE_DIR, "/env90m/predictTB_lake_landcover.csv"))
 head(landcover)
 
 # ============================================================
@@ -166,18 +166,18 @@ head(landcover)
 message("\n=== Weighting proportions by sub-catchment area ===")
 
 # sub-catchment areas (km^2) from the lake-catchment raster
-subc_raster <- rast("spatial/subc_id_lake_catchment.tif")
+subc_raster <- rast(paste0(BASE_DIR, "/spatial/subc_id_lake_catchment.tif"))
 subc_areas  <- terra::expanse(subc_raster, unit = "km", zones = subc_raster)
 names(subc_areas) <- c("layer", "subc_id", "area_km2")
 
 # align id column name and join areas
 names(landcover)[names(landcover) == "subcID"] <- "subc_id"
-landcover <- merge(landcover, subc_areas[, c("subc_id", "area_km2")],
-                   by = "subc_id")
 
-# proportion * area -> km^2 per class-year, per sub-catchment
+# look up each row's sub-catchment area by subc_id and multiply directly,
+# avoiding a merge so landcover is never modified and re-runs stay clean
+matched_areas  <- subc_areas$area_km2[match(landcover$subc_id, subc_areas$subc_id)]
 lc_cols        <- grep("^c[0-9]+_", names(landcover))
-landcover_area <- landcover[, ..lc_cols] * landcover$area_km2
+landcover_area <- landcover[, ..lc_cols] * matched_areas
 
 # ============================================================
 # STEP 3: Sum per class per year, reshape to long
@@ -186,7 +186,7 @@ landcover_area <- landcover[, ..lc_cols] * landcover$area_km2
 col_sums <- colSums(landcover_area)
 
 lake_land_cover <- enframe(col_sums, name = "id", value = "area_km2") %>%
-  separate(id, into = c("variable", "year"), sep = "_") %>%
+  separate(id, into = c("variable", "year"), sep = "_y") %>%
   mutate(year = as.numeric(year))
 
 # explicit class order c10 -> c220
@@ -200,7 +200,7 @@ message("\n=== Plotting land cover time series ===")
 
 p <- ggplot(lake_land_cover, aes(x = year, y = area_km2, color = variable)) +
   geom_line(linewidth = 1.2) +
-  scale_color_manual(values = CLASS_COLORS) +
+  scale_color_manual(values = CLASS_COLORS, breaks = legend_order) +
   scale_x_continuous(
     breaks = seq(min(lake_land_cover$year), max(lake_land_cover$year), by = 2)) +
   scale_y_continuous(labels = scales::comma) +
@@ -212,7 +212,7 @@ p <- ggplot(lake_land_cover, aes(x = year, y = area_km2, color = variable)) +
   guides(color = guide_legend(nrow = 2))
 
 # png() over ggsave() to avoid the ragg device conflict
-png("figures/lakes/lake_landcover_timeseries.png",
+png(paste0(BASE_DIR, "/figures/lakes/lake_landcover_timeseries.png"),
     width = 2400, height = 1500, res = 300)
 print(p)
 dev.off()
@@ -261,10 +261,10 @@ p3 <- ggplot(lake_land_cover, aes(x = year, y = area_km2, color = variable)) +
   guides(color = guide_legend(ncol = 1))
 
 # png() over ggsave() to avoid the ragg device conflict
-png("figures/lakes/lake_landcover_classes_grouped_colors.png",
+png(paste0(BASE_DIR, "/figures/lakes/lake_landcover_classes_grouped_colors.png"),
     width = 3000, height = 2100, res = 300)
 print(p3)
 dev.off()
-message("  Saved: figures/lakes/lake_landcover_classes_grouped_colors.png")
+message("  Saved: figures/lake_landcover_classes_grouped_colors.png")
 
 message("\nLand cover analysis complete.")
