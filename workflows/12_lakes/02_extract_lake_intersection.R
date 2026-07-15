@@ -65,7 +65,7 @@ SWOT_LAKE_NAME <- "lake"
 
 # Full path to the local GWB install. EDIT THIS to your actual install
 # location
-EDGE <- "/home/grigoropoulou/GWB2.0.3/"
+EDGE <- "/home/grigoropoulou/GWB/GWB/"
 
 # ============================================================
 # STEP 1: Load inputs
