@@ -58,7 +58,7 @@ TILE_ID <- "h20v04"
 SWOT_LAKES <- "lakes/swot_lakes/swot_lakes.gpkg"
 
 # Check the layer name of the lake dataset geopackage
-sf::st_layers("lakes/swot_lakes/swot_lakes.gpkg")
+sf::st_layers(SWOT_LAKES)
 
 # Internal SWOT layer name carried by get_lake_intersection().
 SWOT_LAKE_NAME <- "lake"
@@ -73,21 +73,22 @@ EDGE <- "/home/grigoropoulou/GWB2.0.3/"
 
 message("\n=== Loading inputs ===")
 
-# stream network
-gpkg_data <- st_read("spatial/basin/stream_network_pruned.gpkg")
 
 # fish occurrences used to define the search bounding box
 species <- fread("points_snapped/fish/all_snapped_fish_points.csv")
 
 # raster layers for the intersection call
-stream <- sprintf("spatial/segment_%s.tif", TILE_ID)
-flow   <- sprintf("spatial/accumulation_%s.tif", TILE_ID)
-basins <- sprintf("spatial/basin_%s.tif", TILE_ID)
+stream <- sprintf("spatial/r.watershed/segment_tiles20d/segment_%s.tif", TILE_ID)
+flow   <- sprintf("spatial/r.watershed/accumulation_tiles20d/accumulation_%s.tif", TILE_ID)
+basins <- sprintf("spatial/r.watershed/basin_tiles20d/basin_%s.tif", TILE_ID)
 
 # quick look at the SWOT lake database
 lakes <- st_read(SWOT_LAKES)
 head(lakes)
 rm(lakes);gc()
+
+# path to lake ID table
+LAKE_DIR <- paste0(BASE_DIR, "/lakes")
 
 # ============================================================
 # STEP 2: Extract lake IDs within the occurrence bounding box
@@ -101,14 +102,14 @@ extract_lake_ids(data          = species,
                  bbox          = TRUE,
                  var_name      = "lake_id",
                  lake_shape    = SWOT_LAKES,
-                 lake_id_table = "lakes",
+                 lake_id_table = LAKE_DIR,
                  quiet         = TRUE)
 
 # ============================================================
 # STEP 3: Subset to the target lake
 # ============================================================
 
-lake_ids <- fread("lakes/lake_id.txt", header = TRUE)
+lake_ids <- fread(paste0(LAKE_DIR, "/lake_id.txt"), header = TRUE)
 lake_ids <- lake_ids[lake_ids$lake_id == LAKE_ID, ]
 
 # ============================================================
