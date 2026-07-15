@@ -61,6 +61,12 @@ COVER_MIN <- 0.9
 # SWOT prior lake database (same manual download used in 02_).
 SWOT_LAKES     <- "lakes/swot_lakes/swot_lakes.gpkg"
 
+# Check the layer name of the lake dataset geopackage
+sf::st_layers(SWOT_LAKES)
+
+SWOT_LAKE_NAME <-
+  "lake"
+
 # ============================================================
 # STEP 1: Load intersection points, keep network reaches
 # ============================================================
@@ -83,7 +89,7 @@ coord_dat <- coord_dat[indx, ]
 
 message("\n=== Delineating lake catchment ===")
 
-direction <- sprintf("spatial/direction_%s.tif", TILE_ID)
+direction <- sprintf("spatial/r.watershed/direction_tiles20d/direction_%s.tif", TILE_ID)
 catch     <- "lakes/lake_intersections/"
 
 get_lake_catchment(coord_dat,
@@ -123,7 +129,7 @@ terra::writeRaster(lake_catch, sprintf(
 message("\n=== Aligning to sub-catchment grid ===")
 
 subc_raster <- terra::rast(sprintf(
-  "spatial/sub_catchment_%s.tif", TILE_ID))
+  "spatial/r.watershed/sub_catchment_tiles20d/sub_catchment_%s.tif", TILE_ID))
 
 # crop to the lake catchment bbox (keeps the sub-catchment grid intact)
 lake_catch_crop <- terra::crop(subc_raster, lake_catch)
@@ -163,9 +169,7 @@ message("\n=== Drawing lake catchment map ===")
 # load lake surface (vector), subset to the target lake, and the lake outlet
 # point (both produced alongside the intersection points in 02_)
 swot_lakes <- st_read(SWOT_LAKES, quiet = TRUE)
-lake_surface_vect <- swot_lakes %>% filter(lake_id == LAKE_ID)
-
-
+lake_surface_vect <- swot_lakes[swot_lakes[[SWOT_LAKE_NAME]] == LAKE_ID, ]
 
 lake_outlet <- st_read(sprintf(
   "lakes/lake_intersections/outlets_%d.gpkg", LAKE_ID), quiet = TRUE)
@@ -201,10 +205,10 @@ if (file.exists(basin_polygon_path)) {
 }
 
 p <- ggplot() +
-  geom_sf(data = gpkg_data_crop, colour = "#2166ac", linewidth = 0.8) +
-  geom_sf(data = lake_surface_vect, fill = "#2166ac", colour = NA, alpha = 0.6) +
-  geom_sf(data = lake_catch_vect, fill = NA, colour = "grey65", linewidth = 0.8) +
-  geom_sf(data = lake_outlet, colour = "#2166ac", size = 4, shape=17) +
+  geom_sf(data = gpkg_data_crop, colour = "darkblue", linewidth = 0.8) +
+  geom_sf(data = lake_surface_vect, fill = "blue", colour = NA, alpha = 0.6) +
+  geom_sf(data = lake_catch_vect, fill = NA, colour = "black", linewidth = 0.8) +
+  geom_sf(data = lake_outlet, colour = "magenta", size = 4) +
   annotation_scale(location = "bl", width_hint = 0.3) +
   annotation_north_arrow(location = "tr", which_north = "true",
                          style = north_arrow_fancy_orienteering()) +
@@ -212,8 +216,6 @@ p <- ggplot() +
            ylim = c(lake_catch_bbox["ymin"], lake_catch_bbox["ymax"])) +
   theme_minimal() +
   labs(title = "Aoos Springs reservoir lake catchment")
-
-p
 
 # version without the inset map
 png("figures/lakes/lake_catchment_map.png", width = 2700, height = 2400, res = 300)
@@ -230,7 +232,7 @@ dev.off()
 inset_map <- ggplot() +
   geom_sf(data = basin_polygon, fill = "grey90", colour = "grey40", linewidth = 0.3) +
   geom_sf(data = gpkg_data, colour = "grey60", linewidth = 0.2) +
-  geom_sf(data = lake_surface_vect, fill = "#2166ac", colour = "#2166ac", linewidth = 0.5) +
+  geom_sf(data = lake_surface_vect, fill = "blue", colour = "blue", linewidth = 0.5) +
   theme_void() +
   theme(
     panel.background = element_rect(fill = "white", colour = "black", linewidth = 0.4),
