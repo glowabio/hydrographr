@@ -124,7 +124,7 @@ p <- ggplot(streams_bc) +
   geom_sf(aes(colour = betweeness, linewidth = betweeness)) +
   scale_colour_viridis_c(option = "magma", name = "betweenness") +
   scale_linewidth_continuous(range = c(0.2, 1.5), guide = "none") +
-  theme_minimal() +
+  theme_void() +
   labs(title = "Betweenness centrality of the Sarantaporos network")
 
 png("connectivity/centrality_map.png", width = 1800, height = 1600, res = 200)

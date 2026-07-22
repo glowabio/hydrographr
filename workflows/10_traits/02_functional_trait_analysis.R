@@ -247,9 +247,9 @@ p_tree <- ggplot() +
   scale_y_continuous(expand = expansion(mult = c(0.40, 0.05))) +
   labs(title = "Functional trait groups of Sarantaporos fish",
        y = "Gower dissimilarity (Ward.D2 linkage)", x = NULL) +
-  theme_minimal(base_size = 13) +
-  theme(plot.background = element_rect(fill = "#fafaf8", colour = NA),
-        panel.grid.major.x = element_blank(),
+  theme_void(base_size = 13) +
+  theme(plot.background = element_rect(fill = "transparent", colour = NA),
+        # panel.grid.major.x = element_blank(),
         panel.grid.minor   = element_blank(),
         axis.text.x = element_blank(),
         axis.title.y = element_text(colour = "#14323a", face = "bold"),
@@ -291,9 +291,9 @@ p_bars <- ggplot(comp, aes(x = prop, y = trait, fill = I(fill))) +
   facet_wrap(~ group, ncol = 1, scales = "free_y") +
   scale_x_continuous(labels = scales::percent, expand = c(0, 0)) +
   labs(title = "Trait composition per group", x = NULL, y = NULL) +
-  theme_minimal(base_size = 14) +
-  theme(plot.background = element_rect(fill = "#fafaf8", colour = NA),
-        panel.grid = element_blank(),
+  theme_void(base_size = 14) +
+  theme(plot.background = element_rect(fill = "transparent", colour = NA),
+        # panel.grid = element_blank(),
         strip.text = element_text(face = "bold", colour = "#14323a", size = 14),
         plot.title = element_text(face = "bold", colour = "#14323a", size = 15),
         axis.text.y = element_text(size = 13, colour = "#14323a", face = "bold"),
@@ -301,7 +301,7 @@ p_bars <- ggplot(comp, aes(x = prop, y = trait, fill = I(fill))) +
 
 dendro_fig <- patchwork::wrap_plots(p_tree, p_bars, widths = c(1.4, 1))
 ggsave("figures/traits/fish_trait_dendrogram.png", dendro_fig,
-       width = 11, height = 7, dpi = 300, bg = "#fafaf8")
+       width = 11, height = 7, dpi = 300, bg = "transparent")
 message("  Saved: figures/traits/fish_trait_dendrogram.png")
 
 # ============================================================
@@ -423,10 +423,10 @@ p_pie <- ggplot() +
        subtitle = "Stream network beneath (width = Strahler order); pies = group composition; size = richness",
        x = "Longitude", y = "Latitude") +
   guides(fill = guide_legend(order = 1), size = guide_legend(order = 2)) +
-  theme_bw(base_size = 12) +
-  theme(plot.background = element_rect(fill = "#fafaf8", colour = NA),
-        panel.background = element_rect(fill = "#fafaf8", colour = "#b8c2c1"),
-        panel.grid = element_line(colour = "#e3e9e8"),
+  theme_void(base_size = 12) +
+  theme(plot.background = element_rect(fill = "transparent", colour = NA),
+        panel.background = element_rect(fill = "transparent", colour = "#b8c2c1"),
+        # panel.grid = element_line(colour = "#e3e9e8"),
         plot.title = element_text(face = "bold", colour = "#14323a",
                                   margin = margin(b = 2)),
         plot.subtitle = element_text(colour = "#5d7479", size = 9,
@@ -434,11 +434,11 @@ p_pie <- ggplot() +
         plot.title.position = "plot",
         legend.position = "right",
         legend.box = "vertical",
-        legend.key = element_rect(fill = "#fafaf8", colour = NA))
+        legend.key = element_rect(fill = "transparent", colour = NA))
 
 pie_fig <- p_pie
 ggsave("figures/traits/fish_group_pie_map.png", pie_fig,
-       width = 12, height = 10, dpi = 300, bg = "#fafaf8")
+       width = 12, height = 10, dpi = 300, bg = "transparent")
 message("  Saved: figures/traits/fish_group_pie_map.png")
 
 # ============================================================
@@ -478,16 +478,16 @@ p_fd <- ggplot() +
        subtitle = "Stream network beneath (width = Strahler order); colour = Rao's Q; size = species richness",
        x = "Longitude", y = "Latitude") +
   guides(fill = guide_colourbar(order = 1), size = guide_legend(order = 2)) +
-  theme_bw(base_size = 12) +
-  theme(plot.background = element_rect(fill = "#fafaf8", colour = NA),
-        panel.background = element_rect(fill = "#fafaf8", colour = "#b8c2c1"),
-        panel.grid = element_line(colour = "#e3e9e8"),
+  theme_void(base_size = 12) +
+  theme(plot.background = element_rect(fill = "transparent", colour = NA),
+        panel.background = element_rect(fill = "transparent", colour = "#b8c2c1"),
+        # panel.grid = element_line(colour = "#e3e9e8"),
         plot.title = element_text(face = "bold", colour = "#14323a"),
         plot.subtitle = element_text(colour = "#5d7479", size = 9),
         legend.position = "right", legend.box = "vertical",
-        legend.key = element_rect(fill = "#fafaf8", colour = NA))
+        legend.key = element_rect(fill = "transparent", colour = NA))
 
-ggsave("figures/traits/fish_fd_map.png", p_fd, width = 11, height = 10, dpi = 300, bg = "#fafaf8")
+ggsave("figures/traits/fish_fd_map.png", p_fd, width = 11, height = 10, dpi = 300, bg = "transparent")
 message("  Saved: figures/traits/fish_fd_map.png")
 
 # Functional-diversity table (sorted high to low) + Anguilla comparison.

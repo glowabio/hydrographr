@@ -54,8 +54,14 @@ library(danubeoccurR)
 
 select <- dplyr::select
 
-source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
-setwd(BASE_DIR)
+# source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
+# setwd(BASE_DIR)
+
+if (!exists("WORKFLOWS_ROOT")) {
+  root <- tryCatch(rprojroot::find_root(rprojroot::has_dir("workflows")),
+                   error = function(e) getwd())
+  source(file.path(root, "workflows", "helpers", "find_root.R"))
+}
 
 dir.create("points_cleaned/fish", recursive = TRUE, showWarnings = FALSE)
 dir.create("points_cleaned/maps", recursive = TRUE, showWarnings = FALSE)
@@ -348,6 +354,12 @@ sp_basin <- sp_basin_validated %>%
   select(-manually_updated, -speciescheck, -subc_id, -basin_id, -reg_id)
 
 message("  Records after taxonomic validation: ", nrow(sp_basin))
+
+# only sarantaporos species
+TARGET_SPECIES <- c("Alburnoides_prespensis","Anguilla_anguilla","Barbus_prespensis",
+                    "Chondrostoma_ohridanum","Oxynoemacheilus_pindus","Salmo_farioides",
+                    "Squalius_platyceps")
+sp_basin <- sp_basin %>% dplyr::filter(species %in% TARGET_SPECIES)
 
 # ============================================================
 # STEP 6: Save outputs

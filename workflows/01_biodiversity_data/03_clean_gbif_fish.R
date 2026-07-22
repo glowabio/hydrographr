@@ -347,8 +347,13 @@ message("  Saved: points_cleaned/maps/gbif_fish_cleaned_overview.html")
 # STEP 10: Save cleaned data
 # ============================================================
 
-message("\n=== Step 10: Saving Cleaned Data ===")
+TARGET_SPECIES <- c("Alburnoides prespensis","Anguilla anguilla","Barbus prespensis",
+                    "Chondrostoma ohridanum","Oxynoemacheilus pindus","Salmo farioides",
+                    "Squalius platyceps", "Chondrostoma ohridana")
+gbif_cleaned <- gbif_cleaned %>% dplyr::filter(species %in% TARGET_SPECIES)
 
+
+message("\n=== Step 10: Saving Cleaned Data ===")
 fwrite(gbif_cleaned, "points_cleaned/fish/fish_gbif_clean.csv")
 message("  Saved: points_cleaned/fish/fish_gbif_clean.csv")
 

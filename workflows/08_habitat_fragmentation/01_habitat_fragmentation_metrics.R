@@ -821,3 +821,15 @@ message("Scenario graphs: river_graph_current.RDS / river_graph_future.RDS")
 message("\nNOTE — structural fragmentation (Group C) is uniform across species:")
 message("  every dam is a cut. Species passability (0.8/0.5/0) enters only PCI.")
 message("\nNext: 02_habitat_fragmentation_figures.R")
+
+
+
+for (sp in TARGET_SPECIES) {
+  bin_col <- paste0("bin_", sp)
+  suitable_ids <- habitat_dt %>% filter(.data[[bin_col]] == 1L) %>% pull(subc_id) %>% as.character()
+  subg <- induced_subgraph(network_g, V(network_g)[name %in% suitable_ids]) %>% as.undirected()
+  comps <- components(subg, mode = "weak")
+  sizes <- table(comps$membership)
+  cat(sprintf("%-26s raw: %2d | kept(>=2): %2d | single-reach dropped: %d\n",
+              sp, comps$no, sum(sizes >= 2), sum(sizes == 1)))
+}

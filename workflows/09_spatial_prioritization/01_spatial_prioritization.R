@@ -57,7 +57,13 @@
 # LOCATION: workflows/09_spatial_prioritization/01_spatial_prioritization.R
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 
-
+library(sf)
+library(data.table)
+library(dplyr)
+library(igraph)
+library(hydrographr)
+library(prioritizr)
+library(ggplot2)
 
 
 select <- dplyr::select
@@ -349,6 +355,8 @@ message("\n=== Step 5: Solving ===")
 if (!requireNamespace("rcbc", quietly = TRUE))
   stop("rcbc not found. install.packages('rcbc', repos = 'https://cran.r-universe.dev')")
 
+set.seed(42)
+
 # ---- solve_one(): parameterised by boundary matrix, target, cost column ----
 # Uses the tightened SOLVER_GAP (main results). Defined BEFORE any call below.
 solve_one <- function(bmat, target, cost_col = "cost_hfi") {
@@ -520,7 +528,64 @@ message("  Shared: ", shared_AB,
 message("  (n_dam_reaches: selected reaches with a planned dam = conflict reaches;",
         " B should pull these DOWN by penalising high-MW reaches)")
 
+cost_cmp$boundary_weight <- round(c(ba, bb), 1)
+
 fwrite(cost_cmp, "prioritization/cost_scenario_AB_30pct.csv")
+
+
+
+# ------------------------------------------------------------
+# 5b-ii. Habitat connectivity check for the A vs B swap
+#   Virgilio's point: equal total habitat length does not imply
+#   equal connectivity. For each species, count the connected
+#   components formed by its SELECTED suitable reaches, on the
+#   future-scenario graph, under cost A (HFI) and B (HFI+MW).
+#   More components under B = avoiding dam reaches fragmented that
+#   species' priority habitat, even if total length is preserved.
+# ------------------------------------------------------------
+message("\n  --- Habitat connectivity: A vs B (per-species components) ---")
+
+# future graph restricted to basin planning units (dams already removed
+# in river_graph_future by construction)
+g_fut <- igraph::induced_subgraph(
+  river_graph_future,
+  igraph::V(river_graph_future)[
+    names(igraph::V(river_graph_future)) %in% as.character(pu_dat$id)]
+)
+
+# count weak components of one reach-set on g_fut
+n_components <- function(reach_ids, g) {
+  ids <- as.character(reach_ids)
+  ids <- ids[ids %in% names(igraph::V(g))]
+  if (length(ids) == 0) return(0L)
+  sub <- igraph::induced_subgraph(g, igraph::V(g)[names(igraph::V(g)) %in% ids])
+  igraph::components(sub, mode = "weak")$no
+}
+
+conn_rows <- lapply(seq_along(TARGET_SPECIES), function(i) {
+  sp_reaches <- puvspr_dat[species == i, pu]          # suitable for species i
+  selA <- intersect(sp_reaches, sel_A)                 # selected & suitable, A
+  selB <- intersect(sp_reaches, sel_B)                 # selected & suitable, B
+  data.frame(
+    species        = TARGET_SPECIES[i],
+    n_reaches_A    = length(selA),
+    n_reaches_B    = length(selB),
+    n_components_A = n_components(selA, g_fut),
+    n_components_B = n_components(selB, g_fut)
+  )
+}) %>% rbindlist()
+
+conn_rows[, delta_components := n_components_B - n_components_A]
+print(conn_rows)
+fwrite(conn_rows, "prioritization/cost_scenario_AB_connectivity_30pct.csv")
+
+message("  Total components  A: ", sum(conn_rows$n_components_A),
+        " | B: ", sum(conn_rows$n_components_B),
+        " | change: ", sum(conn_rows$delta_components))
+
+
+
+
 
 # ------------------------------------------------------------
 # 5c. Main loop: both scenarios x all targets
@@ -637,6 +702,76 @@ png("prioritization/maps/priority_comparison_30pct.png",
     width = 9, height = 7, units = "in", res = 200)
 print(p_comp); dev.off()
 message("  Saved: prioritization/maps/priority_comparison_30pct.png")
+
+
+# ------------------------------------------------------------
+# 7b. Forgone-hydropower accounting at COMPARISON_TARGET
+#     Answers: to secure the priority network, how many planned
+#     dams coincide with it, and how much licensed capacity (MW)
+#     would be forgone? Reported under two definitions:
+#       (i)  dams sitting ON a selected (priority) reach
+#            [current scenario solution]
+#       (ii) dams on reaches that LOSE priority when dams are added
+#            [reaches "Current only" in the current->future shift]
+#     Co-located licences on one reach are counted individually for
+#     the dam COUNT and summed for MW, matching the damage-ranking
+#     treatment.
+# ------------------------------------------------------------
+message("\n=== Step 7b: Forgone-hydropower accounting (",
+        COMPARISON_TARGET * 100, "% target) ===")
+
+# planned dams only, with per-licence MW (existing dam has no opportunity cost)
+planned_dams <- fread("points_snapped/dams/dams_snapped_points.csv")[
+  status == "planned", .(site_id, subc_id, power_mw)]
+
+sel_ids_cur <- comparison$id[comparison$sol_current == 1]
+lost_ids    <- comparison$id[comparison$status == "Current only"]
+
+# (i) dams on selected priority reaches
+dams_on_sel <- planned_dams[subc_id %in% sel_ids_cur]
+# (ii) dams on reaches dropped under the future scenario
+dams_on_lost <- planned_dams[subc_id %in% lost_ids]
+
+forgone <- data.frame(
+  definition   = c("on_priority_reach", "loses_priority_when_dammed"),
+  n_dams       = c(nrow(dams_on_sel), nrow(dams_on_lost)),
+  n_reaches    = c(uniqueN(dams_on_sel$subc_id), uniqueN(dams_on_lost$subc_id)),
+  mw_forgone   = round(c(sum(dams_on_sel$power_mw,  na.rm = TRUE),
+                         sum(dams_on_lost$power_mw, na.rm = TRUE)), 2)
+)
+print(forgone)
+fwrite(forgone, "prioritization/forgone_hydropower_30pct.csv")
+
+# named list of the dams involved, for the manuscript / SI
+message("  Planned dams on priority reaches:")
+print(dams_on_sel[order(-power_mw)])
+fwrite(dams_on_sel[order(-power_mw)],
+       "prioritization/forgone_hydropower_dams_30pct.csv")
+
+
+# total planned capacity in the sub-basin (denominator for the fraction)
+mw_total_planned <- sum(planned_dams$power_mw, na.rm = TRUE)
+
+forgone <- data.frame(
+  definition   = c("on_priority_reach", "loses_priority_when_dammed"),
+  n_dams       = c(nrow(dams_on_sel), nrow(dams_on_lost)),
+  n_reaches    = c(uniqueN(dams_on_sel$subc_id), uniqueN(dams_on_lost$subc_id)),
+  mw_forgone   = round(c(sum(dams_on_sel$power_mw,  na.rm = TRUE),
+                         sum(dams_on_lost$power_mw, na.rm = TRUE)), 2),
+  mw_total_planned = round(mw_total_planned, 2),
+  pct_of_planned   = round(100 * c(sum(dams_on_sel$power_mw,  na.rm = TRUE),
+                                   sum(dams_on_lost$power_mw, na.rm = TRUE)) /
+                             mw_total_planned, 1)
+)
+print(forgone)
+fwrite(forgone, "prioritization/forgone_hydropower_30pct.csv")
+
+message("  Total planned capacity in sub-basin: ",
+        round(mw_total_planned, 2), " MW across ",
+        nrow(planned_dams), " licences on ",
+        uniqueN(planned_dams$subc_id), " reaches")
+
+
 
 # ============================================================
 # STEP 8: Summary plot -- selected length by target and scenario
