@@ -41,7 +41,9 @@ library(patchwork)
 
 select <- dplyr::select
 
-source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
+if (!exists("WORKFLOWS_DIR"))
+  WORKFLOWS_DIR <- Sys.getenv("WORKFLOWS_CODE", "/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows")
+source(file.path(WORKFLOWS_DIR, "helpers", "config.R"))
 setwd(BASE_DIR)
 
 dir.create("prioritization/maps", recursive = TRUE, showWarnings = FALSE)
@@ -57,10 +59,46 @@ OFFSCALE_CUTOFF <- 1000
 col_isolated  <- "#d73027"   # upstream connectivity loss
 col_dewatered <- "#4575b4"   # downstream dewatering (run-of-river)
 
-status_cols <- c("Both"         = "#1a7a3c",
-                 "Current only" = "#d7191c",
-                 "Future only"  = "#2c7bb6",
-                 "Neither"      = "grey85")
+# Okabe-Ito palette: distinguishable under protanopia, deuteranopia
+# and tritanopia (the previous green/red pair was not).
+status_cols <- c("Both"         = "#009E73",   # bluish green
+                 "Current only" = "#D55E00",   # vermillion
+                 "Future only"  = "#0072B2",   # blue
+                 "Neither"      = "grey65")
+
+
+# ---- STYLE PARAMETERS (shared by all three figures) --------
+FIG_W_IN    <- 5.8
+FIG_H_IN    <- 4.1
+FIG_DPI     <- 300
+BASE_SIZE   <- 16
+
+SIZE_TITLE    <- 15
+SIZE_SUBTITLE <- 10
+SIZE_LEG_TTL  <- 13
+SIZE_LEG_TXT  <- 12
+LEG_KEY_CM    <- 0.6
+
+COL_NETWORK   <- "grey55"
+LWD_NETWORK   <- 0.7
+COL_BASIN     <- "grey30"
+LWD_BASIN     <- 0.6
+
+theme_map_prio <- function() {
+  theme_void(base_size = BASE_SIZE) +
+    theme(
+      plot.title          = element_text(size = SIZE_TITLE, face = "bold",
+                                         hjust = 0, lineheight = 1.05),
+      plot.subtitle       = element_text(size = SIZE_SUBTITLE, colour = "grey40",
+                                         hjust = 0, lineheight = 1.1),
+      plot.title.position = "plot",
+      legend.title        = element_text(size = SIZE_LEG_TTL, face = "bold"),
+      legend.text         = element_text(size = SIZE_LEG_TXT),
+      legend.key.size     = unit(LEG_KEY_CM, "cm"),
+      legend.position     = "right",
+      plot.margin         = margin(6, 6, 6, 6)
+    )
+}
 
 # Place-name lookup (Greek -> Latin). Edit values as preferred.
 thesh_lookup <- tribble(
@@ -94,7 +132,17 @@ stream_lines <- read_sf(
   layer = "stream_network_pruned"
 ) %>% st_transform(4326)
 
-dams_snapped <- fread("points_snapped/dams/dams_snapped_points.csv")
+# --- basin outline ---
+basin_outline <- read_sf(
+  "spatial/subbasin_sarantaporos/subbasin_polygon.gpkg"
+) %>% st_transform(4326)
+
+
+subbasin_subc_ids <- fread("spatial/subbasin_sarantaporos/subbasin_subc_ids_pruned.csv")
+
+# filter dams to those inside the sub-basin
+dams_snapped <- fread("points_snapped/dams/dams_snapped_points.csv") %>%
+  filter(subc_id %in% subbasin_subc_ids$subc_id)
 
 # one place-name + one snapped coordinate per ranked reach (co-located
 # dams share the reach; the ranking already summed their MW and damage).
@@ -162,16 +210,33 @@ p1 <- ggplot(bar_long,
     y = "Connectivity + dewatering damage per MW",
     title = "Planned dams ranked by habitat damage per MW",
     subtitle = paste0("Damage = summed SDM suitability of isolated (upstream) ",
-                      "and dewatered (downstream 2 km) reaches",
-                      if (!is.null(offscale_note)) paste0("\n", offscale_note) else "")
+                      "and dewatered (downstream 2 km) reaches\n",
+                      if (!is.null(offscale_note)) paste0(offscale_note) else "")
   ) +
-  theme_bw(base_size = 11) +
-  theme(legend.position = "top",
-        plot.subtitle = element_text(size = 8, colour = "grey40"),
-        axis.text.y   = element_text(size = 7))
+  # bar chart keeps theme_bw (it needs axes) but takes the shared sizing
+  theme_bw(base_size = BASE_SIZE) +
+  theme(
+    plot.title      = element_text(size = SIZE_TITLE, face = "bold",
+                                   hjust = 0, lineheight = 1.05),
+    plot.subtitle   = element_text(size = SIZE_SUBTITLE, colour = "grey40",
+                                   hjust = 0, lineheight = 1.1),
+    plot.title.position = "plot",
+    legend.title    = element_text(size = SIZE_LEG_TTL, face = "bold"),
+    legend.text     = element_text(size = SIZE_LEG_TXT),
+    legend.key.size = unit(LEG_KEY_CM, "cm"),
+    legend.position = "top",
+    axis.title      = element_text(size = SIZE_LEG_TTL),
+    axis.text.y     = element_text(size = SIZE_SUBTITLE),
+    axis.text.x     = element_text(size = SIZE_SUBTITLE),
+    panel.border    = element_rect(colour = "grey30", linewidth = 0.6),
+    panel.grid.major = element_line(colour = "grey88", linewidth = 0.4),
+    panel.grid.minor = element_blank()
+  )
 
+# taller than the maps: one row per dam label needs vertical room
 png("prioritization/maps/fig1_dam_ranking_bars.png",
-    width = 8, height = 8, units = "in", res = 200)
+    width = FIG_W_IN * 1.6, height = FIG_H_IN * 1.6,
+    units = "in", res = FIG_DPI)
 print(p1); dev.off()
 message("  Saved: prioritization/maps/fig1_dam_ranking_bars.png")
 
@@ -194,13 +259,16 @@ message("  On-scale dams: ", nrow(dam_sf_on),
         " | off-scale (outlet, drawn separately): ", nrow(dam_sf_off))
 
 p2 <- ggplot() +
-  geom_sf(data = stream_lines, colour = "grey80", linewidth = 0.3) +
+  geom_sf(data = basin_outline, fill = NA,
+          colour = COL_BASIN, linewidth = LWD_BASIN) +
+  geom_sf(data = stream_lines,
+          colour = COL_NETWORK, linewidth = LWD_NETWORK) +
   geom_sf(data = dam_sf_on,
           aes(size = damage_total, colour = damage_total),
           alpha = 0.85) +
   scale_colour_viridis_c(option = "inferno", direction = -1,
                          name = "Total damage\n(SDM suitability)") +
-  scale_size_continuous(range = c(1.5, 8),
+  scale_size_continuous(range = c(2, 9),
                         name = "Total damage\n(SDM suitability)") +
   guides(colour = guide_legend(), size = guide_legend())     # merge legends
 
@@ -211,20 +279,19 @@ if (nrow(dam_sf_off) > 0) {
     geom_sf_text(data = dam_sf_off,
                  aes(label = paste0(thesh_lat, "\n(outlet, damage ",
                                     round(damage_total), ")")),
-                 size = 2.8, colour = "black",
+                 size = 3.4, colour = "black", fontface = "bold",
                  nudge_y = 0.012, lineheight = 0.9)
 }
 
 p2 <- p2 +
   labs(title = "Planned-dam habitat damage across the Sarantaporos network",
-       subtitle = paste0("Point size and colour = summed isolated + dewatered ",
-                         "SDM suitability (outlet dam shown off-scale)")) +
-  theme_void(base_size = 11) +
-  theme(plot.subtitle = element_text(size = 9, colour = "grey40"),
-        legend.position = "right")
+       subtitle = paste0("Point size and colour = summed isolated + ",
+                         "dewatered SDM suitability ",
+                         "(outlet dam shown off-scale)")) +
+  theme_map_prio()
 
 png("prioritization/maps/fig2_dam_damage_map.png",
-    width = 9, height = 7, units = "in", res = 200)
+    width = FIG_W_IN, height = FIG_H_IN, units = "in", res = FIG_DPI)
 print(p2); dev.off()
 message("  Saved: prioritization/maps/fig2_dam_damage_map.png")
 
@@ -242,22 +309,45 @@ comp_sf <- stream_lines %>%
                          levels = c("Both", "Current only",
                                     "Future only", "Neither")))
 
-p3 <- ggplot(comp_sf) +
-  geom_sf(aes(colour = status, linewidth = status == "Neither")) +
-  scale_colour_manual(values = status_cols, name = "Priority status") +
-  scale_linewidth_manual(values = c(`TRUE` = 0.3, `FALSE` = 0.9),
+
+# --- dam points, coloured by whether the reach they sit on was selected ---
+# NOTE: dams_snapped already has its own `status` column (planned/existing),
+# so the priority status from `comparison` is renamed to `priority_status`
+# to avoid a .x/.y name clash on the join.
+dam_status_sf <- dams_snapped %>%
+  left_join(comparison %>% rename(subc_id = id, priority_status = status) %>%
+              select(subc_id, priority_status),
+            by = "subc_id") %>%
+  mutate(priority_status = factor(coalesce(priority_status, "Neither"),
+                                  levels = c("Both", "Current only",
+                                             "Future only", "Neither"))) %>%
+  filter(!is.na(longitude_snapped)) %>%
+  st_as_sf(coords = c("longitude_snapped", "latitude_snapped"), crs = 4326)
+
+p3 <- ggplot() +
+  geom_sf(data = basin_outline, fill = NA,
+          colour = COL_BASIN, linewidth = LWD_BASIN) +
+  geom_sf(data = comp_sf,
+          aes(colour = status, linewidth = status == "Neither")) +
+  scale_linewidth_manual(values = c(`TRUE` = LWD_NETWORK, `FALSE` = 1.3),
                          guide = "none") +
+  geom_sf(data = dam_status_sf, aes(fill = priority_status),
+          shape = 21, colour = "black", stroke = 0.5, size = 4) +
+  scale_colour_manual(values = status_cols, name = "Priority status",
+                      aesthetics = c("colour", "fill")) +
   labs(
     title = "Priority reaches: current vs future barrier scenario (30% target)",
-    subtitle = paste0("Red = priority only without planned dams (lost once dams sever ",
-                      "connectivity); blue = priority only under future dams")
+    subtitle = paste0("Vermillion = priority only without planned dams (lost once ",
+                      "dams sever connectivity); blue = priority only under future ",
+                      "dams.\nPoints = dams, coloured by the priority status of ",
+                      "their reach")
   ) +
-  theme_void(base_size = 11) +
-  theme(plot.subtitle = element_text(size = 8, colour = "grey40"),
-        legend.position = "right")
+  theme_map_prio()
 
+
+# A4 = 8.27 x 11.69 in. Roughly a quarter page, landscape.
 png("prioritization/maps/fig3_priority_comparison_30pct.png",
-    width = 9, height = 7, units = "in", res = 200)
+    width = 5.8, height = 4.1, units = "in", res = 300)
 print(p3); dev.off()
 message("  Saved: prioritization/maps/fig3_priority_comparison_30pct.png")
 
@@ -271,4 +361,3 @@ message(paste(rep("=", 80), collapse = ""))
 message("  Fig 1: prioritization/maps/fig1_dam_ranking_bars.png")
 message("  Fig 2: prioritization/maps/fig2_dam_damage_map.png")
 message("  Fig 3: prioritization/maps/fig3_priority_comparison_30pct.png")
-
