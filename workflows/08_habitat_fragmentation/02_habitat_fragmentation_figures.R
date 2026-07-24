@@ -1,8 +1,8 @@
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
-# 02_habitat_fragmentation_figures.R
+# 02_habitat_fragmentation_figures.R   (Module 8 -- Habitat Fragmentation)
 #
 # Produce all figures for the habitat fragmentation analysis.
-# Reads CSV outputs from 07a_habitat_fragmentation_metrics.R and the
+# Reads CSV outputs from 01_habitat_fragmentation_metrics.R and the
 # Sarantaporos stream network for spatial context.
 #
 # Figures:
@@ -17,21 +17,24 @@
 #       map1_patches_{species}_main.png          — Barbus + Salmo
 #       map1_patches_all_species_supplementary.png
 #
-#     Map 2 — Dam buffer overlap
-#       map2_buffer_{species}_main.png            — Barbus + Salmo
-#       map2_buffer_all_species_supplementary.png
+#     Map 2 — Fragments + dam buffer overlap, combined two-panel (current | future)
+#       map2_fragments_buffer_{species}_main.png            — Barbus + Salmo
+#       map2_fragments_buffer_all_species_supplementary.png
 #
-#     Map 3 — Habitat fragments, current vs future scenario
-#       map3_fragments_{species}_main.png         — Barbus + Salmo, two-panel
-#       map3_fragments_all_species_supplementary.png
+#   Summary charts (figures/patch_metrics/):
+#     barplot_species_impact_ranking.png — n_fragments current vs future, per species
+#     barplot_patch_sizes.png            — suitable habitat length, stacked by patch
+#     dotplot_dam_proximity.png          — patch distance to nearest dam
 #
 # Inputs (from 01_habitat_fragmentation_metrics.R):
 #   sdm/patch_metrics/patch_membership_{species}.csv
 #   sdm/patch_metrics/dist_point_{species}.csv
 #   sdm/patch_metrics/dist_patch_{species}.csv
 #   sdm/patch_metrics/dam_buffer_reaches.csv
-#   sdm/patch_metrics/fragments_{scenario}_{species}.csv
+#   sdm/patch_metrics/fragment_membership_{scenario}_{species}.csv
 #   sdm/patch_metrics/species_impact_ranking.csv
+#   sdm/patch_metrics/patch_summary_all.csv
+#   sdm/patch_metrics/dam_patch_proximity.csv
 #
 # Network for maps:
 #   spatial/subbasin_sarantaporos/stream_network_pruned.gpkg
@@ -52,8 +55,10 @@ library(RColorBrewer)
 
 select <- dplyr::select
 
-source("~/Documents/Postdoc/code/workflow_paper/helpers/save_to_nimbus.R")
-source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
+if (!exists("WORKFLOWS_DIR"))
+  WORKFLOWS_DIR <- Sys.getenv("WORKFLOWS_CODE", "/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows")
+source(file.path(WORKFLOWS_DIR, "helpers", "save_to_nimbus.R"))
+source(file.path(WORKFLOWS_DIR, "helpers", "config.R"))
 # BASE_DIR <- NIMBUS_DIR
 setwd(BASE_DIR)
 
@@ -102,6 +107,12 @@ network_sf <- st_read(
   quiet = TRUE
 )
 message("  Network reaches: ", nrow(network_sf))
+
+# Sub-basin boundary — outline for spatial context on fragment maps
+subbasin_sf <- st_read(
+  "spatial/subbasin_sarantaporos/subbasin_polygon.gpkg",
+  quiet = TRUE
+)
 
 # Dam points
 dams <- fread("points_snapped/dams/dams_snapped_points.csv") %>%
@@ -429,6 +440,10 @@ make_fragment_panel <- function(sp, scenario_name, dams_sf_panel, title_label) {
 
   ggplot() +
 
+    # Layer 0: sub-basin boundary — thin outline, matches network linewidth
+    geom_sf(data = subbasin_sf, fill = NA,
+            colour = "grey30", linewidth = 0.3, show.legend = FALSE) +
+
     # Layer 1: full network — grey background
     geom_sf(data = network_sf,
             colour = COL_UNSUITABLE, linewidth = 0.3, show.legend = FALSE) +
@@ -495,6 +510,35 @@ for (sp in MAIN_TEXT_SPECIES) {
   png(out, width = 10, height = 5, units = "in", res = 300)
   print(p); dev.off()
   message("  Saved: ", out)
+}
+
+# Combined main-text figure: Barbus (a) + Salmo (b) stacked, current | future.
+# No in-figure caption text -- the legend key (coloured lines / buffer zone /
+# symbols) is provided in the LaTeX figure caption instead, to keep this
+# compact for two-row use in the manuscript.
+make_species_row <- function(sp, tag) {
+  sp_label  <- gsub("_", " ", sp)
+  p_current <- make_fragment_panel(sp, "current", dams_current_sf, "Current")
+  p_future  <- make_fragment_panel(sp, "future",  dams_future_sf,  "Future")
+  if (is.null(p_current) || is.null(p_future)) return(NULL)
+  # wrap_elements() + ggtitle() (not plot_annotation()) so the title
+  # survives once this row is nested inside the outer row_a / row_b patchwork
+  wrap_elements(p_current | p_future) +
+    ggtitle(bquote(.(tag) ~ italic(.(sp_label)))) +
+    theme(plot.title = element_text(face = "italic", size = 11, hjust = 0.5))
+}
+
+row_a <- make_species_row("Barbus_prespensis", "(a)")
+row_b <- make_species_row("Salmo_farioides",   "(b)")
+
+if (!is.null(row_a) && !is.null(row_b)) {
+  combined_main <- (row_a / row_b) &
+    theme(plot.margin = margin(2, 4, 2, 4))
+
+  out_combined <- "figures/maps/habitat_fragmentation_map.png"
+  png(out_combined, width = 8.5, height = 8, units = "in", res = 300)
+  print(combined_main); dev.off()
+  message("  Saved: ", out_combined)
 }
 
 # Supplementary: rows = species, columns = scenario (current | future)
@@ -736,4 +780,4 @@ message("  figures/maps/map1_patches_{species}_main.png")
 message("  figures/maps/map1_patches_all_species_supplementary.png")
 message("  figures/maps/map2_fragments_buffer_{species}_main.png")
 message("  figures/maps/map2_fragments_buffer_all_species_supplementary.png")
-message("\nNext: 08_pci.R")
+message("\nNext: 09_spatial_prioritization module")
