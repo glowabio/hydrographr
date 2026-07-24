@@ -18,7 +18,7 @@
 #   - lakes/lake_intersections/lake_<id>.tif          (from 02_)
 #   - lakes/lake_intersections/outlets_<id>.gpkg      (from 02_)
 #   - spatial/basin/stream_network_pruned.gpkg        (stream network)
-#   - lakes/swot_lakes.gpkg                           (SWOT prior lake DB)
+#   - lakes/swot_lakes/swot_lakes.gpkg                (SWOT prior lake DB)
 #   - spatial/direction_<tile>.tif                    (flow direction, from 01_)
 #   - spatial/sub_catchment_<tile>.tif                (from 01_)
 #   - spatial/basin/basin_polygon.gpkg                (if present; else fetched)
@@ -28,8 +28,8 @@
 #   - spatial/subc_id_lake_catchment.tif
 #   - spatial/basin/basin_polygon.gpkg                (Vjosa/Aoos basin, if fetched)
 #   - lakes/subc_IDs_lake_catchment.txt               (sub-catchment IDs)
-#   - figures/lakes/lake_catchment_map.png
-#   - figures/lakes/lake_catchment_inset_basin_map.png
+#   - figures/lakes/lake_catchment_map.png / .pdf
+#   - figures/lakes/lake_catchment_inset_basin_map.png / .pdf
 #
 # LOCATION: workflows/12_lakes/03_delineate_lake_catchment.R
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
@@ -38,11 +38,14 @@ library(hydrographr)
 library(terra)
 library(sf)
 library(data.table)
+library(dplyr)
 library(ggplot2)
 library(ggspatial)
 library(patchwork)
 
-source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
+if (!exists("WORKFLOWS_DIR"))
+  WORKFLOWS_DIR <- Sys.getenv("WORKFLOWS_CODE", "/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows")
+source(file.path(WORKFLOWS_DIR, "helpers", "config.R"))
 setwd(BASE_DIR)
 
 dir.create("figures/lakes", recursive = TRUE, showWarnings = FALSE)
@@ -169,6 +172,7 @@ lake_surface_vect <- swot_lakes %>% filter(lake_id == LAKE_ID)
 
 lake_outlet <- st_read(sprintf(
   "lakes/lake_intersections/outlets_%d.gpkg", LAKE_ID), quiet = TRUE)
+if (is.na(st_crs(lake_outlet))) st_crs(lake_outlet) <- 4326
 
 # vectorize the lake catchment raster for plotting with geom_sf
 lake_catch_vect <- terra::as.polygons(lake_catch, dissolve = TRUE) |>
@@ -211,7 +215,7 @@ p <- ggplot() +
   coord_sf(xlim = c(lake_catch_bbox["xmin"], lake_catch_bbox["xmax"]),
            ylim = c(lake_catch_bbox["ymin"], lake_catch_bbox["ymax"])) +
   theme_minimal() +
-  labs(title = "Aoos Springs reservoir lake catchment")
+  theme(panel.grid = element_blank())
 
 p
 
