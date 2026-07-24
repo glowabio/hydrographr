@@ -122,10 +122,7 @@ p_fut <- make_panel(streams_fut, n_fut, "Future") +
   geom_sf(data = dams_sf,shape = 24,
           fill = "#E41A1C", colour = "white", size = 2.5, stroke = 0.5)
 
-combined <- p_cur + p_fut +
-  plot_annotation(
-    title = "Structural fragmentation of the Sarantaporos network",
-    theme = theme(plot.title = element_text(face = "bold", size = 14)))
+combined <- p_cur + p_fut
 
 png("figures/fragmentation_network_map.png",
     width = 2400, height = 1400, res = 200)
