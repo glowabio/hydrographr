@@ -27,7 +27,9 @@ library(patchwork)
 
 select <- dplyr::select
 
-source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
+if (!exists("WORKFLOWS_DIR"))
+  WORKFLOWS_DIR <- Sys.getenv("WORKFLOWS_CODE", "/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows")
+source(file.path(WORKFLOWS_DIR, "helpers", "config.R"))
 setwd(BASE_DIR)
 
 dir.create("figures", showWarnings = FALSE)
@@ -41,6 +43,9 @@ river_graph_future  <- readRDS("spatial/stream_network_graphs/river_graph_future
 streams <- st_read("spatial/subbasin_sarantaporos/stream_network_pruned.gpkg",
                    quiet = TRUE) %>%
   mutate(subc_id = as.character(subc_id))
+
+subbasin <- st_read("spatial/subbasin_sarantaporos/subbasin_polygon.gpkg",
+                    quiet = TRUE)
 
 dams <- fread("points_snapped/dams/dams_snapped_points.csv") %>%
   mutate(subc_id = as.character(subc_id)) %>%
@@ -92,6 +97,10 @@ pal <- rep(RColorBrewer::brewer.pal(12, "Paired"), length.out = max(n_cur, n_fut
 
 make_panel <- function(net_sf, n_frag, title_label) {
   ggplot() +
+    # Sub-basin boundary — thin outline for spatial context
+    geom_sf(data = subbasin, fill = NA,
+            colour = "grey30", linewidth = 0.3) +
+
     geom_sf(data = net_sf,
             aes(colour = factor(fragment)),
             linewidth = 0.6) +
