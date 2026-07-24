@@ -26,6 +26,8 @@
 #   - spatial/stream_network_graphs/river_graph_current.RDS
 #       (any scenario graph works -- centrality uses topology only, not dams;
 #        we use the current graph, which carries the full reach set)
+#   - spatial/subbasin_sarantaporos/subbasin_subc_ids_pruned.csv
+#       (to drop the artificial root node before computing centrality/stats)
 #   - spatial/subbasin_sarantaporos/stream_network_pruned.gpkg
 #       (for mapping centrality back onto reaches)
 #   - spatial/subbasin_sarantaporos/subbasin_polygon.gpkg
@@ -48,7 +50,9 @@ library(data.table)
 
 select <- dplyr::select
 
-source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
+if (!exists("WORKFLOWS_DIR"))
+  WORKFLOWS_DIR <- Sys.getenv("WORKFLOWS_CODE", "/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows")
+source(file.path(WORKFLOWS_DIR, "helpers", "config.R"))
 setwd(BASE_DIR)
 
 dir.create("connectivity", showWarnings = FALSE)
@@ -120,12 +124,17 @@ message("  Saved: spatial/stream_network_graphs/stream_betweeness.gpkg")
 # ============================================================
 message("\nDrawing centrality map...")
 
+subbasin_sf <- st_read("spatial/subbasin_sarantaporos/subbasin_polygon.gpkg",
+                       quiet = TRUE)
+
 p <- ggplot(streams_bc) +
+  # Sub-basin boundary — thin outline for spatial context
+  geom_sf(data = subbasin_sf, fill = NA,
+          colour = "grey30", linewidth = 0.3) +
   geom_sf(aes(colour = betweeness, linewidth = betweeness)) +
   scale_colour_viridis_c(option = "magma", name = "betweenness") +
   scale_linewidth_continuous(range = c(0.2, 1.5), guide = "none") +
-  theme_void() +
-  labs(title = "Betweenness centrality of the Sarantaporos network")
+  theme_void()
 
 png("connectivity/centrality_map.png", width = 1800, height = 1600, res = 200)
 print(p)
