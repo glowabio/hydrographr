@@ -1,5 +1,5 @@
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
-# 07_functional_trait_analysis.R   (Module 10 -- Traits)
+# 02_functional_trait_analysis.R   (Module 10 -- Traits)
 #
 # Group the focal Sarantaporos fish species by their functional traits and
 # map the resulting composition and diversity across the sub-basin. Three
@@ -32,7 +32,7 @@
 #   - figures/traits/fish_fd_map.png
 #   - figures/traits/fish_fd_map_table.csv
 #
-# LOCATION: workflows/10_traits/07_functional_trait_analysis.R
+# LOCATION: workflows/10_traits/02_functional_trait_analysis.R
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 
 library(data.table)
@@ -51,7 +51,9 @@ library(RColorBrewer)
 
 select <- dplyr::select
 
-source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
+if (!exists("WORKFLOWS_DIR"))
+  WORKFLOWS_DIR <- Sys.getenv("WORKFLOWS_CODE", "/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows")
+source(file.path(WORKFLOWS_DIR, "helpers", "config.R"))
 setwd(BASE_DIR)
 
 dir.create("figures/traits", recursive = TRUE, showWarnings = FALSE)
@@ -81,7 +83,7 @@ N_GROUPS <- 2
 # traits (Vertical_position, Migration, max_TL) stay numeric/ordered.
 nominal_traits <- c("Diet", "Habitat", "Repro", "Morph", "Mouth", "Caudal_fin")
 
-RIVER <- "#7d9bb0"   # fixed neutral colour for the stream network
+RIVER <- "grey70"   # fixed neutral colour for the stream network
 
 # Human-readable category labels for each categorical trait code.
 labels_list <- list(
@@ -247,9 +249,9 @@ p_tree <- ggplot() +
   scale_y_continuous(expand = expansion(mult = c(0.40, 0.05))) +
   labs(title = "Functional trait groups of Sarantaporos fish",
        y = "Gower dissimilarity (Ward.D2 linkage)", x = NULL) +
-  theme_void(base_size = 13) +
+  theme_minimal(base_size = 13) +
   theme(plot.background = element_rect(fill = "transparent", colour = NA),
-        # panel.grid.major.x = element_blank(),
+        panel.grid.major.x = element_blank(),
         panel.grid.minor   = element_blank(),
         axis.text.x = element_blank(),
         axis.title.y = element_text(colour = "#14323a", face = "bold"),
@@ -289,19 +291,23 @@ p_bars <- ggplot(comp, aes(x = prop, y = trait, fill = I(fill))) +
             position = position_stack(vjust = 0.5), size = 4, colour = "white",
             fontface = "bold") +
   facet_wrap(~ group, ncol = 1, scales = "free_y") +
-  scale_x_continuous(labels = scales::percent, expand = c(0, 0)) +
+  scale_x_continuous(labels = scales::percent, expand = expansion(add = c(0, 0.02))) +
   labs(title = "Trait composition per group", x = NULL, y = NULL) +
   theme_void(base_size = 14) +
   theme(plot.background = element_rect(fill = "transparent", colour = NA),
-        # panel.grid = element_blank(),
-        strip.text = element_text(face = "bold", colour = "#14323a", size = 14),
-        plot.title = element_text(face = "bold", colour = "#14323a", size = 15),
-        axis.text.y = element_text(size = 13, colour = "#14323a", face = "bold"),
-        axis.text.x = element_text(size = 10, colour = "#5d7479"))
+        #panel.grid = element_blank(),
+        #this is responsible for the right panel titles
+        strip.text = element_text(face = "bold", colour = "#14323a", size = 14,                    margin = margin(t = 4, b = 6)),
+        #this is responsible for the right panel big title
+        plot.title = element_text(face = "bold", colour = "#14323a", size = 15, hjust = 0.5),
+        axis.text.y = element_text(size = 12, colour = "#14323a", face = "bold"),
+        axis.text.x = element_text(size = 6, colour = "#5d7479"))
 
 dendro_fig <- patchwork::wrap_plots(p_tree, p_bars, widths = c(1.4, 1))
-ggsave("figures/traits/fish_trait_dendrogram.png", dendro_fig,
-       width = 11, height = 7, dpi = 300, bg = "transparent")
+png("figures/traits/fish_trait_dendrogram.png",
+    width = 3300, height = 2100, res = 300, bg = "transparent")
+print(dendro_fig)
+dev.off()
 message("  Saved: figures/traits/fish_trait_dendrogram.png")
 
 # ============================================================
@@ -395,7 +401,8 @@ wedges <- make_wedges(as.data.frame(site))
 bb <- st_bbox(basin); site_df <- as.data.frame(site)
 
 p_pie <- ggplot() +
-  geom_sf(data = basin, fill = "#eef3f1", colour = "#7a8c8a", linewidth = 0.5) +
+  # Sub-basin boundary \u2014 thin outline, no fill, for spatial context
+  geom_sf(data = basin, fill = NA, colour = "grey30", linewidth = 0.3) +
   geom_sf(data = streams, aes(linewidth = strahler), colour = RIVER, alpha = 0.9,
           lineend = "round", show.legend = FALSE) +
   scale_linewidth(range = c(0.15, 1.1)) +
@@ -419,26 +426,22 @@ p_pie <- ggplot() +
                     name = "Functional group") +
   coord_sf(xlim = c(bb["xmin"] - 0.03, bb["xmax"] + 0.03),
            ylim = c(bb["ymin"] - 0.03, bb["ymax"] + 0.03)) +
-  labs(title = "Sarantaporos fish assemblages \u2014 functional-group composition",
-       subtitle = "Stream network beneath (width = Strahler order); pies = group composition; size = richness",
-       x = "Longitude", y = "Latitude") +
   guides(fill = guide_legend(order = 1), size = guide_legend(order = 2)) +
-  theme_void(base_size = 12) +
+  theme_void(base_size = 20) +
   theme(plot.background = element_rect(fill = "transparent", colour = NA),
         panel.background = element_rect(fill = "transparent", colour = "#b8c2c1"),
-        # panel.grid = element_line(colour = "#e3e9e8"),
-        plot.title = element_text(face = "bold", colour = "#14323a",
-                                  margin = margin(b = 2)),
-        plot.subtitle = element_text(colour = "#5d7479", size = 9,
-                                     margin = margin(b = 2)),
-        plot.title.position = "plot",
         legend.position = "right",
         legend.box = "vertical",
-        legend.key = element_rect(fill = "transparent", colour = NA))
+        legend.key = element_rect(fill = "transparent", colour = NA),
+        legend.title = element_text(size = 18, face = "bold"),
+        legend.text  = element_text(size = 16),
+        legend.key.size = unit(1.1, "cm"))
 
 pie_fig <- p_pie
-ggsave("figures/traits/fish_group_pie_map.png", pie_fig,
-       width = 12, height = 10, dpi = 300, bg = "transparent")
+png("figures/traits/fish_group_pie_map.png",
+    width = 3600, height = 3000, res = 300, bg = "transparent")
+print(pie_fig)
+dev.off()
 message("  Saved: figures/traits/fish_group_pie_map.png")
 
 # ============================================================
@@ -463,7 +466,8 @@ site_fd <- occ[, .(lon = first(lon), lat = first(lat),
                    species_list = paste(sort(unique(species)), collapse = "; ")), by = Sites]
 
 p_fd <- ggplot() +
-  geom_sf(data = basin, fill = "#eef3f1", colour = "#7a8c8a", linewidth = 0.5) +
+  # Sub-basin boundary \u2014 thin outline, no fill, for spatial context
+  geom_sf(data = basin, fill = NA, colour = "grey30", linewidth = 0.3) +
   geom_sf(data = streams, aes(linewidth = strahler), colour = RIVER, alpha = 0.9,
           lineend = "round", show.legend = FALSE) +
   scale_linewidth(range = c(0.15, 1.1)) +
@@ -474,20 +478,20 @@ p_fd <- ggplot() +
   scale_size_continuous(range = c(3, 11), name = "Species richness", breaks = c(1, 4, 7)) +
   coord_sf(xlim = c(bb["xmin"] - 0.03, bb["xmax"] + 0.03),
            ylim = c(bb["ymin"] - 0.03, bb["ymax"] + 0.03)) +
-  labs(title = "Sarantaporos fish \u2014 functional diversity across sampling sites",
-       subtitle = "Stream network beneath (width = Strahler order); colour = Rao's Q; size = species richness",
-       x = "Longitude", y = "Latitude") +
   guides(fill = guide_colourbar(order = 1), size = guide_legend(order = 2)) +
-  theme_void(base_size = 12) +
+  theme_void(base_size = 20) +
   theme(plot.background = element_rect(fill = "transparent", colour = NA),
         panel.background = element_rect(fill = "transparent", colour = "#b8c2c1"),
-        # panel.grid = element_line(colour = "#e3e9e8"),
-        plot.title = element_text(face = "bold", colour = "#14323a"),
-        plot.subtitle = element_text(colour = "#5d7479", size = 9),
         legend.position = "right", legend.box = "vertical",
-        legend.key = element_rect(fill = "transparent", colour = NA))
+        legend.key = element_rect(fill = "transparent", colour = NA),
+        legend.title = element_text(size = 18, face = "bold"),
+        legend.text  = element_text(size = 16),
+        legend.key.size = unit(1.1, "cm"))
 
-ggsave("figures/traits/fish_fd_map.png", p_fd, width = 11, height = 10, dpi = 300, bg = "transparent")
+png("figures/traits/fish_fd_map.png",
+    width = 3300, height = 3000, res = 300, bg = "transparent")
+print(p_fd)
+dev.off()
 message("  Saved: figures/traits/fish_fd_map.png")
 
 # Functional-diversity table (sorted high to low) + Anguilla comparison.
