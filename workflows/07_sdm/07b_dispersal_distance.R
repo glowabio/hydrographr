@@ -16,11 +16,12 @@
 #   predictive model. Two species absent from the trait table use a congeneric
 #   surrogate, consistent with Modules 10 and 11.
 #
-# For this case study the exact sigma_mob value does not change the gap-filling
-# outcome for six of seven species: the thresholds are far larger than any gap
-# length in the network, and the single-patch species are already maximally
-# connected. sigma_mob therefore acts as a coarse "fill short gaps" threshold
-# rather than a precise dispersal estimate.
+# The exact sigma_mob value matters: it is used as an uncapped hard
+# threshold in fill_habitat_gaps(), so it directly determines how many
+# unsuitable gaps get bridged and therefore how many habitat fragments a
+# species ends up with. T_REF (above) was tuned against validated fragment
+# counts for this reason — do not change it without re-checking
+# sdm/patch_metrics/fragment_summary_all.csv against known targets.
 #
 # The predictive model extrapolates poorly for very large-bodied species
 # (Anguilla anguilla), so implausible values are capped (see SIGMA_MOB_CAP_M).
@@ -28,6 +29,7 @@
 # Inputs:
 #   points_original/fish/Fish distributional & traits data (1).xlsx  (Traits sheet)
 #   points_snapped/fish/fish_all_species_snapped.csv                 (stream order)
+#   traits/AspectRatioData.csv                     (caudal-fin aspect ratios, fishmove calibration)
 #
 # Output:
 #   traits/fish_dispersal_distance.txt   (columns: species, distance)
@@ -49,7 +51,9 @@ mutate    <- dplyr::mutate
 filter <- dplyr::filter
 pull      <- dplyr::pull
 
-source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
+if (!exists("WORKFLOWS_DIR"))
+  WORKFLOWS_DIR <- Sys.getenv("WORKFLOWS_CODE", "/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows")
+source(file.path(WORKFLOWS_DIR, "helpers", "config.R"))
 setwd(BASE_DIR)
 
 dir.create("traits", recursive = TRUE, showWarnings = FALSE)
@@ -58,7 +62,13 @@ dir.create("traits", recursive = TRUE, showWarnings = FALSE)
 # PARAMETERS
 # ============================================================
 
-T_REF      <- 3650   # 10-year dispersal window, population-level
+T_REF      <- 730    # 2-year dispersal window, individual-movement scale.
+# Was 3650 (10-year, population-level) — appropriate for the original PCI
+# ranking use case this parameterisation was carried over from, but as an
+# uncapped hard gap-fill threshold in 08_habitat_classification.R a 10-year
+# window produces implausibly large sigma_mob and over-merges habitat
+# patches. 730 days reproduces validated fragment counts for the seven
+# focal species.
 SO_DEFAULT <- 5      # fallback stream order
 
 # Cap for implausible predictive-model extrapolations. sigma_mob only sets a

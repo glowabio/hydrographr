@@ -37,8 +37,8 @@
 #   - spatial/basin/stream_network.gpkg            (reach lengths)
 #   - spatial/hfp_zonal_stats.csv
 #   - sdm/ensemble/ensemble_{species}.csv
-#   - sdm/ensemble/ensemble_thresholds.csv
-#   - sdm/habitat/habitat_{species}.csv            (binary/gap/semibinary TSS)
+#   - sdm/habitat/habitat_summary.csv              (LPT binarisation thresholds)
+#   - sdm/habitat/habitat_{species}.csv            (binary/gap/semibinary LPT)
 #   - points_snapped/dams/dams_snapped_points.csv
 #   - spatial/stream_network_graphs/river_graph_current.RDS
 #   - spatial/stream_network_graphs/river_graph_future.RDS
@@ -49,10 +49,21 @@
 #   - prioritization/summary_table.csv          (all scenarios x targets)
 #   - prioritization/comparison_30pct.csv        (current vs future, 30%)
 #   - prioritization/cost_scenario_AB_30pct.csv  (HFI vs HFI+MW)
+#   - prioritization/cost_scenario_AB_connectivity_30pct.csv  (per-species component counts, A vs B)
 #   - prioritization/sensitivity_k1_k3.csv
 #   - prioritization/boundary_penalty_calibration.csv
+#   - prioritization/forgone_hydropower_30pct.csv
+#   - prioritization/forgone_hydropower_dams_30pct.csv
 #   - prioritization/maps/priority_comparison_30pct.png
 #   - prioritization/maps/summary_selected_reaches.png
+#
+# Note: sensitivity_analyses.R (this module) is a companion script, not
+# auto-run from here -- it is meant to be sourced/pasted manually in the
+# same R session AFTER this script, since it depends on objects this script
+# leaves in the environment (pu_dat, spec_dat, puvspr_dat, bmat_current,
+# bmat_future, COMPARISON_TARGET, SOLVER_GAP, N_THREADS, BOUNDARY_PENALTY).
+# It writes its own two outputs: prioritization/boundary_penalty_sweep.csv
+# and prioritization/sensitivity_gap.csv.
 #
 # LOCATION: workflows/09_spatial_prioritization/01_spatial_prioritization.R
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
@@ -68,7 +79,9 @@ library(ggplot2)
 
 select <- dplyr::select
 
-source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
+if (!exists("WORKFLOWS_DIR"))
+  WORKFLOWS_DIR <- Sys.getenv("WORKFLOWS_CODE", "/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows")
+source(file.path(WORKFLOWS_DIR, "helpers", "config.R"))
 setwd(BASE_DIR)
 
 # ============================================================
@@ -80,7 +93,12 @@ COMPARISON_TARGET <- 0.3            # target used for the current-vs-future map
 BOUNDARY_PENALTY  <- 0.03           # calibrated via cost-connectivity trade-off (knee ~0.01-0.03; see calibration block)
 SOLVER_GAP        <- 0.001          # tightened from 0.1: gap-sensitivity showed 0.001 reproduces the proven-optimal solution (Jaccard 1.0) in ~15s
 CALIB_GAP         <- 0.1            # loose gap for the exploratory calibration loop (trend only)
-N_THREADS         <- 4
+N_THREADS         <- 1              # CBC with multiple threads + a non-zero
+# gap is not run-to-run reproducible: parallel branch-and-bound exploration
+# order isn't guaranteed identical across runs, so a different (equally
+# near-optimal, but not identical) solution can come back each time. Found
+# by re-running this script twice in a row on unchanged inputs and getting
+# different reach selections. Single-threaded is slower but deterministic.
 CONNECTIVITY_K    <- 3              # multi-hop connectivity neighbourhood
 
 TARGET_SPECIES <- c(
@@ -135,11 +153,14 @@ sdm_list <- lapply(TARGET_SPECIES, function(sp) {
 })
 names(sdm_list) <- TARGET_SPECIES
 
-# Apply TSS thresholds (semi-binary: below threshold -> 0)
-thresholds <- fread("sdm/ensemble/ensemble_thresholds.csv")
+# Apply the binarisation thresholds actually used in Module 8 (LPT, stored in
+# the threshold_lpt column of habitat_summary.csv). This previously read
+# sdm/ensemble/ensemble_thresholds.csv, which held the superseded per-model
+# max-TSS averages; that file is no longer produced (see 07_ensemble.R).
+thresholds <- fread("sdm/habitat/habitat_summary.csv")
 sdm_list <- lapply(TARGET_SPECIES, function(sp) {
   dt <- sdm_list[[sp]]; if (is.null(dt)) return(NULL)
-  thr <- thresholds[species == sp, threshold_tss]
+  thr <- thresholds[species == sp, threshold_lpt]
   if (length(thr) == 0 || is.na(thr)) return(dt)
   dt[ensemble_mean < thr, ensemble_mean := 0]
   dt
@@ -231,11 +252,19 @@ fwrite(pu_dat, "prioritization/pu_dat.csv")
 
 # ============================================================
 # STEP 3: Species-planning-unit table (puvspr_dat)
-#         Gap-filled reaches (suitable in classification but below the
-#         TSS threshold, so semibinary = 0) are assigned the species'
-#         TSS threshold value. This preserves the habitat continuity
-#         established in Module 8 (08_habitat_classification.R) inside
-#         the prioritization, instead of dropping those reaches to 0.
+#         Habitat continuity established in Module 8 is preserved here:
+#         reach suitability = semibinary_lpt, which Module 8 already sets to
+#         the reach's own ensemble probability for every reach it classified
+#         as suitable -- gap-filled reaches included. So gap-filled reaches
+#         enter the prioritization at their (sub-threshold) ensemble value
+#         rather than being dropped to 0.
+#
+#         The fallback below assigns the LPT threshold value to any reach that
+#         is binary-suitable AND gap-filled AND has semibinary == 0. In
+#         practice this never fires (semibinary is non-zero whenever binary
+#         == 1), and the run log confirms "0 gap-filled" for all 7 species;
+#         it is kept only as a guard against a Module 8 change that would
+#         zero those reaches.
 # ============================================================
 
 message("\n=== Step 3: Building species-planning-unit table ===")
@@ -251,18 +280,18 @@ puvspr_dat <- lapply(seq_along(TARGET_SPECIES), function(i) {
   }
   hab <- fread(hab_f)
 
-  thr <- thresholds[species == sp, threshold_tss]
+  thr <- thresholds[species == sp, threshold_lpt]
   if (length(thr) == 0 || is.na(thr)) thr <- 0
 
   # suitability = semibinary value, but gap-filled reaches (suitable,
   # below threshold) get the threshold value instead of 0.
-  hab[, amount := semibinary_tss]
-  hab[binary_tss == 1L & gap_filled_tss == 1L & semibinary_tss == 0,
+  hab[, amount := semibinary_lpt]
+  hab[binary_lpt == 1L & gap_filled_lpt == 1L & semibinary_lpt == 0,
       amount := thr]
 
   out <- hab[amount > 0, .(pu = subc_id, amount)]
   out[, species := i]
-  n_gap <- hab[binary_tss == 1L & gap_filled_tss == 1L & semibinary_tss == 0, .N]
+  n_gap <- hab[binary_lpt == 1L & gap_filled_lpt == 1L & semibinary_lpt == 0, .N]
   message("    ", sp, ": ", nrow(out), " suitable reaches (",
           n_gap, " gap-filled set to threshold ", thr, ")")
   out
@@ -528,6 +557,9 @@ message("  Shared: ", shared_AB,
 message("  (n_dam_reaches: selected reaches with a planned dam = conflict reaches;",
         " B should pull these DOWN by penalising high-MW reaches)")
 
+# Total boundary weight of each selection (both solved against bmat_future)
+ba <- boundary_length(sel_A, bmat_future)
+bb <- boundary_length(sel_B, bmat_future)
 cost_cmp$boundary_weight <- round(c(ba, bb), 1)
 
 fwrite(cost_cmp, "prioritization/cost_scenario_AB_30pct.csv")
@@ -731,16 +763,6 @@ lost_ids    <- comparison$id[comparison$status == "Current only"]
 dams_on_sel <- planned_dams[subc_id %in% sel_ids_cur]
 # (ii) dams on reaches dropped under the future scenario
 dams_on_lost <- planned_dams[subc_id %in% lost_ids]
-
-forgone <- data.frame(
-  definition   = c("on_priority_reach", "loses_priority_when_dammed"),
-  n_dams       = c(nrow(dams_on_sel), nrow(dams_on_lost)),
-  n_reaches    = c(uniqueN(dams_on_sel$subc_id), uniqueN(dams_on_lost$subc_id)),
-  mw_forgone   = round(c(sum(dams_on_sel$power_mw,  na.rm = TRUE),
-                         sum(dams_on_lost$power_mw, na.rm = TRUE)), 2)
-)
-print(forgone)
-fwrite(forgone, "prioritization/forgone_hydropower_30pct.csv")
 
 # named list of the dams involved, for the manuscript / SI
 message("  Planned dams on priority reaches:")

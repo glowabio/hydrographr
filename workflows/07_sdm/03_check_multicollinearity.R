@@ -1,5 +1,5 @@
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
-# 03_check_multicollinearity.R
+# 03_check_multicollinearity.R   (Module 7 -- SDM)
 #
 # Quality check and collinearity assessment of the basin prediction table.
 # Retains VIF-filtered predictor variables for use in SDM fitting.
@@ -19,6 +19,11 @@
 #   - env90m/predict_table_vif.csv   (filtered predict table)
 #   - env90m/selected_vars.csv             (retained variable names)
 #
+# Note: the Step 3 correlation matrix (corrplot()) is rendered to the active
+# graphics device only -- it is never wrapped in png()/pdf() and so is not
+# saved to disk. Fine for interactive use; produces nothing in a batch
+# Rscript run.
+#
 # LOCATION: workflows/07_sdm/03_check_multicollinearity.R
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 
@@ -30,7 +35,9 @@ library(tidyr)
 
 select <- dplyr::select
 
-source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
+if (!exists("WORKFLOWS_DIR"))
+  WORKFLOWS_DIR <- Sys.getenv("WORKFLOWS_CODE", "/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows")
+source(file.path(WORKFLOWS_DIR, "helpers", "config.R"))
 # BASE_DIR <- NIMBUS_DIR
 setwd(BASE_DIR)
 
@@ -136,7 +143,7 @@ selected_vars <- vif_results@results$Variables
 message("  Variables retained after VIF: ", length(selected_vars))
 print(selected_vars)
 
-# replace channel_elv_up_seg_mean with channel_elv_up_seg_mean for interpretability
+# replace channel_elv_up_seg_mean with channel_elv_dw_seg_mean for interpretability
 selected_vars <- gsub("channel_elv_up_seg_mean",
                       "channel_elv_dw_seg_mean",
                       selected_vars)

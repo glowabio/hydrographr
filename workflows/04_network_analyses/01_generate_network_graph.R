@@ -1,5 +1,5 @@
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
-# 01_generate_network_graph.R
+# 01_generate_network_graph.R   (Module 4 -- Network Analyses)
 # Build igraph river network from H90M subcatchments + barriers
 # TWO SCENARIOS: current (existing dam only) vs future (existing + planned)
 #
@@ -10,6 +10,18 @@
 #   n_shp > 0 as a blocking barrier. Species-specific passability
 #   (0.8 / 0.5 / 0) is applied later, at PCI computation time
 #   (Module 10 / pci script), as pass = species_passability ^ n_shp.
+#
+# INPUT:
+#   - spatial/subbasin_sarantaporos/stream_network_pruned.gpkg (Module 3)
+#   - spatial/basin/stream_network_pruned.gpkg (Module 3; reach length only,
+#       temporary fix until length is returned directly by the API)
+#   - points_snapped/dams/dams_snapped_points.csv (Module 3)
+#
+# OUTPUT:
+#   - spatial/stream_network_graphs/river_graph_current.RDS
+#   - spatial/stream_network_graphs/river_graph_future.RDS
+#
+# LOCATION: workflows/04_network_analyses/01_generate_network_graph.R
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 
 library(tidyverse)
@@ -26,7 +38,9 @@ rename   <- dplyr::rename
 group_by <- dplyr::group_by
 
 # Set working directory
-source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
+if (!exists("WORKFLOWS_DIR"))
+  WORKFLOWS_DIR <- Sys.getenv("WORKFLOWS_CODE", "/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows")
+source(file.path(WORKFLOWS_DIR, "helpers", "config.R"))
 # BASE_DIR <- NIMBUS_DIR
 setwd(BASE_DIR)
 
@@ -159,6 +173,7 @@ message("Future:  ", vcount(river_graph_future), " nodes, ",
 # ============================================================
 # SAVE
 # ============================================================
+dir.create("spatial/stream_network_graphs", recursive = TRUE, showWarnings = FALSE)
 saveRDS(river_graph_current, "spatial/stream_network_graphs/river_graph_current.RDS")
 saveRDS(river_graph_future,  "spatial/stream_network_graphs/river_graph_future.RDS")
 

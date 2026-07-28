@@ -1,5 +1,5 @@
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
-# 05_maxent.R
+# 05_maxent.R   (Module 7 -- SDM)
 #
 # Fit MaxEnt species distribution models for freshwater fish species
 # in the Vjosa/Aoos basin using the maxnet package.
@@ -97,7 +97,9 @@ compute_maxent_varimp <- function(mod, pres_data, bg_data,
   rbindlist(imp_list) %>% arrange(desc(importance))
 }
 
-source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
+if (!exists("WORKFLOWS_DIR"))
+  WORKFLOWS_DIR <- Sys.getenv("WORKFLOWS_CODE", "/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows")
+source(file.path(WORKFLOWS_DIR, "helpers", "config.R"))
 # BASE_DIR <- NIMBUS_DIR
 setwd(BASE_DIR)
 

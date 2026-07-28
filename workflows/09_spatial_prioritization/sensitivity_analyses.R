@@ -1,3 +1,18 @@
+# sensitivity_analyses.R   (Module 9 -- Spatial Prioritization)
+#
+# NOT auto-run from anywhere -- source/paste this manually in the same R
+# session right AFTER running 01_spatial_prioritization.R. It has no
+# library()/config.R bootstrap of its own because it depends on objects
+# 01_spatial_prioritization.R leaves in the environment: pu_dat, spec_dat,
+# puvspr_dat, bmat_current, bmat_future, COMPARISON_TARGET, SOLVER_GAP,
+# N_THREADS, BOUNDARY_PENALTY (plus the data.table/ggplot2/prioritizr
+# libraries 01 already loaded).
+#
+# Output:
+#   - prioritization/boundary_penalty_sweep.csv + maps/boundary_penalty_sweep.png
+#   - prioritization/sensitivity_gap.csv
+#
+# LOCATION: workflows/09_spatial_prioritization/sensitivity_analyses.R
 # ============================================================
 # SENSITIVITY: boundary penalty sweep
 #   How much does the current->future priority shift depend on the

@@ -1,5 +1,24 @@
 
-
+#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
+# 01_download_traits.R   (Module 10 -- Traits)
+#
+# Exploratory fetch of fish functional traits from freshwaterecology.info
+# via the fwtraits package. Not used by 02_functional_trait_analysis.R,
+# which reads trait values directly from the HCMR trait Excel sheet
+# instead -- this script's outputs are not currently consumed by any other
+# script in the pipeline.
+#
+# INPUT:
+#   - points_snapped/fish/fish_all_species_snapped.csv (species list)
+#   - freshwaterecology.info API (requires API key in .Renviron)
+#
+# OUTPUT:
+#   - traits/fwtraits_fish_greece.csv       (selected parameters)
+#   - traits/fwtraits_fish_greece_all.csv   (all available fish parameters)
+#   - traits/fwtraits_coverage_summary.csv
+#
+# LOCATION: workflows/10_traits/01_download_traits.R
+#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 
 # install.packages("fwtraits")
 library(fwtraits)
@@ -7,9 +26,12 @@ library(tidyverse)
 library(data.table)
 
 # Set working directory
-source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
-BASE_DIR <- BASE_DIR
+if (!exists("WORKFLOWS_DIR"))
+  WORKFLOWS_DIR <- Sys.getenv("WORKFLOWS_CODE", "/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows")
+source(file.path(WORKFLOWS_DIR, "helpers", "config.R"))
 setwd(BASE_DIR)
+
+dir.create("traits", recursive = TRUE, showWarnings = FALSE)
 
 # ============================================================
 # STEP 1: Authenticate with freshwaterecology.info
@@ -145,15 +167,3 @@ cat("\nSaved:\n")
 cat("  traits/fwtraits_fish_greece.csv (selected parameters)\n")
 cat("  traits/fwtraits_fish_greece_all.csv (all parameters)\n")
 cat("  traits/fwtraits_coverage_summary.csv\n")
-
-
-
-
-
-migration <- fw_fetchdata(data = 'Abramis brama',
-                          organismgroup = 'fi',
-                          ecoparams = 'migration',
-                          cachefolder = 'cache',
-                          warn = TRUE,
-                          inform = TRUE,
-                          details = TRUE)#the species spelling is checked

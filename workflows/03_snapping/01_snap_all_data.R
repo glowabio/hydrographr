@@ -15,16 +15,19 @@
 #   2. Snap HCMR fish, GBIF fish, dams (one call each)
 #   3. Write a snapping-check map and failed-points list per dataset
 #   4. Combine HCMR + GBIF into all_snapped_fish_points.csv
+#   5. Snap factories (powerhouses), same treatment as dams
 #
 # INPUT:
 #   - points_cleaned/fish/fish_points_to_snap_hcmr.csv   (from 01_clean_hcmr_fish.R)
 #   - points_cleaned/fish/fish_gbif_clean_to_snap.csv     (from 03_clean_gbif_fish.R)
 #   - points_cleaned/dams/dams_sarantaporos_clean.csv     (from 01_clean_dam_data.R)
+#   - points_cleaned/dams/factories_sarantaporos_clean.csv (from 01_clean_dam_data.R)
 #
 # OUTPUT:
 #   - points_snapped/fish/all_snapped_fish_points.csv     (combined HCMR + GBIF)
 #   - points_snapped/dams/dams_snapped_points.csv
-#   - points_snapped/maps/{hcmr,gbif,dams}_snapping_check.html
+#   - points_snapped/dams/factories_snapped_points.csv
+#   - points_snapped/maps/{hcmr,gbif,dams,factories}_snapping_check.html
 #   - points_cleaned/{fish,dams}/*_failed_to_snap.csv      (if any fail)
 #
 # REQUIRES: internet access (GeoFRESH snapping API).
@@ -41,7 +44,9 @@ library(sf)
 
 select <- dplyr::select
 
-source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
+if (!exists("WORKFLOWS_DIR"))
+  WORKFLOWS_DIR <- Sys.getenv("WORKFLOWS_CODE", "/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows")
+source(file.path(WORKFLOWS_DIR, "helpers", "config.R"))
 setwd(BASE_DIR)
 
 dir.create("points_snapped/fish", recursive = TRUE, showWarnings = FALSE)
@@ -144,7 +149,6 @@ hcmr_snap <- api_get_snapped_points_cascade(
   colname_site_id = "site_id",
   strahler_seq = STRAHLER_SEQ, distance_threshold = FISH_DIST_THRESHOLD
 )
-fwrite(hcmr_snap, "points_snapped/fish/hcmr_snapped_points.csv")
 
 hcmr_original <- report_snap("HCMR", hcmr_original, hcmr_snap, "site_id")
 saveWidget(make_snap_map(hcmr_original, hcmr_snap, "site_id",
@@ -166,9 +170,6 @@ gbif_snap <- api_get_snapped_points_cascade(
   colname_site_id = "gbifID",
   strahler_seq = STRAHLER_SEQ, distance_threshold = FISH_DIST_THRESHOLD
 )
-fwrite(gbif_snap, sprintf(
-  "points_snapped/fish/gbif_snapped_points_min_strahler%d_dist_thresh_%d.csv",
-  min(STRAHLER_SEQ), FISH_DIST_THRESHOLD))
 
 gbif_original <- report_snap("GBIF", gbif_original, gbif_snap, "gbifID")
 saveWidget(make_snap_map(gbif_original, gbif_snap, "gbifID",
@@ -237,7 +238,7 @@ if (sum(!dams_original$snapped) > 0) {
 
 
 # ============================================================
-# STEP 6: Snap factories (powerhouses) -- for diversion length
+# STEP 5: Snap factories (powerhouses) -- for diversion length
 # ============================================================
 # Identical cascade to dams (same DAM_DIST_THRESHOLD), so dam and factory
 # land on the network consistently and their along-network separation is

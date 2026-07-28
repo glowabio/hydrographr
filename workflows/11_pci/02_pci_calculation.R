@@ -1,5 +1,5 @@
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
-# 02_pci_calculation.R
+# 02_pci_calculation.R   (Module 11 -- PCI)
 #
 # Population Connectivity Index (PCI; Baldan et al. 2022) for the seven
 # Sarantaporos fish species, under the current (single existing dam) and
@@ -42,20 +42,20 @@
 #   spatial/stream_network_graphs/river_graph_future.RDS    (carries n_shp)
 #   points_snapped/fish/fish_all_species_snapped.csv         (species, subc_id)
 #   traits/fish_dispersal_rank.txt                                (dispersal_prob)
-#   traits/species_passability.csv                           (passability)
+#   sdm/patch_metrics/species_passability.csv                (passability, from
+#     08_habitat_fragmentation/01_habitat_fragmentation_metrics.R)
 #
 # OUTPUT
 #   connectivity/pci/pci_full.RDS        (per-species PCI, both scenarios)
 #   connectivity/pci/fi_summary.txt      (7 rows: species, PCI_cur, PCI_fut, FI)
 #
 # LOCATION
-#   workflows/<connectivity_module>/02_pci_calculation.R
+#   workflows/11_pci/02_pci_calculation.R
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 
 library(tidyverse)
 library(igraph)
 library(data.table)
-source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/pci_sparse.R")
 
 # ============================================================
 # FIX: prevent MASS::select etc. from masking dplyr verbs
@@ -65,7 +65,10 @@ rename   <- dplyr::rename
 group_by <- dplyr::group_by
 
 # Set working directory
-source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
+if (!exists("WORKFLOWS_DIR"))
+  WORKFLOWS_DIR <- Sys.getenv("WORKFLOWS_CODE", "/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows")
+source(file.path(WORKFLOWS_DIR, "helpers", "pci_sparse.R"))
+source(file.path(WORKFLOWS_DIR, "helpers", "config.R"))
 setwd(BASE_DIR)
 
 # ============================================================
@@ -90,7 +93,7 @@ occurrences <- fread("points_snapped/fish/fish_all_species_snapped.csv") %>%
 fish_dis_class <- fread("traits/fish_dispersal_rank.txt") %>%
   dplyr::filter(!is.na(dispersal_prob))
 
-passability <- fread("traits/species_passability.csv")
+passability <- fread("sdm/patch_metrics/species_passability.csv")
 
 # ============================================================
 # SPECIES LIST: occupy >= MIN_SUBCATCHMENTS, with dispersal + passability

@@ -24,8 +24,9 @@
 #
 # OUTPUT:
 #   - points_original/fish/fish_data_gbif.csv   (combined raw GBIF download)
-#   - points_original/fish/gbif_citation.txt    (GBIF download DOI)
+#   - points_original/fish/gbif_citation.txt    (one DOI per taxon download, for citation)
 #   - points_original/fish/{taxon}/...          (per-taxon extracted archives)
+#   - points_original/fish/*.zip                (raw per-taxon GBIF download archives)
 #
 # REQUIRES: GBIF credentials in environment (GBIF_USER, GBIF_PWD, GBIF_EMAIL)
 #           and internet access.
@@ -40,7 +41,9 @@ library(stringr)
 
 select <- dplyr::select
 
-source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
+if (!exists("WORKFLOWS_DIR"))
+  WORKFLOWS_DIR <- Sys.getenv("WORKFLOWS_CODE", "/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows")
+source(file.path(WORKFLOWS_DIR, "helpers", "config.R"))
 setwd(BASE_DIR)
 
 out_dir <- file.path(BASE_DIR, "points_original/fish")
@@ -168,12 +171,19 @@ out_csv  <- file.path(out_dir, "fish_data_gbif.csv")
 fwrite(combined, out_csv)
 
 # ============================================================
-# STEP 4: Save GBIF citation DOI
+# STEP 4: Save GBIF citation DOIs
 # ============================================================
 
-# DOI of the last download; cite this in the manuscript for the GBIF data.
-citation <- occ_download_meta(key)$doi
-write.table(citation, "points_original/fish/gbif_citation.txt")
+# Each taxon was submitted as its own occ_download(), so each has its own
+# DOI. Save one row per taxon; cite all of them in the manuscript.
+citations <- data.table(
+  taxon        = names(submitted),
+  download_key = unlist(submitted),
+  doi          = vapply(submitted, function(k)
+    tryCatch(occ_download_meta(k)$doi, error = \(e) NA_character_),
+    character(1))
+)
+fwrite(citations, "points_original/fish/gbif_citation.txt")
 
 # ============================================================
 # SUMMARY

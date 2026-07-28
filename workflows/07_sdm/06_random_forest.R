@@ -1,5 +1,5 @@
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
-# 06_random_forest.R
+# 06_random_forest.R   (Module 7 -- SDM)
 #
 # Fit Random Forest species distribution models for freshwater fish species
 # in the Vjosa/Aoos basin using the ranger package.
@@ -65,7 +65,9 @@ compute_mcc_threshold <- function(pres_preds, abs_preds,
 }
 
 
-source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
+if (!exists("WORKFLOWS_DIR"))
+  WORKFLOWS_DIR <- Sys.getenv("WORKFLOWS_CODE", "/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows")
+source(file.path(WORKFLOWS_DIR, "helpers", "config.R"))
 # BASE_DIR <- NIMBUS_DIR
 setwd(BASE_DIR)
 
@@ -262,16 +264,12 @@ for (sp in target_species) {
     message("  TSS (jackknife): ", round(tss, 3),
             " at threshold: ", round(best_thresh, 3))
 
-    # MCC threshold — using jackknife preds vs background preds
+    # MCC threshold — using jackknife preds vs absence preds
     mcc_result <- compute_mcc_threshold(
-      jack_preds[!is.na(jack_preds)], bg_preds
+      jack_preds[!is.na(jack_preds)], abs_preds
     )
     mcc_thresh <- mcc_result$threshold
     mcc_val    <- mcc_result$mcc
-    message("  MCC threshold: ", round(mcc_thresh, 3),
-            " | MCC: ", round(mcc_val, 3))
-    mcc_thresh  <- mcc_result$threshold
-    mcc_val     <- mcc_result$mcc
     message("  MCC threshold: ", round(mcc_thresh, 3),
             " | MCC: ", round(mcc_val, 3))
 
@@ -334,7 +332,7 @@ for (sp in target_species) {
             " at threshold: ", round(best_thresh, 3))
 
     # MCC threshold
-    mcc_result <- compute_mcc_threshold(test_preds, bg_preds)
+    mcc_result <- compute_mcc_threshold(test_preds, abs_preds)
     mcc_thresh <- mcc_result$threshold
     mcc_val    <- mcc_result$mcc
     message("  MCC threshold: ", round(mcc_thresh, 3),

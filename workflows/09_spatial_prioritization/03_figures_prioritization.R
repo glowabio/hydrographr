@@ -45,7 +45,6 @@ if (!exists("WORKFLOWS_DIR"))
   WORKFLOWS_DIR <- Sys.getenv("WORKFLOWS_CODE", "/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows")
 source(file.path(WORKFLOWS_DIR, "helpers", "config.R"))
 setwd(BASE_DIR)
-
 dir.create("prioritization/maps", recursive = TRUE, showWarnings = FALSE)
 
 # ============================================================
@@ -76,7 +75,7 @@ BASE_SIZE   <- 16
 SIZE_TITLE    <- 15
 SIZE_SUBTITLE <- 10
 SIZE_LEG_TTL  <- 13
-SIZE_LEG_TXT  <- 12
+SIZE_LEG_TXT  <- 9
 LEG_KEY_CM    <- 0.6
 
 COL_NETWORK   <- "grey55"
@@ -207,11 +206,11 @@ p1 <- ggplot(bar_long,
                     breaks = c("Isolated", "Dewatered")) +
   labs(
     x = "Planned dam (location, reach)",
-    y = "Connectivity + dewatering damage per MW",
-    title = "Planned dams ranked by habitat damage per MW",
-    subtitle = paste0("Damage = summed SDM suitability of isolated (upstream) ",
-                      "and dewatered (downstream 2 km) reaches\n",
-                      if (!is.null(offscale_note)) paste0(offscale_note) else "")
+    y = "Connectivity + dewatering damage per MW"#,
+    # title = "Planned dams ranked by habitat damage per MW",
+    # subtitle = paste0("Damage = summed SDM suitability of isolated (upstream) ",
+    #                   "and dewatered (downstream 2 km) reaches\n",
+    #                   if (!is.null(offscale_note)) paste0(offscale_note) else "")
   ) +
   # bar chart keeps theme_bw (it needs axes) but takes the shared sizing
   theme_bw(base_size = BASE_SIZE) +
@@ -284,10 +283,10 @@ if (nrow(dam_sf_off) > 0) {
 }
 
 p2 <- p2 +
-  labs(title = "Planned-dam habitat damage across the Sarantaporos network",
-       subtitle = paste0("Point size and colour = summed isolated + ",
-                         "dewatered SDM suitability ",
-                         "(outlet dam shown off-scale)")) +
+  # labs(title = "Planned-dam habitat damage across the Sarantaporos network",
+  #      subtitle = paste0("Point size and colour = summed isolated + ",
+  #                        "dewatered SDM suitability ",
+  #                        "(outlet dam shown off-scale)")) +
   theme_map_prio()
 
 png("prioritization/maps/fig2_dam_damage_map.png",
@@ -335,13 +334,13 @@ p3 <- ggplot() +
           shape = 21, colour = "black", stroke = 0.5, size = 4) +
   scale_colour_manual(values = status_cols, name = "Priority status",
                       aesthetics = c("colour", "fill")) +
-  labs(
-    title = "Priority reaches: current vs future barrier scenario (30% target)",
-    subtitle = paste0("Vermillion = priority only without planned dams (lost once ",
-                      "dams sever connectivity); blue = priority only under future ",
-                      "dams.\nPoints = dams, coloured by the priority status of ",
-                      "their reach")
-  ) +
+  # labs(
+  #   title = "Priority reaches: current vs future barrier scenario (30% target)",
+  #   subtitle = paste0("Vermillion = priority only without planned dams (lost once ",
+  #                     "dams sever connectivity); blue = priority only under future ",
+  #                     "dams.\nPoints = dams, coloured by the priority status of ",
+  #                     "their reach")
+  # ) +
   theme_map_prio()
 
 

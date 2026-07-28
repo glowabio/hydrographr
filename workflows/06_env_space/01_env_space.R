@@ -1,9 +1,13 @@
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 # 01_env_space.R   (Module 6 -- Species in Environmental Space)
 #
-# Self-contained, descriptive module: shows how species occurrences are
-# distributed across a small set of environmental gradients, BEFORE any
-# modelling (Module 7). Runs independently of the SDM scripts.
+# Descriptive module: shows how species occurrences are distributed across
+# a small set of environmental gradients, BEFORE any modelling (Module 7).
+# Designed to run independently of the SDM scripts -- but as currently
+# written, Steps 0-2 (download/build/rescale) are commented out and the
+# table is read from a cached copy (see Step 1 below); a genuinely fresh
+# run needs those steps re-enabled once, or `env90m/env_space_table.csv`
+# copied in from elsewhere.
 #
 # It builds its OWN environmental table for five descriptor variables
 # (distinct filename from the SDM predict table to avoid confusion),
@@ -45,7 +49,9 @@ library(patchwork)
 
 select <- dplyr::select
 
-source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
+if (!exists("WORKFLOWS_DIR"))
+  WORKFLOWS_DIR <- Sys.getenv("WORKFLOWS_CODE", "/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows")
+source(file.path(WORKFLOWS_DIR, "helpers", "config.R"))
 setwd(BASE_DIR)
 
 dir.create("figures/env_space", recursive = TRUE, showWarnings = FALSE)
@@ -172,6 +178,15 @@ env_space_file <- "env90m/env_space_table.csv"   # distinct from SDM predict_tab
 #
 # fwrite(env_tbl, env_space_file)
 # message("  Saved rescaled table: ", env_space_file)
+
+# Steps 0-2 above (download + build + rescale) are commented out: this
+# table was already built once and is being read from cache to avoid
+# re-downloading on every run. On a fresh BASE_DIR without this file,
+# uncomment Steps 0-2 (or run 07_sdm/02_create_prediction_table.R first,
+# whose predict_table.csv rescaling this block mirrors) before rerunning.
+if (!file.exists(env_space_file))
+  stop(env_space_file, " not found. Steps 0-2 (download/build/rescale) are ",
+       "commented out above and must be run at least once to create it.")
 
 env_tbl <- fread(env_space_file)
 

@@ -6,29 +6,35 @@
 # subbasin.
 #
 # Approach:
-#   TSS threshold applied directly to ENSEMBLE predictions (primary analysis).
+#   LPT threshold applied directly to ENSEMBLE predictions (primary analysis).
 #   MCC threshold applied as sensitivity analysis (Hellegers et al. 2025).
 #   No IDW applied at this stage — if a specific species requires
 #   spatial constraining after visual inspection, IDW can be applied
 #   selectively in a separate step.
 #
-# Workflow per species (run twice: once for TSS, once for MCC):
+# Workflow per species (run twice: once for LPT, once for MCC):
 #   1. Apply threshold to ensemble predictions
 #   2. Fill short unsuitable gaps using fill_habitat_gaps() with sigma_mob
 #   3. Remove isolated single suitable reaches (no suitable neighbours)
 #   4. Output binary (0/1) and semi-binary (0 or ensemble prob) versions
 #
 # Threshold:
-#   Two methods following Hellegers et al. (2025):
-#   - TSS: species-specific mean of MaxEnt + RF + SSN thresholds
-#          (SSN included for Alburnoides and Barbus only, where models
-#           converged without separation; MaxEnt + RF only for all other species)
-#   - MCC: same approach
+#   - LPT (primary): Lowest Presence Threshold — the minimum ensemble
+#          suitability predicted at any occurrence site of that species,
+#          so 100% of its known occurrences are retained (Pearson et al.
+#          2007). One uniform criterion applied to every species, computed
+#          on the ENSEMBLE prediction rather than per-model.
+#          NOTE: the columns/files below are named *_lpt for this reason.
+#          The per-model max-TSS values (thresh_maxent_tss, thresh_rf_tss,
+#          thresh_ssn_tss) are still read and reported as model evaluation
+#          statistics, but no longer set the binarisation threshold.
+#   - MCC (sensitivity, Hellegers et al. 2025): species-specific mean of
+#          the MaxEnt + RF (+ SSN for Alburnoides and Barbus) thresholds.
 #   Note: SSN thresholds are in-sample (fitted values), while MaxEnt and RF
 #         thresholds are out-of-sample (held-out test data)
 #
 # Output gpkgs:
-#   - stream_network_habitat_tss.gpkg: primary analysis (TSS threshold)
+#   - stream_network_habitat_lpt.gpkg: primary analysis (LPT threshold)
 #   - stream_network_habitat_mcc.gpkg: sensitivity analysis (MCC threshold)
 #   Each has 4 columns per species: bin_, semi_, gap_, isol_
 #
@@ -46,15 +52,14 @@
 #   - sdm/ssn_models/model_summary.csv  (SSN thresholds for Alburnoides + Barbus)
 #   - traits/fish_dispersal_distance.txt
 #   - points_original/fish/species_list_sarantaporos.txt
-#   - spatial/basin/stream_network_pruned.gpkg  (for reach length)
 #
 # Output:
 #   - sdm/habitat/habitat_{species}.csv
 #     columns: subc_id, ens_prob,
-#              binary_tss, semibinary_tss, gap_filled_tss, isolated_removed_tss,
+#              binary_lpt, semibinary_lpt, gap_filled_lpt, isolated_removed_lpt,
 #              binary_mcc, semibinary_mcc, gap_filled_mcc, isolated_removed_mcc
 #   - sdm/habitat/habitat_summary.csv
-#   - spatial/subbasin_sarantaporos/stream_network_habitat_tss.gpkg  (primary)
+#   - spatial/subbasin_sarantaporos/stream_network_habitat_lpt.gpkg  (primary)
 #   - spatial/subbasin_sarantaporos/stream_network_habitat_mcc.gpkg  (sensitivity)
 #
 # LOCATION: workflows/07_sdm/08_habitat_classification.R
@@ -68,7 +73,9 @@ library(hydrographr)
 
 select <- dplyr::select
 
-source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
+if (!exists("WORKFLOWS_DIR"))
+  WORKFLOWS_DIR <- Sys.getenv("WORKFLOWS_CODE", "/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows")
+source(file.path(WORKFLOWS_DIR, "helpers", "config.R"))
 # BASE_DIR <- NIMBUS_DIR
 setwd(BASE_DIR)
 
@@ -135,7 +142,8 @@ cat("NAs in edge length:", sum(is.na(edge_length)), "\n")
 
 
 
-# TSS + MCC thresholds — mean of MaxEnt + RF per species
+# Per-model max-TSS + MCC thresholds read in below (max-TSS is reported as a
+# model evaluation statistic only; the binarisation threshold is LPT, see below)
 # SSN excluded (RMSPE not comparable to AUC/TSS/MCC)
 maxent_eval <- fread("sdm/maxent_models/maxent_evaluation.csv") %>%
   select(species,
@@ -153,16 +161,27 @@ ssn_eval <- fread("sdm/ssn_models/model_summary.csv") %>%
          thresh_ssn_tss = best_threshold_tss,
          thresh_ssn_mcc = best_threshold_mcc)
 
-tss_thresholds <- maxent_eval %>%
+# LPT threshold: Lowest Presence Threshold (LPT) on the ENSEMBLE prediction —
+# the minimum ensemble suitability at any occurrence site, applied uniformly
+# per species (retains 100% of occurrences; Pearson et al. 2007). This
+# replaces the earlier per-model max-TSS average: max-TSS on ~5-point holdouts
+# was unstable at these small sample sizes and produced biologically
+# implausible extents. LPT is a single, uniform, reproducible criterion across
+# species. (The per-model max-TSS values above are still reported as model
+# evaluation; they are no longer used to set the binarisation threshold.)
+lpt_threshold <- function(sp) {
+  occ <- fread(file.path("sdm/input/occurr", sp, paste0("occurr_", sp, ".csv")))
+  ens <- fread(file.path("sdm/ensemble", paste0("ensemble_", sp, ".csv")))
+  pres_ids <- occ$subc_id[occ$pres_abs == 1]
+  pv <- ens$ensemble_mean[match(pres_ids, ens$subc_id)]
+  round(min(pv, na.rm = TRUE), 3)
+}
+
+lpt_thresholds <- maxent_eval %>%
   left_join(rf_eval, by = "species") %>%
   left_join(ssn_eval, by = "species") %>%
   mutate(
-    threshold_tss = case_when(
-      !is.na(thresh_ssn_tss) ~
-        round((thresh_maxent_tss + thresh_rf_tss + thresh_ssn_tss) / 3, 3),
-      TRUE ~
-        round((thresh_maxent_tss + thresh_rf_tss) / 2, 3)
-    ),
+    threshold_lpt = vapply(species, lpt_threshold, numeric(1)),
     threshold_mcc = case_when(
       !is.na(thresh_ssn_mcc) ~
         round((thresh_maxent_mcc + thresh_rf_mcc + thresh_ssn_mcc) / 3, 3),
@@ -170,6 +189,8 @@ tss_thresholds <- maxent_eval %>%
         round((thresh_maxent_mcc + thresh_rf_mcc) / 2, 3)
     )
   )
+# SUPERSEDED — the previous binarisation rule (per-model max-TSS average),
+# kept for reference only. Replaced by the LPT rule above; see the note there.
 # tss_thresholds <- maxent_eval %>%
 #   left_join(rf_eval, by = "species") %>%
 #   mutate(
@@ -178,8 +199,8 @@ tss_thresholds <- maxent_eval %>%
 #   )
 
 cat("\nSpecies-specific thresholds:\n")
-print(tss_thresholds %>%
-        select(species, thresh_maxent_tss, thresh_rf_tss, threshold_tss,
+print(lpt_thresholds %>%
+        select(species, thresh_maxent_tss, thresh_rf_tss, threshold_lpt,
                thresh_maxent_mcc, thresh_rf_mcc, threshold_mcc))
 
 # Dispersal distances (sigma_mob) per species
@@ -212,18 +233,18 @@ for (sp in target_species) {
   message(paste(rep("=", 50), collapse = ""))
 
   # Get species-specific thresholds
-  sp_thresh <- tss_thresholds %>% filter(species == sp)
+  sp_thresh <- lpt_thresholds %>% filter(species == sp)
 
-  if (nrow(sp_thresh) == 0 || is.na(sp_thresh$threshold_tss)) {
+  if (nrow(sp_thresh) == 0 || is.na(sp_thresh$threshold_lpt)) {
     message("  WARNING: No thresholds found — using 0.5 for both")
-    sp_threshold_tss <- 0.5
+    sp_threshold_lpt <- 0.5
     sp_threshold_mcc <- 0.5
   } else {
-    sp_threshold_tss <- sp_thresh$threshold_tss
+    sp_threshold_lpt <- sp_thresh$threshold_lpt
     sp_threshold_mcc <- sp_thresh$threshold_mcc
   }
 
-  message("  Threshold TSS: ", sp_threshold_tss)
+  message("  Threshold LPT: ", sp_threshold_lpt)
   message("  Threshold MCC: ", sp_threshold_mcc)
 
   # Get sigma_mob
@@ -293,8 +314,8 @@ for (sp in target_species) {
     )
   }
 
-  message("  --- TSS ---")
-  res_tss <- run_classification(sp_threshold_tss, "TSS")
+  message("  --- LPT ---")
+  res_lpt <- run_classification(sp_threshold_lpt, "LPT")
 
   message("  --- MCC ---")
   res_mcc <- run_classification(sp_threshold_mcc, "MCC")
@@ -303,14 +324,14 @@ for (sp in target_species) {
   sp_habitat <- network_dt %>%
     select(subc_id, ens_prob = all_of(ens_col)) %>%
     mutate(
-      # TSS threshold
-      binary_tss           = as.integer(
-        as.character(subc_id) %in% res_tss$suitable_final),
-      semibinary_tss        = ifelse(binary_tss == 1, ens_prob, 0),
-      gap_filled_tss        = as.integer(
-        as.character(subc_id) %in% res_tss$gap_filled_ids),
-      isolated_removed_tss  = as.integer(
-        as.character(subc_id) %in% res_tss$isolated),
+      # LPT threshold
+      binary_lpt           = as.integer(
+        as.character(subc_id) %in% res_lpt$suitable_final),
+      semibinary_lpt        = ifelse(binary_lpt == 1, ens_prob, 0),
+      gap_filled_lpt        = as.integer(
+        as.character(subc_id) %in% res_lpt$gap_filled_ids),
+      isolated_removed_lpt  = as.integer(
+        as.character(subc_id) %in% res_lpt$isolated),
 
       # MCC threshold
       binary_mcc           = as.integer(
@@ -329,13 +350,13 @@ for (sp in target_species) {
 
   habitat_summary[[sp]] <- data.frame(
     species          = sp,
-    threshold_tss    = sp_threshold_tss,
+    threshold_lpt    = sp_threshold_lpt,
     threshold_mcc    = sp_threshold_mcc,
     sigma_mob_m      = round(sigma_mob),
-    n_suitable_tss   = res_tss$n_final,
-    n_gap_tss        = res_tss$n_gap_filled,
-    n_isol_tss       = res_tss$n_isolated,
-    length_km_tss    = res_tss$length_km,
+    n_suitable_lpt   = res_lpt$n_final,
+    n_gap_lpt        = res_lpt$n_gap_filled,
+    n_isol_lpt       = res_lpt$n_isolated,
+    length_km_lpt    = res_lpt$length_km,
     n_suitable_mcc   = res_mcc$n_final,
     n_gap_mcc        = res_mcc$n_gap_filled,
     n_isol_mcc       = res_mcc$n_isolated,
@@ -360,7 +381,7 @@ message("  Saved: sdm/habitat/habitat_summary.csv")
 
 message("\n=== Step 4: Joining to network gpkgs ===")
 
-network_tss <- network_sf
+network_lpt <- network_sf
 network_mcc <- network_sf
 
 for (sp in target_species) {
@@ -370,16 +391,16 @@ for (sp in target_species) {
 
   hab <- fread(hab_file)
 
-  # TSS columns
-  hab_tss <- hab %>%
+  # LPT columns
+  hab_lpt <- hab %>%
     select(
       subc_id,
-      !!paste0("bin_",  sp) := binary_tss,
-      !!paste0("semi_", sp) := semibinary_tss,
-      !!paste0("gap_",  sp) := gap_filled_tss,
-      !!paste0("isol_", sp) := isolated_removed_tss
+      !!paste0("bin_",  sp) := binary_lpt,
+      !!paste0("semi_", sp) := semibinary_lpt,
+      !!paste0("gap_",  sp) := gap_filled_lpt,
+      !!paste0("isol_", sp) := isolated_removed_lpt
     )
-  network_tss <- network_tss %>% left_join(hab_tss, by = "subc_id")
+  network_lpt <- network_lpt %>% left_join(hab_lpt, by = "subc_id")
 
   # MCC columns
   hab_mcc <- hab %>%
@@ -395,11 +416,11 @@ for (sp in target_species) {
   message("  Joined: ", sp)
 }
 
-# Save TSS gpkg — primary analysis
-st_write(network_tss,
-         "spatial/subbasin_sarantaporos/stream_network_habitat_tss.gpkg",
+# Save LPT gpkg — primary analysis
+st_write(network_lpt,
+         "spatial/subbasin_sarantaporos/stream_network_habitat_lpt.gpkg",
          delete_dsn = TRUE)
-message("  Saved: spatial/subbasin_sarantaporos/stream_network_habitat_tss.gpkg (primary)")
+message("  Saved: spatial/subbasin_sarantaporos/stream_network_habitat_lpt.gpkg (primary)")
 
 # Save MCC gpkg — sensitivity analysis
 st_write(network_mcc,
@@ -417,7 +438,7 @@ message("\n", paste(rep("=", 60), collapse = ""))
 message("HABITAT CLASSIFICATION COMPLETE")
 message(paste(rep("=", 60), collapse = ""))
 message("\nTwo threshold methods (Hellegers et al. 2025):")
-message("  TSS — primary analysis: stream_network_habitat_tss.gpkg")
+message("  LPT — primary analysis: stream_network_habitat_lpt.gpkg")
 message("  MCC — sensitivity analysis: stream_network_habitat_mcc.gpkg")
 message("\nGap filling: sigma_mob per species",
         ifelse(!is.null(MAX_GAP_M),
@@ -428,6 +449,6 @@ message("Note: IDW not applied — apply selectively per species if needed")
 message("\nOutputs:")
 message("  sdm/habitat/habitat_{species}.csv")
 message("  sdm/habitat/habitat_summary.csv")
-message("  spatial/subbasin_sarantaporos/stream_network_habitat_tss.gpkg  (primary)")
+message("  spatial/subbasin_sarantaporos/stream_network_habitat_lpt.gpkg  (primary)")
 message("  spatial/subbasin_sarantaporos/stream_network_habitat_mcc.gpkg  (sensitivity)")
-message("\nNext: 10_patch_metrics.R")
+message("\nNext: 08_habitat_fragmentation module")

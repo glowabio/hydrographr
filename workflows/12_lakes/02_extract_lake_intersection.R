@@ -20,7 +20,7 @@
 # INPUT:
 #   - spatial/basin/stream_network_pruned.gpkg                    (stream network)
 #   - points_snapped/fish/all_snapped_fish_points.csv
-#   - lakes/swot_lakes.gpkg              (SWOT prior lake DB; manual download
+#   - lakes/swot_lakes/swot_lakes.gpkg   (SWOT prior lake DB; manual download
 #       from https://hydroweb.next.theia-land.fr/ -- place here before running)
 #   - spatial/{segment,accumulation,basin}_h20v04.tif   (from 01_)
 #
@@ -28,6 +28,7 @@
 #   - lakes/lake_id.txt                             (all lake IDs in bbox)
 #   - lakes/lake_intersections/coord_lake_<id>.txt  (intersection points)
 #   - lakes/lake_intersections/lake_<id>.tif
+#   - lakes/lake_intersections/outlets_<id>.gpkg    (lake outlet point, read by 03_)
 #
 # REQUIRES: GuidosToolbox Workbench (GWB) installed locally.
 #
@@ -38,7 +39,9 @@ library(hydrographr)
 library(sf)
 library(data.table)
 
-source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
+if (!exists("WORKFLOWS_DIR"))
+  WORKFLOWS_DIR <- Sys.getenv("WORKFLOWS_CODE", "/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows")
+source(file.path(WORKFLOWS_DIR, "helpers", "config.R"))
 setwd(BASE_DIR)
 
 dir.create("lakes/lake_intersections", recursive = TRUE, showWarnings = FALSE)

@@ -1,5 +1,5 @@
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
-# 03_extract_subbasin.R
+# 03_extract_subbasin.R   (Module 3 -- Snapping)
 #
 # Extract the target basin and subbasin networks for connectivity and
 # SDM analysis.
@@ -49,6 +49,7 @@
 #   - points_snapped/basin/fish_sdm_basin.csv
 #   - points_snapped/subbasin_sarantaporos/fish_sdm_subbasin.csv
 #   - points_snapped/subbasin_sarantaporos/species_coverage_summary.csv
+#   - figures/sarantaporos_map_prunning.png                (pruning QA figure)
 #
 # LOCATION: workflows/03_snapping/03_extract_subbasin.R
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
@@ -62,7 +63,9 @@ library(ggplot2)
 
 select <- dplyr::select
 
-source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
+if (!exists("WORKFLOWS_DIR"))
+  WORKFLOWS_DIR <- Sys.getenv("WORKFLOWS_CODE", "/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows")
+source(file.path(WORKFLOWS_DIR, "helpers", "config.R"))
 setwd(BASE_DIR)
 
 # ============================================================
@@ -262,8 +265,8 @@ message("  Fish records in subbasin: ", nrow(fish_subbasin),
         " (", n_distinct(fish_subbasin$species), " species)")
 message("  Dams in subbasin: ", nrow(dams_subbasin))
 if (nrow(dams_subbasin) > 0) {
-  message("  Dams by phase:")
-  print(table(dams_subbasin$phase))
+  message("  Dams by status:")
+  print(table(dams_subbasin$status))
 }
 
 fwrite(fish_subbasin, "points_snapped/subbasin_sarantaporos/fish_subbasin.csv")
@@ -465,6 +468,7 @@ outlet_sf <- st_sf(
 )
 
 library(patchwork)
+library(ggspatial)
 
 # --- MAIN: Sarantaporos sub-basin only ---
 p_main <- ggplot() +
@@ -530,6 +534,7 @@ p_final <- p_main +
 
 p_final
 
+dir.create("figures", recursive = TRUE, showWarnings = FALSE)
 png("figures/sarantaporos_map_prunning.png", width = 9, height = 8, units = "in", res = 200)
 print(p_final); dev.off()
 

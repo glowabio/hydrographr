@@ -1,5 +1,5 @@
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
-# 03b_prepare_sdm_data.R
+# 03b_prepare_sdm_data.R   (Module 7 -- SDM)
 #
 # Prepare species-level presence/absence datasets for SSN and SDM modeling.
 #
@@ -37,7 +37,9 @@ library(sf)
 
 select <- dplyr::select
 
-source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
+if (!exists("WORKFLOWS_DIR"))
+  WORKFLOWS_DIR <- Sys.getenv("WORKFLOWS_CODE", "/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows")
+source(file.path(WORKFLOWS_DIR, "helpers", "config.R"))
 # BASE_DIR <- NIMBUS_DIR
 setwd(BASE_DIR)
 
@@ -45,7 +47,7 @@ setwd(BASE_DIR)
 # PARAMETERS
 # ============================================================
 
-TARGET_PREVALENCE <- 0.1
+TARGET_PREVALENCE <- 0.5
 set.seed(42)
 
 # ============================================================

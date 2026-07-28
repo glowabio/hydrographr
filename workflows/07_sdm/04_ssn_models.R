@@ -1,5 +1,5 @@
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
-# 04_ssn_models.R
+# 04_ssn_models.R   (Module 7 -- SDM)
 #
 # Fit Spatial Stream Network (SSN) models for freshwater fish species
 # distribution in the Vjosa/Aoos basin.
@@ -36,7 +36,7 @@
 #   - spatial/basin/stream_network_pruned.gpkg
 #   - sdm/input/occurr/{species}/occurr_{species}.csv  (from 03b)
 #   - spatial/basin/basin_subc_ids_pruned.csv
-#   - points_snapped/subbasin/subbasin_subc_ids_pruned.csv
+#   - spatial/subbasin_sarantaporos/subbasin_subc_ids_pruned.csv
 #   - env90m/predict_table.csv
 #   - points_original/fish/species_list_sarantaporos.txt
 #
@@ -45,6 +45,10 @@
 #   - sdm/ssn_models/ssn_{species}.rds
 #   - sdm/ssn_models/torgegram_{species}.png
 #   - sdm/ssn_models/model_summary.csv
+#   - sdm/ssn_models/ssn_coefficients.csv       (fixed-effect coefficients + SEs)
+#   - sdm/ssn_models/ssn_model_fit.csv          (AIC/AICc/BIC/pseudo-R2)
+#   - sdm/ssn_models/ssn_covariance_params.csv  (tailup/taildown/euclid params)
+#   - sdm/ssn_models/ssn_loocv.csv              (leave-one-out RMSPE)
 #   - sdm/predictions/pred_{species}.csv       (full basin)
 #   - spatial/subbasin_sarantaporos/stream_network_predictions.gpkg  (subbasin only)
 #
@@ -80,8 +84,10 @@ compute_mcc_threshold <- function(pres_preds, abs_preds,
 
 select <- dplyr::select
 
-source("~/Documents/PhD/scripts/hydrographr/workflows/helpers/save_to_nimbus.R")
-source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
+if (!exists("WORKFLOWS_DIR"))
+  WORKFLOWS_DIR <- Sys.getenv("WORKFLOWS_CODE", "/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows")
+source(file.path(WORKFLOWS_DIR, "helpers", "save_to_nimbus.R"))
+source(file.path(WORKFLOWS_DIR, "helpers", "config.R"))
 # BASE_DIR <- NIMBUS_DIR
 setwd(BASE_DIR)
 
@@ -113,8 +119,16 @@ OCCURR_DIR <- "sdm/input/occurr"
 target_species <- fread("points_original/fish/species_list_sarantaporos.txt") %>%
   pull(species) %>% unique()
 
-message("Target species (", length(target_species), "):")
-for (sp in target_species) message("  ", sp)
+# Chondrostoma ohridanum has only 6 presences, which causes complete
+# separation (near-zero residual deviance, coefficient SEs > 1e6) and
+# produces a degenerate, uninterpretable fit rather than a real model —
+# excluded from SSN fitting entirely, not just from the ensemble.
+ssn_species <- target_species[target_species != "Chondrostoma_ohridanum" &
+                                target_species != "Chondrostoma_ohridana"]
+
+message("Target species (", length(ssn_species), " of ", length(target_species),
+        " — Chondrostoma ohridanum excluded, complete separation):")
+for (sp in ssn_species) message("  ", sp)
 
 # ============================================================
 # STEP 1: Load basin stream network + predict table
@@ -247,7 +261,7 @@ message("  Most downstream edge AFV (should be ~1.0): ",
 
 ssn_results <- list()
 
-for (sp in target_species) {
+for (sp in ssn_species) {
 
   message("\n", paste(rep("=", 60), collapse = ""))
   message("  SPECIES: ", sp)
@@ -683,13 +697,6 @@ results_summary <- lapply(names(ssn_results), function(sp) {
 print(results_summary)
 fwrite(results_summary, "sdm/ssn_models/model_summary.csv")
 message("  Saved: sdm/ssn_models/model_summary.csv")
-
-target_species <- fread("points_original/fish/species_list_sarantaporos.txt") %>%
-  pull(species) %>% unique()
-
-# Exclude Chondrostoma — SSN not fitted
-ssn_species <- target_species[target_species != "Chondrostoma_ohridanum" &
-                                target_species != "Chondrostoma_ohridana"]
 
 coef_list  <- list()
 fit_list   <- list()

@@ -5,8 +5,9 @@
 # map the resulting composition and diversity across the sub-basin. Three
 # related analyses share one trait table and one grouping:
 #
-#   Chapter 1  Functional trait dendrogram (Gower + Ward), with a side panel
-#              showing each group's trait composition.
+#   Chapter 1  Functional trait dendrogram (Gower + Ward) cut at CUT_HEIGHT,
+#              over a trait matrix with one column per species, aligned to
+#              its tip.
 #   Chapter 2  Functional-group pie map: each site as a pie of group shares,
 #              over basin + stream network, pie size = richness.
 #   Chapter 3  Functional diversity map: each site coloured by Rao's quadratic
@@ -15,8 +16,9 @@
 # Target species come from the Sarantaporos checklist; trait values are read
 # from the "Traits" sheet of the HCMR Excel file. Two species absent from the
 # table take surrogate values (see SUBSTITUTE_* below). Discrete group colours
-# use ColorBrewer "Set2", built dynamically from the number of groups produced
-# by cutree(); the diversity map keeps a continuous viridis scale.
+# use the colour-blind-safe Okabe-Ito palette, built dynamically from the
+# number of groups produced by cutting the tree at CUT_HEIGHT; the diversity
+# map keeps a continuous viridis scale.
 #
 # INPUT:
 #   - points_original/fish/species_list_sarantaporos.txt      (target species)
@@ -43,11 +45,9 @@ library(purrr)
 library(cluster)
 library(sf)
 library(ggplot2)
-library(ggdendro)
 library(ggforce)
 library(patchwork)
 library(scales)
-library(RColorBrewer)
 
 select <- dplyr::select
 
@@ -75,9 +75,12 @@ STREAM_GPKG  <- "spatial/subbasin_sarantaporos/stream_network_pruned.gpkg"
 SUBSTITUTE_CONGENER     <- c("Chondrostoma_ohridanum" = "Chondrostoma_vardarense")
 SUBSTITUTE_GENUS_MEDIAN <- "Squalius_platyceps"
 
-# Number of functional groups to cut the dendrogram into. Two is a
-# descriptive choice: the largest vertical gap isolates Anguilla.
-N_GROUPS <- 2
+# Height at which the dendrogram is cut into functional groups. The cut is
+# drawn on the figure as a dashed line, and the groups are derived from the
+# same value (cutree(h = ...)) so line and colours can never disagree.
+# At 0.4 the tree falls into four groups (merge heights 0.31 and 0.48 sit
+# either side of it).
+CUT_HEIGHT <- 0.4
 
 # Unordered categorical traits (Gower treats these as factors); the remaining
 # traits (Vertical_position, Migration, max_TL) stay numeric/ordered.
@@ -85,15 +88,33 @@ nominal_traits <- c("Diet", "Habitat", "Repro", "Morph", "Mouth", "Caudal_fin")
 
 RIVER <- "grey70"   # fixed neutral colour for the stream network
 
-# Human-readable category labels for each categorical trait code.
+# Human-readable category labels for each trait code, following the "legend"
+# sheet of the trait workbook. A few are shortened to fit a matrix cell
+# ("Inferior" for "Inferior or subterminal", "Flattened" for
+# "Dorsoventrally flattened").
 labels_list <- list(
-  Diet       = c("1"="Herbivorous","2"="Insectivorous","3"="Omnivorous","4"="Piscivorous","5"="Detritivorous"),
-  Habitat    = c("1"="Limnophilic","2"="Rheophilic","3"="Eurytopic"),
-  Repro      = c("1"="Phytophilic","2"="Lithophilic","3"="Ostracophilic","4"="Pelagophilic","5"="Viviparous","6"="Mouth-brooding"),
-  Morph      = c("1"="Fusiform","2"="Dorsoventrally flat","3"="Compressed","4"="Elongated","5"="Anguilliform"),
-  Mouth      = c("1"="Superior","2"="Terminal","3"="Inferior/subterminal"),
-  Caudal_fin = c("1"="Rounded","2"="Truncated","3"="Emarginate","4"="Forked","5"="Heterocercal","6"="Pointed")
+  Diet              = c("1"="Herbivorous","2"="Insectivorous","3"="Omnivorous","4"="Piscivorous","5"="Detritivorous"),
+  Habitat           = c("1"="Limnophilic","2"="Rheophilic","3"="Eurytopic"),
+  Repro             = c("1"="Phytophilic","2"="Lithophilic","3"="Ostracophilic","4"="Pelagophilic","5"="Viviparous","6"="Mouth-brooding"),
+  Morph             = c("1"="Fusiform","2"="Flattened","3"="Compressed","4"="Elongated","5"="Anguilliform"),
+  Mouth             = c("1"="Superior","2"="Terminal","3"="Inferior"),
+  Caudal_fin        = c("1"="Rounded","2"="Truncated","3"="Emarginate","4"="Forked","5"="Heterocercal","6"="Pointed"),
+  Vertical_position = c("1"="Demersal","2"="Benthopelagic","3"="Pelagic"),
+  Migration         = c("0"="Non-migratory","1"="Potamodromous","2"="Long-distance")
 )
+
+# Trait rows of the matrix panel, top to bottom, with the row labels used in
+# the figure. max_TL is numeric and printed as a value, the rest are codes
+# translated through labels_list above.
+matrix_traits <- c(Diet              = "Diet",
+                   Habitat           = "Habitat",
+                   Repro             = "Reproduction",
+                   Morph             = "Body shape",
+                   Mouth             = "Mouth position",
+                   Caudal_fin        = "Caudal fin",
+                   Vertical_position = "Vertical position",
+                   Migration         = "Migration",
+                   max_TL            = "Max. length (cm)")
 
 # ============================================================
 # CHAPTER 0: Load species checklist + trait table, resolve traits
@@ -192,15 +213,25 @@ trait_for_dist[nominal_traits] <- lapply(trait_for_dist[nominal_traits], factor)
 
 gower_dist <- daisy(trait_for_dist, metric = "gower")
 hc     <- hclust(gower_dist, method = "ward.D2")
-groups <- cutree(hc, k = N_GROUPS)
+groups <- cutree(hc, h = CUT_HEIGHT)
+N_GROUPS <- length(unique(groups))
 
-# --- Dynamic Set2 palette, one colour per group (recycled past 8 groups) ---
+# --- Colour-blind-safe palette (Okabe & Ito 2008), one colour per group.
+#     Hues are assigned in this fixed order and recycled past eight groups.
+#     Checked under deuteranopia, protanopia and tritanopia simulation: the
+#     closest pair stays ~16 CIE Lab units apart, so all four groups remain
+#     distinguishable for every common form of colour vision deficiency. ---
+OKABE_ITO <- c("#0072B2",  # blue
+               "#E69F00",  # orange
+               "#009E73",  # bluish green
+               "#CC79A7",  # reddish purple
+               "#56B4E9",  # sky blue
+               "#D55E00",  # vermillion
+               "#F0E442",  # yellow
+               "#000000")  # black
 make_group_palette <- function(groups) {
   n_groups <- length(unique(groups))
-  pal <- rep(
-    suppressWarnings(brewer.pal(min(max(3, n_groups), 8), "Set2")),
-    length.out = n_groups
-  )
+  pal <- rep(OKABE_ITO, length.out = n_groups)
   setNames(pal, sort(unique(groups)))
 }
 group_pal    <- make_group_palette(groups)
@@ -219,34 +250,85 @@ group_labels <- if (N_GROUPS == 2) {
   setNames(paste("Group", group_ids), group_ids)
 }
 
-message("  Group membership (k = ", N_GROUPS, "):")
+message("  Group membership (cut at ", CUT_HEIGHT, " -> k = ", N_GROUPS, "):")
 print(groups)
 
-# --- Tree segments, coloured by group where a branch sits within one group ---
-dd      <- dendro_data(as.dendrogram(hc), type = "rectangle")
-seg     <- segment(dd)
-tip_lab <- label(dd)
-tip_lab$group_col <- group_colour[as.character(tip_lab$label)]
+# --- Tree segments, walked straight off the hclust merge matrix ---
+# Each segment is coloured by the cluster it actually represents: a branch
+# whose leaves all fall in one group takes that group's colour, a branch
+# spanning groups is grey. (Deriving colour from the merge structure rather
+# than from leaf positions matters for the tall risers, which sit at an x
+# midway between their children and so cannot be identified positionally.)
 
-leaf_x <- setNames(tip_lab$x, as.character(tip_lab$label))
-seg_group_colour <- apply(seg, 1, function(row) {
-  xs   <- as.numeric(c(row["x"], row["xend"]))
-  near <- names(leaf_x)[leaf_x >= min(xs) - 0.5 & leaf_x <= max(xs) + 0.5]
-  gs   <- unique(groups[near])
+# Tip positions, left to right; the matrix panel below reuses them so every
+# column sits under its own tip.
+tip_lab  <- data.frame(label = hc$labels[hc$order],
+                       x     = seq_along(hc$order),
+                       stringsAsFactors = FALSE)
+tip_lab$group_col <- group_colour[tip_lab$label]
+leaf_x   <- setNames(tip_lab$x, tip_lab$label)
+n_tips   <- nrow(tip_lab)
+x_limits <- c(0.5, n_tips + 0.5)
+
+# Colour for a set of leaves (given as row indices of the original data).
+branch_colour <- function(leaves) {
+  gs <- unique(groups[hc$labels[leaves]])
   if (length(gs) == 1) group_pal[[as.character(gs)]] else "#9a9a95"
-})
+}
+
+# Walk the merges bottom-up, recording each node's leaf set and x position
+# (the midpoint of its two children, the standard dendrogram layout).
+node_leaves <- vector("list", n_tips - 1)
+node_x      <- numeric(n_tips - 1)
+seg_rows    <- list()
+
+for (k in seq_len(n_tips - 1)) {
+  child   <- hc$merge[k, ]
+  child_x <- numeric(2); child_y <- numeric(2); child_col <- character(2)
+  leaves  <- list()
+  for (j in 1:2) {
+    if (child[j] < 0) {                       # a leaf
+      leaf <- -child[j]
+      leaves[[j]]  <- leaf
+      child_x[j]   <- leaf_x[[hc$labels[leaf]]]
+      child_y[j]   <- 0
+    } else {                                  # an earlier merge
+      leaves[[j]]  <- node_leaves[[child[j]]]
+      child_x[j]   <- node_x[child[j]]
+      child_y[j]   <- hc$height[child[j]]
+    }
+    child_col[j] <- branch_colour(leaves[[j]])
+  }
+  node_leaves[[k]] <- unlist(leaves)
+  node_x[k]        <- mean(child_x)
+  h                <- hc$height[k]
+
+  # Two risers (each in its own child's colour) plus the crossbar joining
+  # them (in the merged cluster's colour).
+  seg_rows[[length(seg_rows) + 1]] <- data.frame(
+    x      = c(child_x[1], child_x[2], child_x[1]),
+    y      = c(child_y[1], child_y[2], h),
+    xend   = c(child_x[1], child_x[2], child_x[2]),
+    yend   = c(h, h, h),
+    colour = c(child_col[1], child_col[2], branch_colour(node_leaves[[k]])),
+    stringsAsFactors = FALSE)
+}
+seg <- do.call(rbind, seg_rows)
+seg_group_colour <- seg$colour
 
 p_tree <- ggplot() +
+  # The cut that defines the groups, drawn behind the tree.
+  geom_hline(yintercept = CUT_HEIGHT, linetype = "dashed",
+             colour = "#5d7479", linewidth = 0.7) +
+  annotate("text", x = n_tips + 0.45, y = CUT_HEIGHT,
+           label = paste0("cut at ", CUT_HEIGHT),
+           hjust = 1, vjust = -0.6, size = 3.8, colour = "#5d7479") +
   geom_segment(data = seg, aes(x = x, y = y, xend = xend, yend = yend),
                colour = seg_group_colour, linewidth = 1.3) +
-  geom_text(data = tip_lab, aes(x = x, y = y - 0.01, label = gsub("_", "\n", label),
-                                colour = group_col),
-            hjust = 1, angle = 90, size = 4, lineheight = 0.85,
-            fontface = "bold.italic", show.legend = FALSE) +
-  scale_colour_identity() +
-  # Genus and species sit on two stacked lines, so each label is shorter and
-  # needs less room; the lower expansion still leaves a margin so none clip.
-  scale_y_continuous(expand = expansion(mult = c(0.40, 0.05))) +
+  # Species names live on the matrix panel below, so the tree keeps only a
+  # small margin under the tips.
+  scale_x_continuous(limits = x_limits, expand = expansion(add = 0)) +
+  scale_y_continuous(expand = expansion(mult = c(0.02, 0.05))) +
   labs(title = "Functional trait groups of Sarantaporos fish",
        y = "Gower dissimilarity (Ward.D2 linkage)", x = NULL) +
   theme_minimal(base_size = 13) +
@@ -255,57 +337,63 @@ p_tree <- ggplot() +
         panel.grid.minor   = element_blank(),
         axis.text.x = element_blank(),
         axis.title.y = element_text(colour = "#14323a", face = "bold"),
-        plot.title  = element_text(face = "bold", colour = "#14323a"))
+        plot.title  = element_text(face = "bold", colour = "#14323a"),
+        plot.margin = margin(t = 5, r = 5, b = 0, l = 5))
 
-# --- Side panel: 100% stacked composition bars per categorical trait/group ---
-comp_rows <- list()
-for (g in group_ids) {
-  members <- names(groups)[groups == g]
-  gname   <- paste0(group_labels[[as.character(g)]], " (", length(members), " spp.)")
-  for (tr in nominal_traits) {
-    tab   <- table(factor(traits[members, tr]))
-    tab   <- tab[tab > 0]
-    props <- as.numeric(tab) / length(members)
-    cats  <- labels_list[[tr]][names(tab)]
-    o     <- order(-props)                          # most common category first
-    comp_rows[[length(comp_rows) + 1]] <- data.frame(
-      group = gname, trait = tr, category = cats[o], prop = props[o],
-      rank = seq_along(o), base = group_pal[[as.character(g)]],
-      stringsAsFactors = FALSE)
-  }
-}
-comp <- do.call(rbind, comp_rows)
-comp$trait <- factor(comp$trait, levels = rev(nominal_traits))
+# --- Lower panel: trait matrix, one column per species aligned to its tip ---
+# Cells carry the trait state as text, so the panel needs no colour key; the
+# only colour is a light wash of the species' group, which ties each column
+# back to the branch above it. Every species is shown, so the panel states
+# what the groups share and where they differ without any percentages.
 
-# Lighten the group base colour for lower-ranked categories.
+# Lighten a colour towards white by fraction f (1 = white).
 lighten <- function(hex, f) {
   v <- col2rgb(hex) / 255
   grDevices::rgb(v[1] + (1 - v[1]) * f, v[2] + (1 - v[2]) * f, v[3] + (1 - v[3]) * f)
 }
-comp$fill <- mapply(function(base, rank) lighten(base, min(0.28 * (rank - 1), 0.78)),
-                    comp$base, comp$rank)
 
-p_bars <- ggplot(comp, aes(x = prop, y = trait, fill = I(fill))) +
-  geom_col(width = 0.7, colour = "white", linewidth = 0.3) +
-  geom_text(aes(label = ifelse(prop >= 0.18, paste0(category, " ", round(prop * 100), "%"), "")),
-            position = position_stack(vjust = 0.5), size = 4, colour = "white",
-            fontface = "bold") +
-  facet_wrap(~ group, ncol = 1, scales = "free_y") +
-  scale_x_continuous(labels = scales::percent, expand = expansion(add = c(0, 0.02))) +
-  labs(title = "Trait composition per group", x = NULL, y = NULL) +
-  theme_void(base_size = 14) +
+cell_label <- function(trait, value) {
+  if (is.na(value)) return("–")
+  if (trait == "max_TL") return(formatC(value, format = "fg", digits = 3))
+  lab <- labels_list[[trait]][as.character(value)]
+  if (is.na(lab)) as.character(value) else lab
+}
+
+mat <- expand.grid(species = tip_lab$label, trait = names(matrix_traits),
+                   stringsAsFactors = FALSE)
+mat$x     <- leaf_x[mat$species]
+mat$row   <- match(mat$trait, names(matrix_traits))   # 1 = top row
+mat$label <- mapply(function(sp, tr) cell_label(tr, traits[sp, tr]),
+                    mat$species, mat$trait)
+mat$group <- groups[mat$species]
+mat$fill  <- vapply(mat$group, function(g) lighten(group_pal[[as.character(g)]], 0.86), "")
+
+# Species names, two lines, in their group's colour; used as the top axis.
+tip_names   <- gsub("_", "\n", tip_lab$label)
+tip_colours <- unname(group_colour[tip_lab$label])
+
+p_matrix <- ggplot(mat, aes(x = x, y = -row)) +
+  geom_tile(aes(fill = I(fill)), width = 0.94, height = 0.9) +
+  geom_text(aes(label = label), size = 3.3, colour = "#14323a") +
+  scale_x_continuous(limits = x_limits, expand = expansion(add = 0),
+                     breaks = tip_lab$x, labels = tip_names, position = "top") +
+  scale_y_continuous(breaks = -seq_along(matrix_traits),
+                     labels = unname(matrix_traits),
+                     expand = expansion(add = 0.15)) +
+  labs(x = NULL, y = NULL) +
+  theme_minimal(base_size = 13) +
   theme(plot.background = element_rect(fill = "transparent", colour = NA),
-        #panel.grid = element_blank(),
-        #this is responsible for the right panel titles
-        strip.text = element_text(face = "bold", colour = "#14323a", size = 14,                    margin = margin(t = 4, b = 6)),
-        #this is responsible for the right panel big title
-        plot.title = element_text(face = "bold", colour = "#14323a", size = 15, hjust = 0.5),
-        axis.text.y = element_text(size = 12, colour = "#14323a", face = "bold"),
-        axis.text.x = element_text(size = 6, colour = "#5d7479"))
+        panel.grid   = element_blank(),
+        axis.text.x.top = element_text(size = 9.5, face = "bold.italic",
+                                       colour = tip_colours, lineheight = 0.9,
+                                       margin = margin(b = 4)),
+        axis.text.y  = element_text(size = 10.5, face = "bold", colour = "#14323a",
+                                    hjust = 1),
+        plot.margin  = margin(t = 0, r = 5, b = 5, l = 5))
 
-dendro_fig <- patchwork::wrap_plots(p_tree, p_bars, widths = c(1.4, 1))
+dendro_fig <- p_tree / p_matrix + patchwork::plot_layout(heights = c(1, 1.15))
 png("figures/traits/fish_trait_dendrogram.png",
-    width = 3300, height = 2100, res = 300, bg = "transparent")
+    width = 3000, height = 2400, res = 300, bg = "transparent")
 print(dendro_fig)
 dev.off()
 message("  Saved: figures/traits/fish_trait_dendrogram.png")

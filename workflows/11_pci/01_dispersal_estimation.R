@@ -1,5 +1,5 @@
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
-# 01_dispersal_estimation.R
+# 01_dispersal_estimation.R   (Module 11 -- PCI)
 #
 # Assign a species-specific dispersal probability to each of the seven
 # Sarantaporos fish species, for use as the dispersal parameter in the
@@ -49,7 +49,7 @@
 #              dispersal_prob, source
 #
 # LOCATION
-#   workflows/<connectivity_module>/01_dispersal_estimation.R
+#   workflows/11_pci/01_dispersal_estimation.R
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 
 library(tidyverse)
@@ -64,8 +64,9 @@ rename   <- dplyr::rename
 group_by <- dplyr::group_by
 
 # Set working directory
-source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
-BASE_DIR <- "/home/grigoropoulou/Documents/Postdoc/projects/workflow_paper/data"
+if (!exists("WORKFLOWS_DIR"))
+  WORKFLOWS_DIR <- Sys.getenv("WORKFLOWS_CODE", "/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows")
+source(file.path(WORKFLOWS_DIR, "helpers", "config.R"))
 setwd(BASE_DIR)
 
 # ============================================================

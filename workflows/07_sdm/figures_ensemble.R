@@ -1,21 +1,22 @@
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
-# 07c_ensemble_prediction_map.R
+# figures_ensemble.R   (Module 7 -- SDM, figures)
 # Workflow paper (Paper 1) — Module 7 figure
 #
 # Produces two figures:
 #   Figure main  — 7-panel grid, one per species, reaches coloured by
 #                  ensemble_mean probability (continuous, viridis)
-#                  Grey reaches = below TSS threshold (unsuitable)
-#   Figure supp  — same but binary (suitable/unsuitable) using TSS threshold
+#                  Grey reaches = below LPT threshold (unsuitable)
+#   Figure supp  — same but binary (suitable/unsuitable) using LPT threshold
 #
 # READS:
 #   sdm/ensemble/ensemble_<species>.csv   (subc_id, ensemble_mean, ...)
-#   sdm/ensemble/ensemble_thresholds.csv  (species, threshold_tss)
+#   sdm/habitat/habitat_summary.csv       (species, threshold_lpt)
 #   spatial/subbasin_sarantaporos/stream_network_pruned.gpkg
 #
 # WRITES:
-#   figures/sdm/fig_ensemble_continuous.png   (main, 173 mm wide)
-#   figures/sdm/fig_ensemble_binary.png       (supplement)
+#   figures/sdm/fig_ensemble_continuous.png        (main, 173 mm wide)
+#   figures/sdm/fig_ensemble_binary.png            (supplement)
+#   figures/sdm/fig_barbus_prespensis_habitat.png  (bonus: single-species standalone figure)
 #
 # Species (7): Alburnoides_prespensis, Barbus_prespensis,
 #              Chondrostoma_ohridanum, Anguilla_anguilla,
@@ -29,7 +30,9 @@ library(ggplot2)
 library(patchwork)
 library(scales)      # label_number for legend
 
-source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
+if (!exists("WORKFLOWS_DIR"))
+  WORKFLOWS_DIR <- Sys.getenv("WORKFLOWS_CODE", "/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows")
+source(file.path(WORKFLOWS_DIR, "helpers", "config.R"))
 setwd(BASE_DIR)
 
 dir.create("figures/sdm", recursive = TRUE, showWarnings = FALSE)
@@ -69,9 +72,13 @@ network_sf <- st_read("spatial/subbasin_sarantaporos/stream_network_pruned.gpkg"
   st_transform(4326)
 message("  ", nrow(network_sf), " reaches loaded.")
 
-# ── load TSS thresholds ──────────────────────────────────────────────────────
-thresholds <- fread("sdm/ensemble/ensemble_thresholds.csv")
-# expects columns: species, threshold_tss
+# ── load LPT thresholds ──────────────────────────────────────────────────────
+# Read the LPT thresholds actually applied by 08_habitat_classification.R
+# (habitat_summary.csv), so the figure matches the analysis rather than the
+# older per-model max-TSS average that used to live in ensemble_thresholds.csv
+# (that file is no longer produced).
+thresholds <- fread("sdm/habitat/habitat_summary.csv")
+# expects columns: species, threshold_lpt
 
 # ── shared map theme ─────────────────────────────────────────────────────────
 theme_map_sdm <- function(base_size = 8) {
@@ -94,7 +101,7 @@ make_panel_continuous <- function(sp) {
   }
 
   dt  <- fread(f)
-  thr <- thresholds[species == sp, threshold_tss]
+  thr <- thresholds[species == sp, threshold_lpt]
   if (length(thr) == 0 || is.na(thr)) thr <- 0
 
   # join predictions to network
@@ -129,7 +136,7 @@ make_panel_binary <- function(sp) {
   if (!file.exists(f)) return(NULL)
 
   dt  <- fread(f)
-  thr <- thresholds[species == sp, threshold_tss]
+  thr <- thresholds[species == sp, threshold_lpt]
   if (length(thr) == 0 || is.na(thr)) thr <- 0
 
   net <- network_sf %>%
@@ -187,7 +194,7 @@ message("Assembling continuous figure...")
 p_cont <- wrap_plots(panels_cont, ncol = 4) +
   plot_annotation(
     title    = "Ensemble SDM predictions — Sarantaporos sub-basin",
-    subtitle = "Reaches coloured by ensemble probability (grey = below TSS threshold)",
+    subtitle = "Reaches coloured by ensemble probability (grey = below LPT threshold)",
     theme    = theme(
       plot.title    = element_text(size = 9,  face = "bold", hjust = 0.5),
       plot.subtitle = element_text(size = 7.5, colour = "grey40", hjust = 0.5)
@@ -217,7 +224,7 @@ message("Assembling binary figure...")
 
 p_bin <- wrap_plots(panels_bin, ncol = 4) +
   plot_annotation(
-    title    = "Ensemble SDM predictions — suitable habitat (TSS threshold)",
+    title    = "Ensemble SDM predictions — suitable habitat (LPT threshold)",
     subtitle = "Green = suitable reaches · Grey = unsuitable",
     theme    = theme(
       plot.title    = element_text(size = 9,  face = "bold", hjust = 0.5),
@@ -247,7 +254,7 @@ message("\nBuilding Barbus prespensis standalone figure...")
 sp_barbus <- "Barbus_prespensis"
 dt_barbus <- fread(file.path("sdm/ensemble",
                              paste0("ensemble_", sp_barbus, ".csv")))
-thr_barbus <- thresholds[species == sp_barbus, threshold_tss]
+thr_barbus <- thresholds[species == sp_barbus, threshold_lpt]
 if (length(thr_barbus) == 0 || is.na(thr_barbus)) thr_barbus <- 0
 
 net_barbus <- network_sf %>%
@@ -277,7 +284,7 @@ p_barbus <- ggplot() +
   labs(
     title    = expression(italic("Barbus prespensis") ~ "— suitable habitat"),
     subtitle = paste0("Sarantaporos sub-basin · ", n_suit, " reaches suitable (",
-                      pct_suit, "%) · grey = below TSS threshold")
+                      pct_suit, "%) · grey = below LPT threshold")
   ) +
   theme_void(base_size = 9) +
   theme(

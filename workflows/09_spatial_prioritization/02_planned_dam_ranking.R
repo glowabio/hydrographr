@@ -1,5 +1,5 @@
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
-# 02_planned_dam_ranking.R   (Module 11 -- Planned-dam ranking)
+# 02_planned_dam_ranking.R   (Module 9 -- Planned-dam ranking)
 #
 # Ranks planned dams by the connectivity damage each causes, expressed
 # per MW of forgone energy. Damage = summed SDM habitat suitability
@@ -23,7 +23,6 @@
 #   - prioritization/pu_dat.csv              (planning units, length_km)
 #   - spatial/stream_network_graphs/river_graph_current.RDS
 #   - points_snapped/dams/dams_snapped_points.csv
-#   - points_cleaned/dams/dams_sarantaporos_clean.gpkg
 #
 # Output:
 #   - prioritization/planned_dam_ranking.csv
@@ -39,8 +38,10 @@ library(hydrographr)
 
 select <- dplyr::select
 
-source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/save_to_nimbus.R")
-source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
+if (!exists("WORKFLOWS_DIR"))
+  WORKFLOWS_DIR <- Sys.getenv("WORKFLOWS_CODE", "/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows")
+source(file.path(WORKFLOWS_DIR, "helpers", "save_to_nimbus.R"))
+source(file.path(WORKFLOWS_DIR, "helpers", "config.R"))
 setwd(BASE_DIR)
 
 message("\n", paste(rep("=", 80), collapse = ""))

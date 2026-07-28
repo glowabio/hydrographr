@@ -1,5 +1,5 @@
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
-# 07_ensemble.R
+# 07_ensemble.R   (Module 7 -- SDM)
 #
 # Combine SSN, MaxEnt and Random Forest predictions into an ensemble
 # species distribution model for freshwater fish in the Sarantaporos subbasin.
@@ -20,6 +20,9 @@
 #   - spatial/subbasin_sarantaporos/subbasin_subc_ids_pruned.csv
 #   - spatial/subbasin_sarantaporos/stream_network_pruned.gpkg
 #   - points_original/fish/species_list_sarantaporos.txt
+#   - sdm/ssn_models/model_summary.csv             (SSN predictions)
+#   - sdm/maxent_models/maxent_evaluation.csv       (MaxEnt thresholds)
+#   - sdm/rf_models/rf_evaluation.csv               (RF thresholds)
 #
 # Output:
 #   - sdm/ensemble/ensemble_{species}.csv          (full basin)
@@ -35,7 +38,9 @@ library(sf)
 
 select <- dplyr::select
 
-source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
+if (!exists("WORKFLOWS_DIR"))
+  WORKFLOWS_DIR <- Sys.getenv("WORKFLOWS_CODE", "/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows")
+source(file.path(WORKFLOWS_DIR, "helpers", "config.R"))
 # BASE_DIR <- NIMBUS_DIR
 setwd(BASE_DIR)
 
@@ -270,43 +275,19 @@ st_write(network,
 message("  Saved: spatial/subbasin_sarantaporos/stream_network_ensemble.gpkg")
 
 
-## Ensemble threshold
-ssn_eval <- fread("sdm/ssn_models/model_summary.csv") %>%
-  filter(species %in% SSN_SPECIES) %>%
-  select(species,
-         thresh_ssn_tss = best_threshold_tss,
-         thresh_ssn_mcc = best_threshold_mcc)
-
-maxent_eval <- fread("sdm/maxent_models/maxent_evaluation.csv") %>%
-  select(species,
-         thresh_maxent_tss = best_threshold_tss,
-         thresh_maxent_mcc = best_threshold_mcc)
-
-rf_eval <- fread("sdm/rf_models/rf_evaluation.csv") %>%
-  select(species,
-         thresh_rf_tss = best_threshold_tss,
-         thresh_rf_mcc = best_threshold_mcc)
-
-# For SSN species: mean of 3 models; for others: mean of 2
-ensemble_thresholds <- maxent_eval %>%
-  left_join(rf_eval, by = "species") %>%
-  left_join(ssn_eval, by = "species") %>%
-  mutate(
-    threshold_tss = case_when(
-      species %in% SSN_SPECIES ~
-        round((thresh_maxent_tss + thresh_rf_tss + thresh_ssn_tss) / 3, 3),
-      TRUE ~
-        round((thresh_maxent_tss + thresh_rf_tss) / 2, 3)
-    ),
-    threshold_mcc = case_when(
-      species %in% SSN_SPECIES ~
-        round((thresh_maxent_mcc + thresh_rf_mcc + thresh_ssn_mcc) / 3, 3),
-      TRUE ~
-        round((thresh_maxent_mcc + thresh_rf_mcc) / 2, 3)
-    )
-  )
-
-fwrite(ensemble_thresholds, "sdm/ensemble/ensemble_thresholds.csv")
+## Ensemble threshold — REMOVED (was: sdm/ensemble/ensemble_thresholds.csv)
+#
+# This script used to average the per-model max-TSS / MCC thresholds into
+# ensemble_thresholds.csv. That file is no longer produced or read by anything:
+# binarisation now uses the Lowest Presence Threshold (LPT), computed on the
+# ensemble prediction in 08_habitat_classification.R and written to
+# sdm/habitat/habitat_summary.csv (column threshold_lpt), which is what
+# 08_habitat_classification.R, figures_ensemble.R and Module 9 all read.
+#
+# It was removed because it kept holding stale max-TSS values that looked
+# authoritative: Module 9 was still reading it after the switch to LPT.
+# The per-model max-TSS values themselves remain available as model evaluation
+# statistics in maxent_evaluation.csv / rf_evaluation.csv / model_summary.csv.
 
 
 # ============================================================

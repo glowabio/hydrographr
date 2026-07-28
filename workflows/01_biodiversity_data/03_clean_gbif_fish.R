@@ -27,7 +27,6 @@
 #   - config/study_area_params.csv              (BASIN_ID, from script 01)
 #
 # OUTPUT:
-#   - points_original/fish/fish_data_gbif_fixed.csv  (CSV-repaired raw)
 #   - points_cleaned/fish/fish_gbif_clean.csv        (cleaned, basin only)
 #   - points_cleaned/fish/fish_gbif_clean_to_snap.csv (unique locs for snapping)
 #   - points_cleaned/maps/gbif_fish_cleaned_overview.html
@@ -46,6 +45,7 @@ library(rfishbase)
 library(readr)
 library(leaflet)
 library(htmlwidgets)
+library(hydrographr)
 
 # danubeoccurR provides check_species_name() for Step 6 (GBIF taxonomy
 # validation). Install from GitHub only if missing, so the script does not
@@ -57,7 +57,9 @@ library(danubeoccurR)
 
 select <- dplyr::select
 
-source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
+if (!exists("WORKFLOWS_DIR"))
+  WORKFLOWS_DIR <- Sys.getenv("WORKFLOWS_CODE", "/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows")
+source(file.path(WORKFLOWS_DIR, "helpers", "config.R"))
 setwd(BASE_DIR)
 
 dir.create("points_original/fish", recursive = TRUE, showWarnings = FALSE)
@@ -125,7 +127,6 @@ if (length(prob_rows) > 0) {
 }
 unlink(temp_file)
 
-fwrite(gbif_clean, "points_original/fish/fish_data_gbif_fixed.csv")
 message(sprintf("\nCSV fixing complete: %d clean rows retained", nrow(gbif_clean)))
 
 # ============================================================
@@ -402,7 +403,6 @@ message(sprintf("  Latitude: %.2f to %.2f",
                 max(gbif_cleaned$decimalLatitude)))
 
 message("\nFiles created:")
-message("  - points_original/fish/fish_data_gbif_fixed.csv")
 message("  - points_cleaned/fish/fish_gbif_clean.csv")
 message("  - points_cleaned/fish/fish_gbif_clean_to_snap.csv")
 message("  - points_cleaned/maps/gbif_fish_cleaned_overview.html")

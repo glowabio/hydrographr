@@ -43,7 +43,7 @@
 #   Group C fragment counts are STRUCTURAL and uniform across species:
 #   every dam is treated as a cut, regardless of the species' ability to
 #   pass it. The species-specific passability (0.8 / 0.5 / 0; see below)
-#   enters only the population-level connectivity (PCI) step in Module 10.
+#   enters only the population-level connectivity (PCI) step in Module 11.
 #   For Salmo farioides and Anguilla anguilla (passability 0.8) the
 #   structural fragment counts therefore represent a worst case relative
 #   to their actual movement ability, but they still lose habitat in the
@@ -56,14 +56,14 @@
 #   Oxynoemacheilus pindus, Squalius platyceps        -> 0.0
 #
 # Prerequisite scripts:
-#   01b_extract_sarantaporos_subbasin.R               (Sarantaporos subc_ids)
+#   03_snapping/03_extract_subbasin.R                 (Sarantaporos subc_ids)
 #   04_network_analyses/01_generate_network_graph.R   (scenario graphs)
-#   06_sdm/08_habitat_classification.R                (bin_ columns in habitat gpkg)
+#   07_sdm/08_habitat_classification.R                (bin_ columns in habitat gpkg)
 #
 # Inputs:
 #   spatial/subbasin_sarantaporos/subbasin_subc_ids_pruned.csv
 #   spatial/subbasin_sarantaporos/stream_network_pruned.gpkg  (reach lengths)
-#   spatial/subbasin/stream_network_habitat_tss.gpkg          (SDM predictions)
+#   spatial/subbasin_sarantaporos/stream_network_habitat_lpt.gpkg  (SDM predictions)
 #   spatial/stream_network_graphs/river_graph_current.RDS
 #   spatial/stream_network_graphs/river_graph_future.RDS
 #   points_snapped/dams/dams_snapped_points.csv
@@ -84,8 +84,10 @@ library(dplyr)
 
 select <- dplyr::select
 
-source("~/Documents/Postdoc/code/workflow_paper/helpers/save_to_nimbus.R")
-source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
+if (!exists("WORKFLOWS_DIR"))
+  WORKFLOWS_DIR <- Sys.getenv("WORKFLOWS_CODE", "/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows")
+source(file.path(WORKFLOWS_DIR, "helpers", "save_to_nimbus.R"))
+source(file.path(WORKFLOWS_DIR, "helpers", "config.R"))
 # BASE_DIR <- NIMBUS_DIR
 setwd(BASE_DIR)
 
@@ -124,7 +126,7 @@ DAM_BUFFER_DOWN_M <- 2000   # downstream: dewatered reach (run-of-river)
 MIN_PATCH_REACHES <- 2L
 
 # Threshold method for SDM habitat classification
-THRESHOLD_METHOD <- "tss"
+THRESHOLD_METHOD <- "lpt"
 
 # ============================================================
 # SETUP
@@ -206,7 +208,7 @@ message("  Sarantaporos reaches: ", length(sarantaporos_ids))
 E(network_g)$weight <- E(network_g)$length
 
 # Load SDM habitat predictions and join bin_ columns to network_dt.
-hab_gpkg <- paste0("spatial/subbasin/stream_network_habitat_",
+hab_gpkg <- paste0("spatial/subbasin_sarantaporos/stream_network_habitat_",
                    THRESHOLD_METHOD, ".gpkg")
 message("  Loading SDM predictions from: ", hab_gpkg)
 
@@ -321,11 +323,12 @@ get_fragments <- function(scenario_graph, suitable_ids_chr) {
 
 message("\n=== Step 5: Group B — Dam impact buffers ===")
 
-network_sf_buf <- network_sf %>%
-  left_join(
-    network_dt %>% select(subc_id, length = reach_length_m),
-    by = "subc_id"
-  )
+# network_sf already carries its own `length` column (from the habitat
+# gpkg). Re-joining network_dt$reach_length_m under the same name used to
+# be needed before the habitat gpkg carried length itself; now it just
+# collides (dplyr suffixes both to length.x/length.y), which breaks
+# get_buffer_along_the_network()'s exact-name check below.
+network_sf_buf <- network_sf
 
 message("  Computing buffers for ", nrow(dams_future),
         " dams (future scenario — worst case) ...")
@@ -821,15 +824,3 @@ message("Scenario graphs: river_graph_current.RDS / river_graph_future.RDS")
 message("\nNOTE — structural fragmentation (Group C) is uniform across species:")
 message("  every dam is a cut. Species passability (0.8/0.5/0) enters only PCI.")
 message("\nNext: 02_habitat_fragmentation_figures.R")
-
-
-
-for (sp in TARGET_SPECIES) {
-  bin_col <- paste0("bin_", sp)
-  suitable_ids <- habitat_dt %>% filter(.data[[bin_col]] == 1L) %>% pull(subc_id) %>% as.character()
-  subg <- induced_subgraph(network_g, V(network_g)[name %in% suitable_ids]) %>% as.undirected()
-  comps <- components(subg, mode = "weak")
-  sizes <- table(comps$membership)
-  cat(sprintf("%-26s raw: %2d | kept(>=2): %2d | single-reach dropped: %d\n",
-              sp, comps$no, sum(sizes >= 2), sum(sizes == 1)))
-}

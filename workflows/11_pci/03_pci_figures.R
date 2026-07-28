@@ -1,5 +1,5 @@
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
-# 03_pci_figures.R
+# 03_pci_figures.R   (Module 11 -- PCI)
 #
 # Figures for the Population Connectivity Index results (seven Sarantaporos
 # fish species):
@@ -31,7 +31,7 @@
 #   connectivity/pci/fig_pci_panel.pdf
 #
 # LOCATION
-#   workflows/<connectivity_module>/03_pci_figures.R
+#   workflows/11_pci/03_pci_figures.R
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 library(tidyverse)
 library(data.table)
@@ -44,8 +44,9 @@ select   <- dplyr::select
 rename   <- dplyr::rename
 group_by <- dplyr::group_by
 # Set working directory
-source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
-BASE_DIR <- BASE_DIR
+if (!exists("WORKFLOWS_DIR"))
+  WORKFLOWS_DIR <- Sys.getenv("WORKFLOWS_CODE", "/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows")
+source(file.path(WORKFLOWS_DIR, "helpers", "config.R"))
 setwd(BASE_DIR)
 # ============================================================
 # BASE FONT SIZE (drives all text; bumped up for A4 legibility)

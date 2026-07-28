@@ -16,12 +16,13 @@
 # INPUT:
 #   - spatial/stream_network_graphs/river_graph_current.RDS
 #   - spatial/stream_network_graphs/river_graph_future.RDS
-#     (built by 02_generate_network_graph.R; carry V()$length_reach,
+#     (built by 01_generate_network_graph.R; carry V()$length_reach,
 #      V()$strahler, E()$barrier)
 #
 # OUTPUT:
 #   - connectivity/network_fragmentation_summary.csv
 #   - connectivity/fragment_strahler_distribution.csv
+#   - connectivity/fragment_lengths.csv
 #
 # LOCATION: workflows/05_network_fragmentation/01_network_fragmentation.R
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
@@ -30,7 +31,9 @@ library(tidyverse)
 library(igraph)
 library(data.table)
 
-source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
+if (!exists("WORKFLOWS_DIR"))
+  WORKFLOWS_DIR <- Sys.getenv("WORKFLOWS_CODE", "/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows")
+source(file.path(WORKFLOWS_DIR, "helpers", "config.R"))
 setwd(BASE_DIR)
 
 dir.create("connectivity", showWarnings = FALSE)

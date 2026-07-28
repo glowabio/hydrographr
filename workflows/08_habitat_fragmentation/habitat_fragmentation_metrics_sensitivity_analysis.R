@@ -1,5 +1,5 @@
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
-# 01b_habitat_fragmentation_metrics_sensitivity_analysis.R   (Module 8)
+# habitat_fragmentation_metrics_sensitivity_analysis.R   (Module 8)
 #
 # Sensitivity analysis for the dam impact buffer radii used in Group B2
 # (overlap of habitat patches with dam impact buffers) of
@@ -27,7 +27,7 @@
 #
 # Inputs:
 #   spatial/subbasin_sarantaporos/subbasin_subc_ids_pruned.csv
-#   spatial/subbasin/stream_network_habitat_tss.gpkg   (reach lengths, geometry)
+#   spatial/subbasin_sarantaporos/stream_network_habitat_lpt.gpkg   (reach lengths, geometry)
 #   points_snapped/dams/dams_snapped_points.csv
 #   sdm/patch_metrics/patch_membership_<species>.csv
 #   sdm/patch_metrics/patch_summary_all.csv
@@ -36,8 +36,9 @@
 #   dam_buffer_reaches_up<U>_down<D>.csv       one per combination
 #   dam_buffer_overlap_sensitivity.csv         per-patch overlap, all combinations
 #   dam_buffer_overlap_sensitivity_species.csv species-level overlap, all combinations
+#   dam_buffer_overlap_sensitivity_range.csv   per-species min/max/range across the grid
 #
-# LOCATION: workflows/08_habitat_fragmentation/01b_habitat_fragmentation_metrics_sensitivity_analyses.R
+# LOCATION: workflows/08_habitat_fragmentation/habitat_fragmentation_metrics_sensitivity_analysis.R
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 
 library(hydrographr)
@@ -48,7 +49,9 @@ library(dplyr)
 
 select <- dplyr::select
 
-source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
+if (!exists("WORKFLOWS_DIR"))
+  WORKFLOWS_DIR <- Sys.getenv("WORKFLOWS_CODE", "/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows")
+source(file.path(WORKFLOWS_DIR, "helpers", "config.R"))
 setwd(BASE_DIR)
 
 # ============================================================
@@ -70,7 +73,7 @@ TARGET_SPECIES <- c(
 UP_RADII_M   <- c(50, 200, 500)
 DOWN_RADII_M <- c(1000, 2000, 5000)
 
-THRESHOLD_METHOD <- "tss"
+THRESHOLD_METHOD <- "lpt"
 
 PATCH_METRICS_DIR <- "sdm/patch_metrics"
 OUT_DIR            <- file.path(PATCH_METRICS_DIR, "sensitivity")

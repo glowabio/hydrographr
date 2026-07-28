@@ -1,5 +1,5 @@
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
-# 04_clean_dam_data.R   (Module 1 -- Barrier data preparation)
+# 01_clean_dam_data.R   (Module 2 -- Barrier data preparation)
 #
 # Reproducible cleaning of small-hydropower (SHP) barrier data for the
 # Sarantaporos sub-basin, starting from the RAE (RAAEY) licence registers.
@@ -41,6 +41,8 @@
 #   - points_original/dams/V_SDI_R_HYDRO12_Installation_Licence.csv
 #   - points_original/dams/V_SDI_R_HYDRO11_Production_Licence.csv
 #   - points_original/dams/V_SDI_R_HYDRO7_Evaluation.csv
+#   - points_original/dams/V_SDI_R_HYDRO_OTHER_VALUES_Rejected.csv (read only
+#       for the excluded-count report, not used in scenarios)
 #   - points_original/dams/dams_sarantaporos_table.csv   (expert classification + site_id)
 #
 # Note: no basin-polygon filter is applied here because the expert
@@ -51,6 +53,8 @@
 #   - points_cleaned/dams/dams_sarantaporos_clean.csv    (DAMs, existing+planned, with power)
 #   - points_cleaned/dams/dams_sarantaporos_clean.gpkg
 #   - points_cleaned/dams/dams_classification_full.csv   (all parts + type, audit trail)
+#   - points_cleaned/dams/factories_sarantaporos_clean.csv (powerhouse points, for
+#       diversion-length pairing in Module 8)
 #   - points_cleaned/maps/dams_sarantaporos_clean.html
 #
 # LOCATION: workflows/02_barrier_data/01_clean_dam_data.R
@@ -68,7 +72,9 @@ library(htmlwidgets)
 
 select <- dplyr::select
 
-source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
+if (!exists("WORKFLOWS_DIR"))
+  WORKFLOWS_DIR <- Sys.getenv("WORKFLOWS_CODE", "/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows")
+source(file.path(WORKFLOWS_DIR, "helpers", "config.R"))
 setwd(BASE_DIR)
 
 dir.create("points_cleaned/dams", recursive = TRUE, showWarnings = FALSE)

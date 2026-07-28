@@ -24,15 +24,16 @@
 #
 # INPUT:
 #   - points_original/fish/Fish distributional & traits data (1).xlsx
-#   - points_original/fish/Sarantaporos.xlsx            (basin field data)
-#   - points_original/fish/species_list_sarantaporos.txt
+#   - points_original/fish/Sarantaporos.xlsx            (basin field data, optional)
 #
 # OUTPUT:
 #   - points_cleaned/fish/fish_basin_hcmr.csv           (all species, basin only)
 #   - points_cleaned/fish/fish_points_to_snap_hcmr.csv  (unique sites for snapping)
-#   - points_cleaned/fish/fish_basin_field_data_clean.csv
 #   - config/study_area_params.csv                      (BASIN_ID for downstream)
 #   - points_cleaned/maps/hcmr_fish_basin_overview.html
+#
+# TARGET_SPECIES (the 7 Sarantaporos species) is hard-coded in-script (Step 6),
+# not read from an external species-list file.
 #
 # LOCATION: workflows/01_biodiversity_data/01_clean_hcmr_fish.R
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
@@ -54,14 +55,10 @@ library(danubeoccurR)
 
 select <- dplyr::select
 
-# source("/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows/helpers/config.R")
-# setwd(BASE_DIR)
-
-if (!exists("WORKFLOWS_ROOT")) {
-  root <- tryCatch(rprojroot::find_root(rprojroot::has_dir("workflows")),
-                   error = function(e) getwd())
-  source(file.path(root, "workflows", "helpers", "find_root.R"))
-}
+if (!exists("WORKFLOWS_DIR"))
+  WORKFLOWS_DIR <- Sys.getenv("WORKFLOWS_CODE", "/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows")
+source(file.path(WORKFLOWS_DIR, "helpers", "config.R"))
+setwd(BASE_DIR)
 
 dir.create("points_cleaned/fish", recursive = TRUE, showWarnings = FALSE)
 dir.create("points_cleaned/maps", recursive = TRUE, showWarnings = FALSE)
@@ -117,11 +114,6 @@ sp <- sp %>%
 # occurrence records, so they must not enter the presence dataset.
 dry_fishless <- sp %>% filter(!is.na(DRY) | !is.na(FISHLESS))
 message("  Dry/fishless sites: ", nrow(dry_fishless))
-
-if (nrow(dry_fishless) > 0) {
-  fwrite(dry_fishless,
-         "points_original/fish/fish_hcmr_dry_fishless_sites.csv")
-}
 
 sp <- sp %>%
   filter(is.na(DRY) | is.na(FISHLESS)) %>%
@@ -198,9 +190,6 @@ if (file.exists(basin_file)) {
     )
   message("  Removed invalid coordinate records: ", n_before - nrow(basin_long))
 
-  fwrite(basin_long, "points_cleaned/fish/fish_basin_field_data_clean.csv")
-  message("  Saved: points_cleaned/fish/fish_basin_field_data_clean.csv")
-
 } else {
   message("  Basin field data file not found: ", basin_file)
   message("  Using main dataset only")
@@ -251,8 +240,6 @@ sites_to_query <- bind_rows(sites_to_query, anchor_row) %>%
   distinct(site_id, .keep_all = TRUE)
 
 message("  Unique sites to query: ", nrow(sites_to_query))
-
-fwrite(sites_to_query, "points_cleaned/fish/sites_for_basin_id_query.csv")
 
 basin_ids <- api_get_ids(
   points          = sites_to_query,
@@ -343,15 +330,24 @@ sp_basin_validated <- check_species_name(
   manual             = TRUE
 )
 
-# During manual review we changed "Chondrostoma ohridana" to the updated
-# accepted name "Chondrostoma ohridanum".
+# The only unmatched name manual review has ever needed to fix is
+# "Chondrostoma ohridana" -> the accepted name "Chondrostoma ohridanum"
+# (FishBase has no close match for the misspelling). manual = TRUE opens an
+# interactive Shiny gadget for this, which cannot be operated in a batch
+# Rscript run -- enforced here explicitly instead, so the correction no
+# longer depends on interactive review happening at all.
+sp_basin_validated <- sp_basin_validated %>%
+  mutate(speciescheck = ifelse(species == "Chondrostoma ohridana",
+                                "Chondrostoma ohridanum", speciescheck))
+
 message("  Validated species: ", n_distinct(sp_basin_validated$species))
 
 # Adopt the validated names and drop the helper columns added by
 # check_species_name(). Add manual removals here after reviewing output.
 sp_basin <- sp_basin_validated %>%
   mutate(species = speciescheck) %>%
-  select(-manually_updated, -speciescheck, -subc_id, -basin_id, -reg_id)
+  mutate(species = gsub(" ", "_", species)) %>%
+  select(-manually_updated, -speciescheck, -subc_id, -reg_id)
 
 message("  Records after taxonomic validation: ", nrow(sp_basin))
 
@@ -441,7 +437,6 @@ for (i in seq_len(nrow(species_counts))) {
 message("\nFiles created:")
 message("  points_cleaned/fish/fish_basin_hcmr.csv")
 message("  points_cleaned/fish/fish_points_to_snap_hcmr.csv")
-message("  points_cleaned/fish/fish_basin_field_data_clean.csv")
 message("  config/study_area_params.csv  <- BASIN_ID = ", BASIN_ID)
 message("  points_cleaned/maps/hcmr_fish_basin_overview.html")
 message("\nNext: snapping script")
