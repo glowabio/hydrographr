@@ -49,3 +49,5 @@ docs
 vignettes/data_*
 man/figures*
 vignettes/bib
+# local-only: superseded scripts kept for reference, not published
+workflows/archive/

@@ -253,15 +253,10 @@ Integrates lakes into the stream network.
 workflows/
   helpers/          config.R and shared helper functions
   01_.. 12_..       the twelve modules
-  archive/          superseded scripts, kept for reference only
   DEPENDENCIES.md   script-level input/output map
   LICENSES.txt      package licences
   .Renviron.example template for paths and credentials
 ```
-
-Scripts under `archive/` are not part of the workflow, are not maintained, and
-still contain absolute paths from the original development machine. They are
-retained only as a record of earlier approaches.
 
 ---
 
