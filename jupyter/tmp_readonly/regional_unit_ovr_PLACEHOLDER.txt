@@ -1,0 +1,5 @@
+# Placeholder for the file "regional_unit_ovr.tif"
+# It is >100 MB of size, so we are not including it here in the hydrographr GitHub repo.
+# You can download it here (state 2026-03-18):
+https://public.igb-berlin.de/index.php/s/agciopgzXjWswF4/download?path=%2Fglobal&files=regional_unit_ovr.tif
+
