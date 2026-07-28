@@ -2,29 +2,34 @@
 # 01_env_space.R   (Module 6 -- Species in Environmental Space)
 #
 # Descriptive module: shows how species occurrences are distributed across
-# a small set of environmental gradients, BEFORE any modelling (Module 7).
-# Designed to run independently of the SDM scripts -- but as currently
-# written, Steps 0-2 (download/build/rescale) are commented out and the
-# table is read from a cached copy (see Step 1 below); a genuinely fresh
-# run needs those steps re-enabled once, or `env90m/env_space_table.csv`
-# copied in from elsewhere.
+# the environmental gradients used for modelling, BEFORE any modelling
+# (Module 7).
 #
-# It builds its OWN environmental table for five descriptor variables
-# (distinct filename from the SDM predict table to avoid confusion),
-# subsets it to the sub-catchments of fish occurrences, and produces:
-#   (a) per-species violin/boxplots across the five variables
+# It subsets the SDM prediction table to the sub-catchments of fish
+# occurrences and produces:
+#   (a) per-species violin/boxplots across the variables
 #   (b) a PCA biplot of occurrences in environmental space
 #
-# Variables (5):
-#   outlet_diff_dw_basin   elevation difference to basin outlet (topographic position)
-#   bio01                  annual mean temperature (deg C)
-#   bio15                  precipitation seasonality
-#   order_strahler         Strahler stream order (network position)
-#   slope_grad_dw_cel_mean downstream channel slope gradient
+# Variables (10): the continuous predictors the SDM actually uses, i.e. the
+# post-VIF set in env90m/selected_vars.csv minus the c*_y2020 land-cover
+# fractions (compositional shares, not continuous gradients):
+#   accumulation_mean         flow accumulation (stream size)
+#   bio04_mean                temperature seasonality
+#   bio05_mean                max temperature of warmest month (deg C)
+#   bio15_mean                precipitation seasonality
+#   bio18_mean                precipitation of warmest quarter (mm)
+#   channel_elv_dw_seg_mean   downstream channel elevation (m)
+#   cti_mean                  compound topographic index (wetness)
+#   slope_grad_dw_cel_mean    downstream channel slope gradient
+#   stream_dist_dw_near_mean  distance to nearest downstream stream (m)
+#   stream_dist_up_near_mean  distance to nearest upstream stream (m)
 #
-# Download + rescaling are repeated faithfully from the SDM data-prep step
-# so values are identical to those the SDM used; only the variable subset
-# and the output filename differ.
+# This module therefore describes the SAME environmental space the models
+# were fitted in. The table is built by subsetting Module 7's
+# env90m/predict_table.csv (already in analysis units), so the values are
+# exactly those the SDM saw and no download or rescaling is needed. Steps
+# 0-2 below remain, commented out, as a from-scratch rebuild path for the
+# older standalone variable set.
 #
 # INPUT:
 #   env90m/ (downloaded H90m + CHELSA tables; same as SDM module)
@@ -93,7 +98,7 @@ n_cores    <- max(1, parallel::detectCores() - 1)
 #   Running this module on its own (without the SDM) downloads only these
 #   five variables, keeping Module 6 self-contained.
 
-message("\n=== Step 0: Downloading env90m tables (5 variables) ===")
+message("\n=== Step 0: Downloading env90m tables (from-scratch path only) ===")
 
 dir.create("env90m", showWarnings = FALSE, recursive = TRUE)
 
@@ -134,7 +139,7 @@ if (!file.exists("env90m/subc_ids_basin.txt"))
 # STEP 1: Build the environmental table (this module's own copy)
 # ============================================================
 
-message("\n=== Step 1: Building env_space table (5 variables) ===")
+message("\n=== Step 1: Building env_space table (SDM predictor subset) ===")
 
 env_space_file <- "env90m/env_space_table.csv"   # distinct from SDM predict_table.csv
 
@@ -184,9 +189,42 @@ env_space_file <- "env90m/env_space_table.csv"   # distinct from SDM predict_tab
 # re-downloading on every run. On a fresh BASE_DIR without this file,
 # uncomment Steps 0-2 (or run 07_sdm/02_create_prediction_table.R first,
 # whose predict_table.csv rescaling this block mirrors) before rerunning.
-if (!file.exists(env_space_file))
-  stop(env_space_file, " not found. Steps 0-2 (download/build/rescale) are ",
-       "commented out above and must be run at least once to create it.")
+# Variables: the continuous predictors the SDM (Module 7) actually uses, so
+# this module describes the same environmental space the models were fitted in
+# rather than a separate set of descriptors. Taken from env90m/selected_vars.csv
+# (the post-VIF list); the c*_y2020 land-cover fractions are excluded because
+# they are compositional shares rather than continuous gradients.
+ENV_VARS <- c(
+  "accumulation_mean",          # flow accumulation (stream size)
+  "bio04_mean",                 # temperature seasonality
+  "bio05_mean",                 # max temperature of warmest month
+  "bio15_mean",                 # precipitation seasonality
+  "bio18_mean",                 # precipitation of warmest quarter
+  "channel_elv_dw_seg_mean",    # downstream channel elevation
+  "cti_mean",                   # compound topographic index (wetness)
+  "slope_grad_dw_cel_mean",     # downstream channel slope gradient
+  "stream_dist_dw_near_mean",   # distance to nearest downstream stream
+  "stream_dist_up_near_mean"    # distance to nearest upstream stream
+)
+
+# Built by subsetting Module 7's prediction table, which already holds these
+# columns for every sub-catchment in analysis units -- no downloads needed and
+# no separate rescaling, which also guarantees the values are byte-for-byte the
+# ones the SDM saw. Steps 0-2 above are kept only for a from-scratch rebuild.
+predict_table_file <- "env90m/predict_table.csv"
+
+if (!file.exists(env_space_file)) {
+  if (!file.exists(predict_table_file))
+    stop(predict_table_file, " not found. Run 07_sdm/02_create_prediction_table.R ",
+         "first, or re-enable Steps 0-2 above.")
+  message("  Building ", env_space_file, " from ", predict_table_file)
+  pt <- fread(predict_table_file)
+  miss <- setdiff(ENV_VARS, names(pt))
+  if (length(miss))
+    stop("predict_table.csv is missing: ", paste(miss, collapse = ", "))
+  fwrite(pt[, c("subc_id", ENV_VARS), with = FALSE], env_space_file)
+  message("  Saved: ", env_space_file, " (", length(ENV_VARS), " variables)")
+}
 
 env_tbl <- fread(env_space_file)
 
@@ -214,16 +252,8 @@ message("  Occurrence records: ", nrow(fish))
 
 
 
-# The five rescaled columns we will plot
-plot_cols <- c("outlet_diff_dw_basin_mean", "bio01_mean", "bio15_mean",
-               "stream_strahler", "slope_grad_dw_cel_mean")
-# order_strahler may come back without _mean if it is not a zonal stat; handle both
-if (!"stream_strahler" %in% names(env_tbl) && "order_strahler" %in% names(env_tbl)) {
-  env_tbl <- env_tbl %>% rename(stream_strahler = order_strahler)
-}
-if (!"outlet_diff_dw_basin_mean" %in% names(env_tbl) && "outlet_diff_dw_basin" %in% names(env_tbl)) {
-  env_tbl <- env_tbl %>% rename(outlet_diff_dw_basin_mean = outlet_diff_dw_basin)
-}
+# The columns we will plot -- the SDM predictor set defined above
+plot_cols <- ENV_VARS
 
 occ_env <- fish %>%
   left_join(env_tbl, by = "subc_id") %>%
@@ -233,11 +263,16 @@ message("  Occurrences with complete env data: ", nrow(occ_env))
 
 # Long format for plotting; nicer labels
 var_labels <- c(
-  outlet_diff_dw_basin_mean = "Elevation diff. to outlet (m)",
-  bio01_mean                = "Mean annual temp. (\u00b0C)",
+  accumulation_mean         = "Flow accumulation (km\u00b2)",
+  bio04_mean                = "Temp. seasonality",
+  bio05_mean                = "Max temp. warmest month (\u00b0C)",
   bio15_mean                = "Precip. seasonality",
-  stream_strahler       = "Strahler order",
-  slope_grad_dw_cel_mean    = "Channel slope gradient"
+  bio18_mean                = "Precip. warmest quarter (mm)",
+  channel_elv_dw_seg_mean   = "Downstream channel elev. (m)",
+  cti_mean                  = "Compound topographic index",
+  slope_grad_dw_cel_mean    = "Channel slope gradient",
+  stream_dist_dw_near_mean  = "Dist. to downstream stream (m)",
+  stream_dist_up_near_mean  = "Dist. to upstream stream (m)"
 )
 
 occ_long <- occ_env %>%
@@ -291,19 +326,22 @@ message("  Saved: figures/env_space/env_space_violins_panel.png")
 
 message("\n=== Step 5: PCA ===")
 
-# PCA uses the four CONTINUOUS predictors only. Strahler order is ordinal,
-# so we exclude it from the PCA (it remains in the violin plots); treating
-# an ordinal as continuous in a Euclidean PCA would be a stretch.
-pca_cols <- c("outlet_diff_dw_basin_mean", "bio01_mean",
-              "bio15_mean", "slope_grad_dw_cel_mean")
+# PCA uses all of the SDM predictors -- every variable in ENV_VARS is
+# continuous, so unlike the earlier version (which had to drop ordinal
+# Strahler order) nothing needs excluding here.
+pca_cols <- ENV_VARS
 
 # Power-transform strongly right-skewed variables before PCA so it is not
-# dominated by a few extreme reaches. (Adjust per the distributions above.)
+# dominated by a few extreme reaches. These five have skew > 1.5 and are
+# non-negative, so log1p is safe; the climate variables and cti_mean are
+# near-symmetric (|skew| < 1.2) and are left untransformed. cti_mean also
+# takes negative values, so log1p would not apply to it in any case.
+SKEWED_VARS <- c("accumulation_mean", "channel_elv_dw_seg_mean",
+                 "slope_grad_dw_cel_mean", "stream_dist_dw_near_mean",
+                 "stream_dist_up_near_mean")
+
 pca_dat <- occ_env %>%
-  mutate(
-    slope_grad_dw_cel_mean    = log1p(pmax(slope_grad_dw_cel_mean, 0)),
-    outlet_diff_dw_basin_mean = log1p(pmax(outlet_diff_dw_basin_mean, 0))
-  )
+  mutate(across(all_of(SKEWED_VARS), ~ log1p(pmax(.x, 0))))
 
 pca_mat <- pca_dat %>% select(all_of(pca_cols)) %>% as.matrix()
 pca     <- prcomp(pca_mat, center = TRUE, scale. = TRUE)
