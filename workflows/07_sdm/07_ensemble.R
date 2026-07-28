@@ -39,7 +39,7 @@ library(sf)
 select <- dplyr::select
 
 if (!exists("WORKFLOWS_DIR"))
-  WORKFLOWS_DIR <- Sys.getenv("WORKFLOWS_CODE", "/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows")
+  WORKFLOWS_DIR <- Sys.getenv("WORKFLOWS_CODE", "")   # set WORKFLOWS_CODE in .Renviron, or put your path here
 source(file.path(WORKFLOWS_DIR, "helpers", "config.R"))
 # BASE_DIR <- NIMBUS_DIR
 setwd(BASE_DIR)

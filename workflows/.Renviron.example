@@ -1,0 +1,24 @@
+# Copy this file to `.Renviron` (in this repo's root or your home directory)
+# and fill in the values for your machine. `.Renviron` is git-ignored, so your
+# paths and credentials never enter the repository.
+#
+# R reads `.Renviron` at startup, from the working directory first and then
+# from your home directory. Restart R after editing it.
+
+# --- Required: where the code and the data live -----------------------------
+WORKFLOWS_CODE=/path/to/hydrographr/workflows
+WORKFLOW_DATA=/path/to/workflow_paper/data
+
+# --- Required for Module 1 (GBIF occurrence download) -----------------------
+# Register at https://www.gbif.org/user/profile
+GBIF_USER=your_gbif_username
+GBIF_PWD=your_gbif_password
+GBIF_EMAIL=your_gbif_email
+
+# --- Required for Module 10 (trait download, optional step) -----------------
+# Register at https://www.freshwaterecology.info/ to obtain an API key.
+API_KEY=your_freshwaterecology_api_key
+
+# --- Required for Module 12 (lake land-cover analysis) ----------------------
+# Local GuidosToolbox install directory, e.g. /opt/GWB2.0.3/
+GWB_DIR=/path/to/GWB2.0.3/

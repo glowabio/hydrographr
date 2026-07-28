@@ -40,7 +40,7 @@ library(sf)
 library(data.table)
 
 if (!exists("WORKFLOWS_DIR"))
-  WORKFLOWS_DIR <- Sys.getenv("WORKFLOWS_CODE", "/home/grigoropoulou/Documents/PhD/scripts/hydrographr/workflows")
+  WORKFLOWS_DIR <- Sys.getenv("WORKFLOWS_CODE", "")   # set WORKFLOWS_CODE in .Renviron, or put your path here
 source(file.path(WORKFLOWS_DIR, "helpers", "config.R"))
 setwd(BASE_DIR)
 
@@ -66,9 +66,12 @@ sf::st_layers("lakes/swot_lakes/swot_lakes.gpkg")
 # Internal SWOT layer name carried by get_lake_intersection().
 SWOT_LAKE_NAME <- "lake"
 
-# Full path to the local GWB install. EDIT THIS to your actual install
-# location
-EDGE <- "/home/grigoropoulou/GWB2.0.3/"
+# Full path to the local GuidosToolbox (GWB) install, e.g. "/opt/GWB2.0.3/".
+# Set GWB_DIR in your .Renviron (see .Renviron.example) or put the path here.
+EDGE <- Sys.getenv("GWB_DIR", "")
+if (!nzchar(EDGE))
+  stop("GWB_DIR is not set. GuidosToolbox is required by this script; set ",
+       "GWB_DIR in .Renviron or edit the EDGE path above.", call. = FALSE)
 
 # ============================================================
 # STEP 1: Load inputs

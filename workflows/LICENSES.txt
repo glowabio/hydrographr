@@ -1,0 +1,331 @@
+==============================================================================
+THIRD-PARTY SOFTWARE LICENCES
+Sarantaporos freshwater fish connectivity workflow (hydrographr)
+==============================================================================
+
+Generated 2026-07-28 from the packages actually called in the
+workflow scripts (library()/require()/pkg:: in non-comment lines), with
+licence fields read from the installed package DESCRIPTION files.
+
+R itself: R 4.6.1 -- GPL-2 | GPL-3. See https://www.r-project.org/Licenses/
+
+SECTION 1 lists packages used by the live workflow (Modules 1-12).
+SECTION 2 lists packages used ONLY by legacy scripts under archive/.
+Base and recommended packages ship with R and are covered by R's own licence.
+
+==============================================================================
+SECTION 1 -- LIVE WORKFLOW (43 packages)
+==============================================================================
+
+broom  (1.0.13)
+    Licence : MIT + file LICENSE
+    Authors : David Robinson [aut], Alex Hayes [aut] (ORCID: <https://orcid.org/0000-0002-4985-5160>), S
+    URL     : https://broom.tidymodels.org/
+
+CoordinateCleaner  (3.0.1)
+    Licence : GPL-3
+    Authors : Alexander Zizka [aut, cre], Daniele Silvestro [ctb], Tobias Andermann [ctb], Josue Azevedo
+    URL     : https://ropensci.github.io/CoordinateCleaner/
+
+corrplot  (0.95)
+    Licence : MIT + file LICENSE
+    Authors : Taiyun Wei [cre, aut], Viliam Simko [aut], Michael Levy [ctb], Yihui Xie [ctb], Yan Jin [c
+    URL     : https://github.com/taiyun/corrplot
+
+danubeoccurR  (0.1.0)
+    Licence : GPL (>= 3)
+    Authors : Yusdiel Torres-Cambas [aut, cre] (ORCID: <https://orcid.org/0000-0003-2312-2329>)
+    URL     : https://ytorres-cambas.github.io/danubeoccurR/
+
+data.table  (1.18.4)
+    Licence : MPL-2.0 | file LICENSE
+    Authors : Tyson Barrett [aut, cre] (ORCID: <https://orcid.org/0000-0002-2137-1391>), Matt Dowle [aut
+    URL     : https://r-datatable.com
+
+dismo  (1.3-16)
+    Licence : GPL (>= 3)
+    Authors : Robert J. Hijmans [cre, aut] (<https://orcid.org/0000-0001-5872-2872>), Steven Phillips [a
+    URL     : https://rspatial.org/raster/sdm/
+
+dplyr  (1.2.1)
+    Licence : MIT + file LICENSE
+    Authors : Hadley Wickham [aut, cre] (ORCID: <https://orcid.org/0000-0003-4757-117X>), Romain Françoi
+    URL     : https://dplyr.tidyverse.org
+
+fishmove  (0.3-3)
+    Licence : GPL (>= 2)
+    Authors : Johannes Radinger
+    URL     : http://dx.doi.org/10.1111/faf.12028
+
+fwtraits  (1.0.0)
+    Licence : GPL (>= 3)
+    Authors : Anthony Basooma [aut, cre] (ORCID: <https://orcid.org/0000-0002-8994-9989>), Florian Borgw
+    URL     : https://github.com/AnthonyBasooma/fwtraits
+
+ggforce  (0.5.0)
+    Licence : MIT + file LICENSE
+    Authors : Thomas Lin Pedersen [cre, aut] (ORCID: <https://orcid.org/0000-0002-5147-4711>), RStudio [
+    URL     : https://ggforce.data-imaginist.com
+
+ggplot2  (4.0.3)
+    Licence : MIT + file LICENSE
+    Authors : Hadley Wickham [aut] (ORCID: <https://orcid.org/0000-0003-4757-117X>), Winston Chang [aut]
+    URL     : https://ggplot2.tidyverse.org
+
+ggspatial  (1.1.10)
+    Licence : GPL-3
+    Authors : Dewey Dunnington [aut, cre] (ORCID: <https://orcid.org/0000-0002-9415-4582>), Brent Thorne
+    URL     : https://paleolimbot.github.io/ggspatial/
+
+htmlwidgets  (1.6.4)
+    Licence : MIT + file LICENSE
+    Authors : Ramnath Vaidyanathan [aut, cph], Yihui Xie [aut], JJ Allaire [aut], Joe Cheng [aut], Carso
+    URL     : https://github.com/ramnathv/htmlwidgets
+
+hydrographr  (1.6.0)
+    Licence : GPL-3
+    Authors : Marlene Schürz [aut, cre], Afroditi Grigoropoulou [aut], Jaime Garcia Marquez [aut], Yusdi
+    URL     : https://glowabio.github.io/hydrographr/
+
+igraph  (2.3.2)
+    Licence : GPL (>= 2)
+    Authors : Gábor Csárdi [aut] (ORCID: <https://orcid.org/0000-0001-7098-9676>), Tamás Nepusz [aut] (O
+    URL     : https://r.igraph.org/
+
+leaflet  (2.2.3)
+    Licence : MIT + file LICENSE
+    Authors : Joe Cheng [aut], Barret Schloerke [aut] (ORCID: <https://orcid.org/0000-0001-9986-114X>), 
+    URL     : https://rstudio.github.io/leaflet/
+
+maxnet  (0.1.4)
+    Licence : MIT + file LICENSE
+    Authors : Steven Phillips
+    URL     : https://github.com/mrmaxent/maxnet
+
+pak  (0.9.5)
+    Licence : GPL-3
+    Authors : Gábor Csárdi [aut, cre], Jim Hester [aut], Posit Software, PBC [cph, fnd] (ROR: <https://r
+    URL     : https://pak.r-lib.org/
+
+patchwork  (1.3.2)
+    Licence : MIT + file LICENSE
+    Authors : Thomas Lin Pedersen [cre, aut] (ORCID: <https://orcid.org/0000-0002-5147-4711>)
+    URL     : https://patchwork.data-imaginist.com
+
+prioritizr  (8.1.0)
+    Licence : GPL-3
+    Authors : Jeffrey O Hanson [aut] (ORCID: <https://orcid.org/0000-0002-4716-6134>), Richard Schuster 
+    URL     : https://prioritizr.net
+
+purrr  (1.2.2)
+    Licence : MIT + file LICENSE
+    Authors : Hadley Wickham [aut, cre] (ORCID: <https://orcid.org/0000-0003-4757-117X>), Lionel Henry [
+    URL     : https://purrr.tidyverse.org/
+
+ranger  (0.18.0)
+    Licence : GPL-3
+    Authors : Marvin N. Wright [aut, cre], Stefan Wager [ctb], Philipp Probst [ctb]
+    URL     : https://imbs-hl.github.io/ranger/
+
+RColorBrewer  (1.1-3)
+    Licence : Apache License 2.0
+    Authors : Erich Neuwirth [aut, cre]
+
+readr  (2.2.0)
+    Licence : MIT + file LICENSE
+    Authors : Hadley Wickham [aut], Jim Hester [aut], Romain Francois [ctb], Jennifer Bryan [aut, cre] (
+    URL     : https://readr.tidyverse.org
+
+readxl  (1.5.0)
+    Licence : MIT + file LICENSE
+    Authors : Hadley Wickham [aut] (ORCID: <https://orcid.org/0000-0003-4757-117X>), Jennifer Bryan [aut
+    URL     : https://readxl.tidyverse.org
+
+rfishbase  (5.0.3)
+    Licence : CC0
+    Authors : Carl Boettiger [cre, aut] (ORCID: <https://orcid.org/0000-0002-1642-628X>), Scott Chamberl
+    URL     : https://docs.ropensci.org/rfishbase/
+
+rgbif  (3.8.5)
+    Licence : MIT + file LICENSE
+    Authors : Scott Chamberlain [aut] (0000-0003-1444-9135), Damiano Oldoni [aut] (0000-0003-3445-7562),
+    URL     : https://github.com/ropensci/rgbif (devel)
+
+rnaturalearth  (1.2.0)
+    Licence : MIT + file LICENSE
+    Authors : Philippe Massicotte [aut, cre] (ORCID: <https://orcid.org/0000-0002-5919-4116>), Andy Sout
+    URL     : https://docs.ropensci.org/rnaturalearth/
+
+scales  (1.4.0)
+    Licence : MIT + file LICENSE
+    Authors : Hadley Wickham [aut], Thomas Lin Pedersen [cre, aut] (<https://orcid.org/0000-0002-5147-47
+    URL     : https://scales.r-lib.org
+
+sf  (1.1-1)
+    Licence : GPL-2 | MIT + file LICENSE
+    Authors : Edzer Pebesma [aut, cre] (ORCID: <https://orcid.org/0000-0001-8049-7069>), Roger Bivand [c
+    URL     : https://r-spatial.github.io/sf/
+
+specleanr  (1.0.1)
+    Licence : GPL (>= 3)
+    Authors : Anthony Basooma [aut, cre] (ORCID: <https://orcid.org/0000-0002-8994-9989>), Thomas Hein [
+    URL     : https://anthonybasooma.github.io/specleanr/
+
+SSN2  (0.4.0)
+    Licence : GPL-3
+    Authors : Michael Dumelle [aut, cre] (ORCID: <https://orcid.org/0000-0002-3393-5529>), Jay M. Ver Ho
+    URL     : https://usepa.github.io/SSN2/
+
+SSNbler  (1.1.1)
+    Licence : GPL (>= 3)
+    Authors : Erin Peterson [aut, cre] (ORCID: <https://orcid.org/0000-0003-2992-0372>), Michael Dumelle
+    URL     : https://github.com/pet221/SSNbler
+
+stringr  (1.6.0)
+    Licence : MIT + file LICENSE
+    Authors : Hadley Wickham [aut, cre, cph], Posit Software, PBC [cph, fnd]
+    URL     : https://stringr.tidyverse.org
+
+terra  (1.9-27)
+    Licence : GPL (>= 3)
+    Authors : Robert J. Hijmans [cre, aut] (ORCID: <https://orcid.org/0000-0001-5872-2872>), Andrew Brow
+    URL     : https://rspatial.org/
+
+tibble  (3.3.1)
+    Licence : MIT + file LICENSE
+    Authors : Kirill Müller [aut, cre] (ORCID: <https://orcid.org/0000-0002-1416-3412>), Hadley Wickham 
+    URL     : https://tibble.tidyverse.org/
+
+tidyr  (1.3.2)
+    Licence : MIT + file LICENSE
+    Authors : Hadley Wickham [aut, cre], Davis Vaughan [aut], Maximilian Girlich [aut], Kevin Ushey [ctb
+    URL     : https://tidyr.tidyverse.org
+
+tidyverse  (2.0.0)
+    Licence : MIT + file LICENSE
+    Authors : Hadley Wickham [aut, cre], RStudio [cph, fnd]
+    URL     : https://tidyverse.tidyverse.org
+
+usdm  (2.1-7)
+    Licence : GPL (>= 3)
+    Authors : Babak Naimi
+    URL     : https://r-gis.net/
+
+cluster  (2.1.8.2)  [recommended]
+    Licence : GPL (>= 2)
+    Authors : Martin Maechler [aut, cre] (ORCID: <https://orcid.org/0000-0002-8685-9910>), Peter Roussee
+    URL     : https://svn.r-project.org/R-packages/trunk/cluster/
+
+grDevices  (4.6.1)  [base]
+    Licence : Part of R 4.6.1
+    Authors : R Core Team and contributors worldwide
+
+parallel  (4.6.1)  [base]
+    Licence : Part of R 4.6.1
+    Authors : R Core Team
+
+tools  (4.6.1)  [base]
+    Licence : Part of R 4.6.1
+    Authors : R Core Team
+
+==============================================================================
+SECTION 2 -- ARCHIVED SCRIPTS ONLY (11 packages)
+==============================================================================
+
+cowplot  (1.2.0)
+    Licence : GPL-2
+    Authors : Claus O. Wilke [aut, cre] (ORCID: <https://orcid.org/0000-0002-7470-9261>)
+    URL     : https://wilkelab.org/cowplot/
+
+doParallel  (1.0.17)
+    Licence : GPL-2
+    Authors : Folashade Daniel [cre], Microsoft Corporation [aut, cph], Steve Weston [aut], Dan Tenenbau
+    URL     : https://github.com/RevolutionAnalytics/doparallel
+
+foreach  (1.5.2)
+    Licence : Apache License (== 2.0)
+    Authors : Folashade Daniel [cre], Hong Ooi [ctb], Rich Calaway [ctb], Microsoft [aut, cph], Steve We
+    URL     : https://github.com/RevolutionAnalytics/foreach
+
+ggrepel  (0.9.8)
+    Licence : GPL-3 | file LICENSE
+    Authors : Kamil Slowikowski [aut, cre] (ORCID: <https://orcid.org/0000-0002-2843-6370>), Teun van de
+    URL     : https://ggrepel.slowkow.com/
+
+imager  (1.0.8)
+    Licence : LGPL-3
+    Authors : Simon Barthelme [aut], David Tschumperle [ctb], Jan Wijffels [ctb], Haz Edine Assemlal [ct
+    URL     : https://asgr.github.io/imager/
+
+lwgeom  (0.2-16)
+    Licence : GPL-2
+    Authors : Edzer Pebesma [aut, cre] (ORCID: <https://orcid.org/0000-0001-8049-7069>), Colin Rundel [c
+    URL     : https://r-spatial.github.io/lwgeom/
+
+magick  (2.9.1)
+    Licence : MIT + file LICENSE
+    Authors : Jeroen Ooms [aut, cre] (ORCID: <https://orcid.org/0000-0002-4035-0289>)
+    URL     : https://docs.ropensci.org/magick/ https://ropensci.r-universe.dev/magick
+
+reshape2  (1.4.5)
+    Licence : MIT + file LICENSE
+    Authors : Hadley Wickham [aut, cre]
+    URL     : https://github.com/hadley/reshape
+
+riverconn  (0.3.31)
+    Licence : MIT + file LICENSE
+    Authors : Damiano Baldan [aut, cre] (<https://orcid.org/0000-0001-9237-4883>), David Cunillera-Montc
+    URL     : https://github.com/damianobaldan/riverconn
+
+sfnetworks  (0.6.6)
+    Licence : Apache License (>= 2)
+    Authors : Lucas van der Meer [aut, cre] (ORCID: <https://orcid.org/0000-0001-6336-8628>), Lorena Aba
+    URL     : https://luukvdmeer.github.io/sfnetworks/
+
+tidygraph  (1.3.1)
+    Licence : MIT + file LICENSE
+    Authors : Thomas Lin Pedersen [cre, aut] (<https://orcid.org/0000-0002-5147-4711>)
+    URL     : https://tidygraph.data-imaginist.com
+
+==============================================================================
+SUMMARY BY LICENCE (54 packages total)
+==============================================================================
+
+   23  MIT + file LICENSE
+    7  GPL (>= 3)
+    7  GPL-3
+    3  GPL (>= 2)
+    3  GPL-2
+    3  Part of R 4.6.1
+    1  Apache License (== 2.0)
+    1  Apache License (>= 2)
+    1  Apache License 2.0
+    1  CC0
+    1  GPL-2 | MIT + file LICENSE
+    1  GPL-3 | file LICENSE
+    1  LGPL-3
+    1  MPL-2.0 | file LICENSE
+
+==============================================================================
+NOTES
+==============================================================================
+
+* "MIT + file LICENSE" and "GPL-2 | MIT + file LICENSE" require the
+  copyright notice to be retained; the per-package LICENSE file is inside
+  each installed package directory and on its CRAN page.
+* GPL-licensed packages are used here as unmodified dependencies invoked
+  from R scripts; no GPL code is copied into or linked with this workflow.
+* rfishbase is released CC0 (public domain dedication).
+* Full licence texts are not reproduced here. GPL/MIT/Apache/MPL texts:
+      https://www.r-project.org/Licenses/
+      https://opensource.org/licenses/
+* To regenerate: see the note at the end of this file.
+
+==============================================================================
+HOW THIS FILE WAS GENERATED
+==============================================================================
+
+Scanned all .R files under workflows/ (archive/ separated), extracted
+library(), require() and pkg:: references outside comment lines, then read
+Version/License/Author/URL from installed.packages() and packageDescription().
+Re-run after changing dependencies so the list stays accurate.
