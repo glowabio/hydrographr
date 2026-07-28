@@ -27,7 +27,7 @@
 # (Anguilla anguilla), so implausible values are capped (see SIGMA_MOB_CAP_M).
 #
 # Inputs:
-#   points_original/fish/Fish distributional & traits data (1).xlsx  (Traits sheet)
+#   points_original/fish/fish_distributional_and_traits_data.xlsx  (Traits sheet)
 #   points_snapped/fish/fish_all_species_snapped.csv                 (stream order)
 #   traits/AspectRatioData.csv                     (caudal-fin aspect ratios, fishmove calibration)
 #
@@ -100,7 +100,7 @@ GENUS_MEDIAN_FOR   <- c("Squalius_platyceps")   # take median over its genus
 # ============================================================
 
 fish_traits <- read_xlsx(
-  "points_original/fish/Fish distributional & traits data (1).xlsx",
+  "points_original/fish/fish_distributional_and_traits_data.xlsx",
   sheet = "Traits"
 ) %>%
   rename(species = Species) %>%

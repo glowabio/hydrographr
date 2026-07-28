@@ -1,5 +1,5 @@
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
-# 04_cropfiles.R   (Module 9 -- Spatial Prioritization)
+# 00_human_footprint_cost_layer.R   (Module 9 -- Spatial Prioritization)
 #
 # One-off setup script: crops the global Human Footprint Index (HFP) raster
 # to the Sarantaporos sub-basin and computes per-subcatchment zonal means,
@@ -31,7 +31,7 @@
 #   - spatial/hfp_crop.tif, hfp_wgs.tif, subcatchment_sarantaporos.tif
 #   - spatial/hfp_zonal_stats.csv   (read by 01_spatial_prioritization.R)
 #
-# LOCATION: workflows/09_spatial_prioritization/04_cropfiles.R
+# LOCATION: workflows/09_spatial_prioritization/00_human_footprint_cost_layer.R
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 
 library(hydrographr)

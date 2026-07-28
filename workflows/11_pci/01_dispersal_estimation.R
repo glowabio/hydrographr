@@ -39,7 +39,7 @@
 #
 # INPUT
 #   points_original/fish/species_list_sarantaporos.txt   (species column)
-#   points_original/fish/Fish distributional & traits data (1).xlsx
+#   points_original/fish/fish_distributional_and_traits_data.xlsx
 #                                                        (sheet "Traits")
 #   points_snapped/fish/fish_all_species_snapped.csv     (optional; for max_SO)
 #
@@ -72,7 +72,7 @@ setwd(BASE_DIR)
 # ============================================================
 # PARAMETERS
 # ============================================================
-TRAITS_XLSX  <- "points_original/fish/Fish distributional & traits data (1).xlsx"
+TRAITS_XLSX  <- "points_original/fish/fish_distributional_and_traits_data.xlsx"
 SPECIES_LIST <- "points_original/fish/species_list_sarantaporos.txt"
 OCCURRENCES  <- "points_snapped/fish/fish_all_species_snapped.csv"
 

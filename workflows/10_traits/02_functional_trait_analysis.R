@@ -22,7 +22,7 @@
 #
 # INPUT:
 #   - points_original/fish/species_list_sarantaporos.txt      (target species)
-#   - points_original/fish/Fish distributional & traits data (1).xlsx
+#   - points_original/fish/fish_distributional_and_traits_data.xlsx
 #       sheet "Traits" : functional traits per species
 #   - points_snapped/fish/fish_hcmr_with_species_snapped.csv  (occurrences)
 #   - spatial/subbasin_sarantaporos/subbasin_polygon.gpkg     (basin outline)
@@ -62,7 +62,7 @@ dir.create("figures/traits", recursive = TRUE, showWarnings = FALSE)
 # PARAMETERS
 # ============================================================
 
-TRAITS_XLSX  <- "points_original/fish/Fish distributional & traits data (1).xlsx"
+TRAITS_XLSX  <- "points_original/fish/fish_distributional_and_traits_data.xlsx"
 SPECIES_LIST <- "points_original/fish/species_list_sarantaporos.txt"
 OCC_CSV      <- "points_snapped/fish/fish_hcmr_with_species_snapped.csv"
 BASIN_GPKG   <- "spatial/subbasin_sarantaporos/subbasin_polygon.gpkg"

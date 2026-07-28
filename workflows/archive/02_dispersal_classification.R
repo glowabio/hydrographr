@@ -47,7 +47,7 @@ PD_MAX         <- 0.9    # maximum dispersal probability
 # ============================================================
 
 fish_traits <- read_xlsx(
-  "points_original/fish/Fish distributional & traits data (1).xlsx",
+  "points_original/fish/fish_distributional_and_traits_data.xlsx",
   sheet = "Traits"
 ) %>%
   dplyr::rename(species = Species) %>%

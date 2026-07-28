@@ -35,7 +35,8 @@
 # Input:
 #   - spatial/subbasin_sarantaporos/stream_network_pruned.gpkg
 #   - spatial/basin/stream_network.gpkg            (reach lengths)
-#   - spatial/hfp_zonal_stats.csv
+#   - spatial/hfp_zonal_stats.csv                  (from 00_human_footprint_cost_layer.R
+#                                                   -- run that first if missing)
 #   - sdm/ensemble/ensemble_{species}.csv
 #   - sdm/habitat/habitat_summary.csv              (LPT binarisation thresholds)
 #   - sdm/habitat/habitat_{species}.csv            (binary/gap/semibinary LPT)

@@ -23,7 +23,7 @@
 #   7.  Visualise
 #
 # INPUT:
-#   - points_original/fish/Fish distributional & traits data (1).xlsx
+#   - points_original/fish/fish_distributional_and_traits_data.xlsx
 #   - points_original/fish/Sarantaporos.xlsx            (basin field data, optional)
 #
 # OUTPUT:
@@ -85,7 +85,7 @@ message(paste(rep("=", 80), collapse = ""))
 
 message("\n=== Step 1: Processing main HCMR dataset ===")
 
-sp_raw <- read_xlsx("points_original/fish/Fish distributional & traits data (1).xlsx") %>%
+sp_raw <- read_xlsx("points_original/fish/fish_distributional_and_traits_data.xlsx") %>%
   rename(longitude = Longtitude,
          latitude  = Latitude)
 
