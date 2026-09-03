@@ -48,8 +48,7 @@
 #' @importFrom doFuture registerDoFuture
 #' @importFrom parallel detectCores
 #' @importFrom data.table setDT setnames
-#' @importFrom igraph subcomponent subgraph as_data_frame is_directed degree V
-#' gsize
+#' @importFrom igraph subcomponent subgraph as_data_frame is_directed degree V gsize
 #' @importFrom future.apply future_lapply
 #' @importFrom memuse Sys.meminfo
 #' @export

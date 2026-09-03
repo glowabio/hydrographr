@@ -63,8 +63,7 @@
 #' @importFrom parallel makePSOCKcluster stopCluster
 #' @importFrom doParallel registerDoParallel
 #' @importFrom data.table data.table setDT setnames  rbindlist
-#' @importFrom igraph  subcomponent as_ids is_directed degree edge_attr_names
-#' delete_edge_attr
+#' @importFrom igraph subcomponent as_ids is_directed degree edge_attr_names delete_edge_attr
 #' @importFrom future.apply future_lapply future_mapply
 #' @importFrom dplyr mutate
 #' @importFrom memuse Sys.meminfo

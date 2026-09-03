@@ -38,7 +38,7 @@
 #' @importFrom parallel detectCores stopCluster makePSOCKcluster
 #' @importFrom dplyr mutate
 #' @importFrom igraph graph.data.frame is_directed subcomponent V degree
-#' all_simple_paths as_ids delete_edges delete_vertices adjacent_vertices gsize
+#' @importFrom igraph all_simple_paths as_ids delete_edges delete_vertices adjacent_vertices gsize
 #' @importFrom future.apply future_lapply  future_mapply future_sapply
 #' @importFrom tidyr fill
 #' @importFrom doParallel registerDoParallel

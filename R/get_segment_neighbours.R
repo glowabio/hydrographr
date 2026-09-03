@@ -49,8 +49,7 @@
 #' @importFrom future plan multisession multicore
 #' @importFrom doFuture registerDoFuture
 #' @importFrom parallel detectCores
-#' @importFrom data.table as.data.table setDT setnames
-#' rbindlist setcolorder setkey
+#' @importFrom data.table as.data.table setDT setnames rbindlist setcolorder setkey
 #' @importFrom igraph ego as_ids is_directed as_data_frame
 #' @importFrom future.apply future_lapply future_sapply future_mapply
 #' @importFrom dplyr mutate
