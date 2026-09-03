@@ -332,7 +332,8 @@ get_predict_table <- function(variable,
                            wsl_out_file_path,
                            wsl_tmp_dir,
                            n_cores,
-                           wsl_sh_file))
+                           wsl_sh_file),
+                  stderr = NULL)  # discard WSL UTF-16 proxy warning
 
   }
   if (!quiet) message("INFO: Running bash script: Done.")
