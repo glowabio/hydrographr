@@ -20,6 +20,7 @@
 #' See Details.
 #' @param tile_id character vector. The IDs of the requested tiles.
 #' @param reg_unit_id character vector. The IDs of the requested regional units.
+#' Only applicable for variable "regional_unit", ignored otherwise!
 #' @param global logical. If TRUE, the global extent file is downloaded.
 #' Default is FALSE.
 #' @param download_dir character. The directory where the files will be
