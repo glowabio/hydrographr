@@ -10,7 +10,8 @@
 #' @param id  character. The name of a column containing unique IDs for
 #' each row of "data" (e.g., occurrence or site IDs). The unique IDs need to be
 #' numeric and less than 10 characters long.
-#' @param stream_layer character. Full path of the stream network .tif file
+#' @param stream_layer character. Full path of the stream network .tif file.
+#' You can download it using download_tiles() with the variable name "segment".
 #' @param accu_layer character. Full path of the flow accumulation .tif file.
 #' Needed if the point should be snapped to the next stream segment having
 #' an accumulation value higher than the flow accumulation threshold
