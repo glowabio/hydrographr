@@ -213,6 +213,16 @@ rm $GWB/output/mspa.log
 echo "MSPA is finished"
 
 ### reclassification of MSPA output to retain only the outer borders
+# The reclass code table is written once per R call into the shared TMPDIR and
+# is read by every lake. Without it pkreclass silently passes the raw MSPA
+# class codes (3, 33, 67, 103) through, and the A*B intersection below then
+# returns streamID*3 instead of streamID. Fail loudly rather than emit those.
+if [ ! -s "$TMPDIR/mspa_reclass_code.txt" ]; then
+    echo "ERROR: $TMPDIR/mspa_reclass_code.txt is missing or empty." >&2
+    echo "       Cannot binarise the MSPA output for lake $LK - aborting." >&2
+    return 1
+fi
+
 pkreclass -co COMPRESS=LZW -co ZLEVEL=9 \
     -i $TMPDIR/lake_${LK}_8_1_0_1.tif \
     -o $TMPDIR/mspa_${LK}.tif --code $TMPDIR/mspa_reclass_code.txt
@@ -335,7 +345,6 @@ rm $TMPDIR/coord_lake_${LK}*
 rm $TMPDIR/buffer_${LK}*
 rm $TMPDIR/flow_${LK}.tif
 rm $TMPDIR/CompUnits_${LK}.vrt
-rm $TMPDIR/mspa_reclass_code.txt
 rm $TMPDIR/mspa_${LK}*
 rm $TMPDIR/lake_${LK}*
 rm $TMPDIR/stream_${LK}.tif
@@ -356,5 +365,8 @@ export -f get_lake_intersection
 ids=$(awk -v id_name=${VAR_ID}  'NR == 1 { for (i=1; i<=NF; i++) {f[$i] = i} } \
     NR > 1 {print $(f[id_name])}' $DATA)
 parallel -j $NCORES --delay 3 get_lake_intersection ::: $ids
+
+# shared across all lakes, so only remove once every lake has been processed
+rm -f $TMPDIR/mspa_reclass_code.txt
 
 exit
