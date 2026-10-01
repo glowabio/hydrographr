@@ -40,13 +40,13 @@ download_test_data <- function(download_dir = ".") {
 
 
   # General path to the test data folder in GDrive
-  gdrive_path <- "https://docs.google.com/uc?export=download&id="
+  #gdrive_path <- "https://docs.google.com/uc?export=download&id="
 
   # File id of the zipped folder retrieved from gdrive
-  file_id <- "1kYNWXmtVm6X7MZLISOePGpvxB1pk1scD"
+  #file_id <- "1kYNWXmtVm6X7MZLISOePGpvxB1pk1scD"
 
   # Entire URL to download the zipped test data:
-  gdrive_url <- paste0(gdrive_path, file_id, "&confirm=t")
+  #gdrive_url <- paste0(gdrive_path, file_id, "&confirm=t")
   igb_url <- "https://public.igb-berlin.de/index.php/s/QtRef2tMKrGePyf/download"
 
   # Local directory where to store it:
@@ -68,22 +68,30 @@ download_test_data <- function(download_dir = ".") {
       #warning("Could not download test data from ", igb_url, ", trying now at ", gdrive_url)
       #download.file(gdrive_url, destfile = full_path_local_zip, mode = "wb")
       # This may run into a problem that you need to manually skip the virus check
+      #stop("Could not download test data from ", igb_url,
+      #        ".\nPlease, download manually at", gdrive_url, "or",
+      #        igb_url, ", store to", full_path_local_zip, "and unzip!")
       stop("Could not download test data from ", igb_url,
-              ".\nPlease, download manually at", gdrive_url, "or",
-              igb_url, ", store to", full_path_local_zip, "and unzip!")
+              ".\nPlease, download manually at", igb_url, ", store to",
+              full_path_local_zip, "and unzip!")
     },
     error = function(c) {
       #warning("Could not download test data from ", igb_url, ", trying now at ", gdrive_url)
       #download.file(gdrive_url, destfile = full_path_local_zip, mode = "wb")
       # This may run into a problem that you need to manually skip the virus check
+      #stop("Could not download test data from ", igb_url,
+      #        ".\nPlease, download manually at", gdrive_url, "or",
+      #        igb_url, ", store to", full_path_local_zip, "and unzip!")
       stop("Could not download test data from ", igb_url,
-              ".\nPlease, download manually at ", gdrive_url, " or ",
-              igb_url, ", store to ", full_path_local_zip, " and unzip!")
+              ".\nPlease, download manually at", igb_url, ", store to",
+              full_path_local_zip, "and unzip!")
     }
   )
 
   # Checking file size, if too small it is probably a HTML page with
   # a virus check warning...
+  # Note 2026-09: This is nearly impossible to happen as we no longer download
+  # from GDrive. Leaving this in, just in case we ever move back to GDrive.
   if (file.size(full_path_local_zip) < 30000000) { # 30000000 bytes = 30 MB (real size is > 36 MB)
 
     # Checking the actual text content (only first 10 lines):
@@ -91,19 +99,23 @@ download_test_data <- function(download_dir = ".") {
     if (any(grepl("still like to download", first_lines, fixed = TRUE))) {
       msg <- paste("Downloading the zipped data from GDrive went wrong,",
                    "as you manually need to confirm skipping the virus check.",
-                   "\nPlease, download manually at", gdrive_url, "or",
-                   igb_url, "and store to", full_path_local_zip,
-                   ". Stopping.")
+                   "\nPlease, download manually at", igb_url, "and store to",
+                   full_path_local_zip, ". Stopping.")
       stop(msg)
 
     } else {
       # In case the text is in a different locale and does not contain those
       # exact words, still warn the user:
+      #msg <- paste0("Downloading the zipped data probably",
+      #              " went wrong, it is only ", file.size(full_path_local_zip),
+      #              " bytes.\nIf this function fails, please download",
+      #              " manually at ", gdrive_url, " or ",
+      #              igb_url, " and store to ", full_path_local_zip, ".")
       msg <- paste0("Downloading the zipped data probably",
                     " went wrong, it is only ", file.size(full_path_local_zip),
                     " bytes.\nIf this function fails, please download",
-                    " manually at ", gdrive_url, " or ",
-                    igb_url, " and store to ", full_path_local_zip, ".")
+                    " manually at", igb_url, " and store to ",
+                    full_path_local_zip, ".")
       stop(msg)
     }
   }
