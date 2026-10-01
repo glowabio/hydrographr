@@ -18,7 +18,7 @@ for a small geographic extent, to test the functions.
 The test data will be automatically downloaded and unzipped
 with this function to a desired path, or can be alternatively downloaded at
 
-\url{https://drive.google.com/file/d/1kYNWXmtVm6X7MZLISOePGpvxB1pk1scD/view?usp=share_link}.
+\url{https://public.igb-berlin.de/index.php/s/QtRef2tMKrGePyf/download}.
 }
 \details{
 Downloads the test data of the Hydrography90m dataset
