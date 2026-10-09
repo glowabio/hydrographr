@@ -28,6 +28,18 @@ in docker's image list:
 docker image ls | grep hydrographr
 ```
 
+To build an image with a fixed commit of hydrographr, use a slightly
+adapted Dockerfile:
+
+```
+cd docker
+builddate=$(date '+%Y%m%d')
+docker build -f Dockerfile-fixed -t hydrographr:${builddate}-fixed .
+
+# it would be quite useful to add the commit to the image name:
+githash=pleaseadd # whichever githash is in your dockerfile!
+docker build -f Dockerfile-fixed -t hydrographr:${builddate}-${githash} .
+```
 
 ## How to run
 
@@ -35,20 +47,20 @@ To run the simple test script that runs a few basic functions of hydrographr,
 just to test whether the image was built correctly, run this command:
 
 ```
-docker run -it hydrographr:${builddate}-base Rscript basic_test_script.R
+docker run -it hydrographr:${builddate}-fixed Rscript basic_test_script.R
 ```
 
 To run a container and directly open an R session:
 
 ```
-docker run -it hydrographr:${builddate}-base
+docker run -it hydrographr:${builddate}-fixed
 ```
 
 To run a docker container and open a command line session - you can use R
 from that command line, by typing "R", as on any other Linux machine.
 
 ```
-docker run -it hydrographr:${builddate}-base /bin/bash
+docker run -it hydrographr:${builddate}-fixed /bin/bash
 ```
 
 ## TODO
