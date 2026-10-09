@@ -63,6 +63,21 @@ from that command line, by typing "R", as on any other Linux machine.
 docker run -it hydrographr:${builddate}-fixed /bin/bash
 ```
 
+
+To run a docker container and mount a host dir:
+
+```
+mkdir hytestresults
+docker run -it -v ./hytestresults:/home/ubuntu/hydro/mounted hydrographr:${builddate}-fixed /bin/bash
+```
+
+Now, if you store anything into `/home/ubuntu/hydro/mounted` inside the container,
+it will be visible outside the container in `./hytestresults`.
+
+
+
+
+
 ## TODO
 
 * Maybe make an image that contains e.g. test data and some required data
