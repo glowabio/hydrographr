@@ -26,7 +26,7 @@ df <- rbind(
   c(longitude = 19.603788, latitude = 40.387366, id=5)
 )
 df <- as.data.frame(df)
-tile_ids <- get_tile_id(df, lon="longitude", lat="latitude")
+tile_ids <- get_tile_id(df, lon="longitude", lat="latitude", tempdir="/tmp/hydrographr")
 tile_ids
 test_passed <- identical(tile_ids, c("h18v04", "h20v02", "h20v04"))
 if (test_passed) cat("\nOK\n") else warning("not ok")
@@ -35,7 +35,7 @@ if (test_passed) cat("\nOK\n") else warning("not ok")
 ### test: get_regional_unit_id()
 ### (this would download 118 MB, but they were already downloaded above)
 cat("\nTest: get_regional_unit_id()")
-reg_id <- get_regional_unit_id(df, lon="longitude", lat="latitude")
+reg_id <- get_regional_unit_id(df, lon="longitude", lat="latitude", tempdir="/tmp/hydrographr")
 reg_id
 test_passed <- reg_id == 66
 if (test_passed) cat("\nOK\n") else warning("not ok")

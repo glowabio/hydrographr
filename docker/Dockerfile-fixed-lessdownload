@@ -1,0 +1,205 @@
+FROM ubuntu:26.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=UTC
+
+# ------------------------------------------------------------
+# System packages
+# ------------------------------------------------------------
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        # R
+        r-base \
+        r-base-dev \
+        \
+        # GDAL / geospatial
+        gdal-bin \
+        libgdal-dev \
+        libgeos-dev \
+        libproj-dev \
+        proj-bin \
+        proj-data \
+        libsqlite3-dev \
+        libudunits2-dev \
+        \
+        # GRASS GIS
+        grass \
+        grass-core \
+        grass-dev \
+        \
+        # Build tools needed by GRASS extensions and R packages
+        build-essential \
+        cmake \
+        pkg-config \
+        git \
+        \
+        # GRASS/R utilities
+        python3 \
+        python3-gdal \
+        \
+        # GNU utilities
+        parallel \
+        bc \
+        wget \
+        curl \
+        \
+        # Libraries needed by R packages
+        libcurl4-openssl-dev \
+        libssl-dev \
+        libxml2-dev \
+        libicu-dev \
+        libfontconfig1-dev \
+        libfreetype6-dev \
+        libpng-dev \
+        libtiff-dev \
+        libjpeg-dev \
+        \
+        # Useful for compiling s2
+        libabsl-dev \
+    && \
+    rm -rf /var/lib/apt/lists/*
+
+
+# ------------------------------------------------------------
+# Verify core software
+# ------------------------------------------------------------
+
+RUN R --version && \
+    gdalinfo --version && \
+    grass --version && \
+    parallel --version && \
+    bc --version
+
+
+# ------------------------------------------------------------
+# Install GRASS extensions
+# ------------------------------------------------------------
+
+RUN grass --exec g.extension extension=r.stream.distance && \
+    grass --exec g.extension extension=r.stream.order && \
+    grass --exec g.extension extension=r.stream.snap && \
+    grass --exec g.extension extension=r.stream.basins
+
+
+# ------------------------------------------------------------
+# Install R packages
+# ------------------------------------------------------------
+
+RUN R -q -e "install.packages(c( \
+    'httr2', \
+    'processx', \
+    'data.table', \
+    'tidyr', \
+    'dplyr', \
+    'stringi', \
+    'stringr', \
+    'rlang', \
+    'DBI', \
+    'RSQLite', \
+    'terra', \
+    'sf', \
+    'doParallel', \
+    'foreach', \
+    'future', \
+    'doFuture', \
+    'future.apply', \
+    'memuse', \
+    'igraph', \
+    'magrittr', \
+    # these are for the vignettes:
+    'knitr', \
+    'readr', \
+    'rgbif', \
+    'here' \
+    ), repos='https://cloud.r-project.org')"
+
+
+# ------------------------------------------------------------
+# Verify R packages
+# ------------------------------------------------------------
+
+RUN R -q -e " \
+    packages <- c( \
+        'httr2', \
+        'processx', \
+        'data.table', \
+        'tidyr', \
+        'dplyr', \
+        'stringi', \
+        'stringr', \
+        'rlang', \
+        'DBI', \
+        'RSQLite', \
+        'terra', \
+        'sf', \
+        'doParallel', \
+        'foreach', \
+        'future', \
+        'doFuture', \
+        'future.apply', \
+        'memuse', \
+        'igraph', \
+        'magrittr', \
+        # these are for the vignettes:
+        'knitr', \
+        'readr', \
+        'rgbif', \
+        'here' \
+    ); \
+    missing <- packages[!vapply(packages, requireNamespace, logical(1), quietly=TRUE)]; \
+    if (length(missing)) stop('Missing R packages: ', paste(missing, collapse=', ')); \
+    cat('All R packages installed successfully.\\n') \
+    "
+
+# ------------------------------------------------------------
+# Define and set working dir
+# ------------------------------------------------------------
+
+RUN mkdir -p /home/ubuntu/hydro/
+WORKDIR /home/ubuntu/hydro
+
+# ------------------------------------------------------------
+# Add test data and static data
+# ------------------------------------------------------------
+
+# Can be downloaded using: get_tile_id(...), 120 MB
+RUN mkdir /tmp/hydrographr
+COPY ./lookup_tile_regunit.txt /tmp/hydrographr
+COPY ./regional_unit_ovr.tif /tmp/hydrographr
+
+# Can be downloaded using: download_test_data(...), 38 MB
+COPY ./hydrography90m_test_data.zip .
+RUN unzip ./hydrography90m_test_data.zip -d ./
+
+# ------------------------------------------------------------
+# Install hydrographr
+# ------------------------------------------------------------
+
+# Commit ddf0da0 of 2026-10-09
+ARG HYDROGRAPHR_COMMIT=ddf0da0e5ee0fdebebae2b4d54a1fb7bcf8b2404
+
+# Make shallow clone to avoid downloading the entire repository
+RUN R -q -e "install.packages('remotes', repos='https://cloud.r-project.org')" && \
+    git init /tmp/hydrographr_install && \
+    cd /tmp/hydrographr_install && \
+    git remote add origin https://github.com/glowabio/hydrographr.git && \
+    git fetch --depth 1 origin ${HYDROGRAPHR_COMMIT} && \
+    git checkout FETCH_HEAD && \
+    R -q -e "remotes::install_local('/tmp/hydrographr_install', dependencies=TRUE)" && \
+    rm -rf /tmp/hydrographr_install
+
+# ------------------------------------------------------------
+# Add basic test script
+# ------------------------------------------------------------
+
+COPY basic_test_script.R /home/ubuntu/hydro
+
+
+# ------------------------------------------------------------
+# Run R
+# ------------------------------------------------------------
+
+#CMD ["/bin/bash"]
+CMD ["R"]
+
