@@ -25,11 +25,11 @@ knitr::write_bib(file = 'bib/references_lakes.bib')
 
 ### Introduction
 
-The following workflow showcases the functionality of the hydrographr package to
-integrate lakes into a stream network and species distribution analysis. 
-We will use freshwater fish species occurrence data from the [cite German freshwater
-fish GBIF database] and HydroLAKES shape files and integrate them into the 
-Hydrography90m stream network (Amatulli et al., 2022).
+The following workflow showcases the functionality of the hydrographr package
+to integrate lakes into a stream network and species distribution analysis.
+We will use freshwater fish species occurrence data from the
+[@friedrichs2024freshwater] and HydroLAKES shape files and integrate them into
+the Hydrography90m stream network ([@amatulli2022hydrography90m]).
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE,  
@@ -247,7 +247,7 @@ unlink("r.watershed", recursive = TRUE)
 
 #### 2. HydroLAKES
 
-For the lake data we use the geo-spatial information from the HydroLAKES global lake data set and more specifically their lake polygons. You can either download the lake data stored in shapefiles or in the geodatabase format, both work with the hydrographr package lake functions.
+For the lake data we use the geo-spatial information from the HydroLAKES global lake data set [@messager2016estimating] and more specifically their lake polygons. You can download the lake data either as shapefiles or in the geodatabase format, both work with the hydrographr package lake functions.
 For more information on the data set you can have a look [here](https://www.hydrosheds.org/products/hydrolakes)
 
 ```{r, eval = FALSE}
@@ -294,13 +294,7 @@ a) GWB (GuidosToolbox Workbench) is available at:
 b) The algorithms of this software are
    based on concepts of mathematical morphological image
    analysis described in the publications:
-   Vogt, P., Riitters, K. (2017).
-   GuidosToolbox: universal digital image object analysis.
-   European Journal of Remote Sensing (TEJR),
-   https://doi.org/10.1080/22797254.2017.1330650 and
-   Soille, P., Vogt, P. (2009). Morphological Segmentation
-   of Binary Patterns. Pattern Recognition Letters,
-   https://doi.org/10.1016/j.patrec.2008.10.015
+   [@vogt2017guidostoolbox] and [@soille2009morphological]
 
 #### Lake analysis
 ### Lake ID identification
@@ -388,7 +382,8 @@ get_lake_catchment(data = lake_165245,
 With the delineated lake catchments and having identified the Hydrography90m unique stream segments IDs intersecting with lakes lets us use hydrographr R functions for additional analysis.
 
 #### Environment90m data integration
-We can now integrate the Environment90m dataset [cite Environment90m paper], which include over 50 variables related to topography, hydrology and climate data aggregated to the subcatchment level of the Hydrograpyh90m stream network and apply them to [see also https://hydrography.org/environment90m] our newly delineated lake catchments. 
+
+We can now integrate the Environment90m dataset [@garcia2025environment90m], which include over 50 variables related to topography, hydrology and climate data aggregated to the subcatchment level of the Hydrograpyh90m stream network and apply them to [see also https://hydrography.org/environment90m] our newly delineated lake catchments.
 
 ### Land cover per lake catchment
 For instance, we can download the land cover data to create time series representing the land cover change within a lake catchments. Let`s look at how the percentage of rainfed cropland and decidous forest changed during the time period 1992 to 2020 at lake Rangsdorf (HydroLAKE ID 165245).
