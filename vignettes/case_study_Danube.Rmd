@@ -416,7 +416,7 @@ knitr::include_graphics(here( "man", "figures", "danube_map.png"))
 
 
 
-<!-- ![](../man/figures/danube_map.png) -->
+<!-- ![map of danube basin with species occurrence locations as red dots](../man/figures/danube_map.png) -->
 
 
 

@@ -152,7 +152,7 @@ spdata_plot
 saveWidget(spdata_plot, file=paste0(here(), "man/figures/germany_map.html"))
 ```
 
-![](../man/figures/germany_map.png){width="800"}
+![map of germany with points for fish locations](../man/figures/germany_map.png){width="800"}
 
 ### Abiotic variables data
 
@@ -487,7 +487,7 @@ able to define a certain flow accumulation threshold and ensure that the
 fish occurrences will not be snapped to a headwater stream (first order
 stream) if there is also a higher order stream next to it.
 
-![](../man/figures/snapping.png)
+![image demonstrating the snapping of a point to a river network](../man/figures/snapping.png)
 
 ```{r, eval = FALSE}
 # Define full paths of raster layers
@@ -699,21 +699,23 @@ the lowest values for the different metrics.
 The node **betweenness** is (roughly) defined by the number of geodesics
 (shortest paths) going through a node:
 
-![](../man/figures/betweenness.png)
+![generalized map showing betweenness in a dense river network](../man/figures/betweenness.png)
 
 The **degree** of a node is the number of its adjacent edges:
 
-![](../man/figures/degree.png){width="800"}
+![generalized map showing degree in a dense river network](../man/figures/degree.png){width="800"}
 
 **Farness** centrality is the sum of the length of the shortest paths
 between the node and all other nodes. It is the reciprocal of closeness
 (Altermatt, 2013):
 
-![](../man/figures/farness.png){width="800"}
+![generalized map showing farness in a dense river network](../man/figures/farness.png){width="800"}
 
 The **eccentricity** of a node is its shortest path distance from the
 farthest other node in the graph (West,
-1996):![eccentricity](../man/figures/eccentricity.png){width="800"}
+1996):
+
+![generalized map showing eccentricity in a dense river network](../man/figures/eccentricity.png){width="800"}
 
 We can add the centrality metrics' values to the table of our points,
 using the sub-catchment id:

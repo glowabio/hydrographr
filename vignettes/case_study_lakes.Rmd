@@ -171,7 +171,7 @@ spdata_plot
 saveWidget(spdata_plot, file=file.path(here(), "man/figures/germany_map.html"))
 ```
 
-![](../man/figures/germany_map.png){width="800"}
+![map of germany with points for fish locations](../man/figures/germany_map.png){width="800"}
 
 
 

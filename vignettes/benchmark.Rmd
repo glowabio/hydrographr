@@ -60,7 +60,7 @@ The reclassification task was performed for the sub-catchments of the entire Ama
 
 To assess the performance of computing zonal statistics using `hydrographr::extract_zonal_stat`, we implemented `terra::zonal` to calculate the mean and the standard deviation of a flow accumulation raster layer, where the ca. 31 million sub-catchments of the Amazon basin were used as the zones. `hydrographr::extract_zonal_stat` returns the following nine statistical measures by default in a single run: the number of cells within each zone, minimum and maximum cell values, range, arithmetic mean, population variance, standard deviation, coefficient of variation, and sum (as provided by the underlying r.univar function in GRASS GIS). Hence, if several statistical measures are of interest, the run-times of individual `terra::zonal` executions must be added up for comparison. The calculation of the means is 2.6 times faster when performed with `terra::zonal` on Windows 247 compared to 645 seconds) and Ubuntu (197 compared to 520 seconds). The RAM usage is fairly large when calculating all zonal statistics with `hydrographr`, with 9.38 GB on Windows and 6.96 GB on Linux, while the mean calculation with `terra` only used 2.68 and 5.39 GB, respectively. While the standard deviation is included in the `hydrographr` output table, `terra::zonal` could not complete the task of calculating the standard deviation and ran out of memory.
 
-![](../man/figures/benchmark.png)
+![Set of diagrams comparing run time and RAM usage of various functions](../man/figures/benchmark.png)
 
 ## Benchmark experiments
 
