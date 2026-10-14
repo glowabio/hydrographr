@@ -89,22 +89,23 @@ get_regional_unit_id <- function(data, lon, lat, quiet = TRUE, tempdir = NULL) {
   # If the required file does not already exist,
   # download it into the tempdir()
   if (file.exists(reg_unit_file)) {
-    message(paste("Will use this file (already downloaded):", reg_unit_file))
+    if (!quiet) message(paste("Using this existing file for looking up regional units:", reg_unit_file))
+
   } else {
-    message(paste0("Downloading the global regional unit file to ",
+    if (!quiet) message(paste0("Downloading the global regional unit file to ",
                    reg_unit_file, "..."))
     # first try Nimbus, then GDrive:
     tryCatch(
       {
-        download.file(nimbus_url_full, destfile = reg_unit_file, mode = "wb")
+        download.file(nimbus_url_full, destfile = reg_unit_file, mode = "wb", quiet=quiet)
       },
       warning = function(warn) {
         message(paste("Download failed, reason: ", warn[1]))
-        download.file(gdrive_url_full, destfile = reg_unit_file, mode = "wb")
+        download.file(gdrive_url_full, destfile = reg_unit_file, mode = "wb", quiet=quiet)
       },
       error = function(err) {
         message(paste("Download failed, reason: ", err[1]))
-        download.file(gdrive_url_full, destfile = reg_unit_file, mode = "wb")
+        download.file(gdrive_url_full, destfile = reg_unit_file, mode = "wb", quiet=quiet)
       }
     )
   }
