@@ -42,7 +42,7 @@ could potentially occur. Finally, we will reclassify the layer of all
 the sub-catchments in the study area, creating a habitat suitability
 map.
 
-![overview of the workflow steps](../man/figures/wf_0.png)
+![overview of the workflow steps](../man/figures/cuba_workflow_steps.png)
 
 <!--![overview species distribution model](../man/figures/SDM.png)-->
 
@@ -205,7 +205,7 @@ IDs using the function *get_tile_id()*. This function downloads and uses
 the auxiliary raster file that contains all the regional units globally,
 and thus requires an active internet connection.
 
-<!--![overview of the workflow steps with first step emphasized](../man/figures/wf_1.png)-->
+<!--![overview of the workflow steps with first step emphasized](../man/figures/cuba_workflow_1.png)-->
 
 ```{r, eval = FALSE}
 tile_id <- get_tile_id(data = spdata, lon = "longitude", lat = "latitude")
@@ -233,7 +233,7 @@ and "h10v06", so we will keep only these two.
 tile_id <- tile_id[c(1,3)]
 ```
 
-<!--![overview of the workflow steps with second step emphasized](../man/figures/wf_2.png)-->
+<!--![overview of the workflow steps with second step emphasized](../man/figures/cuba_workflow_2.png)-->
 
 Let's define the Hydrography90m variables that we would like to
 download. We will use the variables
@@ -302,11 +302,11 @@ destfile = "data/chelsa_bioclim/bio1_IPSL-CM6A-LR_ssp370_2041-2070.tif", mode = 
 
 ```
 
-![visual overview of the required data directories](../man/figures/folder_structure.png)
+![visual overview of the required data directories](../man/figures/cuba_folder_structure.png)
 
 
 ### Cropping
-<!--![overview of the workflow steps with third step emphasized](../man/figures/wf_3.png)-->
+<!--![overview of the workflow steps with third step emphasized](../man/figures/cuba_workflow_3.png)-->
 
 After having downloaded all the layers, we need to crop them to the
 extent of our study area. This is straightforward in the case of the
@@ -378,7 +378,7 @@ for(idir in dirs_h90m) {
 ```
 
 ### Merging
-<!--![overview of the workflow steps with fourth step emphasized](../man/figures/wf_4.png)-->
+<!--![overview of the workflow steps with fourth step emphasized](../man/figures/cuba_workflow_4.png)-->
 
 The cropped tiles of the variable now need to be merged together.
 
@@ -441,7 +441,7 @@ a vector of sub-catchment IDs as input. Note that the function
 any raster file provided to the argument *subc_layer*. It can be safely
 used to query very large raster files, as these are not loaded into R.
 
-<!--![overview of the workflow steps with fifth step emphasized](../man/figures/wf_5.png)-->
+<!--![overview of the workflow steps with fifth step emphasized](../man/figures/cuba_workflow_5.png)-->
 
 ```{r, eval = FALSE}
 spdata_ids <- extract_ids(data = spdata, lon = "longitude", lat = "latitude",
@@ -470,7 +470,7 @@ cause memory problems. However, this highly depends to the number of
 sub-catchments as well. We recommend to test the function with different
 parameters to find out what works best for your case.
 
-<!--![overview of the workflow steps with sixth step emphasized](../man/figures/wf_6.png)-->
+<!--![overview of the workflow steps with sixth step emphasized](../man/figures/cuba_workflow_6.png)-->
 
 
 ```{r, eval = FALSE}
@@ -626,7 +626,7 @@ rm(stats_gpkg_h08v06, stats_gpkg_h10v06); gc()
 
 ### Prepare data for modelling
 
-<!--![overview of the workflow steps with seventh step emphasized](../man/figures/wf_7.png)-->
+<!--![overview of the workflow steps with seventh step emphasized](../man/figures/cuba_workflow_7.png)-->
 
 
 Join the stats_table with the .gpkg database
@@ -888,7 +888,7 @@ including the future Bioclim variables.
 pred <- predict(model, data = stats_table_future[,!1])
 ```
 
-<!--![overview of the workflow steps with eighth step emphasized](../man/figures/wf_8.png)-->
+<!--![overview of the workflow steps with eighth step emphasized](../man/figures/cuba_workflow_8.png)-->
 
 We can now reclassify the sub-catchment raster based on the predicted
 probabilities of occurrence, to visualise the potential suitable
@@ -968,7 +968,7 @@ p <- leaflet() %>% addTiles() %>%
 p
 ```
 
-![map of habitat suitability in cuba](../man/figures/prediction.png){width="800"}
+![map of habitat suitability in cuba](../man/figures/cuba_prediction.png){width="800"}
 
 
 ```{r, include = FALSE, eval = FALSE}
@@ -979,6 +979,6 @@ If we zoom in to the habitat suitability map, we can observe the
 sub-catchments that could offer a suitable habitat to the species in a
 more detailed view.
 
-![zoomed subset of habitat suitability map of cuba](../man/figures/prediction_zoom.png){width="800"}
+![zoomed subset of habitat suitability map of cuba](../man/figures/cuba_prediction_zoom.png){width="800"}
 
 ### References
