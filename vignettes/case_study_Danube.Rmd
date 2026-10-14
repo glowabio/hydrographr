@@ -150,11 +150,11 @@ bbcor <- as.data.frame(st_coordinates(dan))
 
 
 ```{r tiles-danube, fig.cap = "Figure 2. Tiles overlapping with the Danube basin", echo = F, out.width='80%'}
-knitr::include_graphics(here( "man", "figures", "tilesDanube.png"))
+knitr::include_graphics(here( "man", "figures", "danube_tiles.png"))
 
 ```
 
-<!-- ![Figure 1. Tiles overlapping with the Danube basin](../man/figures/tilesDanube.png) -->
+<!-- ![Figure 1. Tiles overlapping with the Danube basin](../man/figures/danube_tiles.png) -->
 
 ## Sub-catchments in the Danube basin
 
