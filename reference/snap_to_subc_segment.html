@@ -114,7 +114,10 @@ Default is NULL.</p></dd>
 
 
 <dt id="arg-stream-layer">stream_layer<a class="anchor" aria-label="anchor" href="#arg-stream-layer"></a></dt>
-<dd><p>character. Full path of the stream network .gpkg file.</p></dd>
+<dd><p>character. Full path of the stream network .gpkg file.
+You can download it using download_tiles() with the variable name
+"order_vect_segment". Read the Sao Francisco vignette for more guidance
+on dealing with this potentially very large file.</p></dd>
 
 
 <dt id="arg-n-cores">n_cores<a class="anchor" aria-label="anchor" href="#arg-n-cores"></a></dt>
@@ -200,7 +203,7 @@ value.</p></li>
 <span>                                            stream_layer <span class="op">=</span> <span class="va">stream_vect</span>,</span>
 <span>                                            n_cores <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="co"># Show head of output table</span></span>
-<span><span class="fu"><a href="https://rspatial.github.io/terra/reference/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">snapped_coordinates</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">snapped_coordinates</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># OR</span></span>
 <span><span class="co"># Automatically extract the basin and sub-catchment IDs and</span></span>
@@ -214,7 +217,7 @@ value.</p></li>
 <span>                                            stream_layer <span class="op">=</span> <span class="va">stream_vect</span>,</span>
 <span>                                            n_cores <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="co"># Show head of output table</span></span>
-<span><span class="fu"><a href="https://rspatial.github.io/terra/reference/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">snapped_coordinates</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">snapped_coordinates</span><span class="op">)</span></span>
 <span></span></code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
