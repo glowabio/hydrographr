@@ -84,8 +84,7 @@ lakes <- (paste0(my_directory,
 # see also (https://forest.jrc.ec.europa.eu/en/activities/lpa/gtb/) and
 # (https://glowabio.github.io/hydrographr/articles/case_study_lake_workflow.html)
 # give full path virtual machine linux path
-edge <- (paste0("/home/USER/GWB_version/",
-                    "/GWB"))
+edge <- "/home/USER/GWB_version/GWB"
 
 stream <- (paste0(my_directory,
                     "/hydrography90m_test_data",

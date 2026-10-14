@@ -42,7 +42,10 @@ Default is NULL.}
 
 \item{subc_layer}{character. Full path to the sub-catchment ID .tif layer.}
 
-\item{stream_layer}{character. Full path of the stream network .gpkg file.}
+\item{stream_layer}{character. Full path of the stream network .gpkg file.
+You can download it using download_tiles() with the variable name
+"order_vect_segment". Read the Sao Francisco vignette for more guidance
+on dealing with this potentially very large file.}
 
 \item{n_cores}{numeric. Number of cores used for parallelisation.
 Default is 1.}
