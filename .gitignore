@@ -49,5 +49,7 @@ docs
 vignettes/data_*
 man/figures*
 vignettes/bib
+hydrography90m_test_data/
+
 # local-only: superseded scripts kept for reference, not published
 workflows/archive/
