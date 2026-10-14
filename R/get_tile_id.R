@@ -11,6 +11,8 @@
 #' @param lon character. The name of the column with the longitude coordinates.
 #' @param lat character. The name of the column with the latitude coordinates.
 #' @param tempdir character. The directory to be used as temp folder. Optional.
+#' @param quiet logical. If FALSE, the standard output will be printed.
+#' Default is TRUE.
 #' @importFrom data.table fread
 #' @export
 #'
@@ -33,7 +35,7 @@
 #'             lon = "longitude", lat = "latitude")
 
 
-get_tile_id <- function(data, lon, lat, tempdir=NULL) {
+get_tile_id <- function(data, lon, lat, quiet=TRUE, tempdir=NULL) {
 
   reg_un <- get_regional_unit_id(data, lon, lat, tempdir=tempdir)
   # TODO: Replace in all internal calls of get_regional_unit_id and get_tile_id!
@@ -46,10 +48,10 @@ get_tile_id <- function(data, lon, lat, tempdir=NULL) {
   if (!file.exists(lookup_file)) {
     download.file("https://drive.google.com/uc?export=download&id=1deKhOEjGgvUXPwivYyH99hgHlJV7OgUv&confirm=t",
                   destfile = lookup_file,
-                  quiet = FALSE)
+                  quiet = quiet)
 
   } else {
-    message(paste("Will use this file (already downloaded):", lookup_file))
+    if (!quiet) message(paste("Using this existing file for looking up tiles per regional unit:", lookup_file))
   }
 
   lookup <- fread(lookup_file)
