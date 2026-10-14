@@ -11,7 +11,10 @@ extract_ids(
   id = NULL,
   basin_layer = NULL,
   subc_layer = NULL,
-  quiet = TRUE
+  quiet = TRUE,
+  tempdir = NULL,
+  res_dir = NULL,
+  keep_res_file = FALSE
 )
 }
 \arguments{
@@ -34,6 +37,17 @@ sub-catchment ID.}
 
 \item{quiet}{logical. If FALSE, the standard output will be printed.
 Default is TRUE.}
+
+\item{tempdir}{character Optional (rarely needed): Pass a directory to be
+used as temporary directory. If not provided, the result of a call to
+tempdir() is used.}
+
+\item{res_dir}{character Optional (rarely needed): Pass a directory to be
+used as result directory. If not provided, the same directory as tempdir
+(above) is used.}
+
+\item{keep_res_file}{logical. If TRUE, the result text file will not be.
+deleted. Default is FALSE.}
 }
 \description{
 Extracts the ID value of the basin and/or sub-catchment raster
@@ -65,16 +79,16 @@ download_test_data(my_directory)
 # Example 1: Extracts the ID value at given point locations
 
 # Load occurrence data
-species_occurrence <- read.table(paste0(my_directory,
-                                        "/hydrography90m_test_data",
-                                        "/spdata_1264942.txt"),
+species_occurrence <- read.table(file.path(my_directory,
+                                        "hydrography90m_test_data",
+                                        "spdata_1264942.txt"),
                                  header = TRUE)
 
 # Define full path to the basin and sub-catchments raster layer
-basin_raster <- paste0(my_directory,
-                     "/hydrography90m_test_data/basin_1264942.tif")
-subc_raster <- paste0(my_directory,
-                    "/hydrography90m_test_data/basin_1264942.tif")
+basin_raster <- file.path(my_directory,
+                     "hydrography90m_test_data/basin_1264942.tif")
+subc_raster <- file.path(my_directory,
+                    "hydrography90m_test_data/subcatchment_1264942.tif")
 
 # Extract basin and sub-catchment IDs from the Hydrography90m layers
 hydrography90m_ids <- extract_ids(data = species_occurrence,
@@ -88,10 +102,10 @@ hydrography90m_ids <- extract_ids(data = species_occurrence,
 hydrography90m_ids
 
 # Example 2: Extract ID values of all subcatchments
-subc_raster <- paste0(my_directory,
-"/hydrography90m_test_data/subcatchment_1264942.tif")
+subc_raster <- file.path(my_directory,
+                    "hydrography90m_test_data/subcatchment_1264942.tif")
 hydrography90m_ids <- extract_ids(subc_layer = subc_raster)
-fwrite(hydrography90m_ids, paste0(my_directory, '/subc_IDs.txt'))
+fwrite(hydrography90m_ids, file.path(my_directory, 'subc_IDs.txt'))
 }
 \references{
 \url{https://gdal.org/programs/gdallocationinfo.html}
