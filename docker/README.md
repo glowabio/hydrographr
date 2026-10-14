@@ -133,7 +133,6 @@ docker run -it -v ./downloaded_static:/tmp/hydrographr hydrographr:${builddate}-
 
 ## TODO
 
-* Maybe make an image that contains e.g. test data and some required data
-* Make a slimmer image
+* Make the image slimmer!
 * Extend the basic test scripts, eventually write real unit tests
 * Create an image that has all library versions fixed

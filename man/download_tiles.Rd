@@ -22,7 +22,8 @@ See Details.}
 
 \item{tile_id}{character vector. The IDs of the requested tiles.}
 
-\item{reg_unit_id}{character vector. The IDs of the requested regional units.}
+\item{reg_unit_id}{character vector. The IDs of the requested regional units.
+Only applicable for variable "regional_unit", ignored otherwise!}
 
 \item{global}{logical. If TRUE, the global extent file is downloaded.
 Default is FALSE.}
