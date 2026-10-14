@@ -62,16 +62,16 @@
 #' # Example 1: Extracts the ID value at given point locations
 #'
 #' # Load occurrence data
-#' species_occurrence <- read.table(paste0(my_directory,
-#'                                         "/hydrography90m_test_data",
-#'                                         "/spdata_1264942.txt"),
+#' species_occurrence <- read.table(file.path(my_directory,
+#'                                         "hydrography90m_test_data",
+#'                                         "spdata_1264942.txt"),
 #'                                  header = TRUE)
 #'
 #' # Define full path to the basin and sub-catchments raster layer
-#' basin_raster <- paste0(my_directory,
-#'                      "/hydrography90m_test_data/basin_1264942.tif")
-#' subc_raster <- paste0(my_directory,
-#'                     "/hydrography90m_test_data/basin_1264942.tif")
+#' basin_raster <- file.path(my_directory,
+#'                      "hydrography90m_test_data/basin_1264942.tif")
+#' subc_raster <- file.path(my_directory,
+#'                     "hydrography90m_test_data/subcatchment_1264942.tif")
 #'
 #' # Extract basin and sub-catchment IDs from the Hydrography90m layers
 #' hydrography90m_ids <- extract_ids(data = species_occurrence,
@@ -85,10 +85,10 @@
 #' hydrography90m_ids
 #'
 #' # Example 2: Extract ID values of all subcatchments
-#' subc_raster <- paste0(my_directory,
-#' "/hydrography90m_test_data/subcatchment_1264942.tif")
+#' subc_raster <- file.path(my_directory,
+#'                     "hydrography90m_test_data/subcatchment_1264942.tif")
 #' hydrography90m_ids <- extract_ids(subc_layer = subc_raster)
-#' fwrite(hydrography90m_ids, paste0(my_directory, '/subc_IDs.txt'))
+#' fwrite(hydrography90m_ids, file.path(my_directory, 'subc_IDs.txt'))
 
 
 extract_ids <- function(data = NULL, lon, lat, id = NULL, basin_layer = NULL,
@@ -179,12 +179,12 @@ extract_ids <- function(data = NULL, lon, lat, id = NULL, basin_layer = NULL,
 
     }
     # Export taxon occurrence points
-    coord_tmp_path <- paste0(tempdir, "/coordinates_", rand_string, ".txt")
+    coord_tmp_path <- file.path(tempdir, paste0("coordinates_", rand_string, ".txt"))
     ## Note:Only export lon/lat column
     fwrite(coord, coord_tmp_path, col.names = TRUE,
            row.names = FALSE, quote = FALSE, sep = " ")
     # Path for tmp ids.txt file
-    res_file <- paste0(res_dir, "/ids_", rand_string, ".txt")
+    res_file <- file.path(res_dir, paste0("ids_", rand_string, ".txt"))
 
     # Check operating system
     sys_os <- get_os()
