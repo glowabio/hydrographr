@@ -72,7 +72,7 @@ stream network to the clostest dam up- and downstream of fish occurrence
 sites</h3>
                         <h4 data-toc-skip class="author"></h4>
             
-            <h4 data-toc-skip class="date">2026-04-27</h4>
+            <h4 data-toc-skip class="date">2026-10-14</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/glowabio/hydrographr/blob/HEAD/vignettes/case_study_brazil.Rmd" class="external-link"><code>vignettes/case_study_brazil.Rmd</code></a></small>
       <div class="d-none name"><code>case_study_brazil.Rmd</code></div>
@@ -112,7 +112,10 @@ stream network between each point location (fish and dams) and get the
 up- and downstream stream segments from each point locations as a graph.
 Afterwards, we will query the tables and evaluate the shortest distance
 to the next dam as well as the number of dams.</p>
-<p><img src="../reference/figures/workflow_case_study_brazil.png"></p>
+<div class="float">
+<img src="../reference/figures/workflow_case_study_brazil.png" alt="overview the different steps of this workflow connected with arrows"><div class="figcaption">overview the different steps of this workflow
+connected with arrows</div>
+</div>
 <p>Let’s get started!</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Load libraries</span></span>
@@ -530,7 +533,10 @@ Brazil
 <span>  <span class="fu"><a href="https://rstudio.github.io/leaflet/reference/addLegend.html" class="external-link">addLegend</a></span><span class="op">(</span>pal <span class="op">=</span> <span class="va">factpal</span>, values <span class="op">=</span> <span class="op">~</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/is.bool.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">year</span><span class="op">)</span>,</span>
 <span>            title <span class="op">=</span> <span class="st">"Year of record"</span><span class="op">)</span></span>
 <span><span class="va">spdata_plot</span></span></code></pre></div>
-<p><img src="../reference/figures/occurrence_locations.png"></p>
+<div class="float">
+<img src="../reference/figures/occurrence_locations.png" alt="map of study area with coloured dots where the species occurred"><div class="figcaption">map of study area with coloured dots where the
+species occurred</div>
+</div>
 </div>
 <div class="section level3">
 <h3 id="download-files">Download files<a class="anchor" aria-label="anchor" href="#download-files"></a>
@@ -541,7 +547,7 @@ We can obtain these IDs using the function <code>get_tile_id</code>.
 This function downloads and uses the auxiliary raster file that contains
 all the regional units globally, and thus requires an active internet
 connection.</p>
-<!-- ![](../man/figures/workflow1.png)-->
+<!-- ![overview of workflow steps, first part](../man/figures/workflow1.png)-->
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Get the tile IDs where the points are located</span></span>
 <span><span class="va">tile_id</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_tile_id.html">get_tile_id</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">spdata</span>, lon <span class="op">=</span> <span class="st">"longitude"</span>, lat <span class="op">=</span> <span class="st">"latitude"</span><span class="op">)</span></span></code></pre></div>
@@ -604,7 +610,7 @@ raster tiles and then merge them. Afterwards, we will extract the unique
 sub-catchment IDs from the raster layer to filter the stream network
 GeoPackage tiles (order_vect_segment) for stream segments with the same
 sub-catchment ID and merge them as well.</p>
-<!-- ![](../man/figures/workflow2.png)-->
+<!-- ![overview of workflow steps, second part](../man/figures/workflow2.png)-->
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Define a directory for the São Francisco drainage basin</span></span>
 <span><span class="va">saofra_dir</span> <span class="op">&lt;-</span>  <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data/basin_481051"</span><span class="op">)</span></span>
@@ -744,7 +750,7 @@ respectively. Both datasets can be downloaded from <a href="https://www.globalda
 which are located within the the São Francisco drainage we will use the
 polygon of the drainage basin. For this step we will use the functions
 of the R package <code>sf</code>.</p>
-<!-- ![](../man/figures/workflow3.png)-->
+<!-- ![overview of workflow steps, third part](../man/figures/workflow3.png)-->
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Load the GRanD data shape file</span></span>
 <span><span class="va">grand_pts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_read.html" class="external-link">st_read</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, </span>
@@ -823,7 +829,10 @@ point was originally located in.</p>
 accumulation threshold and to ensure that the fish occurrences and dams
 will not be snapped to a headwater stream (first order stream) if there
 is also a higher order stream next to it.</p>
-<p><img src="../reference/figures/snapping.png"></p>
+<div class="float">
+<img src="../reference/figures/snapping.png" alt="image demonstrating the snapping of a point to a river network"><div class="figcaption">image demonstrating the snapping of a point to a
+river network</div>
+</div>
 <p>The function is implemented in a for-loop to start searching for
 streams with a very high flow accumulation of 400,000 km² in a very
 short distance and then slowly decreases the flow accumulation to 100
@@ -831,7 +840,7 @@ km². If there are still sites left which were not snapped to a stream
 segment yet. The distance will increase from 10 up to 30 cells.</p>
 <p>In addition to the new coordinates the function will also report the
 unique sub-catchment IDs.</p>
-<!-- ![](../man/figures/workflow4.png)-->
+<!-- ![overview of workflow steps, fourth part](../man/figures/workflow4.png)-->
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Define full path to the stream network raster layer</span></span>
 <span><span class="va">stream_rast</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">saofra_dir</span>, <span class="st">"/segment_481051.tif"</span><span class="op">)</span></span>
@@ -1119,7 +1128,10 @@ subc_id_snap_accu
 <span>            title <span class="op">=</span> <span class="st">"Site type"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">locations_plot</span></span></code></pre></div>
-<p><img src="../reference/figures/point_location_snapped.png"></p>
+<div class="float">
+<img src="../reference/figures/point_location_snapped.png" alt="map of study area with locations of dams and fish"><div class="figcaption">map of study area with locations of dams and
+fish</div>
+</div>
 </div>
 <div class="section level3">
 <h3 id="snap-point-locations-to-the-stream-segment-within-the-sub-catchment-with-the-same-unique-id">Snap point locations to the stream segment within the sub-catchment
@@ -1169,7 +1181,7 @@ Sobradinho dam we will use the function
 catchment and use the polygon of the upstream catchment to select our
 point locations using the functions provided by the <code>sf</code>
 package.</p>
-<!-- ![](../man/figures/workflow5.png)-->
+<!-- ![overview of workflow steps, fifth part](../man/figures/workflow5.png)-->
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Define full path for the direction raster layer</span></span>
 <span><span class="va">direction_rast</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">saofra_dir</span>, <span class="st">"/direction_481051.tif"</span><span class="op">)</span></span>
@@ -1267,7 +1279,10 @@ package.</p>
 <span>            title <span class="op">=</span> <span class="st">"Site type"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">upcatch_plot</span></span></code></pre></div>
-<p><img src="../reference/figures/upstream_catchment.png"></p>
+<div class="float">
+<img src="../reference/figures/upstream_catchment.png" alt="map of upstream catchment with coloured dots where the species occurred"><div class="figcaption">map of upstream catchment with coloured dots
+where the species occurred</div>
+</div>
 </div>
 <div class="section level3">
 <h3 id="get-distance-along-the-stream-network">Get distance along the stream network<a class="anchor" aria-label="anchor" href="#get-distance-along-the-stream-network"></a>
@@ -1276,7 +1291,7 @@ package.</p>
 each fish occurrence we will first calculate the distance between all
 point locations (fish occurrences and dams) using the function
 <code>get_distance</code>.</p>
-<!-- ![](../man/figures/workflow6.png)-->
+<!-- ![overview of workflow steps, sixth part](../man/figures/workflow6.png)-->
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Define the full path to the upstream basin raster layer and the GeoPackage</span></span>
 <span><span class="co"># of the upstream stream segments </span></span>
@@ -1394,7 +1409,7 @@ sub-catchment IDs of the fish occurrences to use the function
 <code>get_catchment_graph</code>. The function will return for each fish
 occurrence all sub-catchment IDs which are located up- or
 downstream.</p>
-<!-- ![](../man/figures/workflow7.png)-->
+<!-- ![overview of workflow steps, seventh part](../man/figures/workflow7.png)-->
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Define full path to the GeoPackage of the stream segments</span></span>
 <span><span class="co"># upstream_segment_vect &lt;- paste0(upcatch_dir, "/order_vect_segment_2516.gpkg")</span></span>
@@ -1623,7 +1638,7 @@ the closest dam<a class="anchor" aria-label="anchor" href="#determine-the-number
 sub-catchment IDs up- and downstream of each fish occurrence, we can
 estimate the number of dams and evaluate the distance to the closest
 dam.</p>
-<!-- ![](../man/figures/workflow.png) -->
+<!-- ![overview of workflow steps](../man/figures/workflow.png) -->
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Get all sub-catchment IDs of fish occurrences with stream segments upstream</span></span>
 <span><span class="va">fs_subc_ids_up</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">upstream_segments</span><span class="op">)</span></span>
@@ -1750,7 +1765,9 @@ dam.</p>
 <span>                      labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Existing"</span>, <span class="st">"Future"</span><span class="op">)</span>,</span>
 <span>                      values <span class="op">=</span> <span class="va">cols</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Fish occurrence site ID"</span>, y <span class="op">=</span> <span class="st">"Number of dams"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="../reference/figures/number_of_dams.png"></p>
+<div class="float">
+<img src="../reference/figures/number_of_dams.png" alt="barplots of number of dams for fish site"><div class="figcaption">barplots of number of dams for fish site</div>
+</div>
 <p>With the exception of the fish occurrence sites 4 and 6 the number of
 upstream dams will dramatically increase. Especially for site 9, which
 has already 14 dams located upstream, the number might increase to 94
@@ -1772,7 +1789,10 @@ disconnection of these two sites from the others.</p>
 <span>                      labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Existing"</span>, <span class="st">"Future"</span><span class="op">)</span>,</span>
 <span>                      values <span class="op">=</span> <span class="va">cols</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Fish occurrence site ID"</span>, y <span class="op">=</span> <span class="st">"Distance along the stream network (km)"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="../reference/figures/distance_to_dams.png"></p>
+<div class="float">
+<img src="../reference/figures/distance_to_dams.png" alt="bar plots showing distance of dams for fish sites"><div class="figcaption">bar plots showing distance of dams for fish
+sites</div>
+</div>
 <p>The distance to the next existing dam upstream ranges from 12.6km for
 the fish occurrence site 8 to 528.9km for the fish occurrence site 9.
 For most sites the the distance to the next dam upstream will decrease
@@ -1788,9 +1808,11 @@ decrease from about 1475km to about 114km for the fish occurrence sites
 </h3>
 <div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-amatulli2022hydrography90m" class="csl-entry">
-Amatulli, Giuseppe, Jaime Garcia Marquez, Tushar Sethi, et al. 2022.
-<span>“Hydrography90m: A New High-Resolution Global Hydrographic
-Dataset.”</span> <em>Earth System Science Data</em> 14 (10): 4525–50.
+Amatulli, Giuseppe, Jaime Garcia Marquez, Tushar Sethi, Jens Kiesel,
+Afroditi Grigoropoulou, Maria M Üblacker, Longzhu Q Shen, and Sami
+Domisch. 2022. <span>“Hydrography90m: A New High-Resolution Global
+Hydrographic Dataset.”</span> <em>Earth System Science Data</em> 14
+(10): 4525–50.
 </div>
 <div id="ref-R-leafem" class="csl-entry">
 Appelhans, Tim. 2022. <em>Leafem: Leaflet Extensions for Mapview</em>.
@@ -1829,12 +1851,14 @@ Standardized Support for Spatial Vector Data</span>.”</span>
 </div>
 <div id="ref-R-base" class="csl-entry">
 R Core Team. 2022. <em>R: A Language and Environment for Statistical
-Computing</em>. R Foundation for Statistical Computing. <a href="https://www.R-project.org/" class="external-link">https://www.R-project.org/</a>.
+Computing</em>. Vienna, Austria: R Foundation for Statistical Computing.
+<a href="https://www.R-project.org/" class="external-link">https://www.R-project.org/</a>.
 </div>
 <div id="ref-R-hydrographr" class="csl-entry">
-Schürz, Marlene, Afroditi Grigoropoulou, Jaime Garcia Marquez, et al.
-2023. <em>Hydrographr: Scalable Hydrographic Data Processing in r</em>.
-<a href="https://glowabio.github.io/hydrographr/" class="external-link">https://glowabio.github.io/hydrographr/</a>.
+Schürz, Marlene, Afroditi Grigoropoulou, Jaime Garcia Marquez, Yusdiel
+Torres Cambas, Christoph Schürz, Mathieu Floury, Thomas Tomiczek,
+Vanessa Bremerich, Giuseppe Amatulli, and Sami Domisch. 2023.
+<em>Hydrographr: Scalable Hydrographic Data Processing in r</em>. <a href="https://glowabio.github.io/hydrographr/" class="external-link">https://glowabio.github.io/hydrographr/</a>.
 </div>
 <div id="ref-R-htmlwidgets" class="csl-entry">
 Vaidyanathan, Ramnath, Yihui Xie, JJ Allaire, Joe Cheng, Carson Sievert,
@@ -1845,12 +1869,12 @@ Wickham, Hadley. 2016. <em>Ggplot2: Elegant Graphics for Data
 Analysis</em>. Springer-Verlag New York. <a href="https://ggplot2.tidyverse.org" class="external-link">https://ggplot2.tidyverse.org</a>.
 </div>
 <div id="ref-R-stringr" class="csl-entry">
-Wickham, Hadley. 2022. <em>Stringr: Simple, Consistent Wrappers for
-Common String Operations</em>. <a href="https://CRAN.R-project.org/package=stringr" class="external-link">https://CRAN.R-project.org/package=stringr</a>.
+———. 2022. <em>Stringr: Simple, Consistent Wrappers for Common String
+Operations</em>. <a href="https://CRAN.R-project.org/package=stringr" class="external-link">https://CRAN.R-project.org/package=stringr</a>.
 </div>
 <div id="ref-R-forcats" class="csl-entry">
-Wickham, Hadley. 2023. <em>Forcats: Tools for Working with Categorical
-Variables (Factors)</em>. <a href="https://CRAN.R-project.org/package=forcats" class="external-link">https://CRAN.R-project.org/package=forcats</a>.
+———. 2023. <em>Forcats: Tools for Working with Categorical Variables
+(Factors)</em>. <a href="https://CRAN.R-project.org/package=forcats" class="external-link">https://CRAN.R-project.org/package=forcats</a>.
 </div>
 <div id="ref-R-dplyr" class="csl-entry">
 Wickham, Hadley, Romain François, Lionel Henry, and Kirill Müller. 2022.
@@ -1867,12 +1891,12 @@ Computational Research</em>, edited by Victoria Stodden, Friedrich
 Leisch, and Roger D. Peng. Chapman; Hall/CRC.
 </div>
 <div id="ref-knitr2015" class="csl-entry">
-Xie, Yihui. 2015. <em>Dynamic Documents with <span>R</span> and
-Knitr</em>. 2nd ed. Chapman; Hall/CRC. <a href="https://yihui.org/knitr/" class="external-link">https://yihui.org/knitr/</a>.
+———. 2015. <em>Dynamic Documents with <span>R</span> and Knitr</em>. 2nd
+ed. Boca Raton, Florida: Chapman; Hall/CRC. <a href="https://yihui.org/knitr/" class="external-link">https://yihui.org/knitr/</a>.
 </div>
 <div id="ref-R-knitr" class="csl-entry">
-Xie, Yihui. 2023. <em>Knitr: A General-Purpose Package for Dynamic
-Report Generation in r</em>. <a href="https://yihui.org/knitr/" class="external-link">https://yihui.org/knitr/</a>.
+———. 2023. <em>Knitr: A General-Purpose Package for Dynamic Report
+Generation in r</em>. <a href="https://yihui.org/knitr/" class="external-link">https://yihui.org/knitr/</a>.
 </div>
 <div id="ref-R-kableExtra" class="csl-entry">
 Zhu, Hao. 2021. <em>kableExtra: Construct Complex Table with Kable and
@@ -1891,7 +1915,7 @@ Pipe Syntax</em>. <a href="https://CRAN.R-project.org/package=kableExtra" class=
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer>

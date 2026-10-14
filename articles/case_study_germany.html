@@ -71,7 +71,7 @@ species data prior to network analyses for freshwater fish in
 Germany</h3>
                         <h4 data-toc-skip class="author"></h4>
             
-            <h4 data-toc-skip class="date">2026-04-27</h4>
+            <h4 data-toc-skip class="date">2026-10-14</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/glowabio/hydrographr/blob/HEAD/vignettes/case_study_germany.Rmd" class="external-link"><code>vignettes/case_study_germany.Rmd</code></a></small>
       <div class="d-none name"><code>case_study_germany.Rmd</code></div>
@@ -272,7 +272,10 @@ xmax, ymax)</p>
 <span>  <span class="fu"><a href="https://rstudio.github.io/leaflet/reference/addLegend.html" class="external-link">addLegend</a></span><span class="op">(</span>pal <span class="op">=</span> <span class="va">factpal</span>, values <span class="op">=</span> <span class="op">~</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/is.bool.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">year</span><span class="op">)</span>,</span>
 <span>            title <span class="op">=</span> <span class="st">"Year of record"</span><span class="op">)</span></span>
 <span><span class="va">spdata_plot</span></span></code></pre></div>
-<p><img src="../reference/figures/germany_map.png" width="800"></p>
+<div class="float">
+<img src="../reference/figures/germany_map.png" width="800" alt="map of germany with points for fish locations"><div class="figcaption">map of germany with points for fish
+locations</div>
+</div>
 </div>
 <div class="section level3">
 <h3 id="abiotic-variables-data">Abiotic variables data<a class="anchor" aria-label="anchor" href="#abiotic-variables-data"></a>
@@ -608,7 +611,10 @@ segment of the sub-catchment the point was originally located in.</p>
 accumulation threshold and ensure that the fish occurrences will not be
 snapped to a headwater stream (first order stream) if there is also a
 higher order stream next to it.</p>
-<p><img src="../reference/figures/snapping.png"></p>
+<div class="float">
+<img src="../reference/figures/snapping.png" alt="image demonstrating the snapping of a point to a river network"><div class="figcaption">image demonstrating the snapping of a point to a
+river network</div>
+</div>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Define full paths of raster layers</span></span>
 <span><span class="va">stream_rast</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">study_area_dir</span>, <span class="st">"/segment_h18v02_crop.tif"</span><span class="op">)</span></span>
@@ -918,16 +924,29 @@ QGIS. Yellow sub-catchments have the highest values, whereas dark blue
 have the lowest values for the different metrics.</p>
 <p>The node <strong>betweenness</strong> is (roughly) defined by the
 number of geodesics (shortest paths) going through a node:</p>
-<p><img src="../reference/figures/betweenness.png"></p>
+<div class="float">
+<img src="../reference/figures/betweenness.png" alt="generalized map showing betweenness in a dense river network"><div class="figcaption">generalized map showing betweenness in a dense
+river network</div>
+</div>
 <p>The <strong>degree</strong> of a node is the number of its adjacent
 edges:</p>
-<p><img src="../reference/figures/degree.png" width="800"></p>
+<div class="float">
+<img src="../reference/figures/degree.png" width="800" alt="generalized map showing degree in a dense river network"><div class="figcaption">generalized map showing degree in a dense river
+network</div>
+</div>
 <p><strong>Farness</strong> centrality is the sum of the length of the
 shortest paths between the node and all other nodes. It is the
 reciprocal of closeness (Altermatt, 2013):</p>
-<p><img src="../reference/figures/farness.png" width="800"></p>
+<div class="float">
+<img src="../reference/figures/farness.png" width="800" alt="generalized map showing farness in a dense river network"><div class="figcaption">generalized map showing farness in a dense river
+network</div>
+</div>
 <p>The <strong>eccentricity</strong> of a node is its shortest path
-distance from the farthest other node in the graph (West, 1996):<img src="../reference/figures/eccentricity.png" width="800" alt="eccentricity"></p>
+distance from the farthest other node in the graph (West, 1996):</p>
+<div class="float">
+<img src="../reference/figures/eccentricity.png" width="800" alt="generalized map showing eccentricity in a dense river network"><div class="figcaption">generalized map showing eccentricity in a dense
+river network</div>
+</div>
 <p>We can add the centrality metrics’ values to the table of our points,
 using the sub-catchment id:</p>
 <div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
@@ -2010,18 +2029,21 @@ Müller, Kirill. 2020. <em>Here: A Simpler Way to Find Your Files</em>.
 </div>
 <div id="ref-R-base" class="csl-entry">
 R Core Team. 2023. <em>R: A Language and Environment for Statistical
-Computing</em>. R Foundation for Statistical Computing. <a href="https://www.R-project.org/" class="external-link">https://www.R-project.org/</a>.
+Computing</em>. Vienna, Austria: R Foundation for Statistical Computing.
+<a href="https://www.R-project.org/" class="external-link">https://www.R-project.org/</a>.
 </div>
 <div id="ref-R-hydrographr" class="csl-entry">
-Schürz, Marlene, Afroditi Grigoropoulou, Jaime Garcia Marquez, et al.
-2023. <em>Hydrographr: Scalable Hydrographic Data Processing in r</em>.
-<a href="https://glowabio.github.io/hydrographr/" class="external-link">https://glowabio.github.io/hydrographr/</a>.
+Schürz, Marlene, Afroditi Grigoropoulou, Jaime Garcia Marquez, Yusdiel
+Torres Cambas, Christoph Schürz, Mathieu Floury, Thomas Tomiczek,
+Vanessa Bremerich, Giuseppe Amatulli, and Sami Domisch. 2023.
+<em>Hydrographr: Scalable Hydrographic Data Processing in r</em>. <a href="https://glowabio.github.io/hydrographr/" class="external-link">https://glowabio.github.io/hydrographr/</a>.
 </div>
 <div id="ref-hydrographr2023" class="csl-entry">
-Schürz, Marlene, Afroditi Grigoropoulou, Jaime García Márquez, et al.
-2023. <span>“Hydrographr: An r Package for Scalable Hydrographic Data
-Processing.”</span> <em>Methods in Ecology and Evolution</em> 0 (0):
-1–11. https://doi.org/<a href="https://doi.org/10.1111/2041-210X.14226" class="external-link">https://doi.org/10.1111/2041-210X.14226</a>.
+Schürz, Marlene, Afroditi Grigoropoulou, Jaime García Márquez, Yusdiel
+Torres-Cambas, Thomas Tomiczek, Mathieu Floury, Vanessa Bremerich, et
+al. 2023. <span>“Hydrographr: An r Package for Scalable Hydrographic
+Data Processing.”</span> <em>Methods in Ecology and Evolution</em> 0
+(0): 1–11. https://doi.org/<a href="https://doi.org/10.1111/2041-210X.14226" class="external-link">https://doi.org/10.1111/2041-210X.14226</a>.
 </div>
 <div id="ref-R-htmlwidgets" class="csl-entry">
 Vaidyanathan, Ramnath, Yihui Xie, JJ Allaire, Joe Cheng, Carson Sievert,
@@ -2042,12 +2064,12 @@ Computational Research</em>, edited by Victoria Stodden, Friedrich
 Leisch, and Roger D. Peng. Chapman; Hall/CRC.
 </div>
 <div id="ref-knitr2015" class="csl-entry">
-Xie, Yihui. 2015. <em>Dynamic Documents with <span>R</span> and
-Knitr</em>. 2nd ed. Chapman; Hall/CRC. <a href="https://yihui.org/knitr/" class="external-link">https://yihui.org/knitr/</a>.
+———. 2015. <em>Dynamic Documents with <span>R</span> and Knitr</em>. 2nd
+ed. Boca Raton, Florida: Chapman; Hall/CRC. <a href="https://yihui.org/knitr/" class="external-link">https://yihui.org/knitr/</a>.
 </div>
 <div id="ref-R-knitr" class="csl-entry">
-Xie, Yihui. 2023. <em>Knitr: A General-Purpose Package for Dynamic
-Report Generation in r</em>. <a href="https://yihui.org/knitr/" class="external-link">https://yihui.org/knitr/</a>.
+———. 2023. <em>Knitr: A General-Purpose Package for Dynamic Report
+Generation in r</em>. <a href="https://yihui.org/knitr/" class="external-link">https://yihui.org/knitr/</a>.
 </div>
 <div id="ref-R-kableExtra" class="csl-entry">
 Zhu, Hao. 2021. <em>kableExtra: Construct Complex Table with Kable and
@@ -2066,7 +2088,7 @@ Pipe Syntax</em>. <a href="http://haozhu233.github.io/kableExtra/" class="extern
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer>

@@ -70,7 +70,7 @@
 data before and after a Species Distribution Model</h3>
                         <h4 data-toc-skip class="author"></h4>
             
-            <h4 data-toc-skip class="date">2026-04-27</h4>
+            <h4 data-toc-skip class="date">2026-10-14</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/glowabio/hydrographr/blob/HEAD/vignettes/case_study_cuba.Rmd" class="external-link"><code>vignettes/case_study_cuba.Rmd</code></a></small>
       <div class="d-none name"><code>case_study_cuba.Rmd</code></div>
@@ -95,8 +95,10 @@ the random forest (RF) algorithm, we will build a simple SDM and predict
 where the species could potentially occur. Finally, we will reclassify
 the layer of all the sub-catchments in the study area, creating a
 habitat suitability map.</p>
-<p><img src="../reference/figures/wf_0.png"></p>
-<!--![](../man/figures/SDM.png)-->
+<div class="float">
+<img src="../reference/figures/cuba_workflow_steps.png" alt="overview of the workflow steps"><div class="figcaption">overview of the workflow steps</div>
+</div>
+<!--![overview species distribution model](../man/figures/SDM.png)-->
 <p><a href="https://www.gbif.org/species/1424240" class="external-link"><em>Hypolestes
 trinitatis</em></a> is a damselfly species endemic to Cuba. The species
 inhabits rivers and streams located in forest areas at the main mountain
@@ -920,7 +922,9 @@ xmax, ymax)</p>
 <span>  <span class="fu"><a href="https://rstudio.github.io/leaflet/reference/map-layers.html" class="external-link">addCircles</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">spdata_vect</span>, color <span class="op">=</span> <span class="st">"purple"</span><span class="op">)</span> <span class="co"># data = spdata</span></span>
 <span></span>
 <span><span class="va">m</span></span></code></pre></div>
-<p><img src="../reference/figures/cuba_map.png"></p>
+<div class="float">
+<img src="../reference/figures/cuba_map.png" alt="map of cuba with locations of occurrences"><div class="figcaption">map of cuba with locations of occurrences</div>
+</div>
 </div>
 <div class="section level3">
 <h3 id="download-files">Download files<a class="anchor" aria-label="anchor" href="#download-files"></a>
@@ -931,7 +935,7 @@ these IDs using the function <em>get_tile_id()</em>. This function
 downloads and uses the auxiliary raster file that contains all the
 regional units globally, and thus requires an active internet
 connection.</p>
-<!--![](../man/figures/wf_1.png)-->
+<!--![overview of the workflow steps with first step emphasized](../man/figures/cuba_workflow_1.png)-->
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">tile_id</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_tile_id.html">get_tile_id</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">spdata</span>, lon <span class="op">=</span> <span class="st">"longitude"</span>, lat <span class="op">=</span> <span class="st">"latitude"</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
@@ -946,7 +950,7 @@ double check which tile IDs are relevant for your purpose using the
 “h08v06” and “h10v06”, so we will keep only these two.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">tile_id</span> <span class="op">&lt;-</span> <span class="va">tile_id</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">3</span><span class="op">)</span><span class="op">]</span></span></code></pre></div>
-<!--![](../man/figures/wf_2.png)-->
+<!--![overview of the workflow steps with second step emphasized](../man/figures/cuba_workflow_2.png)-->
 <p>Let’s define the Hydrography90m variables that we would like to
 download. We will use the variables <a href="https://hydrography.org/hydrography90m/hydrography90m_layers#stream-slope-layers" class="external-link">slope_curv_max_dw_cel</a>
 (maximum curvature between the highest upstream, focal and downstream
@@ -995,12 +999,15 @@ and visualisations are available <a href="https://hydrography.org/hydrography90m
 <span>destfile <span class="op">=</span> <span class="st">"data/chelsa_bioclim/bio15_IPSL-CM6A-LR_ssp370_2041-2070.tif"</span>, mode <span class="op">=</span> <span class="st">"wb"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/download.file.html" class="external-link">download.file</a></span><span class="op">(</span><span class="st">"https://os.zhdk.cloud.switch.ch/envicloud/chelsa/chelsa_V2/GLOBAL/climatologies/2041-2070/IPSL-CM6A-LR/ssp370/bio/CHELSA_bio1_2041-2070_ipsl-cm6a-lr_ssp370_V.2.1.tif"</span>,</span>
 <span>destfile <span class="op">=</span> <span class="st">"data/chelsa_bioclim/bio1_IPSL-CM6A-LR_ssp370_2041-2070.tif"</span>, mode <span class="op">=</span> <span class="st">"wb"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="../reference/figures/folder_structure.png"></p>
+<div class="float">
+<img src="../reference/figures/cuba_folder_structure.png" alt="visual overview of the required data directories"><div class="figcaption">visual overview of the required data
+directories</div>
+</div>
 </div>
 <div class="section level3">
 <h3 id="cropping">Cropping<a class="anchor" aria-label="anchor" href="#cropping"></a>
 </h3>
-<!--![](../man/figures/wf_3.png)-->
+<!--![overview of the workflow steps with third step emphasized](../man/figures/cuba_workflow_3.png)-->
 <p>After having downloaded all the layers, we need to crop them to the
 extent of our study area. This is straightforward in the case of the
 global CHELSA layers:</p>
@@ -1058,7 +1065,7 @@ as there is an extra step before reaching to the final output.</p>
 <div class="section level3">
 <h3 id="merging">Merging<a class="anchor" aria-label="anchor" href="#merging"></a>
 </h3>
-<!--![](../man/figures/wf_4.png)-->
+<!--![overview of the workflow steps with fourth step emphasized](../man/figures/cuba_workflow_4.png)-->
 <p>The cropped tiles of the variable now need to be merged together.</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># This can be done sequentially:</span></span>
@@ -1118,7 +1125,7 @@ require a vector of sub-catchment IDs as input. Note that the function
 points of any raster file provided to the argument <em>subc_layer</em>.
 It can be safely used to query very large raster files, as these are not
 loaded into R.</p>
-<!--![](../man/figures/wf_5.png)-->
+<!--![overview of the workflow steps with fifth step emphasized](../man/figures/cuba_workflow_5.png)-->
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">spdata_ids</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_ids.html">extract_ids</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">spdata</span>, lon <span class="op">=</span> <span class="st">"longitude"</span>, lat <span class="op">=</span> <span class="st">"latitude"</span>,</span>
 <span>                          id <span class="op">=</span> <span class="st">"occurrence_ID"</span>, quiet <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -1181,7 +1188,7 @@ Caution, don’t increase the number of cores to more than 3 as this can
 cause memory problems. However, this highly depends to the number of
 sub-catchments as well. We recommend to test the function with different
 parameters to find out what works best for your case.</p>
-<!--![](../man/figures/wf_6.png)-->
+<!--![overview of the workflow steps with sixth step emphasized](../man/figures/cuba_workflow_6.png)-->
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Define input var_layers for the extract_zonal_stat() function</span></span>
 <span><span class="va">var_layers</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">layer_dir</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="fl">9</span><span class="op">]</span></span>
@@ -3416,13 +3423,13 @@ an indicator of the sub-catchment size</p>
 <span><span class="co"># Clear up memory</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">stats_gpkg_h08v06</span>, <span class="va">stats_gpkg_h10v06</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/base/gc.html" class="external-link">gc</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##            used  (Mb) gc trigger  (Mb) max used  (Mb)</span></span>
-<span><span class="co">## Ncells  4790838 255.9    9457868 505.2  5991480 320.0</span></span>
-<span><span class="co">## Vcells 27337544 208.6   87692828 669.1 87692828 669.1</span></span></code></pre>
+<span><span class="co">## Ncells  4720539 252.2    9550987 510.1  5583020 298.2</span></span>
+<span><span class="co">## Vcells 27246466 207.9   87586161 668.3 87586160 668.3</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="prepare-data-for-modelling">Prepare data for modelling<a class="anchor" aria-label="anchor" href="#prepare-data-for-modelling"></a>
 </h3>
-<!--![](../man/figures/wf_7.png)-->
+<!--![overview of the workflow steps with seventh step emphasized](../man/figures/cuba_workflow_7.png)-->
 <p>Join the stats_table with the .gpkg database</p>
 <div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">stats_table</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">stats_table_zon</span>, <span class="va">stats_gpkg</span>, by <span class="op">=</span> <span class="st">"subcatchment_id"</span><span class="op">)</span></span></code></pre></div>
@@ -5424,7 +5431,7 @@ samples are called the <strong>out-of-bag errors</strong>.</p>
 including the future Bioclim variables.</p>
 <div class="sourceCode" id="cb60"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">model</span>, data <span class="op">=</span> <span class="va">stats_table_future</span><span class="op">[</span>,<span class="op">!</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
-<!--![](../man/figures/wf_8.png)-->
+<!--![overview of the workflow steps with eighth step emphasized](../man/figures/cuba_workflow_8.png)-->
 <p>We can now reclassify the sub-catchment raster based on the predicted
 probabilities of occurrence, to visualise the potential suitable
 habitats of the species. For this purpose we will use the
@@ -5488,20 +5495,27 @@ points</p>
 <span>           position <span class="op">=</span> <span class="st">"bottomleft"</span>, opacity <span class="op">=</span> <span class="fl">1</span>, labFormat <span class="op">=</span> <span class="fu"><a href="https://rstudio.github.io/leaflet/reference/addLegend.html" class="external-link">labelFormat</a></span><span class="op">(</span>suffix <span class="op">=</span> <span class="st">"%"</span><span class="op">)</span><span class="op">)</span>  <span class="co"># add a legend</span></span>
 <span></span>
 <span><span class="va">p</span></span></code></pre></div>
-<p><img src="../reference/figures/prediction.png" width="800"></p>
+<div class="float">
+<img src="../reference/figures/cuba_prediction.png" width="800" alt="map of habitat suitability in cuba"><div class="figcaption">map of habitat suitability in cuba</div>
+</div>
 <p>If we zoom in to the habitat suitability map, we can observe the
 sub-catchments that could offer a suitable habitat to the species in a
 more detailed view.</p>
-<p><img src="../reference/figures/prediction_zoom.png" width="800"></p>
+<div class="float">
+<img src="../reference/figures/cuba_prediction_zoom.png" width="800" alt="zoomed subset of habitat suitability map of cuba"><div class="figcaption">zoomed subset of habitat suitability map of
+cuba</div>
+</div>
 </div>
 <div class="section level3 unnumbered">
 <h3 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h3>
 <div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-amatulli2022hydrography90m" class="csl-entry">
-Amatulli, Giuseppe, Jaime Garcia Marquez, Tushar Sethi, et al. 2022.
-<span>“Hydrography90m: A New High-Resolution Global Hydrographic
-Dataset.”</span> <em>Earth System Science Data</em> 14 (10): 4525–50.
+Amatulli, Giuseppe, Jaime Garcia Marquez, Tushar Sethi, Jens Kiesel,
+Afroditi Grigoropoulou, Maria M Üblacker, Longzhu Q Shen, and Sami
+Domisch. 2022. <span>“Hydrography90m: A New High-Resolution Global
+Hydrographic Dataset.”</span> <em>Earth System Science Data</em> 14
+(10): 4525–50.
 </div>
 <div id="ref-R-leafem" class="csl-entry">
 Appelhans, Tim. 2022. <em>Leafem: Leaflet Extensions for Mapview</em>.
@@ -5532,12 +5546,14 @@ Research Institute WSL, Switzerland</em>.
 </div>
 <div id="ref-R-base" class="csl-entry">
 R Core Team. 2022. <em>R: A Language and Environment for Statistical
-Computing</em>. R Foundation for Statistical Computing. <a href="https://www.R-project.org/" class="external-link">https://www.R-project.org/</a>.
+Computing</em>. Vienna, Austria: R Foundation for Statistical Computing.
+<a href="https://www.R-project.org/" class="external-link">https://www.R-project.org/</a>.
 </div>
 <div id="ref-R-hydrographr" class="csl-entry">
-Schürz, Marlene, Afroditi Grigoropoulou, Jaime Garcia Marquez, et al.
-2023. <em>Hydrographr: Scalable Hydrographic Data Processing in r</em>.
-<a href="https://glowabio.github.io/hydrographr/" class="external-link">https://glowabio.github.io/hydrographr/</a>.
+Schürz, Marlene, Afroditi Grigoropoulou, Jaime Garcia Marquez, Yusdiel
+Torres Cambas, Christoph Schürz, Mathieu Floury, Thomas Tomiczek,
+Vanessa Bremerich, Giuseppe Amatulli, and Sami Domisch. 2023.
+<em>Hydrographr: Scalable Hydrographic Data Processing in r</em>. <a href="https://glowabio.github.io/hydrographr/" class="external-link">https://glowabio.github.io/hydrographr/</a>.
 </div>
 <div id="ref-torres2016conservation" class="csl-entry">
 Torres-Cambas, Yusdiel, Martiño Cabana-Otero, M Olalla Lorenzo-Carballa,
@@ -5547,7 +5563,7 @@ of Insect Conservation</em> 20: 277–84.
 </div>
 <div id="ref-ETOcuba" class="csl-entry">
 Torres-Cambas, Yusdiel, and Juan Carlos Salazar Salina. 2022.
-<em>Ephemeroptera, Trichoptera and Odonata of Cuba</em>. <a href="https://doi.org/10.18728/igb-fred-778.3" class="external-link uri">Https://doi.org/10.18728/igb-fred-778.3</a>. <a href="https://doi.org/10.18728/igb-fred-778.3" class="external-link">https://doi.org/10.18728/igb-fred-778.3</a>.
+<span>“Ephemeroptera, Trichoptera and Odonata of Cuba.”</span> <a href="https://doi.org/10.18728/igb-fred-778.3" class="external-link uri">https://doi.org/10.18728/igb-fred-778.3</a>. <a href="https://doi.org/10.18728/igb-fred-778.3" class="external-link">https://doi.org/10.18728/igb-fred-778.3</a>.
 </div>
 <div id="ref-R-htmlwidgets" class="csl-entry">
 Vaidyanathan, Ramnath, Yihui Xie, JJ Allaire, Joe Cheng, Carson Sievert,
@@ -5583,12 +5599,12 @@ Computational Research</em>, edited by Victoria Stodden, Friedrich
 Leisch, and Roger D. Peng. Chapman; Hall/CRC.
 </div>
 <div id="ref-knitr2015" class="csl-entry">
-Xie, Yihui. 2015. <em>Dynamic Documents with <span>R</span> and
-Knitr</em>. 2nd ed. Chapman; Hall/CRC. <a href="https://yihui.org/knitr/" class="external-link">https://yihui.org/knitr/</a>.
+———. 2015. <em>Dynamic Documents with <span>R</span> and Knitr</em>. 2nd
+ed. Boca Raton, Florida: Chapman; Hall/CRC. <a href="https://yihui.org/knitr/" class="external-link">https://yihui.org/knitr/</a>.
 </div>
 <div id="ref-R-knitr" class="csl-entry">
-Xie, Yihui. 2023. <em>Knitr: A General-Purpose Package for Dynamic
-Report Generation in r</em>. <a href="https://yihui.org/knitr/" class="external-link">https://yihui.org/knitr/</a>.
+———. 2023. <em>Knitr: A General-Purpose Package for Dynamic Report
+Generation in r</em>. <a href="https://yihui.org/knitr/" class="external-link">https://yihui.org/knitr/</a>.
 </div>
 <div id="ref-R-kableExtra" class="csl-entry">
 Zhu, Hao. 2021. <em>kableExtra: Construct Complex Table with Kable and
@@ -5607,7 +5623,7 @@ Pipe Syntax</em>. <a href="https://CRAN.R-project.org/package=kableExtra" class=
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer>

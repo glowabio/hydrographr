@@ -70,7 +70,7 @@
 use the hydrographr package with the NHDPlusHR dataset</h3>
                         <h4 data-toc-skip class="author"></h4>
             
-            <h4 data-toc-skip class="date">2026-04-27</h4>
+            <h4 data-toc-skip class="date">2026-10-14</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/glowabio/hydrographr/blob/HEAD/vignettes/example_other_stream_networks.Rmd" class="external-link"><code>vignettes/example_other_stream_networks.Rmd</code></a></small>
       <div class="d-none name"><code>example_other_stream_networks.Rmd</code></div>
@@ -115,7 +115,7 @@ use the hydrographr package with the NHDPlusHR dataset</h3>
 <code>nhdplusTools</code> or from this USGS website: <a href="https://apps.nationalmap.gov/downloader/" class="external-link uri">https://apps.nationalmap.gov/downloader/</a></p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Download NHDPlus raster data for Hawaii </span></span>
-<span><span class="fu"><a href="https://doi-usgs.github.io/nhdplusTools/reference/download_nhdplusv2.html" class="external-link">download_nhdplusv2</a></span><span class="op">(</span>outdir <span class="op">=</span> <span class="va">rast_dir</span>,</span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/nhdplusTools/man/download_nhdplusv2.html" class="external-link">download_nhdplusv2</a></span><span class="op">(</span>outdir <span class="op">=</span> <span class="va">rast_dir</span>,</span>
 <span>                   url <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span>
 <span>                     <span class="st">"https://prd-tnm.s3.amazonaws.com/StagedProducts/"</span>,</span>
 <span>                                <span class="st">"Hydrography/NHDPlusHR/Beta/GDB/"</span>,</span>
@@ -129,7 +129,7 @@ use the hydrographr package with the NHDPlusHR dataset</h3>
 <span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Download NHDPlus vector data for Hawaii </span></span>
-<span><span class="fu"><a href="https://doi-usgs.github.io/nhdplusTools/reference/download_nhdplusv2.html" class="external-link">download_nhdplusv2</a></span><span class="op">(</span>outdir <span class="op">=</span> <span class="va">vect_dir</span>,</span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/nhdplusTools/man/download_nhdplusv2.html" class="external-link">download_nhdplusv2</a></span><span class="op">(</span>outdir <span class="op">=</span> <span class="va">vect_dir</span>,</span>
 <span>                   url <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span>
 <span>                     <span class="st">"https://prd-tnm.s3.amazonaws.com/StagedProducts/"</span>,</span>
 <span>                      <span class="st">"Hydrography/NHDPlusHR/Beta/GDB/"</span>,</span>
@@ -185,7 +185,10 @@ GBIF.org using the R package <code>rgbif</code>.</p>
 <span>  <span class="fu"><a href="https://rstudio.github.io/leaflet/reference/map-layers.html" class="external-link">addCircles</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">spdata</span>, color <span class="op">=</span> <span class="st">"purple"</span><span class="op">)</span> </span>
 <span></span>
 <span><span class="va">m</span></span></code></pre></div>
-<p><img src="../reference/figures/hawaii_map.png"></p>
+<div class="float">
+<img src="../reference/figures/hawaii_map.png" alt="map of hawaii with species locations as dots"><div class="figcaption">map of hawaii with species locations as
+dots</div>
+</div>
 <p>By inspecting the NHDPlusHR data, we observe that the coordinate
 reference system is not WGS84, but the EPSG:26904.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
@@ -364,7 +367,7 @@ Hawaii.</p>
 <code class="sourceCode R"><span><span class="va">gdb_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">vect_dir</span>, <span class="st">"/NHDPLUS_H_2006_HU4_GDB"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Write out a .gpkg file based on the .gdb files</span></span>
-<span><span class="fu"><a href="https://doi-usgs.github.io/nhdplusTools/reference/get_nhdplushr.html" class="external-link">get_nhdplushr</a></span><span class="op">(</span><span class="va">gdb_dir</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">gdb_dir</span>, <span class="st">"nhdplus_2006-HU4.gpkg"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/nhdplusTools/man/get_nhdplushr.html" class="external-link">get_nhdplushr</a></span><span class="op">(</span><span class="va">gdb_dir</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">gdb_dir</span>, <span class="st">"nhdplus_2006-HU4.gpkg"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span></span>
 <span><span class="co"># Import flow line attribute table as a data.table</span></span>
@@ -440,9 +443,9 @@ Tools</em>. <a href="https://doi-usgs.github.io/nhdplusTools/%0Ahttps://github.c
 https://github.com/doi-usgs/nhdplusTools/</a>.
 </div>
 <div id="ref-nhdplusTools2023" class="csl-entry">
-Blodgett, David, and Mike Johnson. 2023b. <em>nhdplusTools: Tools for
-Accessing and Working with the NHDPlus</em>. Version 0.6.2. U.S.
-Geological Survey; U.S. Geological Survey. <a href="https://doi.org/10.5066/P97AS8JD" class="external-link">https://doi.org/10.5066/P97AS8JD</a>.
+———. 2023b. <em>nhdplusTools: Tools for Accessing and Working with the
+NHDPlus</em> (version 0.6.2). Reston, VA: U.S. Geological Survey; U.S.
+Geological Survey. <a href="https://doi.org/10.5066/P97AS8JD" class="external-link">https://doi.org/10.5066/P97AS8JD</a>.
 </div>
 <div id="ref-rgbif2017" class="csl-entry">
 Chamberlain, Scott, and Carl Boettiger. 2017. <span>“R Python, and Ruby
@@ -470,12 +473,14 @@ Müller, Kirill. 2020. <em>Here: A Simpler Way to Find Your Files</em>.
 </div>
 <div id="ref-R-base" class="csl-entry">
 R Core Team. 2023. <em>R: A Language and Environment for Statistical
-Computing</em>. R Foundation for Statistical Computing. <a href="https://www.R-project.org/" class="external-link">https://www.R-project.org/</a>.
+Computing</em>. Vienna, Austria: R Foundation for Statistical Computing.
+<a href="https://www.R-project.org/" class="external-link">https://www.R-project.org/</a>.
 </div>
 <div id="ref-R-hydrographr" class="csl-entry">
-Schürz, Marlene, Afroditi Grigoropoulou, Jaime Garcia Marquez, et al.
-2023. <em>Hydrographr: Scalable Hydrographic Data Processing in r</em>.
-<a href="https://glowabio.github.io/hydrographr/" class="external-link">https://glowabio.github.io/hydrographr/</a>.
+Schürz, Marlene, Afroditi Grigoropoulou, Jaime Garcia Marquez, Yusdiel
+Torres Cambas, Christoph Schürz, Mathieu Floury, Thomas Tomiczek,
+Vanessa Bremerich, Giuseppe Amatulli, and Sami Domisch. 2023.
+<em>Hydrographr: Scalable Hydrographic Data Processing in r</em>. <a href="https://glowabio.github.io/hydrographr/" class="external-link">https://glowabio.github.io/hydrographr/</a>.
 </div>
 <div id="ref-R-htmlwidgets" class="csl-entry">
 Vaidyanathan, Ramnath, Yihui Xie, JJ Allaire, Joe Cheng, Carson Sievert,
@@ -492,12 +497,12 @@ Computational Research</em>, edited by Victoria Stodden, Friedrich
 Leisch, and Roger D. Peng. Chapman; Hall/CRC.
 </div>
 <div id="ref-knitr2015" class="csl-entry">
-Xie, Yihui. 2015. <em>Dynamic Documents with <span>R</span> and
-Knitr</em>. 2nd ed. Chapman; Hall/CRC. <a href="https://yihui.org/knitr/" class="external-link">https://yihui.org/knitr/</a>.
+———. 2015. <em>Dynamic Documents with <span>R</span> and Knitr</em>. 2nd
+ed. Boca Raton, Florida: Chapman; Hall/CRC. <a href="https://yihui.org/knitr/" class="external-link">https://yihui.org/knitr/</a>.
 </div>
 <div id="ref-R-knitr" class="csl-entry">
-Xie, Yihui. 2023. <em>Knitr: A General-Purpose Package for Dynamic
-Report Generation in r</em>. <a href="https://yihui.org/knitr/" class="external-link">https://yihui.org/knitr/</a>.
+———. 2023. <em>Knitr: A General-Purpose Package for Dynamic Report
+Generation in r</em>. <a href="https://yihui.org/knitr/" class="external-link">https://yihui.org/knitr/</a>.
 </div>
 <div id="ref-R-kableExtra" class="csl-entry">
 Zhu, Hao. 2021. <em>kableExtra: Construct Complex Table with Kable and
@@ -516,7 +521,7 @@ Pipe Syntax</em>. <a href="https://CRAN.R-project.org/package=kableExtra" class=
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer>

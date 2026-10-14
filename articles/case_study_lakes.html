@@ -71,7 +71,7 @@ the processing of spatial and species data for network analyses of
 freshwater fish in Germany</h3>
                         <h4 data-toc-skip class="author"></h4>
             
-            <h4 data-toc-skip class="date">2026-04-27</h4>
+            <h4 data-toc-skip class="date">2026-10-14</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/glowabio/hydrographr/blob/HEAD/vignettes/case_study_lakes.Rmd" class="external-link"><code>vignettes/case_study_lakes.Rmd</code></a></small>
       <div class="d-none name"><code>case_study_lakes.Rmd</code></div>
@@ -85,9 +85,10 @@ freshwater fish in Germany</h3>
 <p>The following workflow showcases the functionality of the hydrographr
 package to integrate lakes into a stream network and species
 distribution analysis. We will use freshwater fish species occurrence
-data from the [cite German freshwater fish GBIF database] and HydroLAKES
-shape files and integrate them into the Hydrography90m stream network
-(Amatulli et al., 2022).</p>
+data from the <span class="citation">(<a href="#ref-friedrichs2024freshwater">Friedrichs-Manthey, Bowler, and
+Freyhof 2024</a>)</span> and HydroLAKES shape files and integrate them
+into the Hydrography90m stream network (<span class="citation">(<a href="#ref-amatulli2022hydrography90m">Amatulli et al.
+2022</a>)</span>).</p>
 <p>Load required libraries</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://glowabio.github.io/hydrographr/" class="external-link">hydrographr</a></span><span class="op">)</span></span>
@@ -123,11 +124,12 @@ shape files and integrate them into the Hydrography90m stream network
 <span><span class="va">spdata_all</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://docs.ropensci.org/rgbif/reference/occ_download_get.html" class="external-link">occ_download_get</a></span><span class="op">(</span>key<span class="op">=</span><span class="st">"0004551-231002084531237"</span>,</span>
 <span>                              overwrite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="va">occ_download_import</span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/data.table/man/fwrite.html" class="external-link">fwrite</a></span><span class="op">(</span><span class="va">spdata_all</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data/fish_germany_gbif.csv"</span><span class="op">)</span>,</span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/data.table/man/fwrite.html" class="external-link">fwrite</a></span><span class="op">(</span><span class="va">spdata_all</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"data/fish_germany_gbif.csv"</span><span class="op">)</span>,</span>
 <span>    row.names <span class="op">=</span> <span class="cn">F</span>, quote <span class="op">=</span> <span class="cn">F</span>, sep <span class="op">=</span> <span class="st">"\t"</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Import and clean the data</span></span>
-<span><span class="va">spdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/data.table/man/fread.html" class="external-link">fread</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data/fish_germany_gbif.csv"</span><span class="op">)</span>, sep <span class="op">=</span> <span class="st">"\t"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span><span class="va">spdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/data.table/man/fread.html" class="external-link">fread</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"data/fish_germany_gbif.csv"</span><span class="op">)</span>, sep <span class="op">=</span> <span class="st">"\t"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">gbifID</span>, <span class="va">decimalLongitude</span>, <span class="va">decimalLatitude</span>, <span class="va">species</span>, <span class="va">year</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span><span class="st">"longitude"</span> <span class="op">=</span> <span class="st">"decimalLongitude"</span>,</span>
 <span>         <span class="st">"latitude"</span> <span class="op">=</span> <span class="st">"decimalLatitude"</span><span class="op">)</span></span></code></pre></div>
@@ -284,7 +286,10 @@ xmax, ymax)</p>
 <span>  <span class="fu"><a href="https://rstudio.github.io/leaflet/reference/addLegend.html" class="external-link">addLegend</a></span><span class="op">(</span>pal <span class="op">=</span> <span class="va">factpal</span>, values <span class="op">=</span> <span class="op">~</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/is.bool.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">year</span><span class="op">)</span>,</span>
 <span>            title <span class="op">=</span> <span class="st">"Year of record"</span><span class="op">)</span></span>
 <span><span class="va">spdata_plot</span></span></code></pre></div>
-<p><img src="../reference/figures/germany_map.png" width="800"></p>
+<div class="float">
+<img src="../reference/figures/germany_map.png" width="800" alt="map of germany with points for fish locations"><div class="figcaption">map of germany with points for fish
+locations</div>
+</div>
 </div>
 <div class="section level3">
 <h3 id="abiotic-variables-data">Abiotic variables data<a class="anchor" aria-label="anchor" href="#abiotic-variables-data"></a>
@@ -293,12 +298,18 @@ xmax, ymax)</p>
 <h4 id="hydrography90m">1. Hydrography90m<a class="anchor" aria-label="anchor" href="#hydrography90m"></a>
 </h4>
 <p>In order to integrate lakes into the Hydrography90m, we need to
-download the following GEO.tiff files (in brackets the variable and
-folder name to download): 1. basin files (“basin”) 2. sub-catchment
-files (“SUb_catchment) 3. stream network (”segment”) 4. flow
-accumulation (“accumulation”) 5. flow direction</p>
-<p>First, we identify the tile ID covering our species data. In our case
-that are three tiles (h16v02; h18v00; h18v02).</p>
+download the following GeoTIFF files (in brackets the variable and
+folder name to download):</p>
+<ol style="list-style-type: decimal">
+<li>basin files (<code>"basin"</code>)</li>
+<li>sub-catchment files (<code>"sub_catchment</code>)</li>
+<li>stream network (<code>"segment"</code>)</li>
+<li>flow accumulation (<code>"accumulation"</code>)</li>
+<li>flow direction (<code>"direction"</code>)</li>
+</ol>
+<p>First, we identify the tile IDs of the tiles covering our species
+data. In our case that are three tiles (<code>h16v02</code>,
+<code>h18v00</code>, <code>h18v02</code>).</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># get tile ID for Germany</span></span>
 <span><span class="va">tile_id</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_tile_id.html">get_tile_id</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">spdata</span>,</span>
@@ -310,22 +321,24 @@ catchments.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># select the necessary hydrological variables for downloading</span></span>
 <span><span class="va">vars_tif</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"basin"</span>, <span class="st">"sub_catchment"</span>, <span class="st">"segment"</span>, <span class="st">"accumulation"</span>, <span class="st">"direction"</span><span class="op">)</span></span>
+<span></span>
 <span><span class="co"># Extend timeout to 1000s to allow uninterrupted downloading</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>timeout <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Download the tif.files of the selceted variables</span></span>
+<span><span class="co"># Download the tif.files of the selected variables</span></span>
 <span><span class="fu"><a href="../reference/download_tiles.html">download_tiles</a></span><span class="op">(</span>variable <span class="op">=</span> <span class="va">vars_tif</span>,</span>
 <span>               tile_id <span class="op">=</span> <span class="va">tile_id</span>,</span>
 <span>               file_format <span class="op">=</span> <span class="st">"tif"</span>,</span>
-<span>               download_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"data"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>Note that the files have been downloaded to a new folder (i.e.,
-“r.watershed”).</p>
+<span>               download_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"data"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>Note that the files have been downloaded to a new folder
+<code>r.watershed</code>.</p>
 <p>Now we can merge the three tile files to obtain the sub-catchment
 raster file for the lakes in Germany</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">for</span> <span class="op">(</span><span class="va">var</span> <span class="kw">in</span> <span class="va">vars_tif</span><span class="op">)</span> <span class="op">{</span></span>
+<span></span>
 <span>  <span class="co"># Define the folder for the current variable</span></span>
-<span>  <span class="va">var_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"data/r.watershed/"</span>, <span class="va">var</span>, <span class="st">"_tiles20d/"</span><span class="op">)</span></span>
+<span>  <span class="va">var_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"data/r.watershed"</span>, <span class="va">var</span>, <span class="st">"_tiles20d"</span><span class="op">)</span></span>
 <span>  </span>
 <span>  <span class="co"># Build path to .tif file names for each variable and tile ids</span></span>
 <span>  <span class="va">tile_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">var</span>, <span class="st">"_"</span>, <span class="va">tile_id</span>, <span class="st">".tif"</span><span class="op">)</span></span>
@@ -338,7 +351,7 @@ raster file for the lakes in Germany</p>
 <span>  <span class="fu"><a href="../reference/merge_tiles.html">merge_tiles</a></span><span class="op">(</span></span>
 <span>    tile_dir <span class="op">=</span> <span class="va">var_dir</span>,</span>
 <span>    tile_names <span class="op">=</span> <span class="va">tile_names</span>,</span>
-<span>    out_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data/"</span><span class="op">)</span>,</span>
+<span>    out_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"data"</span><span class="op">)</span>,</span>
 <span>    file_name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">var</span>, <span class="st">".tif"</span><span class="op">)</span>,</span>
 <span>    read <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>    bigtiff <span class="op">=</span> <span class="cn">TRUE</span></span>
@@ -354,21 +367,22 @@ and folders we don’t need anymore.</p>
 <h4 id="hydrolakes">2. HydroLAKES<a class="anchor" aria-label="anchor" href="#hydrolakes"></a>
 </h4>
 <p>For the lake data we use the geo-spatial information from the
-HydroLAKES global lake data set and more specifically their lake
-polygons. You can either download the lake data stored in shapefiles or
-in the geodatabase format, both work with the hydrographr package lake
-functions. For more information on the data set you can have a look <a href="https://www.hydrosheds.org/products/hydrolakes" class="external-link">here</a></p>
+HydroLAKES global lake data set <span class="citation">(<a href="#ref-messager2016estimating">Messager et al. 2016</a>)</span> and
+more specifically their lake polygons. You can download the lake data
+either as shapefiles or in the geodatabase format, both work with the
+hydrographr package lake functions. For more information on the data set
+you can have a look <a href="https://www.hydrosheds.org/products/hydrolakes" class="external-link">here</a></p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Extend timeout to 1000s to allow uninterrupted downloading</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>timeout <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Download URL of the HydroLAKES shapefile</span></span>
 <span><span class="va">hydrolakes_url</span> <span class="op">&lt;-</span> <span class="st">"https://data.hydrosheds.org/file/hydrolakes/HydroLAKES_polys_v10_shp.zip"</span></span>
-<span><span class="va">hydrolakes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data/"</span>, <span class="st">"HydroLAKES_polys_v10_shp.zip"</span><span class="op">)</span></span>
+<span><span class="va">hydrolakes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"data"</span>, <span class="st">"HydroLAKES_polys_v10_shp.zip"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Download the dataset</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/download.file.html" class="external-link">download.file</a></span><span class="op">(</span><span class="st">"https://data.hydrosheds.org/file/hydrolakes/HydroLAKES_polys_v10_shp.zip"</span>, destfile <span class="op">=</span> <span class="va">hydrolakes</span>, mode <span class="op">=</span> <span class="st">"wb"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/unzip.html" class="external-link">unzip</a></span><span class="op">(</span><span class="va">hydrolakes</span>, exdir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/unzip.html" class="external-link">unzip</a></span><span class="op">(</span><span class="va">hydrolakes</span>, exdir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"data"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level3">
@@ -393,30 +407,31 @@ executable, and run it using the command:</p>
 <div class="section level4">
 <h4 id="windows">Windows<a class="anchor" aria-label="anchor" href="#windows"></a>
 </h4>
-<p>Windows user need to install the GWB tool to their linux virtual
-machine. If you don’t have the linux virtual machine isntalled on your
+<p>Windows users need to install the GWB tool to their linux virtual
+machine. If you don’t have the linux virtual machine installed on your
 computer please follow the instructions <a href="https://glowabio.github.io/hydrographr/articles/windows_system_setup.html" class="external-link">here</a>
 in order to be able to run the hydrographr R package. Then go to your
 linux system, open the terminal and install GuidosToolbox Workbench.</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="ex">$</span> wget https://ies-ows.jrc.ec.europa.eu/gtb/GWB/GWB_linux64.run</span>
 <span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a><span class="ex">$</span> chmod u+x GWB_linux64.run</span>
 <span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a><span class="ex">$</span> ./GWB_linux64.run</span></code></pre></div>
-<p>Citation: a) GWB (GuidosToolbox Workbench) is available at: <a href="https://forest.jrc.ec.europa.eu/en/activities/lpa/gtb/" class="external-link uri">https://forest.jrc.ec.europa.eu/en/activities/lpa/gtb/</a>
-b) The algorithms of this software are based on concepts of mathematical
-morphological image analysis described in the publications: Vogt, P.,
-Riitters, K. (2017). GuidosToolbox: universal digital image object
-analysis. European Journal of Remote Sensing (TEJR), <a href="https://doi.org/10.1080/22797254.2017.1330650" class="external-link uri">https://doi.org/10.1080/22797254.2017.1330650</a> and
-Soille, P., Vogt, P. (2009). Morphological Segmentation of Binary
-Patterns. Pattern Recognition Letters, <a href="https://doi.org/10.1016/j.patrec.2008.10.015" class="external-link uri">https://doi.org/10.1016/j.patrec.2008.10.015</a></p>
-</div>
-<div class="section level4">
-<h4 id="lake-analysis">Lake analysis<a class="anchor" aria-label="anchor" href="#lake-analysis"></a>
-</h4>
+<p>Citation:</p>
+<ol style="list-style-type: lower-alpha">
+<li><p>GWB (GuidosToolbox Workbench) is available at: <a href="https://forest.jrc.ec.europa.eu/en/activities/lpa/gtb/" class="external-link uri">https://forest.jrc.ec.europa.eu/en/activities/lpa/gtb/</a></p></li>
+<li><p>The algorithms of this software are based on concepts of
+mathematical morphological image analysis described in the publications:
+<span class="citation">(<a href="#ref-vogt2017guidostoolbox">Vogt and
+Riitters 2017</a>)</span> and <span class="citation">(<a href="#ref-soille2009morphological">Soille and Vogt
+2009</a>)</span></p></li>
+</ol>
 </div>
 </div>
 <div class="section level3">
-<h3 id="lake-id-identification">Lake ID identification<a class="anchor" aria-label="anchor" href="#lake-id-identification"></a>
+<h3 id="lake-analysis">Lake analysis<a class="anchor" aria-label="anchor" href="#lake-analysis"></a>
 </h3>
+<div class="section level4">
+<h4 id="lake-id-identification">Lake ID identification<a class="anchor" aria-label="anchor" href="#lake-id-identification"></a>
+</h4>
 <p>Let’s start the lake analysis by identifying all HydroLAKES which are
 spatially overlapping with our species data and extract the
 corresponding lake IDs. We can do that in two ways:</p>
@@ -437,11 +452,11 @@ data</li>
 <span>                 xmax <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">spdata</span><span class="op">$</span><span class="va">longitude</span><span class="op">)</span>,</span>
 <span>                 ymax <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">spdata</span><span class="op">$</span><span class="va">latitude</span><span class="op">)</span>,</span>
 <span>                 bbox <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>                 lake_shape <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data/HydroLAKES_polys_v10_shp/HydroLAKES_polys_v10.shp"</span><span class="op">)</span>,</span>
-<span>                 lake_id_table <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data/"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span>                 lake_shape <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"data/HydroLAKES_polys_v10_shp/HydroLAKES_polys_v10.shp"</span><span class="op">)</span>,</span>
+<span>                 lake_id_table <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"data"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>This option leaves us with 3419 lakes, saved under the text file
-“lake_id.txt”. Let’s get more specific and only look at the lakes with
-species data within them.</p>
+<code>lake_id.txt</code>. Let’s get more specific and only look at the
+lakes with species data within them.</p>
 <ol start="2" style="list-style-type: decimal">
 <li>Extracting all HydroLAKES IDs of lakes that contain species
 data</li>
@@ -450,22 +465,22 @@ data</li>
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/extract_lake_ids.html">extract_lake_ids</a></span><span class="op">(</span><span class="va">spdata</span>,</span>
 <span>                 lon <span class="op">=</span> <span class="st">"longitude"</span>,</span>
 <span>                 lat <span class="op">=</span> <span class="st">"latitude"</span>,</span>
-<span>                 lake_shape <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data/HydroLAKES_polys_v10_shp/HydroLAKES_polys_v10.shp"</span><span class="op">)</span>,</span>
-<span>                 lake_id_table <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data/"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span>                 lake_shape <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"data/HydroLAKES_polys_v10_shp/HydroLAKES_polys_v10.shp"</span><span class="op">)</span>,</span>
+<span>                 lake_id_table <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"data"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
-<div class="section level3">
-<h3 id="stream-network-and-lake-intersection">Stream network and lake intersection<a class="anchor" aria-label="anchor" href="#stream-network-and-lake-intersection"></a>
-</h3>
+<div class="section level4">
+<h4 id="stream-network-and-lake-intersection">Stream network and lake intersection<a class="anchor" aria-label="anchor" href="#stream-network-and-lake-intersection"></a>
+</h4>
 <p>Now we can overlay our stream segments with the lake shapefile. In
-that way we identify per lake all intersection points between stream
-network and lake. Note that this function is running in parallel and
-make sure to have enough free CPUs to run the function.</p>
-<p>Lets first load in our lake id table which we just created with the 2
-step and the <code>extract_lake_ids</code> function and we filter for
-two lakes the Rangsdorfer lake (Hylak_id 165245) and the Zeuthener lake
-(Hylak_id 165161) in our dataset.</p>
+that way we identify for each lake all intersection points between
+stream network and lake. Note that this function is running in parallel
+and make sure to have enough free CPUs to run the function.</p>
+<p>Let’s first load in our lake id table which we just created with the
+2nd step and the <code>extract_lake_ids</code> function and we filter
+for two lakes: the Rangsdorfer lake (Hylak_id <code>165245</code>) and
+the Zeuthener lake (Hylak_id <code>165161</code>) in our dataset.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">lake_ids</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/data.table/man/fread.html" class="external-link">fread</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data/lake_id.txt"</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">lake_ids</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/data.table/man/fread.html" class="external-link">fread</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"data/lake_id.txt"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">lake_ids</span> <span class="op">&lt;-</span> <span class="va">lake_ids</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">Hylak_id</span> <span class="op"><a href="https://rspatial.github.io/terra/reference/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">165245</span>, <span class="fl">165161</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/distinct.html" class="external-link">distinct</a></span><span class="op">(</span><span class="va">Hylak_id</span>, .keep_all <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
@@ -474,20 +489,20 @@ that you need to specify the correct node to your GWB (GuidosToolbox
 Workbench) specified in the edge parameter.</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_lake_intersection.html">get_lake_intersection</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">lake_ids</span>,</span>
-<span>                      lakes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data/HydroLAKES_polys_v10_shp/HydroLAKES_polys_v10.shp"</span><span class="op">)</span>,</span>
+<span>                      lakes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"data/HydroLAKES_polys_v10_shp/HydroLAKES_polys_v10.shp"</span><span class="op">)</span>,</span>
 <span>                      lake_id <span class="op">=</span> <span class="st">"Hylak_id"</span>,</span>
 <span>                      lake_name <span class="op">=</span> <span class="st">"HydroLAKES_polys_v10"</span>,</span>
 <span>                      buffer <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>                      edge <span class="op">=</span> <span class="st">"/home/USER/GWB_version/GWB"</span>,</span>
-<span>                      stream <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data/segment.tif"</span><span class="op">)</span>,</span>
-<span>                      flow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data/accumulation.tif"</span><span class="op">)</span>,</span>
-<span>                      basins <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data/basin.tif"</span><span class="op">)</span>,</span>
-<span>                      lake_dat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data/"</span><span class="op">)</span>,</span>
+<span>                      stream <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"data/segment.tif"</span><span class="op">)</span>,</span>
+<span>                      flow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"data/accumulation.tif"</span><span class="op">)</span>,</span>
+<span>                      basins <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"data/basin.tif"</span><span class="op">)</span>,</span>
+<span>                      lake_dat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"data"</span><span class="op">)</span>,</span>
 <span>                      n_cores <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
 </div>
-<div class="section level3">
-<h3 id="lake-catchment-delineation">Lake catchment delineation<a class="anchor" aria-label="anchor" href="#lake-catchment-delineation"></a>
-</h3>
+<div class="section level4">
+<h4 id="lake-catchment-delineation">Lake catchment delineation<a class="anchor" aria-label="anchor" href="#lake-catchment-delineation"></a>
+</h4>
 <p>Having identified the lake intersection points enables us to
 delineate for each intersection point the corresponding upstream
 catchment area. Doing this for the lake outlet (i.e the intersection
@@ -496,23 +511,25 @@ catchment area. To do this we apply the <code>get_lake_catchment</code>
 function, specifying the outlet with n = 1 (default first row of the
 intersection table):</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">lake_165245</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/data.table/man/fread.html" class="external-link">fread</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data/coord_lake_165245.txt"</span><span class="op">)</span><span class="op">)</span> </span>
+<code class="sourceCode R"><span><span class="va">lake_165245</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/data.table/man/fread.html" class="external-link">fread</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"data/coord_lake_165245.txt"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/get_lake_catchment.html">get_lake_catchment</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">lake_165245</span>,</span>
-<span>                               direction <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data/direction.tif"</span><span class="op">)</span>,</span>
-<span>                               lake_basin <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data/"</span><span class="op">)</span>,</span>
+<span>                               direction <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"data/direction.tif"</span><span class="op">)</span>,</span>
+<span>                               lake_basin <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"data"</span><span class="op">)</span>,</span>
 <span>                               lake_id <span class="op">=</span> <span class="st">"lake_ID"</span>,</span>
 <span>                               n <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>                               n_cores <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
 <p>With the delineated lake catchments and having identified the
 Hydrography90m unique stream segments IDs intersecting with lakes lets
 us use hydrographr R functions for additional analysis.</p>
+</div>
 <div class="section level4">
 <h4 id="environment90m-data-integration">Environment90m data integration<a class="anchor" aria-label="anchor" href="#environment90m-data-integration"></a>
 </h4>
-<p>We can now integrate the Environment90m dataset [cite Environment90m
-paper], which include over 50 variables related to topography, hydrology
-and climate data aggregated to the subcatchment level of the
-Hydrograpyh90m stream network and apply them to [see also <a href="https://hydrography.org/environment90m" class="external-link uri">https://hydrography.org/environment90m</a>] our newly
+<p>We can now integrate the Environment90m dataset <span class="citation">(<a href="#ref-garcia2025environment90m">García Márquez
+et al. 2025</a>)</span>, which include over 50 variables related to
+topography, hydrology and climate data aggregated to the subcatchment
+level of the Hydrograpyh90m stream network and apply them to [see also
+<a href="https://hydrography.org/environment90m" class="external-link uri">https://hydrography.org/environment90m</a>] our newly
 delineated lake catchments.</p>
 </div>
 </div>
@@ -520,10 +537,10 @@ delineated lake catchments.</p>
 <h3 id="land-cover-per-lake-catchment">Land cover per lake catchment<a class="anchor" aria-label="anchor" href="#land-cover-per-lake-catchment"></a>
 </h3>
 <p>For instance, we can download the land cover data to create time
-series representing the land cover change within a lake catchments.
-Let`s look at how the percentage of rainfed cropland and decidous forest
-changed during the time period 1992 to 2020 at lake Rangsdorf (HydroLAKE
-ID 165245).</p>
+series representing the land cover change within a lake catchment. Let’s
+look at how the percentage of rainfed cropland and decidous forest
+changed during the time period 1992 to 2020 at lake Rangsdorf
+(HydroLAKES ID <code>165245</code>).</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">tile_id</span> <span class="op">&lt;-</span> <span class="st">"h18v02"</span></span>
 <span><span class="fu"><a href="../reference/download_env90m_tables.html">download_landcover_tables</a></span><span class="op">(</span></span>
@@ -539,21 +556,21 @@ ID 165245).</p>
 <span>  quiet <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>First we identify all sub-catchments of the lake catchment using the
-<code>extract_ids</code> function: Note check again visually which
-basin.tif files are covered by the lake catchment, since it can span
-over multiple basin tiles. In our case the lake catchment is situated
-only in one tile (tile id h18v02).</p>
+<code>extract_ids</code> function: Note: Please check again visually
+which basin.tif files are covered by the lake catchment, since it can
+span over multiple basin tiles. In our case the lake catchment is
+situated only in one tile (tile id <code>h18v02</code>).</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">lake_catch</span> <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">rast</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data/basin_lake_165245_coord_1.tif"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">sub_catch</span> <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">rast</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data/sub_catchment.tif"</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">lake_catch</span> <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">rast</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"data/basin_lake_165245_coord_1.tif"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">sub_catch</span> <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">rast</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"data/sub_catchment.tif"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">lake_catch_crop</span> <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/crop.html" class="external-link">crop</a></span><span class="op">(</span><span class="va">sub_catch</span>, <span class="va">lake_catch</span><span class="op">)</span></span>
 <span><span class="va">lake_catch_crop</span> <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/mask.html" class="external-link">mask</a></span><span class="op">(</span><span class="va">lake_catch_crop</span>, <span class="va">lake_catch</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/writeRaster.html" class="external-link">writeRaster</a></span><span class="op">(</span><span class="va">lake_catch_crop</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data/lake_catch_crop.tif"</span><span class="op">)</span>, overwrite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="va">lake_catch_crop</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data/lake_catch_crop.tif"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/writeRaster.html" class="external-link">writeRaster</a></span><span class="op">(</span><span class="va">lake_catch_crop</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"data/lake_catch_crop.tif"</span><span class="op">)</span>, overwrite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">lake_catch_crop</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"data/lake_catch_crop.tif"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">lake_catch_ids</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_ids.html">extract_ids</a></span><span class="op">(</span>subc_layer <span class="op">=</span> <span class="va">lake_catch_crop</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/data.table/man/fwrite.html" class="external-link">fwrite</a></span><span class="op">(</span><span class="va">lake_catch_ids</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">'/data/subc_IDs.txt'</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/pkg/data.table/man/fwrite.html" class="external-link">fwrite</a></span><span class="op">(</span><span class="va">lake_catch_ids</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">'data/subc_IDs.txt'</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>Now we subset the Environment90m land cover data by the sub_catchment
 ID and join the yearly data table to create a time series of land cover
 change.</p>
@@ -567,25 +584,24 @@ change.</p>
 <span></span>
 <span><span class="va">var</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">c10_names</span>, <span class="va">c20_names</span><span class="op">)</span></span>
 <span></span>
-<span></span>
 <span><span class="va">tb</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_predict_table.html">get_predict_table</a></span><span class="op">(</span>variable <span class="op">=</span> <span class="va">var</span>,</span>
 <span>  statistics <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mean"</span><span class="op">)</span>,</span>
 <span>  tile_id <span class="op">=</span> <span class="va">tile_id</span>,</span>
-<span>  input_var_path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/esa_cci_landcover_v2_1_1/"</span><span class="op">)</span>,</span>
-<span>  subcatch_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data/subc_IDs.txt"</span><span class="op">)</span>,</span>
-<span>  out_file_path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data/predictTB.csv"</span><span class="op">)</span>,</span>
+<span>  input_var_path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"esa_cci_landcover_v2_1_1/"</span><span class="op">)</span>,</span>
+<span>  subcatch_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"data/subc_IDs.txt"</span><span class="op">)</span>,</span>
+<span>  out_file_path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"data/predictTB.csv"</span><span class="op">)</span>,</span>
 <span>  read <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  quiet <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  overwrite <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  n_cores <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/data.table/man/fwrite.html" class="external-link">fwrite</a></span><span class="op">(</span><span class="va">tb</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">'/data/land_cover_subc.txt'</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/pkg/data.table/man/fwrite.html" class="external-link">fwrite</a></span><span class="op">(</span><span class="va">tb</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">'data/land_cover_subc.txt'</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>The landcover values show the percentage covered by the different
-land use categories.To show a change in land cover we will convert the
+land use categories. To show a change in land cover we will convert the
 percentage in the area they cover of any given sub-catchment. For this
 we will calculate the area of our sub-catchments.</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">lake_catch_crop</span> <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">rast</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data/lake_catch_crop.tif"</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">lake_catch_crop</span> <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">rast</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"data/lake_catch_crop.tif"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">lakec_area</span> <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/expanse.html" class="external-link">expanse</a></span><span class="op">(</span><span class="va">lake_catch_crop</span>, unit<span class="op">=</span><span class="st">"km"</span>, zones<span class="op">=</span><span class="va">lake_catch_crop</span><span class="op">)</span></span>
 <span><span class="va">tb</span><span class="op">[</span>, <span class="fl">2</span><span class="op">:</span><span class="fl">59</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">tb</span><span class="op">[</span>, <span class="fl">2</span><span class="op">:</span><span class="fl">59</span><span class="op">]</span> <span class="op">*</span> <span class="va">lakec_area</span><span class="op">$</span><span class="va">area</span></span>
 <span><span class="va">col_sums</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/rowSums.html" class="external-link">colSums</a></span><span class="op">(</span><span class="va">tb</span><span class="op">[</span>, <span class="fl">2</span><span class="op">:</span><span class="fl">59</span><span class="op">]</span><span class="op">)</span></span>
@@ -597,12 +613,11 @@ we will calculate the area of our sub-catchments.</p>
 <span><span class="va">df</span> <span class="op">&lt;-</span> <span class="va">df</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/separate.html" class="external-link">separate</a></span><span class="op">(</span><span class="va">id</span>, into <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"variable"</span>, <span class="st">"year"</span><span class="op">)</span>, sep <span class="op">=</span> <span class="st">"_y"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>year <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">year</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>Lets portrait the land cover time series within a simple histogram,
+<p>Let’s portrait the land cover time series within a simple histogram,
 showcasing the change over time in the rainfed and irrigated crop in the
 lake catchment.</p>
-<p>Add histogram</p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Plot</span></span>
+<code class="sourceCode R"><span><span class="co"># Plot histogram</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">df</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">year</span>, y <span class="op">=</span> <span class="va">value</span>, color <span class="op">=</span> <span class="va">variable</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">1.2</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_color_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"c10"</span> <span class="op">=</span> <span class="st">"blue"</span>, <span class="st">"c20"</span> <span class="op">=</span> <span class="st">"orange"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
@@ -617,50 +632,50 @@ lake catchment.</p>
 <p>Additionally to the environmental analysis we can look at the
 position of lakes within the stream network. For instance we can
 calculate the distance between the Rangsdorfer lake and the Zeuthener
-lake (lake ID 165161). Do to this we first need to download vector data
-of the Hydrography90m stream network and abstract it into a graph.</p>
-<div class="section level4">
-<h4 id="calculating-distances-between-lakes">Calculating distances between lakes<a class="anchor" aria-label="anchor" href="#calculating-distances-between-lakes"></a>
-</h4>
-</div>
+lake (lake ID <code>165161</code>). To do this we first need to download
+vector data of the Hydrography90m stream network and abstract it into a
+graph.</p>
 </div>
 <div class="section level3">
-<h3 id="download-the-vector-stream-network-geopackage">Download the vector stream network geopackage<a class="anchor" aria-label="anchor" href="#download-the-vector-stream-network-geopackage"></a>
+<h3 id="calculating-distances-between-lakes">Calculating distances between lakes<a class="anchor" aria-label="anchor" href="#calculating-distances-between-lakes"></a>
 </h3>
+<div class="section level4">
+<h4 id="download-the-vector-stream-network-geopackage">Download the vector stream network geopackage<a class="anchor" aria-label="anchor" href="#download-the-vector-stream-network-geopackage"></a>
+</h4>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Download the tif.files of the selceted variables</span></span>
+<code class="sourceCode R"><span><span class="co"># Download the tif.files of the selected variables</span></span>
 <span><span class="fu"><a href="../reference/download_tiles.html">download_tiles</a></span><span class="op">(</span>variable <span class="op">=</span> <span class="st">"order_vect_segment"</span>,</span>
 <span>               tile_id <span class="op">=</span> <span class="va">tile_id</span>,</span>
 <span>               file_format <span class="op">=</span> <span class="st">"gpkg"</span>,</span>
-<span>               download_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data/"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span>               download_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"data"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>Note that the data is stored in a separate folder called
-r.stream.order. To calculate the distance between lakes we first
-represent the vector stream network in a graph.</p>
+<code>r.stream.order</code>. To calculate the distance between lakes we
+first represent the vector stream network in a graph.</p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">my_graph</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_geopackage.html">read_geopackage</a></span><span class="op">(</span>gpkg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>,</span>
-<span>                                          <span class="st">"data/r.stream.order"</span>,</span>
-<span>                                          <span class="st">"/order_vect_tiles20d/order_vect_segment_h18v02.gpkg"</span><span class="op">)</span>,</span>
+<code class="sourceCode R"><span><span class="va">my_graph</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_geopackage.html">read_geopackage</a></span><span class="op">(</span>gpkg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">wdir</span>,</span>
+<span>                                             <span class="st">"data/r.stream.order"</span>,</span>
+<span>                                             <span class="st">"order_vect_tiles20d/order_vect_segment_h18v02.gpkg"</span><span class="op">)</span>,</span>
 <span>                            import_as <span class="op">=</span> <span class="st">"graph"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">my_graph</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_geopackage.html">read_geopackage</a></span><span class="op">(</span>gpkg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>,</span>
-<span>                                          <span class="st">"/data/r.stream.order"</span>,</span>
-<span>                                          <span class="st">"/order_vect_merge.gpkg"</span><span class="op">)</span>,</span>
+<span><span class="va">my_graph</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_geopackage.html">read_geopackage</a></span><span class="op">(</span>gpkg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">wdir</span>,</span>
+<span>                                             <span class="st">"data/r.stream.order"</span>,</span>
+<span>                                             <span class="st">"order_vect_merge.gpkg"</span><span class="op">)</span>,</span>
 <span>                            import_as <span class="op">=</span> <span class="st">"graph"</span><span class="op">)</span></span></code></pre></div>
 <p>Now we extract the stream segment ID of the lake outlets. Between the
 two lakes of interest we will calculate the distance in meter.</p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">lake_165245_intersect</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/data.table/man/fread.html" class="external-link">fread</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data/coord_lake_165245.txt"</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">lake_165245_intersect</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/data.table/man/fread.html" class="external-link">fread</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"data/coord_lake_165245.txt"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">lake_165245_intersect</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">lake_165161_intersect</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/data.table/man/fread.html" class="external-link">fread</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"/data/coord_lake_165161.txt"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">lake_165161_intersect</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/data.table/man/fread.html" class="external-link">fread</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">wdir</span>, <span class="st">"data/coord_lake_165161.txt"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">lake_165161_intersect</span><span class="op">)</span></span></code></pre></div>
 <p>In both tables the first row represents the lake outlet (having the
 highest flow accumulation value). We can now calculate the distance
 between the two outlets using the sub-catchment ID of the first row
-found in the column subc_id. That are for the Rangsdorfer lake subc_id
-507419535 and for the Zeuthener lake subc_id 507343759. They correspond
-to the unique sub-catchment and stream segment ID of the Hydrography90m
-stream network.</p>
+found in the column <code>subc_id</code>. That are for the Rangsdorfer
+lake subc_id <code>507419535</code> and for the Zeuthener lake subc_id
+<code>507343759</code>. They correspond to the unique sub-catchment and
+stream segment ID of the Hydrography90m stream network.</p>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">subc_id</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"507419535"</span>, <span class="st">"507343759"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
@@ -673,20 +688,31 @@ stream network.</p>
 <p>The distance between the two lakes (from outlet to outlet) amounts to
 31842.6 meter or 31.8 km.</p>
 </div>
+</div>
 <div class="section level3 unnumbered">
 <h3 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h3>
 <div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-amatulli2022hydrography90m" class="csl-entry">
-Amatulli, Giuseppe, Jaime Garcia Marquez, Tushar Sethi, et al. 2022.
-<span>“Hydrography90m: A New High-Resolution Global Hydrographic
-Dataset.”</span> <em>Earth System Science Data</em> 14 (10): 4525–50.
+Amatulli, Giuseppe, Jaime Garcia Marquez, Tushar Sethi, Jens Kiesel,
+Afroditi Grigoropoulou, Maria M Üblacker, Longzhu Q Shen, and Sami
+Domisch. 2022. <span>“Hydrography90m: A New High-Resolution Global
+Hydrographic Dataset.”</span> <em>Earth System Science Data</em> 14
+(10): 4525–50.
 </div>
 <div id="ref-friedrichs2024freshwater" class="csl-entry">
 Friedrichs-Manthey, Martin, Diana E Bowler, and Jörg Freyhof. 2024.
 <span>“Freshwater Fish in Mid and Northern German Rivers–Long-Term
 Trends and Associated Species Traits.”</span> <em>Science of the Total
 Environment</em> 957: 177759.
+</div>
+<div id="ref-garcia2025environment90m" class="csl-entry">
+García Márquez, Jaime R., Afroditi Grigoropoulou, Thomas Tomiczek,
+Marlene Schürz, Vanessa Bremerich, Yusdiel Torres-Cambas, Merret
+Buurman, Kristi Bego, Giuseppe Amatulli, and Sami Domisch. 2025.
+<span>“Environment90m: Globally Standardized Environmental Variables for
+Spatial Freshwater Biodiversity Science at High Spatial
+Resolution.”</span> Manuscript in preparation.
 </div>
 <div id="ref-messager2016estimating" class="csl-entry">
 Messager, Mathis Loı̈c, Bernhard Lehner, Günther Grill, Irena Nedeva, and
@@ -695,16 +721,26 @@ Stored in Global Lakes Using a Geo-Statistical Approach.”</span>
 <em>Nature Communications</em> 7 (1): 13603.
 </div>
 <div id="ref-schurz2023hydrographr" class="csl-entry">
-<span class="nocase">Schürz, Marlene, Afroditi Grigoropoulou, Jaime
-Garcı́a Márquez, et al.</span> 2023. <span>“Hydrographr: An r Package for
-Scalable Hydrographic Data Processing.”</span> <em>Methods in Ecology
-and Evolution</em> 14 (12): 2953–63.
+Schürz, Marlene, Afroditi Grigoropoulou, Jaime Garcı́a Márquez, Yusdiel
+Torres-Cambas, Thomas Tomiczek, Mathieu Floury, Vanessa Bremerich, et
+al. 2023. <span>“Hydrographr: An r Package for Scalable Hydrographic
+Data Processing.”</span> <em>Methods in Ecology and Evolution</em> 14
+(12): 2953–63.
+</div>
+<div id="ref-soille2009morphological" class="csl-entry">
+Soille, Pierre, and Peter Vogt. 2009. <span>“Morphological Segmentation
+of Binary Patterns.”</span> <em>Pattern Recognition Letters</em> 30 (4):
+456–59. <a href="https://doi.org/10.1016/j.patrec.2008.10.015" class="external-link">https://doi.org/10.1016/j.patrec.2008.10.015</a>.
 </div>
 <div id="ref-soille2022morphological" class="csl-entry">
-Soille, Pierre, and Peter Vogt. 2022. <span>“Morphological Spatial
-Pattern Analysis: Open Source Release.”</span> <em>The International
-Archives of the Photogrammetry, Remote Sensing and Spatial Information
-Sciences</em> 48: 427–33.
+———. 2022. <span>“Morphological Spatial Pattern Analysis: Open Source
+Release.”</span> <em>The International Archives of the Photogrammetry,
+Remote Sensing and Spatial Information Sciences</em> 48: 427–33.
+</div>
+<div id="ref-vogt2017guidostoolbox" class="csl-entry">
+Vogt, Peter, and Kurt Riitters. 2017. <span>“<span>GuidosToolbox</span>:
+Universal Digital Image Object Analysis.”</span> <em>European Journal of
+Remote Sensing</em> 50 (1): 352–61. <a href="https://doi.org/10.1080/22797254.2017.1330650" class="external-link">https://doi.org/10.1080/22797254.2017.1330650</a>.
 </div>
 </div>
 </div>
@@ -719,7 +755,7 @@ Sciences</em> 48: 427–33.
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer>
