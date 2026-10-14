@@ -42,7 +42,7 @@
 #' \url{https://ies-ows.jrc.ec.europa.eu/gtb/GTB/MSPA_Guide.pdf}
 #'
 #' @examples
-#' #' \dontrun{
+#' \dontrun{
 #' # Download test data into the temporary R folder
 #' # or define a different directory
 #' my_directory <- tempdir()
@@ -65,7 +65,7 @@
 #' # see also (https://forest.jrc.ec.europa.eu/en/activities/lpa/gtb/) and
 #' # (https://glowabio.github.io/hydrographr/articles/case_study_lake_workflow.html)
 #' # give full path virtual machine linux path
-#' edge <- (paste0(/home/USER/GWB_version/,
+#' edge <- (paste0("/home/USER/GWB_version/",
 #'                     "/GWB"))
 #'
 #' stream <- (paste0(my_directory,

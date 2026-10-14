@@ -61,7 +61,7 @@ between the stream network (i.e., Hydrography90m) and the corresponding
 lake's geospatial file (e.g., HydroLAKES shapefile).
 }
 \examples{
-#' \dontrun{
+\dontrun{
 # Download test data into the temporary R folder
 # or define a different directory
 my_directory <- tempdir()
@@ -84,7 +84,7 @@ lakes <- (paste0(my_directory,
 # see also (https://forest.jrc.ec.europa.eu/en/activities/lpa/gtb/) and
 # (https://glowabio.github.io/hydrographr/articles/case_study_lake_workflow.html)
 # give full path virtual machine linux path
-edge <- (paste0(/home/USER/GWB_version/,
+edge <- (paste0("/home/USER/GWB_version/",
                     "/GWB"))
 
 stream <- (paste0(my_directory,
