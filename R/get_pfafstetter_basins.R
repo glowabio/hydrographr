@@ -29,6 +29,8 @@
 #' data.table=FALSE.
 #' @param n_cores numeric. Number of cores used for parallelisation. Default is
 #' NULL (= detectCores(logical=FALSE)-1). Optional.
+#' @param quiet logical. If FALSE, the some diagnostic output will be printed.
+#' Default is FALSE.
 #'
 #' @returns Either a data.table, or a raster (terra object) loaded into R. In
 #' case the result is a raster, then a .tif file is written to disk.
@@ -103,11 +105,15 @@
 
 
 get_pfafstetter_basins <- function(g, subc_raster, out_dir, file_name,
-                                   data_table = FALSE, n_cores = NULL) {
+                                   data_table = FALSE, n_cores = NULL,
+                                   quiet = FALSE) {
 
 
 
   # Check input arguments
+  if (!is.logical(quiet))
+    stop("quiet: Has to be TRUE or FALSE.")
+
   if (class(g) != "igraph")
     stop("Input must be an igraph object.")
 
@@ -128,11 +134,7 @@ get_pfafstetter_basins <- function(g, subc_raster, out_dir, file_name,
   if (missing(file_name) && data_table==FALSE)
     stop("Please provide the file name of the output file.")
 
-  quiet <- FALSE
-  if (!quiet) message("Vertex attributes: ", paste(igraph::vertex_attr_names(g), collapse=", "))
-  if (!quiet) message("Edge attributes: ", paste(igraph::edge_attr_names(g), collapse=", "))
-
-cat("Setting up parallel backend...\n")
+  if (!quiet) message("Setting up parallel backend...")
 
   # Setting up parallelization if n_cores is not provided
   if (is.null(n_cores)) {
@@ -154,7 +156,7 @@ cat("Setting up parallel backend...\n")
 # Foreach
 cl <- makePSOCKcluster(n_cores)
 registerDoParallel(cl)
-cat("Using", foreach::getDoParWorkers(), "CPUs...", "\n")
+if (!quiet) message("Using ", foreach::getDoParWorkers(), " CPUs...")
 
 # Avoid exponential numbers in the reclassification
 options(scipen=999)
@@ -168,8 +170,12 @@ mapply_fun <- function(element,name){
 "%ni%" <- Negate("%in%")
 
 
+if (!quiet) {
+  message("Preparing the graph...")
+  message("Vertex attributes: ", paste(igraph::vertex_attr_names(g), collapse=", "))
+  message("Edge attributes: ", paste(igraph::edge_attr_names(g), collapse=", "))
+}
 
-cat("Preparing the graph...\n")
 # Need to re-define the graph to overcome any errors due to different IDs,
 # depending on how the graph was initially created
 # So we convert to data.frame and then data.table...
@@ -189,7 +195,7 @@ if (!(igraph::is_igraph(g))) {
 if (!quiet) {
   message("Number of vertices: ", igraph::vcount(g))
   message("Number of edges: ", igraph::ecount(g))
-  message("Names of edge attributes: ", igraph::edge_attr_names(g)) # none!
+  #message("Names of edge attributes: ", igraph::edge_attr_names(g)) # none!
   #message("Print whole graph: \n")
   #print(g)
 }
@@ -230,7 +236,7 @@ if (length(outlet)!=1) {
 
 
 
-cat("Calculating the area of single sub-catchments...\n")
+if (!quiet) message("Calculating the area of single sub-catchments...")
 # Needs a data-table to assign results
 # IDs have to match, hence run this again
 streams_dt <- setDT(data.frame(stream=as.numeric(as_ids(V(g)))))
@@ -246,7 +252,7 @@ streams_dt <- tmp_scatch_area[streams_dt, on="stream"]
 
 
 
-cat("Finding the most contributing stream...", "\n")
+if (!quiet) message("Finding the most contributing stream...")
 ### Run only with foreach (future / lapply results in strange results
 # for very small basins)
 
@@ -300,7 +306,7 @@ gc()
 ###--- Get up to 4 most contributing tributaries along main stream -----
 ###---------------------------------------------------------------------#
 
-cat("Finding the next 4 most contributing tributaries....", "\n")
+if (!quiet) message("Finding the next 4 most contributing tributaries....")
 # Delete the edges of the main stream (not the vertices, else any single
 # stream reaches, i.e. stand-alone connected to main stream, yield an error
 # as there is nothing to connect to)
@@ -382,7 +388,7 @@ trib_order <- na.omit(trib_order)
 
 
 ###---- Assign Pfafstetter code -----
-cat("Assigning the Pfafstetter codes....", "\n")
+if (!quiet) message("Assigning the Pfafstetter codes....")
 ### Generate the sequence - can be shorter for small basins
 tmp_odd <- seq(1, 7, 2)
 tmp_even <- seq(2, 8, 2)
@@ -516,21 +522,22 @@ all_stream_code <- all_stream_code[, lapply(.SD, as.integer)]
 if (data_table==TRUE) {
   return(all_stream_code)
 } else {
-cat("Creating Pfafstetter basin raster...", "\n")
+if (!quiet) message("Creating Pfafstetter basin raster...")
 # Reclassify the sub-catchment raster and get the map
 pfafstetter_raster <- reclass_raster(data = all_stream_code,
                             rast_val = "stream",
                             new_val = "code",
                             raster_layer = subc_raster,
                             recl_layer = paste0(out_dir, "/", file_name),
-                            read = TRUE)
+                            read = TRUE,
+                            quiet = quiet)
 
 
-cat("Pfafstetter basin layer written to", paste0(out_dir, "/", file_name), "\n")
+if (!quiet) message("Pfafstetter basin layer written to: ", paste0(out_dir, "/", file_name))
 return(pfafstetter_raster)
 
  }
-cat("Pfafstetter basin delineation done", "\n")
+if (!quiet) message("Pfafstetter basin delineation done")
 stopCluster(cl)
 plan(sequential)
 }
