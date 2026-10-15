@@ -136,12 +136,10 @@ get_pfafstetter_basins <- function(g, subc_raster, out_dir, file_name,
 
   if (!quiet) message("Setting up parallel backend...")
 
-  # Setting up parallelization if n_cores is not provided
+  # Setting up parallelization:
+  # If n_cores is not provided, detect number of available cores
   if (is.null(n_cores)) {
-
-  #  Detect number of available cores
-  n_cores <- detectCores(logical = FALSE) - 1
-
+    n_cores <- detectCores(logical = FALSE) - 1
   }
 
   # Check parallel backend depending on the OS
@@ -161,15 +159,16 @@ if (!quiet) message("Using ", foreach::getDoParWorkers(), " CPUs...")
 # Avoid exponential numbers in the reclassification
 options(scipen=999)
 
-### Get the path number as an additional column in the graph list.vs
+# Get the path number as an additional column in the graph list.vs
 mapply_fun <- function(element,name){
   mutate(element,PATH_ID = name)
 }
 
-### Fast subsetting by vector elements
+# Fast subsetting by vector elements
 "%ni%" <- Negate("%in%")
 
 
+# Preparing the graph...
 if (!quiet) {
   message("Preparing the graph...")
   message("Vertex attributes: ", paste(igraph::vertex_attr_names(g), collapse=", "))
@@ -220,21 +219,17 @@ headwater_names <- g_dt_tmp[order(-out_dist)]$from[1:100]
 # case, remove them:
 headwater_names <- headwater_names[!is.na(headwater_names)] # remove NAs if less than 100 subc_id
 
-
 # Stop if too few stream segments (currently three, need to go lower?)
 if (gsize(g_subset)<3) {
   stop("The input basin has too few stream segments / sub-catchments. Please
        select another outlet segment with get_catchment_graph()")
 }
 
-
 # Stop if too many outlets
 if (length(outlet)!=1) {
   stop("Only one outlet possible. You may want to run get_catchment_graph()
        to get a single drainage basin.")
 }
-
-
 
 if (!quiet) message("Calculating the area of single sub-catchments...")
 # Needs a data-table to assign results
@@ -253,13 +248,16 @@ streams_dt <- tmp_scatch_area[streams_dt, on="stream"]
 
 
 if (!quiet) message("Finding the most contributing stream...")
-### Run only with foreach (future / lapply results in strange results
+# Run only with foreach (future / lapply results in strange results
 # for very small basins)
 
-l <- foreach::foreach (i=headwater_names, .inorder=FALSE,
-              .packages = "igraph")  %dopar% {
-              out <-subcomponent(g, i, mode = c("out"))
-              }
+l <- foreach::foreach(
+  i=headwater_names,
+  .inorder=FALSE,
+  .packages = "igraph"
+) %dopar% {
+  out <-subcomponent(g, i, mode = c("out"))
+}
 
 ### Get into datatable format
 names(l) <- headwater_names
