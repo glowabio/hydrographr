@@ -151,393 +151,390 @@ get_pfafstetter_basins <- function(g, subc_raster, out_dir, file_name,
     plan(multicore, workers = n_cores)
   }
 
-# Foreach
-cl <- makePSOCKcluster(n_cores)
-registerDoParallel(cl)
-if (!quiet) message("Using ", foreach::getDoParWorkers(), " CPUs...")
-
-# Avoid exponential numbers in the reclassification
-options(scipen=999)
-
-# Get the path number as an additional column in the graph list.vs
-mapply_fun <- function(element,name){
-  mutate(element,PATH_ID = name)
-}
-
-# Fast subsetting by vector elements
-"%ni%" <- Negate("%in%")
-
-
-# Preparing the graph...
-if (!quiet) {
-  message("Preparing the graph...")
-  message("Vertex attributes: ", paste(igraph::vertex_attr_names(g), collapse=", "))
-  message("Edge attributes: ", paste(igraph::edge_attr_names(g), collapse=", "))
-}
-
-# Need to re-define the graph to overcome any errors due to different IDs,
-# depending on how the graph was initially created
-# So we convert to data.frame and then data.table...
-g_dt_tmp <- setDT(igraph::as_data_frame(g))
-# ... and then back to graph:
-# Note: graph.data.frame is deprecated in igraph 2.0.0
-g <- graph_from_data_frame(
-  g_dt_tmp[, c("from", "to")],
-  directed = TRUE
-)
-# Add a check just to be sure:
-if (!(igraph::is_igraph(g))) {
-  stop("Could not re-generate an igraph object...")
-}
-
-# Diagnostics:
-if (!quiet) {
-  message("Number of vertices: ", igraph::vcount(g))
-  message("Number of edges: ", igraph::ecount(g))
-  #message("Names of edge attributes: ", igraph::edge_attr_names(g)) # none!
-  #message("Print whole graph: \n")
-  #print(g)
-}
-
-# Get all possible paths from the outlet
-# These are named integer vectors (name is the vertex name, i.e. the subc_id,
-# and value is the position of the vertex in the graph's vertex sequence V(g))
-outlet = which(degree(g, v = V(g), mode = "out")==0, useNames = T)
-
-# Get all headwaters
-#headwater = which(degree(g, v = V(g), mode = "in")==0, useNames = T) # all, slow
-# In the subsequent code, only the names (i.e. the subc_ids) are needed:
-#headwater_names <- names(heatwater)
-#rm(headwater)
-
-# Instead, get a pre-selection of those 100 main stream candidates that have the
-# longest distance to the outlet (the most contributing stream is likely to
-# to be one of these)
-headwater_names <- g_dt_tmp[order(-out_dist)]$from[1:100]
-# Note: If out_dist contains NA values, order(out_dist) places them at the end,
-# so they won't be selected unless there are fewer than 100 non-NA rows - for that
-# case, remove them:
-headwater_names <- headwater_names[!is.na(headwater_names)] # remove NAs if less than 100 subc_id
-
-# Stop if too few stream segments (currently three, need to go lower?)
-if (gsize(g_subset)<3) {
-  stop("The input basin has too few stream segments / sub-catchments. Please
-       select another outlet segment with get_catchment_graph()")
-}
-
-# Stop if too many outlets
-if (length(outlet)!=1) {
-  stop("Only one outlet possible. You may want to run get_catchment_graph()
-       to get a single drainage basin.")
-}
-
-if (!quiet) message("Calculating the area of single sub-catchments...")
-# Needs a data-table to assign results
-# IDs have to match, hence run this again
-streams_dt <- setDT(data.frame(stream=as.numeric(as_ids(V(g)))))
-
-# Attach the area of each stream-reach
-tmp_r <- rast(subc_raster)
-tmp_scatch_area <- expanse(tmp_r, byValue=T, unit="km")
-setDT(tmp_scatch_area)
-tmp_scatch_area <- tmp_scatch_area[,-1]
-setnames(tmp_scatch_area, c("stream", "area_km2"))
-streams_dt <- tmp_scatch_area[streams_dt, on="stream"]
-
-
-
-
-if (!quiet) message("Finding the most contributing stream...")
-# Run only with foreach (future / lapply results in strange results
-# for very small basins)
-
-l <- foreach::foreach(
-  i=headwater_names,
-  .inorder=FALSE,
-  .packages = "igraph"
-) %dopar% {
-  out <-subcomponent(g, i, mode = c("out"))
-}
-
-### Get into datatable format
-names(l) <- headwater_names
-l <- future_lapply(l, as_ids)
-l <- future_lapply(l, as.data.table)
-### Get the path number as an additional column
-l <- future_mapply(mapply_fun,l,names(l),SIMPLIFY = F)
-### Merge as datatable
-tmp_dt <- rbindlist(l); rm(l)
-names(tmp_dt)[1] <- "stream"
-
-### Remove the outlet
-setkey(tmp_dt, stream)
-tmp_dt <- tmp_dt[!(tmp_dt$stream==as.numeric(names(outlet))),]
-tmp_dt$seq_id <- seq.int(1:nrow(tmp_dt))
+  # Foreach
+  cl <- makePSOCKcluster(n_cores)
+  registerDoParallel(cl)
+  if (!quiet) message("Using ", foreach::getDoParWorkers(), " CPUs...")
+
+  # Avoid exponential numbers in the reclassification
+  options(scipen=999)
+
+  # Get the path number as an additional column in the graph list.vs
+  mapply_fun <- function(element,name){
+    mutate(element,PATH_ID = name)
+  }
+
+  # Fast subsetting by vector elements
+  "%ni%" <- Negate("%in%")
+
+
+  # Preparing the graph...
+  if (!quiet) {
+    message("Preparing the graph...")
+    message("Vertex attributes: ", paste(igraph::vertex_attr_names(g), collapse=", "))
+    message("Edge attributes: ", paste(igraph::edge_attr_names(g), collapse=", "))
+  }
+
+  # Need to re-define the graph to overcome any errors due to different IDs,
+  # depending on how the graph was initially created
+  # So we convert to data.frame and then data.table...
+  g_dt_tmp <- setDT(igraph::as_data_frame(g))
+  # ... and then back to graph:
+  # Note: graph.data.frame is deprecated in igraph 2.0.0
+  g <- graph_from_data_frame(
+    g_dt_tmp[, c("from", "to")],
+    directed = TRUE
+  )
+  # Add a check just to be sure:
+  if (!(igraph::is_igraph(g))) {
+    stop("Could not re-generate an igraph object...")
+  }
+
+  # Diagnostics:
+  if (!quiet) {
+    message("Number of vertices: ", igraph::vcount(g))
+    message("Number of edges: ", igraph::ecount(g))
+    #message("Names of edge attributes: ", igraph::edge_attr_names(g)) # none!
+    #message("Print whole graph: \n")
+    #print(g)
+  }
+
+  # Get all possible paths from the outlet
+  # These are named integer vectors (name is the vertex name, i.e. the subc_id,
+  # and value is the position of the vertex in the graph's vertex sequence V(g))
+  outlet = which(degree(g, v = V(g), mode = "out")==0, useNames = T)
+
+  # Get all headwaters
+  #headwater = which(degree(g, v = V(g), mode = "in")==0, useNames = T) # all, slow
+  # In the subsequent code, only the names (i.e. the subc_ids) are needed:
+  #headwater_names <- names(heatwater)
+  #rm(headwater)
+
+  # Instead, get a pre-selection of those 100 main stream candidates that have the
+  # longest distance to the outlet (the most contributing stream is likely to
+  # to be one of these)
+  headwater_names <- g_dt_tmp[order(-out_dist)]$from[1:100]
+  # Note: If out_dist contains NA values, order(out_dist) places them at the end,
+  # so they won't be selected unless there are fewer than 100 non-NA rows - for that
+  # case, remove them:
+  headwater_names <- headwater_names[!is.na(headwater_names)] # remove NAs if less than 100 subc_id
+
+  # Stop if too few stream segments (currently three, need to go lower?)
+  if (gsize(g_subset)<3) {
+    stop("The input basin has too few stream segments / sub-catchments. Please
+         select another outlet segment with get_catchment_graph()")
+  }
+
+  # Stop if too many outlets
+  if (length(outlet)!=1) {
+    stop("Only one outlet possible. You may want to run get_catchment_graph()
+         to get a single drainage basin.")
+  }
+
+  if (!quiet) message("Calculating the area of single sub-catchments...")
+  # Needs a data-table to assign results
+  # IDs have to match, hence run this again
+  streams_dt <- setDT(data.frame(stream=as.numeric(as_ids(V(g)))))
+
+  # Attach the area of each stream-reach
+  tmp_r <- rast(subc_raster)
+  tmp_scatch_area <- expanse(tmp_r, byValue=T, unit="km")
+  setDT(tmp_scatch_area)
+  tmp_scatch_area <- tmp_scatch_area[,-1]
+  setnames(tmp_scatch_area, c("stream", "area_km2"))
+  streams_dt <- tmp_scatch_area[streams_dt, on="stream"]
+
+
+  if (!quiet) message("Finding the most contributing stream...")
+  # Run only with foreach (future / lapply results in strange results
+  # for very small basins)
+
+  l <- foreach::foreach(
+    i=headwater_names,
+    .inorder=FALSE,
+    .packages = "igraph"
+  ) %dopar% {
+    out <-subcomponent(g, i, mode = c("out"))
+  }
+
+  ### Get into datatable format
+  names(l) <- headwater_names
+  l <- future_lapply(l, as_ids)
+  l <- future_lapply(l, as.data.table)
+  ### Get the path number as an additional column
+  l <- future_mapply(mapply_fun,l,names(l),SIMPLIFY = F)
+  ### Merge as datatable
+  tmp_dt <- rbindlist(l); rm(l)
+  names(tmp_dt)[1] <- "stream"
+
+  ### Remove the outlet
+  setkey(tmp_dt, stream)
+  tmp_dt <- tmp_dt[!(tmp_dt$stream==as.numeric(names(outlet))),]
+  tmp_dt$seq_id <- seq.int(1:nrow(tmp_dt))
 
-tmp_dt$stream <- as.numeric(tmp_dt$stream)
-tmp_dt$PATH_ID <- as.numeric(tmp_dt$PATH_ID)
-
-### Join
-tmp_dt <- streams_dt[tmp_dt, on="stream"] # left join, preserves ordering
+  tmp_dt$stream <- as.numeric(tmp_dt$stream)
+  tmp_dt$PATH_ID <- as.numeric(tmp_dt$PATH_ID)
 
-### Get maximum flow acc per PATH_ID
-sum_flow_acc_PATH_ID <- tmp_dt[,.(sum_flow_acc=sum(area_km2)), by="PATH_ID"]
-
-### Identify the main stream = max contributing drainage
-setorder(sum_flow_acc_PATH_ID, -sum_flow_acc)
-main_headwater_id <- sum_flow_acc_PATH_ID[1]$PATH_ID # headwater tip ID
+  ### Join
+  tmp_dt <- streams_dt[tmp_dt, on="stream"] # left join, preserves ordering
 
+  ### Get maximum flow acc per PATH_ID
+  sum_flow_acc_PATH_ID <- tmp_dt[,.(sum_flow_acc=sum(area_km2)), by="PATH_ID"]
+
+  ### Identify the main stream = max contributing drainage
+  setorder(sum_flow_acc_PATH_ID, -sum_flow_acc)
+  main_headwater_id <- sum_flow_acc_PATH_ID[1]$PATH_ID # headwater tip ID
 
-### Get the single stream reaches of the main stream
-# edges, ordered from down-to upstream
-main_stream <- all_simple_paths(g, from = outlet,
-                                to = as.character(main_headwater_id), "in")
-
-main_stream <- as_ids(unlist(main_stream[[1]]))
-# remove the first item, which is the outlet
-main_stream <- main_stream[-1]
-rm(list=ls(pattern="^tmp_")) # cleanup
-rm(g_dt_tmp, sum_flow_acc_PATH_ID, headwater_names)
-gc()
-
-###---------------------------------------------------------------------#
-###--- Get up to 4 most contributing tributaries along main stream -----
-###---------------------------------------------------------------------#
-
-if (!quiet) message("Finding the next 4 most contributing tributaries....")
-# Delete the edges of the main stream (not the vertices, else any single
-# stream reaches, i.e. stand-alone connected to main stream, yield an error
-# as there is nothing to connect to)
-
-# requires the outlet to be removed
-g_del <- delete_edges(g, V(g)[paste(main_stream)])
 
-# From each main stream vertex, walk to the headwaters to get entire tributary
-l2 <- future_sapply(as.character(main_stream),
-                    function(x) subcomponent(g_del, x, mode = c("in")))
-# Get into datatable format
-l2 <- future_lapply(l2, function(x) names(x))
-l2 <- future_lapply(l2, as.data.table)
-l2 <- future_mapply(mapply_fun,l2,names(l2),SIMPLIFY = F)
-
-### Merge as datatable
-dt2 <- rbindlist(l2)
-names(dt2)[1] <- "stream"
-setkey(dt2, stream)
-# Convert to character IDs
-dt2$stream <- as.numeric(dt2$stream)
-dt2$PATH_ID <- as.numeric(dt2$PATH_ID)
-
-### Remove the main stream ID from each subcomponent
-dt2 <- dt2[dt2$stream %ni% as.numeric(main_stream) ,]
-
-### Join
-dt2 <- streams_dt[dt2, on="stream"] # left join, preserves ordering
-
-### Get maximum flow acc per PATH_ID
-flow_acc_per_PATH_ID_trib <- dt2[,.(sum_flow_acc=sum(area_km2)), by="PATH_ID"]
-
-### Identify the top 4 tributaries flowing into main stream
-setorder(flow_acc_per_PATH_ID_trib, -sum_flow_acc)
-
-
-
-
-
-###--- Identify the stream ID of the contributing tributaries ----
-# Get the main stream id at the branches = the position
-trib_order <- flow_acc_per_PATH_ID_trib[1:4,1]
-main_stream_branch_id <- na.omit(trib_order) # could be less than four
-main_stream_branch_id <- as.character(t(main_stream_branch_id))
-
-
-# Remove IDs of single streams belonging to the entire tributary
-# (note: main stream is deleted in g_del)
-main_trib_all_id <- future_sapply(main_stream_branch_id,
-                          function(x) subcomponent(g_del, x, mode = c("in")))
-
-### Get into datatable format
-main_trib_all_id <- future_lapply(main_trib_all_id, function(x) names(x))
-main_trib_all_id <- future_lapply(main_trib_all_id, as.data.table)
-main_trib_all_id <- future_mapply(mapply_fun,main_trib_all_id,
-                                  names(main_trib_all_id),SIMPLIFY = F)
-
-### Merge as datatable
-main_trib_all_id <- rbindlist(main_trib_all_id)
-names(main_trib_all_id)[1] <- "stream"
-setkey(main_trib_all_id, stream)
-
-main_trib_all_id$stream <- as.numeric(main_trib_all_id$stream)
-main_trib_all_id$PATH_ID <- as.numeric(main_trib_all_id$PATH_ID)
-
-
-
-# Remove the main stream ID
-# At which position are the tributaries? Use the ordered main stream
-main_dt <- data.table(stream=as.numeric(main_stream),
-                      seq_id=seq.int(1:length(main_stream)))
-main_dt$PATH_ID <- main_dt$stream # copy for join only
-
-# Get tributary position along main stream
-trib_order <- main_dt[trib_order, on="PATH_ID"]
-setorder(trib_order, seq_id)
-### In case of less than four tributaries
-trib_order <- na.omit(trib_order)
-
-
-###---- Assign Pfafstetter code -----
-if (!quiet) message("Assigning the Pfafstetter codes....")
-### Generate the sequence - can be shorter for small basins
-tmp_odd <- seq(1, 7, 2)
-tmp_even <- seq(2, 8, 2)
-
-### Insert the tributary and interbasin code. Note that interbasins are is
-# simply inserted at the same position (as in the end, this specific main
-# stream ID will be an interbasin, not belonging to the tributary)
-N_TRIBUTARIES <- length(unique(trib_order$PATH_ID))
-trib_order$code_trib <- tmp_even[1:N_TRIBUTARIES]
-
-N_INTERBASIN <- nrow(trib_order)
-trib_order$code_inter <-  tmp_odd[1:N_INTERBASIN]
-
-# Attach to the main stream table
-tmp_names <- c("PATH_ID", "code_trib", "code_inter")
-main_trib_all_id <-  trib_order[,..tmp_names] [main_trib_all_id, on="PATH_ID"]
-# change name to match other table
-setnames(main_trib_all_id, "code_trib", "code")
-
-
-### Insert the position of tributaries in main_dt
-setkey(main_dt, seq_id)
-main_dt <- trib_order[,..tmp_names] [main_dt, on="PATH_ID"]
-
-### Add last odd upstream code manually in case it's missing
-# (only if 4 or less stream ID present --> there can't be a "9"
-if (max(main_dt$code_trib, na.rm=T)<=6) {
-  main_dt$code_inter <- ifelse(!is.na(main_dt$PATH_ID) &
-                                 is.na(main_dt$code_inter),
-                               max(main_dt$code_inter, na.rm=T)+2,
-                               main_dt$code_inter)
-                                        }
-
-# Fill in the interbasin Pfafstetter code along the main stream
-# (ordered from down- to upstream)
-main_dt <- as.data.table(main_dt %>% fill(code_inter, .direction = c("up")))
-
-# Assign the "9" code = the upstream part of the main stream
-main_dt$code <- ifelse(is.na(main_dt$code_inter), 9, main_dt$code_inter)
-
-
-#--- Get all stream ID of the interbasins -----
-### Get a network without tributary streams, and without the main stream ID
-# to which the tributaries connect (=need to break the network)
-# Delete the tributary streams ID and the branching stream ID
-# from g = limit the subcomponent search
-delete_these <- append(as.character(main_trib_all_id$stream),
-                       as.character(trib_order$stream) )
-delete_these <- unique(delete_these)
-
-g_del_for_interbas <- igraph::delete_vertices(g, V(g)[paste(delete_these)])
-
-# Get the most downstream interbasin stream reach for which to search
-first_interbas_id <- main_dt[match(unique(main_dt$code), main_dt$code),]
-names(first_interbas_id)[1] <- "first_interbas_id"
-
-# Find all streams belonging to the interbasins
-first_interbas_id_char <- as.character(first_interbas_id$first_interbas_id)
-tmp <- future_sapply(first_interbas_id_char,
-                     function(x) subcomponent(g_del_for_interbas, x,
-                                              mode = c("in")))
-# Get into datatable format
-tmp <- future_lapply(tmp, function(x) names(x))
-tmp <- future_lapply(tmp, as.data.table)
-tmp <- future_mapply(mapply_fun,tmp,names(tmp),SIMPLIFY = F)
-
-# Merge as datatable
-dt3 <- rbindlist(tmp)
-names(dt3)[1] <- "stream"
-setnames(dt3, "PATH_ID", "first_interbas_id")
-
-dt3$stream <- as.numeric(dt3$stream)
-dt3$first_interbas_id <- as.numeric(dt3$first_interbas_id)
-setkey(dt3, stream)
-
-
-# Correct the subcomponents: if two interbasin-IDs share the same vertex,
-# the ID located lower will find the same subcomponent as the one located
-# more upstream. Keep only those that belong to the upstream-ID
-tmp_adj <- adjacent_vertices(g_del_for_interbas,
-                             first_interbas_id_char, mode = c("in"))
-tmp_adj <- lapply(tmp_adj, function(x) names(x))
-tmp_adj <- lapply(tmp_adj, as.data.table)
-tmp_adj <- mapply(mapply_fun,tmp_adj,names(tmp_adj),SIMPLIFY = F)
-tmp_adj <- rbindlist(tmp_adj)
-tmp_adj_names <- c("stream_in_catchment", "PATH_ID")
-setnames(tmp_adj, names(tmp_adj), tmp_adj_names)
-tmp_adj$stream_in_catchment <- as.numeric(tmp_adj$stream_in_catchment)
-tmp_adj$PATH_ID <- as.numeric(tmp_adj$PATH_ID)
-
-### Add the information of stream position
-tmp_names <- c("PATH_ID", "seq_id")
-tmp_adj <- main_dt[,..tmp_names] [tmp_adj, on="PATH_ID"]
-
-# If on the same row, it means that it's duplicated
-# Replace the catchmant (or subcomponent) stream IDs with the main outlet ID
-fix_these <- tmp_adj[tmp_adj$stream_in_catchment %in% tmp_adj$PATH_ID,]$PATH_ID
-
-dt3$fix_these <- ifelse(dt3$first_interbas_id %in% fix_these, NA, 0)
-# take out the main stream reach itself, keep it
-dt3$fix_these <- ifelse(dt3$stream %in% fix_these, 0, dt3$fix_these)
-### Remove all rows where the lower interbasin main stream id points to the
-# catchment stream IDs (i.e., these belong to the next Pfaf-basin...)
-dt3 <- na.omit(dt3)
-dt3$fix_these=NULL
-
-
-### Get the Pfafstetter code for these interbasin subcomponent streams
-tmp_names <- c("first_interbas_id", "code")
-dt3 <- first_interbas_id[,..tmp_names] [dt3, on="first_interbas_id"]
-### Add the branching stream ID as well - not needed, done in next step...
-
-### Delete duplicate main stream ID in the interbasin stream IDs
-dt3 <- dt3[dt3$stream %ni% main_dt$stream,]
-
-
-# Add the tributary stream and interbasin id to the final table
-tmp_names <- c("stream", "code")
-
-all_stream_code <- rbind(main_trib_all_id[main_trib_all_id$stream %ni%
-                                            trib_order$stream,][,..tmp_names],
-                                            main_dt[,..tmp_names],
-                                            dt3[,..tmp_names])
-
-## Check if still duplicated
-all_stream_code <- all_stream_code[!duplicated(all_stream_code),]
-setorder(all_stream_code, stream)
-all_stream_code <- all_stream_code[, lapply(.SD, as.integer)]
-
-# Return data.table or raster
-if (data_table==TRUE) {
-  return(all_stream_code)
-} else {
-if (!quiet) message("Creating Pfafstetter basin raster...")
-# Reclassify the sub-catchment raster and get the map
-pfafstetter_raster <- reclass_raster(data = all_stream_code,
-                            rast_val = "stream",
-                            new_val = "code",
-                            raster_layer = subc_raster,
-                            recl_layer = paste0(out_dir, "/", file_name),
-                            read = TRUE,
-                            quiet = quiet)
-
-
-if (!quiet) message("Pfafstetter basin layer written to: ", paste0(out_dir, "/", file_name))
-return(pfafstetter_raster)
-
- }
-if (!quiet) message("Pfafstetter basin delineation done")
-stopCluster(cl)
-plan(sequential)
+  ### Get the single stream reaches of the main stream
+  # edges, ordered from down-to upstream
+  main_stream <- all_simple_paths(g, from = outlet,
+                                  to = as.character(main_headwater_id), "in")
+
+  main_stream <- as_ids(unlist(main_stream[[1]]))
+  # remove the first item, which is the outlet
+  main_stream <- main_stream[-1]
+  rm(list=ls(pattern="^tmp_")) # cleanup
+  rm(g_dt_tmp, sum_flow_acc_PATH_ID, headwater_names)
+  gc()
+
+  ###---------------------------------------------------------------------#
+  ###--- Get up to 4 most contributing tributaries along main stream -----
+  ###---------------------------------------------------------------------#
+
+  if (!quiet) message("Finding the next 4 most contributing tributaries....")
+  # Delete the edges of the main stream (not the vertices, else any single
+  # stream reaches, i.e. stand-alone connected to main stream, yield an error
+  # as there is nothing to connect to)
+
+  # requires the outlet to be removed
+  g_del <- delete_edges(g, V(g)[paste(main_stream)])
+
+  # From each main stream vertex, walk to the headwaters to get entire tributary
+  l2 <- future_sapply(as.character(main_stream),
+                      function(x) subcomponent(g_del, x, mode = c("in")))
+  # Get into datatable format
+  l2 <- future_lapply(l2, function(x) names(x))
+  l2 <- future_lapply(l2, as.data.table)
+  l2 <- future_mapply(mapply_fun,l2,names(l2),SIMPLIFY = F)
+
+  ### Merge as datatable
+  dt2 <- rbindlist(l2)
+  names(dt2)[1] <- "stream"
+  setkey(dt2, stream)
+  # Convert to character IDs
+  dt2$stream <- as.numeric(dt2$stream)
+  dt2$PATH_ID <- as.numeric(dt2$PATH_ID)
+
+  ### Remove the main stream ID from each subcomponent
+  dt2 <- dt2[dt2$stream %ni% as.numeric(main_stream) ,]
+
+  ### Join
+  dt2 <- streams_dt[dt2, on="stream"] # left join, preserves ordering
+
+  ### Get maximum flow acc per PATH_ID
+  flow_acc_per_PATH_ID_trib <- dt2[,.(sum_flow_acc=sum(area_km2)), by="PATH_ID"]
+
+  ### Identify the top 4 tributaries flowing into main stream
+  setorder(flow_acc_per_PATH_ID_trib, -sum_flow_acc)
+
+
+
+
+
+  ###--- Identify the stream ID of the contributing tributaries ----
+  # Get the main stream id at the branches = the position
+  trib_order <- flow_acc_per_PATH_ID_trib[1:4,1]
+  main_stream_branch_id <- na.omit(trib_order) # could be less than four
+  main_stream_branch_id <- as.character(t(main_stream_branch_id))
+
+
+  # Remove IDs of single streams belonging to the entire tributary
+  # (note: main stream is deleted in g_del)
+  main_trib_all_id <- future_sapply(main_stream_branch_id,
+                            function(x) subcomponent(g_del, x, mode = c("in")))
+
+  ### Get into datatable format
+  main_trib_all_id <- future_lapply(main_trib_all_id, function(x) names(x))
+  main_trib_all_id <- future_lapply(main_trib_all_id, as.data.table)
+  main_trib_all_id <- future_mapply(mapply_fun,main_trib_all_id,
+                                    names(main_trib_all_id),SIMPLIFY = F)
+
+  ### Merge as datatable
+  main_trib_all_id <- rbindlist(main_trib_all_id)
+  names(main_trib_all_id)[1] <- "stream"
+  setkey(main_trib_all_id, stream)
+
+  main_trib_all_id$stream <- as.numeric(main_trib_all_id$stream)
+  main_trib_all_id$PATH_ID <- as.numeric(main_trib_all_id$PATH_ID)
+
+
+
+  # Remove the main stream ID
+  # At which position are the tributaries? Use the ordered main stream
+  main_dt <- data.table(stream=as.numeric(main_stream),
+                        seq_id=seq.int(1:length(main_stream)))
+  main_dt$PATH_ID <- main_dt$stream # copy for join only
+
+  # Get tributary position along main stream
+  trib_order <- main_dt[trib_order, on="PATH_ID"]
+  setorder(trib_order, seq_id)
+  ### In case of less than four tributaries
+  trib_order <- na.omit(trib_order)
+
+
+  ###---- Assign Pfafstetter code -----
+  if (!quiet) message("Assigning the Pfafstetter codes....")
+  ### Generate the sequence - can be shorter for small basins
+  tmp_odd <- seq(1, 7, 2)
+  tmp_even <- seq(2, 8, 2)
+
+  ### Insert the tributary and interbasin code. Note that interbasins are is
+  # simply inserted at the same position (as in the end, this specific main
+  # stream ID will be an interbasin, not belonging to the tributary)
+  N_TRIBUTARIES <- length(unique(trib_order$PATH_ID))
+  trib_order$code_trib <- tmp_even[1:N_TRIBUTARIES]
+
+  N_INTERBASIN <- nrow(trib_order)
+  trib_order$code_inter <-  tmp_odd[1:N_INTERBASIN]
+
+  # Attach to the main stream table
+  tmp_names <- c("PATH_ID", "code_trib", "code_inter")
+  main_trib_all_id <-  trib_order[,..tmp_names] [main_trib_all_id, on="PATH_ID"]
+  # change name to match other table
+  setnames(main_trib_all_id, "code_trib", "code")
+
+
+  ### Insert the position of tributaries in main_dt
+  setkey(main_dt, seq_id)
+  main_dt <- trib_order[,..tmp_names] [main_dt, on="PATH_ID"]
+
+  ### Add last odd upstream code manually in case it's missing
+  # (only if 4 or less stream ID present --> there can't be a "9"
+  if (max(main_dt$code_trib, na.rm=T)<=6) {
+    main_dt$code_inter <- ifelse(!is.na(main_dt$PATH_ID) &
+                                   is.na(main_dt$code_inter),
+                                 max(main_dt$code_inter, na.rm=T)+2,
+                                 main_dt$code_inter)
+  }
+
+  # Fill in the interbasin Pfafstetter code along the main stream
+  # (ordered from down- to upstream)
+  main_dt <- as.data.table(main_dt %>% fill(code_inter, .direction = c("up")))
+
+  # Assign the "9" code = the upstream part of the main stream
+  main_dt$code <- ifelse(is.na(main_dt$code_inter), 9, main_dt$code_inter)
+
+
+  #--- Get all stream ID of the interbasins -----
+  ### Get a network without tributary streams, and without the main stream ID
+  # to which the tributaries connect (=need to break the network)
+  # Delete the tributary streams ID and the branching stream ID
+  # from g = limit the subcomponent search
+  delete_these <- append(as.character(main_trib_all_id$stream),
+                         as.character(trib_order$stream) )
+  delete_these <- unique(delete_these)
+
+  g_del_for_interbas <- igraph::delete_vertices(g, V(g)[paste(delete_these)])
+
+  # Get the most downstream interbasin stream reach for which to search
+  first_interbas_id <- main_dt[match(unique(main_dt$code), main_dt$code),]
+  names(first_interbas_id)[1] <- "first_interbas_id"
+
+  # Find all streams belonging to the interbasins
+  first_interbas_id_char <- as.character(first_interbas_id$first_interbas_id)
+  tmp <- future_sapply(first_interbas_id_char,
+                       function(x) subcomponent(g_del_for_interbas, x,
+                                                mode = c("in")))
+  # Get into datatable format
+  tmp <- future_lapply(tmp, function(x) names(x))
+  tmp <- future_lapply(tmp, as.data.table)
+  tmp <- future_mapply(mapply_fun,tmp,names(tmp),SIMPLIFY = F)
+
+  # Merge as datatable
+  dt3 <- rbindlist(tmp)
+  names(dt3)[1] <- "stream"
+  setnames(dt3, "PATH_ID", "first_interbas_id")
+
+  dt3$stream <- as.numeric(dt3$stream)
+  dt3$first_interbas_id <- as.numeric(dt3$first_interbas_id)
+  setkey(dt3, stream)
+
+
+  # Correct the subcomponents: if two interbasin-IDs share the same vertex,
+  # the ID located lower will find the same subcomponent as the one located
+  # more upstream. Keep only those that belong to the upstream-ID
+  tmp_adj <- adjacent_vertices(g_del_for_interbas,
+                               first_interbas_id_char, mode = c("in"))
+  tmp_adj <- lapply(tmp_adj, function(x) names(x))
+  tmp_adj <- lapply(tmp_adj, as.data.table)
+  tmp_adj <- mapply(mapply_fun,tmp_adj,names(tmp_adj),SIMPLIFY = F)
+  tmp_adj <- rbindlist(tmp_adj)
+  tmp_adj_names <- c("stream_in_catchment", "PATH_ID")
+  setnames(tmp_adj, names(tmp_adj), tmp_adj_names)
+  tmp_adj$stream_in_catchment <- as.numeric(tmp_adj$stream_in_catchment)
+  tmp_adj$PATH_ID <- as.numeric(tmp_adj$PATH_ID)
+
+  ### Add the information of stream position
+  tmp_names <- c("PATH_ID", "seq_id")
+  tmp_adj <- main_dt[,..tmp_names] [tmp_adj, on="PATH_ID"]
+
+  # If on the same row, it means that it's duplicated
+  # Replace the catchmant (or subcomponent) stream IDs with the main outlet ID
+  fix_these <- tmp_adj[tmp_adj$stream_in_catchment %in% tmp_adj$PATH_ID,]$PATH_ID
+
+  dt3$fix_these <- ifelse(dt3$first_interbas_id %in% fix_these, NA, 0)
+  # take out the main stream reach itself, keep it
+  dt3$fix_these <- ifelse(dt3$stream %in% fix_these, 0, dt3$fix_these)
+  ### Remove all rows where the lower interbasin main stream id points to the
+  # catchment stream IDs (i.e., these belong to the next Pfaf-basin...)
+  dt3 <- na.omit(dt3)
+  dt3$fix_these=NULL
+
+
+  ### Get the Pfafstetter code for these interbasin subcomponent streams
+  tmp_names <- c("first_interbas_id", "code")
+  dt3 <- first_interbas_id[,..tmp_names] [dt3, on="first_interbas_id"]
+  ### Add the branching stream ID as well - not needed, done in next step...
+
+  ### Delete duplicate main stream ID in the interbasin stream IDs
+  dt3 <- dt3[dt3$stream %ni% main_dt$stream,]
+
+
+  # Add the tributary stream and interbasin id to the final table
+  tmp_names <- c("stream", "code")
+
+  all_stream_code <- rbind(main_trib_all_id[main_trib_all_id$stream %ni%
+                                              trib_order$stream,][,..tmp_names],
+                                              main_dt[,..tmp_names],
+                                              dt3[,..tmp_names])
+
+  ## Check if still duplicated
+  all_stream_code <- all_stream_code[!duplicated(all_stream_code),]
+  setorder(all_stream_code, stream)
+  all_stream_code <- all_stream_code[, lapply(.SD, as.integer)]
+
+  # Return data.table or raster
+  if (data_table==TRUE) {
+    return(all_stream_code)
+  } else {
+    if (!quiet) message("Creating Pfafstetter basin raster...")
+    # Reclassify the sub-catchment raster and get the map
+    pfafstetter_raster <- reclass_raster(data = all_stream_code,
+                              rast_val = "stream",
+                              new_val = "code",
+                              raster_layer = subc_raster,
+                              recl_layer = paste0(out_dir, "/", file_name),
+                              read = TRUE,
+                              quiet = quiet)
+
+    if (!quiet) message("Pfafstetter basin layer written to: ", paste0(out_dir, "/", file_name))
+    return(pfafstetter_raster)
+  }
+
+  if (!quiet) message("Pfafstetter basin delineation done")
+  stopCluster(cl)
+  plan(sequential)
 }
 
 
