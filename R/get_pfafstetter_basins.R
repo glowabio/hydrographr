@@ -170,7 +170,11 @@ cat("Preparing the graph...\n")
 # Need to re-define the graph to overcome any errors due to different IDs,
 # depending on how the graph was initially created
 g_dt_tmp <- setDT(igraph::as_data_frame(g))
-g <- graph.data.frame(g_dt_tmp[,c("from", "to")], directed = T)
+# Note: graph.data.frame is deprecated in igraph 2.0.0
+g <- graph_from_data_frame(
+  g_dt_tmp[, c("from", "to")],
+  directed = TRUE
+)
 # Get all possible paths from the outlet
 # These are named integer vectors (name is the vertex name, i.e. the subc_id,
 # and value is the position of the vertex in the graph's vertex sequence V(g))
