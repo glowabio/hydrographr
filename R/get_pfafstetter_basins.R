@@ -128,6 +128,9 @@ get_pfafstetter_basins <- function(g, subc_raster, out_dir, file_name,
   if (missing(file_name) && data_table==FALSE)
     stop("Please provide the file name of the output file.")
 
+  quiet <- FALSE
+  if (!quiet) message("Vertex attributes: ", paste(igraph::vertex_attr_names(g), collapse=", "))
+  if (!quiet) message("Edge attributes: ", paste(igraph::edge_attr_names(g), collapse=", "))
 
 cat("Setting up parallel backend...\n")
 
@@ -169,27 +172,47 @@ mapply_fun <- function(element,name){
 cat("Preparing the graph...\n")
 # Need to re-define the graph to overcome any errors due to different IDs,
 # depending on how the graph was initially created
+# So we convert to data.frame and then data.table...
 g_dt_tmp <- setDT(igraph::as_data_frame(g))
+# ... and then back to graph:
 # Note: graph.data.frame is deprecated in igraph 2.0.0
 g <- graph_from_data_frame(
   g_dt_tmp[, c("from", "to")],
   directed = TRUE
 )
+# Add a check just to be sure:
+if (!(igraph::is_igraph(g))) {
+  stop("Could not re-generate an igraph object...")
+}
+
+# Diagnostics:
+if (!quiet) {
+  message("Number of vertices: ", igraph::vcount(g))
+  message("Number of edges: ", igraph::ecount(g))
+  message("Names of edge attributes: ", igraph::edge_attr_names(g)) # none!
+  #message("Print whole graph: \n")
+  #print(g)
+}
+
 # Get all possible paths from the outlet
 # These are named integer vectors (name is the vertex name, i.e. the subc_id,
 # and value is the position of the vertex in the graph's vertex sequence V(g))
 outlet = which(degree(g, v = V(g), mode = "out")==0, useNames = T)
+
+# Get all headwaters
 #headwater = which(degree(g, v = V(g), mode = "in")==0, useNames = T) # all, slow
 # In the subsequent code, only the names (i.e. the subc_ids) are needed:
 #headwater_names <- names(heatwater)
 #rm(headwater)
 
-### Get a pre-selection of those 100 main stream candidates that have the
-### longest distance to the outlet (the most contributing stream is likely to
-### to be one of these)
+# Instead, get a pre-selection of those 100 main stream candidates that have the
+# longest distance to the outlet (the most contributing stream is likely to
+# to be one of these)
 headwater_names <- g_dt_tmp[order(-out_dist)]$from[1:100]
+# Note: If out_dist contains NA values, order(out_dist) places them at the end,
+# so they won't be selected unless there are fewer than 100 non-NA rows - for that
+# case, remove them:
 headwater_names <- headwater_names[!is.na(headwater_names)] # remove NAs if less than 100 subc_id
-
 
 
 # Stop if too few stream segments (currently three, need to go lower?)
