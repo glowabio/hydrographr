@@ -172,15 +172,19 @@ cat("Preparing the graph...\n")
 g_dt_tmp <- setDT(igraph::as_data_frame(g))
 g <- graph.data.frame(g_dt_tmp[,c("from", "to")], directed = T)
 # Get all possible paths from the outlet
+# These are named integer vectors (name is the vertex name, i.e. the subc_id,
+# and value is the position of the vertex in the graph's vertex sequence V(g))
 outlet = which(degree(g, v = V(g), mode = "out")==0, useNames = T)
 #headwater = which(degree(g, v = V(g), mode = "in")==0, useNames = T) # all, slow
-
+# In the subsequent code, only the names (i.e. the subc_ids) are needed:
+#headwater_names <- names(heatwater)
+#rm(headwater)
 
 ### Get a pre-selection of those 100 main stream candidates that have the
 ### longest distance to the outlet (the most contributing stream is likely to
 ### to be one of these)
-headwater <- g_dt_tmp[order(-out_dist)]$from[1:100]
-headwater <- headwater[!is.na(headwater)] # remove NAs if less than 100 subc_id
+headwater_names <- g_dt_tmp[order(-out_dist)]$from[1:100]
+headwater_names <- headwater_names[!is.na(headwater_names)] # remove NAs if less than 100 subc_id
 
 
 
@@ -219,13 +223,13 @@ cat("Finding the most contributing stream...", "\n")
 ### Run only with foreach (future / lapply results in strange results
 # for very small basins)
 
-l <- foreach::foreach (i=names(headwater), .inorder=FALSE,
+l <- foreach::foreach (i=headwater_names, .inorder=FALSE,
               .packages = "igraph")  %dopar% {
               out <-subcomponent(g, i, mode = c("out"))
               }
 
 ### Get into datatable format
-names(l) <- names(headwater)
+names(l) <- headwater_names
 l <- future_lapply(l, as_ids)
 l <- future_lapply(l, as.data.table)
 ### Get the path number as an additional column
@@ -262,7 +266,7 @@ main_stream <- as_ids(unlist(main_stream[[1]]))
 # remove the first item, which is the outlet
 main_stream <- main_stream[-1]
 rm(list=ls(pattern="^tmp_")) # cleanup
-rm(g_dt_tmp, sum_flow_acc_PATH_ID, headwater)
+rm(g_dt_tmp, sum_flow_acc_PATH_ID, headwater_names)
 gc()
 
 ###---------------------------------------------------------------------#
