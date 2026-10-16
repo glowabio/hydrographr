@@ -39,9 +39,7 @@ Amatulli, G., Garcia Marquez, J.R., Sethi, T., Kiesel, J., Grigoropoulou, A., Ü
 
 If you're using the environmental data, please also cite the Environment90m data:
 
-Garcia Marquez, J., Amatulli, G., Grigoropoulou, A., Schürz, M., Tomiczek, T., Buurman, M., Bremerich, V., Bego, K. and Domisch, S.: Global datasets of aggregated environmental variables at the sub-catchment scale for freshwater biodiversity modeling, in prep.
-(Please contact the authors for more up-to-date citation info.)
-
+García Márquez, J. R., Grigoropoulou, A., Tomiczek, T., Schürz, M., Bremerich, V., Torres-Cambas, Y., Buurman, M., Amatulli, G., and Domisch, S. (2026): Environment90m - globally standardized environmental variables for freshwater science at high spatial resolution. _Earth System Science Data_, 18, 1541-1559, [doi:10.5194/essd-18-1541-2026](https://doi.org/10.5194/essd-18-1541-2026).
 
 We thank [NFDI4Biodiversity](https://www.nfdi4biodiversity.org/en/) and [NFDI4Earth](https://www.nfdi4earth.de/) for providing the funding that helped us getting the hydrographr package together!
 
