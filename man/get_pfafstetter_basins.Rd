@@ -10,7 +10,8 @@ get_pfafstetter_basins(
   out_dir,
   file_name,
   data_table = FALSE,
-  n_cores = NULL
+  n_cores = NULL,
+  quiet = FALSE
 )
 }
 \arguments{
@@ -37,6 +38,9 @@ Default is FALSE.}
 
 \item{n_cores}{numeric. Number of cores used for parallelisation. Default is
 NULL (= detectCores(logical=FALSE)-1). Optional.}
+
+\item{quiet}{logical. If FALSE, the some diagnostic output will be printed.
+Default is FALSE.}
 }
 \value{
 Either a data.table, or a raster (terra object) loaded into R. In
