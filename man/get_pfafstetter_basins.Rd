@@ -97,7 +97,8 @@ pfafstetter <- get_pfafstetter_basins(g = g_subset ,
                                       out_dir = out_dir,
                                       file_name = "pfafstetter_raster.tif",
                                       data_table = FALSE,
-                                      n_cores = 4)
+                                      n_cores = 4,
+                                      quiet = FALSE)
 
 
 }
