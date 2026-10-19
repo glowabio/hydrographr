@@ -94,7 +94,8 @@
 #'                                       out_dir = out_dir,
 #'                                       file_name = "pfafstetter_raster.tif",
 #'                                       data_table = FALSE,
-#'                                       n_cores = 4)
+#'                                       n_cores = 4,
+#'                                       quiet = FALSE)
 #'
 #'
 #' @note You can use the online map at https://geo.igb-berlin.de/maps/351/view
@@ -144,6 +145,7 @@ get_pfafstetter_basins <- function(g, subc_raster, out_dir, file_name,
 
   # Check parallel backend depending on the OS
   if (get_os() == "windows") {
+    plan(sequential) # first reset any old connection
     plan(multisession, workers = n_cores)
   }
 
@@ -526,15 +528,18 @@ get_pfafstetter_basins <- function(g, subc_raster, out_dir, file_name,
                               raster_layer = subc_raster,
                               recl_layer = paste0(out_dir, "/", file_name),
                               read = TRUE,
-                              quiet = quiet)
+                              quiet = TRUE)
 
     if (!quiet) message("Pfafstetter basin layer written to: ", paste0(out_dir, "/", file_name))
     return(pfafstetter_raster)
   }
 
   if (!quiet) message("Pfafstetter basin delineation done")
-  stopCluster(cl)
+
+
   plan(sequential)
+  stopCluster(cl)
+
 }
 
 
