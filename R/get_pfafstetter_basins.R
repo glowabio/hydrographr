@@ -534,11 +534,12 @@ get_pfafstetter_basins <- function(g, subc_raster, out_dir, file_name,
     return(pfafstetter_raster)
   }
 
-  if (!quiet) message("Pfafstetter basin delineation done")
+  #if (!quiet) message("Pfafstetter basin delineation done")
 
-
-  plan(sequential)
-  stopCluster(cl)
+  # these are never reached, as the function returns before hand.
+  # TODO Fix the paralell setup!!
+  #plan(sequential)
+  #stopCluster(cl)
 
 }
 
