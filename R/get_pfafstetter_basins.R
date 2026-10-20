@@ -222,7 +222,7 @@ get_pfafstetter_basins <- function(g, subc_raster, out_dir, file_name,
   headwater_names <- headwater_names[!is.na(headwater_names)] # remove NAs if less than 100 subc_id
 
   # Stop if too few stream segments (currently three, need to go lower?)
-  if (gsize(g_subset)<3) {
+  if (gsize(g)<3) {
     stop("The input basin has too few stream segments / sub-catchments. Please
          select another outlet segment with get_catchment_graph()")
   }

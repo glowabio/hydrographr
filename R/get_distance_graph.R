@@ -58,7 +58,6 @@
 #' @md
 #'
 #'
-#'
 #' @note
 #' For getting the actual IDs of the path between two sub-catchments,
 #' you can use the igraph function "all_shortest_paths":
