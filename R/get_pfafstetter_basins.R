@@ -158,6 +158,8 @@ get_pfafstetter_basins <- function(g, subc_raster, out_dir, file_name,
   # Initialize separate parallel backend for the *foreach* framework,
   # for functions such as: foreach(...) %dopar% {...}
   cl <- makePSOCKcluster(n_cores)
+  # maybe force it to stop PSOCK workers on exit? (TODO test this)
+  #on.exit(parallel::stopCluster(cl), add = TRUE)
   registerDoParallel(cl)
   if (!quiet) message("Using ", foreach::getDoParWorkers(), " CPUs (for foreach/dopar)...")
 
@@ -262,6 +264,9 @@ get_pfafstetter_basins <- function(g, subc_raster, out_dir, file_name,
   ) %dopar% {
     out <-subcomponent(g, i, mode = c("out"))
   }
+  # maybe stop PSOCK workers here, as we are not using any more
+  # foreach / %dopar% further below: (TODO test this)
+  parallel::stopCluster(cl)
 
   ### Get into datatable format
   # TODO: Check if this part really benefits from parallelisation, or whether
@@ -543,7 +548,7 @@ get_pfafstetter_basins <- function(g, subc_raster, out_dir, file_name,
   #if (!quiet) message("Pfafstetter basin delineation done")
 
   # these are never reached, as the function returns before hand.
-  # TODO Fix the paralell setup!!
+  # TODO Test my suggested fix for the paralell setup (above)
   #plan(sequential)
   #stopCluster(cl)
 
