@@ -143,20 +143,23 @@ get_pfafstetter_basins <- function(g, subc_raster, out_dir, file_name,
     n_cores <- detectCores(logical = FALSE) - 1
   }
 
-  # Check parallel backend depending on the OS
+  # Check parallel backend (for future framework) depending on the OS
+  # Initialize parallel backend for the *future* framework,
+  # for functions such as: future_lapply, future_mapply, future_sapply
   if (get_os() == "windows") {
     plan(sequential) # first reset any old connection
     plan(multisession, workers = n_cores)
-  }
-
-  if (get_os() == "osx" || get_os() == "linux")  {
+  } else if (get_os() == "osx" || get_os() == "linux")  {
     plan(multicore, workers = n_cores)
   }
+  if (!quiet) message("Using ", future::nbrOfWorkers(), " CPUs (for future_*apply)...")
 
   # Foreach
+  # Initialize separate parallel backend for the *foreach* framework,
+  # for functions such as: foreach(...) %dopar% {...}
   cl <- makePSOCKcluster(n_cores)
   registerDoParallel(cl)
-  if (!quiet) message("Using ", foreach::getDoParWorkers(), " CPUs...")
+  if (!quiet) message("Using ", foreach::getDoParWorkers(), " CPUs (for foreach/dopar)...")
 
   # Avoid exponential numbers in the reclassification
   options(scipen=999)
@@ -261,6 +264,8 @@ get_pfafstetter_basins <- function(g, subc_raster, out_dir, file_name,
   }
 
   ### Get into datatable format
+  # TODO: Check if this part really benefits from parallelisation, or whether
+  # the overhead is not too expensive.
   names(l) <- headwater_names
   l <- future_lapply(l, as_ids)
   l <- future_lapply(l, as.data.table)
