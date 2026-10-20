@@ -250,10 +250,11 @@ get_pfafstetter_basins <- function(g, subc_raster, out_dir, file_name,
   if (!quiet) message("Finding the most contributing stream...")
   # Run only with foreach (future / lapply results in strange results
   # for very small basins)
-
+  # Setting .inorder to TRUE, as we require the result to be in the same order
+  # as before, so that setting names(l) <- headwater_names makes sense!
   l <- foreach::foreach(
     i=headwater_names,
-    .inorder=FALSE,
+    .inorder=TRUE,
     .packages = "igraph"
   ) %dopar% {
     out <-subcomponent(g, i, mode = c("out"))
